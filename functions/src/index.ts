@@ -11,3 +11,4 @@ export { collectWorldItem } from './functions/collectWorldItem';
 export { equipItem, unequipItem } from './functions/equipItem';
 export { purchaseItem } from './functions/purchaseItem';
 export { restAtInn } from './functions/restAtInn';
+export { useItem } from './functions/useItem';

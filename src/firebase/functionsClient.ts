@@ -105,3 +105,8 @@ export async function callRestAtInn(): Promise<void> {
   const fn = httpsCallable(functions, 'restAtInn');
   await fn({});
 }
+
+export async function callUseItem(itemId: string): Promise<void> {
+  const fn = httpsCallable<{ itemId: string }, unknown>(functions, 'useItem');
+  await fn({ itemId });
+}

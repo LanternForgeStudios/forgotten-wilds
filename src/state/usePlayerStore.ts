@@ -1,15 +1,26 @@
 import { create } from 'zustand';
-import type { Player } from '@/types';
+import type { EquipmentSlot, Player } from '@/types';
 
 interface PlayerState {
   player: Player | null;
   displayName: string | null;
   hydrate: (player: Player, displayName: string) => void;
+  /** Optimistic-only: reflects an equip/unequip locally before the round-trip resolves, so the UI
+   *  feels instant. The Cloud Function call this accompanies (and the resyncSave after it) is
+   *  still what actually persists the change and remains the source of truth - this never writes
+   *  anywhere itself, it just avoids a visible lag in a value the player already legitimately owns. */
+  patchEquipment: (slot: EquipmentSlot, itemId: string | null) => void;
 }
 
-/** Populated only from Cloud Function responses or reads of users/{uid} — never mutated locally. */
-export const usePlayerStore = create<PlayerState>((set) => ({
+/** Populated only from Cloud Function responses or reads of users/{uid} — never mutated locally,
+ *  except the deliberate, narrow optimistic-UI exception in patchEquipment above. */
+export const usePlayerStore = create<PlayerState>((set, get) => ({
   player: null,
   displayName: null,
   hydrate: (player, displayName) => set({ player, displayName }),
+  patchEquipment: (slot, itemId) => {
+    const { player } = get();
+    if (!player) return;
+    set({ player: { ...player, equipment: { ...player.equipment, [slot]: itemId } } });
+  },
 }));

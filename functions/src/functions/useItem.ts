@@ -1,0 +1,51 @@
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { getFirestore } from 'firebase-admin/firestore';
+import { ITEMS } from '../data/items';
+import type { PlayerSave } from '../shared-types';
+
+interface UseItemRequest {
+  itemId: string;
+}
+
+/** Consuming a healing/spirit item outside of combat - reuses the same effect data combat's
+ *  'item' action applies, just without a combat session in the loop. */
+export const useItem = onCall<UseItemRequest>(async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
+
+  const itemId = request.data?.itemId;
+  const def = itemId ? ITEMS[itemId] : undefined;
+  const effect = def?.effect;
+  if (!effect) {
+    throw new HttpsError('invalid-argument', 'That item cannot be used this way.');
+  }
+
+  const db = getFirestore();
+  const userRef = db.collection('users').doc(uid);
+
+  return db.runTransaction(async (tx) => {
+    const snap = await tx.get(userRef);
+    if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
+    const save = snap.data() as PlayerSave;
+
+    const entry = save.inventory.find((i) => i.itemId === itemId);
+    if (!entry || entry.quantity < 1) {
+      throw new HttpsError('failed-precondition', 'You do not have that item.');
+    }
+
+    if (effect.healHp) {
+      save.player.stats.hp = Math.min(save.player.stats.maxHp, save.player.stats.hp + effect.healHp);
+    }
+    if (effect.healSpirit) {
+      save.player.stats.spirit = Math.min(save.player.stats.maxSpirit, save.player.stats.spirit + effect.healSpirit);
+    }
+
+    entry.quantity -= 1;
+    save.inventory = save.inventory.filter((i) => i.quantity > 0);
+
+    save.updatedAt = Date.now();
+    tx.set(userRef, save);
+
+    return { stats: save.player.stats, inventory: save.inventory };
+  });
+});
