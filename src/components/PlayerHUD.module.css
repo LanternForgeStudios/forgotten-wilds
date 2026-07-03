@@ -57,3 +57,36 @@
   color: var(--fw-accent);
   opacity: 0.9;
 }
+
+.account {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--fw-panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.accountEmail {
+  font-size: 10px;
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signOutButton {
+  background: transparent;
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.signOutButton:hover {
+  color: var(--fw-danger);
+  border-color: var(--fw-danger);
+}

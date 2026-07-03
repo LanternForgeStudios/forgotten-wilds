@@ -69,8 +69,8 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 - `functions/src/data/` — the **authoritative** copies of the same content (prices, stats, loot,
   quest definitions) that the client's copies must stay in sync with by hand; the client copies
   are for display only and are never trusted for anything that persists.
-- `functions/src/engine/` — pure combat/quest/equipment logic, unit-testable independent of
-  Firestore.
+- `functions/src/engine/` — pure combat/quest/equipment logic, unit-tested independent of
+  Firestore (`cd functions && npm test`, Vitest).
 - `functions/src/functions/` — the callable Cloud Functions: `createCharacter`, `startEncounter`,
   `resolveCombatAction`, `talkToNpc`, `enterLocation`, `collectWorldItem`, `equipItem`/
   `unequipItem`, `purchaseItem`, `restAtInn`.
@@ -89,7 +89,7 @@ Equipment, **J** for Journal of Legends.
   sequence-breaks (e.g. rushes into Hollow Rail Mine before finishing the Ironwood Trail quest)
   can still collect the lantern relic, but that specific quest step won't retroactively credit
   once earlier quests catch up. Normal linear play is unaffected.
-- No automated test suite; combat/quest engine logic is written as pure functions specifically so
-  Vitest coverage can be added later without refactoring.
+- Vitest covers the pure combat/quest/equipment engine functions (`functions/src/engine/*.test.ts`)
+  but not the Cloud Functions themselves (Firestore transactions) or any client code yet.
 - Character sprites are single-frame placeholders (see `public/CREDITS.md`) rather than full
   4-direction walk-cycle sheets — swap via `src/assets/registry.ts`, no code changes needed.

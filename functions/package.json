@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "test": "vitest run",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "deploy": "firebase deploy --only functions"
@@ -19,6 +20,7 @@
     "firebase-functions": "^6.0.0"
   },
   "devDependencies": {
-    "typescript": "~5.7.0"
+    "typescript": "~5.7.0",
+    "vitest": "^4.1.9"
   }
 }
