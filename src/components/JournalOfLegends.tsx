@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
 import { useJournalStore } from '@/state/useJournalStore';
+import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { ENEMIES, LOCATIONS, LORE_ENTRIES } from '@/data';
 import styles from './CharacterMenu.module.css';
 
@@ -20,6 +21,7 @@ const TABS: { id: Tab; label: string }[] = [
 export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const journal = useJournalStore((s) => s.journal);
   const [tab, setTab] = useState<Tab>('creatures');
+  useOverlayClose(onClose);
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -107,7 +109,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
           </div>
         )}
 
-        <p className={styles.closeHint}>Click outside to close</p>
+        <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );

@@ -5,6 +5,7 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { callPurchaseItem } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { SHOP_LISTINGS, ITEMS, EQUIPMENT } from '@/data';
 import styles from './CharacterMenu.module.css';
 
@@ -17,6 +18,7 @@ export function Shop({ onClose }: ShopProps) {
   const uid = useAuthStore((s) => s.user?.uid);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useOverlayClose(onClose);
 
   async function buy(itemId: string) {
     if (busy) return;
@@ -62,7 +64,7 @@ export function Shop({ onClose }: ShopProps) {
         {error && (
           <p style={{ color: 'var(--fw-danger)', fontSize: 13 }}>{error}</p>
         )}
-        <p className={styles.closeHint}>Click outside to close</p>
+        <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );

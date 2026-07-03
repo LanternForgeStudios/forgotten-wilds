@@ -69,7 +69,12 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
       },
       currentLocationId: STARTING_LOCATION_ID,
     },
-    inventory: [{ itemId: 'healing-poultice', quantity: 2 }],
+    // Starting equipment must also exist in inventory, or unequipping it leaves it unrecoverable
+    // (equip/unequip never grant or destroy items - they only reference what's already owned).
+    inventory: [
+      { itemId: 'healing-poultice', quantity: 2 },
+      { itemId: 'keepers-lantern', quantity: 1 },
+    ],
     quests: {},
     journal: {
       creaturesDiscovered: [],

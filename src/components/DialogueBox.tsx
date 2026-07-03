@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { DialogueLine } from '@/types';
 import { getAssetUrl } from '@/assets/assetManager';
 import { Panel } from './common/Panel';
@@ -25,6 +25,22 @@ export function DialogueBox({ lines, portraitAssetId, onClose, footer }: Dialogu
     }
   }
 
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === ' ') {
+        e.preventDefault();
+        advance();
+      }
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, isLast, onClose]);
+
   if (!line) return null;
 
   return (
@@ -35,7 +51,7 @@ export function DialogueBox({ lines, portraitAssetId, onClose, footer }: Dialogu
           <p className={styles.speaker}>{line.speaker}</p>
           <p className={styles.text}>{line.text}</p>
           {isLast && footer}
-          <p className={styles.hint}>{isLast ? 'Click to close' : 'Click to continue'}</p>
+          <p className={styles.hint}>{isLast ? 'Click or Space to close' : 'Click or Space to continue'}</p>
         </div>
       </Panel>
     </div>

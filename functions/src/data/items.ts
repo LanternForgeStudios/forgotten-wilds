@@ -27,6 +27,8 @@ export const SHOP_PRICES: Record<string, number> = {
   'healing-poultice': 15,
   'spirit-draught': 18,
   'lantern-oil': 40,
+  // A spare standard-issue lantern - cheap safety net for anyone who unequips their only one.
+  'keepers-lantern': 8,
 };
 
 export const INN_REST_COST = 10;

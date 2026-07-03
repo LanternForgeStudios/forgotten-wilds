@@ -75,6 +75,7 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'healing-poultice', price: 15, currency: 'gold' },
   { itemId: 'spirit-draught', price: 18, currency: 'gold' },
   { itemId: 'lantern-oil', price: 40, currency: 'gold' },
+  { itemId: 'keepers-lantern', price: 8, currency: 'gold' },
 ];
 
 export const INN_REST_COST = 10;

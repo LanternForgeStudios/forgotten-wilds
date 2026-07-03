@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { PlayerHUD } from '@/components/PlayerHUD';
-import { TileGrid } from '@/components/exploration/TileGrid';
+import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
 import { Panel } from '@/components/common/Panel';
 import { QuestLog } from '@/components/QuestLog';
 import { CharacterMenu } from '@/components/CharacterMenu';
@@ -36,6 +36,13 @@ export function DungeonScene() {
 
   useEffect(() => {
     function handleInteract(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        if (message) setMessage(null);
+        else if (questLogOpen) setQuestLogOpen(false);
+        else if (menuOpen) setMenuOpen(false);
+        else if (journalOpen) setJournalOpen(false);
+        return;
+      }
       if (e.key === 'l' || e.key === 'L') {
         setQuestLogOpen((open) => !open);
         return;
@@ -87,6 +94,21 @@ export function DungeonScene() {
     );
   }
 
+  const entities: GridEntity[] = map.objects
+    .filter((o) => o.type === 'interactable')
+    .map((o) => {
+      if (o.refId === 'coalbound-warden') {
+        return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'battle.enemy.coalbound-warden', label: '???' };
+      }
+      return {
+        id: o.refId ?? `${o.x},${o.y}`,
+        x: o.x,
+        y: o.y,
+        spriteAssetId: 'icon.item.miners-lost-lantern',
+        label: 'Lantern Relic',
+      };
+    });
+
   return (
     <div className={styles.wrap}>
       <PlayerHUD />
@@ -96,6 +118,7 @@ export function DungeonScene() {
         tilesetColumns={TILESET_COLUMNS}
         player={position}
         playerSpriteAssetId="sprite.player"
+        entities={entities}
       />
       <p className={styles.hint}>
         Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I
@@ -116,7 +139,9 @@ export function DungeonScene() {
         >
           <Panel style={{ width: 'min(600px, 90vw)' }}>
             <p style={{ margin: 0 }}>{message}</p>
-            <p style={{ fontSize: 12, opacity: 0.7, textAlign: 'right', margin: '8px 0 0' }}>Click to close</p>
+            <p style={{ fontSize: 12, opacity: 0.7, textAlign: 'right', margin: '8px 0 0' }}>
+              Click or Esc to close
+            </p>
           </Panel>
         </div>
       )}

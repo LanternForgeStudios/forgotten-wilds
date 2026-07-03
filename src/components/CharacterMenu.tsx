@@ -6,6 +6,7 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { callEquipItem, callUnequipItem } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { ITEMS, EQUIPMENT } from '@/data';
 import { EQUIPMENT_SLOTS } from '@/types';
 import styles from './CharacterMenu.module.css';
@@ -30,6 +31,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
   const player = usePlayerStore((s) => s.player);
   const uid = useAuthStore((s) => s.user?.uid);
   const [busy, setBusy] = useState(false);
+  useOverlayClose(onClose);
 
   async function equip(itemId: string) {
     if (busy) return;
@@ -120,7 +122,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
           </div>
         )}
 
-        <p className={styles.closeHint}>Click outside to close</p>
+        <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );

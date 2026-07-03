@@ -1,5 +1,6 @@
 import { Panel } from './common/Panel';
 import { useQuestStore } from '@/state/useQuestStore';
+import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { QUESTS } from '@/data';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
 import styles from './QuestLog.module.css';
@@ -10,10 +11,11 @@ interface QuestLogProps {
 
 export function QuestLog({ onClose }: QuestLogProps) {
   const progress = useQuestStore((s) => s.progress);
+  useOverlayClose(onClose);
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <Panel className={styles.panel} style={{ textAlign: 'left' }}>
+      <Panel className={styles.panel} style={{ textAlign: 'left' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <h2 className={styles.title}>Journal of Legends — Quests</h2>
         {QUESTS.map((quest) => {
           const status = effectiveQuestStatus(quest, progress);
@@ -42,7 +44,7 @@ export function QuestLog({ onClose }: QuestLogProps) {
             </div>
           );
         })}
-        <p className={styles.closeHint}>Click to close</p>
+        <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );

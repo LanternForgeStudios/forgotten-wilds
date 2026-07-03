@@ -4,6 +4,7 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { callRestAtInn } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { INN_REST_COST } from '@/data';
 import styles from './CharacterMenu.module.css';
 
@@ -17,6 +18,7 @@ export function Inn({ onClose }: InnProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rested, setRested] = useState(false);
+  useOverlayClose(onClose);
 
   async function rest() {
     if (busy) return;
@@ -49,7 +51,7 @@ export function Inn({ onClose }: InnProps) {
           </button>
         )}
         {error && <p style={{ color: 'var(--fw-danger)', fontSize: 13 }}>{error}</p>}
-        <p className={styles.closeHint}>Click outside to close</p>
+        <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );
