@@ -7,7 +7,7 @@ import {
   type ResolveCombatActionResponse,
 } from '@/firebase/functionsClient';
 import { fetchPlayerSave } from '@/firebase/saveService';
-import { hydrateAllStores } from '@/state/hydrate';
+import { hydrateAllStores, resyncSave } from '@/state/hydrate';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useSceneStore, type SceneName } from '@/state/useSceneStore';
@@ -84,6 +84,14 @@ export function CombatScene() {
       setPlayerHp(res.playerHp);
       setPlayerSpirit(res.playerSpirit);
 
+      // An item's inventory count only lives in Firestore, not in the combat response above, so
+      // it must be resynced here too - otherwise the displayed quantity never decrements mid-fight
+      // even though the server correctly consumed it, and using it again eventually fails once the
+      // real (server-side) stock hits zero while the stale client count still shows some left.
+      if (type === 'item' && uid) {
+        await resyncSave(uid);
+      }
+
       if (res.phase === 'continue') {
         setPhase('playerTurn');
         return;
@@ -108,7 +116,15 @@ export function CombatScene() {
     const targetLocationId = phase === 'defeat' ? 'ash-hallow' : locationId;
     const targetLocation = LOCATIONS.find((l) => l.id === targetLocationId);
     const scene = targetLocation ? LOCATION_KIND_TO_SCENE[targetLocation.kind] : 'town';
-    goTo(scene, { locationId: targetLocationId });
+    // Restore the exact tile the fight was triggered from, rather than dumping the player back at
+    // the map's default spawn - but only within the same location; a defeat sends the player to
+    // Ash Hallow instead, where the original coordinates from a different map don't apply.
+    const preserveSpawn = targetLocationId === locationId;
+    goTo(scene, {
+      locationId: targetLocationId,
+      spawnX: preserveSpawn ? params.spawnX : undefined,
+      spawnY: preserveSpawn ? params.spawnY : undefined,
+    });
   }
 
   const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');

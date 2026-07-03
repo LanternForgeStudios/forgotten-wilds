@@ -27,9 +27,9 @@ export function DungeonScene() {
   const { map, position, facingDelta } = useLocationExploration({
     locationId: LOCATION_ID,
     suspended: message !== null || questLogOpen || menuOpen || journalOpen,
-    onEncounterZoneStep: (chance) => {
+    onEncounterZoneStep: (chance, pos) => {
       if (Math.random() < chance) {
-        goTo('combat', { locationId: LOCATION_ID });
+        goTo('combat', { locationId: LOCATION_ID, spawnX: pos.x, spawnY: pos.y });
       }
     },
   });
@@ -76,7 +76,12 @@ export function DungeonScene() {
       } else if (obj?.refId === 'coalbound-warden') {
         const ready = questProgress['the-miners-lantern']?.status === 'completed';
         if (ready) {
-          goTo('combat', { locationId: LOCATION_ID, bossId: 'coalbound-warden' });
+          goTo('combat', {
+            locationId: LOCATION_ID,
+            bossId: 'coalbound-warden',
+            spawnX: position.x,
+            spawnY: position.y,
+          });
         } else {
           setMessage('Something vast and ember-lit stirs in the dark ahead — but the way feels barred to you, for now.');
         }

@@ -19,9 +19,9 @@ export function OverworldScene() {
   const { map, position } = useLocationExploration({
     locationId: LOCATION_ID,
     suspended: questLogOpen || menuOpen || journalOpen,
-    onEncounterZoneStep: (chance) => {
+    onEncounterZoneStep: (chance, pos) => {
       if (Math.random() < chance) {
-        goTo('combat', { locationId: LOCATION_ID });
+        goTo('combat', { locationId: LOCATION_ID, spawnX: pos.x, spawnY: pos.y });
       }
     },
   });

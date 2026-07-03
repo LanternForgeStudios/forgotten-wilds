@@ -16,7 +16,7 @@ const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
 interface UseLocationExplorationOptions {
   locationId: string;
   suspended?: boolean;
-  onEncounterZoneStep?: (chance: number) => void;
+  onEncounterZoneStep?: (chance: number, pos: GridPosition) => void;
 }
 
 /** Shared map-load + spawn-resolution + movement + transition logic for Town/Overworld/Dungeon scenes. */
@@ -44,6 +44,9 @@ export function useLocationExploration({
 
   const spawnPoint = useMemo(() => {
     if (!map) return { x: 1, y: 1 };
+    if (params.locationId === locationId && params.spawnX !== undefined && params.spawnY !== undefined) {
+      return { x: params.spawnX, y: params.spawnY };
+    }
     const spawnId = params.locationId === locationId ? (params.spawnId ?? 'default') : 'default';
     const spawn = map.objects.find((o) => o.type === 'spawnPoint' && o.refId === spawnId);
     return spawn ? { x: spawn.x, y: spawn.y } : { x: 1, y: 1 };
@@ -69,7 +72,7 @@ export function useLocationExploration({
       (o) => o.type === 'encounterZone' && o.x === pos.x && o.y === pos.y,
     );
     if (zone) {
-      onEncounterZoneStep?.(zone.encounterChance ?? 0.15);
+      onEncounterZoneStep?.(zone.encounterChance ?? 0.15, pos);
     }
   };
 

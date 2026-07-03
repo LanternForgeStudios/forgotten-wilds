@@ -11,6 +11,10 @@ export type SceneName =
 export interface SceneParams {
   locationId?: string;
   spawnId?: string;
+  /** Raw tile coordinates, preferred over spawnId when both target the same locationId (e.g.
+   *  restoring the exact spot combat was triggered from, rather than a named map entrance). */
+  spawnX?: number;
+  spawnY?: number;
   bossId?: string;
 }
 
