@@ -1,0 +1,70 @@
+import type { Skill } from '@/types';
+
+// Display copy only — functions/src/data/skills.ts is the authoritative source used in combat resolution.
+export const SKILLS: Skill[] = [
+  {
+    id: 'keepers-strike',
+    name: "Keeper's Strike",
+    description: 'A focused blow channeling lantern-light through the blade, striking harder than a plain attack.',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 18,
+    spiritCost: 0,
+  },
+  {
+    id: 'lantern-flame',
+    name: 'Lantern Flame',
+    description: 'Spirit fire drawn from the Keeper\'s lantern, searing restless spirits — especially coal-touched ones.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 22,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['coalSpirits'],
+  },
+  // Enemy signature moves
+  {
+    id: 'mothling-dustwing',
+    name: 'Dustwing Flurry',
+    description: 'A disorienting flurry of moth-wing dust.',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 10,
+    spiritCost: 0,
+  },
+  {
+    id: 'miner-pickaxe-swing',
+    name: 'Rusted Pickaxe Swing',
+    description: "A wild, spirit-driven swing of a rusted mining pick.",
+    kind: 'skill',
+    damageType: 'physical',
+    power: 14,
+    spiritCost: 0,
+  },
+  {
+    id: 'coalspirit-cinderburst',
+    name: 'Cinder Burst',
+    description: 'A burst of smoldering coal-spirit embers.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 16,
+    spiritCost: 0,
+  },
+  {
+    id: 'warden-coal-slam',
+    name: 'Coalbound Slam',
+    description: "The Warden's fists crash down, wreathed in ember and rail-iron.",
+    kind: 'skill',
+    damageType: 'physical',
+    power: 20,
+    spiritCost: 0,
+  },
+  {
+    id: 'warden-warden-wrath',
+    name: "Warden's Wrath",
+    description: 'A second-phase eruption of pent-up spirit fury, unlocked once the Warden is wounded.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 30,
+    spiritCost: 0,
+  },
+];

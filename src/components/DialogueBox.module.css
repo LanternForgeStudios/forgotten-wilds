@@ -1,0 +1,48 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 20;
+}
+
+.box {
+  width: min(680px, 92vw);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.portrait {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  image-rendering: pixelated;
+}
+
+.body {
+  flex: 1;
+}
+
+.speaker {
+  margin: 0 0 6px;
+  color: var(--fw-accent);
+  font-weight: bold;
+}
+
+.text {
+  margin: 0;
+  line-height: 1.5;
+  min-height: 3em;
+}
+
+.hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--fw-text-dim);
+  text-align: right;
+}

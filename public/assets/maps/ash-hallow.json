@@ -1,0 +1,288 @@
+{
+  "width": 14,
+  "height": 10,
+  "tilewidth": 16,
+  "tileheight": 16,
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
+    }
+  ],
+  "layers": [
+    {
+      "type": "tilelayer",
+      "name": "ground",
+      "width": 14,
+      "height": 10,
+      "data": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "type": "objectgroup",
+      "name": "objects",
+      "objects": [
+        {
+          "type": "spawnPoint",
+          "x": 96,
+          "y": 112,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "default"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 192,
+          "y": 80,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ironwood-trail"
+            }
+          ]
+        },
+        {
+          "type": "npc",
+          "x": 48,
+          "y": 48,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "elias-rowan"
+            }
+          ]
+        },
+        {
+          "type": "npc",
+          "x": 96,
+          "y": 48,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "mara-vale"
+            }
+          ]
+        },
+        {
+          "type": "npc",
+          "x": 144,
+          "y": 48,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "silas-flint"
+            }
+          ]
+        },
+        {
+          "type": "npc",
+          "x": 48,
+          "y": 96,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "juniper-reed"
+            }
+          ]
+        },
+        {
+          "type": "npc",
+          "x": 144,
+          "y": 96,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "nell-ashby"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 208,
+          "y": 80,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ironwood-trail"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "tilecount": 132,
+      "tiles": [
+        {
+          "id": 24,
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

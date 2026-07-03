@@ -1,0 +1,59 @@
+.hud {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  width: 220px;
+  font-size: 13px;
+}
+
+.name {
+  margin: 0 0 6px;
+  font-weight: bold;
+  color: var(--fw-accent);
+  display: flex;
+  justify-content: space-between;
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.barLabel {
+  width: 16px;
+  opacity: 0.8;
+}
+
+.barTrack {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.barFillHp {
+  height: 100%;
+  background: var(--fw-hp);
+}
+
+.barFillSpirit {
+  height: 100%;
+  background: var(--fw-spirit);
+}
+
+.barValue {
+  width: 56px;
+  text-align: right;
+  opacity: 0.85;
+  font-size: 11px;
+}
+
+.gold {
+  margin-top: 6px;
+  color: var(--fw-accent);
+  opacity: 0.9;
+}

@@ -1,0 +1,51 @@
+:root {
+  --fw-bg: #1b1611;
+  --fw-bg-deep: #120e0b;
+  --fw-panel: #2a2118;
+  --fw-panel-border: #6b4f2e;
+  --fw-text: #ece1cf;
+  --fw-text-dim: #b8a888;
+  --fw-accent: #e0a94a;
+  --fw-accent-dim: #a8762c;
+  --fw-hp: #b34b3c;
+  --fw-spirit: #4b7fa8;
+  --fw-danger: #c0392b;
+
+  --fw-font: 'Segoe UI', system-ui, sans-serif;
+
+  color-scheme: dark;
+  color: var(--fw-text);
+  background: var(--fw-bg-deep);
+  font-family: var(--fw-font);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.app-shell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fw-text-dim);
+}

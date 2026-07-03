@@ -1,0 +1,118 @@
+.wrap {
+  position: relative;
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  background-size: cover;
+  background-position: center;
+}
+
+.enemyArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.enemySprite {
+  image-rendering: pixelated;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.5));
+}
+
+.enemyBar {
+  width: min(360px, 80vw);
+  margin: 0 auto 12px;
+}
+
+.enemyName {
+  text-align: center;
+  margin: 0 0 4px;
+  color: var(--fw-text);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.hpTrack {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+.hpFill {
+  height: 100%;
+  background: var(--fw-hp);
+  transition: width 300ms ease;
+}
+
+.bottomPanel {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.logPanel {
+  flex: 1;
+  min-height: 120px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.playerPanel {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.playerName {
+  margin: 0 0 8px;
+  font-weight: bold;
+  color: var(--fw-accent);
+}
+
+.actionsPanel {
+  width: 260px;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-content: start;
+}
+
+.actionButton {
+  background: var(--fw-accent-dim);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  padding: 10px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.actionButton:hover:not(:disabled) {
+  background: var(--fw-accent);
+  color: var(--fw-bg-deep);
+}
+
+.actionButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}

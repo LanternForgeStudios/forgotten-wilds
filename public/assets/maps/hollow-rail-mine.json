@@ -1,0 +1,592 @@
+{
+  "width": 18,
+  "height": 10,
+  "tilewidth": 16,
+  "tileheight": 16,
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
+    }
+  ],
+  "layers": [
+    {
+      "type": "tilelayer",
+      "name": "ground",
+      "width": 18,
+      "height": 10,
+      "data": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "type": "objectgroup",
+      "name": "objects",
+      "objects": [
+        {
+          "type": "spawnPoint",
+          "x": 16,
+          "y": 80,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ironwood-trail"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 0,
+          "y": 80,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ironwood-trail"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-hollow-rail-mine"
+            }
+          ]
+        },
+        {
+          "type": "interactable",
+          "x": 208,
+          "y": 48,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "miners-lost-lantern"
+            }
+          ]
+        },
+        {
+          "type": "interactable",
+          "x": 256,
+          "y": 112,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "coalbound-warden"
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 48,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 48,
+          "y": 96,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 64,
+          "y": 32,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 64,
+          "y": 80,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 80,
+          "y": 64,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 80,
+          "y": 112,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 96,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 96,
+          "y": 96,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 112,
+          "y": 32,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 112,
+          "y": 80,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 128,
+          "y": 64,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 128,
+          "y": 112,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 144,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 144,
+          "y": 96,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 160,
+          "y": 32,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 160,
+          "y": 80,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 176,
+          "y": 64,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 176,
+          "y": 112,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 192,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 192,
+          "y": 96,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 208,
+          "y": 32,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 208,
+          "y": 80,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 224,
+          "y": 64,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 224,
+          "y": 112,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 240,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 240,
+          "y": 96,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.22
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "tilecount": 132,
+      "tiles": [
+        {
+          "id": 24,
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

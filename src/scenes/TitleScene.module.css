@@ -1,0 +1,86 @@
+.wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  min-height: 100svh;
+  background: radial-gradient(ellipse at center, var(--fw-bg) 0%, var(--fw-bg-deep) 100%);
+  text-align: center;
+}
+
+.title {
+  font-size: 48px;
+  letter-spacing: 2px;
+  color: var(--fw-accent);
+  margin: 0;
+  text-shadow: 0 2px 12px rgba(224, 169, 74, 0.35);
+}
+
+.tagline {
+  color: var(--fw-text-dim);
+  margin: 0 0 8px;
+  font-style: italic;
+}
+
+.panel {
+  width: min(360px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.button {
+  background: var(--fw-accent-dim);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.button:hover {
+  background: var(--fw-accent);
+  color: var(--fw-bg-deep);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input {
+  background: var(--fw-bg-deep);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  padding: 10px 12px;
+  font-size: 15px;
+  border-radius: 4px;
+}
+
+.linkButton {
+  background: transparent;
+  border: none;
+  color: var(--fw-text-dim);
+  text-decoration: underline;
+  font-size: 13px;
+  padding: 4px;
+}
+
+.linkButton:hover {
+  color: var(--fw-accent);
+}
+
+.error {
+  color: var(--fw-danger);
+  font-size: 13px;
+  margin: 0;
+}
+
+.info {
+  color: var(--fw-spirit);
+  font-size: 13px;
+  margin: 0;
+}

@@ -1,0 +1,10 @@
+.panel {
+  border-style: solid;
+  border-width: 16px;
+  border-image-slice: 16 fill;
+  border-image-width: 16px;
+  border-image-repeat: stretch;
+  padding: 16px;
+  background-color: var(--fw-panel);
+  color: var(--fw-text);
+}
