@@ -1,5 +1,7 @@
 # Forgotten Wilds
 
+**[Play it live](https://lanternforgestudios.github.io/forgotten-wilds/)**
+
 A browser-based JRPG set in Mytherra's Iron Mountains. Single-player exploration, turn-based
 combat, and quests today; live town presence now, with clean seams for future party/chat/trade/
 lodge/world-event systems. See `Forgotten-Wilds_Requirements.txt` for the full design brief.
