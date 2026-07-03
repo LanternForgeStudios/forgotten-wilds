@@ -95,7 +95,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     name: "The Miner's Lantern",
     description: 'A relic lantern recovered from Hollow Rail Mine, its flame unnervingly steady underground.',
     slot: 'lantern',
-    iconAssetId: 'icon.equipment.miners-lost-lantern',
+    iconAssetId: 'icon.equipment.miners-lost-lantern-equipped',
     statBonuses: { maxSpirit: 14, defense: 2 },
   },
   {
