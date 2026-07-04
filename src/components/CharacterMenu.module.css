@@ -34,6 +34,44 @@
   color: var(--fw-text);
 }
 
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.subtab {
+  background: transparent;
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.subtabActive {
+  background: var(--fw-accent-dim);
+  color: var(--fw-text);
+}
+
+.sortSelect {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -49,6 +87,56 @@
   border: 1px solid var(--fw-panel-border);
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.itemCardSelected {
+  border-color: var(--fw-accent);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.detailPanel {
+  margin-top: 12px;
+  padding: 10px;
+  border-top: 1px solid var(--fw-panel-border);
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.detailIcon {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+}
+
+.detailName {
+  margin: 0;
+  font-weight: bold;
+  color: var(--fw-accent);
+}
+
+.detailMeta {
+  margin: 2px 0 0;
+  font-size: 11px;
+  opacity: 0.7;
+  text-transform: capitalize;
+}
+
+.detailDescription {
+  margin: 0 0 6px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.detailStats {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fw-spirit);
 }
 
 .icon {
