@@ -19,6 +19,9 @@ export interface MapObject {
   targetSpawnId?: string;
   /** for encounterZone: chance per step, 0-1 */
   encounterChance?: number;
+  /** for npc objects: max tile distance the npc will wander from this spawn point (cosmetic client-side
+   *  animation only, not server state). Omitted/undefined means the npc stands still. */
+  wanderRadius?: number;
 }
 
 export interface TileMap {

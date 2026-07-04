@@ -7,7 +7,8 @@ export type AssetCategory =
   | 'ui'
   | 'icon'
   | 'background'
-  | 'audio';
+  | 'audio'
+  | 'structure';
 
 export type AssetStatus = 'placeholder' | 'final';
 
@@ -501,6 +502,60 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: null,
     status: 'placeholder',
     notes: 'Authored by hand to the Tiled JSON schema, using tileset.tiny-dungeon. Added in Phase 8.',
+  },
+  {
+    id: 'map.ash-hallow-elias-house',
+    category: 'map',
+    intendedUse: "Tiled JSON map for Elias Rowan's house interior, in Ash Hallow",
+    filePath: 'maps/ash-hallow-elias-house.json',
+    dimensions: null,
+    status: 'placeholder',
+    notes: 'Authored by hand to the Tiled JSON schema, using tileset.tiny-dungeon. Id namespaced by town since other villages will have their own houses/shops later.',
+  },
+  {
+    id: 'map.ash-hallow-mara-shop',
+    category: 'map',
+    intendedUse: "Tiled JSON map for Mara Vale's general store interior, in Ash Hallow",
+    filePath: 'maps/ash-hallow-mara-shop.json',
+    dimensions: null,
+    status: 'placeholder',
+    notes: 'Authored by hand to the Tiled JSON schema, using tileset.tiny-dungeon. Id namespaced by town since other villages will have their own houses/shops later.',
+  },
+  {
+    id: 'map.ash-hallow-inn',
+    category: 'map',
+    intendedUse: 'Tiled JSON map for the Ash Hallow Inn interior',
+    filePath: 'maps/ash-hallow-inn.json',
+    dimensions: null,
+    status: 'placeholder',
+    notes: 'Authored by hand to the Tiled JSON schema, using tileset.tiny-dungeon.',
+  },
+  {
+    id: 'structure.house',
+    category: 'structure',
+    intendedUse: "Overworld building-facade marker for Elias Rowan's house door in Ash Hallow",
+    filePath: 'sprites/structures/house.svg',
+    dimensions: { width: 48, height: 48 },
+    status: 'placeholder',
+    notes: 'Generated SVG placeholder. Final art should be a painted building facade sized to its footprint.',
+  },
+  {
+    id: 'structure.shop',
+    category: 'structure',
+    intendedUse: "Overworld building-facade marker for Mara Vale's general store door in Ash Hallow",
+    filePath: 'sprites/structures/shop.svg',
+    dimensions: { width: 48, height: 48 },
+    status: 'placeholder',
+    notes: 'Generated SVG placeholder. Final art should be a painted building facade sized to its footprint.',
+  },
+  {
+    id: 'structure.inn',
+    category: 'structure',
+    intendedUse: 'Overworld building-facade marker for the Ash Hallow Inn door',
+    filePath: 'sprites/structures/inn.svg',
+    dimensions: { width: 48, height: 48 },
+    status: 'placeholder',
+    notes: 'Generated SVG placeholder. Final art should be a painted building facade sized to its footprint.',
   },
 ];
 

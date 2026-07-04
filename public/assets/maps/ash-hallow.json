@@ -188,26 +188,60 @@
           ]
         },
         {
-          "type": "npc",
+          "type": "transition",
           "x": 48,
           "y": 48,
           "properties": [
             {
               "name": "refId",
               "type": "string",
-              "value": "elias-rowan"
+              "value": "ash-hallow-elias-house"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow"
             }
           ]
         },
         {
-          "type": "npc",
+          "type": "spawnPoint",
+          "x": 48,
+          "y": 48,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow-elias-house"
+            }
+          ]
+        },
+        {
+          "type": "transition",
           "x": 96,
           "y": 48,
           "properties": [
             {
               "name": "refId",
               "type": "string",
-              "value": "mara-vale"
+              "value": "ash-hallow-mara-shop"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 96,
+          "y": 48,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow-mara-shop"
             }
           ]
         },
@@ -220,18 +254,40 @@
               "name": "refId",
               "type": "string",
               "value": "silas-flint"
+            },
+            {
+              "name": "wanderRadius",
+              "type": "int",
+              "value": 2
             }
           ]
         },
         {
-          "type": "npc",
+          "type": "transition",
           "x": 48,
           "y": 96,
           "properties": [
             {
               "name": "refId",
               "type": "string",
-              "value": "juniper-reed"
+              "value": "ash-hallow-inn"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 48,
+          "y": 96,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow-inn"
             }
           ]
         },
@@ -244,6 +300,11 @@
               "name": "refId",
               "type": "string",
               "value": "nell-ashby"
+            },
+            {
+              "name": "wanderRadius",
+              "type": "int",
+              "value": 2
             }
           ]
         },

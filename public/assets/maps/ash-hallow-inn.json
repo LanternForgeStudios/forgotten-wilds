@@ -1,0 +1,144 @@
+{
+  "width": 8,
+  "height": 7,
+  "tilewidth": 16,
+  "tileheight": 16,
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
+    }
+  ],
+  "layers": [
+    {
+      "type": "tilelayer",
+      "name": "ground",
+      "width": 8,
+      "height": 7,
+      "data": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        1,
+        1,
+        1,
+        25,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "type": "objectgroup",
+      "name": "objects",
+      "objects": [
+        {
+          "type": "spawnPoint",
+          "x": 64,
+          "y": 80,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            }
+          ]
+        },
+        {
+          "type": "npc",
+          "x": 64,
+          "y": 32,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "juniper-reed"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 64,
+          "y": 96,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ash-hallow"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow-inn"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "tilecount": 132,
+      "tiles": [
+        {
+          "id": 24,
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

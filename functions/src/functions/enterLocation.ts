@@ -7,7 +7,14 @@ interface EnterLocationRequest {
   locationId: string;
 }
 
-const KNOWN_LOCATION_IDS = new Set(['ash-hallow', 'ironwood-trail', 'hollow-rail-mine']);
+const KNOWN_LOCATION_IDS = new Set([
+  'ash-hallow',
+  'ironwood-trail',
+  'hollow-rail-mine',
+  'ash-hallow-elias-house',
+  'ash-hallow-mara-shop',
+  'ash-hallow-inn',
+]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {
   const uid = request.auth?.uid;

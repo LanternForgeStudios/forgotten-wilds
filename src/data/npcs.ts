@@ -7,7 +7,7 @@ export const NPCS: Npc[] = [
     title: 'Lantern Keeper Mentor',
     spriteAssetId: 'sprite.npc.elias-rowan',
     portraitAssetId: 'portrait.elias-rowan',
-    locationId: 'ash-hallow',
+    locationId: 'ash-hallow-elias-house',
     dialogue: [
       { speaker: 'Elias Rowan', text: 'So. Another lantern, another Keeper. Ash Hallow could use one.' },
       {
@@ -30,7 +30,7 @@ export const NPCS: Npc[] = [
     title: 'General Store Owner',
     spriteAssetId: 'sprite.npc.mara-vale',
     portraitAssetId: 'portrait.mara-vale',
-    locationId: 'ash-hallow',
+    locationId: 'ash-hallow-mara-shop',
     dialogue: [
       { speaker: 'Mara Vale', text: "Welcome in. Mind the floorboard by the door, it's got opinions." },
       { speaker: 'Mara Vale', text: "Poultices, draughts, a bit of gear. Everything an Ash Hallow Keeper needs, more or less." },
@@ -60,7 +60,7 @@ export const NPCS: Npc[] = [
     title: 'Innkeeper',
     spriteAssetId: 'sprite.npc.juniper-reed',
     portraitAssetId: 'portrait.juniper-reed',
-    locationId: 'ash-hallow',
+    locationId: 'ash-hallow-inn',
     dialogue: [
       { speaker: 'Juniper Reed', text: 'Bed and a warm meal, gold on the table. Rest as long as the lantern-light holds.' },
       { speaker: 'Juniper Reed', text: "You look ridge-worn. Sit a while before you fall over." },

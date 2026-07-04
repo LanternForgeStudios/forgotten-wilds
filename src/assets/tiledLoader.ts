@@ -101,6 +101,7 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
       refId: propValue<string>(o.properties, 'refId'),
       targetSpawnId: propValue<string>(o.properties, 'targetSpawnId'),
       encounterChance: propValue<number>(o.properties, 'encounterChance'),
+      wanderRadius: propValue<number>(o.properties, 'wanderRadius'),
     }));
 
   const walkableTileIds: number[] = [];

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7a5c3a"/>
+      <stop offset="1" stop-color="#4a3520"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="4" fill="url(#g)" stroke="#2c2013" stroke-width="1"/>
+  <polygon points="4,18 24,4 44,18" fill="#3a2c1a" stroke="#2c2013" stroke-width="1"/>
+  <rect x="18" y="26" width="12" height="18" fill="#2c2013"/>
+  <text x="50%" y="14" font-family="Georgia, serif" font-size="6" fill="#f4e9d8" text-anchor="middle">HOUSE</text>
+</svg>
