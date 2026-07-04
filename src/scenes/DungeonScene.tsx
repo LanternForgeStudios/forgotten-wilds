@@ -1,11 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PlayerHUD } from '@/components/PlayerHUD';
 import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
+import { MobileHud } from '@/components/exploration/MobileHud';
 import { Panel } from '@/components/common/Panel';
 import { QuestLog } from '@/components/QuestLog';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import { useExplorationViewport } from '@/hooks/useExplorationViewport';
+import { useDragMovement } from '@/hooks/useDragMovement';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useQuestStore } from '@/state/useQuestStore';
@@ -24,15 +28,54 @@ export function DungeonScene() {
   const [questLogOpen, setQuestLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
-  const { map, position, facingDelta } = useLocationExploration({
+  const isMobile = useIsMobile();
+  const { scale, viewportTiles } = useExplorationViewport();
+  const gridWrapperRef = useRef<HTMLDivElement>(null);
+  const suspended = message !== null || questLogOpen || menuOpen || journalOpen;
+  const { map, position, facingDelta, attemptMove } = useLocationExploration({
     locationId: LOCATION_ID,
-    suspended: message !== null || questLogOpen || menuOpen || journalOpen,
+    suspended,
     onEncounterZoneStep: (chance, pos) => {
       if (Math.random() < chance) {
         goTo('combat', { locationId: LOCATION_ID, spawnX: pos.x, spawnY: pos.y });
       }
     },
   });
+
+  useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
+
+  function attemptInteract() {
+    if (suspended || !map) return;
+    const { dx, dy } = facingDelta(position.facing);
+    const target = { x: position.x + dx, y: position.y + dy };
+    const obj = map.objects.find(
+      (o) => o.type === 'interactable' && o.x === target.x && o.y === target.y,
+    );
+    if (obj?.refId === 'miners-lost-lantern') {
+      callCollectWorldItem(LOCATION_ID, 'miners-lost-lantern')
+        .then(async (res) => {
+          if (uid) await resyncSave(uid);
+          setMessage(
+            res.alreadyCollected
+              ? "There's nothing left here — you already recovered the lantern."
+              : "You pry the battered lantern free of the rubble. It's warm to the touch, as if never truly abandoned.",
+          );
+        })
+        .catch((err) => setMessage(err instanceof Error ? err.message : 'The lantern will not budge.'));
+    } else if (obj?.refId === 'coalbound-warden') {
+      const ready = questProgress['the-miners-lantern']?.status === 'completed';
+      if (ready) {
+        goTo('combat', {
+          locationId: LOCATION_ID,
+          bossId: 'coalbound-warden',
+          spawnX: position.x,
+          spawnY: position.y,
+        });
+      } else {
+        setMessage('Something vast and ember-lit stirs in the dark ahead — but the way feels barred to you, for now.');
+      }
+    }
+  }
 
   useEffect(() => {
     function handleInteract(e: KeyboardEvent) {
@@ -56,39 +99,11 @@ export function DungeonScene() {
         return;
       }
       if (e.key !== 'Enter' && e.key !== ' ') return;
-      if (message || questLogOpen || menuOpen || journalOpen || !map) return;
-      const { dx, dy } = facingDelta(position.facing);
-      const target = { x: position.x + dx, y: position.y + dy };
-      const obj = map.objects.find(
-        (o) => o.type === 'interactable' && o.x === target.x && o.y === target.y,
-      );
-      if (obj?.refId === 'miners-lost-lantern') {
-        callCollectWorldItem(LOCATION_ID, 'miners-lost-lantern')
-          .then(async (res) => {
-            if (uid) await resyncSave(uid);
-            setMessage(
-              res.alreadyCollected
-                ? "There's nothing left here — you already recovered the lantern."
-                : "You pry the battered lantern free of the rubble. It's warm to the touch, as if never truly abandoned.",
-            );
-          })
-          .catch((err) => setMessage(err instanceof Error ? err.message : 'The lantern will not budge.'));
-      } else if (obj?.refId === 'coalbound-warden') {
-        const ready = questProgress['the-miners-lantern']?.status === 'completed';
-        if (ready) {
-          goTo('combat', {
-            locationId: LOCATION_ID,
-            bossId: 'coalbound-warden',
-            spawnX: position.x,
-            spawnY: position.y,
-          });
-        } else {
-          setMessage('Something vast and ember-lit stirs in the dark ahead — but the way feels barred to you, for now.');
-        }
-      }
+      attemptInteract();
     }
     window.addEventListener('keydown', handleInteract);
     return () => window.removeEventListener('keydown', handleInteract);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message, questLogOpen, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
 
   if (!map) {
@@ -117,18 +132,31 @@ export function DungeonScene() {
   return (
     <div className={styles.wrap}>
       <PlayerHUD />
-      <TileGrid
-        map={map}
-        tilesetAssetId="tileset.tiny-dungeon"
-        tilesetColumns={TILESET_COLUMNS}
-        player={position}
-        playerSpriteAssetId="sprite.player"
-        entities={entities}
-      />
-      <p className={styles.hint}>
-        Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I
-        &nbsp;·&nbsp; Journal: J
-      </p>
+      <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
+        <TileGrid
+          map={map}
+          tilesetAssetId="tileset.tiny-dungeon"
+          tilesetColumns={TILESET_COLUMNS}
+          player={position}
+          playerSpriteAssetId="sprite.player"
+          entities={entities}
+          scale={scale}
+          viewportTiles={viewportTiles}
+        />
+      </div>
+      {isMobile ? (
+        <MobileHud
+          onInteract={attemptInteract}
+          onQuestLog={() => setQuestLogOpen((open) => !open)}
+          onInventory={() => setMenuOpen((open) => !open)}
+          onJournal={() => setJournalOpen((open) => !open)}
+        />
+      ) : (
+        <p className={styles.hint}>
+          Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I
+          &nbsp;·&nbsp; Journal: J
+        </p>
+      )}
       {message && (
         <div
           style={{

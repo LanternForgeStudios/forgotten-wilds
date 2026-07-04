@@ -76,7 +76,12 @@ export function useLocationExploration({
     }
   };
 
-  const { position, facingDelta } = useGridMovement({ map, start: spawnPoint, suspended, onStep: handleStep });
+  const { position, facingDelta, attemptMove } = useGridMovement({
+    map,
+    start: spawnPoint,
+    suspended,
+    onStep: handleStep,
+  });
 
-  return { location, map, position, facingDelta };
+  return { location, map, position, facingDelta, attemptMove };
 }

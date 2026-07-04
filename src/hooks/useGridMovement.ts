@@ -9,24 +9,31 @@ export interface GridPosition {
   facing: Facing;
 }
 
-const KEY_TO_DELTA: Record<string, { dx: number; dy: number; facing: Facing }> = {
-  ArrowUp: { dx: 0, dy: -1, facing: 'up' },
-  w: { dx: 0, dy: -1, facing: 'up' },
-  W: { dx: 0, dy: -1, facing: 'up' },
-  ArrowDown: { dx: 0, dy: 1, facing: 'down' },
-  s: { dx: 0, dy: 1, facing: 'down' },
-  S: { dx: 0, dy: 1, facing: 'down' },
-  ArrowLeft: { dx: -1, dy: 0, facing: 'left' },
-  a: { dx: -1, dy: 0, facing: 'left' },
-  A: { dx: -1, dy: 0, facing: 'left' },
-  ArrowRight: { dx: 1, dy: 0, facing: 'right' },
-  d: { dx: 1, dy: 0, facing: 'right' },
-  D: { dx: 1, dy: 0, facing: 'right' },
+const KEY_TO_FACING: Record<string, Facing> = {
+  ArrowUp: 'up',
+  w: 'up',
+  W: 'up',
+  ArrowDown: 'down',
+  s: 'down',
+  S: 'down',
+  ArrowLeft: 'left',
+  a: 'left',
+  A: 'left',
+  ArrowRight: 'right',
+  d: 'right',
+  D: 'right',
+};
+
+const FACING_TO_DELTA: Record<Facing, { dx: number; dy: number }> = {
+  up: { dx: 0, dy: -1 },
+  down: { dx: 0, dy: 1 },
+  left: { dx: -1, dy: 0 },
+  right: { dx: 1, dy: 0 },
 };
 
 const BLOCKING_OBJECT_TYPES = new Set(['npc', 'interactable']);
 
-function isWalkable(map: TileMap, x: number, y: number): boolean {
+export function isWalkable(map: TileMap, x: number, y: number): boolean {
   if (x < 0 || y < 0 || x >= map.width || y >= map.height) return false;
   const ground = map.layers.find((l) => l.name === 'ground');
   if (!ground) return false;
@@ -55,54 +62,55 @@ export function useGridMovement({ map, start, suspended, onStep, stepIntervalMs 
     setPosition({ x: start.x, y: start.y, facing: 'down' });
   }, [start.x, start.y]);
 
-  useEffect(() => {
-    if (!map || suspended) return;
-
-    function handleKeyDown(e: KeyboardEvent) {
-      const delta = KEY_TO_DELTA[e.key];
-      if (!delta) return;
-      e.preventDefault();
+  // Single source of truth for "try to move one tile in this direction" - the keyboard handler,
+  // the mobile joystick, and any on-screen D-pad all funnel through this so they share the same
+  // throttling/collision/turning behavior instead of three slightly different reimplementations.
+  const attemptMove = useCallback(
+    (facing: Facing) => {
+      if (!map || suspended) return;
 
       const now = Date.now();
       const current = positionRef.current;
+      const delta = FACING_TO_DELTA[facing];
 
       // Always allow turning to face a new direction even if the move itself is throttled/blocked.
       if (now - lastMoveRef.current < stepIntervalMs) {
-        if (current.facing !== delta.facing) setPosition({ ...current, facing: delta.facing });
+        if (current.facing !== facing) setPosition({ ...current, facing });
         return;
       }
 
       const nextX = current.x + delta.dx;
       const nextY = current.y + delta.dy;
 
-      if (!isWalkable(map!, nextX, nextY)) {
-        if (current.facing !== delta.facing) setPosition({ ...current, facing: delta.facing });
+      if (!isWalkable(map, nextX, nextY)) {
+        if (current.facing !== facing) setPosition({ ...current, facing });
         return;
       }
 
       lastMoveRef.current = now;
-      const next: GridPosition = { x: nextX, y: nextY, facing: delta.facing };
+      const next: GridPosition = { x: nextX, y: nextY, facing };
       setPosition(next);
       onStep?.(next);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [map, suspended, stepIntervalMs],
+  );
+
+  useEffect(() => {
+    if (!map || suspended) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      const facing = KEY_TO_FACING[e.key];
+      if (!facing) return;
+      e.preventDefault();
+      attemptMove(facing);
     }
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, suspended, stepIntervalMs]);
+  }, [map, suspended, attemptMove]);
 
-  const facingDelta = useCallback((facing: Facing) => {
-    switch (facing) {
-      case 'up':
-        return { dx: 0, dy: -1 };
-      case 'down':
-        return { dx: 0, dy: 1 };
-      case 'left':
-        return { dx: -1, dy: 0 };
-      case 'right':
-        return { dx: 1, dy: 0 };
-    }
-  }, []);
+  const facingDelta = useCallback((facing: Facing) => FACING_TO_DELTA[facing], []);
 
-  return { position, facingDelta };
+  return { position, facingDelta, attemptMove };
 }

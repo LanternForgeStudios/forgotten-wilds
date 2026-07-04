@@ -6,6 +6,13 @@
   image-rendering: pixelated;
 }
 
+.world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: transform 120ms linear;
+}
+
 .tile {
   position: absolute;
   image-rendering: pixelated;

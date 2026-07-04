@@ -82,7 +82,8 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 ## In-game controls
 
 Arrow keys / WASD to move, Enter/Space to interact, **L** for Quest Log, **I** for Inventory/
-Equipment, **J** for Journal of Legends.
+Equipment, **J** for Journal of Legends. On touch devices (auto-detected), drag anywhere on the
+map to move and use the on-screen HUD buttons in place of the keyboard shortcuts.
 
 ## Known limitations (MVP scope)
 
