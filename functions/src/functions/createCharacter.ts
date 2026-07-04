@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { STARTING_STATS } from '../data/leveling';
+import { buildFreshPlayer, buildFreshSaveContent } from '../engine/newCharacter';
 import type { PlayerSave } from '../shared-types';
 
 interface CreateCharacterRequest {
@@ -9,7 +9,6 @@ interface CreateCharacterRequest {
 
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 24;
-const STARTING_LOCATION_ID = 'ash-hallow';
 
 function validateName(raw: unknown): string {
   if (typeof raw !== 'string') {
@@ -45,47 +44,19 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
     displayName: name,
     createdAt: now,
     lastLoginAt: now,
-    player: {
-      uid,
-      name,
-      level: 1,
-      xp: 0,
-      gold: 50,
-      spiritEssence: 0,
-      festivalTokens: 0,
-      premiumCurrency: 0,
-      stats: { ...STARTING_STATS },
-      spiritRank: 'Unawakened',
-      explorerRank: 'Newcomer',
-      regionalReputation: 0,
-      equipment: {
-        weapon: null,
-        armor: null,
-        boots: null,
-        gloves: null,
-        charm: null,
-        lantern: 'keepers-lantern',
-        spiritTotem: null,
-      },
-      currentLocationId: STARTING_LOCATION_ID,
-    },
-    // Starting equipment must also exist in inventory, or unequipping it leaves it unrecoverable
-    // (equip/unequip never grant or destroy items - they only reference what's already owned).
-    inventory: [
-      { itemId: 'healing-poultice', quantity: 2 },
-      { itemId: 'keepers-lantern', quantity: 1 },
-    ],
-    quests: {},
-    journal: {
-      creaturesDiscovered: [],
-      locationsVisited: [STARTING_LOCATION_ID],
-      loreUnlocked: ['lore-great-silence', 'lore-lantern-keepers'],
-      bossesDefeated: [],
-    },
+    player: buildFreshPlayer(uid, name, now),
+    ...buildFreshSaveContent(),
     updatedAt: now,
   };
 
   await userRef.set(save);
+  // Public, minimal directory entry so other players can find this account by name to send a
+  // friend request - deliberately excludes email/anything sensitive (see searchUsers.ts).
+  await db.collection('userDirectory').doc(uid).set({
+    uid,
+    displayName: name,
+    displayNameLower: name.toLowerCase(),
+  });
 
   return save;
 });

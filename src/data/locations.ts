@@ -10,6 +10,7 @@ export const LOCATIONS: Location[] = [
     battleBackgroundAssetId: 'battle-bg.forest',
     encounterTable: [],
     npcIds: ['elias-rowan', 'mara-vale', 'silas-flint', 'juniper-reed', 'nell-ashby'],
+    fastTravel: true,
   },
   {
     id: 'ironwood-trail',
@@ -23,6 +24,7 @@ export const LOCATIONS: Location[] = [
       { enemyId: 'greater-mothling', weight: 1 },
     ],
     npcIds: [],
+    fastTravel: true,
   },
   {
     id: 'hollow-rail-mine',
@@ -38,6 +40,7 @@ export const LOCATIONS: Location[] = [
       { enemyId: 'coal-wraith', weight: 1 },
     ],
     npcIds: [],
+    fastTravel: true,
   },
   {
     id: 'ash-hallow-elias-house',
@@ -48,6 +51,8 @@ export const LOCATIONS: Location[] = [
     battleBackgroundAssetId: 'battle-bg.forest',
     encounterTable: [],
     npcIds: ['elias-rowan'],
+    fastTravel: false,
+    parentLocationId: 'ash-hallow',
   },
   {
     id: 'ash-hallow-mara-shop',
@@ -58,6 +63,8 @@ export const LOCATIONS: Location[] = [
     battleBackgroundAssetId: 'battle-bg.forest',
     encounterTable: [],
     npcIds: ['mara-vale'],
+    fastTravel: false,
+    parentLocationId: 'ash-hallow',
   },
   {
     id: 'ash-hallow-inn',
@@ -68,5 +75,7 @@ export const LOCATIONS: Location[] = [
     battleBackgroundAssetId: 'battle-bg.forest',
     encounterTable: [],
     npcIds: ['juniper-reed'],
+    fastTravel: false,
+    parentLocationId: 'ash-hallow',
   },
 ];

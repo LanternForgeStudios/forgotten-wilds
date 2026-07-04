@@ -1,17 +1,13 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useGridMovement, type GridPosition } from './useGridMovement';
 import { useTileMap } from './useTileMap';
-import { useSceneStore, type SceneName } from '@/state/useSceneStore';
+import { useWanderingNpcs } from './useWanderingNpcs';
+import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { callEnterLocation } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { LOCATIONS } from '@/data';
-
-const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
-  town: 'town',
-  overworld: 'overworld',
-  dungeon: 'dungeon',
-};
 
 interface UseLocationExplorationOptions {
   locationId: string;
@@ -53,20 +49,27 @@ export function useLocationExploration({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
-  const handleStep = (pos: GridPosition) => {
+  const handleStep = (pos: GridPosition, isDash?: boolean) => {
     if (!map) return;
 
     const transition = map.objects.find(
-      (o) => o.type === 'transition' && o.x === pos.x && o.y === pos.y,
+      (o) =>
+        o.type === 'transition' &&
+        o.x === pos.x &&
+        o.y === pos.y &&
+        (!o.requiredFacing || o.requiredFacing === pos.facing),
     );
     if (transition?.refId) {
       const targetLocation = LOCATIONS.find((l) => l.id === transition.refId);
-      const scene = targetLocation ? LOCATION_KIND_TO_SCENE[targetLocation.kind] : undefined;
+      const scene = targetLocation ? sceneForLocationKind(targetLocation.kind) : undefined;
       if (scene) {
         goTo(scene, { locationId: transition.refId, spawnId: transition.targetSpawnId });
         return;
       }
     }
+
+    // Dashing through a stretch of trail is exactly what it's for - no encounter roll mid-dash.
+    if (isDash) return;
 
     const zone = map.objects.find(
       (o) => o.type === 'encounterZone' && o.x === pos.x && o.y === pos.y,
@@ -76,12 +79,16 @@ export function useLocationExploration({
     }
   };
 
-  const { position, facingDelta, attemptMove } = useGridMovement({
+  const wanderPositions = useWanderingNpcs(map);
+  const dynamicBlockers = useMemo(() => Object.values(wanderPositions), [wanderPositions]);
+
+  const { position, positionRef, facingDelta, attemptMove } = useGridMovement({
     map,
     start: spawnPoint,
     suspended,
     onStep: handleStep,
+    dynamicBlockers,
   });
 
-  return { location, map, position, facingDelta, attemptMove };
+  return { location, map, position, positionRef, facingDelta, attemptMove, wanderPositions };
 }

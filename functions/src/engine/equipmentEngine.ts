@@ -13,3 +13,12 @@ export function adjustStatsForBonuses(stats: Stats, bonuses: StatBonuses, sign: 
   stats.hp = Math.min(stats.hp, stats.maxHp);
   stats.spirit = Math.min(stats.spirit, stats.maxSpirit);
 }
+
+/** Unlike the generic stat bonuses above (which stack additively across several equipped slots),
+ *  only one lantern can ever be equipped at a time, so its oil capacity fully *replaces* the
+ *  previous value rather than adding to it. Current oil clamps down if the new capacity is lower -
+ *  swapping lanterns is not a way to top off for free. */
+export function setLanternOilCapacity(stats: Stats, oilCapacity: number): void {
+  stats.maxLanternOil = Math.max(0, oilCapacity);
+  stats.lanternOil = Math.min(stats.lanternOil, stats.maxLanternOil);
+}

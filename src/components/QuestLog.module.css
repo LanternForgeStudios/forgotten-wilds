@@ -19,6 +19,27 @@
   color: var(--fw-accent);
 }
 
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.filterTab {
+  background: transparent;
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.filterTabActive {
+  background: var(--fw-accent-dim);
+  color: var(--fw-text);
+}
+
 .quest {
   padding: 10px 0;
   border-top: 1px solid var(--fw-panel-border);

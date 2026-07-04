@@ -22,6 +22,11 @@ export interface MapObject {
   /** for npc objects: max tile distance the npc will wander from this spawn point (cosmetic client-side
    *  animation only, not server state). Omitted/undefined means the npc stands still. */
   wanderRadius?: number;
+  /** for transition objects: the player must be moving in this direction to trigger the transition
+   *  (e.g. a building door only opens if you walk "up" into it from the street) - stepping onto the
+   *  tile from another direction just walks onto it as a normal floor tile. Omitted means any
+   *  direction triggers it, which is correct for map-edge transitions only reachable from one side. */
+  requiredFacing?: 'up' | 'down' | 'left' | 'right';
 }
 
 export interface TileMap {

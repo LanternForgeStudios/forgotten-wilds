@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { rollEnemyForLocation } from '../engine/combatEngine';
+import { rollEncounterGroup, rollEnemyLevel, scaledEnemyStats, BOSS_LEVEL } from '../engine/combatEngine';
 import { ENEMIES } from '../data/enemies';
 import { effectiveStatus } from '../engine/questEngine';
 import type { CombatSession, PlayerSave } from '../shared-types';
@@ -35,7 +35,7 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
   }
   const save = userSnap.data() as PlayerSave;
 
-  let enemy;
+  let enemies;
   const bossId = request.data?.bossId;
   if (bossId) {
     const prerequisite = BOSS_PREREQUISITE_QUEST[bossId];
@@ -43,23 +43,32 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
     if (!ENEMIES[bossId]?.isBoss || !questsDone) {
       throw new HttpsError('failed-precondition', 'That boss cannot be challenged yet.');
     }
-    enemy = ENEMIES[bossId];
+    // Bosses are always a single scripted fight, never grouped with trash mobs.
+    enemies = [ENEMIES[bossId]];
   } else {
     try {
-      enemy = rollEnemyForLocation(locationId);
+      enemies = rollEncounterGroup(locationId, save.player.level);
     } catch {
       throw new HttpsError('invalid-argument', `No enemies are known to roam "${locationId}".`);
     }
   }
+
+  const rolledLevels = bossId
+    ? [BOSS_LEVEL]
+    : enemies.map((e) => rollEnemyLevel(save.player.level, e));
+  const rolledStats = enemies.map((e, i) => scaledEnemyStats(e, rolledLevels[i]));
 
   const now = Date.now();
   const session: CombatSession = {
     sessionId: db.collection('combatSessions').doc().id,
     uid,
     locationId,
-    enemyId: enemy.id,
-    enemyHp: enemy.stats.maxHp,
-    enemyMaxHp: enemy.stats.maxHp,
+    enemies: enemies.map((e, i) => ({
+      enemyId: e.id,
+      level: rolledLevels[i],
+      hp: rolledStats[i].maxHp,
+      maxHp: rolledStats[i].maxHp,
+    })),
     round: 1,
     status: 'active',
     startedAt: now,
@@ -69,10 +78,16 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
 
   return {
     sessionId: session.sessionId,
-    enemyId: enemy.id,
-    enemyName: enemy.name,
-    enemyHp: enemy.stats.maxHp,
-    enemyMaxHp: enemy.stats.maxHp,
+    enemies: enemies.map((e, index) => ({
+      index,
+      enemyId: e.id,
+      name: e.name,
+      tier: e.tier,
+      level: rolledLevels[index],
+      hp: rolledStats[index].maxHp,
+      maxHp: rolledStats[index].maxHp,
+      isBoss: e.isBoss,
+    })),
     playerHp: save.player.stats.hp,
     playerMaxHp: save.player.stats.maxHp,
     playerSpirit: save.player.stats.spirit,

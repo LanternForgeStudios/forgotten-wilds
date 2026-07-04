@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import { TierBadge } from './common/TierBadge';
 import { getAssetUrl } from '@/assets/assetManager';
 import { usePlayerStore } from '@/state/usePlayerStore';
+import { useInventoryStore } from '@/state/useInventoryStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { callPurchaseItem } from '@/firebase/functionsClient';
+import { callPurchaseItem, callSellItem } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
+import { sellPriceFor } from '@/utils/sellPrice';
 import { SHOP_LISTINGS, ITEMS, EQUIPMENT } from '@/data';
 import styles from './CharacterMenu.module.css';
 
@@ -13,8 +16,14 @@ interface ShopProps {
   onClose: () => void;
 }
 
+function defFor(itemId: string) {
+  return ITEMS.find((i) => i.id === itemId) ?? EQUIPMENT.find((e) => e.id === itemId);
+}
+
 export function Shop({ onClose }: ShopProps) {
+  const [tab, setTab] = useState<'buy' | 'sell'>('buy');
   const player = usePlayerStore((s) => s.player);
+  const inventory = useInventoryStore((s) => s.items);
   const uid = useAuthStore((s) => s.user?.uid);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,33 +43,102 @@ export function Shop({ onClose }: ShopProps) {
     }
   }
 
+  async function sell(itemId: string) {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await callSellItem(itemId, 1);
+      if (uid) await resyncSave(uid);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not sell that item.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>Mara Vale's General Store</h2>
         <p style={{ fontSize: 13, marginTop: 0 }}>Your gold: {player?.gold ?? 0}g</p>
-        <div className={styles.grid}>
-          {SHOP_LISTINGS.map((listing) => {
-            const def = ITEMS.find((i) => i.id === listing.itemId) ?? EQUIPMENT.find((e) => e.id === listing.itemId);
-            const iconAssetId = def && 'iconAssetId' in def ? def.iconAssetId : undefined;
-            const name = def?.name ?? listing.itemId;
-            const canAfford = (player?.gold ?? 0) >= listing.price;
-            return (
-              <div key={listing.itemId} className={styles.itemCard}>
-                {iconAssetId && <img src={getAssetUrl(iconAssetId)} alt="" className={styles.icon} />}
-                <span className={styles.itemName}>{name}</span>
-                <span style={{ fontSize: 11, opacity: 0.8 }}>{listing.price}g</span>
-                <button
-                  className={styles.smallButton}
-                  disabled={busy || !canAfford}
-                  onClick={() => buy(listing.itemId)}
-                >
-                  Buy
-                </button>
-              </div>
-            );
-          })}
+
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tab} ${tab === 'buy' ? styles.tabActive : ''}`}
+            onClick={() => setTab('buy')}
+          >
+            Buy
+          </button>
+          <button
+            className={`${styles.tab} ${tab === 'sell' ? styles.tabActive : ''}`}
+            onClick={() => setTab('sell')}
+          >
+            Sell
+          </button>
         </div>
+
+        {tab === 'buy' && (
+          <div className={styles.grid}>
+            {SHOP_LISTINGS.map((listing) => {
+              const def = defFor(listing.itemId);
+              const iconAssetId = def && 'iconAssetId' in def ? def.iconAssetId : undefined;
+              const name = def?.name ?? listing.itemId;
+              const canAfford = (player?.gold ?? 0) >= listing.price;
+              return (
+                <div key={listing.itemId} className={styles.itemCard}>
+                  {iconAssetId && <img src={getAssetUrl(iconAssetId)} alt="" className={styles.icon} />}
+                  <span className={styles.itemName}>{name}</span>
+                  {def?.tier && <TierBadge tier={def.tier} />}
+                  <span style={{ fontSize: 11, opacity: 0.8 }}>{listing.price}g</span>
+                  <button
+                    className={styles.smallButton}
+                    disabled={busy || !canAfford}
+                    onClick={() => buy(listing.itemId)}
+                  >
+                    Buy
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {tab === 'sell' && (() => {
+          const sellable = inventory
+            .map((entry) => ({ entry, price: sellPriceFor(entry.itemId) }))
+            .filter((row): row is { entry: (typeof inventory)[number]; price: number } => row.price !== undefined);
+
+          return (
+            <div className={styles.grid}>
+              {sellable.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>Nothing to sell.</p>}
+              {sellable.map(({ entry, price }) => {
+                const def = defFor(entry.itemId);
+                const iconAssetId = def && 'iconAssetId' in def ? def.iconAssetId : undefined;
+                const name = def?.name ?? entry.itemId;
+                const equippedSlot = def && 'slot' in def ? def.slot : undefined;
+                const isEquipped = equippedSlot ? player?.equipment[equippedSlot] === entry.itemId : false;
+                return (
+                  <div key={entry.itemId} className={styles.itemCard}>
+                    {iconAssetId && <img src={getAssetUrl(iconAssetId)} alt="" className={styles.icon} />}
+                    <span className={styles.itemName}>{name}</span>
+                    {def?.tier && <TierBadge tier={def.tier} />}
+                    <span style={{ fontSize: 11, opacity: 0.8 }}>x{entry.quantity}</span>
+                    <span style={{ fontSize: 11, opacity: 0.8 }}>{price}g each</span>
+                    {isEquipped ? (
+                      <span style={{ fontSize: 11, color: 'var(--fw-spirit)' }}>Equipped</span>
+                    ) : (
+                      <button className={styles.smallButton} disabled={busy} onClick={() => sell(entry.itemId)}>
+                        Sell 1
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+
         {error && (
           <p style={{ color: 'var(--fw-danger)', fontSize: 13 }}>{error}</p>
         )}

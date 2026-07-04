@@ -1,5 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
-import type { PlayerSave } from '@/types';
+import type { EnemyTier, PlayerSave } from '@/types';
 import { functions } from './firebaseConfig';
 
 export async function callCreateCharacter(name: string): Promise<PlayerSave> {
@@ -8,12 +8,20 @@ export async function callCreateCharacter(name: string): Promise<PlayerSave> {
   return result.data;
 }
 
+export interface EncounterEnemy {
+  index: number;
+  enemyId: string;
+  name: string;
+  tier: EnemyTier;
+  level: number;
+  hp: number;
+  maxHp: number;
+  isBoss: boolean;
+}
+
 export interface StartEncounterResponse {
   sessionId: string;
-  enemyId: string;
-  enemyName: string;
-  enemyHp: number;
-  enemyMaxHp: number;
+  enemies: EncounterEnemy[];
   playerHp: number;
   playerMaxHp: number;
   playerSpirit: number;
@@ -54,9 +62,15 @@ export async function callCollectWorldItem(
 }
 
 export interface CombatActionRequest {
-  type: 'attack' | 'skill' | 'spiritArt' | 'item' | 'defend' | 'flee';
+  type: 'attack' | 'skill' | 'lanternAbility' | 'item' | 'defend' | 'flee';
+  /** for 'skill' - which Specialty Attack; defaults to keepers-strike. */
   skillId?: string;
+  /** for 'lanternAbility' - which ability of the equipped lantern. */
+  abilityId?: string;
   itemId?: string;
+  /** Which enemy (by its index from StartEncounterResponse.enemies) attack/skill/lanternAbility
+   *  hits. Ignored for item/defend/flee. */
+  targetIndex?: number;
 }
 
 export interface ResolveCombatActionResponse {
@@ -66,8 +80,9 @@ export interface ResolveCombatActionResponse {
   playerMaxHp: number;
   playerSpirit: number;
   playerMaxSpirit: number;
-  enemyHp: number;
-  enemyMaxHp: number;
+  playerLanternOil: number;
+  playerMaxLanternOil: number;
+  enemies: { index: number; hp: number; maxHp: number }[];
   rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean } | null;
   playerLevel: number;
   playerGold: number;
@@ -109,4 +124,103 @@ export async function callRestAtInn(): Promise<void> {
 export async function callUseItem(itemId: string): Promise<void> {
   const fn = httpsCallable<{ itemId: string }, unknown>(functions, 'useItem');
   await fn({ itemId });
+}
+
+export async function callInteractWithShrine(
+  locationId: string,
+  refId: string,
+): Promise<{ questsCompleted: string[]; unlockedStamina: boolean }> {
+  const fn = httpsCallable<
+    { locationId: string; refId: string },
+    { questsCompleted: string[]; unlockedStamina: boolean }
+  >(functions, 'interactWithShrine');
+  const result = await fn({ locationId, refId });
+  return result.data;
+}
+
+export async function callDash(): Promise<{ stamina: number; maxStamina: number }> {
+  const fn = httpsCallable<Record<string, never>, { stamina: number; maxStamina: number }>(functions, 'dash');
+  const result = await fn({});
+  return result.data;
+}
+
+export async function callOpenChest(
+  locationId: string,
+  chestId: string,
+): Promise<{ alreadyOpened: boolean; itemId: string }> {
+  const fn = httpsCallable<
+    { locationId: string; chestId: string },
+    { alreadyOpened: boolean; itemId: string }
+  >(functions, 'openChest');
+  const result = await fn({ locationId, chestId });
+  return result.data;
+}
+
+export async function callSellItem(
+  itemId: string,
+  quantity?: number,
+): Promise<{ gold: number; soldQuantity: number; goldEarned: number }> {
+  const fn = httpsCallable<
+    { itemId: string; quantity?: number },
+    { gold: number; soldQuantity: number; goldEarned: number }
+  >(functions, 'sellItem');
+  const result = await fn({ itemId, quantity });
+  return result.data;
+}
+
+export async function callSearchUsers(query: string): Promise<{ results: { uid: string; displayName: string }[] }> {
+  const fn = httpsCallable<{ query: string }, { results: { uid: string; displayName: string }[] }>(
+    functions,
+    'searchUsers',
+  );
+  const result = await fn({ query });
+  return result.data;
+}
+
+export async function callSendFriendRequest(
+  toUid: string,
+): Promise<{ status: 'sent' | 'accepted' | 'already-pending' }> {
+  const fn = httpsCallable<{ toUid: string }, { status: 'sent' | 'accepted' | 'already-pending' }>(
+    functions,
+    'sendFriendRequest',
+  );
+  const result = await fn({ toUid });
+  return result.data;
+}
+
+export async function callRespondToFriendRequest(
+  requestId: string,
+  accept: boolean,
+): Promise<{ status: string }> {
+  const fn = httpsCallable<{ requestId: string; accept: boolean }, { status: string }>(
+    functions,
+    'respondToFriendRequest',
+  );
+  const result = await fn({ requestId, accept });
+  return result.data;
+}
+
+export async function callRemoveFriend(friendUid: string): Promise<void> {
+  const fn = httpsCallable<{ friendUid: string }, unknown>(functions, 'removeFriend');
+  await fn({ friendUid });
+}
+
+export async function callBlockUser(targetUid: string): Promise<void> {
+  const fn = httpsCallable<{ targetUid: string }, unknown>(functions, 'blockUser');
+  await fn({ targetUid });
+}
+
+export async function callUnblockUser(targetUid: string): Promise<void> {
+  const fn = httpsCallable<{ targetUid: string }, unknown>(functions, 'unblockUser');
+  await fn({ targetUid });
+}
+
+export async function callSendDirectMessage(toUid: string, text: string): Promise<void> {
+  const fn = httpsCallable<{ toUid: string; text: string }, unknown>(functions, 'sendDirectMessage');
+  await fn({ toUid, text });
+}
+
+export async function callResetPlayerProgress(confirmEmail: string): Promise<void> {
+  const fn = httpsCallable<{ confirmEmail: string }, unknown>(functions, 'resetPlayerProgress');
+  await fn({ confirmEmail });
 }

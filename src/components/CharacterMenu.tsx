@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import { TierBadge } from './common/TierBadge';
 import { getAssetUrl } from '@/assets/assetManager';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -9,6 +10,8 @@ import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { ITEMS, EQUIPMENT } from '@/data';
 import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
+import { formatStatBonuses } from '@/utils/statBonuses';
+import { isUsableEffect, itemWouldHaveEffect } from '@/utils/itemEffect';
 import styles from './CharacterMenu.module.css';
 
 interface CharacterMenuProps {
@@ -25,24 +28,17 @@ const SLOT_LABELS: Record<string, string> = {
   spiritTotem: 'Spirit Totem',
 };
 
-type InventorySubTab = 'all' | 'consumable' | 'equipment' | 'keyItem';
+type InventorySubTab = 'all' | 'consumable' | 'equipment' | 'keyItem' | 'unique';
 
 const SUBTAB_LABELS: Record<InventorySubTab, string> = {
   all: 'All',
   consumable: 'Consumables',
   equipment: 'Equipment',
   keyItem: 'Key Items',
+  unique: 'Unique',
 };
 
 type SortOption = 'name' | 'quantityDesc';
-
-const STAT_LABELS: Record<string, string> = {
-  attack: 'ATK',
-  defense: 'DEF',
-  speed: 'SPD',
-  maxHp: 'Max HP',
-  maxSpirit: 'Max Spirit',
-};
 
 interface ResolvedItem {
   itemId: string;
@@ -141,7 +137,11 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
           });
 
           const visible = resolved
-            .filter((entry) => subTab === 'all' || subTabOf(entry) === subTab)
+            .filter((entry) => {
+              if (subTab === 'all') return true;
+              if (subTab === 'unique') return !!(entry.equipDef?.unique ?? entry.itemDef?.unique);
+              return subTabOf(entry) === subTab;
+            })
             .sort((a, b) =>
               sortBy === 'name' ? a.name.localeCompare(b.name) : b.quantity - a.quantity,
             );
@@ -177,7 +177,8 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                 {visible.map((entry) => {
                   const { equipDef, itemDef } = entry;
                   const isEquipped = equipDef && player?.equipment[equipDef.slot] === entry.itemId;
-                  const isUsable = itemDef?.effect && (itemDef.effect.healHp || itemDef.effect.healSpirit);
+                  const isUsable = isUsableEffect(itemDef?.effect);
+                  const wouldHelp = player ? itemWouldHaveEffect(itemDef?.effect, player.stats) : false;
                   const isSelected = selectedItemId === entry.itemId;
                   return (
                     <div
@@ -190,7 +191,14 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       <span style={{ fontSize: 11, opacity: 0.7 }}>x{entry.quantity}</span>
                       {equipDef &&
                         (isEquipped ? (
-                          <span style={{ fontSize: 11, color: 'var(--fw-spirit)' }}>Equipped</span>
+                          <>
+                            <span style={{ fontSize: 11, color: 'var(--fw-spirit)' }}>Equipped</span>
+                            {formatStatBonuses(equipDef.statBonuses) && (
+                              <span style={{ fontSize: 10, color: 'var(--fw-spirit)', opacity: 0.85 }}>
+                                {formatStatBonuses(equipDef.statBonuses)}
+                              </span>
+                            )}
+                          </>
                         ) : (
                           <button
                             className={styles.smallButton}
@@ -206,13 +214,14 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       {isUsable && (
                         <button
                           className={styles.smallButton}
-                          disabled={busy}
+                          disabled={busy || !wouldHelp}
+                          title={wouldHelp ? undefined : 'Already at maximum - using this would have no effect.'}
                           onClick={(e) => {
                             e.stopPropagation();
                             useItem(entry.itemId);
                           }}
                         >
-                          Use
+                          {wouldHelp ? 'Use' : 'Full'}
                         </button>
                       )}
                     </div>
@@ -227,21 +236,22 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       <img src={getAssetUrl(selected.iconAssetId)} alt="" className={styles.detailIcon} />
                     )}
                     <div>
-                      <p className={styles.detailName}>{selected.name}</p>
+                      <p className={styles.detailName}>
+                        {selected.name} {(selected.equipDef ?? selected.itemDef) && (
+                          <TierBadge tier={(selected.equipDef ?? selected.itemDef)!.tier} style={{ marginLeft: 6 }} />
+                        )}
+                      </p>
                       <p className={styles.detailMeta}>
                         {selected.equipDef
                           ? `${SLOT_LABELS[selected.equipDef.slot]} · x${selected.quantity}`
                           : `${SUBTAB_LABELS[subTabOf(selected)]} · x${selected.quantity}`}
+                        {(selected.equipDef?.unique ?? selected.itemDef?.unique) && ' · Unique (cannot be lost, sold, or traded)'}
                       </p>
                     </div>
                   </div>
                   <p className={styles.detailDescription}>{selected.description}</p>
-                  {selected.equipDef && Object.keys(selected.equipDef.statBonuses).length > 0 && (
-                    <p className={styles.detailStats}>
-                      {Object.entries(selected.equipDef.statBonuses)
-                        .map(([stat, value]) => `${(value as number) > 0 ? '+' : ''}${value} ${STAT_LABELS[stat] ?? stat}`)
-                        .join('  ·  ')}
-                    </p>
+                  {selected.equipDef && formatStatBonuses(selected.equipDef.statBonuses) && (
+                    <p className={styles.detailStats}>{formatStatBonuses(selected.equipDef.statBonuses)}</p>
                   )}
                   {selected.itemDef?.effect && (
                     <p className={styles.detailStats}>
@@ -267,7 +277,14 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                   {equipDef ? (
                     <>
                       <img src={getAssetUrl(equipDef.iconAssetId)} alt="" className={styles.icon} style={{ width: 32, height: 32 }} />
-                      <span style={{ fontSize: 13, flex: 1 }}>{equipDef.name}</span>
+                      <span style={{ fontSize: 13, flex: 1 }}>
+                        {equipDef.name}
+                        {formatStatBonuses(equipDef.statBonuses) && (
+                          <span style={{ fontSize: 11, color: 'var(--fw-spirit)', marginLeft: 8 }}>
+                            {formatStatBonuses(equipDef.statBonuses)}
+                          </span>
+                        )}
+                      </span>
                       <button className={styles.smallButton} disabled={busy} onClick={() => unequip(slot)}>
                         Unequip
                       </button>

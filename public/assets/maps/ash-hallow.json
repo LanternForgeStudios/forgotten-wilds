@@ -201,6 +201,11 @@
               "name": "targetSpawnId",
               "type": "string",
               "value": "from-ash-hallow"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "up"
             }
           ]
         },
@@ -230,6 +235,11 @@
               "name": "targetSpawnId",
               "type": "string",
               "value": "from-ash-hallow"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "up"
             }
           ]
         },
@@ -276,6 +286,11 @@
               "name": "targetSpawnId",
               "type": "string",
               "value": "from-ash-hallow"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "up"
             }
           ]
         },

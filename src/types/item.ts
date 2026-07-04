@@ -2,10 +2,18 @@ import type { EquipmentSlot, Stats } from './stats';
 
 export type ItemCategory = 'consumable' | 'equipment' | 'keyItem' | 'lanternUpgrade';
 
+/** Rarity/power tier shared by every inventory-eligible thing (consumables, key items, and
+ *  equipment alike) - Common through Mythic. Legendary and Mythic are reserved for items tied to
+ *  a specific milestone (a boss trophy, a one-time quest reward), not shop stock. */
+export type Tier = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+
 export interface ItemEffect {
   healHp?: number;
   healSpirit?: number;
   reviveOnDefeat?: boolean;
+  /** Refills the equipped lantern's Oil, clamped to its capacity. Usable in and out of combat,
+   *  same as the other consumable effects. */
+  restoreOil?: number;
 }
 
 export interface Item {
@@ -16,6 +24,10 @@ export interface Item {
   iconAssetId: string;
   effect?: ItemEffect;
   stackable: boolean;
+  tier: Tier;
+  /** Caps ownership at 1 and blocks a second copy from ever being granted (loot, purchase, quest
+   *  reward) - for one-of-a-kind trophies and quest relics, not regular stackable consumables. */
+  unique?: boolean;
 }
 
 export interface EquipmentItem {
@@ -25,6 +37,12 @@ export interface EquipmentItem {
   slot: EquipmentSlot;
   iconAssetId: string;
   statBonuses: Partial<Stats>;
+  tier: Tier;
+  unique?: boolean;
+  /** Lantern-slot only: how much Lantern Oil this lantern holds, and which Lantern Ability id(s)
+   *  (src/data/lanternAbilities.ts) it grants while equipped. */
+  oilCapacity?: number;
+  lanternAbilityIds?: string[];
 }
 
 export interface InventoryItem {

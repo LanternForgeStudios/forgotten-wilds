@@ -8,14 +8,68 @@
   justify-content: flex-end;
   background-size: cover;
   background-position: center;
+  box-sizing: border-box;
+}
+
+/* Full-bleed background above stays edge-to-edge, but the actual battle UI is capped to a
+   sensible size range - centered and readable on an ultrawide monitor, never squeezed illegibly
+   small on a tiny screen (the 700px media query below handles that end). */
+.stage {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  max-width: 1400px;
+  min-height: 480px;
+  max-height: 1100px;
+  margin: 0 auto;
 }
 
 .enemyArea {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.enemyRowBack,
+.enemyRowFront {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.enemyRowBack {
+  opacity: 0.92;
+  transform: scale(0.8);
+  margin-bottom: -8px;
+}
+
+.enemySlot {
+  background: none;
+  border: none;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.enemySlot:disabled {
+  cursor: default;
+}
+
+.enemySlotTargeted {
+  background: rgba(224, 169, 74, 0.12);
+  outline: 2px solid var(--fw-accent);
 }
 
 .enemySprite {
@@ -23,20 +77,33 @@
   filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.5));
 }
 
+/* HP bar is anchored directly under each enemy's own sprite, not a single shared bar, since each
+   enemy in a group fight has independent HP. */
 .enemyBar {
-  width: min(360px, 80vw);
-  margin: 0 auto 12px;
+  width: min(160px, 90%);
+  margin-top: 4px;
 }
 
 .enemyName {
   text-align: center;
-  margin: 0 0 4px;
+  margin: 0 0 2px;
+  font-size: 12px;
   color: var(--fw-text);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
+.enemyTier {
+  text-align: center;
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
 .hpTrack {
-  height: 10px;
+  height: 8px;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 5px;
   overflow: hidden;
@@ -49,6 +116,21 @@
   transition: width 300ms ease;
 }
 
+.targetMarker {
+  font-size: 10px;
+  color: var(--fw-accent);
+  margin-top: 2px;
+}
+
+.targetHint {
+  font-size: 12px;
+  color: var(--fw-text-dim);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin: 0;
+}
+
 .bottomPanel {
   width: 100%;
   display: flex;
@@ -57,34 +139,26 @@
   box-sizing: border-box;
 }
 
+/* Smaller message log, larger action panel - the log only needs to show the last couple of
+   lines at a glance, the action buttons are what the player actually interacts with every turn. */
 .logPanel {
   flex: 1;
-  min-height: 120px;
-  max-height: 160px;
+  min-width: 0;
+  min-height: 80px;
+  max-height: 100px;
   overflow-y: auto;
-  font-size: 13px;
+  font-size: 12px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.playerPanel {
-  width: 220px;
-  flex-shrink: 0;
-}
-
-.playerName {
-  margin: 0 0 8px;
-  font-weight: bold;
-  color: var(--fw-accent);
-}
-
 .actionsPanel {
-  width: 260px;
+  width: 340px;
   flex-shrink: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
   align-content: start;
 }
 
@@ -92,8 +166,8 @@
   background: var(--fw-accent-dim);
   border: 1px solid var(--fw-panel-border);
   color: var(--fw-text);
-  padding: 10px 8px;
-  font-size: 13px;
+  padding: 14px 8px;
+  font-size: 14px;
   border-radius: 4px;
 }
 
@@ -115,4 +189,20 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 700px) {
+  .bottomPanel {
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .actionsPanel {
+    width: 100%;
+  }
+
+  .logPanel {
+    max-height: 70px;
+  }
 }

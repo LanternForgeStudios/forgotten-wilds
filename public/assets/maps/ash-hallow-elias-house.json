@@ -103,6 +103,11 @@
               "name": "targetSpawnId",
               "type": "string",
               "value": "from-ash-hallow-elias-house"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "down"
             }
           ]
         }

@@ -2,9 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { MapObject, TileMap } from '@/types';
 import { isWalkable } from './useGridMovement';
 
-interface Wanderer extends MapObject {
+interface NpcObject extends MapObject {
   refId: string;
-  wanderRadius: number;
 }
 
 const STEP_INTERVAL_MS = 2200;
@@ -15,17 +14,18 @@ export interface WanderPosition {
   y: number;
 }
 
-/** Cosmetic client-side random walk for npc map objects that declare a `wanderRadius`. Purely
- *  local animation - not server state, not synced between players - since NPC position doesn't
- *  affect gameplay fairness the way player/combat state does. See [[useGridMovement]] for the
- *  shared walkability rule this reuses. */
+/** Current tile of every npc on the map - not just the ones that wander. This doubles as the
+ *  single source of truth for npc collision (see `dynamicBlockers` in useGridMovement): a static
+ *  npc's entry never moves from its home tile, and a `wanderRadius` npc's entry is nudged by a
+ *  cosmetic client-side random walk (not server state, not synced between players - npc position
+ *  doesn't affect gameplay fairness the way player/combat state does). */
 export function useWanderingNpcs(map: TileMap | null): Record<string, WanderPosition> {
   const [positions, setPositions] = useState<Record<string, WanderPosition>>({});
 
   const homesKey = map
     ? map.objects
-        .filter((o) => o.type === 'npc' && o.refId && o.wanderRadius)
-        .map((o) => `${o.refId}:${o.x}:${o.y}:${o.wanderRadius}`)
+        .filter((o) => o.type === 'npc' && o.refId)
+        .map((o) => `${o.refId}:${o.x}:${o.y}:${o.wanderRadius ?? 0}`)
         .join('|')
     : '';
 
@@ -34,14 +34,15 @@ export function useWanderingNpcs(map: TileMap | null): Record<string, WanderPosi
 
   useEffect(() => {
     if (!map) return;
-    const wanderers = map.objects.filter(
-      (o): o is Wanderer => o.type === 'npc' && !!o.refId && !!o.wanderRadius,
-    );
-    if (wanderers.length === 0) {
+    const npcs = map.objects.filter((o): o is NpcObject => o.type === 'npc' && !!o.refId);
+    if (npcs.length === 0) {
       setPositions({});
       return;
     }
-    setPositions(Object.fromEntries(wanderers.map((w) => [w.refId, { x: w.x, y: w.y }])));
+    setPositions(Object.fromEntries(npcs.map((n) => [n.refId, { x: n.x, y: n.y }])));
+
+    const wanderers = npcs.filter((n) => !!n.wanderRadius);
+    if (wanderers.length === 0) return;
 
     const intervalId = window.setInterval(() => {
       const currentMap = mapRef.current;
@@ -56,8 +57,8 @@ export function useWanderingNpcs(map: TileMap | null): Record<string, WanderPosi
           if (dx === 0 && dy === 0) continue;
           const candidateX = current.x + dx;
           const candidateY = current.y + dy;
-          const withinHomeRadius =
-            Math.abs(candidateX - home.x) <= home.wanderRadius && Math.abs(candidateY - home.y) <= home.wanderRadius;
+          const radius = home.wanderRadius!;
+          const withinHomeRadius = Math.abs(candidateX - home.x) <= radius && Math.abs(candidateY - home.y) <= radius;
           if (!withinHomeRadius || !isWalkable(currentMap, candidateX, candidateY)) continue;
           next[home.refId] = { x: candidateX, y: candidateY };
         }

@@ -13,10 +13,16 @@ export interface LootDrop {
   maxQuantity: number;
 }
 
+/** The 3 tiers a fight can be at - Regular and Elite enemies additionally roll a 1-5 level that
+ *  scales their stats/rewards up (see rollEnemyLevel in combatEngine.ts); Boss tier never rolls a
+ *  level, its difficulty is exactly what's authored here. */
+export type EnemyTier = 'regular' | 'elite' | 'boss';
+
 export interface EnemyDefinition {
   id: string;
   name: string;
   family: 'mothlings' | 'restlessMiners' | 'coalSpirits' | 'boss';
+  tier: EnemyTier;
   isBoss: boolean;
   stats: { maxHp: number; attack: number; defense: number; speed: number };
   moves: EnemyMove[];
@@ -30,6 +36,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     id: 'mothling',
     name: 'Mothling',
     family: 'mothlings',
+    tier: 'regular',
     isBoss: false,
     stats: { maxHp: 28, attack: 7, defense: 3, speed: 9 },
     moves: [
@@ -44,6 +51,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     id: 'greater-mothling',
     name: 'Greater Mothling',
     family: 'mothlings',
+    tier: 'elite',
     isBoss: false,
     stats: { maxHp: 42, attack: 10, defense: 5, speed: 11 },
     moves: [
@@ -58,6 +66,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     id: 'restless-miner',
     name: 'Restless Miner',
     family: 'restlessMiners',
+    tier: 'regular',
     isBoss: false,
     stats: { maxHp: 34, attack: 9, defense: 6, speed: 6 },
     moves: [
@@ -72,6 +81,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     id: 'foreman-wraith',
     name: 'Foreman Wraith',
     family: 'restlessMiners',
+    tier: 'elite',
     isBoss: false,
     stats: { maxHp: 50, attack: 12, defense: 8, speed: 7 },
     moves: [
@@ -86,6 +96,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     id: 'coal-spirit',
     name: 'Coal Spirit',
     family: 'coalSpirits',
+    tier: 'regular',
     isBoss: false,
     stats: { maxHp: 30, attack: 8, defense: 4, speed: 8 },
     moves: [
@@ -100,6 +111,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     id: 'coal-wraith',
     name: 'Coal Wraith',
     family: 'coalSpirits',
+    tier: 'elite',
     isBoss: false,
     stats: { maxHp: 46, attack: 11, defense: 6, speed: 9 },
     moves: [
@@ -114,6 +126,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     id: 'coalbound-warden',
     name: 'The Coalbound Warden',
     family: 'boss',
+    tier: 'boss',
     isBoss: true,
     stats: { maxHp: 140, attack: 13, defense: 8, speed: 8 },
     moves: [

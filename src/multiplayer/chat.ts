@@ -1,5 +1,6 @@
-// TODO(multiplayer): chat placeholder. TownPresencePanel (src/components/TownPresencePanel.tsx)
-// is the natural attachment point for a future "message" button per nameplate.
+// TODO(multiplayer): chat placeholder. The presence popover in PlayerHUD
+// (src/components/PlayerHUD.tsx) is the natural attachment point for a future "message" button
+// per nameplate.
 export interface ChatMessage {
   id: string;
   fromUid: string;

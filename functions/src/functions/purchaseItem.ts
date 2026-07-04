@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { SHOP_PRICES } from '../data/items';
+import { ITEMS, SHOP_PRICES } from '../data/items';
 import type { PlayerSave } from '../shared-types';
 
 interface PurchaseItemRequest {
@@ -25,6 +25,9 @@ export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
 
     if (save.player.gold < price) {
       throw new HttpsError('failed-precondition', 'Not enough gold.');
+    }
+    if (ITEMS[itemId]?.unique && save.inventory.some((i) => i.itemId === itemId)) {
+      throw new HttpsError('failed-precondition', 'You already own the only one of those.');
     }
 
     save.player.gold -= price;

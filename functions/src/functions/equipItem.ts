@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { EQUIPMENT, type EquipmentSlot } from '../data/equipment';
-import { adjustStatsForBonuses } from '../engine/equipmentEngine';
+import { adjustStatsForBonuses, setLanternOilCapacity } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
 
 const VALID_SLOTS = new Set<EquipmentSlot>([
@@ -49,6 +49,7 @@ export const equipItem = onCall<EquipItemRequest>(async (request) => {
       if (previousDef) adjustStatsForBonuses(save.player.stats, previousDef.statBonuses, -1);
     }
     adjustStatsForBonuses(save.player.stats, def.statBonuses, 1);
+    if (slot === 'lantern') setLanternOilCapacity(save.player.stats, def.oilCapacity ?? 0);
     save.player.equipment[slot] = itemId;
 
     save.updatedAt = Date.now();
@@ -82,6 +83,7 @@ export const unequipItem = onCall<UnequipItemRequest>(async (request) => {
       const def = EQUIPMENT[currentItemId];
       if (def) adjustStatsForBonuses(save.player.stats, def.statBonuses, -1);
     }
+    if (slot === 'lantern') setLanternOilCapacity(save.player.stats, 0);
     save.player.equipment[slot] = null;
 
     save.updatedAt = Date.now();

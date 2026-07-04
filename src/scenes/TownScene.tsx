@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
 import { MobileHud } from '@/components/exploration/MobileHud';
+import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { DialogueBox } from '@/components/DialogueBox';
 import { PlayerHUD } from '@/components/PlayerHUD';
 import { QuestLog } from '@/components/QuestLog';
@@ -8,21 +9,24 @@ import { CharacterMenu } from '@/components/CharacterMenu';
 import { Shop } from '@/components/Shop';
 import { Inn } from '@/components/Inn';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
-import { TownPresencePanel } from '@/components/TownPresencePanel';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useExplorationViewport } from '@/hooks/useExplorationViewport';
+import { useExplorationViewport, HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
-import { useWanderingNpcs } from '@/hooks/useWanderingNpcs';
+import { useDash } from '@/hooks/useDash';
+import { useDashKeybind } from '@/hooks/useDashKeybind';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useSceneStore } from '@/state/useSceneStore';
 import { callTalkToNpc } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS } from '@/data';
-import type { Npc } from '@/types';
+import type { Npc, OnlinePresence } from '@/types';
 import styles from './TownScene.module.css';
+
+const PRESENCE_STALE_AFTER_MS = 60_000;
 
 const TILESET_COLUMNS = 12;
 
@@ -45,19 +49,23 @@ export function TownScene() {
   const [journalOpen, setJournalOpen] = useState(false);
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
+  const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const isMobile = useIsMobile();
-  const { scale, viewportTiles } = useExplorationViewport();
+  const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const suspended = activeNpc !== null || questLogOpen || menuOpen || shopOpen || innOpen || journalOpen;
-  const { map, position, facingDelta, attemptMove } = useLocationExploration({
+  const { map, position, positionRef, facingDelta, attemptMove, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
   });
+  const [presences, setPresences] = useState<OnlinePresence[]>([]);
 
-  const wanderPositions = useWanderingNpcs(map);
-
-  useHeartbeat(uid, displayName, locationId);
+  useHeartbeat(uid, displayName, locationId, position);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
+  const dash = useDash({ attemptMove, positionRef });
+  useDashKeybind(dash, staminaUnlocked && !suspended);
+
+  useEffect(() => subscribeToPresence(setPresences), []);
 
   function handleDialogueClose() {
     const hook = activeNpc?.gameplayHook;
@@ -139,12 +147,19 @@ export function TownScene() {
       return { id: `building-${o.refId}`, x: o.x, y: o.y, spriteAssetId: marker.spriteAssetId, label: marker.label };
     });
 
-  const entities = [...npcEntities, ...buildingEntities];
+  const now = Date.now();
+  const otherPlayerEntities: GridEntity[] = presences
+    .filter(
+      (p) =>
+        p.uid !== uid && p.locationId === locationId && now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS,
+    )
+    .map((p) => ({ id: `player-${p.uid}`, x: p.x, y: p.y, spriteAssetId: 'sprite.player', label: p.displayName }));
+
+  const entities = [...npcEntities, ...buildingEntities, ...otherPlayerEntities];
 
   return (
-    <div className={styles.wrap}>
-      <PlayerHUD />
-      <TownPresencePanel locationId={locationId} />
+    <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
+      <PlayerHUD locationId={locationId} />
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
@@ -154,20 +169,25 @@ export function TownScene() {
           playerSpriteAssetId="sprite.player"
           entities={entities}
           scale={scale}
-          viewportTiles={viewportTiles}
+          viewportSize={viewportSize}
         />
       </div>
       {isMobile ? (
-        <MobileHud
-          onInteract={attemptInteract}
-          onQuestLog={() => setQuestLogOpen((open) => !open)}
-          onInventory={() => setMenuOpen((open) => !open)}
-          onJournal={() => setJournalOpen((open) => !open)}
-        />
+        <>
+          <DirectionPad attemptMove={attemptMove} />
+          <MobileHud
+            onInteract={attemptInteract}
+            onDash={staminaUnlocked ? dash : undefined}
+            onQuestLog={() => setQuestLogOpen((open) => !open)}
+            onInventory={() => setMenuOpen((open) => !open)}
+            onJournal={() => setJournalOpen((open) => !open)}
+          />
+        </>
       ) : (
         <p className={styles.hint}>
-          Move: arrow keys / WASD &nbsp;·&nbsp; Talk: Enter / Space &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I
-          &nbsp;·&nbsp; Journal: J
+          Move: arrow keys / WASD &nbsp;·&nbsp; Talk: Enter / Space
+          {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
+          &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
         </p>
       )}
       {activeNpc && (

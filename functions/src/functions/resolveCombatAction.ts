@@ -5,6 +5,8 @@ import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
 import { ENEMIES } from '../data/enemies';
 import { ITEMS } from '../data/items';
 import { SKILLS } from '../data/skills';
+import { EQUIPMENT } from '../data/equipment';
+import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import type { CombatAction, CombatSession, PlayerSave } from '../shared-types';
 
 interface ResolveCombatActionRequest {
@@ -43,8 +45,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     }
     const save = userSnap.data() as PlayerSave;
 
-    const enemy = ENEMIES[session.enemyId];
-    if (!enemy) {
+    if (session.enemies.some((e) => !ENEMIES[e.enemyId])) {
       throw new HttpsError('internal', 'Unknown enemy in this session.');
     }
 
@@ -55,11 +56,33 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       if (!itemId || !invEntry || invEntry.quantity < 1 || !def?.usableInCombat) {
         throw new HttpsError('failed-precondition', 'You cannot use that item right now.');
       }
+      const effect = def.effect;
+      const wouldHaveEffect =
+        !!effect &&
+        ((!!effect.healHp && save.player.stats.hp < save.player.stats.maxHp) ||
+          (!!effect.healSpirit && save.player.stats.spirit < save.player.stats.maxSpirit) ||
+          (!!effect.restoreOil && save.player.stats.lanternOil < save.player.stats.maxLanternOil));
+      if (!wouldHaveEffect) {
+        throw new HttpsError('failed-precondition', 'That would have no effect right now.');
+      }
     }
-    if (action.type === 'spiritArt') {
-      const cost = SKILLS['lantern-flame'].spiritCost;
-      if (save.player.stats.spirit < cost) {
+    if (action.type === 'skill') {
+      const skill = SKILLS[action.skillId ?? 'keepers-strike'];
+      if (!skill) throw new HttpsError('invalid-argument', 'Unknown Specialty Attack.');
+      if (save.player.stats.spirit < skill.spiritCost) {
         throw new HttpsError('failed-precondition', 'Not enough Spirit for that.');
+      }
+    }
+    if (action.type === 'lanternAbility') {
+      const lanternId = save.player.equipment.lantern;
+      const lanternDef = lanternId ? EQUIPMENT[lanternId] : undefined;
+      const abilityId = action.abilityId;
+      const ability = abilityId ? LANTERN_ABILITIES[abilityId] : undefined;
+      if (!ability || !lanternDef?.lanternAbilityIds?.includes(abilityId!)) {
+        throw new HttpsError('failed-precondition', 'Your equipped lantern cannot do that.');
+      }
+      if (save.player.stats.lanternOil < ability.oilCost) {
+        throw new HttpsError('failed-precondition', 'Not enough Lantern Oil for that.');
       }
     }
 
@@ -67,13 +90,12 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       action,
       playerStats: save.player.stats,
       inventory: save.inventory,
-      enemy,
-      enemyHp: session.enemyHp,
-      enemyName: enemy.name,
+      enemies: session.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
     });
 
     save.player.stats.hp = result.playerHp;
     save.player.stats.spirit = result.playerSpirit;
+    save.player.stats.lanternOil = result.playerLanternOil;
 
     if (result.itemConsumedId) {
       const entry = save.inventory.find((i) => i.itemId === result.itemConsumedId);
@@ -86,13 +108,21 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     let rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean } | null = null;
 
     if (result.phase === 'victory') {
-      const reward = computeRewards(enemy, save.player.xp, save.player.level);
+      const defeated = session.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level }));
+      const enemyIds = defeated.map((e) => e.enemyId);
+      const reward = computeRewards(defeated, save.player.xp, save.player.level);
       save.player.xp += reward.xp;
       save.player.gold += reward.gold;
       if (reward.leveledUp) {
         save.player.level = reward.newLevel;
         save.player.stats.maxHp += reward.statGrowth.maxHp ?? 0;
         save.player.stats.maxSpirit += reward.statGrowth.maxSpirit ?? 0;
+        // Stays untouched at 0 until Stamina is unlocked (interactWithShrine.ts grants the base
+        // pool, already scaled for the player's current level, the moment that happens).
+        if (save.player.stats.maxStamina > 0) {
+          save.player.stats.maxStamina += reward.statGrowth.maxStamina ?? 0;
+          save.player.stats.stamina = Math.min(save.player.stats.stamina, save.player.stats.maxStamina);
+        }
         save.player.stats.attack += reward.statGrowth.attack ?? 0;
         save.player.stats.defense += reward.statGrowth.defense ?? 0;
         save.player.stats.speed += reward.statGrowth.speed ?? 0;
@@ -100,21 +130,31 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         save.player.stats.spirit = save.player.stats.maxSpirit;
       }
       for (const itemId of reward.lootItemIds) {
+        // A unique drop (e.g. a boss trophy) never grants a second copy, even if the same boss
+        // is challenged and defeated again later.
+        if (ITEMS[itemId]?.unique && save.inventory.some((i) => i.itemId === itemId)) continue;
         const entry = save.inventory.find((i) => i.itemId === itemId);
         if (entry) entry.quantity += 1;
         else save.inventory.push({ itemId, quantity: 1 });
       }
-      if (!save.journal.creaturesDiscovered.includes(enemy.id)) {
-        save.journal.creaturesDiscovered.push(enemy.id);
-      }
-      if (enemy.isBoss && !save.journal.bossesDefeated.includes(enemy.id)) {
-        save.journal.bossesDefeated.push(enemy.id);
-      }
 
-      const questEvents: { type: 'defeatEnemies' | 'defeatBoss'; targetId: string }[] = [
-        { type: 'defeatEnemies', targetId: enemy.id },
-      ];
-      if (enemy.isBoss) questEvents.push({ type: 'defeatBoss', targetId: enemy.id });
+      // Group defeated enemies by id so a quest like "defeat 3 mothlings" advances by the actual
+      // count killed in this one fight, not just +1, and each unique species is only journaled once.
+      const countByEnemyId = new Map<string, number>();
+      for (const id of enemyIds) countByEnemyId.set(id, (countByEnemyId.get(id) ?? 0) + 1);
+
+      const questEvents: { type: 'defeatEnemies' | 'defeatBoss'; targetId: string; amount?: number }[] = [];
+      for (const [enemyId, count] of countByEnemyId) {
+        const enemy = ENEMIES[enemyId];
+        if (!save.journal.creaturesDiscovered.includes(enemyId)) {
+          save.journal.creaturesDiscovered.push(enemyId);
+        }
+        if (enemy.isBoss && !save.journal.bossesDefeated.includes(enemyId)) {
+          save.journal.bossesDefeated.push(enemyId);
+        }
+        questEvents.push({ type: 'defeatEnemies', targetId: enemyId, amount: count });
+        if (enemy.isBoss) questEvents.push({ type: 'defeatBoss', targetId: enemyId });
+      }
       const completions = questEvents.flatMap((event) => advanceQuests(save.quests, event));
       applyQuestRewards(save, completions);
 
@@ -129,10 +169,11 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
+    const updatedEnemies = session.enemies.map((e, i) => ({ ...e, hp: result.enemyHp[i] }));
     if (result.phase === 'continue') {
-      tx.update(sessionRef, { enemyHp: result.enemyHp, round: session.round + 1 });
+      tx.update(sessionRef, { enemies: updatedEnemies, round: session.round + 1 });
     } else {
-      tx.update(sessionRef, { enemyHp: result.enemyHp, status: 'resolved' });
+      tx.update(sessionRef, { enemies: updatedEnemies, status: 'resolved' });
     }
 
     return {
@@ -142,8 +183,9 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       playerMaxHp: save.player.stats.maxHp,
       playerSpirit: save.player.stats.spirit,
       playerMaxSpirit: save.player.stats.maxSpirit,
-      enemyHp: result.enemyHp,
-      enemyMaxHp: session.enemyMaxHp,
+      playerLanternOil: save.player.stats.lanternOil,
+      playerMaxLanternOil: save.player.stats.maxLanternOil,
+      enemies: updatedEnemies.map((e, index) => ({ index, hp: e.hp, maxHp: e.maxHp })),
       rewards,
       playerLevel: save.player.level,
       playerGold: save.player.gold,

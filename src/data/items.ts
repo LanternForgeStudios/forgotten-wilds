@@ -10,6 +10,17 @@ export const ITEMS: Item[] = [
     iconAssetId: 'icon.item.healing-poultice',
     effect: { healHp: 30 },
     stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'greater-healing-poultice',
+    name: 'Greater Healing Poultice',
+    description: 'A stronger brew, harder to come by - restores considerably more HP than the common poultice.',
+    category: 'consumable',
+    iconAssetId: 'icon.item.healing-poultice',
+    effect: { healHp: 55 },
+    stackable: true,
+    tier: 'uncommon',
   },
   {
     id: 'spirit-draught',
@@ -19,14 +30,17 @@ export const ITEMS: Item[] = [
     iconAssetId: 'icon.item.spirit-draught',
     effect: { healSpirit: 20 },
     stackable: true,
+    tier: 'common',
   },
   {
     id: 'lantern-oil',
     name: 'Lantern Oil',
-    description: 'Refined oil that strengthens a Keeper\'s lantern, unlocking its next upgrade tier.',
-    category: 'lanternUpgrade',
+    description: "Refined oil for a Keeper's lantern - refills the Oil its ability draws on. Usable in or out of battle.",
+    category: 'consumable',
     iconAssetId: 'icon.item.lantern-oil',
+    effect: { restoreOil: 15 },
     stackable: true,
+    tier: 'uncommon',
   },
   {
     id: 'moth-dust',
@@ -35,6 +49,7 @@ export const ITEMS: Item[] = [
     category: 'keyItem',
     iconAssetId: 'icon.item.moth-dust',
     stackable: true,
+    tier: 'common',
   },
   {
     id: 'rusted-token',
@@ -43,6 +58,7 @@ export const ITEMS: Item[] = [
     category: 'keyItem',
     iconAssetId: 'icon.item.rusted-token',
     stackable: true,
+    tier: 'common',
   },
   {
     id: 'ember-shard',
@@ -51,6 +67,7 @@ export const ITEMS: Item[] = [
     category: 'keyItem',
     iconAssetId: 'icon.item.ember-shard',
     stackable: true,
+    tier: 'uncommon',
   },
   {
     id: 'miners-lost-lantern',
@@ -59,6 +76,8 @@ export const ITEMS: Item[] = [
     category: 'keyItem',
     iconAssetId: 'icon.item.miners-lost-lantern',
     stackable: false,
+    tier: 'rare',
+    unique: true,
   },
   {
     id: 'wardens-ember-heart',
@@ -67,15 +86,25 @@ export const ITEMS: Item[] = [
     category: 'keyItem',
     iconAssetId: 'icon.item.wardens-ember-heart',
     stackable: false,
+    tier: 'legendary',
+    unique: true,
   },
 ];
 
 // Display copy only — functions/src/data/prices.ts is authoritative for purchaseItem.
 export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'healing-poultice', price: 15, currency: 'gold' },
+  { itemId: 'greater-healing-poultice', price: 45, currency: 'gold' },
   { itemId: 'spirit-draught', price: 18, currency: 'gold' },
-  { itemId: 'lantern-oil', price: 40, currency: 'gold' },
+  { itemId: 'lantern-oil', price: 20, currency: 'gold' },
   { itemId: 'keepers-lantern', price: 8, currency: 'gold' },
+  // Common-tier equipment only - uncommon gear comes from chests/quests, not the shop.
+  { itemId: 'miners-pick', price: 30, currency: 'gold' },
+  { itemId: 'travelers-coat', price: 30, currency: 'gold' },
+  { itemId: 'worn-trail-boots', price: 25, currency: 'gold' },
+  { itemId: 'frayed-gloves', price: 20, currency: 'gold' },
+  { itemId: 'ash-hallow-token', price: 25, currency: 'gold' },
+  { itemId: 'carved-totem', price: 20, currency: 'gold' },
 ];
 
 export const INN_REST_COST = 10;

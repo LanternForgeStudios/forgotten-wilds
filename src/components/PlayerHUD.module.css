@@ -1,30 +1,72 @@
-.hud {
+.bar {
   position: fixed;
-  top: 16px;
-  left: 16px;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
-  width: 220px;
-  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 14px;
+  background: var(--fw-panel);
+  border-bottom: 2px solid var(--fw-panel-border);
+  font-size: 12px;
+  /* Not overflow:hidden - the presence popover is an absolutely-positioned child that extends
+     below the bar's own height, and overflow:hidden here would clip it out of view entirely. */
+  overflow: visible;
 }
 
 .name {
-  margin: 0 0 6px;
   font-weight: bold;
   color: var(--fw-accent);
-  display: flex;
-  justify-content: space-between;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.barRow {
+.level {
+  opacity: 0.75;
+  font-weight: normal;
+}
+
+.location {
+  opacity: 0.7;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-left: 1px solid var(--fw-panel-border);
+  padding-left: 14px;
+}
+
+@media (max-width: 720px) {
+  .location {
+    display: none;
+  }
+}
+
+.statGroup {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 4px;
+  min-width: 90px;
+  flex: 1 1 120px;
+  max-width: 200px;
+}
+
+.xpButton {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.xpButton:hover .barFillXp {
+  filter: brightness(1.2);
 }
 
 .barLabel {
-  width: 16px;
   opacity: 0.8;
+  flex-shrink: 0;
 }
 
 .barTrack {
@@ -33,6 +75,7 @@
   background: rgba(0, 0, 0, 0.4);
   border-radius: 4px;
   overflow: hidden;
+  min-width: 30px;
 }
 
 .barFillHp {
@@ -45,35 +88,135 @@
   background: var(--fw-spirit);
 }
 
+.barFillXp {
+  height: 100%;
+  background: var(--fw-accent);
+}
+
+.barFillOil {
+  height: 100%;
+  background: #d97b2e;
+}
+
+.barFillStamina {
+  height: 100%;
+  background: #5cb85c;
+}
+
 .barValue {
-  width: 56px;
+  width: 52px;
   text-align: right;
   opacity: 0.85;
   font-size: 11px;
+  flex-shrink: 0;
+}
+
+.xpValue {
+  width: 92px;
+  white-space: nowrap;
 }
 
 .gold {
-  margin-top: 6px;
   color: var(--fw-accent);
   opacity: 0.9;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.account {
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid var(--fw-panel-border);
+.presenceWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.presenceButton {
+  background: transparent;
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.presenceButton:hover {
+  color: var(--fw-text);
+  border-color: var(--fw-accent);
+}
+
+.presencePopover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  width: 200px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--fw-panel);
+  border: 1px solid var(--fw-panel-border);
+  border-radius: 6px;
+  padding: 8px;
+  z-index: 11;
+}
+
+.presenceEmpty {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.presenceRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
+  padding: 4px 0;
 }
 
-.accountEmail {
-  font-size: 10px;
-  opacity: 0.6;
+.presenceName {
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 12px;
+}
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--fw-accent-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.account {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.accountEmail {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  font-size: 10px;
+  opacity: 0.6;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountEmail:hover {
+  opacity: 1;
+  text-decoration: underline;
 }
 
 .signOutButton {
@@ -81,7 +224,7 @@
   border: 1px solid var(--fw-panel-border);
   color: var(--fw-text-dim);
   font-size: 10px;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 3px;
   flex-shrink: 0;
 }
@@ -89,4 +232,35 @@
 .signOutButton:hover {
   color: var(--fw-danger);
   border-color: var(--fw-danger);
+}
+
+@media (max-width: 480px) {
+  .bar {
+    gap: 6px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  .statGroup {
+    min-width: 0;
+    gap: 3px;
+    flex-basis: 60px;
+  }
+
+  .barTrack {
+    min-width: 18px;
+  }
+
+  .barValue,
+  .xpValue {
+    width: auto;
+  }
+
+  .gold {
+    font-size: 11px;
+  }
+
+  .presenceButton {
+    padding: 3px 6px;
+  }
 }

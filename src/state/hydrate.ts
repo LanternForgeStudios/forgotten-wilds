@@ -4,6 +4,7 @@ import { usePlayerStore } from './usePlayerStore';
 import { useInventoryStore } from './useInventoryStore';
 import { useQuestStore } from './useQuestStore';
 import { useJournalStore } from './useJournalStore';
+import { useWorldStateStore } from './useWorldStateStore';
 
 /** Fans a PlayerSave (from a Cloud Function response or a users/{uid} read) out to every store. */
 export function hydrateAllStores(save: PlayerSave): void {
@@ -11,6 +12,7 @@ export function hydrateAllStores(save: PlayerSave): void {
   useInventoryStore.getState().hydrate(save.inventory);
   useQuestStore.getState().hydrate(save.quests);
   useJournalStore.getState().hydrate(save.journal);
+  useWorldStateStore.getState().hydrate(save.openedChests ?? []);
 }
 
 /** Re-reads users/{uid} and re-hydrates every store. Used after any Cloud Function call whose

@@ -20,6 +20,10 @@ export interface Player {
   regionalReputation: number;
   equipment: PlayerEquipment;
   currentLocationId: string;
+  /** Server clock reading the last time Stamina was reconciled - lets Dash compute how much has
+   *  regenerated since without a scheduled job ticking every player. Only meaningful once Stamina
+   *  is unlocked. */
+  staminaUpdatedAt: number;
 }
 
 export interface PlayerSave {
@@ -30,5 +34,8 @@ export interface PlayerSave {
   inventory: InventoryItem[];
   quests: Record<string, QuestProgress>;
   journal: JournalState;
+  /** World chest ids this player has already opened - a chest only ever grants its item once per
+   *  player, regardless of how many times it's interacted with afterward. */
+  openedChests: string[];
   updatedAt: number;
 }

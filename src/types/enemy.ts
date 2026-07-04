@@ -19,11 +19,15 @@ export interface EnemyMove {
   unlocksAtHpFraction?: number;
 }
 
+/** Regular and Elite additionally roll a 1-5 level in combat that scales stats/rewards up; Boss
+ *  tier never rolls a level - its difficulty is exactly what's authored here. */
+export type EnemyTier = 'regular' | 'elite' | 'boss';
+
 export interface Enemy {
   id: string;
   name: string;
   family: 'mothlings' | 'restlessMiners' | 'coalSpirits' | 'boss';
-  tier: number;
+  tier: EnemyTier;
   isBoss: boolean;
   battleSpriteAssetId: string;
   stats: EnemyStats;

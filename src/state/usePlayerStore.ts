@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { EquipmentSlot, Player } from '@/types';
+import type { EquipmentSlot, Player, Stats } from '@/types';
 
 interface PlayerState {
   player: Player | null;
@@ -10,6 +10,10 @@ interface PlayerState {
    *  still what actually persists the change and remains the source of truth - this never writes
    *  anywhere itself, it just avoids a visible lag in a value the player already legitimately owns. */
   patchEquipment: (slot: EquipmentSlot, itemId: string | null) => void;
+  /** Not optimistic - the values passed in are always the server's own round-result numbers
+   *  (resolveCombatAction's response), just applied here instead of waiting for a full resync so
+   *  the top HUD's HP/SP bars track combat live, turn by turn. */
+  patchStats: (stats: Partial<Stats>) => void;
 }
 
 /** Populated only from Cloud Function responses or reads of users/{uid} — never mutated locally,
@@ -22,5 +26,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     const { player } = get();
     if (!player) return;
     set({ player: { ...player, equipment: { ...player.equipment, [slot]: itemId } } });
+  },
+  patchStats: (stats) => {
+    const { player } = get();
+    if (!player) return;
+    set({ player: { ...player, stats: { ...player.stats, ...stats } } });
   },
 }));

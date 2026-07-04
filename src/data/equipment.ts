@@ -9,6 +9,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'weapon',
     iconAssetId: 'icon.equipment.miners-pick',
     statBonuses: { attack: 4 },
+    tier: 'common',
   },
   {
     id: 'keepers-lantern-staff',
@@ -17,6 +18,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'weapon',
     iconAssetId: 'icon.equipment.keepers-lantern-staff',
     statBonuses: { attack: 8, speed: 1 },
+    tier: 'uncommon',
   },
   {
     id: 'travelers-coat',
@@ -25,6 +27,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'armor',
     iconAssetId: 'icon.equipment.travelers-coat',
     statBonuses: { defense: 4 },
+    tier: 'common',
   },
   {
     id: 'ironwood-vest',
@@ -33,6 +36,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'armor',
     iconAssetId: 'icon.equipment.ironwood-vest',
     statBonuses: { defense: 8, maxHp: 10 },
+    tier: 'uncommon',
   },
   {
     id: 'worn-trail-boots',
@@ -41,6 +45,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'boots',
     iconAssetId: 'icon.equipment.worn-trail-boots',
     statBonuses: { speed: 2 },
+    tier: 'common',
   },
   {
     id: 'ridge-runner-boots',
@@ -49,6 +54,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'boots',
     iconAssetId: 'icon.equipment.ridge-runner-boots',
     statBonuses: { speed: 5 },
+    tier: 'uncommon',
   },
   {
     id: 'frayed-gloves',
@@ -57,6 +63,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'gloves',
     iconAssetId: 'icon.equipment.frayed-gloves',
     statBonuses: { attack: 2 },
+    tier: 'common',
   },
   {
     id: 'miners-leather-gloves',
@@ -65,6 +72,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'gloves',
     iconAssetId: 'icon.equipment.miners-leather-gloves',
     statBonuses: { attack: 5, defense: 1 },
+    tier: 'uncommon',
   },
   {
     id: 'ash-hallow-token',
@@ -73,6 +81,16 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'charm',
     iconAssetId: 'icon.equipment.ash-hallow-token',
     statBonuses: { maxSpirit: 8 },
+    tier: 'common',
+  },
+  {
+    id: 'warding-charm',
+    name: 'Warding Charm',
+    description: 'A charm etched with warding sigils, said to turn aside a share of any blow while steadying the spirit.',
+    slot: 'charm',
+    iconAssetId: 'icon.equipment.warding-charm',
+    statBonuses: { maxSpirit: 10, defense: 3 },
+    tier: 'uncommon',
   },
   {
     id: 'moonlit-charm',
@@ -81,6 +99,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'charm',
     iconAssetId: 'icon.equipment.moonlit-charm',
     statBonuses: { maxSpirit: 16 },
+    tier: 'rare',
   },
   {
     id: 'keepers-lantern',
@@ -89,6 +108,9 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'lantern',
     iconAssetId: 'icon.equipment.keepers-lantern',
     statBonuses: { maxSpirit: 5 },
+    tier: 'common',
+    oilCapacity: 20,
+    lanternAbilityIds: ['lantern-flame'],
   },
   {
     id: 'miners-lost-lantern-equipped',
@@ -97,6 +119,10 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'lantern',
     iconAssetId: 'icon.equipment.miners-lost-lantern-equipped',
     statBonuses: { maxSpirit: 14, defense: 2 },
+    tier: 'rare',
+    unique: true,
+    oilCapacity: 35,
+    lanternAbilityIds: ['steadfast-ember'],
   },
   {
     id: 'carved-totem',
@@ -105,5 +131,15 @@ export const EQUIPMENT: EquipmentItem[] = [
     slot: 'spiritTotem',
     iconAssetId: 'icon.equipment.carved-totem',
     statBonuses: { attack: 1, defense: 1 },
+    tier: 'common',
+  },
+  {
+    id: 'emberwood-totem',
+    name: 'Emberwood Totem',
+    description: 'A totem carved from fire-scarred wood, said to quicken the hand of whoever carries it.',
+    slot: 'spiritTotem',
+    iconAssetId: 'icon.equipment.emberwood-totem',
+    statBonuses: { attack: 3, speed: 2 },
+    tier: 'uncommon',
   },
 ];

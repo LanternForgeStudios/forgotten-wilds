@@ -14,6 +14,8 @@ export async function updatePresence(presence: OnlinePresence): Promise<void> {
     locationId: presence.locationId,
     lastHeartbeat: presence.lastHeartbeat,
     joinedAt: presence.joinedAt,
+    x: presence.x,
+    y: presence.y,
   });
 }
 

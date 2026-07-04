@@ -1,0 +1,205 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.panel {
+  width: min(560px, 94vw);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.title {
+  margin: 0 0 12px;
+  color: var(--fw-accent);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.tabActive {
+  background: var(--fw-accent-dim);
+  color: var(--fw-text);
+}
+
+.section {
+  margin-top: 4px;
+}
+
+.sectionTitle {
+  margin: 14px 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 6px 0;
+  border-top: 1px solid var(--fw-panel-border);
+}
+
+.infoRow:first-child {
+  border-top: none;
+}
+
+.infoLabel {
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+.searchBar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.textInput {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.rowName {
+  flex: 1;
+  font-size: 13px;
+}
+
+.pendingTag {
+  font-size: 11px;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.smallButton {
+  background: var(--fw-accent-dim);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.smallButton:hover {
+  background: var(--fw-accent);
+  color: var(--fw-bg-deep);
+}
+
+.dangerButton {
+  background: transparent;
+  border: 1px solid var(--fw-danger);
+  color: var(--fw-danger);
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.dangerButton:hover {
+  background: var(--fw-danger);
+  color: var(--fw-bg-deep);
+}
+
+.dangerButton:disabled {
+  opacity: 0.4;
+}
+
+.dangerText {
+  font-size: 13px;
+  color: var(--fw-danger);
+  opacity: 0.9;
+  margin-top: 0;
+}
+
+.dmPanel {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--fw-panel-border);
+}
+
+.dmMessages {
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.dmMine {
+  align-self: flex-end;
+  background: var(--fw-accent-dim);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin: 0;
+  max-width: 80%;
+}
+
+.dmTheirs {
+  align-self: flex-start;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin: 0;
+  max-width: 80%;
+}
+
+.empty {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.error {
+  color: var(--fw-danger);
+  font-size: 12px;
+}
+
+.closeHint {
+  margin-top: 14px;
+  font-size: 12px;
+  opacity: 0.7;
+  text-align: right;
+}

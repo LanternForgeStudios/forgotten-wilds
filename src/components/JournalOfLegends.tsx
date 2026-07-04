@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
 import { useJournalStore } from '@/state/useJournalStore';
+import { useSceneStore } from '@/state/useSceneStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
+import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { ENEMIES, LOCATIONS, LORE_ENTRIES } from '@/data';
 import styles from './CharacterMenu.module.css';
 
@@ -20,8 +22,27 @@ const TABS: { id: Tab; label: string }[] = [
 
 export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const journal = useJournalStore((s) => s.journal);
+  const goTo = useSceneStore((s) => s.goTo);
+  const currentLocationId = useSceneStore((s) => s.params.locationId);
   const [tab, setTab] = useState<Tab>('creatures');
+  const [expandedLocations, setExpandedLocations] = useState<Set<string>>(new Set());
   useOverlayClose(onClose);
+
+  function travelTo(locationId: string) {
+    const loc = LOCATIONS.find((l) => l.id === locationId);
+    if (!loc) return;
+    goTo(sceneForLocationKind(loc.kind), { locationId: loc.id });
+    onClose();
+  }
+
+  function toggleExpanded(locationId: string) {
+    setExpandedLocations((prev) => {
+      const next = new Set(prev);
+      if (next.has(locationId)) next.delete(locationId);
+      else next.add(locationId);
+      return next;
+    });
+  }
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -59,18 +80,58 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
 
         {tab === 'locations' && (
           <div>
-            {journal.locationsVisited.map((id) => {
-              const loc = LOCATIONS.find((l) => l.id === id);
-              return (
-                <div key={id} className={styles.slotRow}>
-                  <span style={{ fontSize: 13, flex: 1 }}>
-                    <strong>{loc?.name ?? id}</strong>
-                    <br />
-                    <span style={{ opacity: 0.7 }}>{loc?.description}</span>
-                  </span>
-                </div>
-              );
-            })}
+            {journal.locationsVisited
+              .filter((id) => !LOCATIONS.find((l) => l.id === id)?.parentLocationId)
+              .map((id) => {
+                const loc = LOCATIONS.find((l) => l.id === id);
+                const canTravel = loc?.fastTravel && id !== currentLocationId;
+                const children = LOCATIONS.filter(
+                  (l) => l.parentLocationId === id && journal.locationsVisited.includes(l.id),
+                );
+                const expanded = expandedLocations.has(id);
+                return (
+                  <div key={id}>
+                    <div
+                      className={styles.slotRow}
+                      style={{ cursor: children.length > 0 ? 'pointer' : 'default' }}
+                      onClick={() => children.length > 0 && toggleExpanded(id)}
+                    >
+                      <span style={{ fontSize: 13, flex: 1 }}>
+                        <strong>
+                          {children.length > 0 && (expanded ? '▾ ' : '▸ ')}
+                          {loc?.name ?? id}
+                        </strong>
+                        <br />
+                        <span style={{ opacity: 0.7 }}>{loc?.description}</span>
+                      </span>
+                      {canTravel && (
+                        <button
+                          className={styles.smallButton}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            travelTo(id);
+                          }}
+                        >
+                          Travel Here
+                        </button>
+                      )}
+                      {loc?.fastTravel && id === currentLocationId && (
+                        <span style={{ fontSize: 11, opacity: 0.6 }}>You are here</span>
+                      )}
+                    </div>
+                    {expanded &&
+                      children.map((child) => (
+                        <div key={child.id} className={styles.slotRow} style={{ paddingLeft: 24 }}>
+                          <span style={{ fontSize: 12, flex: 1 }}>
+                            <strong>{child.name}</strong>
+                            <br />
+                            <span style={{ opacity: 0.7 }}>{child.description}</span>
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                );
+              })}
           </div>
         )}
 

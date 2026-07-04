@@ -3,7 +3,8 @@ export type QuestObjectiveType =
   | 'defeatEnemies'
   | 'reachLocation'
   | 'collectItem'
-  | 'defeatBoss';
+  | 'defeatBoss'
+  | 'interactWithShrine';
 
 export interface QuestObjective {
   id: string;

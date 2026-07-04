@@ -33,11 +33,25 @@ export const useItem = onCall<UseItemRequest>(async (request) => {
       throw new HttpsError('failed-precondition', 'You do not have that item.');
     }
 
+    const wouldHaveEffect =
+      (!!effect.healHp && save.player.stats.hp < save.player.stats.maxHp) ||
+      (!!effect.healSpirit && save.player.stats.spirit < save.player.stats.maxSpirit) ||
+      (!!effect.restoreOil && save.player.stats.lanternOil < save.player.stats.maxLanternOil);
+    if (!wouldHaveEffect) {
+      throw new HttpsError('failed-precondition', 'That would have no effect right now.');
+    }
+
     if (effect.healHp) {
       save.player.stats.hp = Math.min(save.player.stats.maxHp, save.player.stats.hp + effect.healHp);
     }
     if (effect.healSpirit) {
       save.player.stats.spirit = Math.min(save.player.stats.maxSpirit, save.player.stats.spirit + effect.healSpirit);
+    }
+    if (effect.restoreOil) {
+      save.player.stats.lanternOil = Math.min(
+        save.player.stats.maxLanternOil,
+        save.player.stats.lanternOil + effect.restoreOil,
+      );
     }
 
     entry.quantity -= 1;

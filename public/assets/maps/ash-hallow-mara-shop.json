@@ -103,6 +103,11 @@
               "name": "targetSpawnId",
               "type": "string",
               "value": "from-ash-hallow-mara-shop"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "down"
             }
           ]
         }

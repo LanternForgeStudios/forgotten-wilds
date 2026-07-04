@@ -14,15 +14,11 @@ export interface Skill {
 
 export const SKILLS: Record<string, Skill> = {
   attack: { id: 'attack', kind: 'skill', damageType: 'physical', power: 10, spiritCost: 0 },
-  'keepers-strike': { id: 'keepers-strike', kind: 'skill', damageType: 'physical', power: 18, spiritCost: 0 },
-  'lantern-flame': {
-    id: 'lantern-flame',
-    kind: 'spiritArt',
-    damageType: 'spirit',
-    power: 22,
-    spiritCost: 12,
-    effectiveAgainstFamilies: ['coalSpirits'],
-  },
+  // A Specialty Attack, gated by Spirit rather than a cooldown - see data/specialAttacks.ts for
+  // the roster/unlock metadata; this entry is just its combat math.
+  'keepers-strike': { id: 'keepers-strike', kind: 'skill', damageType: 'physical', power: 18, spiritCost: 10 },
+  // Lantern Flame moved to data/lanternAbilities.ts - it's tied to whichever lantern is equipped
+  // (fueled by Lantern Oil), not a generally-learned skill like the ones in this file.
   'mothling-dustwing': { id: 'mothling-dustwing', kind: 'skill', damageType: 'physical', power: 10, spiritCost: 0 },
   'miner-pickaxe-swing': { id: 'miner-pickaxe-swing', kind: 'skill', damageType: 'physical', power: 14, spiritCost: 0 },
   'coalspirit-cinderburst': {

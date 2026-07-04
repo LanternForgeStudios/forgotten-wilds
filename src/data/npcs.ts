@@ -21,7 +21,7 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['keepers-first-light', 'mothlight-on-the-ridge', 'the-coalbound-warden'],
+      questIds: ['keepers-first-light', 'mothlight-on-the-ridge', 'the-coalbound-warden', 'guardians-call'],
     },
   },
   {

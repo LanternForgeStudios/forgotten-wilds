@@ -86,4 +86,73 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 150, gold: 100, itemIds: ['wardens-ember-heart'] },
   },
+  {
+    id: 'guardians-call',
+    name: "The Guardian's Call",
+    giverNpcId: 'elias-rowan',
+    description: 'The Warden is calmed. Elias asked to hear how it went - return to him in Ash Hallow.',
+    prerequisiteQuestId: 'the-coalbound-warden',
+    objectives: [
+      {
+        id: 'talk-elias-after-warden',
+        type: 'talkToNpc',
+        description: 'Report back to Elias Rowan in Ash Hallow.',
+        targetId: 'elias-rowan',
+        requiredCount: 1,
+      },
+    ],
+    reward: { xp: 20, gold: 15 },
+  },
+  {
+    id: 'guardians-trial',
+    name: "The Guardian's Trial",
+    giverNpcId: 'elias-rowan',
+    description:
+      "Elias speaks of an older shrine on Ironwood Trail, and something that still watches over it. Find it.",
+    prerequisiteQuestId: 'guardians-call',
+    objectives: [
+      {
+        id: 'find-guardian',
+        type: 'interactWithShrine',
+        description: 'Find the shrine on Ironwood Trail and speak with the Guardian.',
+        targetId: 'guardian-of-ironwood',
+        requiredCount: 1,
+      },
+    ],
+    reward: { xp: 20, gold: 15 },
+  },
+  {
+    id: 'guardians-proof',
+    name: "The Guardian's Proof",
+    giverNpcId: 'guardian-of-ironwood',
+    description: 'The Guardian will not teach its ways to the untested. Prove your resolve on the trail.',
+    prerequisiteQuestId: 'guardians-trial',
+    objectives: [
+      {
+        id: 'prove-resolve',
+        type: 'defeatEnemies',
+        description: 'Defeat 5 Mothlings on Ironwood Trail.',
+        targetId: 'mothling',
+        requiredCount: 5,
+      },
+    ],
+    reward: { xp: 40, gold: 30 },
+  },
+  {
+    id: 'guardians-blessing',
+    name: "The Guardian's Blessing",
+    giverNpcId: 'guardian-of-ironwood',
+    description: 'Return to the shrine and report what you have done.',
+    prerequisiteQuestId: 'guardians-proof',
+    objectives: [
+      {
+        id: 'report-to-guardian',
+        type: 'interactWithShrine',
+        description: 'Return to the Guardian of Ironwood.',
+        targetId: 'guardian-of-ironwood',
+        requiredCount: 1,
+      },
+    ],
+    reward: { xp: 60, gold: 40 },
+  },
 ];

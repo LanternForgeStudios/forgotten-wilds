@@ -9,18 +9,10 @@ export const SKILLS: Skill[] = [
     kind: 'skill',
     damageType: 'physical',
     power: 18,
-    spiritCost: 0,
+    spiritCost: 10,
   },
-  {
-    id: 'lantern-flame',
-    name: 'Lantern Flame',
-    description: 'Spirit fire drawn from the Keeper\'s lantern, searing restless spirits — especially coal-touched ones.',
-    kind: 'spiritArt',
-    damageType: 'spirit',
-    power: 22,
-    spiritCost: 12,
-    effectiveAgainstFamilies: ['coalSpirits'],
-  },
+  // Lantern Flame moved to src/data/lanternAbilities.ts — it belongs to whichever lantern is
+  // equipped (fueled by Lantern Oil), not a generally-learned skill.
   // Enemy signature moves
   {
     id: 'mothling-dustwing',

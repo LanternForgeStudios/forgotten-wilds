@@ -1,10 +1,11 @@
 import type { Party } from './future';
 
-export type CombatActionType = 'attack' | 'skill' | 'spiritArt' | 'item' | 'defend' | 'flee';
+export type CombatActionType = 'attack' | 'skill' | 'lanternAbility' | 'item' | 'defend' | 'flee';
 
 export interface CombatAction {
   type: CombatActionType;
   skillId?: string;
+  abilityId?: string;
   itemId?: string;
 }
 

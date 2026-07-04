@@ -19,9 +19,11 @@ interface TileGridProps {
   playerSpriteAssetId: string;
   entities?: GridEntity[];
   scale?: number;
-  /** Visible window size in tiles. Maps larger than this scroll to keep the player centered.
-   *  Omit for a map that should always render at full size (no camera). */
-  viewportTiles?: { width: number; height: number };
+  /** Visible window size in exact pixels (typically the real available window area) - maps larger
+   *  than this scroll to keep the player centered. Omit for a map that should always render at
+   *  full size (no camera). Pixels rather than a tile count so the container always matches the
+   *  real viewport with no floor-to-tile rounding gap at the edges. */
+  viewportSize?: { width: number; height: number };
 }
 
 /** Clamps a 1D camera offset so the focus point is centered without scrolling past the world edge. */
@@ -41,7 +43,7 @@ export function TileGrid({
   playerSpriteAssetId,
   entities = [],
   scale = 3,
-  viewportTiles,
+  viewportSize,
 }: TileGridProps) {
   const tileSize = map.tileWidth * scale;
   const tilesetUrl = getAssetUrl(tilesetAssetId);
@@ -49,8 +51,8 @@ export function TileGrid({
 
   const worldWidthPx = map.width * tileSize;
   const worldHeightPx = map.height * tileSize;
-  const viewportWidthPx = (viewportTiles?.width ?? map.width) * tileSize;
-  const viewportHeightPx = (viewportTiles?.height ?? map.height) * tileSize;
+  const viewportWidthPx = viewportSize?.width ?? worldWidthPx;
+  const viewportHeightPx = viewportSize?.height ?? worldHeightPx;
 
   const cameraX = clampCamera(player.x * tileSize + tileSize / 2, viewportWidthPx, worldWidthPx);
   const cameraY = clampCamera(player.y * tileSize + tileSize / 2, viewportHeightPx, worldHeightPx);

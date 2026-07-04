@@ -17,6 +17,15 @@ export interface Stats {
   maxHp: number;
   spirit: number;
   maxSpirit: number;
+  /** Fuel for the equipped lantern's ability - capacity comes entirely from whichever lantern is
+   *  equipped (see EquipmentDefinition.oilCapacity), same pattern as any other equipment-derived
+   *  stat. 0/0 with nothing equipped. */
+  lanternOil: number;
+  maxLanternOil: number;
+  /** Powers Dash - regenerates on its own over real time (see Player.staminaUpdatedAt), unlike
+   *  every other resource here. Stays 0/0 until the Guardian of Ironwood quest chain unlocks it. */
+  stamina: number;
+  maxStamina: number;
   attack: number;
   defense: number;
   speed: number;
@@ -42,6 +51,9 @@ export interface Player {
   regionalReputation: number;
   equipment: PlayerEquipment;
   currentLocationId: string;
+  /** Server clock reading the last time Stamina was reconciled - lets the dash function compute
+   *  how much has regenerated since without a scheduled job ticking every player. */
+  staminaUpdatedAt: number;
 }
 
 export interface InventoryItem {
@@ -71,28 +83,94 @@ export interface PlayerSave {
   inventory: InventoryItem[];
   quests: Record<string, QuestProgress>;
   journal: JournalState;
+  /** World chest ids this player has already opened - a chest only ever grants its item once per
+   *  player, regardless of how many times it's interacted with afterward. */
+  openedChests: string[];
   updatedAt: number;
 }
 
-export type CombatActionType = 'attack' | 'skill' | 'spiritArt' | 'item' | 'defend' | 'flee';
+// 'skill' = a Specialty Attack (Keeper's Strike and future shrine-taught ones), gated by Spirit.
+// 'lanternAbility' = whatever ability(s) the currently-equipped lantern grants, gated by Lantern
+// Oil - a separate roster from Specialty Attacks, tied to gear rather than learned independently.
+export type CombatActionType = 'attack' | 'skill' | 'lanternAbility' | 'item' | 'defend' | 'flee';
 
 export interface CombatAction {
   type: CombatActionType;
+  /** for 'skill' - which Specialty Attack (data/specialAttacks.ts); defaults to keepers-strike. */
   skillId?: string;
+  /** for 'lanternAbility' - which ability of the equipped lantern (data/lanternAbilities.ts). */
+  abilityId?: string;
   itemId?: string;
+  /** Index into the session's `enemies` array - which foe attack/skill/lanternAbility targets.
+   *  Ignored for item/defend/flee. Defaults to the first still-alive enemy if omitted/invalid. */
+  targetIndex?: number;
 }
 
 export type CombatSessionStatus = 'active' | 'resolved';
+
+export interface CombatEnemyState {
+  enemyId: string;
+  /** 1-5 for a Regular/Elite roll, fixed at BOSS_LEVEL for a boss - see rollEnemyLevel. */
+  level: number;
+  hp: number;
+  maxHp: number;
+}
 
 export interface CombatSession {
   sessionId: string;
   uid: string;
   locationId: string;
-  enemyId: string;
-  enemyHp: number;
-  enemyMaxHp: number;
+  /** 1-6 enemies for a regular encounter, always exactly 1 for a boss fight. Array order is fixed
+   *  for the session's lifetime - `targetIndex` in CombatAction refers to this order. */
+  enemies: CombatEnemyState[];
   round: number;
   status: CombatSessionStatus;
   startedAt: number;
   expiresAt: number;
+}
+
+// --- Social: friend search/requests/blocking/DMs. All server-authoritative - clients only ever
+// read these via onSnapshot, never write them directly (see firestore.rules). ---
+
+/** Public, minimal directory entry for friend search - deliberately excludes email/anything
+ *  sensitive. One entry per account, written once at createCharacter time. */
+export interface UserDirectoryEntry {
+  uid: string;
+  displayName: string;
+  displayNameLower: string;
+}
+
+export type FriendRequestStatus = 'pending' | 'accepted' | 'declined';
+
+export interface FriendRequest {
+  id: string;
+  fromUid: string;
+  fromDisplayName: string;
+  toUid: string;
+  toDisplayName: string;
+  status: FriendRequestStatus;
+  createdAt: number;
+}
+
+/** friendships/{uid} - one doc per account, kept symmetric by the accepting function (both
+ *  sides' docs are updated in the same transaction). */
+export interface FriendshipDoc {
+  friendUids: string[];
+}
+
+/** blocks/{uid} - one doc per account. Never readable by anyone but the owner - a blocked user
+ *  is never told they've been blocked. */
+export interface BlockListDoc {
+  blockedUids: string[];
+}
+
+/** directMessages/{id} - flat collection, `participants` (sorted [uidA, uidB]) is what security
+ *  rules and client queries filter on. Only exchanged between accepted friends (see
+ *  sendDirectMessage.ts) - a lightweight stand-in for the full town Chat feature planned later. */
+export interface DirectMessage {
+  id: string;
+  participants: [string, string];
+  fromUid: string;
+  text: string;
+  sentAt: number;
 }
