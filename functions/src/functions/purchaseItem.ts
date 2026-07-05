@@ -1,10 +1,12 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { ITEMS, SHOP_PRICES } from '../data/items';
+import { SHOP_PRICES, SHOP_CATALOGS } from '../data/items';
+import { grantItem } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface PurchaseItemRequest {
   itemId: string;
+  shopId: string;
 }
 
 export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
@@ -12,8 +14,15 @@ export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
   const itemId = request.data?.itemId;
+  const shopId = request.data?.shopId;
   const price = itemId ? SHOP_PRICES[itemId] : undefined;
   if (price === undefined) throw new HttpsError('invalid-argument', 'That item is not for sale here.');
+  // Confirms the item is actually stocked by the shop the client claims to have opened - without
+  // this, any item in the flat SHOP_PRICES table could be bought regardless of which NPC/shopId
+  // the request came from.
+  if (typeof shopId !== 'string' || !SHOP_CATALOGS[shopId]?.includes(itemId)) {
+    throw new HttpsError('invalid-argument', 'That item is not for sale here.');
+  }
 
   const db = getFirestore();
   const userRef = db.collection('users').doc(uid);
@@ -26,14 +35,10 @@ export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
     if (save.player.gold < price) {
       throw new HttpsError('failed-precondition', 'Not enough gold.');
     }
-    if (ITEMS[itemId]?.unique && save.inventory.some((i) => i.itemId === itemId)) {
+    if (!grantItem(save.inventory, itemId)) {
       throw new HttpsError('failed-precondition', 'You already own the only one of those.');
     }
-
     save.player.gold -= price;
-    const entry = save.inventory.find((i) => i.itemId === itemId);
-    if (entry) entry.quantity += 1;
-    else save.inventory.push({ itemId, quantity: 1 });
 
     save.updatedAt = Date.now();
     tx.set(userRef, save);

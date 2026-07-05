@@ -114,7 +114,8 @@ export function DungeonScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The chest will not open.'));
     } else if (obj?.refId) {
       const label = labelForInteractable(obj.refId, openedChests);
-      setMessage(`You find ${label}. Perhaps it will mean something, in time.`);
+      const article = label.startsWith('Empty') ? 'an ' : 'a ';
+      setMessage(`You find ${article}${label.toLowerCase()}. Perhaps it will mean something, in time.`);
     }
   }
 

@@ -111,9 +111,9 @@ export async function callUnequipItem(slot: string): Promise<void> {
   await fn({ slot });
 }
 
-export async function callPurchaseItem(itemId: string): Promise<void> {
-  const fn = httpsCallable<{ itemId: string }, unknown>(functions, 'purchaseItem');
-  await fn({ itemId });
+export async function callPurchaseItem(itemId: string, shopId: string): Promise<void> {
+  const fn = httpsCallable<{ itemId: string; shopId: string }, unknown>(functions, 'purchaseItem');
+  await fn({ itemId, shopId });
 }
 
 export async function callRestAtInn(): Promise<void> {

@@ -14,7 +14,11 @@ export const sellItem = onCall<SellItemRequest>(async (request) => {
 
   const itemId = request.data?.itemId;
   if (!itemId) throw new HttpsError('invalid-argument', 'No item specified.');
-  const requestedQuantity = Math.max(1, Math.floor(request.data?.quantity ?? 1));
+  const rawQuantity = request.data?.quantity ?? 1;
+  if (typeof rawQuantity !== 'number' || !Number.isFinite(rawQuantity)) {
+    throw new HttpsError('invalid-argument', 'Invalid quantity.');
+  }
+  const requestedQuantity = Math.max(1, Math.floor(rawQuantity));
 
   const price = sellPriceFor(itemId);
   if (price === undefined) {

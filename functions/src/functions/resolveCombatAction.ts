@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { resolveRound, computeRewards } from '../engine/combatEngine';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { grantItem } from '../engine/inventoryEngine';
 import { ENEMIES } from '../data/enemies';
 import { ITEMS } from '../data/items';
 import { SKILLS } from '../data/skills';
@@ -132,10 +133,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       for (const itemId of reward.lootItemIds) {
         // A unique drop (e.g. a boss trophy) never grants a second copy, even if the same boss
         // is challenged and defeated again later.
-        if (ITEMS[itemId]?.unique && save.inventory.some((i) => i.itemId === itemId)) continue;
-        const entry = save.inventory.find((i) => i.itemId === itemId);
-        if (entry) entry.quantity += 1;
-        else save.inventory.push({ itemId, quantity: 1 });
+        grantItem(save.inventory, itemId);
       }
 
       // Group defeated enemies by id so a quest like "defeat 3 mothlings" advances by the actual

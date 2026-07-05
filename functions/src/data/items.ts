@@ -91,4 +91,13 @@ export const SHOP_PRICES: Record<string, number> = {
   'river-stone-charm': 25,
 };
 
+// Authoritative per-shop catalogs - purchaseItem.ts validates the requested itemId actually
+// belongs to the given shopId, not just that it exists somewhere in SHOP_PRICES. Keep in sync by
+// hand with src/data/items.ts's SHOP_CATALOGS (display copy).
+export const SHOP_CATALOGS: Record<string, string[]> = {
+  'mara-vale-general-store': ['keepers-lantern', 'river-stone-charm'],
+  'blacksmith-forge': ['weathered-walking-staff', 'worn-keeper-coat', 'traveler-boots', 'work-gloves'],
+  apothecary: ['healing-poultice', 'greater-healing-poultice', 'spirit-draught', 'lantern-oil'],
+};
+
 export const INN_REST_COST = 10;

@@ -10,10 +10,15 @@ interface EnterLocationRequest {
 const KNOWN_LOCATION_IDS = new Set([
   'ash-hallow',
   'ironwood-trail',
+  'raven-ridge',
+  'whisper-falls',
+  'black-briar-forest',
   'hollow-rail-mine',
   'ash-hallow-elias-house',
   'ash-hallow-mara-shop',
   'ash-hallow-inn',
+  'ash-hallow-blacksmith',
+  'ash-hallow-apothecary',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

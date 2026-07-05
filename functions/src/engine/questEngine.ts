@@ -1,4 +1,5 @@
 import { QUESTS, type QuestObjectiveType } from '../data/quests';
+import { grantItem } from './inventoryEngine';
 import type { PlayerSave, QuestProgress } from '../shared-types';
 
 export function effectiveStatus(
@@ -65,9 +66,9 @@ export function applyQuestRewards(save: PlayerSave, completions: QuestCompletion
     save.player.xp += reward.xp;
     save.player.gold += reward.gold;
     for (const itemId of reward.itemIds ?? []) {
-      const entry = save.inventory.find((i) => i.itemId === itemId);
-      if (entry) entry.quantity += 1;
-      else save.inventory.push({ itemId, quantity: 1 });
+      // A unique reward item already owned some other way is skipped, not an error - the quest
+      // still completes and its xp/gold still land.
+      grantItem(save.inventory, itemId);
     }
   }
 }

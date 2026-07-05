@@ -7,7 +7,18 @@ interface TalkToNpcRequest {
   npcId: string;
 }
 
-const KNOWN_NPC_IDS = new Set(['elias-rowan', 'mara-vale', 'silas-flint', 'juniper-reed', 'nell-ashby']);
+const KNOWN_NPC_IDS = new Set([
+  'elias-rowan',
+  'mara-vale',
+  'silas-flint',
+  'juniper-reed',
+  'nell-ashby',
+  'tobias-hearn',
+  'wren-callahan',
+  'faye-whitlock',
+  'reeve-talbot',
+  'mayor-osric-bell',
+]);
 
 export const talkToNpc = onCall<TalkToNpcRequest>(async (request) => {
   const uid = request.auth?.uid;

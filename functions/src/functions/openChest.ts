@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
+import { grantItem } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface OpenChestRequest {
@@ -46,9 +47,9 @@ export const openChest = onCall<OpenChestRequest>(async (request) => {
       return { alreadyOpened: true, itemId };
     }
 
-    const entry = save.inventory.find((i) => i.itemId === itemId);
-    if (entry) entry.quantity += 1;
-    else save.inventory.push({ itemId, quantity: 1 });
+    // A unique item already owned some other way (quest reward, etc.) - still mark the chest
+    // opened so it doesn't linger as an obviously-reachable freebie, just grant nothing further.
+    grantItem(save.inventory, itemId);
 
     save.openedChests = [...openedChests, chestId];
     save.updatedAt = Date.now();

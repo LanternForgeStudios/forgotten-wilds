@@ -35,7 +35,7 @@ export function Shop({ shopId, onClose }: ShopProps) {
     setBusy(true);
     setError(null);
     try {
-      await callPurchaseItem(itemId);
+      await callPurchaseItem(itemId, shopId);
       if (uid) await resyncSave(uid);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not complete that purchase.');

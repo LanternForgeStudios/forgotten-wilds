@@ -102,6 +102,10 @@ function computeDamage(power: number, attackerAtk: number, defenderDef: number):
 
 function pickEnemyMove(enemy: EnemyDefinition, hpFraction: number) {
   const available = enemy.moves.filter((m) => !m.unlocksAtHpFraction || hpFraction <= m.unlocksAtHpFraction);
+  // If every one of this enemy's moves is HP-gated above the current threshold (content bug -
+  // every authored enemy today has at least one unconditional move), fall back to its first move
+  // rather than returning undefined and crashing the transaction.
+  if (available.length === 0) return enemy.moves[0];
   const totalWeight = available.reduce((sum, m) => sum + m.weight, 0);
   let roll = Math.random() * totalWeight;
   for (const move of available) {
@@ -138,7 +142,6 @@ export interface RoundResult {
   enemyHp: number[];
   phase: RoundOutcomePhase;
   itemConsumedId?: string;
-  fleeAttempted: boolean;
 }
 
 /** One round of turn-based combat against a roster of 1-6 enemies. Turn order is the player plus
@@ -162,7 +165,6 @@ export function resolveRound(input: RoundInput): RoundResult {
   let playerLanternOil = input.playerStats.lanternOil;
   let playerDefending = false;
   let itemConsumedId: string | undefined;
-  let fleeAttempted = false;
 
   const enemyHp = input.enemies.map((e) => e.hp);
   const enemyDefs = input.enemies.map((e) => ENEMIES[e.enemyId]);
@@ -275,10 +277,9 @@ export function resolveRound(input: RoundInput): RoundResult {
     const alive = aliveIndices();
     const avgSpeed = alive.length ? alive.reduce((sum, i) => sum + enemyStats[i].speed, 0) / alive.length : 0;
     const fleeChance = Math.min(0.9, Math.max(0.1, 0.3 + (input.playerStats.speed - avgSpeed) * 0.05));
-    fleeAttempted = true;
     if (Math.random() < fleeChance) {
       log.push('You break away and flee the fight.');
-      return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase: 'fled', fleeAttempted };
+      return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase: 'fled' };
     }
     log.push('You try to flee, but there is no opening! Every foe still standing gets a free hit.');
     for (const i of alive) enemyAttack(i);
@@ -304,7 +305,7 @@ export function resolveRound(input: RoundInput): RoundResult {
   if (allDefeated) phase = 'victory';
   else if (playerHp <= 0) phase = 'defeat';
 
-  return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase, itemConsumedId, fleeAttempted };
+  return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase, itemConsumedId };
 }
 
 export interface RewardResult {
@@ -350,6 +351,7 @@ export function computeRewards(defeated: DefeatedEnemy[], currentXp: number, cur
     ? {
         maxHp: STAT_GROWTH_PER_LEVEL.maxHp * levelsGained,
         maxSpirit: STAT_GROWTH_PER_LEVEL.maxSpirit * levelsGained,
+        maxStamina: STAT_GROWTH_PER_LEVEL.maxStamina * levelsGained,
         attack: STAT_GROWTH_PER_LEVEL.attack * levelsGained,
         defense: STAT_GROWTH_PER_LEVEL.defense * levelsGained,
         speed: STAT_GROWTH_PER_LEVEL.speed * levelsGained,
