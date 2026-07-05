@@ -38,6 +38,20 @@ const SUBTAB_LABELS: Record<InventorySubTab, string> = {
   unique: 'Unique',
 };
 
+/** Order matches how the slot-type filter is meant to read left to right when narrowing the
+ *  Inventory tab's Equipment subtab, not EQUIPMENT_SLOTS's equip-tab display order. */
+const SLOT_FILTER_ORDER: EquipmentSlot[] = ['armor', 'weapon', 'boots', 'gloves', 'lantern', 'charm', 'spiritTotem'];
+
+const SLOT_FILTER_LABELS: Record<EquipmentSlot, string> = {
+  weapon: 'Weapon',
+  armor: 'Armor',
+  boots: 'Boots',
+  gloves: 'Gloves',
+  charm: 'Charm',
+  lantern: 'Lanterns',
+  spiritTotem: 'Spirit Totem',
+};
+
 type SortOption = 'name' | 'quantityDesc';
 
 interface ResolvedItem {
@@ -59,8 +73,10 @@ function subTabOf(entry: ResolvedItem): InventorySubTab {
 export function CharacterMenu({ onClose }: CharacterMenuProps) {
   const [tab, setTab] = useState<'inventory' | 'equipment'>('inventory');
   const [subTab, setSubTab] = useState<InventorySubTab>('all');
+  const [slotFilter, setSlotFilter] = useState<EquipmentSlot | 'all'>('all');
   const [sortBy, setSortBy] = useState<SortOption>('name');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [equipPickerSlot, setEquipPickerSlot] = useState<EquipmentSlot | null>(null);
   const inventory = useInventoryStore((s) => s.items);
   const player = usePlayerStore((s) => s.player);
   const patchEquipment = usePlayerStore((s) => s.patchEquipment);
@@ -142,6 +158,10 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
               if (subTab === 'unique') return !!(entry.equipDef?.unique ?? entry.itemDef?.unique);
               return subTabOf(entry) === subTab;
             })
+            .filter((entry) => {
+              if (subTab !== 'equipment' || slotFilter === 'all') return true;
+              return entry.equipDef?.slot === slotFilter;
+            })
             .sort((a, b) =>
               sortBy === 'name' ? a.name.localeCompare(b.name) : b.quantity - a.quantity,
             );
@@ -156,7 +176,10 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                     <button
                       key={key}
                       className={`${styles.subtab} ${subTab === key ? styles.subtabActive : ''}`}
-                      onClick={() => setSubTab(key)}
+                      onClick={() => {
+                        setSubTab(key);
+                        setSlotFilter('all');
+                      }}
                     >
                       {SUBTAB_LABELS[key]}
                     </button>
@@ -171,6 +194,26 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                   <option value="quantityDesc">Sort: Quantity (high to low)</option>
                 </select>
               </div>
+
+              {subTab === 'equipment' && (
+                <div className={styles.subtabs} style={{ marginBottom: 10 }}>
+                  <button
+                    className={`${styles.subtab} ${slotFilter === 'all' ? styles.subtabActive : ''}`}
+                    onClick={() => setSlotFilter('all')}
+                  >
+                    All
+                  </button>
+                  {SLOT_FILTER_ORDER.map((slot) => (
+                    <button
+                      key={slot}
+                      className={`${styles.subtab} ${slotFilter === slot ? styles.subtabActive : ''}`}
+                      onClick={() => setSlotFilter(slot)}
+                    >
+                      {SLOT_FILTER_LABELS[slot]}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div className={styles.grid}>
                 {visible.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>Nothing here.</p>}
@@ -271,6 +314,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
             {EQUIPMENT_SLOTS.map((slot) => {
               const itemId = player.equipment[slot];
               const equipDef = itemId ? EQUIPMENT.find((e) => e.id === itemId) : undefined;
+              const eligible = inventory.filter((entry) => EQUIPMENT.find((e) => e.id === entry.itemId)?.slot === slot);
               return (
                 <div key={slot} className={styles.slotRow}>
                   <span className={styles.slotName}>{SLOT_LABELS[slot]}</span>
@@ -290,7 +334,14 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       </button>
                     </>
                   ) : (
-                    <span style={{ fontSize: 13, opacity: 0.5, flex: 1 }}>Empty</span>
+                    <>
+                      <span style={{ fontSize: 13, opacity: 0.5, flex: 1 }}>Empty</span>
+                      {eligible.length > 0 && (
+                        <button className={styles.smallButton} disabled={busy} onClick={() => setEquipPickerSlot(slot)}>
+                          Equip
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               );
@@ -300,6 +351,50 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
 
         <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
+
+      {equipPickerSlot && (
+        <div
+          className={styles.overlay}
+          style={{ zIndex: 30 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setEquipPickerSlot(null);
+          }}
+        >
+          <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <h3 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>Equip {SLOT_LABELS[equipPickerSlot]}</h3>
+            <div className={styles.grid}>
+              {inventory
+                .filter((entry) => EQUIPMENT.find((e) => e.id === entry.itemId)?.slot === equipPickerSlot)
+                .map((entry) => {
+                  const def = EQUIPMENT.find((e) => e.id === entry.itemId)!;
+                  const slot = equipPickerSlot;
+                  return (
+                    <div
+                      key={entry.itemId}
+                      className={styles.itemCard}
+                      onClick={() => {
+                        equip(entry.itemId, slot);
+                        setEquipPickerSlot(null);
+                      }}
+                    >
+                      <img src={getAssetUrl(def.iconAssetId)} alt="" className={styles.icon} />
+                      <span className={styles.itemName}>{def.name}</span>
+                      <TierBadge tier={def.tier} />
+                      <p style={{ fontSize: 11, opacity: 0.85, margin: 0, textAlign: 'center' }}>{def.description}</p>
+                      {formatStatBonuses(def.statBonuses) && (
+                        <span style={{ fontSize: 10, color: 'var(--fw-spirit)' }}>{formatStatBonuses(def.statBonuses)}</span>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+            <button className={styles.smallButton} style={{ marginTop: 12 }} onClick={() => setEquipPickerSlot(null)}>
+              Cancel
+            </button>
+          </Panel>
+        </div>
+      )}
     </div>
   );
 }
