@@ -34,62 +34,62 @@ function emptySave(overrides: Partial<PlayerSave> = {}): PlayerSave {
 
 describe('effectiveStatus', () => {
   it('is active for a quest with no prerequisite and no stored progress', () => {
-    expect(effectiveStatus('keepers-first-light', {})).toBe('active');
+    expect(effectiveStatus('a-new-keeper', {})).toBe('active');
   });
 
   it('is locked when its prerequisite has not been completed', () => {
-    expect(effectiveStatus('mothlight-on-the-ridge', {})).toBe('locked');
+    expect(effectiveStatus('ash-hallow-tour', {})).toBe('locked');
   });
 
   it('is active once its prerequisite is completed', () => {
     const quests: Record<string, QuestProgress> = {
-      'keepers-first-light': { status: 'completed', objectiveCounts: {} },
+      'a-new-keeper': { status: 'completed', objectiveCounts: {} },
     };
-    expect(effectiveStatus('mothlight-on-the-ridge', quests)).toBe('active');
+    expect(effectiveStatus('ash-hallow-tour', quests)).toBe('active');
   });
 
   it('stays completed once completed, regardless of prerequisite bookkeeping', () => {
     const quests: Record<string, QuestProgress> = {
-      'keepers-first-light': { status: 'completed', objectiveCounts: {} },
+      'a-new-keeper': { status: 'completed', objectiveCounts: {} },
     };
-    expect(effectiveStatus('keepers-first-light', quests)).toBe('completed');
+    expect(effectiveStatus('a-new-keeper', quests)).toBe('completed');
   });
 });
 
 describe('advanceQuests', () => {
   it('advances a matching objective and does not complete it early', () => {
     const quests: Record<string, QuestProgress> = {
-      'keepers-first-light': { status: 'completed', objectiveCounts: {} },
+      'beneath-hollow-rail': { status: 'completed', objectiveCounts: {} },
     };
-    const completions = advanceQuests(quests, { type: 'defeatEnemies', targetId: 'mothling' });
-    expect(quests['mothlight-on-the-ridge'].objectiveCounts['defeat-mothlings']).toBe(1);
+    const completions = advanceQuests(quests, { type: 'defeatEnemies', targetId: 'restless-miner' });
+    expect(quests['into-hollow-rail'].objectiveCounts['clear-shafts']).toBe(1);
     expect(completions).toHaveLength(0);
   });
 
   it('completes the quest once the required count is reached', () => {
     const quests: Record<string, QuestProgress> = {
-      'keepers-first-light': { status: 'completed', objectiveCounts: {} },
-      'mothlight-on-the-ridge': { status: 'active', objectiveCounts: { 'defeat-mothlings': 2 } },
+      'beneath-hollow-rail': { status: 'completed', objectiveCounts: {} },
+      'into-hollow-rail': { status: 'active', objectiveCounts: { 'clear-shafts': 2 } },
     };
-    const completions = advanceQuests(quests, { type: 'defeatEnemies', targetId: 'mothling' });
-    expect(quests['mothlight-on-the-ridge'].status).toBe('completed');
-    expect(completions).toEqual([{ questId: 'mothlight-on-the-ridge', reward: expect.any(Object) }]);
+    const completions = advanceQuests(quests, { type: 'defeatEnemies', targetId: 'restless-miner' });
+    expect(quests['into-hollow-rail'].status).toBe('completed');
+    expect(completions).toEqual([{ questId: 'into-hollow-rail', reward: expect.any(Object) }]);
   });
 
   it('does not advance a locked (prerequisite-unmet) quest', () => {
     const quests: Record<string, QuestProgress> = {};
     const completions = advanceQuests(quests, { type: 'reachLocation', targetId: 'hollow-rail-mine' });
-    expect(quests['echoes-in-the-mine']).toBeUndefined();
+    expect(quests['beneath-hollow-rail']).toBeUndefined();
     expect(completions).toHaveLength(0);
   });
 
   it('ignores events that do not match any active objective', () => {
     const quests: Record<string, QuestProgress> = {
-      'keepers-first-light': { status: 'completed', objectiveCounts: {} },
+      'beneath-hollow-rail': { status: 'completed', objectiveCounts: {} },
     };
     const completions = advanceQuests(quests, { type: 'defeatEnemies', targetId: 'coal-spirit' });
     expect(completions).toHaveLength(0);
-    expect(quests['mothlight-on-the-ridge']).toBeUndefined();
+    expect(quests['into-hollow-rail']).toBeUndefined();
   });
 });
 
@@ -97,7 +97,7 @@ describe('applyQuestRewards', () => {
   it('adds xp, gold, and reward items to the save', () => {
     const save = emptySave();
     applyQuestRewards(save, [
-      { questId: 'keepers-first-light', reward: { xp: 10, gold: 20, itemIds: ['healing-poultice'] } },
+      { questId: 'a-new-keeper', reward: { xp: 10, gold: 20, itemIds: ['healing-poultice'] } },
     ]);
     expect(save.player.xp).toBe(10);
     expect(save.player.gold).toBe(20);
@@ -107,8 +107,15 @@ describe('applyQuestRewards', () => {
   it('stacks reward items onto existing inventory quantities', () => {
     const save = emptySave({ inventory: [{ itemId: 'healing-poultice', quantity: 2 }] });
     applyQuestRewards(save, [
-      { questId: 'mothlight-on-the-ridge', reward: { xp: 30, gold: 35, itemIds: ['healing-poultice'] } },
+      { questId: 'ash-hallow-tour', reward: { xp: 30, gold: 35, itemIds: ['healing-poultice'] } },
     ]);
     expect(save.inventory).toEqual([{ itemId: 'healing-poultice', quantity: 3 }]);
+  });
+
+  it('triggers a level-up from quest xp alone, with no combat involved', () => {
+    const save = emptySave();
+    applyQuestRewards(save, [{ questId: 'a-new-keeper', reward: { xp: 100, gold: 0 } }]);
+    expect(save.player.level).toBeGreaterThan(1);
+    expect(save.player.stats.maxHp).toBeGreaterThan(60);
   });
 });

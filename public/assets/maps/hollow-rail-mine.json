@@ -316,7 +316,7 @@
         25,
         25,
         25,
-        1,
+        25,
         1,
         25,
         25,
@@ -1237,6 +1237,47 @@
               "name": "refId",
               "type": "string",
               "value": "default"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 448,
+          "y": 144,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow-mine-office"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 464,
+          "y": 144,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ash-hallow-mine-office"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-mine-office"
+            }
+          ]
+        },
+        {
+          "type": "interactable",
+          "x": 320,
+          "y": 128,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "mine-shrine"
             }
           ]
         }

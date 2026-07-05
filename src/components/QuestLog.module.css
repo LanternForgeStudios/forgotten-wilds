@@ -40,6 +40,35 @@
   color: var(--fw-text);
 }
 
+.region {
+  border-top: 1px solid var(--fw-panel-border);
+}
+
+.region:first-of-type {
+  border-top: none;
+}
+
+.regionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  color: var(--fw-text);
+  font-weight: bold;
+  font-size: 14px;
+  padding: 10px 0 4px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.regionCount {
+  font-size: 12px;
+  font-weight: normal;
+  opacity: 0.65;
+}
+
 .quest {
   padding: 10px 0;
   border-top: 1px solid var(--fw-panel-border);
@@ -52,10 +81,6 @@
 .questName {
   margin: 0 0 4px;
   font-weight: bold;
-}
-
-.locked {
-  opacity: 0.45;
 }
 
 .status {

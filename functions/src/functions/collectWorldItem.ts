@@ -13,6 +13,15 @@ const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'hollow-rail-mine': {
     'miners-lost-lantern': 'miners-lost-lantern',
   },
+  // Mossy Creek and Fallen Watchtower are landmarks within the Ironwood Trail map, not their own
+  // locations, so their refId is looked up under 'ironwood-trail' here.
+  'ironwood-trail': {
+    'mossy-creek': 'stone-fragment',
+    'fallen-watchtower': 'wind-fragment',
+  },
+  'whisper-falls': {
+    'water-fragment': 'water-fragment',
+  },
 };
 
 export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) => {

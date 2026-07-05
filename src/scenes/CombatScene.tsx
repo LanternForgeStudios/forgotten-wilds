@@ -8,8 +8,7 @@ import {
   type EncounterEnemy,
   type ResolveCombatActionResponse,
 } from '@/firebase/functionsClient';
-import { fetchPlayerSave } from '@/firebase/saveService';
-import { hydrateAllStores, resyncSave } from '@/state/hydrate';
+import { resyncSave } from '@/state/hydrate';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -134,8 +133,7 @@ export function CombatScene() {
       }
 
       if (uid) {
-        const save = await fetchPlayerSave(uid);
-        if (save) hydrateAllStores(save);
+        await resyncSave(uid);
       }
       setPhase(res.phase);
     } catch (err) {

@@ -9,6 +9,8 @@
     { "type": "spawnPoint", "x": 22, "y": 8, "refId": "from-black-briar-forest" },
     { "type": "transition", "x": 23, "y": 8, "refId": "black-briar-forest", "targetSpawnId": "from-whisper-falls" },
 
+    { "type": "interactable", "x": 12, "y": 8, "refId": "water-fragment" },
+
     { "type": "encounterZone", "x": 4, "y": 3, "encounterChance": 0.24 },
     { "type": "encounterZone", "x": 8, "y": 3, "encounterChance": 0.24 },
     { "type": "encounterZone", "x": 12, "y": 3, "encounterChance": 0.24 },

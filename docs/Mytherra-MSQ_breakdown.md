@@ -1,6 +1,9 @@
 Forgotten Wilds
 Main Story Framework (MSF)
-Volume I — The Great Silence
+Book One — The Great Silence
+(Naming note: "Book One" refers to the entire six-region base game. "Volume I", "Volume II", etc.
+below refer to individual regions - Volume I = Iron Mountains, Volume II = Crimson Bayou, and so
+on. The two numbering schemes are independent of each other.)
 PROLOGUE
 The Lantern is Lit
 Story Purpose
@@ -1320,7 +1323,7 @@ The Endless Prairie should be the first region where the player begins to questi
 
 One improvement I'd make before continuing is to introduce Recurring Threads. These are questions that begin in one region and continue through the game, giving players a sense that they're assembling a much larger puzzle.
 
-For Volume I they might be:
+For Book One they might be:
 
 Thread	Introduced	Resolved
 The Great Silence	Prologue	Finale
@@ -2340,7 +2343,7 @@ They don't conquer.
 
 They understand.
 
-This also gives us a perfect ending for Volume I while leaving Volume II open.
+This also gives us a perfect ending for Book One while leaving Book Two open.
 
 Forgotten Wilds
 Main Story Framework (MSF)
@@ -2595,7 +2598,7 @@ MSF-FF-008
 A New Dawn
 Story Purpose
 
-Conclude Volume I.
+Conclude Book One.
 
 Story Beats
 Return to Ash Hallow with Elias Rowan.
@@ -2608,13 +2611,13 @@ Final Rewards
 Winter Stag Totem
 Guardian Memory Complete
 Lantern Keeper Master Rank
-World Completion: Volume I
+World Completion: Book One
 World Flags
-volume_one_complete
+book_one_complete
 all_regions_restored
 hall_of_lanterns_restored
 guardian_memories_complete
-Volume I Completion Summary
+Book One Completion Summary
 
 By the end of the game, the player has:
 
@@ -2647,13 +2650,13 @@ The restored Guardians begin to stir once more, and the lands of Mytherra slowly
 
 Yet in the closing moments, the assembled Guardians look not to the past, but toward the distant horizon. Though the Great Silence succeeded in containing the Hollow, they reveal that its prison was never meant to last forever.
 
-One final line closes the first volume:
+One final line closes Book One:
 
 "The Silence held... but only because someone remained to keep watch."
 
 Far beyond the known regions of Mytherra, an unseen Lantern still burns.
 
-The screen fades, setting the stage for Volume II—not as a continuation of the same mystery, but as the beginning of a new era where the world, now healing, must prepare for what lies beyond the edge of the map.
+The screen fades, setting the stage for Book Two—not as a continuation of the same mystery, but as the beginning of a new era where the world, now healing, must prepare for what lies beyond the edge of the map.
 
 I think we just outlined the backbone of Forgotten Wilds
 

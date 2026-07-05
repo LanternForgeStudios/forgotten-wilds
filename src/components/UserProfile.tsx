@@ -3,6 +3,7 @@ import { Panel } from './common/Panel';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
+import { signOutUser } from '@/firebase/auth';
 import {
   subscribeToFriendship,
   subscribeToBlockList,
@@ -225,6 +226,9 @@ export function UserProfile({ onClose }: UserProfileProps) {
               <span className={styles.infoLabel}>Member Since</span>
               <span>{memberSince}</span>
             </div>
+            <button className={styles.smallButton} style={{ marginTop: 12 }} onClick={() => signOutUser()}>
+              Sign out
+            </button>
           </div>
         )}
 

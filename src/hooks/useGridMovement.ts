@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TileMap } from '@/types';
+import { isTypingTarget } from '@/utils/keyboard';
 
 export type Facing = 'up' | 'down' | 'left' | 'right';
 
@@ -128,6 +129,7 @@ export function useGridMovement({
     if (!map || suspended) return;
 
     function handleKeyDown(e: KeyboardEvent) {
+      if (isTypingTarget(e)) return;
       // Shift+direction is Dash, handled by a separate hook (useDashKeybind) - don't also take a
       // normal single-tile step on the same keypress.
       if (e.shiftKey) return;

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { isTypingTarget } from '@/utils/keyboard';
 
 const DASH_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D']);
 
@@ -9,6 +10,7 @@ export function useDashKeybind(dash: () => void, enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
     function handleKeyDown(e: KeyboardEvent) {
+      if (isTypingTarget(e)) return;
       if (!e.shiftKey || !DASH_KEYS.has(e.key)) return;
       e.preventDefault();
       dash();

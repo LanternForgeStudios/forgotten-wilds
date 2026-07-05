@@ -492,42 +492,42 @@
           ]
         },
         {
-          "type": "npc",
-          "x": 256,
+          "type": "transition",
+          "x": 240,
           "y": 48,
           "properties": [
             {
               "name": "refId",
               "type": "string",
-              "value": "faye-whitlock"
+              "value": "ash-hallow-armory"
             },
             {
-              "name": "wanderRadius",
-              "type": "int",
-              "value": 2
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "up"
             }
           ]
         },
         {
-          "type": "npc",
-          "x": 96,
-          "y": 112,
+          "type": "spawnPoint",
+          "x": 240,
+          "y": 48,
           "properties": [
             {
               "name": "refId",
               "type": "string",
-              "value": "silas-flint"
-            },
-            {
-              "name": "wanderRadius",
-              "type": "int",
-              "value": 2
+              "value": "from-ash-hallow-armory"
             }
           ]
         },
         {
           "type": "npc",
-          "x": 192,
+          "x": 144,
           "y": 112,
           "properties": [
             {
@@ -543,19 +543,14 @@
           ]
         },
         {
-          "type": "npc",
-          "x": 256,
+          "type": "interactable",
+          "x": 288,
           "y": 112,
           "properties": [
             {
               "name": "refId",
               "type": "string",
-              "value": "reeve-talbot"
-            },
-            {
-              "name": "wanderRadius",
-              "type": "int",
-              "value": 2
+              "value": "ash-hallow-shrine"
             }
           ]
         },
@@ -594,19 +589,104 @@
           ]
         },
         {
-          "type": "npc",
+          "type": "transition",
+          "x": 96,
+          "y": 160,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ash-hallow-archive"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "up"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 96,
+          "y": 160,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow-archive"
+            }
+          ]
+        },
+        {
+          "type": "transition",
           "x": 144,
           "y": 160,
           "properties": [
             {
               "name": "refId",
               "type": "string",
-              "value": "mayor-osric-bell"
+              "value": "ash-hallow-mine-office"
             },
             {
-              "name": "wanderRadius",
-              "type": "int",
-              "value": 2
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "up"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 144,
+          "y": 160,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow-mine-office"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 192,
+          "y": 160,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ash-hallow-town-hall"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "up"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 192,
+          "y": 160,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow-town-hall"
             }
           ]
         },

@@ -478,6 +478,18 @@
           ]
         },
         {
+          "type": "npc",
+          "x": 192,
+          "y": 128,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ranger-caleb"
+            }
+          ]
+        },
+        {
           "type": "encounterZone",
           "x": 64,
           "y": 48,

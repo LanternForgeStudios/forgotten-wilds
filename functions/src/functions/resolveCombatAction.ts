@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { resolveRound, computeRewards } from '../engine/combatEngine';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
 import { grantItem } from '../engine/inventoryEngine';
+import { applyLevelUp } from '../engine/levelingEngine';
 import { ENEMIES } from '../data/enemies';
 import { ITEMS } from '../data/items';
 import { SKILLS } from '../data/skills';
@@ -111,25 +112,11 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     if (result.phase === 'victory') {
       const defeated = session.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level }));
       const enemyIds = defeated.map((e) => e.enemyId);
+      const levelBefore = save.player.level;
       const reward = computeRewards(defeated, save.player.xp, save.player.level);
       save.player.xp += reward.xp;
       save.player.gold += reward.gold;
-      if (reward.leveledUp) {
-        save.player.level = reward.newLevel;
-        save.player.stats.maxHp += reward.statGrowth.maxHp ?? 0;
-        save.player.stats.maxSpirit += reward.statGrowth.maxSpirit ?? 0;
-        // Stays untouched at 0 until Stamina is unlocked (interactWithShrine.ts grants the base
-        // pool, already scaled for the player's current level, the moment that happens).
-        if (save.player.stats.maxStamina > 0) {
-          save.player.stats.maxStamina += reward.statGrowth.maxStamina ?? 0;
-          save.player.stats.stamina = Math.min(save.player.stats.stamina, save.player.stats.maxStamina);
-        }
-        save.player.stats.attack += reward.statGrowth.attack ?? 0;
-        save.player.stats.defense += reward.statGrowth.defense ?? 0;
-        save.player.stats.speed += reward.statGrowth.speed ?? 0;
-        save.player.stats.hp = save.player.stats.maxHp;
-        save.player.stats.spirit = save.player.stats.maxSpirit;
-      }
+      applyLevelUp(save);
       for (const itemId of reward.lootItemIds) {
         // A unique drop (e.g. a boss trophy) never grants a second copy, even if the same boss
         // is challenged and defeated again later.
@@ -156,7 +143,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       const completions = questEvents.flatMap((event) => advanceQuests(save.quests, event));
       applyQuestRewards(save, completions);
 
-      rewards = { xp: reward.xp, gold: reward.gold, itemIds: reward.lootItemIds, leveledUp: reward.leveledUp };
+      rewards = { xp: reward.xp, gold: reward.gold, itemIds: reward.lootItemIds, leveledUp: save.player.level > levelBefore };
     } else if (result.phase === 'defeat') {
       // Soft respawn at the inn - no punishing penalty, per design decision in the plan.
       save.player.stats.hp = Math.round(save.player.stats.maxHp * 0.5);

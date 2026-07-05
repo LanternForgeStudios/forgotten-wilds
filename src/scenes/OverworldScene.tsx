@@ -3,6 +3,7 @@ import { PlayerHUD } from '@/components/PlayerHUD';
 import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
+import { DialogueBox } from '@/components/DialogueBox';
 import { Panel } from '@/components/common/Panel';
 import { QuestLog } from '@/components/QuestLog';
 import { CharacterMenu } from '@/components/CharacterMenu';
@@ -19,56 +20,57 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
-import { callInteractWithShrine, callOpenChest } from '@/firebase/functionsClient';
+import {
+  callOpenChest,
+  callVisitLandmark,
+  callCollectWorldItem,
+  callInteractWithShrine,
+  callTalkToNpc,
+} from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
-import { ITEMS, EQUIPMENT } from '@/data';
+import { ITEMS, EQUIPMENT, LOCATIONS, NPCS } from '@/data';
+import { isTypingTarget } from '@/utils/keyboard';
+import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
 
-const LOCATION_ID = 'ironwood-trail';
 const TILESET_COLUMNS = 12;
 
-/** Flavor text for the Guardian of Ironwood shrine, chosen client-side from the current quest
- *  progress rather than invented server-side - the server only reports what advanced/unlocked. */
-function guardianMessage(
-  questsCompleted: string[],
-  unlockedStamina: boolean,
-  guardiansTrialStatus: string | undefined,
-  guardiansProofStatus: string | undefined,
-  guardiansBlessingStatus: string | undefined,
-): string {
-  if (unlockedStamina) {
-    return 'The Guardian of Ironwood inclines its head. "You have proven your resolve. Draw on the trail\'s strength when you need to move swiftly - Stamina is yours to command now."';
-  }
-  if (questsCompleted.includes('guardians-trial')) {
-    return 'The Guardian of Ironwood regards you in silence, then speaks: "Prove your resolve against what stalks this trail, and return to me."';
-  }
-  if (guardiansBlessingStatus === 'active') {
-    return 'The Guardian of Ironwood watches you, waiting. It has nothing more to say until you are ready to leave once more.';
-  }
-  if (guardiansProofStatus === 'active') {
-    return 'The Guardian of Ironwood is silent. It is waiting to see whether you can prove yourself first.';
-  }
-  if (guardiansTrialStatus === 'active') {
-    return 'You have found it: a shrine half-swallowed by root and moss, and within it, something ancient stirs.';
-  }
-  return 'The shrine is quiet. Whatever watches over it does not stir for you - not yet.';
-}
+/** Landmarks are pure "visit and see" sub-areas within a larger overworld map - visiting records
+ *  Journal coverage and quest progress but doesn't grant an item. */
+const VISIT_ONLY_LANDMARKS = new Set(['hunters-camp']);
+/** Shrine-style landmarks route through interactWithShrine instead - see KNOWN_SHRINES in
+ *  interactWithShrine.ts. That function fires both an interactWithShrine event (for
+ *  investigate/restore quests) and a reachLocation event (for discovery quests) on every call, so
+ *  the same tile naturally supports "first find it" and "later restore it" as separate quests. */
+const SHRINE_LANDMARKS = new Set(['spirit-grove']);
+/** Landmarks that grant a key item the first time they're visited - maps the interactable's refId
+ *  to the item it grants (mirrors collectWorldItem.ts's WORLD_ITEMS server-side, since that
+ *  function's response doesn't echo back which item was granted). */
+const FRAGMENT_LANDMARKS: Record<string, string> = {
+  'mossy-creek': 'stone-fragment',
+  'fallen-watchtower': 'wind-fragment',
+  'water-fragment': 'water-fragment',
+};
 
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
 function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId.startsWith('chest-')) return openedChests.includes(refId) ? 'Empty Chest' : 'Chest';
-  if (refId === 'guardian-of-ironwood') return 'Shrine';
+  if (refId === 'water-fragment') return 'a faint glimmer in the pool';
+  const landmark = LOCATIONS.find((l) => l.id === refId);
+  if (landmark) return landmark.name;
   return 'something';
 }
 
 export function OverworldScene() {
+  const locationId = useSceneStore((s) => s.params.locationId) ?? 'ironwood-trail';
   const goTo = useSceneStore((s) => s.goTo);
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
+  const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [questLogOpen, setQuestLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
@@ -76,18 +78,19 @@ export function OverworldScene() {
   const isMobile = useIsMobile();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const suspended = questLogOpen || menuOpen || journalOpen || message !== null;
+  const suspended = activeNpc !== null || questLogOpen || menuOpen || journalOpen || message !== null;
   const { map, position, positionRef, facingDelta, attemptMove } = useLocationExploration({
-    locationId: LOCATION_ID,
+    locationId,
     suspended,
     onEncounterZoneStep: (chance, pos) => {
       if (Math.random() < chance) {
-        goTo('combat', { locationId: LOCATION_ID, spawnX: pos.x, spawnY: pos.y });
+        goTo('combat', { locationId, spawnX: pos.x, spawnY: pos.y });
       }
     },
+    onBlockedTransition: setMessage,
   });
 
-  useHeartbeat(uid, displayName, LOCATION_ID, position);
+  useHeartbeat(uid, displayName, locationId, position);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
   const dash = useDash({ attemptMove, positionRef });
   useDashKeybind(dash, staminaUnlocked && !suspended);
@@ -96,30 +99,29 @@ export function OverworldScene() {
     if (suspended || !map) return;
     const { dx, dy } = facingDelta(position.facing);
     const target = { x: position.x + dx, y: position.y + dy };
+
+    const npcObject = map.objects.find(
+      (o) => o.type === 'npc' && o.x === target.x && o.y === target.y,
+    );
+    if (npcObject?.refId) {
+      const npc = NPCS.find((n) => n.id === npcObject.refId);
+      if (npc) {
+        setActiveNpc(npc);
+        callTalkToNpc(npc.id)
+          .then(async () => {
+            if (uid) await resyncSave(uid);
+          })
+          .catch((err) => console.error('talkToNpc failed', err));
+      }
+      return;
+    }
+
     const obj = map.objects.find(
       (o) => o.type === 'interactable' && o.x === target.x && o.y === target.y,
     );
-    if (obj?.refId === 'guardian-of-ironwood') {
-      callInteractWithShrine(LOCATION_ID, 'guardian-of-ironwood')
-        .then(async (res) => {
-          if (uid) await resyncSave(uid);
-          const progress = useQuestStore.getState().progress;
-          setMessage(
-            guardianMessage(
-              res.questsCompleted,
-              res.unlockedStamina,
-              progress['guardians-trial']?.status,
-              progress['guardians-proof']?.status,
-              progress['guardians-blessing']?.status,
-            ),
-          );
-        })
-        .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
-      return;
-    }
     if (obj?.refId?.startsWith('chest-')) {
       const chestId = obj.refId;
-      callOpenChest(LOCATION_ID, chestId)
+      callOpenChest(locationId, chestId)
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           const name =
@@ -135,6 +137,54 @@ export function OverworldScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The chest will not open.'));
       return;
     }
+    if (obj?.refId && SHRINE_LANDMARKS.has(obj.refId)) {
+      const refId = obj.refId;
+      const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
+      callInteractWithShrine(locationId, refId)
+        .then(async (res) => {
+          if (uid) await resyncSave(uid);
+          if (res.unlockedStamina) {
+            setMessage(
+              `The shrine at ${landmarkName} kindles fully alight once more. You feel the trail's strength answer you - Stamina is yours to command now.`,
+            );
+          } else {
+            setMessage(`You have found ${landmarkName}. A shrine stands here, long neglected.`);
+          }
+        })
+        .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
+      return;
+    }
+    if (obj?.refId && VISIT_ONLY_LANDMARKS.has(obj.refId)) {
+      const landmarkId = obj.refId;
+      const landmarkName = LOCATIONS.find((l) => l.id === landmarkId)?.name ?? landmarkId;
+      callVisitLandmark(landmarkId)
+        .then(async (res) => {
+          if (uid) await resyncSave(uid);
+          setMessage(
+            res.alreadyVisited
+              ? `You've already explored ${landmarkName}.`
+              : `You find ${landmarkName}. Perhaps it will mean something, in time.`,
+          );
+        })
+        .catch((err) => setMessage(err instanceof Error ? err.message : 'You cannot linger here.'));
+      return;
+    }
+    if (obj?.refId && FRAGMENT_LANDMARKS[obj.refId]) {
+      const refId = obj.refId;
+      const itemId = FRAGMENT_LANDMARKS[refId];
+      callCollectWorldItem(locationId, refId)
+        .then(async (res) => {
+          if (uid) await resyncSave(uid);
+          const name = ITEMS.find((i) => i.id === itemId)?.name ?? itemId;
+          setMessage(
+            res.alreadyCollected
+              ? "There's nothing left to find here."
+              : `You recover ${name}. It feels like part of something larger.`,
+          );
+        })
+        .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
+      return;
+    }
     if (obj?.refId) {
       const label = labelForInteractable(obj.refId, openedChests);
       setMessage(`You find ${label.startsWith('Empty') ? 'an ' + label.toLowerCase() : 'a ' + label.toLowerCase()}. Perhaps it will mean something, in time.`);
@@ -143,8 +193,10 @@ export function OverworldScene() {
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
+      if (isTypingTarget(e)) return;
       if (e.key === 'Escape') {
-        if (message) setMessage(null);
+        if (activeNpc) setActiveNpc(null);
+        else if (message) setMessage(null);
         else if (questLogOpen) setQuestLogOpen(false);
         else if (menuOpen) setMenuOpen(false);
         else if (journalOpen) setJournalOpen(false);
@@ -158,17 +210,30 @@ export function OverworldScene() {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, questLogOpen, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress]);
+  }, [activeNpc, message, questLogOpen, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress]);
 
   if (!map) {
     return (
       <div className={styles.wrap}>
-        <p>Setting out onto Ironwood Trail...</p>
+        <p>Setting out...</p>
       </div>
     );
   }
 
-  const entities: GridEntity[] = map.objects
+  const npcEntities: GridEntity[] = map.objects
+    .filter((o) => o.type === 'npc' && o.refId)
+    .map((o) => {
+      const npc = NPCS.find((n) => n.id === o.refId);
+      return {
+        id: o.refId!,
+        x: o.x,
+        y: o.y,
+        spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
+        label: npc?.name,
+      };
+    });
+
+  const interactableEntities: GridEntity[] = map.objects
     .filter((o) => o.type === 'interactable' && o.refId)
     .map((o) => ({
       id: o.refId!,
@@ -178,9 +243,11 @@ export function OverworldScene() {
       label: labelForInteractable(o.refId!, openedChests),
     }));
 
+  const entities = [...npcEntities, ...interactableEntities];
+
   return (
     <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
-      <PlayerHUD locationId={LOCATION_ID} />
+      <PlayerHUD locationId={locationId} />
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
@@ -208,9 +275,16 @@ export function OverworldScene() {
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
-          &nbsp;·&nbsp; Watch for Mothlings in the deep grass &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I
+          &nbsp;·&nbsp; Watch for danger in the deep grass &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I
           &nbsp;·&nbsp; Journal: J
         </p>
+      )}
+      {activeNpc && (
+        <DialogueBox
+          lines={activeNpc.dialogue}
+          portraitAssetId={activeNpc.portraitAssetId}
+          onClose={() => setActiveNpc(null)}
+        />
       )}
       {message && (
         <div

@@ -49,6 +49,17 @@ export async function callEnterLocation(locationId: string): Promise<{ questsCom
   return result.data;
 }
 
+export async function callVisitLandmark(
+  landmarkId: string,
+): Promise<{ alreadyVisited: boolean; questsCompleted: string[] }> {
+  const fn = httpsCallable<{ landmarkId: string }, { alreadyVisited: boolean; questsCompleted: string[] }>(
+    functions,
+    'visitLandmark',
+  );
+  const result = await fn({ landmarkId });
+  return result.data;
+}
+
 export async function callCollectWorldItem(
   locationId: string,
   refId: string,

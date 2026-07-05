@@ -9,6 +9,8 @@
     { "type": "spawnPoint", "x": 22, "y": 8, "refId": "from-whisper-falls" },
     { "type": "transition", "x": 23, "y": 8, "refId": "whisper-falls", "targetSpawnId": "from-raven-ridge" },
 
+    { "type": "npc", "x": 12, "y": 8, "refId": "ranger-caleb" },
+
     { "type": "encounterZone", "x": 4, "y": 3, "encounterChance": 0.22 },
     { "type": "encounterZone", "x": 8, "y": 3, "encounterChance": 0.22 },
     { "type": "encounterZone", "x": 12, "y": 3, "encounterChance": 0.22 },

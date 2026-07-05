@@ -18,13 +18,18 @@ export interface QuestReward {
   xp: number;
   gold: number;
   itemIds?: string[];
+  spiritEssence?: number;
 }
+
+/** Display-only grouping for the Quest Log's tabs - not read by any server logic. */
+export type QuestCategory = 'main' | 'side' | 'misc';
 
 export interface Quest {
   id: string;
   name: string;
   giverNpcId: string;
   description: string;
+  category: QuestCategory;
   prerequisiteQuestId: string | null;
   objectives: QuestObjective[];
   reward: QuestReward;

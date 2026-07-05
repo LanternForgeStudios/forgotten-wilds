@@ -9,15 +9,19 @@ interface TalkToNpcRequest {
 
 const KNOWN_NPC_IDS = new Set([
   'elias-rowan',
-  'mara-vale',
+  'finn-rowan',
+  'mara-ash',
   'silas-flint',
   'juniper-reed',
   'nell-ashby',
-  'tobias-hearn',
-  'wren-callahan',
-  'faye-whitlock',
-  'reeve-talbot',
-  'mayor-osric-bell',
+  'aldren-stone',
+  'tessa-ironhand',
+  'willow-briar',
+  'historian-miriam',
+  'mayor-eleanor-ashcroft',
+  'hunter-garrick',
+  'spirit-child',
+  'ranger-caleb',
 ]);
 
 export const talkToNpc = onCall<TalkToNpcRequest>(async (request) => {

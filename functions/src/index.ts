@@ -7,6 +7,7 @@ export { startEncounter } from './functions/startEncounter';
 export { resolveCombatAction } from './functions/resolveCombatAction';
 export { talkToNpc } from './functions/talkToNpc';
 export { enterLocation } from './functions/enterLocation';
+export { visitLandmark } from './functions/visitLandmark';
 export { collectWorldItem } from './functions/collectWorldItem';
 export { equipItem, unequipItem } from './functions/equipItem';
 export { purchaseItem } from './functions/purchaseItem';

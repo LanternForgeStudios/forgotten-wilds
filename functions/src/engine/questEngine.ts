@@ -1,5 +1,6 @@
 import { QUESTS, type QuestObjectiveType } from '../data/quests';
 import { grantItem } from './inventoryEngine';
+import { applyLevelUp } from './levelingEngine';
 import type { PlayerSave, QuestProgress } from '../shared-types';
 
 export function effectiveStatus(
@@ -25,7 +26,7 @@ export interface QuestAdvanceEvent {
 
 export interface QuestCompletion {
   questId: string;
-  reward: { xp: number; gold: number; itemIds?: string[] };
+  reward: { xp: number; gold: number; itemIds?: string[]; spiritEssence?: number };
 }
 
 /**
@@ -59,16 +60,19 @@ export function advanceQuests(quests: Record<string, QuestProgress>, event: Ques
   return completions;
 }
 
-/** Applies quest rewards (xp/gold/items) directly onto a PlayerSave. Does not handle leveling; call sites that
- *  also grant combat XP should apply level-up logic afterward using the combined xp total. */
+/** Applies quest rewards (xp/gold/spiritEssence/items) directly onto a PlayerSave, then checks for
+ *  a level-up from the accumulated xp - safe to call even alongside a separate combat-xp grant in
+ *  the same request, since applyLevelUp is idempotent. */
 export function applyQuestRewards(save: PlayerSave, completions: QuestCompletion[]): void {
   for (const { reward } of completions) {
     save.player.xp += reward.xp;
     save.player.gold += reward.gold;
+    save.player.spiritEssence += reward.spiritEssence ?? 0;
     for (const itemId of reward.itemIds ?? []) {
       // A unique reward item already owned some other way is skipped, not an error - the quest
       // still completes and its xp/gold still land.
       grantItem(save.inventory, itemId);
     }
   }
+  applyLevelUp(save);
 }

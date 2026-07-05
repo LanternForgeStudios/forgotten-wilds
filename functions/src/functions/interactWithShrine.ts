@@ -9,9 +9,14 @@ interface InteractWithShrineRequest {
   refId: string;
 }
 
-/** Server-side source of truth for which shrine interactables actually exist. */
+/** Server-side source of truth for which shrine interactables actually exist. The Guardian of
+ *  Ironwood shrine (an ad hoc Stamina/Dash unlock chain built before the canonical MSQ existed)
+ *  has been retired in favor of the Spirit Grove restoration shrine from the real MSQ content
+ *  (see the 'rekindling-spirit-grove' quest, gated behind the three Guardian Sigil fragments). */
 const KNOWN_SHRINES: Record<string, Set<string>> = {
-  'ironwood-trail': new Set(['guardian-of-ironwood']),
+  'ironwood-trail': new Set(['spirit-grove']),
+  'ash-hallow': new Set(['ash-hallow-shrine']),
+  'hollow-rail-mine': new Set(['mine-shrine']),
 };
 
 export const interactWithShrine = onCall<InteractWithShrineRequest>(async (request) => {
@@ -32,13 +37,18 @@ export const interactWithShrine = onCall<InteractWithShrineRequest>(async (reque
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
 
-    const completions = advanceQuests(save.quests, { type: 'interactWithShrine', targetId: refId });
+    // Fires both event types so one interaction can satisfy a "discover this place" quest
+    // (reachLocation) and a separate, later "do something here" quest (interactWithShrine) without
+    // needing the client to know which one currently applies.
+    const shrineCompletions = advanceQuests(save.quests, { type: 'interactWithShrine', targetId: refId });
+    const discoveryCompletions = advanceQuests(save.quests, { type: 'reachLocation', targetId: refId });
+    const completions = [...shrineCompletions, ...discoveryCompletions];
     applyQuestRewards(save, completions);
 
     const completedIds = completions.map((c) => c.questId);
-    // The Guardian's final quest is also what unlocks Stamina/Dash - the base pool is scaled for
+    // Restoring Spirit Grove is also what unlocks Stamina/Dash - the base pool is scaled for
     // the player's current level so it isn't undersized for someone who leveled up along the way.
-    const unlockedStamina = completedIds.includes('guardians-blessing');
+    const unlockedStamina = completedIds.includes('rekindling-spirit-grove');
     if (unlockedStamina) {
       const level = save.player.level;
       save.player.stats.maxStamina = BASE_STAMINA_ON_UNLOCK + STAT_GROWTH_PER_LEVEL.maxStamina * (level - 1);

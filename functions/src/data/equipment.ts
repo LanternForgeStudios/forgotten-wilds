@@ -169,4 +169,22 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'rare',
     familyId: 'mountain-spirits',
   },
+  // Legendary reward for defeating the Coalbound Warden (MSF-IM-011) - the first Legendary
+  // Spirit Totem, now that the quest content granting it exists.
+  'mountain-guardian-totem': {
+    id: 'mountain-guardian-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxHp: 15, attack: 12, defense: 8 },
+    tier: 'legendary',
+    unique: true,
+    familyId: 'mountain-spirits',
+  },
+  // Prologue reward (MSF-P-001) - a starting-kit charm, not part of any regional family.
+  'travelers-cloak': {
+    id: 'travelers-cloak',
+    slot: 'charm',
+    statBonuses: { maxHp: 5, speed: 1 },
+    tier: 'common',
+    unique: true,
+  },
 };

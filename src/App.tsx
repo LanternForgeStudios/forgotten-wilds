@@ -9,6 +9,7 @@ import { TownScene } from '@/scenes/TownScene';
 import { OverworldScene } from '@/scenes/OverworldScene';
 import { DungeonScene } from '@/scenes/DungeonScene';
 import { CombatScene } from '@/scenes/CombatScene';
+import { ToastHost } from '@/components/ToastHost';
 
 function App() {
   const currentScene = useSceneStore((s) => s.currentScene);
@@ -49,26 +50,35 @@ function App() {
     );
   }
 
-  switch (currentScene) {
-    case 'title':
-      return <TitleScene />;
-    case 'characterCreation':
-      return <CharacterCreationScene />;
-    case 'town':
-      return <TownScene />;
-    case 'overworld':
-      return <OverworldScene />;
-    case 'dungeon':
-      return <DungeonScene />;
-    case 'combat':
-      return <CombatScene />;
-    default:
-      return (
-        <div className="app-shell">
-          <p>Scene "{currentScene}" not implemented yet.</p>
-        </div>
-      );
+  function renderScene() {
+    switch (currentScene) {
+      case 'title':
+        return <TitleScene />;
+      case 'characterCreation':
+        return <CharacterCreationScene />;
+      case 'town':
+        return <TownScene />;
+      case 'overworld':
+        return <OverworldScene />;
+      case 'dungeon':
+        return <DungeonScene />;
+      case 'combat':
+        return <CombatScene />;
+      default:
+        return (
+          <div className="app-shell">
+            <p>Scene "{currentScene}" not implemented yet.</p>
+          </div>
+        );
+    }
   }
+
+  return (
+    <>
+      {renderScene()}
+      <ToastHost />
+    </>
+  );
 }
 
 export default App;

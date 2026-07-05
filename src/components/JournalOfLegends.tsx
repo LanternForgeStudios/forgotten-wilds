@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
 import { useJournalStore } from '@/state/useJournalStore';
+import { useQuestStore } from '@/state/useQuestStore';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { ENEMIES, LOCATIONS, LORE_ENTRIES } from '@/data';
 import styles from './CharacterMenu.module.css';
+
+/** Fast Travel is earned via the Prologue's shrine-restoration quest (MSF-P-003, "The First
+ *  Flame") - matches the MSQ's `fast_travel_unlocked` world flag. Ordinary step-by-step map
+ *  transitions are unaffected; this only gates the Journal's "jump straight there" button. */
+const FAST_TRAVEL_UNLOCK_QUEST = 'the-first-flame';
 
 interface JournalOfLegendsProps {
   onClose: () => void;
@@ -22,6 +28,8 @@ const TABS: { id: Tab; label: string }[] = [
 
 export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const journal = useJournalStore((s) => s.journal);
+  const questProgress = useQuestStore((s) => s.progress);
+  const fastTravelUnlocked = questProgress[FAST_TRAVEL_UNLOCK_QUEST]?.status === 'completed';
   const goTo = useSceneStore((s) => s.goTo);
   const currentLocationId = useSceneStore((s) => s.params.locationId);
   const [tab, setTab] = useState<Tab>('creatures');
@@ -84,7 +92,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
               .filter((id) => !LOCATIONS.find((l) => l.id === id)?.parentLocationId)
               .map((id) => {
                 const loc = LOCATIONS.find((l) => l.id === id);
-                const canTravel = loc?.fastTravel && id !== currentLocationId;
+                const canTravel = loc?.fastTravel && id !== currentLocationId && fastTravelUnlocked;
                 const children = LOCATIONS.filter(
                   (l) => l.parentLocationId === id && journal.locationsVisited.includes(l.id),
                 );
@@ -117,6 +125,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                       )}
                       {loc?.fastTravel && id === currentLocationId && (
                         <span style={{ fontSize: 11, opacity: 0.6 }}>You are here</span>
+                      )}
+                      {loc?.fastTravel && id !== currentLocationId && !fastTravelUnlocked && (
+                        <span style={{ fontSize: 11, opacity: 0.6 }}>Restore the Ash Hallow shrine to unlock Fast Travel</span>
                       )}
                     </div>
                     {expanded &&

@@ -1,0 +1,135 @@
+{
+  "width": 7,
+  "height": 6,
+  "tilewidth": 16,
+  "tileheight": 16,
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
+    }
+  ],
+  "layers": [
+    {
+      "type": "tilelayer",
+      "name": "ground",
+      "width": 7,
+      "height": 6,
+      "data": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        1,
+        1,
+        25,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "type": "objectgroup",
+      "name": "objects",
+      "objects": [
+        {
+          "type": "spawnPoint",
+          "x": 48,
+          "y": 64,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            }
+          ]
+        },
+        {
+          "type": "npc",
+          "x": 48,
+          "y": 32,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "mayor-eleanor-ashcroft"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 48,
+          "y": 80,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ash-hallow"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow-town-hall"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "down"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "tilecount": 132,
+      "tiles": [
+        {
+          "id": 24,
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

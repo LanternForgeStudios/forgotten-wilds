@@ -13,7 +13,7 @@ interface StartEncounterRequest {
 
 /** Which quest must be completed before a given boss can be challenged. */
 const BOSS_PREREQUISITE_QUEST: Record<string, string> = {
-  'coalbound-warden': 'the-miners-lantern',
+  'coalbound-warden': 'the-shrine-below',
 };
 
 export const startEncounter = onCall<StartEncounterRequest>(async (request) => {

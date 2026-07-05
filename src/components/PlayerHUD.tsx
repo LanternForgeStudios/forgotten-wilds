@@ -3,7 +3,6 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
-import { signOutUser } from '@/firebase/auth';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
@@ -34,12 +33,12 @@ interface PlayerHUDProps {
   locationId?: string;
 }
 
-/** Single horizontal bar docked to the top of the screen: name/level, HP/SP, gold, who else is
- *  here (if in a town), and account controls. Replaces the old stacked corner panel plus the
- *  separate TownPresencePanel so the map viewport below it can use the full remaining screen. */
+/** Single horizontal bar docked to the top of the screen: name/level (opens the User Profile,
+ *  which is also where sign-out lives now), HP/SP, gold, and who else is here (if in a town).
+ *  Replaces the old stacked corner panel plus the separate TownPresencePanel so the map viewport
+ *  below it can use the full remaining screen. */
 export function PlayerHUD({ locationId }: PlayerHUDProps) {
   const player = usePlayerStore((s) => s.player);
-  const account = useAuthStore((s) => s.user?.email ?? s.user?.displayName ?? null);
   const uid = useAuthStore((s) => s.user?.uid);
   const isMobile = useIsMobile();
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
@@ -75,9 +74,9 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
 
   return (
     <div className={styles.bar} style={{ height: barHeight }}>
-      <span className={styles.name}>
+      <button className={styles.name} onClick={() => setProfileOpen(true)} title="View your user profile">
         {player.name} <span className={styles.level}>Lv.{player.level}</span>
-      </span>
+      </button>
 
       {locationName && <span className={styles.location}>{locationName}</span>}
 
@@ -85,30 +84,30 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
         <span className={styles.barLabel}>HP</span>
         <div className={styles.barTrack}>
           <div className={styles.barFillHp} style={{ width: `${hpPct}%` }} />
+          <span className={styles.barValue}>
+            {player.stats.hp}/{player.stats.maxHp}
+          </span>
         </div>
-        <span className={styles.barValue}>
-          {player.stats.hp}/{player.stats.maxHp}
-        </span>
       </div>
 
       <div className={styles.statGroup}>
         <span className={styles.barLabel}>SP</span>
         <div className={styles.barTrack}>
           <div className={styles.barFillSpirit} style={{ width: `${spiritPct}%` }} />
+          <span className={styles.barValue}>
+            {player.stats.spirit}/{player.stats.maxSpirit}
+          </span>
         </div>
-        <span className={styles.barValue}>
-          {player.stats.spirit}/{player.stats.maxSpirit}
-        </span>
       </div>
 
       <div className={styles.statGroup}>
         <span className={styles.barLabel}>Oil</span>
         <div className={styles.barTrack}>
           <div className={styles.barFillOil} style={{ width: `${oilPct}%` }} />
+          <span className={styles.barValue}>
+            {player.stats.lanternOil}/{player.stats.maxLanternOil}
+          </span>
         </div>
-        <span className={styles.barValue}>
-          {player.stats.lanternOil}/{player.stats.maxLanternOil}
-        </span>
       </div>
 
       {player.stats.maxStamina > 0 && (
@@ -119,10 +118,10 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
               className={styles.barFillStamina}
               style={{ width: `${Math.max(0, Math.min(100, (player.stats.stamina / player.stats.maxStamina) * 100))}%` }}
             />
+            <span className={styles.barValue}>
+              {player.stats.stamina}/{player.stats.maxStamina}
+            </span>
           </div>
-          <span className={styles.barValue}>
-            {player.stats.stamina}/{player.stats.maxStamina}
-          </span>
         </div>
       )}
 
@@ -134,10 +133,10 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
         <span className={styles.barLabel}>XP</span>
         <div className={styles.barTrack}>
           <div className={styles.barFillXp} style={{ width: `${xpPct}%` }} />
+          <span className={`${styles.barValue} ${styles.xpValue}`}>
+            {xp ? `${xp.remaining} to Lv.${player.level + 1}` : 'MAX'}
+          </span>
         </div>
-        <span className={`${styles.barValue} ${styles.xpValue}`}>
-          {xp ? `${xp.remaining} to Lv.${player.level + 1}` : 'MAX'}
-        </span>
       </button>
 
       <span className={styles.gold}>{player.gold}g</span>
@@ -163,21 +162,6 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
           )}
         </div>
       )}
-
-      <div className={styles.account}>
-        {!isMobile && account && (
-          <button
-            className={styles.accountEmail}
-            onClick={() => setProfileOpen(true)}
-            title="View your user profile"
-          >
-            {account}
-          </button>
-        )}
-        <button className={styles.signOutButton} onClick={() => signOutUser()}>
-          Sign out
-        </button>
-      </div>
 
       {statsOpen && <CharacterStats onClose={() => setStatsOpen(false)} />}
       {profileOpen && <UserProfile onClose={() => setProfileOpen(false)} />}

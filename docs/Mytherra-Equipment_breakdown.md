@@ -30,6 +30,15 @@ Uncommon	Better merchants, hidden chests, stronger enemies
 Rare	Quest rewards, elite enemies, expensive merchants after story progression
 Mythic	Major side quests, shrine restoration, Guardian blessings, optional bosses
 Legendary	Main story bosses, Guardian rewards, secret endgame content
+
+Merchant Sourcing by Shop
+
+Each town splits merchant-sold equipment across two services, with no overlap in what each one
+stocks:
+
+Blacksmith	Weapon, Charm, Spirit Totem (occasionally other equipables)
+Armory	Armor, Boots, Gloves
+
 Region 1 — Iron Mountains
 
 Theme: Endurance • Memory • Stone

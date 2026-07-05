@@ -478,6 +478,18 @@
           ]
         },
         {
+          "type": "interactable",
+          "x": 192,
+          "y": 128,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "water-fragment"
+            }
+          ]
+        },
+        {
           "type": "encounterZone",
           "x": 64,
           "y": 48,

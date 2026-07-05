@@ -18,16 +18,23 @@
     { "type": "transition", "x": 12, "y": 3, "refId": "ash-hallow-apothecary", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
     { "type": "spawnPoint", "x": 12, "y": 3, "refId": "from-ash-hallow-apothecary" },
 
-    { "type": "npc", "x": 16, "y": 3, "refId": "faye-whitlock", "wanderRadius": 2 },
+    { "type": "transition", "x": 15, "y": 3, "refId": "ash-hallow-armory", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 15, "y": 3, "refId": "from-ash-hallow-armory" },
 
-    { "type": "npc", "x": 6, "y": 7, "refId": "silas-flint", "wanderRadius": 2 },
-    { "type": "npc", "x": 12, "y": 7, "refId": "nell-ashby", "wanderRadius": 2 },
-    { "type": "npc", "x": 16, "y": 7, "refId": "reeve-talbot", "wanderRadius": 2 },
+    { "type": "npc", "x": 9, "y": 7, "refId": "nell-ashby", "wanderRadius": 2 },
+    { "type": "interactable", "x": 18, "y": 7, "refId": "ash-hallow-shrine" },
 
     { "type": "transition", "x": 3, "y": 10, "refId": "ash-hallow-inn", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
     { "type": "spawnPoint", "x": 3, "y": 10, "refId": "from-ash-hallow-inn" },
 
-    { "type": "npc", "x": 9, "y": 10, "refId": "mayor-osric-bell", "wanderRadius": 2 },
+    { "type": "transition", "x": 6, "y": 10, "refId": "ash-hallow-archive", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 6, "y": 10, "refId": "from-ash-hallow-archive" },
+
+    { "type": "transition", "x": 9, "y": 10, "refId": "ash-hallow-mine-office", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 9, "y": 10, "refId": "from-ash-hallow-mine-office" },
+
+    { "type": "transition", "x": 12, "y": 10, "refId": "ash-hallow-town-hall", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 12, "y": 10, "refId": "from-ash-hallow-town-hall" },
 
     { "type": "transition", "x": 21, "y": 7, "refId": "ironwood-trail", "targetSpawnId": "from-ash-hallow" }
   ]

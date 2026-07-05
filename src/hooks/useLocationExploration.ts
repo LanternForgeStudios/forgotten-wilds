@@ -4,15 +4,20 @@ import { useTileMap } from './useTileMap';
 import { useWanderingNpcs } from './useWanderingNpcs';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
+import { useQuestStore } from '@/state/useQuestStore';
 import { callEnterLocation } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
+import { getBlockedMessage } from '@/utils/locationGates';
 import { LOCATIONS } from '@/data';
 
 interface UseLocationExplorationOptions {
   locationId: string;
   suspended?: boolean;
   onEncounterZoneStep?: (chance: number, pos: GridPosition) => void;
+  /** Called instead of transitioning when the target location is gated behind an incomplete
+   *  quest - the caller decides how to surface it (every scene already has a message Panel). */
+  onBlockedTransition?: (message: string) => void;
 }
 
 /** Shared map-load + spawn-resolution + movement + transition logic for Town/Overworld/Dungeon scenes. */
@@ -20,6 +25,7 @@ export function useLocationExploration({
   locationId,
   suspended,
   onEncounterZoneStep,
+  onBlockedTransition,
 }: UseLocationExplorationOptions) {
   const location = LOCATIONS.find((l) => l.id === locationId)!;
   const { map } = useTileMap(locationId, location.mapAssetId);
@@ -60,6 +66,11 @@ export function useLocationExploration({
         (!o.requiredFacing || o.requiredFacing === pos.facing),
     );
     if (transition?.refId) {
+      const blockedMessage = getBlockedMessage(transition.refId, useQuestStore.getState().progress);
+      if (blockedMessage) {
+        onBlockedTransition?.(blockedMessage);
+        return;
+      }
       const targetLocation = LOCATIONS.find((l) => l.id === transition.refId);
       const scene = targetLocation ? sceneForLocationKind(targetLocation.kind) : undefined;
       if (scene) {
@@ -79,7 +90,9 @@ export function useLocationExploration({
     }
   };
 
-  const wanderPositions = useWanderingNpcs(map);
+  // Paused while an overlay (dialogue, menus, shop, etc.) is open, same as movement - an NPC
+  // wandering off mid-conversation reads as a bug, not ambience.
+  const wanderPositions = useWanderingNpcs(map, suspended);
   const dynamicBlockers = useMemo(() => Object.values(wanderPositions), [wanderPositions]);
 
   const { position, positionRef, facingDelta, attemptMove } = useGridMovement({

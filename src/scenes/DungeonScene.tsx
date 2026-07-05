@@ -19,7 +19,8 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
-import { callCollectWorldItem, callOpenChest } from '@/firebase/functionsClient';
+import { isTypingTarget } from '@/utils/keyboard';
+import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { ITEMS, EQUIPMENT } from '@/data';
 import styles from './TownScene.module.css';
@@ -33,6 +34,7 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId.startsWith('chest-')) return openedChests.includes(refId) ? 'Empty Chest' : 'Chest';
   if (refId === 'coalbound-warden') return 'something vast, ember-lit';
   if (refId === 'miners-lost-lantern') return 'Lantern Relic';
+  if (refId === 'mine-shrine') return 'Shrine';
   return 'something';
 }
 
@@ -59,6 +61,7 @@ export function DungeonScene() {
         goTo('combat', { locationId: LOCATION_ID, spawnX: pos.x, spawnY: pos.y });
       }
     },
+    onBlockedTransition: setMessage,
   });
 
   useHeartbeat(uid, displayName, LOCATION_ID, position);
@@ -85,7 +88,7 @@ export function DungeonScene() {
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The lantern will not budge.'));
     } else if (obj?.refId === 'coalbound-warden') {
-      const ready = questProgress['the-miners-lantern']?.status === 'completed';
+      const ready = questProgress['the-shrine-below']?.status === 'completed';
       if (ready) {
         goTo('combat', {
           locationId: LOCATION_ID,
@@ -96,6 +99,13 @@ export function DungeonScene() {
       } else {
         setMessage('Something vast and ember-lit stirs in the dark ahead — but the way feels barred to you, for now.');
       }
+    } else if (obj?.refId === 'mine-shrine') {
+      callInteractWithShrine(LOCATION_ID, 'mine-shrine')
+        .then(async () => {
+          if (uid) await resyncSave(uid);
+          setMessage('A shrine carved into the rock, coated in soot. Something in it still resists the corruption around it.');
+        })
+        .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
     } else if (obj?.refId?.startsWith('chest-')) {
       const chestId = obj.refId;
       callOpenChest(LOCATION_ID, chestId)
@@ -121,6 +131,7 @@ export function DungeonScene() {
 
   useEffect(() => {
     function handleInteract(e: KeyboardEvent) {
+      if (isTypingTarget(e)) return;
       if (e.key === 'Escape') {
         if (message) setMessage(null);
         else if (questLogOpen) setQuestLogOpen(false);
@@ -161,6 +172,9 @@ export function DungeonScene() {
     .map((o) => {
       if (o.refId === 'coalbound-warden') {
         return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'battle.enemy.coalbound-warden', label: '???' };
+      }
+      if (o.refId === 'mine-shrine') {
+        return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' };
       }
       return {
         id: o.refId!,

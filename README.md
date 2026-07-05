@@ -62,8 +62,8 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 
 - `src/scenes/` — Title, Character Creation, Town, Overworld, Dungeon, Combat
 - `src/components/` — DialogueBox, QuestLog, CharacterMenu (Inventory/Equipment), Shop, Inn,
-  JournalOfLegends, PlayerHUD, TownPresencePanel, and shared UI (`common/Panel` — the 9-slice
-  panel used everywhere)
+  JournalOfLegends, PlayerHUD, ToastHost (transient quest-progress notifications), and shared UI
+  (`common/Panel` — the 9-slice panel used everywhere)
 - `src/data/` — display-only seed data (items, equipment, enemies, NPCs, quests, locations, lore)
 - `src/assets/` — the Asset Manager and registry (`registry.ts`); every sprite/tileset/icon/map
   is looked up by id here, never imported by file path directly. See `public/CREDITS.md` for
@@ -73,9 +73,8 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   are for display only and are never trusted for anything that persists.
 - `functions/src/engine/` — pure combat/quest/equipment logic, unit-tested independent of
   Firestore (`cd functions && npm test`, Vitest).
-- `functions/src/functions/` — the callable Cloud Functions: `createCharacter`, `startEncounter`,
-  `resolveCombatAction`, `talkToNpc`, `enterLocation`, `collectWorldItem`, `equipItem`/
-  `unequipItem`, `purchaseItem`, `restAtInn`.
+- `functions/src/functions/` — the callable Cloud Functions (one file per function; see
+  `functions/src/index.ts` for the current exported list, which grows over time).
 - `src/multiplayer/` — typed stub interfaces (party, chat, trade, lodges, world events) for
   systems not built yet; every function throws "not implemented," ready to be filled in.
 
@@ -87,11 +86,13 @@ map to move and use the on-screen HUD buttons in place of the keyboard shortcuts
 
 ## Known limitations (MVP scope)
 
-- Quest prerequisite-gated objectives (`reachLocation`, `collectItem`) only advance if the
-  triggering action happens *after* the prerequisite quest is already completed. A player who
-  sequence-breaks (e.g. rushes into Hollow Rail Mine before finishing the Ironwood Trail quest)
-  can still collect the lantern relic, but that specific quest step won't retroactively credit
-  once earlier quests catch up. Normal linear play is unaffected.
+- Region transitions along the main story path (Ironwood Trail, Raven Ridge, Whisper Falls,
+  Hollow Rail Mine) are quest-gated - both client-side (a clear in-game message) and server-side
+  (`functions/src/functions/enterLocation.ts` rejects the request outright), so sequence-breaking
+  into those specific regions early isn't possible. Outside of those gates, quest objectives in
+  general (`reachLocation`, `collectItem`, etc.) still only advance if the triggering action
+  happens *after* the prerequisite quest is already completed - they don't retroactively credit.
+  Normal linear play is unaffected either way.
 - Vitest covers the pure combat/quest/equipment engine functions (`functions/src/engine/*.test.ts`)
   but not the Cloud Functions themselves (Firestore transactions) or any client code yet.
 - Character sprites are single-frame placeholders (see `public/CREDITS.md`) rather than full

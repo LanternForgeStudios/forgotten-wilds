@@ -19,8 +19,10 @@ export interface WanderPosition {
  *  npc's entry never moves from its home tile, and a `wanderRadius` npc's entry is nudged by a
  *  cosmetic client-side random walk (not server state, not synced between players - npc position
  *  doesn't affect gameplay fairness the way player/combat state does). */
-export function useWanderingNpcs(map: TileMap | null): Record<string, WanderPosition> {
+export function useWanderingNpcs(map: TileMap | null, paused?: boolean): Record<string, WanderPosition> {
   const [positions, setPositions] = useState<Record<string, WanderPosition>>({});
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
 
   const homesKey = map
     ? map.objects
@@ -47,6 +49,7 @@ export function useWanderingNpcs(map: TileMap | null): Record<string, WanderPosi
     const intervalId = window.setInterval(() => {
       const currentMap = mapRef.current;
       if (!currentMap) return;
+      if (pausedRef.current) return;
       setPositions((prev) => {
         const next = { ...prev };
         for (const home of wanderers) {
