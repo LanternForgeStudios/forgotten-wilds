@@ -149,8 +149,11 @@ export async function callInteractWithShrine(
   return result.data;
 }
 
-export async function callDash(): Promise<{ stamina: number; maxStamina: number }> {
-  const fn = httpsCallable<Record<string, never>, { stamina: number; maxStamina: number }>(functions, 'dash');
+export async function callDash(): Promise<{ stamina: number; maxStamina: number; staminaUpdatedAt: number }> {
+  const fn = httpsCallable<Record<string, never>, { stamina: number; maxStamina: number; staminaUpdatedAt: number }>(
+    functions,
+    'dash',
+  );
   const result = await fn({});
   return result.data;
 }

@@ -2,9 +2,11 @@ import { Panel } from './common/Panel';
 import { getAssetUrl } from '@/assets/assetManager';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
+import { useNow } from '@/hooks/useNow';
 import { EQUIPMENT, STARTING_STATS, STAT_GROWTH_PER_LEVEL, XP_THRESHOLDS } from '@/data';
 import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
 import { formatStatBonuses } from '@/utils/statBonuses';
+import { predictedStamina } from '@/utils/staminaRegen';
 import styles from './CharacterStats.module.css';
 
 interface CharacterStatsProps {
@@ -34,9 +36,15 @@ function baseAtLevel(stat: keyof typeof STAT_GROWTH_PER_LEVEL, level: number): n
 
 export function CharacterStats({ onClose }: CharacterStatsProps) {
   const player = usePlayerStore((s) => s.player);
+  const now = useNow(250);
   useOverlayClose(onClose);
 
   if (!player) return null;
+
+  const displayedStamina =
+    player.stats.maxStamina > 0
+      ? Math.round(predictedStamina(player.stats.stamina, player.stats.maxStamina, player.staminaUpdatedAt, now))
+      : 0;
 
   const equippedDefs = EQUIPMENT_SLOTS.map((slot) => {
     const itemId = player.equipment[slot];
@@ -97,7 +105,7 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
               <div className={styles.resourceRow}>
                 <span>Stamina</span>
                 <span>
-                  {player.stats.stamina} / {player.stats.maxStamina}
+                  {displayedStamina} / {player.stats.maxStamina}
                 </span>
               </div>
             )}

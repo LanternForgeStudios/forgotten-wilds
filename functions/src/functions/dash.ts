@@ -2,10 +2,14 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import type { PlayerSave } from '../shared-types';
 
-/** How much Stamina one Dash costs, and how fast it regenerates on its own - both fixed server
- *  constants rather than data-file content since there's only one kind of dash right now. */
+/** How much Stamina one Dash costs, and how long a full empty-to-max refill takes - both fixed
+ *  server constants rather than data-file content since there's only one kind of dash right now.
+ *  Regen is expressed as "seconds to fill the whole bar" rather than a flat per-second amount so
+ *  it still feels like a few seconds at any level, even though maxStamina grows with level (see
+ *  STAT_GROWTH_PER_LEVEL.maxStamina) - kept in sync by hand with the client's display-only copy in
+ *  src/utils/staminaRegen.ts, the same way any other client/server display number is. */
 const DASH_COST = 15;
-const REGEN_PER_SECOND = 1;
+const FULL_REGEN_SECONDS = 6;
 
 export const dash = onCall(async (request) => {
   const uid = request.auth?.uid;
@@ -29,9 +33,10 @@ export const dash = onCall(async (request) => {
     // first reconciles however much time has passed since the last update.
     const now = Date.now();
     const elapsedSeconds = Math.max(0, (now - save.player.staminaUpdatedAt) / 1000);
+    const regenPerSecond = save.player.stats.maxStamina / FULL_REGEN_SECONDS;
     const regenerated = Math.min(
       save.player.stats.maxStamina - save.player.stats.stamina,
-      elapsedSeconds * REGEN_PER_SECOND,
+      elapsedSeconds * regenPerSecond,
     );
     save.player.stats.stamina = Math.min(save.player.stats.maxStamina, save.player.stats.stamina + regenerated);
 
@@ -47,6 +52,10 @@ export const dash = onCall(async (request) => {
     save.updatedAt = now;
     tx.set(userRef, save);
 
-    return { stamina: save.player.stats.stamina, maxStamina: save.player.stats.maxStamina };
+    return {
+      stamina: save.player.stats.stamina,
+      maxStamina: save.player.stats.maxStamina,
+      staminaUpdatedAt: save.player.staminaUpdatedAt,
+    };
   });
 });

@@ -10,7 +10,7 @@ export interface GridPosition {
   facing: Facing;
 }
 
-const KEY_TO_FACING: Record<string, Facing> = {
+export const KEY_TO_FACING: Record<string, Facing> = {
   ArrowUp: 'up',
   w: 'up',
   W: 'up',

@@ -21,7 +21,7 @@ export function MobileHud({ onInteract, onDash, onQuestLog, onInventory, onJourn
         </button>
       )}
       {onDash && (
-        <button className={styles.interactButton} onClick={onDash}>
+        <button className={styles.interactButton} onClick={() => onDash()}>
           Dash
         </button>
       )}

@@ -19,16 +19,18 @@ interface UseDashOptions {
   positionRef: RefObject<GridPosition>;
 }
 
-/** Dash: up to 5 tiles in the direction the player is currently facing, stopping early on
- *  collision, gated by the server-authoritative Stamina cost (see functions/src/functions/dash.ts)
- *  plus a client-side 1s cooldown between attempts (a pacing limit, not an anti-cheat one - the
- *  finite, slowly-regenerating Stamina cost is what actually rate-limits this server-side). */
+/** Dash: up to 5 tiles in the given direction (or the player's current facing if none is given,
+ *  e.g. the mobile Dash button), stopping early on collision, gated by the server-authoritative
+ *  Stamina cost (see functions/src/functions/dash.ts) plus a client-side 1s cooldown between
+ *  attempts (a pacing limit, not an anti-cheat one - the finite, slowly-regenerating Stamina cost
+ *  is what actually rate-limits this server-side). */
 export function useDash({ attemptMove, positionRef }: UseDashOptions) {
   const lastDashAtRef = useRef(0);
   const dashingRef = useRef(false);
   const patchStats = usePlayerStore((s) => s.patchStats);
+  const patchPlayer = usePlayerStore((s) => s.patchPlayer);
 
-  const dash = useCallback(async () => {
+  const dash = useCallback(async (requestedFacing?: Facing) => {
     if (dashingRef.current) return;
     const now = Date.now();
     if (now - lastDashAtRef.current < DASH_COOLDOWN_MS) return;
@@ -41,10 +43,14 @@ export function useDash({ attemptMove, positionRef }: UseDashOptions) {
       return; // not unlocked yet, or not enough stamina - no-op, no error UI for a movement flourish
     }
     patchStats({ stamina: result.stamina, maxStamina: result.maxStamina });
+    patchPlayer({ staminaUpdatedAt: result.staminaUpdatedAt });
 
     dashingRef.current = true;
     try {
-      const facing = positionRef.current.facing;
+      // The Shift+direction keybind passes the held direction explicitly, since it may not match
+      // whichever way the player was last facing. The mobile Dash button has no direction of its
+      // own to offer, so it falls back to the current facing.
+      const facing = requestedFacing ?? positionRef.current.facing;
       for (let i = 0; i < DASH_TILES; i++) {
         const before = positionRef.current;
         attemptMove(facing, { isDash: true });
@@ -55,7 +61,7 @@ export function useDash({ attemptMove, positionRef }: UseDashOptions) {
     } finally {
       dashingRef.current = false;
     }
-  }, [attemptMove, patchStats, positionRef]);
+  }, [attemptMove, patchStats, patchPlayer, positionRef]);
 
   return dash;
 }

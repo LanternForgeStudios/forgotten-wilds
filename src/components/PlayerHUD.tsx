@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useNow } from '@/hooks/useNow';
 import { HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
 import { XP_THRESHOLDS, LOCATIONS } from '@/data';
+import { predictedStamina } from '@/utils/staminaRegen';
 import type { OnlinePresence } from '@/types';
 import styles from './PlayerHUD.module.css';
 
@@ -45,6 +47,10 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   const [presenceOpen, setPresenceOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  // Ticks the HUD every quarter-second purely so the Stamina bar visibly climbs back up in real
+  // time between Dash calls instead of only updating right after one - display-only, never
+  // persisted (see predictedStamina).
+  const now = useNow(250);
 
   useEffect(() => {
     if (!locationId) return;
@@ -64,7 +70,10 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   const xp = xpProgress(player.xp, player.level);
   const xpPct = xp ? Math.max(0, Math.min(100, (xp.intoLevel / xp.span) * 100)) : 100;
 
-  const now = Date.now();
+  const displayedStamina =
+    player.stats.maxStamina > 0
+      ? Math.round(predictedStamina(player.stats.stamina, player.stats.maxStamina, player.staminaUpdatedAt, now))
+      : 0;
   const visiblePresences = locationId
     ? presences
         .filter((p) => p.locationId === locationId && now - p.lastHeartbeat < STALE_AFTER_MS)
@@ -116,10 +125,10 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
           <div className={styles.barTrack}>
             <div
               className={styles.barFillStamina}
-              style={{ width: `${Math.max(0, Math.min(100, (player.stats.stamina / player.stats.maxStamina) * 100))}%` }}
+              style={{ width: `${Math.max(0, Math.min(100, (displayedStamina / player.stats.maxStamina) * 100))}%` }}
             />
             <span className={styles.barValue}>
-              {player.stats.stamina}/{player.stats.maxStamina}
+              {displayedStamina}/{player.stats.maxStamina}
             </span>
           </div>
         </div>

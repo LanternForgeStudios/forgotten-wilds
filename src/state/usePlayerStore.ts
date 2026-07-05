@@ -14,6 +14,10 @@ interface PlayerState {
    *  (resolveCombatAction's response), just applied here instead of waiting for a full resync so
    *  the top HUD's HP/SP bars track combat live, turn by turn. */
   patchStats: (stats: Partial<Stats>) => void;
+  /** Same non-optimistic pattern as patchStats, for Player-level fields outside `stats` (e.g.
+   *  staminaUpdatedAt after a Dash) - always server round-result values, applied without waiting
+   *  for a full resync. */
+  patchPlayer: (patch: Partial<Player>) => void;
 }
 
 /** Populated only from Cloud Function responses or reads of users/{uid} — never mutated locally,
@@ -31,5 +35,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     const { player } = get();
     if (!player) return;
     set({ player: { ...player, stats: { ...player.stats, ...stats } } });
+  },
+  patchPlayer: (patch) => {
+    const { player } = get();
+    if (!player) return;
+    set({ player: { ...player, ...patch } });
   },
 }));
