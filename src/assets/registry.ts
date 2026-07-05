@@ -740,7 +740,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'icon.equipment.travelers-cloak',
     category: 'icon',
-    intendedUse: "Equipment icon for travelers-cloak (Prologue starting-kit charm)",
+    intendedUse: "Equipment icon for travelers-cloak (Prologue starting-kit armor)",
     filePath: 'icons/travelers-cloak.svg',
     dimensions: { width: 64, height: 64 },
     status: 'placeholder',

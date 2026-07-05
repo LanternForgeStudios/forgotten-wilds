@@ -179,12 +179,13 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     unique: true,
     familyId: 'mountain-spirits',
   },
-  // Prologue reward (MSF-P-001) - a starting-kit charm, not part of any regional family.
+  // Prologue reward (MSF-P-001) - a starting-kit armor piece, not part of any regional family.
+  // Not unique - it's a plain wool cloak given to every new Lantern Keeper, not a one-of-a-kind
+  // relic, so owning it doesn't need to block ever granting another copy.
   'travelers-cloak': {
     id: 'travelers-cloak',
-    slot: 'charm',
+    slot: 'armor',
     statBonuses: { maxHp: 5, speed: 1 },
     tier: 'common',
-    unique: true,
   },
 };

@@ -117,10 +117,12 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       save.player.xp += reward.xp;
       save.player.gold += reward.gold;
       applyLevelUp(save);
+      const grantedItemIds: string[] = [];
       for (const itemId of reward.lootItemIds) {
         // A unique drop (e.g. a boss trophy) never grants a second copy, even if the same boss
-        // is challenged and defeated again later.
-        grantItem(save.inventory, itemId);
+        // is challenged and defeated again later - skip it from the reported loot too, so the
+        // victory screen doesn't claim an item was found when nothing was actually added.
+        if (grantItem(save.inventory, itemId)) grantedItemIds.push(itemId);
       }
 
       // Group defeated enemies by id so a quest like "defeat 3 mothlings" advances by the actual
@@ -143,7 +145,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       const completions = questEvents.flatMap((event) => advanceQuests(save.quests, event));
       applyQuestRewards(save, completions);
 
-      rewards = { xp: reward.xp, gold: reward.gold, itemIds: reward.lootItemIds, leveledUp: save.player.level > levelBefore };
+      rewards = { xp: reward.xp, gold: reward.gold, itemIds: grantedItemIds, leveledUp: save.player.level > levelBefore };
     } else if (result.phase === 'defeat') {
       // Soft respawn at the inn - no punishing penalty, per design decision in the plan.
       save.player.stats.hp = Math.round(save.player.stats.maxHp * 0.5);

@@ -8,7 +8,9 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { callPurchaseItem, callSellItem } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
+import { useToastStore } from '@/state/useToastStore';
 import { sellPriceFor } from '@/utils/sellPrice';
+import { formatStatBonuses } from '@/utils/statBonuses';
 import { SHOP_LISTINGS, SHOP_TITLES, SHOP_CATALOGS, ITEMS, EQUIPMENT } from '@/data';
 import styles from './CharacterMenu.module.css';
 
@@ -21,45 +23,63 @@ function defFor(itemId: string) {
   return ITEMS.find((i) => i.id === itemId) ?? EQUIPMENT.find((e) => e.id === itemId);
 }
 
+const SLOT_LABELS: Record<string, string> = {
+  weapon: 'Weapon',
+  armor: 'Armor',
+  boots: 'Boots',
+  gloves: 'Gloves',
+  charm: 'Charm',
+  lantern: 'Lantern',
+  spiritTotem: 'Spirit Totem',
+};
+
 export function Shop({ shopId, onClose }: ShopProps) {
   const [tab, setTab] = useState<'buy' | 'sell'>('buy');
   const player = usePlayerStore((s) => s.player);
   const inventory = useInventoryStore((s) => s.items);
   const uid = useAuthStore((s) => s.user?.uid);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const pushToast = useToastStore((s) => s.push);
   useOverlayClose(onClose);
 
-  async function buy(itemId: string) {
+  async function buy(itemId: string, name: string, price: number) {
     if (busy) return;
-    setBusy(true);
+    setBusy(itemId);
     setError(null);
     try {
       await callPurchaseItem(itemId, shopId);
       if (uid) await resyncSave(uid);
+      pushToast(`Bought ${name} for ${price}g`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not complete that purchase.');
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
-  async function sell(itemId: string) {
+  async function sell(itemId: string, name: string, price: number) {
     if (busy) return;
-    setBusy(true);
+    setBusy(itemId);
     setError(null);
     try {
       await callSellItem(itemId, 1);
       if (uid) await resyncSave(uid);
+      pushToast(`Sold ${name} for ${price}g`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not sell that item.');
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
   const catalog = SHOP_CATALOGS[shopId] ?? [];
   const listings = SHOP_LISTINGS.filter((l) => catalog.includes(l.itemId));
+  const selectedDef = selectedItemId ? defFor(selectedItemId) : undefined;
+  const selectedOwnedQuantity = selectedItemId
+    ? (inventory.find((i) => i.itemId === selectedItemId)?.quantity ?? 0)
+    : 0;
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -90,18 +110,27 @@ export function Shop({ shopId, onClose }: ShopProps) {
               const iconAssetId = def && 'iconAssetId' in def ? def.iconAssetId : undefined;
               const name = def?.name ?? listing.itemId;
               const canAfford = (player?.gold ?? 0) >= listing.price;
+              const isBusy = busy === listing.itemId;
+              const isSelected = selectedItemId === listing.itemId;
               return (
-                <div key={listing.itemId} className={styles.itemCard}>
+                <div
+                  key={listing.itemId}
+                  className={`${styles.itemCard} ${isSelected ? styles.itemCardSelected : ''}`}
+                  onClick={() => setSelectedItemId(listing.itemId)}
+                >
                   {iconAssetId && <img src={getAssetUrl(iconAssetId)} alt="" className={styles.icon} />}
                   <span className={styles.itemName}>{name}</span>
                   {def?.tier && <TierBadge tier={def.tier} />}
                   <span style={{ fontSize: 11, opacity: 0.8 }}>{listing.price}g</span>
                   <button
                     className={styles.smallButton}
-                    disabled={busy || !canAfford}
-                    onClick={() => buy(listing.itemId)}
+                    disabled={!!busy || !canAfford}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      buy(listing.itemId, name, listing.price);
+                    }}
                   >
-                    Buy
+                    {isBusy ? 'Buying…' : 'Buy'}
                   </button>
                 </div>
               );
@@ -123,8 +152,14 @@ export function Shop({ shopId, onClose }: ShopProps) {
                 const name = def?.name ?? entry.itemId;
                 const equippedSlot = def && 'slot' in def ? def.slot : undefined;
                 const isEquipped = equippedSlot ? player?.equipment[equippedSlot] === entry.itemId : false;
+                const isBusy = busy === entry.itemId;
+                const isSelected = selectedItemId === entry.itemId;
                 return (
-                  <div key={entry.itemId} className={styles.itemCard}>
+                  <div
+                    key={entry.itemId}
+                    className={`${styles.itemCard} ${isSelected ? styles.itemCardSelected : ''}`}
+                    onClick={() => setSelectedItemId(entry.itemId)}
+                  >
                     {iconAssetId && <img src={getAssetUrl(iconAssetId)} alt="" className={styles.icon} />}
                     <span className={styles.itemName}>{name}</span>
                     {def?.tier && <TierBadge tier={def.tier} />}
@@ -133,8 +168,15 @@ export function Shop({ shopId, onClose }: ShopProps) {
                     {isEquipped ? (
                       <span style={{ fontSize: 11, color: 'var(--fw-spirit)' }}>Equipped</span>
                     ) : (
-                      <button className={styles.smallButton} disabled={busy} onClick={() => sell(entry.itemId)}>
-                        Sell 1
+                      <button
+                        className={styles.smallButton}
+                        disabled={!!busy}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          sell(entry.itemId, name, price);
+                        }}
+                      >
+                        {isBusy ? 'Selling…' : 'Sell 1'}
                       </button>
                     )}
                   </div>
@@ -143,6 +185,36 @@ export function Shop({ shopId, onClose }: ShopProps) {
             </div>
           );
         })()}
+
+        {selectedDef && (
+          <div className={styles.detailPanel}>
+            <div className={styles.detailHeader}>
+              {'iconAssetId' in selectedDef && selectedDef.iconAssetId && (
+                <img src={getAssetUrl(selectedDef.iconAssetId)} alt="" className={styles.detailIcon} />
+              )}
+              <div>
+                <p className={styles.detailName}>
+                  {selectedDef.name} <TierBadge tier={selectedDef.tier} style={{ marginLeft: 6 }} />
+                </p>
+                <p className={styles.detailMeta}>
+                  {'slot' in selectedDef ? SLOT_LABELS[selectedDef.slot] : 'category' in selectedDef ? selectedDef.category : ''}
+                  {selectedOwnedQuantity > 0 && ` · You own x${selectedOwnedQuantity}`}
+                  {selectedDef.unique && ' · Unique (cannot be lost, sold, or traded)'}
+                </p>
+              </div>
+            </div>
+            <p className={styles.detailDescription}>{selectedDef.description}</p>
+            {'statBonuses' in selectedDef && formatStatBonuses(selectedDef.statBonuses) && (
+              <p className={styles.detailStats}>{formatStatBonuses(selectedDef.statBonuses)}</p>
+            )}
+            {'effect' in selectedDef && selectedDef.effect && (
+              <p className={styles.detailStats}>
+                {selectedDef.effect.healHp ? `Restores ${selectedDef.effect.healHp} HP  ` : ''}
+                {selectedDef.effect.healSpirit ? `Restores ${selectedDef.effect.healSpirit} Spirit  ` : ''}
+              </p>
+            )}
+          </div>
+        )}
 
         {error && (
           <p style={{ color: 'var(--fw-danger)', fontSize: 13 }}>{error}</p>

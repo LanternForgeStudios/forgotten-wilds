@@ -206,10 +206,9 @@ export const EQUIPMENT: EquipmentItem[] = [
     id: 'travelers-cloak',
     name: "Traveler's Cloak",
     description: 'A plain wool cloak given to every new Lantern Keeper on their first day.',
-    slot: 'charm',
+    slot: 'armor',
     iconAssetId: 'icon.equipment.travelers-cloak',
     statBonuses: { maxHp: 5, speed: 1 },
     tier: 'common',
-    unique: true,
   },
 ];

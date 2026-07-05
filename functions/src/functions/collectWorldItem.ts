@@ -43,17 +43,24 @@ export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) 
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
 
-    const alreadyHave = save.inventory.some((i) => i.itemId === itemId);
-    if (alreadyHave) {
-      return { alreadyCollected: true, questsCompleted: [] as string[] };
+    if (save.player.currentLocationId !== locationId) {
+      throw new HttpsError('failed-precondition', 'You are not at that location.');
     }
 
-    save.inventory.push({ itemId, quantity: 1 });
+    const alreadyHave = save.inventory.some((i) => i.itemId === itemId);
+    if (!alreadyHave) {
+      save.inventory.push({ itemId, quantity: 1 });
+    }
+
+    // Always advance quests on this event, even if the item was already collected - a quest
+    // whose collectItem objective wasn't active yet the first time this node was visited (e.g.
+    // reachable well before its own prerequisite quest) would otherwise never see the event again,
+    // permanently soft-locking it once the fast path above starts short-circuiting.
     const completions = advanceQuests(save.quests, { type: 'collectItem', targetId: itemId });
     applyQuestRewards(save, completions);
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
-    return { alreadyCollected: false, questsCompleted: completions.map((c) => c.questId) };
+    return { alreadyCollected: alreadyHave, questsCompleted: completions.map((c) => c.questId) };
   });
 });

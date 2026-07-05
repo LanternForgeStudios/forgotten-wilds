@@ -79,7 +79,7 @@ export function OverworldScene() {
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const suspended = activeNpc !== null || questLogOpen || menuOpen || journalOpen || message !== null;
-  const { map, position, positionRef, facingDelta, attemptMove } = useLocationExploration({
+  const { map, position, positionRef, facingDelta, attemptMove, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
     onEncounterZoneStep: (chance, pos) => {
@@ -100,9 +100,11 @@ export function OverworldScene() {
     const { dx, dy } = facingDelta(position.facing);
     const target = { x: position.x + dx, y: position.y + dy };
 
-    const npcObject = map.objects.find(
-      (o) => o.type === 'npc' && o.x === target.x && o.y === target.y,
-    );
+    const npcObject = map.objects.find((o) => {
+      if (o.type !== 'npc' || !o.refId) return false;
+      const pos = wanderPositions[o.refId] ?? { x: o.x, y: o.y };
+      return pos.x === target.x && pos.y === target.y;
+    });
     if (npcObject?.refId) {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
@@ -210,7 +212,7 @@ export function OverworldScene() {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeNpc, message, questLogOpen, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress]);
+  }, [activeNpc, message, questLogOpen, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
 
   if (!map) {
     return (
@@ -224,10 +226,11 @@ export function OverworldScene() {
     .filter((o) => o.type === 'npc' && o.refId)
     .map((o) => {
       const npc = NPCS.find((n) => n.id === o.refId);
+      const pos = wanderPositions[o.refId!] ?? { x: o.x, y: o.y };
       return {
         id: o.refId!,
-        x: o.x,
-        y: o.y,
+        x: pos.x,
+        y: pos.y,
         spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
         label: npc?.name,
       };

@@ -41,6 +41,11 @@ export const openChest = onCall<OpenChestRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+
+    if (save.player.currentLocationId !== locationId) {
+      throw new HttpsError('failed-precondition', 'You are not at that location.');
+    }
+
     const openedChests = save.openedChests ?? [];
 
     if (openedChests.includes(chestId)) {

@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { SHOP_PRICES, SHOP_CATALOGS } from '../data/items';
+import { SHOP_PRICES, SHOP_CATALOGS, ITEMS } from '../data/items';
 import { grantItem } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
 
@@ -35,6 +35,16 @@ export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
     if (save.player.gold < price) {
       throw new HttpsError('failed-precondition', 'Not enough gold.');
     }
+
+    // Non-consumables (equipment, key items, lantern upgrades) can only ever be bought one at a
+    // time from a shop - a second copy serves no purpose since it can't be equipped twice. This is
+    // purchase-specific: it doesn't stop the same item being found or earned again later through
+    // quests/chests/loot, which route through grantItem directly rather than this function.
+    const isConsumable = ITEMS[itemId]?.category === 'consumable';
+    if (!isConsumable && save.inventory.some((i) => i.itemId === itemId && i.quantity >= 1)) {
+      throw new HttpsError('failed-precondition', 'You already own one of those.');
+    }
+
     if (!grantItem(save.inventory, itemId)) {
       throw new HttpsError('failed-precondition', 'You already own the only one of those.');
     }

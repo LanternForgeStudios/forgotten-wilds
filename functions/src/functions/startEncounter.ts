@@ -35,6 +35,19 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
   }
   const save = userSnap.data() as PlayerSave;
 
+  if (save.player.currentLocationId !== locationId) {
+    throw new HttpsError('failed-precondition', 'You are not at that location.');
+  }
+
+  const sessionRef = db.collection('combatSessions').doc(uid);
+  const existingSession = await sessionRef.get();
+  if (existingSession.exists) {
+    const existing = existingSession.data() as CombatSession;
+    if (existing.status === 'active' && existing.expiresAt > Date.now()) {
+      throw new HttpsError('failed-precondition', 'You are already in an encounter.');
+    }
+  }
+
   let enemies;
   const bossId = request.data?.bossId;
   if (bossId) {
@@ -74,7 +87,7 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
     startedAt: now,
     expiresAt: now + 30 * 60 * 1000,
   };
-  await db.collection('combatSessions').doc(uid).set(session);
+  await sessionRef.set(session);
 
   return {
     sessionId: session.sessionId,

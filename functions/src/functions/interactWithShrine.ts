@@ -37,6 +37,10 @@ export const interactWithShrine = onCall<InteractWithShrineRequest>(async (reque
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
 
+    if (save.player.currentLocationId !== locationId) {
+      throw new HttpsError('failed-precondition', 'You are not at that location.');
+    }
+
     // Fires both event types so one interaction can satisfy a "discover this place" quest
     // (reachLocation) and a separate, later "do something here" quest (interactWithShrine) without
     // needing the client to know which one currently applies.
