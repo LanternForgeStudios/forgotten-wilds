@@ -571,7 +571,7 @@
             {
               "name": "refId",
               "type": "string",
-              "value": "from-ironwood-trail"
+              "value": "from-black-briar-forest"
             }
           ]
         },
@@ -583,7 +583,7 @@
             {
               "name": "refId",
               "type": "string",
-              "value": "ironwood-trail"
+              "value": "black-briar-forest"
             },
             {
               "name": "targetSpawnId",

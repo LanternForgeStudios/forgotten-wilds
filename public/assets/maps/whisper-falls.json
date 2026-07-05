@@ -1,0 +1,669 @@
+{
+  "width": 24,
+  "height": 16,
+  "tilewidth": 16,
+  "tileheight": 16,
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
+    }
+  ],
+  "layers": [
+    {
+      "type": "tilelayer",
+      "name": "ground",
+      "width": 24,
+      "height": 16,
+      "data": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "type": "objectgroup",
+      "name": "objects",
+      "objects": [
+        {
+          "type": "spawnPoint",
+          "x": 32,
+          "y": 128,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "default"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 16,
+          "y": 128,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-raven-ridge"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 0,
+          "y": 128,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "raven-ridge"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-whisper-falls"
+            }
+          ]
+        },
+        {
+          "type": "spawnPoint",
+          "x": 352,
+          "y": 128,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-black-briar-forest"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 368,
+          "y": 128,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "black-briar-forest"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-whisper-falls"
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 64,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 128,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 192,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 256,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 320,
+          "y": 48,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 64,
+          "y": 128,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 128,
+          "y": 128,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 256,
+          "y": 128,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 320,
+          "y": 128,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 64,
+          "y": 192,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 128,
+          "y": 192,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 192,
+          "y": 192,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 256,
+          "y": 192,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        },
+        {
+          "type": "encounterZone",
+          "x": 320,
+          "y": 192,
+          "properties": [
+            {
+              "name": "encounterChance",
+              "type": "float",
+              "value": 0.24
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "tilecount": 132,
+      "tiles": [
+        {
+          "id": 24,
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

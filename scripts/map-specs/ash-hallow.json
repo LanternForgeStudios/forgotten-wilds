@@ -1,0 +1,34 @@
+{
+  "width": 22,
+  "height": 14,
+  "tilesetAssetId": "tileset.tiny-dungeon",
+  "objects": [
+    { "type": "spawnPoint", "x": 10, "y": 11, "refId": "default" },
+    { "type": "spawnPoint", "x": 19, "y": 7, "refId": "from-ironwood-trail" },
+
+    { "type": "transition", "x": 3, "y": 3, "refId": "ash-hallow-elias-house", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 3, "y": 3, "refId": "from-ash-hallow-elias-house" },
+
+    { "type": "transition", "x": 6, "y": 3, "refId": "ash-hallow-mara-shop", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 6, "y": 3, "refId": "from-ash-hallow-mara-shop" },
+
+    { "type": "transition", "x": 9, "y": 3, "refId": "ash-hallow-blacksmith", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 9, "y": 3, "refId": "from-ash-hallow-blacksmith" },
+
+    { "type": "transition", "x": 12, "y": 3, "refId": "ash-hallow-apothecary", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 12, "y": 3, "refId": "from-ash-hallow-apothecary" },
+
+    { "type": "npc", "x": 16, "y": 3, "refId": "faye-whitlock", "wanderRadius": 2 },
+
+    { "type": "npc", "x": 6, "y": 7, "refId": "silas-flint", "wanderRadius": 2 },
+    { "type": "npc", "x": 12, "y": 7, "refId": "nell-ashby", "wanderRadius": 2 },
+    { "type": "npc", "x": 16, "y": 7, "refId": "reeve-talbot", "wanderRadius": 2 },
+
+    { "type": "transition", "x": 3, "y": 10, "refId": "ash-hallow-inn", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 3, "y": 10, "refId": "from-ash-hallow-inn" },
+
+    { "type": "npc", "x": 9, "y": 10, "refId": "mayor-osric-bell", "wanderRadius": 2 },
+
+    { "type": "transition", "x": 21, "y": 7, "refId": "ironwood-trail", "targetSpawnId": "from-ash-hallow" }
+  ]
+}

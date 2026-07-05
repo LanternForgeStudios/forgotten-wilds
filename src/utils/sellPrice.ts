@@ -6,9 +6,8 @@ const TIER_FALLBACK_SELL_VALUE: Record<Tier, number> = {
   common: 15,
   uncommon: 30,
   rare: 60,
-  epic: 120,
-  legendary: 250,
-  mythic: 500,
+  mythic: 150,
+  legendary: 300,
 };
 
 /** Display-only estimate of what the shop will pay for one unit of an item - undefined if it

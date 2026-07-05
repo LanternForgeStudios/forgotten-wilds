@@ -683,7 +683,7 @@
             {
               "name": "refId",
               "type": "string",
-              "value": "from-hollow-rail-mine"
+              "value": "from-raven-ridge"
             }
           ]
         },
@@ -712,7 +712,7 @@
             {
               "name": "refId",
               "type": "string",
-              "value": "hollow-rail-mine"
+              "value": "raven-ridge"
             },
             {
               "name": "targetSpawnId",

@@ -37,6 +37,8 @@ const BUILDING_MARKERS: Record<string, { label: string; spriteAssetId: string }>
   'ash-hallow-elias-house': { label: "Elias' House", spriteAssetId: 'structure.house' },
   'ash-hallow-mara-shop': { label: "Mara's Shop", spriteAssetId: 'structure.shop' },
   'ash-hallow-inn': { label: 'The Inn', spriteAssetId: 'structure.inn' },
+  'ash-hallow-blacksmith': { label: 'The Forge', spriteAssetId: 'structure.blacksmith' },
+  'ash-hallow-apothecary': { label: 'Apothecary', spriteAssetId: 'structure.apothecary' },
 };
 
 export function TownScene() {
@@ -45,6 +47,7 @@ export function TownScene() {
   const [questLogOpen, setQuestLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [activeShopId, setActiveShopId] = useState<string | undefined>();
   const [innOpen, setInnOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const uid = useAuthStore((s) => s.user?.uid);
@@ -70,8 +73,12 @@ export function TownScene() {
   function handleDialogueClose() {
     const hook = activeNpc?.gameplayHook;
     setActiveNpc(null);
-    if (hook?.type === 'shop') setShopOpen(true);
-    else if (hook?.type === 'inn') setInnOpen(true);
+    if (hook?.type === 'shop') {
+      setActiveShopId(hook.shopId);
+      setShopOpen(true);
+    } else if (hook?.type === 'inn') {
+      setInnOpen(true);
+    }
   }
 
   function attemptInteract() {
@@ -199,7 +206,7 @@ export function TownScene() {
       )}
       {questLogOpen && <QuestLog onClose={() => setQuestLogOpen(false)} />}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
-      {shopOpen && <Shop onClose={() => setShopOpen(false)} />}
+      {shopOpen && <Shop shopId={activeShopId ?? ''} onClose={() => setShopOpen(false)} />}
       {innOpen && <Inn onClose={() => setInnOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
     </div>

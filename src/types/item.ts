@@ -3,9 +3,12 @@ import type { EquipmentSlot, Stats } from './stats';
 export type ItemCategory = 'consumable' | 'equipment' | 'keyItem' | 'lanternUpgrade';
 
 /** Rarity/power tier shared by every inventory-eligible thing (consumables, key items, and
- *  equipment alike) - Common through Mythic. Legendary and Mythic are reserved for items tied to
- *  a specific milestone (a boss trophy, a one-time quest reward), not shop stock. */
-export type Tier = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+ *  equipment alike), in ascending order: Common < Uncommon < Rare < Mythic < Legendary. Mythic
+ *  and Legendary are reserved for items tied to a specific milestone (major side quests/shrine
+ *  restoration/Guardian blessings for Mythic; main story bosses/Guardian rewards/secret endgame
+ *  content for Legendary - a named, story-tied artifact that ends its equipment family), never
+ *  shop stock. Per the canonical equipment design (docs/Mytherra-Equipment_breakdown.md). */
+export type Tier = 'common' | 'uncommon' | 'rare' | 'mythic' | 'legendary';
 
 export interface ItemEffect {
   healHp?: number;
@@ -38,6 +41,9 @@ export interface EquipmentItem {
   iconAssetId: string;
   statBonuses: Partial<Stats>;
   tier: Tier;
+  /** Which equipment family this belongs to (e.g. 'walking-staff') - display/grouping only, not
+   *  read by any equip mechanic. See functions/src/data/equipment.ts for the full explanation. */
+  familyId?: string;
   unique?: boolean;
   /** Lantern-slot only: how much Lantern Oil this lantern holds, and which Lantern Ability id(s)
    *  (src/data/lanternAbilities.ts) it grants while equipped. */

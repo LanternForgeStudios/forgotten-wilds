@@ -36,4 +36,7 @@ export const SKILLS: Record<string, Skill> = {
     power: 30,
     spiritCost: 0,
   },
+  'ridge-ambush': { id: 'ridge-ambush', kind: 'skill', damageType: 'physical', power: 12, spiritCost: 0 },
+  'wisp-chill': { id: 'wisp-chill', kind: 'spiritArt', damageType: 'spirit', power: 14, spiritCost: 0 },
+  'briar-thorn-lash': { id: 'briar-thorn-lash', kind: 'skill', damageType: 'physical', power: 13, spiritCost: 0 },
 };

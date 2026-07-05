@@ -9,10 +9,11 @@ import { callPurchaseItem, callSellItem } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { sellPriceFor } from '@/utils/sellPrice';
-import { SHOP_LISTINGS, ITEMS, EQUIPMENT } from '@/data';
+import { SHOP_LISTINGS, SHOP_TITLES, SHOP_CATALOGS, ITEMS, EQUIPMENT } from '@/data';
 import styles from './CharacterMenu.module.css';
 
 interface ShopProps {
+  shopId: string;
   onClose: () => void;
 }
 
@@ -20,7 +21,7 @@ function defFor(itemId: string) {
   return ITEMS.find((i) => i.id === itemId) ?? EQUIPMENT.find((e) => e.id === itemId);
 }
 
-export function Shop({ onClose }: ShopProps) {
+export function Shop({ shopId, onClose }: ShopProps) {
   const [tab, setTab] = useState<'buy' | 'sell'>('buy');
   const player = usePlayerStore((s) => s.player);
   const inventory = useInventoryStore((s) => s.items);
@@ -57,10 +58,13 @@ export function Shop({ onClose }: ShopProps) {
     }
   }
 
+  const catalog = SHOP_CATALOGS[shopId] ?? [];
+  const listings = SHOP_LISTINGS.filter((l) => catalog.includes(l.itemId));
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-        <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>Mara Vale's General Store</h2>
+        <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>{SHOP_TITLES[shopId] ?? 'Shop'}</h2>
         <p style={{ fontSize: 13, marginTop: 0 }}>Your gold: {player?.gold ?? 0}g</p>
 
         <div className={styles.tabs}>
@@ -80,7 +84,8 @@ export function Shop({ onClose }: ShopProps) {
 
         {tab === 'buy' && (
           <div className={styles.grid}>
-            {SHOP_LISTINGS.map((listing) => {
+            {listings.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>Nothing for sale here.</p>}
+            {listings.map((listing) => {
               const def = defFor(listing.itemId);
               const iconAssetId = def && 'iconAssetId' in def ? def.iconAssetId : undefined;
               const name = def?.name ?? listing.itemId;

@@ -23,8 +23,8 @@ describe('sellPriceFor', () => {
   });
 
   it('falls back to a flat tier-based value for non-purchasable, non-unique gear', () => {
-    // keepers-lantern-staff (uncommon weapon) isn't in SHOP_PRICES - chest/quest reward only.
-    expect(sellPriceFor('keepers-lantern-staff')).toBe(30);
+    // ironwood-walking-staff (uncommon weapon) isn't in SHOP_PRICES - chest/quest reward only.
+    expect(sellPriceFor('ironwood-walking-staff')).toBe(30);
     // moth-dust (common key item) also isn't purchasable.
     expect(sellPriceFor('moth-dust')).toBe(15);
   });

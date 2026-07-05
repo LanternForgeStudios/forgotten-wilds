@@ -27,10 +27,12 @@ deploy in the current conversation turn.
    `NODE_EXTRA_CA_CERTS` to a PEM export of the intercepting root cert before running — see
    `run_local` skill's troubleshooting note for how that cert was obtained previously; don't
    silently fall back to disabling TLS verification.
-3. Watch for each function's "Successful create/update operation" line — there are 10 functions
-   (`createCharacter`, `startEncounter`, `resolveCombatAction`, `talkToNpc`, `enterLocation`,
-   `collectWorldItem`, `equipItem`, `unequipItem`, `purchaseItem`, `restAtInn`). Confirm all of
-   them report success.
+3. Watch for each function's "Successful create/update operation" line. Don't check this against a
+   hardcoded list or count in this file — the function roster grows over time and a stale count
+   here would go unnoticed. Instead, get the current expected list fresh each time from the
+   `export` lines in `functions/src/index.ts` (one export statement per function, some lines export
+   more than one), and confirm every one of them appears with a successful create/update line in
+   the deploy output.
 4. A warning about "No cleanup policy detected for repositories" after a successful deploy is
    non-fatal (container images from Cloud Build will just accumulate slightly over time) — don't
    try to fix it automatically; that's a separate, explicit ask (`firebase

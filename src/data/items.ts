@@ -70,6 +70,33 @@ export const ITEMS: Item[] = [
     tier: 'uncommon',
   },
   {
+    id: 'wolf-fang',
+    name: 'Wolf Fang',
+    description: 'A curved fang from a cliff wolf, still sharp.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.wolf-fang',
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'silver-droplet',
+    name: 'Silver Droplet',
+    description: 'A bead of water from Whisper Falls that never quite dries.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.silver-droplet',
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'withered-bramble',
+    name: 'Withered Bramble',
+    description: 'A twist of thorned bramble from Black Briar Forest, cold to the touch.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.withered-bramble',
+    stackable: true,
+    tier: 'common',
+  },
+  {
     id: 'miners-lost-lantern',
     name: "The Miner's Lost Lantern",
     description: 'A battered lantern relic, lost deep in Hollow Rail Mine. Recovering it is a quest unto itself.',
@@ -98,13 +125,28 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'spirit-draught', price: 18, currency: 'gold' },
   { itemId: 'lantern-oil', price: 20, currency: 'gold' },
   { itemId: 'keepers-lantern', price: 8, currency: 'gold' },
-  // Common-tier equipment only - uncommon gear comes from chests/quests, not the shop.
-  { itemId: 'miners-pick', price: 30, currency: 'gold' },
-  { itemId: 'travelers-coat', price: 30, currency: 'gold' },
-  { itemId: 'worn-trail-boots', price: 25, currency: 'gold' },
-  { itemId: 'frayed-gloves', price: 20, currency: 'gold' },
-  { itemId: 'ash-hallow-token', price: 25, currency: 'gold' },
-  { itemId: 'carved-totem', price: 20, currency: 'gold' },
+  // Common-tier equipment only, per the canonical rarity progression - Uncommon/Rare gear comes
+  // from chests instead; no totem is sold here, Spirit Totems start at Rare in this design.
+  { itemId: 'weathered-walking-staff', price: 30, currency: 'gold' },
+  { itemId: 'worn-keeper-coat', price: 30, currency: 'gold' },
+  { itemId: 'traveler-boots', price: 25, currency: 'gold' },
+  { itemId: 'work-gloves', price: 20, currency: 'gold' },
+  { itemId: 'river-stone-charm', price: 25, currency: 'gold' },
 ];
+
+// Display-only grouping of SHOP_LISTINGS by which NPC/building sells it - purchaseItem.ts itself
+// doesn't care which shop UI a purchase came through (it only validates itemId + price against
+// SHOP_PRICES, and no item is sold by two shops), so this split is purely for the Shop screen.
+export const SHOP_TITLES: Record<string, string> = {
+  'mara-vale-general-store': "Mara Vale's General Store",
+  'blacksmith-forge': 'The Ash Hallow Forge',
+  apothecary: "Wren's Apothecary",
+};
+
+export const SHOP_CATALOGS: Record<string, string[]> = {
+  'mara-vale-general-store': ['keepers-lantern', 'river-stone-charm'],
+  'blacksmith-forge': ['weathered-walking-staff', 'worn-keeper-coat', 'traveler-boots', 'work-gloves'],
+  apothecary: ['healing-poultice', 'greater-healing-poultice', 'spirit-draught', 'lantern-oil'],
+};
 
 export const INN_REST_COST = 10;

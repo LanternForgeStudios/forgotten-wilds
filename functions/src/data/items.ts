@@ -1,6 +1,9 @@
 // Authoritative — the client's src/data/items.ts is a display copy only.
 
-export type Tier = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+// Ascending order: Common < Uncommon < Rare < Mythic < Legendary. Per the canonical equipment
+// design (docs/Mytherra-Equipment_breakdown.md) - Legendary is a named, story-tied artifact that
+// ends its equipment family, ranked above Mythic.
+export type Tier = 'common' | 'uncommon' | 'rare' | 'mythic' | 'legendary';
 
 export interface ItemEffect {
   healHp?: number;
@@ -52,6 +55,9 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'moth-dust': { id: 'moth-dust', category: 'keyItem', usableInCombat: false, tier: 'common' },
   'rusted-token': { id: 'rusted-token', category: 'keyItem', usableInCombat: false, tier: 'common' },
   'ember-shard': { id: 'ember-shard', category: 'keyItem', usableInCombat: false, tier: 'uncommon' },
+  'wolf-fang': { id: 'wolf-fang', category: 'keyItem', usableInCombat: false, tier: 'common' },
+  'silver-droplet': { id: 'silver-droplet', category: 'keyItem', usableInCombat: false, tier: 'common' },
+  'withered-bramble': { id: 'withered-bramble', category: 'keyItem', usableInCombat: false, tier: 'common' },
   'miners-lost-lantern': {
     id: 'miners-lost-lantern',
     category: 'keyItem',
@@ -75,14 +81,14 @@ export const SHOP_PRICES: Record<string, number> = {
   'lantern-oil': 20,
   // A spare standard-issue lantern - cheap safety net for anyone who unequips their only one.
   'keepers-lantern': 8,
-  // Common-tier equipment - Mara stocks one of each slot's basic gear. Uncommon-tier gear is
-  // deliberately not sold here; it comes from chests and quest rewards instead.
-  'miners-pick': 30,
-  'travelers-coat': 30,
-  'worn-trail-boots': 25,
-  'frayed-gloves': 20,
-  'ash-hallow-token': 25,
-  'carved-totem': 20,
+  // Common-tier equipment only, per the canonical rarity progression (Common: "merchants, enemy
+  // drops, common chests"). Uncommon/Rare gear comes from chests instead; no totem is sold here -
+  // Spirit Totems start at Rare in this design, they aren't regular merchant stock.
+  'weathered-walking-staff': 30,
+  'worn-keeper-coat': 30,
+  'traveler-boots': 25,
+  'work-gloves': 20,
+  'river-stone-charm': 25,
 };
 
 export const INN_REST_COST = 10;
