@@ -78,10 +78,21 @@ export interface CombatActionRequest {
   skillId?: string;
   /** for 'lanternAbility' - which ability of the equipped lantern. */
   abilityId?: string;
-  itemId?: string;
+  /** 0-3 item ids (duplicates allowed) - consumed before the turn-order loop regardless of `type`. */
+  itemIds?: string[];
   /** Which enemy (by its index from StartEncounterResponse.enemies) attack/skill/lanternAbility
-   *  hits. Ignored for item/defend/flee. */
+   *  hits. Ignored for item/defend/flee, and ignored when `targetAll` is true. */
   targetIndex?: number;
+  /** attack/skill/offensive lanternAbility hit every living enemy at reduced damage + a per-target
+   *  miss chance, instead of one. No-ops to single-target when only one enemy is alive. */
+  targetAll?: boolean;
+}
+
+export interface CombatHitResult {
+  targetIndex: number;
+  damage: number;
+  missed: boolean;
+  defeated: boolean;
 }
 
 export interface ResolveCombatActionResponse {
@@ -98,6 +109,10 @@ export interface ResolveCombatActionResponse {
   playerLevel: number;
   playerGold: number;
   currentLocationId: string;
+  /** Sum of all enemy->player damage this round (after Defend halving). */
+  damageTakenByPlayer: number;
+  /** Every enemy the player damaged/missed this round (attack/skill/offensive lanternAbility). */
+  hits: CombatHitResult[];
 }
 
 export async function callResolveCombatAction(

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Panel } from '@/components/common/Panel';
 import { PlayerHUD } from '@/components/PlayerHUD';
 import { getAssetUrl } from '@/assets/assetManager';
 import {
   callResolveCombatAction,
   callStartEncounter,
+  type CombatHitResult,
   type EncounterEnemy,
   type ResolveCombatActionResponse,
 } from '@/firebase/functionsClient';
@@ -12,6 +13,7 @@ import { resyncSave } from '@/state/hydrate';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
+import { useToastStore } from '@/state/useToastStore';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
 import { useSceneStore, type SceneName } from '@/state/useSceneStore';
@@ -49,9 +51,17 @@ export function CombatScene() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [enemies, setEnemies] = useState<EncounterEnemy[]>([]);
   const [targetIndex, setTargetIndex] = useState<number | null>(null);
+  const [targetMode, setTargetMode] = useState<'single' | 'all'>('single');
   const [log, setLog] = useState<string[]>([]);
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Up to 3 item ids queued to ride along with whatever primary action the player takes next
+  // (duplicates allowed - e.g. 2x the same potion). Cleared only after a round actually resolves.
+  const [tray, setTray] = useState<string[]>([]);
+  // Per-enemy hit results from the most recent round, used to drive the bounce/floating damage-or-
+  // -miss text; batched by id so a stale timeout can't clear a *newer* round's hits.
+  const [activeHits, setActiveHits] = useState<(CombatHitResult & { key: number })[]>([]);
+  const hitBatchRef = useRef(0);
 
   const locationId = params.locationId ?? 'ironwood-trail';
   const location = LOCATIONS.find((l) => l.id === locationId);
@@ -96,17 +106,19 @@ export function CombatScene() {
 
   async function act(
     type: 'attack' | 'skill' | 'lanternAbility' | 'defend' | 'flee' | 'item',
-    options?: { itemId?: string; abilityId?: string },
+    options?: { abilityId?: string },
   ) {
     if (!sessionId || phase === 'resolving') return;
     setPhase('resolving');
     try {
       const needsTarget = type === 'attack' || type === 'skill' || type === 'lanternAbility';
+      const usedItems = tray.length > 0;
       const res = await callResolveCombatAction(sessionId, {
         type,
-        itemId: options?.itemId,
         abilityId: options?.abilityId,
-        targetIndex: needsTarget ? targetIndex ?? undefined : undefined,
+        itemIds: tray,
+        targetIndex: needsTarget && targetMode === 'single' ? targetIndex ?? undefined : undefined,
+        targetAll: needsTarget && targetMode === 'all',
       });
       setLog((prev) => [...prev, ...res.log]);
       setEnemies((prev) => prev.map((e) => {
@@ -114,12 +126,24 @@ export function CombatScene() {
         return updated ? { ...e, hp: updated.hp } : e;
       }));
       patchStats({ hp: res.playerHp, spirit: res.playerSpirit, lanternOil: res.playerLanternOil });
+      setTray([]);
+
+      if (res.damageTakenByPlayer > 0) {
+        useToastStore.getState().push(`Took ${res.damageTakenByPlayer} damage this round.`);
+      }
+
+      hitBatchRef.current += 1;
+      const batch = hitBatchRef.current;
+      setActiveHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
+      setTimeout(() => {
+        setActiveHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
+      }, 1500);
 
       // An item's inventory count only lives in Firestore, not in the combat response above, so
       // it must be resynced here too - otherwise the displayed quantity never decrements mid-fight
       // even though the server correctly consumed it, and using it again eventually fails once the
       // real (server-side) stock hits zero while the stale client count still shows some left.
-      if (type === 'item' && uid) {
+      if (usedItems && uid) {
         await resyncSave(uid);
       }
 
@@ -140,6 +164,22 @@ export function CombatScene() {
       setErrorMessage(err instanceof Error ? err.message : 'Something went wrong resolving that action.');
       setPhase('error');
     }
+  }
+
+  const queuedCountFor = (itemId: string) => tray.filter((id) => id === itemId).length;
+  const canQueueMore = tray.length < 3;
+
+  function queueItem(itemId: string) {
+    if (!canQueueMore) return;
+    setTray((prev) => [...prev, itemId]);
+  }
+
+  function dequeueItem(itemId: string) {
+    setTray((prev) => {
+      const i = prev.lastIndexOf(itemId);
+      if (i === -1) return prev;
+      return [...prev.slice(0, i), ...prev.slice(i + 1)];
+    });
   }
 
   function returnToExploration() {
@@ -177,27 +217,41 @@ export function CombatScene() {
     .filter((a): a is NonNullable<typeof a> => !!a);
 
   function renderEnemy(enemy: EncounterEnemy) {
-    if (enemy.hp <= 0) return null; // defeated - disappears from the battlefield
+    const hit = activeHits.find((h) => h.targetIndex === enemy.index);
+    // A killing blow keeps its slot rendered just long enough for the bounce/floating text to
+    // finish, instead of vanishing the instant `enemies` state reflects 0 hp.
+    if (enemy.hp <= 0 && !hit) return null;
     const def = ENEMIES.find((e) => e.id === enemy.enemyId);
     const hpPct = enemy.maxHp > 0 ? Math.max(0, (enemy.hp / enemy.maxHp) * 100) : 0;
-    const isTarget = enemy.index === targetIndex;
+    const isTarget = targetMode === 'all' ? true : enemy.index === targetIndex;
     const size = enemy.isBoss ? 256 : 128;
     return (
       <button
         key={enemy.index}
         type="button"
         className={`${styles.enemySlot} ${isTarget ? styles.enemySlotTargeted : ''}`}
-        onClick={() => setTargetIndex(enemy.index)}
-        disabled={!canPickTarget && enemy.index !== targetIndex}
+        onClick={() => {
+          setTargetMode('single');
+          setTargetIndex(enemy.index);
+        }}
+        disabled={targetMode !== 'all' && !canPickTarget && enemy.index !== targetIndex}
       >
         {def && (
           <img
             src={getAssetUrl(def.battleSpriteAssetId)}
             alt={enemy.name}
-            className={styles.enemySprite}
+            className={`${styles.enemySprite} ${hit ? styles.enemyBounce : ''}`}
             width={size}
             height={size}
           />
+        )}
+        {hit && (
+          <span
+            key={hit.key}
+            className={`${styles.floatingText} ${hit.missed ? styles.floatingMiss : styles.floatingDamage}`}
+          >
+            {hit.missed ? 'MISS' : `-${hit.damage}`}
+          </span>
         )}
         <div className={styles.enemyBar}>
           <p className={styles.enemyName}>{enemy.name}</p>
@@ -232,7 +286,13 @@ export function CombatScene() {
               <div className={styles.enemyRowFront}>{front.map(renderEnemy)}</div>
             </>
           )}
-          {canPickTarget && <p className={styles.targetHint}>Tap an enemy to choose your target</p>}
+          {canPickTarget && (
+            <p className={styles.targetHint}>
+              {targetMode === 'all'
+                ? 'Attacking all foes at once - reduced damage each, chance to miss.'
+                : 'Tap an enemy to choose your target'}
+            </p>
+          )}
         </div>
 
         <div className={styles.bottomPanel}>
@@ -251,25 +311,59 @@ export function CombatScene() {
               {combatItems.map((i) => {
                 const def = ITEMS.find((d) => d.id === i.itemId);
                 const wouldHelp = player ? itemWouldHaveEffect(def?.effect, player.stats) : false;
+                const queued = queuedCountFor(i.itemId);
+                const canAdd = wouldHelp && canQueueMore && queued < i.quantity;
                 return (
-                  <button
-                    key={i.itemId}
-                    className={styles.actionButton}
-                    disabled={!wouldHelp}
-                    title={wouldHelp ? undefined : 'Already at maximum - using this would have no effect.'}
-                    onClick={() => act('item', { itemId: i.itemId })}
-                  >
-                    {i.itemId.replace(/-/g, ' ')} x{i.quantity}
-                    {!wouldHelp && ' (Full)'}
-                  </button>
+                  <div key={i.itemId} className={styles.itemRow}>
+                    <span>
+                      {i.itemId.replace(/-/g, ' ')} x{i.quantity}
+                      {queued > 0 && ` — queued: ${queued}`}
+                      {!wouldHelp && ' (Full)'}
+                    </span>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <button
+                        type="button"
+                        className={styles.actionButton}
+                        disabled={queued === 0}
+                        onClick={() => dequeueItem(i.itemId)}
+                      >
+                        -
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.actionButton}
+                        disabled={!canAdd}
+                        title={wouldHelp ? undefined : 'Already at maximum - using this would have no effect.'}
+                        onClick={() => queueItem(i.itemId)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 );
               })}
+              <button
+                className={styles.actionButton}
+                disabled={tray.length === 0}
+                onClick={() => act('item')}
+              >
+                Use Items Only
+              </button>
               <button className={styles.actionButton} onClick={() => setPhase('playerTurn')}>
-                Back
+                Done
               </button>
             </>
           ) : (
             <>
+              {aliveEnemies.length > 1 && phase === 'playerTurn' && (
+                <button
+                  className={styles.actionButton}
+                  style={{ gridColumn: '1 / -1' }}
+                  onClick={() => setTargetMode((m) => (m === 'all' ? 'single' : 'all'))}
+                >
+                  Target: {targetMode === 'all' ? 'All Foes' : 'Single'}
+                </button>
+              )}
               <button className={styles.actionButton} disabled={phase !== 'playerTurn'} onClick={() => act('attack')}>
                 {weaponName}
               </button>
@@ -295,7 +389,7 @@ export function CombatScene() {
                 disabled={phase !== 'playerTurn'}
                 onClick={() => setPhase('itemMenu')}
               >
-                Item
+                Items{tray.length > 0 ? ` (${tray.length}/3)` : ''}
               </button>
               <button className={styles.actionButton} disabled={phase !== 'playerTurn'} onClick={() => act('defend')}>
                 Defend

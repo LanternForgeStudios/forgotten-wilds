@@ -6,6 +6,8 @@ import {
   rollEncounterGroup,
   rollEnemyLevel,
   maxEncounterSizeForLevel,
+  aggregateItemCounts,
+  hasSufficientQuantity,
 } from './combatEngine';
 import { ENEMIES } from '../data/enemies';
 import type { Stats } from '../shared-types';
@@ -201,8 +203,6 @@ describe('resolveRound', () => {
   });
 
   it('defend halves the enemy hit it takes effect against', () => {
-    // Defending only guards the hit that lands after the defend action resolves, so the player
-    // must act first this round (higher speed) for the brace to be in place in time.
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const defending = resolveRound({
       action: { type: 'defend' },
@@ -220,6 +220,29 @@ describe('resolveRound', () => {
     const dmgWhileDefending = 999 - defending.playerHp;
     const dmgWhileAttacking = 999 - attacking.playerHp;
     expect(dmgWhileDefending).toBeLessThan(dmgWhileAttacking);
+  });
+
+  it('defend halves damage even from an enemy faster than the player', () => {
+    // Regression test for a real bug: playerDefending used to be set mid-turn-loop by
+    // playerTurn(), so any enemy sorted before the player (i.e. faster) already resolved its
+    // attack at full damage before the brace took effect. Fixed by deciding playerDefending up
+    // front, from the action alone - this test uses speed:-999 (enemy guaranteed to act first)
+    // specifically to catch a regression of that bug, which the speed:999 tests above cannot.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const defending = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: soloEnemies(),
+    });
+    const attacking = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: soloEnemies(),
+    });
+    vi.restoreAllMocks();
+    expect(999 - defending.playerHp).toBeLessThan(999 - attacking.playerHp);
   });
 
   it('defend halves damage from every enemy still standing, not just one', () => {
@@ -241,6 +264,32 @@ describe('resolveRound', () => {
         { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
         { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
       ],
+    });
+    vi.restoreAllMocks();
+    expect(999 - defending.playerHp).toBeLessThan(999 - attacking.playerHp);
+  });
+
+  it('defend halves damage from a mixed-speed group of enemies, faster and slower alike', () => {
+    // mothling (speed 9) is faster than the player; restless-miner (speed 6) is slower - a
+    // genuinely mixed roster, confirming the fix isn't just "works when the player is fastest" or
+    // "works when the player is slowest against a uniform group."
+    const restlessMiner = ENEMIES['restless-miner'];
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const enemies = [
+      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+      { enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp },
+    ];
+    const defending = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: 7, hp: 999, maxHp: 999 }), // between the two enemies' speeds
+      inventory: [],
+      enemies,
+    });
+    const attacking = resolveRound({
+      action: { type: 'attack', targetIndex: 0 },
+      playerStats: stats({ speed: 7, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies,
     });
     vi.restoreAllMocks();
     expect(999 - defending.playerHp).toBeLessThan(999 - attacking.playerHp);
@@ -282,23 +331,23 @@ describe('resolveRound', () => {
 
   it('using Lantern Oil (the item) restores lantern oil', () => {
     const result = resolveRound({
-      action: { type: 'item', itemId: 'lantern-oil' },
+      action: { type: 'item', itemIds: ['lantern-oil'] },
       playerStats: stats({ speed: 999, lanternOil: 0 }),
       inventory: [{ itemId: 'lantern-oil', quantity: 1 }],
       enemies: soloEnemies(),
     });
     expect(result.playerLanternOil).toBeGreaterThan(0);
-    expect(result.itemConsumedId).toBe('lantern-oil');
+    expect(result.itemConsumedIds).toEqual(['lantern-oil']);
   });
 
   it('using a healing item restores hp and reports the consumed item', () => {
     const result = resolveRound({
-      action: { type: 'item', itemId: 'healing-poultice' },
+      action: { type: 'item', itemIds: ['healing-poultice'] },
       playerStats: stats({ hp: 10, speed: 999 }),
       inventory: [{ itemId: 'healing-poultice', quantity: 1 }],
       enemies: soloEnemies(),
     });
-    expect(result.itemConsumedId).toBe('healing-poultice');
+    expect(result.itemConsumedIds).toEqual(['healing-poultice']);
     expect(result.playerHp).toBeGreaterThan(10);
   });
 
@@ -314,8 +363,8 @@ describe('resolveRound', () => {
   });
 
   it('reports defeat once player hp reaches zero', () => {
-    // Lower speed than the enemy so it acts first, before the defend brace is in place, against
-    // 1 hp and 0 defense - guaranteed lethal regardless of damage variance.
+    // 1 hp and 0 defense against even a halved (defended) hit is still guaranteed lethal,
+    // regardless of damage variance or turn order.
     const result = resolveRound({
       action: { type: 'defend' },
       playerStats: stats({ hp: 1, maxHp: 60, speed: -999, defense: 0 }),
@@ -324,6 +373,188 @@ describe('resolveRound', () => {
     });
     expect(result.phase).toBe('defeat');
     expect(result.playerHp).toBe(0);
+  });
+
+  describe('multi-item turns', () => {
+    it('consumes up to 3 distinct items in one round, moving hp/spirit/oil independently', () => {
+      const result = resolveRound({
+        action: { type: 'item', itemIds: ['healing-poultice', 'spirit-draught', 'lantern-oil'] },
+        playerStats: stats({ hp: 10, spirit: 5, lanternOil: 0, speed: 999 }),
+        inventory: [
+          { itemId: 'healing-poultice', quantity: 1 },
+          { itemId: 'spirit-draught', quantity: 1 },
+          { itemId: 'lantern-oil', quantity: 1 },
+        ],
+        enemies: soloEnemies(),
+      });
+      expect(result.playerHp).toBeGreaterThan(10);
+      expect(result.playerSpirit).toBeGreaterThan(5);
+      expect(result.playerLanternOil).toBeGreaterThan(0);
+      expect(result.itemConsumedIds.sort()).toEqual(['healing-poultice', 'lantern-oil', 'spirit-draught']);
+    });
+
+    it('applies the same item twice when queued twice, clamped at max', () => {
+      const result = resolveRound({
+        action: { type: 'item', itemIds: ['healing-poultice', 'healing-poultice'] },
+        playerStats: stats({ hp: 10, maxHp: 60, speed: 999 }),
+        inventory: [{ itemId: 'healing-poultice', quantity: 2 }],
+        enemies: soloEnemies(),
+      });
+      const single = resolveRound({
+        action: { type: 'item', itemIds: ['healing-poultice'] },
+        playerStats: stats({ hp: 10, maxHp: 60, speed: 999 }),
+        inventory: [{ itemId: 'healing-poultice', quantity: 1 }],
+        enemies: soloEnemies(),
+      });
+      expect(result.playerHp).toBeGreaterThan(single.playerHp);
+      expect(result.itemConsumedIds).toEqual(['healing-poultice', 'healing-poultice']);
+    });
+
+    it('an item queued alongside attack heals AND deals damage in the same round', () => {
+      const result = resolveRound({
+        action: { type: 'attack', itemIds: ['healing-poultice'] },
+        playerStats: stats({ hp: 10, speed: 999 }),
+        inventory: [{ itemId: 'healing-poultice', quantity: 1 }],
+        enemies: soloEnemies(),
+      });
+      expect(result.playerHp).toBeGreaterThan(10);
+      expect(result.itemConsumedIds).toEqual(['healing-poultice']);
+      expect(result.enemyHp[0]).toBeLessThan(mothling.stats.maxHp);
+    });
+  });
+
+  describe('target-all', () => {
+    function threeMothlings() {
+      return [
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+      ];
+    }
+
+    it('hits every alive enemy, with damage exactly when not missed', () => {
+      let missCount = 0;
+      for (let i = 0; i < 50; i++) {
+        const result = resolveRound({
+          action: { type: 'attack', targetAll: true },
+          playerStats: stats({ speed: 999 }),
+          inventory: [],
+          enemies: threeMothlings(),
+        });
+        expect(result.hits.length).toBe(3);
+        for (const hit of result.hits) {
+          if (hit.missed) {
+            missCount++;
+            expect(hit.damage).toBe(0);
+          } else {
+            expect(hit.damage).toBeGreaterThanOrEqual(1);
+          }
+        }
+      }
+      // ~15% miss chance per target across 150 total rolls - loose band, not an exact assertion.
+      expect(missCount).toBeGreaterThan(0);
+      expect(missCount).toBeLessThan(150 * 0.4);
+    });
+
+    it('deals less damage per target than single-target, at a fixed damage roll', () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.5); // no misses, fixed variance roll
+      const allResult = resolveRound({
+        action: { type: 'attack', targetAll: true },
+        playerStats: stats({ speed: 999 }),
+        inventory: [],
+        enemies: threeMothlings(),
+      });
+      const singleResult = resolveRound({
+        action: { type: 'attack', targetIndex: 0 },
+        playerStats: stats({ speed: 999 }),
+        inventory: [],
+        enemies: threeMothlings(),
+      });
+      vi.restoreAllMocks();
+      const allDamagePerTarget = allResult.hits[0].damage;
+      const singleDamage = mothling.stats.maxHp - singleResult.enemyHp[0];
+      expect(allDamagePerTarget).toBeLessThan(singleDamage);
+    });
+
+    it('falls back to normal single-target behavior when only one enemy is alive', () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+      const allResult = resolveRound({
+        action: { type: 'attack', targetAll: true },
+        playerStats: stats({ speed: 999 }),
+        inventory: [],
+        enemies: soloEnemies(),
+      });
+      const singleResult = resolveRound({
+        action: { type: 'attack' },
+        playerStats: stats({ speed: 999 }),
+        inventory: [],
+        enemies: soloEnemies(),
+      });
+      vi.restoreAllMocks();
+      expect(allResult.hits[0].missed).toBe(false);
+      expect(allResult.hits[0].damage).toBe(singleResult.hits[0].damage);
+    });
+
+    it('marks the killing hit as defeated', () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+      const result = resolveRound({
+        action: { type: 'attack', targetAll: true },
+        playerStats: stats({ speed: 999, attack: 999 }),
+        inventory: [],
+        enemies: threeMothlings(),
+      });
+      vi.restoreAllMocks();
+      expect(result.hits.every((h) => h.defeated)).toBe(true);
+      expect(result.phase).toBe('victory');
+    });
+
+    it('sums damageTakenByPlayer across every enemy attack in the round', () => {
+      const result = resolveRound({
+        action: { type: 'attack', targetIndex: 0 },
+        playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+        inventory: [],
+        enemies: threeMothlings(),
+      });
+      expect(result.damageTakenByPlayer).toBe(999 - result.playerHp);
+      expect(result.damageTakenByPlayer).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe('aggregateItemCounts', () => {
+  it('groups duplicate ids within the first 3 entries', () => {
+    const counts = aggregateItemCounts(['a', 'a', 'b']);
+    expect(counts.get('a')).toBe(2);
+    expect(counts.get('b')).toBe(1);
+  });
+
+  it('ignores anything past the 3-item cap entirely', () => {
+    const counts = aggregateItemCounts(['a', 'a', 'b', 'c', 'd']);
+    expect(counts.get('a')).toBe(2);
+    expect(counts.get('b')).toBe(1);
+    expect(counts.get('c')).toBeUndefined(); // beyond slice(0,3), never counted
+  });
+});
+
+describe('hasSufficientQuantity', () => {
+  it('returns false when requesting more than owned', () => {
+    expect(hasSufficientQuantity(['potion', 'potion'], [{ itemId: 'potion', quantity: 1 }])).toBe(false);
+  });
+
+  it('returns true at exactly the owned quantity', () => {
+    expect(hasSufficientQuantity(['potion', 'potion'], [{ itemId: 'potion', quantity: 2 }])).toBe(true);
+  });
+
+  it('aggregates duplicate ids before comparing against inventory', () => {
+    expect(
+      hasSufficientQuantity(
+        ['potion', 'oil', 'potion'],
+        [
+          { itemId: 'potion', quantity: 2 },
+          { itemId: 'oil', quantity: 1 },
+        ],
+      ),
+    ).toBe(true);
   });
 });
 

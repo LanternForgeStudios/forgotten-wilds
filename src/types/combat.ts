@@ -6,7 +6,12 @@ export interface CombatAction {
   type: CombatActionType;
   skillId?: string;
   abilityId?: string;
-  itemId?: string;
+  /** 0-3 item ids (duplicates allowed) - consumed before the turn-order loop regardless of `type`. */
+  itemIds?: string[];
+  targetIndex?: number;
+  /** attack/skill/offensive lanternAbility hit every living enemy at reduced damage + a per-target
+   *  miss chance, instead of one. No-ops to single-target when only one enemy is alive. */
+  targetAll?: boolean;
 }
 
 export type CombatPhase =

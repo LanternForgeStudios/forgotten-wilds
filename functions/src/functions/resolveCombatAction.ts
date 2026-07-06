@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { resolveRound, computeRewards } from '../engine/combatEngine';
+import { resolveRound, computeRewards, aggregateItemCounts, hasSufficientQuantity } from '../engine/combatEngine';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
 import { grantItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
@@ -51,11 +51,16 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       throw new HttpsError('internal', 'Unknown enemy in this session.');
     }
 
-    if (action.type === 'item') {
-      const itemId = action.itemId;
-      const invEntry = itemId ? save.inventory.find((i) => i.itemId === itemId) : undefined;
-      const def = itemId ? ITEMS[itemId] : undefined;
-      if (!itemId || !invEntry || invEntry.quantity < 1 || !def?.usableInCombat) {
+    const itemIds = action.itemIds ?? [];
+    if (itemIds.length > 3) {
+      throw new HttpsError('invalid-argument', 'You can use at most 3 items per turn.');
+    }
+    if (action.type === 'item' && itemIds.length === 0) {
+      throw new HttpsError('failed-precondition', 'You cannot use that item right now.');
+    }
+    for (const [itemId] of aggregateItemCounts(itemIds)) {
+      const def = ITEMS[itemId];
+      if (!def?.usableInCombat) {
         throw new HttpsError('failed-precondition', 'You cannot use that item right now.');
       }
       const effect = def.effect;
@@ -67,6 +72,9 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       if (!wouldHaveEffect) {
         throw new HttpsError('failed-precondition', 'That would have no effect right now.');
       }
+    }
+    if (itemIds.length > 0 && !hasSufficientQuantity(itemIds, save.inventory)) {
+      throw new HttpsError('failed-precondition', 'You do not have enough of that item.');
     }
     if (action.type === 'skill') {
       const skill = SKILLS[action.skillId ?? 'keepers-strike'];
@@ -99,12 +107,12 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     save.player.stats.spirit = result.playerSpirit;
     save.player.stats.lanternOil = result.playerLanternOil;
 
-    if (result.itemConsumedId) {
-      const entry = save.inventory.find((i) => i.itemId === result.itemConsumedId);
-      if (entry) {
-        entry.quantity -= 1;
-        save.inventory = save.inventory.filter((i) => i.quantity > 0);
+    if (result.itemConsumedIds.length > 0) {
+      for (const [itemId, count] of aggregateItemCounts(result.itemConsumedIds)) {
+        const entry = save.inventory.find((i) => i.itemId === itemId);
+        if (entry) entry.quantity -= count;
       }
+      save.inventory = save.inventory.filter((i) => i.quantity > 0);
     }
 
     let rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean } | null = null;
@@ -173,6 +181,8 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       playerLanternOil: save.player.stats.lanternOil,
       playerMaxLanternOil: save.player.stats.maxLanternOil,
       enemies: updatedEnemies.map((e, index) => ({ index, hp: e.hp, maxHp: e.maxHp })),
+      damageTakenByPlayer: result.damageTakenByPlayer,
+      hits: result.hits,
       rewards,
       playerLevel: save.player.level,
       playerGold: save.player.gold,

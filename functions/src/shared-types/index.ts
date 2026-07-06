@@ -100,10 +100,19 @@ export interface CombatAction {
   skillId?: string;
   /** for 'lanternAbility' - which ability of the equipped lantern (data/lanternAbilities.ts). */
   abilityId?: string;
-  itemId?: string;
+  /** 0-3 item ids (duplicates allowed, e.g. 2x the same potion) - consumed before the turn-order
+   *  loop regardless of `type`, so they never cost a turn or trigger an extra enemy attack. A bare
+   *  `type: 'item'` action is "use these and nothing else"; any other type (attack/skill/
+   *  lanternAbility/defend/flee) can carry itemIds alongside its primary action in the same round. */
+  itemIds?: string[];
   /** Index into the session's `enemies` array - which foe attack/skill/lanternAbility targets.
-   *  Ignored for item/defend/flee. Defaults to the first still-alive enemy if omitted/invalid. */
+   *  Ignored for item/defend/flee, and ignored when `targetAll` is true. Defaults to the first
+   *  still-alive enemy if omitted/invalid. */
   targetIndex?: number;
+  /** attack/skill/offensive lanternAbility hit every living enemy instead of one, at reduced
+   *  damage per target and a chance to miss each one independently. No-ops to single-target
+   *  behavior when only one enemy is alive. */
+  targetAll?: boolean;
 }
 
 export type CombatSessionStatus = 'active' | 'resolved';

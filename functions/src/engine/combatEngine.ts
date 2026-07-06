@@ -133,6 +133,13 @@ export interface RoundInput {
 
 export type RoundOutcomePhase = 'continue' | 'victory' | 'defeat' | 'fled';
 
+export interface CombatHitResult {
+  targetIndex: number;
+  damage: number;
+  missed: boolean;
+  defeated: boolean;
+}
+
 export interface RoundResult {
   log: string[];
   playerHp: number;
@@ -141,7 +148,34 @@ export interface RoundResult {
   /** Updated hp for every enemy in the roster, same order as the input. */
   enemyHp: number[];
   phase: RoundOutcomePhase;
-  itemConsumedId?: string;
+  /** Every item id consumed this round (0-3 entries, duplicates allowed if the same item was used
+   *  more than once). Always an array, even when empty. */
+  itemConsumedIds: string[];
+  /** Every enemy the player damaged/missed this round via attack/skill/offensive lanternAbility. */
+  hits: CombatHitResult[];
+  /** Sum of all enemy->player damage this round (after Defend halving is applied). */
+  damageTakenByPlayer: number;
+}
+
+/** Groups a (possibly duplicate-laden) list of item ids into counts per id, capped at 3 total uses
+ *  per round - shared by the engine (applying effects) and resolveCombatAction.ts (validating
+ *  ownership/quantity before ever calling resolveRound). */
+export function aggregateItemCounts(itemIds: string[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const id of itemIds.slice(0, 3)) counts.set(id, (counts.get(id) ?? 0) + 1);
+  return counts;
+}
+
+/** Whether the player's inventory covers every requested item use this round, accounting for
+ *  duplicate ids (e.g. 2x the same potion needs quantity >= 2). */
+export function hasSufficientQuantity(
+  itemIds: string[],
+  inventory: { itemId: string; quantity: number }[],
+): boolean {
+  for (const [itemId, count] of aggregateItemCounts(itemIds)) {
+    if ((inventory.find((i) => i.itemId === itemId)?.quantity ?? 0) < count) return false;
+  }
+  return true;
 }
 
 /** One round of turn-based combat against a roster of 1-6 enemies. Turn order is the player plus
@@ -157,14 +191,29 @@ export interface RoundResult {
  *  caller (resolveCombatAction.ts) is responsible for validating the player actually has enough
  *  of the relevant resource and, for lanternAbility, that the ability really belongs to their
  *  currently-equipped lantern, before calling this function. */
+const TARGET_ALL_MISS_CHANCE = 0.15;
+const TARGET_ALL_DAMAGE_FACTOR = 0.6;
+
 export function resolveRound(input: RoundInput): RoundResult {
   const { action } = input;
   const log: string[] = [];
   let playerHp = input.playerStats.hp;
   let playerSpirit = input.playerStats.spirit;
   let playerLanternOil = input.playerStats.lanternOil;
-  let playerDefending = false;
-  let itemConsumedId: string | undefined;
+  let damageTakenByPlayer = 0;
+  const itemConsumedIds: string[] = [];
+  const hits: CombatHitResult[] = [];
+
+  // Decided up front, from the action alone - NOT set mid-loop by playerTurn() - so that every
+  // enemy attack this round is halved consistently, regardless of turn-order/speed. Previously
+  // this was a mid-loop side effect of playerTurn(), which meant any enemy faster than the player
+  // (and therefore resolved earlier in the speed-sorted turn order) hit at full damage even though
+  // the player had chosen to Defend that same round.
+  const isDefensiveLanternAbility =
+    action.type === 'lanternAbility' &&
+    !!action.abilityId &&
+    LANTERN_ABILITIES[action.abilityId]?.category === 'defensive';
+  const playerDefending = action.type === 'defend' || isDefensiveLanternAbility;
 
   const enemyHp = input.enemies.map((e) => e.hp);
   const enemyDefs = input.enemies.map((e) => ENEMIES[e.enemyId]);
@@ -173,13 +222,13 @@ export function resolveRound(input: RoundInput): RoundResult {
   const isAlive = (i: number) => enemyHp[i] > 0;
   const aliveIndices = () => enemyHp.map((_, i) => i).filter(isAlive);
 
-  function damageEnemy(i: number, dmg: number, verb: string) {
+  function damageEnemy(i: number, dmg: number, verb: string): boolean {
     const before = enemyHp[i];
     enemyHp[i] = Math.max(0, before - dmg);
     log.push(`${verb} ${enemyDefs[i].name} for ${dmg} damage.`);
-    if (before > 0 && enemyHp[i] <= 0) {
-      log.push(`${enemyDefs[i].name} is defeated!`);
-    }
+    const defeated = before > 0 && enemyHp[i] <= 0;
+    if (defeated) log.push(`${enemyDefs[i].name} is defeated!`);
+    return defeated;
   }
 
   function enemyAttack(i: number) {
@@ -192,6 +241,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     let dmg = computeDamage(skill.power, stats.attack, input.playerStats.defense);
     if (playerDefending) dmg = Math.round(dmg / 2);
     playerHp = Math.max(0, playerHp - dmg);
+    damageTakenByPlayer += dmg;
     log.push(
       `${def.name} uses ${move.skillId.replace(/-/g, ' ')} for ${dmg} damage${
         playerDefending ? ' (halved - you defended)' : ''
@@ -207,22 +257,73 @@ export function resolveRound(input: RoundInput): RoundResult {
     return alive[0];
   }
 
+  /** Shared by attack/skill/offensive-lanternAbility: hits either the resolved single target, or
+   *  every living enemy when `action.targetAll` is set and more than one is alive (each rolled and
+   *  scaled independently - own defense, own variance, own miss chance). Falls back to normal
+   *  single-target behavior (no reduction, no miss) once only one enemy remains. */
+  function resolveOffensiveHits(power: number, verb: string, bonusMultiplier: (enemyIdx: number) => number = () => 1) {
+    const alive = aliveIndices();
+    const useAll = !!action.targetAll && alive.length > 1;
+    const targets = useAll ? alive : [resolveTargetIndex()].filter((i): i is number => i !== undefined);
+
+    for (const i of targets) {
+      const missed = useAll && Math.random() < TARGET_ALL_MISS_CHANCE;
+      if (missed) {
+        log.push(`Your attack on ${enemyDefs[i].name} goes wide - miss!`);
+        hits.push({ targetIndex: i, damage: 0, missed: true, defeated: false });
+        continue;
+      }
+      let dmg = Math.round(computeDamage(power, input.playerStats.attack, enemyStats[i].defense) * bonusMultiplier(i));
+      if (useAll) dmg = Math.max(1, Math.round(dmg * TARGET_ALL_DAMAGE_FACTOR));
+      const defeated = damageEnemy(i, dmg, verb);
+      hits.push({ targetIndex: i, damage: dmg, missed: false, defeated });
+    }
+  }
+
+  function consumeItems(itemIds: string[]) {
+    for (const [itemId, count] of aggregateItemCounts(itemIds)) {
+      const def = ITEMS[itemId];
+      if (!def?.effect) continue;
+      for (let n = 0; n < count; n++) itemConsumedIds.push(itemId);
+
+      let healHpTotal = 0;
+      let healSpiritTotal = 0;
+      let restoreOilTotal = 0;
+      for (let n = 0; n < count; n++) {
+        if (def.effect.healHp) {
+          const before = playerHp;
+          playerHp = Math.min(input.playerStats.maxHp, playerHp + def.effect.healHp);
+          healHpTotal += playerHp - before;
+        }
+        if (def.effect.healSpirit) {
+          const before = playerSpirit;
+          playerSpirit = Math.min(input.playerStats.maxSpirit, playerSpirit + def.effect.healSpirit);
+          healSpiritTotal += playerSpirit - before;
+        }
+        if (def.effect.restoreOil) {
+          const before = playerLanternOil;
+          playerLanternOil = Math.min(input.playerStats.maxLanternOil, playerLanternOil + def.effect.restoreOil);
+          restoreOilTotal += playerLanternOil - before;
+        }
+      }
+
+      const label = itemId.replace(/-/g, ' ');
+      const suffix = count > 1 ? ` x${count}` : '';
+      if (healHpTotal > 0) log.push(`You use ${label}${suffix} and recover ${healHpTotal} HP.`);
+      if (healSpiritTotal > 0) log.push(`You use ${label}${suffix} and recover ${healSpiritTotal} Spirit.`);
+      if (restoreOilTotal > 0) log.push(`You use ${label}${suffix} and restore ${restoreOilTotal} Lantern Oil.`);
+    }
+  }
+
   function playerTurn() {
     switch (action.type) {
-      case 'attack': {
-        const i = resolveTargetIndex();
-        if (i === undefined) break;
-        const dmg = computeDamage(SKILLS.attack.power, input.playerStats.attack, enemyStats[i].defense);
-        damageEnemy(i, dmg, 'You strike');
+      case 'attack':
+        resolveOffensiveHits(SKILLS.attack.power, 'You strike');
         break;
-      }
       case 'skill': {
         const skill = SKILLS[action.skillId ?? 'keepers-strike'];
         playerSpirit = Math.max(0, playerSpirit - skill.spiritCost);
-        const i = resolveTargetIndex();
-        if (i === undefined) break;
-        const dmg = computeDamage(skill.power, input.playerStats.attack, enemyStats[i].defense);
-        damageEnemy(i, dmg, "Keeper's Strike hits");
+        resolveOffensiveHits(skill.power, "Keeper's Strike hits");
         break;
       }
       case 'lanternAbility': {
@@ -230,48 +331,34 @@ export function resolveRound(input: RoundInput): RoundResult {
         if (!ability) break;
         playerLanternOil = Math.max(0, playerLanternOil - ability.oilCost);
         if (ability.category === 'offensive') {
-          const i = resolveTargetIndex();
-          if (i === undefined) break;
-          const bonus = ability.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1;
-          const dmg = Math.round(computeDamage(ability.power ?? 0, input.playerStats.attack, enemyStats[i].defense) * bonus);
-          damageEnemy(i, dmg, `${ability.name} sears${bonus > 1 ? ' (super effective!)' : ''}`);
+          resolveOffensiveHits(
+            ability.power ?? 0,
+            `${ability.name} sears`,
+            (i) => (ability.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1),
+          );
         } else if (ability.category === 'healing') {
           const healed = Math.min(input.playerStats.maxHp - playerHp, ability.healHp ?? 0);
           playerHp = Math.min(input.playerStats.maxHp, playerHp + (ability.healHp ?? 0));
           log.push(`${ability.name} draws on the lantern's warmth, restoring ${healed} HP.`);
         } else {
-          playerDefending = true;
           log.push(`${ability.name} wraps you in the lantern's glow, ready to blunt the next blow.`);
         }
         break;
       }
-      case 'item': {
-        const itemId = action.itemId!;
-        const def = ITEMS[itemId];
-        itemConsumedId = itemId;
-        if (def.effect?.healHp) {
-          playerHp = Math.min(input.playerStats.maxHp, playerHp + def.effect.healHp);
-          log.push(`You use ${itemId.replace(/-/g, ' ')} and recover ${def.effect.healHp} HP.`);
-        }
-        if (def.effect?.healSpirit) {
-          playerSpirit = Math.min(input.playerStats.maxSpirit, playerSpirit + def.effect.healSpirit);
-          log.push(`You use ${itemId.replace(/-/g, ' ')} and recover ${def.effect.healSpirit} Spirit.`);
-        }
-        if (def.effect?.restoreOil) {
-          playerLanternOil = Math.min(input.playerStats.maxLanternOil, playerLanternOil + def.effect.restoreOil);
-          log.push(`You use ${itemId.replace(/-/g, ' ')} and restore ${def.effect.restoreOil} Lantern Oil.`);
-        }
-        break;
-      }
-      case 'defend': {
-        playerDefending = true;
+      case 'item':
+        break; // fully handled by consumeItems() below, run unconditionally before this switch
+      case 'defend':
         log.push('You brace yourself, ready to absorb the next blow.');
         break;
-      }
       case 'flee':
         break; // handled before the turn-order loop, never reached here
     }
   }
+
+  // Items never cost a turn or trigger an extra enemy attack - they're consumed once, up front,
+  // regardless of what the primary action (attack/skill/lanternAbility/defend/flee/item) turns
+  // out to be.
+  consumeItems(action.itemIds ?? []);
 
   if (action.type === 'flee') {
     const alive = aliveIndices();
@@ -279,7 +366,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     const fleeChance = Math.min(0.9, Math.max(0.1, 0.3 + (input.playerStats.speed - avgSpeed) * 0.05));
     if (Math.random() < fleeChance) {
       log.push('You break away and flee the fight.');
-      return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase: 'fled' };
+      return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase: 'fled', itemConsumedIds, hits, damageTakenByPlayer };
     }
     log.push('You try to flee, but there is no opening! Every foe still standing gets a free hit.');
     for (const i of alive) enemyAttack(i);
@@ -305,7 +392,7 @@ export function resolveRound(input: RoundInput): RoundResult {
   if (allDefeated) phase = 'victory';
   else if (playerHp <= 0) phase = 'defeat';
 
-  return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase, itemConsumedId };
+  return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase, itemConsumedIds, hits, damageTakenByPlayer };
 }
 
 export interface RewardResult {
