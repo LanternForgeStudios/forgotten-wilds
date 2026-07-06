@@ -44,6 +44,13 @@ export function isWalkable(map: TileMap, x: number, y: number, facing?: Facing):
   if (!ground) return false;
   const gid = ground.data[y * map.width + x];
   if (!map.walkableTileIds.includes(gid)) return false;
+  // Discrete collision-only obstacles authored on the Tiled 'collisions' layer (fences, rocks,
+  // ledges, barriers). Purely geometric - blocks movement but never triggers interaction logic,
+  // unlike an 'interactable' MapObject.
+  const collisionBlocked = map.collisionObjects.some(
+    (r) => x >= r.x && x < r.x + r.width && y >= r.y && y < r.y + r.height,
+  );
+  if (collisionBlocked) return false;
   const blocked = map.objects.some((o) => BLOCKING_OBJECT_TYPES.has(o.type) && o.x === x && o.y === y);
   if (blocked) return false;
   // A gated transition (e.g. a building door) only behaves like open floor when approached from

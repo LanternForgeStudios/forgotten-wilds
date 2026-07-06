@@ -30,7 +30,6 @@ import styles from './TownScene.module.css';
 
 const PRESENCE_STALE_AFTER_MS = 60_000;
 
-const TILESET_COLUMNS = 12;
 
 /** Building-door transitions get a facade marker so they read as "a building" rather than a
  *  blank floor tile - keyed by the transition's target locationId (only entrances need this,
@@ -206,7 +205,7 @@ export function TownScene() {
         <TileGrid
           map={map}
           tilesetAssetId="tileset.tiny-dungeon"
-          tilesetColumns={TILESET_COLUMNS}
+          tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId="sprite.player"
           entities={entities}

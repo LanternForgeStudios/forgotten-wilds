@@ -33,8 +33,6 @@ import { isTypingTarget } from '@/utils/keyboard';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
 
-const TILESET_COLUMNS = 12;
-
 /** Landmarks are pure "visit and see" sub-areas within a larger overworld map - visiting records
  *  Journal coverage and quest progress but doesn't grant an item. */
 const VISIT_ONLY_LANDMARKS = new Set(['hunters-camp']);
@@ -255,7 +253,7 @@ export function OverworldScene() {
         <TileGrid
           map={map}
           tilesetAssetId="tileset.tiny-dungeon"
-          tilesetColumns={TILESET_COLUMNS}
+          tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId="sprite.player"
           entities={entities}

@@ -1,4 +1,4 @@
-import type { MapObject, MapObjectType, TileLayer, TileMap } from '@/types';
+import type { CollisionRect, MapObject, MapObjectType, TileLayer, TileMap } from '@/types';
 import { getAssetUrl } from './assetManager';
 
 // Minimal shape of the subset of the Tiled JSON map format (https://doc.mapeditor.org/en/stable/reference/json-map-format/)
@@ -17,6 +17,8 @@ interface TiledTileLayer {
   width: number;
   height: number;
   data: number[];
+  visible?: boolean;
+  opacity?: number;
 }
 
 interface TiledObject {
@@ -24,6 +26,9 @@ interface TiledObject {
   type: string;
   x: number;
   y: number;
+  /** Pixel width/height, present on rectangle objects (used only by the 'collisions' layer). */
+  width?: number;
+  height?: number;
   properties?: TiledProperty[];
 }
 
@@ -41,6 +46,7 @@ interface TiledTilesetTile {
 interface TiledEmbeddedTileset {
   firstgid: number;
   tilecount: number;
+  columns?: number;
   tiles?: TiledTilesetTile[];
 }
 
@@ -60,6 +66,8 @@ function propValue<T extends string | number | boolean>(
 ): T | undefined {
   return properties?.find((p) => p.name === name)?.value as T | undefined;
 }
+
+const KNOWN_TILELAYER_NAMES = /^(ground|decorations-\d+|overhang)$/;
 
 function objectType(raw: string): MapObjectType {
   if (
@@ -87,12 +95,32 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     throw new Error(`Tiled map "${mapAssetId}" is missing a "tilesetAssetId" custom property.`);
   }
 
+  if (import.meta.env.DEV) {
+    for (const l of raw.layers) {
+      if (l.type === 'tilelayer' && !KNOWN_TILELAYER_NAMES.test(l.name)) {
+        console.warn(
+          `Tiled map "${mapAssetId}": tile layer "${l.name}" doesn't match ground/decorations-N/overhang and will not render.`,
+        );
+      }
+      if (l.type === 'objectgroup' && l.name !== 'objects' && l.name !== 'collisions') {
+        console.warn(`Tiled map "${mapAssetId}": object layer "${l.name}" is not "objects" or "collisions" and will be ignored.`);
+      }
+    }
+  }
+
   const layers: TileLayer[] = raw.layers
     .filter((l): l is TiledTileLayer => l.type === 'tilelayer')
-    .map((l) => ({ name: l.name, width: l.width, height: l.height, data: l.data }));
+    .map((l) => ({
+      name: l.name,
+      width: l.width,
+      height: l.height,
+      data: l.data,
+      visible: l.visible ?? true,
+      opacity: l.opacity ?? 1,
+    }));
 
   const objects: MapObject[] = raw.layers
-    .filter((l): l is TiledObjectGroup => l.type === 'objectgroup')
+    .filter((l): l is TiledObjectGroup => l.type === 'objectgroup' && l.name !== 'collisions')
     .flatMap((l) => l.objects)
     .map((o) => ({
       type: objectType(o.type),
@@ -105,6 +133,19 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
       requiredFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'requiredFacing'),
     }));
 
+  // 'collisions' is an object layer of discrete, non-interactive obstacles (fences, rocks, ledges,
+  // barriers). Parsed entirely separately from `objects` above - it never flows through
+  // objectType()'s allow-list, and the object's own Class/Type field is ignored (geometry only).
+  const collisionObjects: CollisionRect[] = raw.layers
+    .filter((l): l is TiledObjectGroup => l.type === 'objectgroup' && l.name === 'collisions')
+    .flatMap((l) => l.objects)
+    .map((o) => ({
+      x: Math.floor(o.x / raw.tilewidth),
+      y: Math.floor(o.y / raw.tileheight),
+      width: Math.max(1, Math.round((o.width || raw.tilewidth) / raw.tilewidth)),
+      height: Math.max(1, Math.round((o.height || raw.tileheight) / raw.tileheight)),
+    }));
+
   const walkableTileIds: number[] = [];
   for (const tileset of raw.tilesets) {
     for (const tile of tileset.tiles ?? []) {
@@ -114,6 +155,8 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     }
   }
 
+  const columns = raw.tilesets[0]?.columns ?? 12;
+
   return {
     locationId,
     tileWidth: raw.tilewidth,
@@ -121,8 +164,10 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     width: raw.width,
     height: raw.height,
     tilesetAssetId,
+    columns,
     layers,
     objects,
+    collisionObjects,
     walkableTileIds,
   };
 }

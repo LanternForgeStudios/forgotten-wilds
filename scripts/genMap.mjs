@@ -23,6 +23,11 @@
 // JSON, matching every existing hand-authored map's convention - tiledLoader.ts divides back down
 // on load). The generated room is a solid border of non-walkable tile (gid 1) with a fully
 // walkable interior (gid 25), same tileset convention as every existing map in this repo.
+//
+// This script only ever produces a `ground` tile layer plus an `objects` layer - it has no concept
+// of the richer decorations-N/collisions/overhang layers the Tiled editor workflow supports (see
+// UseTILEDforMaps.txt). Maps that want those should be authored directly in Tiled and exported to
+// public/assets/maps/<location-id>.json rather than extended through this generator.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 

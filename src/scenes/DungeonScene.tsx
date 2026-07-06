@@ -26,7 +26,6 @@ import { ITEMS, EQUIPMENT } from '@/data';
 import styles from './TownScene.module.css';
 
 const LOCATION_ID = 'hollow-rail-mine';
-const TILESET_COLUMNS = 12;
 
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
@@ -189,7 +188,7 @@ export function DungeonScene() {
         <TileGrid
           map={map}
           tilesetAssetId="tileset.tiny-dungeon"
-          tilesetColumns={TILESET_COLUMNS}
+          tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId="sprite.player"
           entities={entities}

@@ -1,4 +1,4 @@
-import type { TileMap } from '@/types';
+import type { TileLayer, TileMap } from '@/types';
 import { getAssetUrl } from '@/assets/assetManager';
 import type { GridPosition } from '@/hooks/useGridMovement';
 import styles from './TileGrid.module.css';
@@ -48,6 +48,38 @@ export function TileGrid({
   const tileSize = map.tileWidth * scale;
   const tilesetUrl = getAssetUrl(tilesetAssetId);
   const ground = map.layers.find((l) => l.name === 'ground');
+  const decorationLayers = map.layers
+    .filter((l) => /^decorations-\d+$/.test(l.name))
+    .sort((a, b) => Number(a.name.split('-')[1]) - Number(b.name.split('-')[1]));
+  const overhang = map.layers.find((l) => l.name === 'overhang');
+
+  function renderTileLayer(layer: TileLayer, keyPrefix: string) {
+    if (!layer.visible) return null;
+    return layer.data.map((gid, index) => {
+      if (gid <= 0) return null;
+      const localIndex = gid - 1;
+      const col = localIndex % tilesetColumns;
+      const row = Math.floor(localIndex / tilesetColumns);
+      const x = index % map.width;
+      const y = Math.floor(index / map.width);
+      return (
+        <div
+          key={`${keyPrefix}-${index}`}
+          className={styles.tile}
+          style={{
+            left: x * tileSize,
+            top: y * tileSize,
+            width: tileSize,
+            height: tileSize,
+            opacity: layer.opacity,
+            backgroundImage: `url(${tilesetUrl})`,
+            backgroundPosition: `-${col * tileSize}px -${row * tileSize}px`,
+            backgroundSize: `${tilesetColumns * tileSize}px auto`,
+          }}
+        />
+      );
+    });
+  }
 
   const worldWidthPx = map.width * tileSize;
   const worldHeightPx = map.height * tileSize;
@@ -67,29 +99,8 @@ export function TileGrid({
           transform: `translate(${-cameraX}px, ${-cameraY}px)`,
         }}
       >
-        {ground?.data.map((gid, index) => {
-          if (gid <= 0) return null;
-          const localIndex = gid - 1;
-          const col = localIndex % tilesetColumns;
-          const row = Math.floor(localIndex / tilesetColumns);
-          const x = index % map.width;
-          const y = Math.floor(index / map.width);
-          return (
-            <div
-              key={index}
-              className={styles.tile}
-              style={{
-                left: x * tileSize,
-                top: y * tileSize,
-                width: tileSize,
-                height: tileSize,
-                backgroundImage: `url(${tilesetUrl})`,
-                backgroundPosition: `-${col * tileSize}px -${row * tileSize}px`,
-                backgroundSize: `${tilesetColumns * tileSize}px auto`,
-              }}
-            />
-          );
-        })}
+        {ground && renderTileLayer(ground, 'ground')}
+        {decorationLayers.map((l) => renderTileLayer(l, l.name))}
 
         {entities.map((entity) => (
           <div
@@ -108,6 +119,8 @@ export function TileGrid({
         >
           <img src={getAssetUrl(playerSpriteAssetId)} alt="" className={styles.entitySprite} />
         </div>
+
+        {overhang && renderTileLayer(overhang, 'overhang')}
       </div>
     </div>
   );
