@@ -30,7 +30,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A winding ridge trail through haunted forest, said to be favored by Mothling swarms after dusk.',
     mapAssetId: 'map.ironwood-trail',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.ironwood-trail',
     encounterTable: [
       { enemyId: 'mothling', weight: 3 },
       { enemyId: 'greater-mothling', weight: 1 },
@@ -92,7 +92,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Rocky mountain paths above Ironwood Trail - Cliff Pass, the Abandoned Rail Line, Eagle Overlook, and the old Moon Witch Circle all lie along its length.',
     mapAssetId: 'map.raven-ridge',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.raven-ridge',
     encounterTable: [
       { enemyId: 'cliff-wolf', weight: 3 },
       { enemyId: 'ridge-hawk', weight: 1 },
@@ -106,7 +106,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A waterfall region past Raven Ridge - the Lower Falls, a Hidden Cave, the Lantern Pools, and the Ancient Stair wind through the spray.',
     mapAssetId: 'map.whisper-falls',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.whisper-falls',
     encounterTable: [
       { enemyId: 'pool-wisp', weight: 3 },
       { enemyId: 'falls-siren', weight: 1 },
@@ -120,7 +120,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Dense haunted woods on the far side of Whisper Falls - the Forgotten Cemetery, the Hollow Tree, Spirit Clearing, and the Fog Marsh lie within.',
     mapAssetId: 'map.black-briar-forest',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.black-briar-forest',
     encounterTable: [
       { enemyId: 'briar-wraith', weight: 3 },
       { enemyId: 'cemetery-shade', weight: 1 },
@@ -134,7 +134,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'An abandoned mine and its collapsed rail line, haunted by the miners who never left and the coal spirits that grew from their grief.',
     mapAssetId: 'map.hollow-rail-mine',
-    battleBackgroundAssetId: 'battle-bg.dungeon',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
     encounterTable: [
       { enemyId: 'restless-miner', weight: 2 },
       { enemyId: 'foreman-wraith', weight: 1 },

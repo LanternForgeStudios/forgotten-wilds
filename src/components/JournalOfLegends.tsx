@@ -5,8 +5,11 @@ import { useQuestStore } from '@/state/useQuestStore';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
-import { ENEMIES, LOCATIONS, LORE_ENTRIES } from '@/data';
+import { effectiveQuestStatus } from '@/engine/quests/questStatus';
+import { ENEMIES, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
+import type { Quest, QuestCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
+import questStyles from './QuestLog.module.css';
 
 /** Fast Travel is earned via the Prologue's shrine-restoration quest (MSF-P-003, "The First
  *  Flame") - matches the MSQ's `fast_travel_unlocked` world flag. Ordinary step-by-step map
@@ -17,13 +20,39 @@ interface JournalOfLegendsProps {
   onClose: () => void;
 }
 
-type Tab = 'creatures' | 'locations' | 'lore' | 'bosses';
+type Tab = 'quests' | 'locations' | 'creatures' | 'lore' | 'bosses';
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'creatures', label: 'Creatures' },
+  { id: 'quests', label: 'Quests' },
   { id: 'locations', label: 'Locations' },
+  { id: 'creatures', label: 'Creatures' },
   { id: 'lore', label: 'Lore' },
   { id: 'bosses', label: 'Bosses' },
+];
+
+/** Quest givers who aren't a regular NPC (e.g. a shrine/landmark interactable) - mapped to the
+ *  location they're physically found in, same as any NPC's locationId would resolve to. */
+const NON_NPC_GIVER_LOCATIONS: Record<string, string> = {};
+
+/** Collapses a sub-location (Elias' house, Mara's shop, the Inn) up to its Main Area, same
+ *  bucketing this Journal's own Locations tab uses - a quest "earned in Ash Hallow" shouldn't
+ *  fragment into three near-empty region sections for one town. */
+function mainLocationId(locationId: string): string {
+  return LOCATIONS.find((l) => l.id === locationId)?.parentLocationId ?? locationId;
+}
+
+/** Where a quest was picked up, for grouping - undefined only if the giver can't be resolved at
+ *  all (shouldn't happen for real content, but keeps grouping from crashing on bad data). */
+function questMainLocationId(quest: Quest): string | undefined {
+  const npcLocationId = NPCS.find((n) => n.id === quest.giverNpcId)?.locationId;
+  const locationId = npcLocationId ?? NON_NPC_GIVER_LOCATIONS[quest.giverNpcId];
+  return locationId ? mainLocationId(locationId) : undefined;
+}
+
+const QUEST_CATEGORY_TABS: { id: QuestCategory; label: string }[] = [
+  { id: 'main', label: 'Main Story' },
+  { id: 'side', label: 'Side Quests' },
+  { id: 'misc', label: 'Other' },
 ];
 
 export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
@@ -32,9 +61,23 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const fastTravelUnlocked = questProgress[FAST_TRAVEL_UNLOCK_QUEST]?.status === 'completed';
   const goTo = useSceneStore((s) => s.goTo);
   const currentLocationId = useSceneStore((s) => s.params.locationId);
-  const [tab, setTab] = useState<Tab>('creatures');
+  const [tab, setTab] = useState<Tab>('quests');
   const [expandedLocations, setExpandedLocations] = useState<Set<string>>(new Set());
+  const [questCategoryTab, setQuestCategoryTab] = useState<QuestCategory>('main');
+  const [activeQuestsOnly, setActiveQuestsOnly] = useState(false);
+  // Tracks *collapsed* quest regions rather than expanded ones, so every region defaults to open
+  // on first view without needing to precompute ids.
+  const [collapsedQuestRegions, setCollapsedQuestRegions] = useState<Set<string>>(new Set());
   useOverlayClose(onClose);
+
+  function toggleQuestRegion(id: string) {
+    setCollapsedQuestRegions((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   function travelTo(locationId: string) {
     const loc = LOCATIONS.find((l) => l.id === locationId);
@@ -67,6 +110,115 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             </button>
           ))}
         </div>
+
+        {tab === 'quests' &&
+          (() => {
+            const questsInTab = QUESTS.filter((q) => q.category === questCategoryTab);
+            const regionIds = Array.from(
+              new Set(questsInTab.map((q) => questMainLocationId(q)).filter((id): id is string => !!id)),
+            );
+            // Keep region order stable (matches LOCATIONS array order, i.e. introduction order)
+            // rather than reshuffling as quests are discovered.
+            regionIds.sort((a, b) => LOCATIONS.findIndex((l) => l.id === a) - LOCATIONS.findIndex((l) => l.id === b));
+
+            const regions = regionIds
+              .map((regionId) => {
+                const regionQuests = questsInTab.filter((q) => questMainLocationId(q) === regionId);
+                const visibleQuests = regionQuests
+                  .filter((q) => {
+                    const status = effectiveQuestStatus(q, questProgress);
+                    if (status === 'locked') return false;
+                    if (activeQuestsOnly && status !== 'active') return false;
+                    return true;
+                  })
+                  // Active quests first within a region so what's still to do doesn't get buried
+                  // below everything already completed there.
+                  .sort((a, b) => {
+                    const aActive = effectiveQuestStatus(a, questProgress) === 'active' ? 0 : 1;
+                    const bActive = effectiveQuestStatus(b, questProgress) === 'active' ? 0 : 1;
+                    return aActive - bActive;
+                  });
+                const completedCount = regionQuests.filter(
+                  (q) => effectiveQuestStatus(q, questProgress) === 'completed',
+                ).length;
+                return { regionId, regionQuests, visibleQuests, completedCount };
+              })
+              // A region with quests that are all still locked has nothing to show yet - just
+              // show the ones given, don't render an empty section for it.
+              .filter((r) => r.visibleQuests.length > 0);
+
+            return (
+              <div>
+                <div
+                  className={styles.tabs}
+                  style={{ marginBottom: 10, justifyContent: 'space-between', alignItems: 'center' }}
+                >
+                  <div className={styles.tabs}>
+                    {QUEST_CATEGORY_TABS.map((t) => (
+                      <button
+                        key={t.id}
+                        className={`${styles.tab} ${questCategoryTab === t.id ? styles.tabActive : ''}`}
+                        onClick={() => setQuestCategoryTab(t.id)}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                  <label style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={activeQuestsOnly}
+                      onChange={(e) => setActiveQuestsOnly(e.target.checked)}
+                    />
+                    Active only
+                  </label>
+                </div>
+
+                {regions.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No quests here yet.</p>}
+
+                {regions.map(({ regionId, regionQuests, visibleQuests, completedCount }) => {
+                  const expanded = !collapsedQuestRegions.has(regionId);
+                  return (
+                    <div key={regionId} className={questStyles.region}>
+                      <button className={questStyles.regionHeader} onClick={() => toggleQuestRegion(regionId)}>
+                        <span>
+                          {expanded ? '▾' : '▸'} {LOCATIONS.find((l) => l.id === regionId)?.name ?? regionId}
+                        </span>
+                        <span className={questStyles.regionCount}>
+                          {completedCount}/{regionQuests.length}
+                        </span>
+                      </button>
+                      {expanded &&
+                        visibleQuests.map((quest) => {
+                          const status = effectiveQuestStatus(quest, questProgress);
+                          const counts = questProgress[quest.id]?.objectiveCounts ?? {};
+                          return (
+                            <div key={quest.id} className={questStyles.quest}>
+                              <p className={questStyles.questName}>
+                                {quest.name}
+                                <span
+                                  className={`${questStyles.status} ${
+                                    status === 'completed' ? questStyles.statusCompleted : questStyles.statusActive
+                                  }`}
+                                >
+                                  {status}
+                                </span>
+                              </p>
+                              <p className={questStyles.objective}>{quest.description}</p>
+                              {quest.objectives.map((o) => (
+                                <p key={o.id} className={questStyles.objective}>
+                                  • {o.description} ({Math.min(counts[o.id] ?? 0, o.requiredCount)}/{o.requiredCount})
+                                </p>
+                              ))}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
         {tab === 'creatures' && (
           <div>

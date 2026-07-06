@@ -118,4 +118,27 @@ describe('applyQuestRewards', () => {
     expect(save.player.level).toBeGreaterThan(1);
     expect(save.player.stats.maxHp).toBeGreaterThan(60);
   });
+
+  it('auto-credits a collectItem objective the player already satisfies once its quest activates', () => {
+    // Player found a stone-fragment while exploring, well before 'fragments-of-the-first-promise'
+    // (which needs it) ever unlocked - completing its prerequisite here should immediately credit
+    // that objective from existing inventory, with no separate trip back to where it was found.
+    const save = emptySave({
+      inventory: [{ itemId: 'stone-fragment', quantity: 1 }],
+      quests: {
+        'strange-tracks': { status: 'completed', objectiveCounts: {} },
+        'the-forgotten-shrine': { status: 'active', objectiveCounts: { 'talk-spirit-child': 1 } },
+      },
+    });
+    const completions = advanceQuests(save.quests, { type: 'interactWithShrine', targetId: 'spirit-grove' });
+    applyQuestRewards(save, completions);
+
+    expect(save.quests['the-forgotten-shrine'].status).toBe('completed');
+    expect(effectiveStatus('fragments-of-the-first-promise', save.quests)).toBe('active');
+    expect(save.quests['fragments-of-the-first-promise'].objectiveCounts['get-stone']).toBe(1);
+    // water/wind fragments weren't in inventory, so those objectives (and the quest itself)
+    // correctly remain unsatisfied.
+    expect(save.quests['fragments-of-the-first-promise'].objectiveCounts['get-water'] ?? 0).toBe(0);
+    expect(save.quests['fragments-of-the-first-promise'].status).toBe('active');
+  });
 });

@@ -2,7 +2,7 @@
  *  constant in functions/src/functions/dash.ts, kept in sync by hand like any other client/server
  *  display number. Used to interpolate the HUD's Stamina bar between server round-trips so it
  *  visibly climbs in real time instead of only updating right after a Dash. */
-export const FULL_REGEN_SECONDS = 6;
+export const FULL_REGEN_SECONDS = 20;
 
 /** Predicted current Stamina, extrapolated from the last server-confirmed value and timestamp.
  *  Display-only - never written anywhere; the next Dash call recomputes the real value itself

@@ -5,11 +5,11 @@ import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { DialogueBox } from '@/components/DialogueBox';
 import { Panel } from '@/components/common/Panel';
-import { QuestLog } from '@/components/QuestLog';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
@@ -71,14 +71,13 @@ export function OverworldScene() {
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
-  const [questLogOpen, setQuestLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const suspended = activeNpc !== null || questLogOpen || menuOpen || journalOpen || message !== null;
+  const suspended = activeNpc !== null || menuOpen || journalOpen || message !== null;
   const { map, position, positionRef, facingDelta, attemptMove, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
@@ -89,6 +88,8 @@ export function OverworldScene() {
     },
     onBlockedTransition: setMessage,
   });
+
+  const { pending, run } = usePendingAction();
 
   useHeartbeat(uid, displayName, locationId, position);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
@@ -109,7 +110,7 @@ export function OverworldScene() {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
         setActiveNpc(npc);
-        callTalkToNpc(npc.id)
+        run(callTalkToNpc(npc.id))
           .then(async () => {
             if (uid) await resyncSave(uid);
           })
@@ -123,7 +124,7 @@ export function OverworldScene() {
     );
     if (obj?.refId?.startsWith('chest-')) {
       const chestId = obj.refId;
-      callOpenChest(locationId, chestId)
+      run(callOpenChest(locationId, chestId))
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           const name =
@@ -142,7 +143,7 @@ export function OverworldScene() {
     if (obj?.refId && SHRINE_LANDMARKS.has(obj.refId)) {
       const refId = obj.refId;
       const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
-      callInteractWithShrine(locationId, refId)
+      run(callInteractWithShrine(locationId, refId))
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           if (res.unlockedStamina) {
@@ -159,7 +160,7 @@ export function OverworldScene() {
     if (obj?.refId && VISIT_ONLY_LANDMARKS.has(obj.refId)) {
       const landmarkId = obj.refId;
       const landmarkName = LOCATIONS.find((l) => l.id === landmarkId)?.name ?? landmarkId;
-      callVisitLandmark(landmarkId)
+      run(callVisitLandmark(landmarkId))
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
@@ -174,7 +175,7 @@ export function OverworldScene() {
     if (obj?.refId && FRAGMENT_LANDMARKS[obj.refId]) {
       const refId = obj.refId;
       const itemId = FRAGMENT_LANDMARKS[refId];
-      callCollectWorldItem(locationId, refId)
+      run(callCollectWorldItem(locationId, refId))
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           const name = ITEMS.find((i) => i.id === itemId)?.name ?? itemId;
@@ -199,12 +200,10 @@ export function OverworldScene() {
       if (e.key === 'Escape') {
         if (activeNpc) setActiveNpc(null);
         else if (message) setMessage(null);
-        else if (questLogOpen) setQuestLogOpen(false);
         else if (menuOpen) setMenuOpen(false);
         else if (journalOpen) setJournalOpen(false);
         return;
       }
-      if (e.key === 'l' || e.key === 'L') setQuestLogOpen((open) => !open);
       if (e.key === 'i' || e.key === 'I') setMenuOpen((open) => !open);
       if (e.key === 'j' || e.key === 'J') setJournalOpen((open) => !open);
       if (e.key === 'Enter' || e.key === ' ') attemptInteract();
@@ -212,7 +211,7 @@ export function OverworldScene() {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeNpc, message, questLogOpen, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
+  }, [activeNpc, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
 
   if (!map) {
     return (
@@ -251,6 +250,7 @@ export function OverworldScene() {
   return (
     <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
       <PlayerHUD locationId={locationId} />
+      {pending && <div className={styles.pendingIndicator}>...</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
@@ -269,7 +269,6 @@ export function OverworldScene() {
           <MobileHud
             onInteract={attemptInteract}
             onDash={staminaUnlocked ? dash : undefined}
-            onQuestLog={() => setQuestLogOpen((open) => !open)}
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
           />
@@ -278,8 +277,7 @@ export function OverworldScene() {
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
-          &nbsp;·&nbsp; Watch for danger in the deep grass &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I
-          &nbsp;·&nbsp; Journal: J
+          &nbsp;·&nbsp; Watch for danger in the deep grass &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
         </p>
       )}
       {activeNpc && (
@@ -310,7 +308,6 @@ export function OverworldScene() {
           </Panel>
         </div>
       )}
-      {questLogOpen && <QuestLog onClose={() => setQuestLogOpen(false)} />}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
     </div>

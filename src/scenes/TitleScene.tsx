@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Panel } from '@/components/common/Panel';
+import { getAssetUrl } from '@/assets/assetManager';
 import {
   authErrorMessage,
   sendPasswordReset,
@@ -59,11 +60,7 @@ export function TitleScene() {
   }
 
   return (
-    <div className={styles.wrap}>
-      <div>
-        <h1 className={styles.title}>Forgotten Wilds</h1>
-        <p className={styles.tagline}>The lantern remembers what the mountain forgot.</p>
-      </div>
+    <div className={styles.wrap} style={{ backgroundImage: `url(${getAssetUrl('background.title-screen')})` }}>
       <Panel className={styles.panel}>
         <button type="button" className={styles.button} onClick={handleGoogle} disabled={busy}>
           Sign in with Google

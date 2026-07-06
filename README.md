@@ -61,9 +61,10 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 ## Project structure
 
 - `src/scenes/` — Title, Character Creation, Town, Overworld, Dungeon, Combat
-- `src/components/` — DialogueBox, QuestLog, CharacterMenu (Inventory/Equipment), Shop, Inn,
-  JournalOfLegends, PlayerHUD, ToastHost (transient quest-progress notifications), and shared UI
-  (`common/Panel` — the 9-slice panel used everywhere)
+- `src/components/` — DialogueBox, CharacterMenu (Inventory/Equipment), Shop, Inn, JournalOfLegends
+  (Quests/Locations/Creatures/Lore/Bosses tabs — the Quest Log was folded into its Quests tab),
+  PlayerHUD, ToastHost (transient quest-progress notifications), and shared UI (`common/Panel` —
+  the 9-slice panel used everywhere)
 - `src/data/` — display-only seed data (items, equipment, enemies, NPCs, quests, locations, lore)
 - `src/assets/` — the Asset Manager and registry (`registry.ts`); every sprite/tileset/icon/map
   is looked up by id here, never imported by file path directly. See `public/CREDITS.md` for
@@ -80,9 +81,9 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 
 ## In-game controls
 
-Arrow keys / WASD to move, Enter/Space to interact, **L** for Quest Log, **I** for Inventory/
-Equipment, **J** for Journal of Legends. On touch devices (auto-detected), drag anywhere on the
-map to move and use the on-screen HUD buttons in place of the keyboard shortcuts.
+Arrow keys / WASD to move, Enter/Space to interact, **I** for Inventory/Equipment, **J** for
+Journal of Legends (opens to its Quests tab by default). On touch devices (auto-detected), drag
+anywhere on the map to move and use the on-screen HUD buttons in place of the keyboard shortcuts.
 
 ## Known limitations (MVP scope)
 

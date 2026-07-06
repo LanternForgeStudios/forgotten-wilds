@@ -1,28 +1,18 @@
 .wrap {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  gap: 24px;
   width: 100%;
   min-height: 100svh;
-  background: radial-gradient(ellipse at center, var(--fw-bg) 0%, var(--fw-bg-deep) 100%);
+  padding-bottom: 6vh;
+  /* The hero art already has the game's logo and tagline painted into it (see
+     background.title-screen in the registry), so there's no separate on-screen text title here -
+     the panel sits low enough in the frame to clear the logo, which sits in the upper third. */
+  background-color: var(--fw-bg-deep);
+  background-size: cover;
+  background-position: center 30%;
   text-align: center;
-}
-
-.title {
-  font-size: 48px;
-  letter-spacing: 2px;
-  color: var(--fw-accent);
-  margin: 0;
-  text-shadow: 0 2px 12px rgba(224, 169, 74, 0.35);
-}
-
-.tagline {
-  color: var(--fw-text-dim);
-  margin: 0 0 8px;
-  font-style: italic;
 }
 
 .panel {

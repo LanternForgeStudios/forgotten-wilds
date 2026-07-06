@@ -39,17 +39,44 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
     throw new HttpsError('failed-precondition', 'You are not at that location.');
   }
 
+  const bossId = request.data?.bossId;
+
   const sessionRef = db.collection('combatSessions').doc(uid);
   const existingSession = await sessionRef.get();
   if (existingSession.exists) {
     const existing = existingSession.data() as CombatSession;
-    if (existing.status === 'active' && existing.expiresAt > Date.now()) {
+    const now = Date.now();
+    if (existing.status === 'active' && existing.expiresAt > now) {
+      // A genuine second call for the exact same fresh encounter within a couple seconds of the
+      // first (React StrictMode double-invokes mount effects in development, and a doubled tap on
+      // a "fight" interactable can race the same way) - hand back the same session instead of
+      // erroring, rather than treating every repeat call as an attempt to reroll a losing fight.
+      const isLikelyDuplicateCall =
+        now - existing.startedAt < 3000 && existing.locationId === locationId && existing.enemies.length > 0;
+      if (isLikelyDuplicateCall) {
+        return {
+          sessionId: existing.sessionId,
+          enemies: existing.enemies.map((e, index) => ({
+            index,
+            enemyId: e.enemyId,
+            name: ENEMIES[e.enemyId]?.name ?? e.enemyId,
+            tier: ENEMIES[e.enemyId]?.tier,
+            level: e.level,
+            hp: e.hp,
+            maxHp: e.maxHp,
+            isBoss: ENEMIES[e.enemyId]?.isBoss,
+          })),
+          playerHp: save.player.stats.hp,
+          playerMaxHp: save.player.stats.maxHp,
+          playerSpirit: save.player.stats.spirit,
+          playerMaxSpirit: save.player.stats.maxSpirit,
+        };
+      }
       throw new HttpsError('failed-precondition', 'You are already in an encounter.');
     }
   }
 
   let enemies;
-  const bossId = request.data?.bossId;
   if (bossId) {
     const prerequisite = BOSS_PREREQUISITE_QUEST[bossId];
     const questsDone = !prerequisite || effectiveStatus(prerequisite, save.quests) === 'completed';

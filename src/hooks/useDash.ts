@@ -8,7 +8,10 @@ const DASH_TILES = 5;
 // Must exceed useGridMovement's own step throttle (150ms default) or each scheduled attemptMove
 // call would just get swallowed by that throttle instead of actually advancing a tile.
 const DASH_STEP_MS = 170;
-const DASH_COOLDOWN_MS = 1000;
+// Matches the server's own hard floor (functions/src/functions/dash.ts) - not itself what prevents
+// spamming (the server enforces that regardless of what the client sends), just avoids firing a
+// network call the client already knows would be rejected.
+const DASH_COOLDOWN_MS = 3000;
 
 function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));

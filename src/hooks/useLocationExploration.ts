@@ -52,8 +52,11 @@ export function useLocationExploration({
     const spawnId = params.locationId === locationId ? (params.spawnId ?? 'default') : 'default';
     const spawn = map.objects.find((o) => o.type === 'spawnPoint' && o.refId === spawnId);
     return spawn ? { x: spawn.x, y: spawn.y } : { x: 1, y: 1 };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map]);
+    // useTileMap caches loaded maps across visits, so `map` keeps the same object reference on a
+    // repeat visit - this must also depend on the actual spawn-selecting params, or arriving back
+    // at an already-cached location from a different neighboring map won't recompute and will
+    // silently reuse whichever spawn point was resolved the very first time that map was loaded.
+  }, [map, locationId, params.locationId, params.spawnId, params.spawnX, params.spawnY]);
 
   const handleStep = (pos: GridPosition, isDash?: boolean) => {
     if (!map) return;

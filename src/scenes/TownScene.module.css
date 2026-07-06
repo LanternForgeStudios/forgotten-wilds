@@ -16,3 +16,31 @@
   color: var(--fw-text-dim);
   z-index: 10;
 }
+
+/** Shown the instant an interaction (talk/chest/shrine/landmark) is fired, before its Cloud
+ *  Function call resolves - bridges the round-trip so it doesn't read as an unresponsive click. */
+.pendingIndicator {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--fw-panel);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 12px;
+  z-index: 15;
+  pointer-events: none;
+  animation: pendingPulse 1s ease-in-out infinite;
+}
+
+@keyframes pendingPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}

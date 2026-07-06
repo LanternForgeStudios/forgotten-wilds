@@ -4,7 +4,6 @@ import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { DialogueBox } from '@/components/DialogueBox';
 import { PlayerHUD } from '@/components/PlayerHUD';
-import { QuestLog } from '@/components/QuestLog';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { Shop } from '@/components/Shop';
 import { Inn } from '@/components/Inn';
@@ -12,6 +11,7 @@ import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { Panel } from '@/components/common/Panel';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
@@ -54,7 +54,6 @@ const SHRINES = new Set(['ash-hallow-shrine']);
 export function TownScene() {
   const locationId = useSceneStore((s) => s.params.locationId) ?? 'ash-hallow';
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
-  const [questLogOpen, setQuestLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [activeShopId, setActiveShopId] = useState<string | undefined>();
@@ -67,14 +66,14 @@ export function TownScene() {
   const isMobile = useIsMobile();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const suspended =
-    activeNpc !== null || questLogOpen || menuOpen || shopOpen || innOpen || journalOpen || message !== null;
+  const suspended = activeNpc !== null || menuOpen || shopOpen || innOpen || journalOpen || message !== null;
   const { map, position, positionRef, facingDelta, attemptMove, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
     onBlockedTransition: setMessage,
   });
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
+  const { pending, run } = usePendingAction();
 
   useHeartbeat(uid, displayName, locationId, position);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
@@ -107,7 +106,7 @@ export function TownScene() {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
         setActiveNpc(npc);
-        callTalkToNpc(npc.id)
+        run(callTalkToNpc(npc.id))
           .then(async () => {
             if (uid) await resyncSave(uid);
           })
@@ -120,7 +119,7 @@ export function TownScene() {
     );
     if (shrineObject?.refId) {
       const refId = shrineObject.refId;
-      callInteractWithShrine(locationId, refId)
+      run(callInteractWithShrine(locationId, refId))
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
@@ -140,10 +139,6 @@ export function TownScene() {
         setMessage(null);
         return;
       }
-      if (e.key === 'l' || e.key === 'L') {
-        setQuestLogOpen((open) => !open);
-        return;
-      }
       if (e.key === 'i' || e.key === 'I') {
         setMenuOpen((open) => !open);
         return;
@@ -158,7 +153,7 @@ export function TownScene() {
     window.addEventListener('keydown', handleInteract);
     return () => window.removeEventListener('keydown', handleInteract);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeNpc, message, questLogOpen, menuOpen, shopOpen, innOpen, journalOpen, map, position, facingDelta, uid, wanderPositions]);
+  }, [activeNpc, message, menuOpen, shopOpen, innOpen, journalOpen, map, position, facingDelta, uid, wanderPositions]);
 
   if (!map) {
     return (
@@ -206,6 +201,7 @@ export function TownScene() {
   return (
     <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
       <PlayerHUD locationId={locationId} />
+      {pending && <div className={styles.pendingIndicator}>...</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
@@ -224,7 +220,6 @@ export function TownScene() {
           <MobileHud
             onInteract={attemptInteract}
             onDash={staminaUnlocked ? dash : undefined}
-            onQuestLog={() => setQuestLogOpen((open) => !open)}
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
           />
@@ -233,7 +228,7 @@ export function TownScene() {
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Talk: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
-          &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
+          &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
         </p>
       )}
       {activeNpc && (
@@ -264,7 +259,6 @@ export function TownScene() {
           </Panel>
         </div>
       )}
-      {questLogOpen && <QuestLog onClose={() => setQuestLogOpen(false)} />}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {shopOpen && <Shop shopId={activeShopId ?? ''} onClose={() => setShopOpen(false)} />}
       {innOpen && <Inn onClose={() => setInnOpen(false)} />}

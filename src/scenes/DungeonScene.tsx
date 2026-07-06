@@ -4,11 +4,11 @@ import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { Panel } from '@/components/common/Panel';
-import { QuestLog } from '@/components/QuestLog';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
@@ -45,14 +45,13 @@ export function DungeonScene() {
   const questProgress = useQuestStore((s) => s.progress);
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const [message, setMessage] = useState<string | null>(null);
-  const [questLogOpen, setQuestLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const isMobile = useIsMobile();
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const suspended = message !== null || questLogOpen || menuOpen || journalOpen;
+  const suspended = message !== null || menuOpen || journalOpen;
   const { map, position, positionRef, facingDelta, attemptMove } = useLocationExploration({
     locationId: LOCATION_ID,
     suspended,
@@ -63,6 +62,8 @@ export function DungeonScene() {
     },
     onBlockedTransition: setMessage,
   });
+
+  const { pending, run } = usePendingAction();
 
   useHeartbeat(uid, displayName, LOCATION_ID, position);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
@@ -77,7 +78,7 @@ export function DungeonScene() {
       (o) => o.type === 'interactable' && o.x === target.x && o.y === target.y,
     );
     if (obj?.refId === 'miners-lost-lantern') {
-      callCollectWorldItem(LOCATION_ID, 'miners-lost-lantern')
+      run(callCollectWorldItem(LOCATION_ID, 'miners-lost-lantern'))
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
@@ -100,7 +101,7 @@ export function DungeonScene() {
         setMessage('Something vast and ember-lit stirs in the dark ahead — but the way feels barred to you, for now.');
       }
     } else if (obj?.refId === 'mine-shrine') {
-      callInteractWithShrine(LOCATION_ID, 'mine-shrine')
+      run(callInteractWithShrine(LOCATION_ID, 'mine-shrine'))
         .then(async () => {
           if (uid) await resyncSave(uid);
           setMessage('A shrine carved into the rock, coated in soot. Something in it still resists the corruption around it.');
@@ -108,7 +109,7 @@ export function DungeonScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
     } else if (obj?.refId?.startsWith('chest-')) {
       const chestId = obj.refId;
-      callOpenChest(LOCATION_ID, chestId)
+      run(callOpenChest(LOCATION_ID, chestId))
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           const name =
@@ -134,13 +135,8 @@ export function DungeonScene() {
       if (isTypingTarget(e)) return;
       if (e.key === 'Escape') {
         if (message) setMessage(null);
-        else if (questLogOpen) setQuestLogOpen(false);
         else if (menuOpen) setMenuOpen(false);
         else if (journalOpen) setJournalOpen(false);
-        return;
-      }
-      if (e.key === 'l' || e.key === 'L') {
-        setQuestLogOpen((open) => !open);
         return;
       }
       if (e.key === 'i' || e.key === 'I') {
@@ -157,7 +153,7 @@ export function DungeonScene() {
     window.addEventListener('keydown', handleInteract);
     return () => window.removeEventListener('keydown', handleInteract);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, questLogOpen, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
+  }, [message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
 
   if (!map) {
     return (
@@ -188,6 +184,7 @@ export function DungeonScene() {
   return (
     <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
       <PlayerHUD locationId={LOCATION_ID} />
+      {pending && <div className={styles.pendingIndicator}>...</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
@@ -206,7 +203,6 @@ export function DungeonScene() {
           <MobileHud
             onInteract={attemptInteract}
             onDash={staminaUnlocked ? dash : undefined}
-            onQuestLog={() => setQuestLogOpen((open) => !open)}
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
           />
@@ -215,7 +211,7 @@ export function DungeonScene() {
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
-          &nbsp;·&nbsp; Quest Log: L &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
+          &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
         </p>
       )}
       {message && (
@@ -239,7 +235,6 @@ export function DungeonScene() {
           </Panel>
         </div>
       )}
-      {questLogOpen && <QuestLog onClose={() => setQuestLogOpen(false)} />}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
     </div>
