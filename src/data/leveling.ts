@@ -1,7 +1,12 @@
 // Display copy only — functions/src/data/leveling.ts is authoritative for level-up resolution.
 
-/** XP required to reach each level; index 0 unused, index 1 = level 1 (0 XP). */
-export const XP_THRESHOLDS: number[] = [0, 0, 40, 100, 180, 280, 400, 540, 700, 880, 1080];
+export const MAX_LEVEL = 100;
+
+// xpForLevel(L) = 10*L*(L+1) - 20 for L>=2 - the exact closed form of what used to be a hand-typed
+// array. Index 0 unused, index 1 = level 1 (0 XP).
+export const XP_THRESHOLDS: number[] = Array.from({ length: MAX_LEVEL + 1 }, (_, level) =>
+  level < 2 ? 0 : 10 * level * (level + 1) - 20,
+);
 
 export const STARTING_STATS = {
   hp: 60,

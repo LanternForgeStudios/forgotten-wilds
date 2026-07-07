@@ -72,7 +72,11 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
           playerMaxSpirit: save.player.stats.maxSpirit,
         };
       }
-      throw new HttpsError('failed-precondition', 'You are already in an encounter.');
+      // Anything else with an existing 'active' session is an abandoned fight (the player closed
+      // the tab, refreshed, or navigated away mid-round - nothing ever marks a session resolved
+      // except a full resolveCombatAction call reaching a terminal phase) rather than a deliberate
+      // reroll attempt. Fall through and simply overwrite it with a freshly-rolled encounter, same
+      // as the already-expired-session case below.
     }
   }
 

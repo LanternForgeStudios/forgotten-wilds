@@ -104,7 +104,7 @@ Battle sprite only (these enemies don't appear on the overworld map, only in com
 | `icon.equipment.ash-hallow-token` | 64 | Ash Hallow Token (charm) |
 | `icon.equipment.moonlit-charm` | 64 | Moonlit Charm |
 | `icon.equipment.keepers-lantern` | 64 | Keeper's Lantern (starting lantern) |
-| `icon.equipment.miners-lost-lantern-equipped` | 64 | The Miner's Lantern (equipped relic) |
+| `icon.equipment.miners-lost-lantern-equipped` | 64 | Lantern of Enduring Embers |
 | `icon.equipment.carved-totem` | 64 | Carved Totem (spirit totem) |
 | `icon.currency.gold` | 32 | Gold |
 | `icon.currency.spirit-essence` | 32 | Spirit Essence |

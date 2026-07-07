@@ -23,6 +23,44 @@ export const NPCS: Npc[] = [
       type: 'questGiver',
       questIds: ['a-new-keeper', 'ash-hallow-tour', 'beyond-the-lantern-light', 'the-coalbound-warden', 'the-mountain-remembers'],
     },
+    dialogueVariants: [
+      {
+        questId: 'the-mountain-remembers',
+        lines: [
+          { speaker: 'Elias Rowan', text: "The mountain remembers now. So do I — more than I expected to, and less than I'd like." },
+          { speaker: 'Elias Rowan', text: "The Guardians didn't abandon us. Someone silenced them. That changes everything I thought I understood about the First Promise." },
+          { speaker: 'Elias Rowan', text: "The answers keep pointing south, toward the Bayou. Rest before you go. You've earned that much." },
+        ],
+      },
+      {
+        questId: 'the-coalbound-warden',
+        lines: [
+          { speaker: 'Elias Rowan', text: "Hollow Rail is quiet again. Silas hasn't stopped talking about it since you got back." },
+          { speaker: 'Elias Rowan', text: "There's a memory waiting to be assembled, if the old accounts are right. I think it's time we found out what it holds." },
+        ],
+      },
+      {
+        questId: 'beyond-the-lantern-light',
+        lines: [
+          { speaker: 'Elias Rowan', text: "So you've left Ash Hallow's light behind and come back in one piece. Good. That's the first real test, and you passed it." },
+          { speaker: 'Elias Rowan', text: "Ironwood Trail's troubles run deeper than a few frightened Echoes, I think. Keep your eyes open out there." },
+        ],
+      },
+      {
+        questId: 'ash-hallow-tour',
+        lines: [
+          { speaker: 'Elias Rowan', text: "You've met the whole town now, and the shrine's flame is lit. Ash Hallow trusts you a little more for it." },
+          { speaker: 'Elias Rowan', text: "It won't be long before I send you past the gates. Make the most of the quiet while it lasts." },
+        ],
+      },
+      {
+        questId: 'a-new-keeper',
+        lines: [
+          { speaker: 'Elias Rowan', text: "The vows are taken, the lantern's yours. Feels lighter than you expected, doesn't it? It won't stay that way." },
+          { speaker: 'Elias Rowan', text: "Go learn this town before I ask you to leave it. Ash Hallow's worth knowing." },
+        ],
+      },
+    ],
   },
   {
     id: 'finn-rowan',
@@ -66,6 +104,29 @@ export const NPCS: Npc[] = [
       { speaker: 'Silas Flint', text: "If you're fool enough to go back in, go careful. Listen for the echoes." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['beneath-hollow-rail', 'into-hollow-rail', 'the-shrine-below'] },
+    dialogueVariants: [
+      {
+        questId: 'the-shrine-below',
+        lines: [
+          { speaker: 'Silas Flint', text: "Shrine's lit again, down where I never thought light would sit easy. Mine Heart's open now. That's on you." },
+          { speaker: 'Silas Flint', text: "Whatever's waiting in there, finish it. Forty years of listening to those echoes is enough for one lifetime." },
+        ],
+      },
+      {
+        questId: 'into-hollow-rail',
+        lines: [
+          { speaker: 'Silas Flint', text: "You're in deeper than any Keeper's gone in years. Aldric Vale's supplies, you said? Then it's true. He never left." },
+          { speaker: 'Silas Flint', text: "Find that shrine. If anything down there can still be put right, it's that." },
+        ],
+      },
+      {
+        questId: 'beneath-hollow-rail',
+        lines: [
+          { speaker: 'Silas Flint', text: "You went in. Most don't, once they've heard me talk about it." },
+          { speaker: 'Silas Flint', text: "Upper shafts cleared, you said. Don't let that fool you into thinking the worst of it is behind you." },
+        ],
+      },
+    ],
   },
   {
     id: 'juniper-reed',
@@ -96,6 +157,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Nell Ashby', text: "If you find it — the real lantern, not another campfire story — I want to know everything." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['the-lost-expedition', 'embers-that-never-faded'] },
+    dialogueVariants: [
+      {
+        questId: 'embers-that-never-faded',
+        lines: [
+          { speaker: 'Nell Ashby', text: "You actually found it. The Miner's Lost Lantern, real as anything, and every campfire story wrong in a different way." },
+          { speaker: 'Nell Ashby', text: "I'm rewriting three chapters tonight. Come back when you've got another one nobody believes." },
+        ],
+      },
+      {
+        questId: 'the-lost-expedition',
+        lines: [
+          { speaker: 'Nell Ashby', text: "So the miners' story is real — a Keeper really did stay behind. Aldric Vale. I never once heard that name right." },
+          { speaker: 'Nell Ashby', text: "If his lantern's still down there somewhere, I need it in my collection. Or at least in my notes." },
+        ],
+      },
+    ],
   },
   {
     id: 'aldren-stone',
@@ -148,6 +225,29 @@ export const NPCS: Npc[] = [
       { speaker: 'Historian Miriam', text: "I've got three shelves of that history and no one to read it to but the mice. Ask me anytime." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['the-first-flame', 'fragments-of-the-first-promise', 'the-mountain-remembers'] },
+    dialogueVariants: [
+      {
+        questId: 'the-mountain-remembers',
+        lines: [
+          { speaker: 'Historian Miriam', text: "A Guardian Memory, assembled whole. I've spent my life reading fragments — I never thought I'd see one complete." },
+          { speaker: 'Historian Miriam', text: "The Guardians were silenced, not gone. I'll be corresponding with the Bayou about this for months." },
+        ],
+      },
+      {
+        questId: 'fragments-of-the-first-promise',
+        lines: [
+          { speaker: 'Historian Miriam', text: "The Sigil, whole again. Three fragments, three corners of Ironwood Trail — someone wanted that shrine forgotten." },
+          { speaker: 'Historian Miriam', text: "Guardian Sigils aren't decoration. They're memory made solid. Whatever broke that one didn't do it by accident." },
+        ],
+      },
+      {
+        questId: 'the-first-flame',
+        lines: [
+          { speaker: 'Historian Miriam', text: "You rekindled the Town Shrine yourself? Elias will want to hear every detail." },
+          { speaker: 'Historian Miriam', text: "Shrines remember. That's the whole of what I know for certain, and somehow it's still not enough." },
+        ],
+      },
+    ],
   },
   {
     id: 'hunter-garrick',
@@ -161,6 +261,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Hunter Garrick', text: "Follow the Spirit Tracks if you want answers. I've gone as far as I'm willing to go alone." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['strange-tracks', 'shadows-on-raven-ridge'] },
+    dialogueVariants: [
+      {
+        questId: 'shadows-on-raven-ridge',
+        lines: [
+          { speaker: 'Hunter Garrick', text: "Raven Ridge checks out, more or less — but whatever's stirring, it's coming up from Hollow Rail Mine." },
+          { speaker: 'Hunter Garrick', text: "Tell Elias what you found. I've done my part of the tracking. The mine's Silas's problem now, and yours." },
+        ],
+      },
+      {
+        questId: 'strange-tracks',
+        lines: [
+          { speaker: 'Hunter Garrick', text: "First Echo down and the tracks keep going. Whatever's out there, it's not alone." },
+          { speaker: 'Hunter Garrick', text: "Ranger Caleb knows the Ridge better than I do. Find him if the trail keeps climbing." },
+        ],
+      },
+    ],
   },
   {
     id: 'spirit-child',
@@ -174,6 +290,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Spirit Child', text: "Someone took the Sigil. Without it, the grove cannot remember how to wake." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['the-forgotten-shrine', 'rekindling-spirit-grove'] },
+    dialogueVariants: [
+      {
+        questId: 'rekindling-spirit-grove',
+        lines: [
+          { speaker: 'Spirit Child', text: "The grove remembers its song now. Can you hear it? I couldn't, before you came." },
+          { speaker: 'Spirit Child', text: "The Echoes are quieter here. Not gone — but they're not so afraid anymore either." },
+        ],
+      },
+      {
+        questId: 'the-forgotten-shrine',
+        lines: [
+          { speaker: 'Spirit Child', text: "You found the missing Sigil's trail. Historian Miriam will know more about it than I do." },
+          { speaker: 'Spirit Child', text: "Bring the pieces back to me, when you have them all. The grove has waited long enough." },
+        ],
+      },
+    ],
   },
   {
     id: 'ranger-caleb',

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Panel } from '@/components/common/Panel';
+import { getAssetUrl } from '@/assets/assetManager';
 import { callCreateCharacter } from '@/firebase/functionsClient';
 import { hydrateAllStores } from '@/state/hydrate';
 import { useSceneStore } from '@/state/useSceneStore';
@@ -27,7 +28,7 @@ export function CharacterCreationScene() {
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} style={{ backgroundImage: `url(${getAssetUrl('background.title-screen')})` }}>
       <div>
         <h1 className={styles.title}>Take Up the Lantern</h1>
         <p className={styles.tagline}>Every Keeper needs a name the mountain will remember.</p>
@@ -49,6 +50,7 @@ export function CharacterCreationScene() {
             {busy ? 'Lighting the lantern...' : 'Begin Journey'}
           </button>
         </form>
+        {busy && <p className={styles.info}>Lighting the Light...</p>}
         {error && <p className={styles.error}>{error}</p>}
       </Panel>
     </div>

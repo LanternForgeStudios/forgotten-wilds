@@ -434,8 +434,8 @@ export function CombatScene() {
         <div className={styles.overlay}>
           <Panel style={{ width: 'min(420px, 90vw)', textAlign: 'center' }}>
             <p>{errorMessage}</p>
-            <button className={styles.actionButton} onClick={() => goTo('town')} style={{ marginTop: 12 }}>
-              Return to Ash Hallow
+            <button className={styles.actionButton} onClick={returnToExploration} style={{ marginTop: 12 }}>
+              Return
             </button>
           </Panel>
         </div>

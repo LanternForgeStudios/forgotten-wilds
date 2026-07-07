@@ -30,6 +30,7 @@ import {
 import { resyncSave } from '@/state/hydrate';
 import { ITEMS, EQUIPMENT, LOCATIONS, NPCS } from '@/data';
 import { isTypingTarget } from '@/utils/keyboard';
+import { resolveNpcDialogue } from '@/utils/npcDialogue';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
 
@@ -41,14 +42,10 @@ const VISIT_ONLY_LANDMARKS = new Set(['hunters-camp']);
  *  investigate/restore quests) and a reachLocation event (for discovery quests) on every call, so
  *  the same tile naturally supports "first find it" and "later restore it" as separate quests. */
 const SHRINE_LANDMARKS = new Set(['spirit-grove']);
-/** Landmarks that grant a key item the first time they're visited - maps the interactable's refId
- *  to the item it grants (mirrors collectWorldItem.ts's WORLD_ITEMS server-side, since that
- *  function's response doesn't echo back which item was granted). */
-const FRAGMENT_LANDMARKS: Record<string, string> = {
-  'mossy-creek': 'stone-fragment',
-  'fallen-watchtower': 'wind-fragment',
-  'water-fragment': 'water-fragment',
-};
+/** Landmarks that grant a key item the first time they're visited, routed through
+ *  callCollectWorldItem - purely a client-side dispatch decision (which call to make), not an
+ *  item-identity lookup; the granted item's id comes back in that call's own response. */
+const FRAGMENT_LANDMARKS = new Set(['mossy-creek', 'fallen-watchtower', 'water-fragment']);
 
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
@@ -170,13 +167,12 @@ export function OverworldScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'You cannot linger here.'));
       return;
     }
-    if (obj?.refId && FRAGMENT_LANDMARKS[obj.refId]) {
+    if (obj?.refId && FRAGMENT_LANDMARKS.has(obj.refId)) {
       const refId = obj.refId;
-      const itemId = FRAGMENT_LANDMARKS[refId];
       run(callCollectWorldItem(locationId, refId))
         .then(async (res) => {
           if (uid) await resyncSave(uid);
-          const name = ITEMS.find((i) => i.id === itemId)?.name ?? itemId;
+          const name = ITEMS.find((i) => i.id === res.itemId)?.name ?? res.itemId;
           setMessage(
             res.alreadyCollected
               ? "There's nothing left to find here."
@@ -280,7 +276,7 @@ export function OverworldScene() {
       )}
       {activeNpc && (
         <DialogueBox
-          lines={activeNpc.dialogue}
+          lines={resolveNpcDialogue(activeNpc, questProgress)}
           portraitAssetId={activeNpc.portraitAssetId}
           onClose={() => setActiveNpc(null)}
         />

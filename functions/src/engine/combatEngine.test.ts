@@ -46,9 +46,14 @@ describe('maxEncounterSizeForLevel', () => {
     expect(maxEncounterSizeForLevel(2)).toBe(2);
   });
 
-  it('only reaches the full group size of 6 at the level cap', () => {
+  it('only reaches the full group size of 6 by level 10, well before the overall level cap', () => {
     expect(maxEncounterSizeForLevel(10)).toBe(6);
     expect(maxEncounterSizeForLevel(20)).toBe(6); // never exceeds 6 even past the nominal cap
+  });
+
+  it('stays capped at 6 all the way to the level cap of 100 - group size and per-enemy toughness ' +
+    'are independent knobs; enemy stats (see scaledEnemyStats) keep scaling well past level 10', () => {
+    expect(maxEncounterSizeForLevel(100)).toBe(6);
   });
 
   it('scales monotonically with level', () => {
@@ -89,12 +94,23 @@ describe('rollEnemyLevel', () => {
     }
   });
 
-  it('stays within 1-5 for regular/elite enemies across a range of player levels', () => {
+  it('stays within 1-50 for regular/elite enemies across a range of player levels', () => {
     const mothling = ENEMIES.mothling;
     for (let i = 0; i < 30; i++) {
       const level = rollEnemyLevel(8, mothling);
       expect(level).toBeGreaterThanOrEqual(1);
       expect(level).toBeLessThanOrEqual(5);
+    }
+  });
+
+  it('keeps climbing at high player levels instead of flatlining at the old level-5 cap', () => {
+    const mothling = ENEMIES.mothling;
+    for (let i = 0; i < 30; i++) {
+      const level = rollEnemyLevel(100, mothling);
+      expect(level).toBeGreaterThanOrEqual(1);
+      expect(level).toBeLessThanOrEqual(50);
+      // Should be rolling around baseLevel = round(100/2) = 50, not stuck at the old cap of 5.
+      expect(level).toBeGreaterThan(5);
     }
   });
 });
@@ -518,6 +534,58 @@ describe('resolveRound', () => {
       expect(result.damageTakenByPlayer).toBe(999 - result.playerHp);
       expect(result.damageTakenByPlayer).toBeGreaterThan(0);
     });
+  });
+
+  describe('enemy scaling stays a fair fight across the level cap (1-100)', () => {
+    // Verified by hand against computeDamage/scaledEnemyStats at each checkpoint: player stats
+    // built the same way applyLevelUp would (STARTING_STATS + STAT_GROWTH_PER_LEVEL*(level-1)),
+    // enemy stats at the level rollEnemyLevel would roll (baseLevel = round(playerLevel/2)).
+    // variance=1.0 (mocked) removes the +/-10% roll so the expected damage is exact, not a range.
+    const CHECKPOINTS = [
+      { playerLevel: 1, enemyLevel: 1, dmgToEnemy: 13, dmgToPlayer: 11 },
+      { playerLevel: 10, enemyLevel: 5, dmgToEnemy: 18, dmgToPlayer: 15 },
+      { playerLevel: 25, enemyLevel: 13, dmgToEnemy: 25, dmgToPlayer: 23 },
+      { playerLevel: 50, enemyLevel: 25, dmgToEnemy: 38, dmgToPlayer: 35 },
+      { playerLevel: 75, enemyLevel: 38, dmgToEnemy: 50, dmgToPlayer: 48 },
+      { playerLevel: 100, enemyLevel: 50, dmgToEnemy: 63, dmgToPlayer: 60 },
+    ];
+
+    it.each(CHECKPOINTS)(
+      'player level $playerLevel vs enemy level $enemyLevel: neither one-shots nor stalls',
+      ({ playerLevel, enemyLevel, dmgToEnemy, dmgToPlayer }) => {
+        vi.spyOn(Math, 'random').mockReturnValue(0.5);
+        const playerStats = stats({
+          hp: 999,
+          maxHp: 999, // isolate this round's damage from the player's own real maxHp
+          attack: 8 + 2 * (playerLevel - 1),
+          defense: 5 + (playerLevel - 1),
+          speed: 999, // player acts first so the enemy's own hit this round is easy to isolate
+        });
+        const result = resolveRound({
+          action: { type: 'attack' },
+          playerStats,
+          inventory: [],
+          enemies: [{ enemyId: mothling.id, level: enemyLevel, hp: 999999 }], // isolate from enemy maxHp too
+        });
+        vi.restoreAllMocks();
+
+        const actualDmgToEnemy = 999999 - result.enemyHp[0];
+        const actualDmgToPlayer = 999 - result.playerHp;
+        expect(actualDmgToEnemy).toBe(dmgToEnemy);
+        expect(actualDmgToPlayer).toBe(dmgToPlayer);
+
+        // No one-shots, no unwinnable grind, at any checkpoint including the level cap.
+        // 16/8 mirror ENEMY_STAT_GROWTH_PER_LEVEL.maxHp / STAT_GROWTH_PER_LEVEL.maxHp.
+        const enemyMaxHp = mothling.stats.maxHp + 16 * (enemyLevel - 1);
+        const playerMaxHp = 60 + 8 * (playerLevel - 1);
+        const hitsToKillEnemy = Math.ceil(enemyMaxHp / actualDmgToEnemy);
+        const hitsToKillPlayer = Math.ceil(playerMaxHp / actualDmgToPlayer);
+        expect(hitsToKillEnemy).toBeGreaterThanOrEqual(2);
+        expect(hitsToKillEnemy).toBeLessThanOrEqual(20);
+        expect(hitsToKillPlayer).toBeGreaterThanOrEqual(2);
+        expect(hitsToKillPlayer).toBeLessThanOrEqual(20);
+      },
+    );
   });
 });
 

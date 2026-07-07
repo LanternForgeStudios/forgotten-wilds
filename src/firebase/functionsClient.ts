@@ -63,10 +63,10 @@ export async function callVisitLandmark(
 export async function callCollectWorldItem(
   locationId: string,
   refId: string,
-): Promise<{ alreadyCollected: boolean; questsCompleted: string[] }> {
+): Promise<{ alreadyCollected: boolean; questsCompleted: string[]; itemId: string }> {
   const fn = httpsCallable<
     { locationId: string; refId: string },
-    { alreadyCollected: boolean; questsCompleted: string[] }
+    { alreadyCollected: boolean; questsCompleted: string[]; itemId: string }
   >(functions, 'collectWorldItem');
   const result = await fn({ locationId, refId });
   return result.data;

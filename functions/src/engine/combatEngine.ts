@@ -46,26 +46,37 @@ export function rollEncounterGroup(locationId: string, playerLevel: number): Ene
 }
 
 export const MIN_ENEMY_LEVEL = 1;
-export const MAX_ENEMY_LEVEL = 5;
+// Half the player level cap (MAX_LEVEL in data/leveling.ts) - baseLevel below is player level/2,
+// so this lets enemy level keep climbing all the way to a level-100 player instead of flatlining
+// once the player passes level ~10 (this used to be 5, which - combined with every location being
+// quest-gated rather than level-gated, so a player can grind indefinitely in an already-unlocked
+// region - meant every enemy everywhere permanently stopped scaling early while the player's own
+// stats kept climbing without bound).
+export const MAX_ENEMY_LEVEL = 50;
 /** Bosses never roll a level - this is the fixed value used purely so the same scaling math
  *  path can run for every enemy without a boss-shaped special case. */
 export const BOSS_LEVEL = 1;
 
-function levelMultiplier(level: number): number {
-  return 1 + (level - 1) * 0.15;
-}
+/** Per-enemy-level stat growth, additive like the player's own STAT_GROWTH_PER_LEVEL - 2x the
+ *  player's rate, because enemy level advances at half the player's rate (baseLevel below), so
+ *  over the full 1-100 player range that's 99 player level-ups against only 49 enemy level-ups,
+ *  a ratio of ~2.02 that this constant reproduces cleanly. Replaces the old multiplicative
+ *  `levelMultiplier` (1 + (level-1)*0.15), which topped out at a shallow 1.6x at the old level-5
+ *  cap - far too weak to keep pace with a player whose own stats grow additively to level 100. */
+const ENEMY_STAT_GROWTH_PER_LEVEL = { maxHp: 16, attack: 4, defense: 2, speed: 2 };
 
-/** Regular/Elite encounters roll a level (1-5) that scales stats and rewards up - factors the
- *  player's own level (so encounters roughly track how far they've progressed) and the enemy's
- *  innate potency (an already-hard-hitting enemy gets a slightly lower level ceiling, so overall
- *  threat stays balanced across the roster rather than compounding on top of an already-strong
- *  base). Bosses always return BOSS_LEVEL - their difficulty is exactly what's hand-authored. */
+/** Reward scaling has its own slope - it doesn't need to move at the same rate as stat scaling. */
+const REWARD_GROWTH_PER_LEVEL = 0.5;
+
+/** Regular/Elite encounters roll a level (1-50) that scales stats and rewards up, tracking the
+ *  player's own level so encounters stay a fair fight from level 1 through level 100 (see
+ *  ENEMY_STAT_GROWTH_PER_LEVEL). Bosses always return BOSS_LEVEL - their difficulty is exactly
+ *  what's hand-authored. */
 export function rollEnemyLevel(playerLevel: number, enemy: EnemyDefinition): number {
   if (enemy.tier === 'boss') return BOSS_LEVEL;
   const baseLevel = Math.max(MIN_ENEMY_LEVEL, Math.round(playerLevel / 2));
-  const potencyDamper = enemy.stats.attack >= 10 ? 1 : 0;
   const jitter = Math.floor(Math.random() * 3) - 1; // -1, 0, or +1
-  return Math.min(MAX_ENEMY_LEVEL, Math.max(MIN_ENEMY_LEVEL, baseLevel + jitter - potencyDamper));
+  return Math.min(MAX_ENEMY_LEVEL, Math.max(MIN_ENEMY_LEVEL, baseLevel + jitter));
 }
 
 export interface ScaledEnemyStats {
@@ -75,22 +86,25 @@ export interface ScaledEnemyStats {
   speed: number;
 }
 
-/** The enemy's real in-combat stats - its authored base stats multiplied by its rolled level.
- *  Level 1 is exactly the authored base; level 5 is 60% stronger across the board. */
+/** The enemy's real in-combat stats - its authored base stats plus additive per-level growth,
+ *  structurally parallel to how the player's own stats grow (see ENEMY_STAT_GROWTH_PER_LEVEL).
+ *  Level 1 is exactly the authored base. Elites and regulars roll from the same level
+ *  distribution, so an elite's authored base-stat edge persists as a real (if proportionally
+ *  shrinking) advantage at every level rather than being cancelled out by a level penalty. */
 export function scaledEnemyStats(enemy: EnemyDefinition, level: number): ScaledEnemyStats {
-  const m = levelMultiplier(level);
+  const levelsAboveOne = level - 1;
   return {
-    maxHp: Math.round(enemy.stats.maxHp * m),
-    attack: Math.round(enemy.stats.attack * m),
-    defense: Math.round(enemy.stats.defense * m),
-    speed: Math.round(enemy.stats.speed * m),
+    maxHp: enemy.stats.maxHp + ENEMY_STAT_GROWTH_PER_LEVEL.maxHp * levelsAboveOne,
+    attack: enemy.stats.attack + ENEMY_STAT_GROWTH_PER_LEVEL.attack * levelsAboveOne,
+    defense: enemy.stats.defense + ENEMY_STAT_GROWTH_PER_LEVEL.defense * levelsAboveOne,
+    speed: enemy.stats.speed + ENEMY_STAT_GROWTH_PER_LEVEL.speed * levelsAboveOne,
   };
 }
 
-/** xp/gold scale the same way stats do, so a higher-level roll of the same enemy is worth
- *  proportionally more to defeat. */
+/** xp/gold scale the same way (a higher-level roll of the same enemy is worth proportionally more
+ *  to defeat), on their own slope independent of how stats scale. */
 export function scaledEnemyRewards(enemy: EnemyDefinition, level: number): { xp: number; gold: number } {
-  const m = levelMultiplier(level);
+  const m = 1 + (level - 1) * REWARD_GROWTH_PER_LEVEL;
   return { xp: Math.round(enemy.xpReward * m), gold: Math.round(enemy.goldReward * m) };
 }
 
@@ -117,7 +131,7 @@ function pickEnemyMove(enemy: EnemyDefinition, hpFraction: number) {
 
 export interface RoundEnemyInput {
   enemyId: string;
-  /** 1-5 for Regular/Elite, always BOSS_LEVEL for a boss - see rollEnemyLevel. */
+  /** 1-50 for Regular/Elite, always BOSS_LEVEL for a boss - see rollEnemyLevel. */
   level: number;
   hp: number;
 }

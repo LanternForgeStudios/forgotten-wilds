@@ -119,7 +119,7 @@ export type CombatSessionStatus = 'active' | 'resolved';
 
 export interface CombatEnemyState {
   enemyId: string;
-  /** 1-5 for a Regular/Elite roll, fixed at BOSS_LEVEL for a boss - see rollEnemyLevel. */
+  /** 1-50 for a Regular/Elite roll, fixed at BOSS_LEVEL for a boss - see rollEnemyLevel. */
   level: number;
   hp: number;
   maxHp: number;

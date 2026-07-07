@@ -19,6 +19,7 @@ import { useDash } from '@/hooks/useDash';
 import { useDashKeybind } from '@/hooks/useDashKeybind';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
+import { useQuestStore } from '@/state/useQuestStore';
 import { useSceneStore } from '@/state/useSceneStore';
 import { callTalkToNpc, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
@@ -26,6 +27,7 @@ import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS } from '@/data';
 import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
+import { resolveNpcDialogue } from '@/utils/npcDialogue';
 import styles from './TownScene.module.css';
 
 const PRESENCE_STALE_AFTER_MS = 60_000;
@@ -62,6 +64,7 @@ export function TownScene() {
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
+  const questProgress = useQuestStore((s) => s.progress);
   const isMobile = useIsMobile();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
@@ -232,7 +235,7 @@ export function TownScene() {
       )}
       {activeNpc && (
         <DialogueBox
-          lines={activeNpc.dialogue}
+          lines={resolveNpcDialogue(activeNpc, questProgress)}
           portraitAssetId={activeNpc.portraitAssetId}
           onClose={handleDialogueClose}
         />

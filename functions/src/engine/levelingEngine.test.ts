@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyLevelUp } from './levelingEngine';
+import { levelForXp } from '../data/leveling';
 import type { PlayerSave } from '../shared-types';
 
 function saveAtLevel(level: number, xp: number): PlayerSave {
@@ -77,5 +78,27 @@ describe('applyLevelUp', () => {
     save.player.stats.stamina = 40;
     applyLevelUp(save);
     expect(save.player.stats.maxStamina).toBeGreaterThan(40);
+  });
+
+  it('reaches level 50 (checkpoint for the level-100 cap) with the expected stat totals', () => {
+    // xpForLevel(50) = 10*50*51 - 20 = 25480
+    const save = saveAtLevel(1, 25480);
+    applyLevelUp(save);
+    expect(save.player.level).toBe(50);
+    expect(save.player.stats.maxHp).toBe(452);
+    expect(save.player.stats.attack).toBe(106);
+    expect(save.player.stats.defense).toBe(54);
+    expect(save.player.stats.speed).toBe(55);
+  });
+});
+
+describe('levelForXp at the level-100 cap', () => {
+  it('reaches exactly level 100 at the xp threshold, and one xp below is still level 99', () => {
+    expect(levelForXp(100980)).toBe(100);
+    expect(levelForXp(100979)).toBe(99);
+  });
+
+  it('never exceeds the level cap no matter how much xp is granted', () => {
+    expect(levelForXp(999999999)).toBe(100);
   });
 });

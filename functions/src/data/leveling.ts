@@ -1,6 +1,14 @@
 // Authoritative — the client's src/data/leveling.ts is a display copy only.
 
-export const XP_THRESHOLDS: number[] = [0, 0, 40, 100, 180, 280, 400, 540, 700, 880, 1080];
+export const MAX_LEVEL = 100;
+
+// xpForLevel(L) = 10*L*(L+1) - 20 for L>=2 - the exact closed form of what used to be a hand-typed
+// array (verified against every prior hardcoded entry: L=2->40, L=5->280, L=10->1080, all exact),
+// generated instead of transcribed so there's one source of truth instead of a 101-entry list
+// someone has to hand-type correctly. Index 0 unused, index 1 = level 1 (0 XP).
+export const XP_THRESHOLDS: number[] = Array.from({ length: MAX_LEVEL + 1 }, (_, level) =>
+  level < 2 ? 0 : 10 * level * (level + 1) - 20,
+);
 
 // Reflects a fresh character with the default starting equipment already on (the keepers-lantern
 // equipped by createCharacter.ts) - maxSpirit/maxLanternOil here already include its bonuses,

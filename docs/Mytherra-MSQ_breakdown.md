@@ -843,8 +843,7 @@ Boss
 Coalbound Warden
 
 Rewards
-Mountain Guardian Totem
-Rare Equipment
+Mountain Guardian Totem (implemented as Legendary tier - the first Legendary Spirit Totem)
 XP
 World Flags
 coalbound_warden_resolved

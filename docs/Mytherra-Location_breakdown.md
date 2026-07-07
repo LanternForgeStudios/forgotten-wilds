@@ -33,29 +33,34 @@ Ash Hallow
 
 The first Lantern Keeper settlement.
 
-Contains:
+Contains (implemented names, as shipped):
 
-Lantern Keeper Hall
-Inn
-General Store
-Blacksmith
-Armory
-Apothecary
-Mayor's House
-Historian's Cabin
-Mine Office
-Player Housing District (future)
-Town Square
-Lantern Shrine
-Interior Maps
-Inn
-Blacksmith
-General Store
-Armory
-Lantern Hall
-Mayor's House
-Historian Cabin
-Mine Office
+Elias Rowan's House (was "Lantern Keeper Hall" in the original brief)
+The Ash Hallow Inn (Juniper Reed, innkeeper)
+Mara Ash's General Store
+The Ash Hallow Forge (was "Blacksmith" - Aldren Stone, blacksmith)
+The Ash Hallow Armory (Tessa Ironhand, armorer)
+Willow's Apothecary (was "Apothecary")
+Ash Hallow Town Hall (was "Mayor's House" - Mayor Eleanor Ashcroft)
+The Ash Hallow Archive (was "Historian's Cabin" - Historian Miriam)
+The Mine Office (Silas Flint, foreman)
+Town Shrine (implemented as an interactable within the main Ash Hallow map itself, not a
+  separate location/map - was "Lantern Shrine" in the original brief)
+Player Housing District (future) - not yet implemented, kept for later side-quest content
+Town Square - not yet implemented as its own location, kept for later side-quest content
+
+Other Ash Hallow NPCs not yet tied to a shop/quest hook above: Finn Rowan (Elias's nephew, lore)
+and Nell Ashby (folklore collector, side-quest giver for the-lost-expedition/embers-that-never-faded).
+
+Interior Maps (implemented names)
+The Ash Hallow Inn
+The Ash Hallow Forge
+Mara Ash's General Store
+The Ash Hallow Armory
+Elias Rowan's House
+Ash Hallow Town Hall
+The Ash Hallow Archive
+The Mine Office
 Overworld Areas
 Ironwood Trail
 

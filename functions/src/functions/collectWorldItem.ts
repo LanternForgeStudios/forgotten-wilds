@@ -61,6 +61,6 @@ export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) 
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
-    return { alreadyCollected: alreadyHave, questsCompleted: completions.map((c) => c.questId) };
+    return { alreadyCollected: alreadyHave, questsCompleted: completions.map((c) => c.questId), itemId };
   });
 });
