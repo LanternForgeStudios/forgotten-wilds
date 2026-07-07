@@ -13,9 +13,9 @@ export interface LootDrop {
   maxQuantity: number;
 }
 
-/** The 3 tiers a fight can be at - Regular and Elite enemies additionally roll a 1-5 level that
- *  scales their stats/rewards up (see rollEnemyLevel in combatEngine.ts); Boss tier never rolls a
- *  level, its difficulty is exactly what's authored here. */
+/** The 3 tiers a fight can be at - every enemy rolls a 1-50 level that scales its stats/rewards up
+ *  (see rollEnemyLevel/scaledEnemyStats in combatEngine.ts). Boss tier grows at a steeper rate
+ *  (BOSS_STAT_GROWTH_PER_LEVEL) than Regular/Elite, so its authored stat lead stays meaningful. */
 export type EnemyTier = 'regular' | 'elite' | 'boss';
 
 export interface EnemyDefinition {
@@ -253,4 +253,13 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
     { enemyId: 'briar-wraith', weight: 3 },
     { enemyId: 'cemetery-shade', weight: 1 },
   ],
+};
+
+/** Which locations a boss's optional "adds" (0-3 additional enemies that can join the fight) may
+ *  be drawn from - the boss's own region. Includes the boss's own home location, since its own
+ *  trash mobs are a legitimate add source too. Bosses must never appear in ENCOUNTER_TABLES
+ *  themselves (adds are drawn from those tables, and a boss showing up as an "add" would be a
+ *  content-authoring bug), so no filtering for that case is needed here. */
+export const BOSS_REGION_LOCATIONS: Record<string, string[]> = {
+  'coalbound-warden': ['ironwood-trail', 'raven-ridge', 'whisper-falls', 'black-briar-forest', 'hollow-rail-mine'],
 };

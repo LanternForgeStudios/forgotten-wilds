@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { rollEncounterGroup, rollEnemyLevel, scaledEnemyStats, BOSS_LEVEL } from '../engine/combatEngine';
+import { rollEncounterGroup, rollBossEncounter, rollEnemyLevel, scaledEnemyStats } from '../engine/combatEngine';
 import { ENEMIES } from '../data/enemies';
 import { effectiveStatus } from '../engine/questEngine';
 import type { CombatSession, PlayerSave } from '../shared-types';
@@ -87,8 +87,8 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
     if (!ENEMIES[bossId]?.isBoss || !questsDone) {
       throw new HttpsError('failed-precondition', 'That boss cannot be challenged yet.');
     }
-    // Bosses are always a single scripted fight, never grouped with trash mobs.
-    enemies = [ENEMIES[bossId]];
+    // The boss itself plus 0-3 additional enemies drawn from its region - see rollBossEncounter.
+    enemies = rollBossEncounter(bossId);
   } else {
     try {
       enemies = rollEncounterGroup(locationId, save.player.level);
@@ -97,9 +97,7 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
     }
   }
 
-  const rolledLevels = bossId
-    ? [BOSS_LEVEL]
-    : enemies.map((e) => rollEnemyLevel(save.player.level, e));
+  const rolledLevels = enemies.map(() => rollEnemyLevel(save.player.level));
   const rolledStats = enemies.map((e, i) => scaledEnemyStats(e, rolledLevels[i]));
 
   const now = Date.now();

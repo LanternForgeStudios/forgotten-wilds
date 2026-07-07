@@ -118,7 +118,14 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     let rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean } | null = null;
 
     if (result.phase === 'victory') {
-      const defeated = session.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level }));
+      // A boss already in save.journal.bossesDefeated (before the journal-update loop below
+      // mutates it) is being refought - its own lootTable roll is skipped so a repeat kill pays
+      // out like a regular fight (xp/gold still awarded normally, see computeRewards).
+      const defeated = session.enemies.map((e) => ({
+        enemyId: e.enemyId,
+        level: e.level,
+        skipLoot: !!ENEMIES[e.enemyId]?.isBoss && save.journal.bossesDefeated.includes(e.enemyId),
+      }));
       const enemyIds = defeated.map((e) => e.enemyId);
       const levelBefore = save.player.level;
       const reward = computeRewards(defeated, save.player.xp, save.player.level);

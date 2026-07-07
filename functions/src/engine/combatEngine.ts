@@ -1,4 +1,4 @@
-import { ENCOUNTER_TABLES, ENEMIES, type EnemyDefinition } from '../data/enemies';
+import { BOSS_REGION_LOCATIONS, ENCOUNTER_TABLES, ENEMIES, type EnemyDefinition } from '../data/enemies';
 import { SKILLS } from '../data/skills';
 import { ITEMS } from '../data/items';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
@@ -45,6 +45,42 @@ export function rollEncounterGroup(locationId: string, playerLevel: number): Ene
   return enemies;
 }
 
+/** Weighted toward fewer adds so a mostly-solo boss stays the common case: 40% zero adds, 30% one,
+ *  20% two, 10% three. Deliberately not tied to player level (unlike maxEncounterSizeForLevel,
+ *  which sizes ambient wandering encounters) - a boss's entourage is a fixed range regardless of
+ *  how strong the player has become. */
+const ADD_COUNT_WEIGHTS = [40, 30, 20, 10];
+
+function rollAddCount(): number {
+  const totalWeight = ADD_COUNT_WEIGHTS.reduce((sum, w) => sum + w, 0);
+  let roll = Math.random() * totalWeight;
+  for (let count = 0; count < ADD_COUNT_WEIGHTS.length; count++) {
+    roll -= ADD_COUNT_WEIGHTS[count];
+    if (roll <= 0) return count;
+  }
+  return 0;
+}
+
+/** Rolls a boss fight's full roster: 0-3 additional enemies ("adds"), each independently drawn
+ *  from a random location within the boss's own region (BOSS_REGION_LOCATIONS) via the exact same
+ *  rollEnemyForLocation path a normal wandering encounter uses, followed by the boss itself.
+ *  Adds are returned FIRST, boss LAST - not just cosmetic: the client defaults the initial/
+ *  death-reassigned target to the first array entry, so this ordering makes an add the default
+ *  target for free, only falling through to the boss once every add is dead. */
+export function rollBossEncounter(bossId: string): EnemyDefinition[] {
+  const regionLocationIds = BOSS_REGION_LOCATIONS[bossId];
+  if (!regionLocationIds || regionLocationIds.length === 0) {
+    throw new Error(`No region locations configured for boss "${bossId}".`);
+  }
+  const addCount = rollAddCount();
+  const adds: EnemyDefinition[] = [];
+  for (let i = 0; i < addCount; i++) {
+    const locationId = regionLocationIds[Math.floor(Math.random() * regionLocationIds.length)];
+    adds.push(rollEnemyForLocation(locationId));
+  }
+  return [...adds, ENEMIES[bossId]];
+}
+
 export const MIN_ENEMY_LEVEL = 1;
 // Half the player level cap (MAX_LEVEL in data/leveling.ts) - baseLevel below is player level/2,
 // so this lets enemy level keep climbing all the way to a level-100 player instead of flatlining
@@ -53,9 +89,6 @@ export const MIN_ENEMY_LEVEL = 1;
 // region - meant every enemy everywhere permanently stopped scaling early while the player's own
 // stats kept climbing without bound).
 export const MAX_ENEMY_LEVEL = 50;
-/** Bosses never roll a level - this is the fixed value used purely so the same scaling math
- *  path can run for every enemy without a boss-shaped special case. */
-export const BOSS_LEVEL = 1;
 
 /** Per-enemy-level stat growth, additive like the player's own STAT_GROWTH_PER_LEVEL - 2x the
  *  player's rate, because enemy level advances at half the player's rate (baseLevel below), so
@@ -65,15 +98,31 @@ export const BOSS_LEVEL = 1;
  *  cap - far too weak to keep pace with a player whose own stats grow additively to level 100. */
 const ENEMY_STAT_GROWTH_PER_LEVEL = { maxHp: 16, attack: 4, defense: 2, speed: 2 };
 
-/** Reward scaling has its own slope - it doesn't need to move at the same rate as stat scaling. */
+/** Bosses grow 3x as fast per level as regular/elite enemies. Applying the same rate to both
+ *  (verified numerically) collapses a boss's authored stat lead (e.g. the Coalbound Warden's
+ *  ~4.1x maxHp lead over a trash mob) down to a barely-there ~1.1x by level 100 - it stops
+ *  feeling like a boss. This keeps a boss at a stable ~2.8-3.1x advantage across the whole
+ *  1-100 player range instead. */
+const BOSS_STAT_GROWTH_MULTIPLIER = 3;
+const BOSS_STAT_GROWTH_PER_LEVEL = {
+  maxHp: ENEMY_STAT_GROWTH_PER_LEVEL.maxHp * BOSS_STAT_GROWTH_MULTIPLIER,
+  attack: ENEMY_STAT_GROWTH_PER_LEVEL.attack * BOSS_STAT_GROWTH_MULTIPLIER,
+  defense: ENEMY_STAT_GROWTH_PER_LEVEL.defense * BOSS_STAT_GROWTH_MULTIPLIER,
+  speed: ENEMY_STAT_GROWTH_PER_LEVEL.speed * BOSS_STAT_GROWTH_MULTIPLIER,
+};
+
+/** Reward scaling has its own slope - it doesn't need to move at the same rate as stat scaling.
+ *  Multiplicative, so it preserves the boss/trash reward ratio exactly at every level - only
+ *  additive stat scaling needed a boss-specific rate (see BOSS_STAT_GROWTH_PER_LEVEL). */
 const REWARD_GROWTH_PER_LEVEL = 0.5;
 
-/** Regular/Elite encounters roll a level (1-50) that scales stats and rewards up, tracking the
- *  player's own level so encounters stay a fair fight from level 1 through level 100 (see
- *  ENEMY_STAT_GROWTH_PER_LEVEL). Bosses always return BOSS_LEVEL - their difficulty is exactly
- *  what's hand-authored. */
-export function rollEnemyLevel(playerLevel: number, enemy: EnemyDefinition): number {
-  if (enemy.tier === 'boss') return BOSS_LEVEL;
+/** Every enemy (including bosses) rolls a level (1-50) that scales stats and rewards up, tracking
+ *  the player's own level so encounters stay a fair fight from level 1 through level 100 (see
+ *  ENEMY_STAT_GROWTH_PER_LEVEL / BOSS_STAT_GROWTH_PER_LEVEL, which is where boss vs. regular/elite
+ *  differentiation now happens - this roll itself no longer depends on which enemy it's for).
+ *  Bosses used to always return a fixed level 1 - a boss's difficulty now comes from its much
+ *  higher authored base stats plus its own steeper growth rate, not from skipping scaling entirely. */
+export function rollEnemyLevel(playerLevel: number): number {
   const baseLevel = Math.max(MIN_ENEMY_LEVEL, Math.round(playerLevel / 2));
   const jitter = Math.floor(Math.random() * 3) - 1; // -1, 0, or +1
   return Math.min(MAX_ENEMY_LEVEL, Math.max(MIN_ENEMY_LEVEL, baseLevel + jitter));
@@ -87,17 +136,19 @@ export interface ScaledEnemyStats {
 }
 
 /** The enemy's real in-combat stats - its authored base stats plus additive per-level growth,
- *  structurally parallel to how the player's own stats grow (see ENEMY_STAT_GROWTH_PER_LEVEL).
- *  Level 1 is exactly the authored base. Elites and regulars roll from the same level
- *  distribution, so an elite's authored base-stat edge persists as a real (if proportionally
- *  shrinking) advantage at every level rather than being cancelled out by a level penalty. */
+ *  structurally parallel to how the player's own stats grow. Level 1 is exactly the authored
+ *  base. Elites and regulars (and now bosses) roll from the same level distribution, so an
+ *  elite's or boss's authored base-stat edge persists as a real (if proportionally shrinking)
+ *  advantage at every level rather than being cancelled out by a level penalty - bosses use their
+ *  own steeper growth rate (BOSS_STAT_GROWTH_PER_LEVEL) so that edge stays meaningful at endgame. */
 export function scaledEnemyStats(enemy: EnemyDefinition, level: number): ScaledEnemyStats {
   const levelsAboveOne = level - 1;
+  const growth = enemy.tier === 'boss' ? BOSS_STAT_GROWTH_PER_LEVEL : ENEMY_STAT_GROWTH_PER_LEVEL;
   return {
-    maxHp: enemy.stats.maxHp + ENEMY_STAT_GROWTH_PER_LEVEL.maxHp * levelsAboveOne,
-    attack: enemy.stats.attack + ENEMY_STAT_GROWTH_PER_LEVEL.attack * levelsAboveOne,
-    defense: enemy.stats.defense + ENEMY_STAT_GROWTH_PER_LEVEL.defense * levelsAboveOne,
-    speed: enemy.stats.speed + ENEMY_STAT_GROWTH_PER_LEVEL.speed * levelsAboveOne,
+    maxHp: enemy.stats.maxHp + growth.maxHp * levelsAboveOne,
+    attack: enemy.stats.attack + growth.attack * levelsAboveOne,
+    defense: enemy.stats.defense + growth.defense * levelsAboveOne,
+    speed: enemy.stats.speed + growth.speed * levelsAboveOne,
   };
 }
 
@@ -131,7 +182,7 @@ function pickEnemyMove(enemy: EnemyDefinition, hpFraction: number) {
 
 export interface RoundEnemyInput {
   enemyId: string;
-  /** 1-50 for Regular/Elite, always BOSS_LEVEL for a boss - see rollEnemyLevel. */
+  /** 1-50 for every enemy, including bosses - see rollEnemyLevel. */
   level: number;
   hp: number;
 }
@@ -421,6 +472,12 @@ export interface RewardResult {
 export interface DefeatedEnemy {
   enemyId: string;
   level: number;
+  /** True to skip this enemy's lootTable roll entirely - used for a boss already defeated before
+   *  this fight (being refought): xp/gold still pay out normally, but its guaranteed/special item
+   *  drops don't repeat. Explicit rather than relying on those items happening to be marked
+   *  `unique: true` (which stops a *duplicate* grant, but doesn't stop the roll/log from firing,
+   *  and wouldn't protect a future boss drop that isn't marked unique). */
+  skipLoot?: boolean;
 }
 
 /** Sums xp/gold/loot across every enemy defeated in the fight (called once, at full-clear
@@ -430,11 +487,12 @@ export function computeRewards(defeated: DefeatedEnemy[], currentXp: number, cur
   let totalXp = 0;
   let totalGold = 0;
 
-  for (const { enemyId, level } of defeated) {
+  for (const { enemyId, level, skipLoot } of defeated) {
     const enemy = ENEMIES[enemyId];
     const reward = scaledEnemyRewards(enemy, level);
     totalXp += reward.xp;
     totalGold += reward.gold;
+    if (skipLoot) continue;
     for (const drop of enemy.lootTable) {
       if (Math.random() < drop.chance) {
         const qty = drop.minQuantity + Math.floor(Math.random() * (drop.maxQuantity - drop.minQuantity + 1));

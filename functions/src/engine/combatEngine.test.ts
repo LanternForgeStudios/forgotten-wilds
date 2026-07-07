@@ -4,10 +4,12 @@ import {
   resolveRound,
   rollEnemyForLocation,
   rollEncounterGroup,
+  rollBossEncounter,
   rollEnemyLevel,
   maxEncounterSizeForLevel,
   aggregateItemCounts,
   hasSufficientQuantity,
+  scaledEnemyStats,
 } from './combatEngine';
 import { ENEMIES } from '../data/enemies';
 import type { Stats } from '../shared-types';
@@ -87,31 +89,78 @@ describe('rollEncounterGroup', () => {
 });
 
 describe('rollEnemyLevel', () => {
-  it('always returns the fixed boss level for a boss, regardless of player level', () => {
-    const boss = ENEMIES['coalbound-warden'];
-    for (const playerLevel of [1, 5, 10]) {
-      expect(rollEnemyLevel(playerLevel, boss)).toBe(1);
-    }
-  });
+  // rollEnemyLevel itself no longer distinguishes bosses from regular/elite enemies - every enemy
+  // (including bosses) rolls from the identical range below. Boss vs. regular/elite
+  // differentiation now happens entirely in scaledEnemyStats (see that describe block), via a
+  // steeper boss-specific growth rate applied on top of whatever level this function rolls.
 
   it('stays within 1-50 for regular/elite enemies across a range of player levels', () => {
-    const mothling = ENEMIES.mothling;
     for (let i = 0; i < 30; i++) {
-      const level = rollEnemyLevel(8, mothling);
+      const level = rollEnemyLevel(8);
       expect(level).toBeGreaterThanOrEqual(1);
       expect(level).toBeLessThanOrEqual(5);
     }
   });
 
   it('keeps climbing at high player levels instead of flatlining at the old level-5 cap', () => {
-    const mothling = ENEMIES.mothling;
     for (let i = 0; i < 30; i++) {
-      const level = rollEnemyLevel(100, mothling);
+      const level = rollEnemyLevel(100);
       expect(level).toBeGreaterThanOrEqual(1);
       expect(level).toBeLessThanOrEqual(50);
       // Should be rolling around baseLevel = round(100/2) = 50, not stuck at the old cap of 5.
       expect(level).toBeGreaterThan(5);
     }
+  });
+});
+
+describe('scaledEnemyStats', () => {
+  it('returns exactly the authored base stats at level 1, for both regular and boss tiers', () => {
+    const mothling = ENEMIES.mothling;
+    const boss = ENEMIES['coalbound-warden'];
+    expect(scaledEnemyStats(mothling, 1)).toEqual(mothling.stats);
+    expect(scaledEnemyStats(boss, 1)).toEqual(boss.stats);
+  });
+
+  it('grows a boss 3x as fast per level as a regular/elite enemy, so its authored lead persists', () => {
+    const mothling = ENEMIES.mothling;
+    const boss = ENEMIES['coalbound-warden'];
+    // levelsAboveOne = 24 at level 25 for both.
+    const mothlingAt25 = scaledEnemyStats(mothling, 25);
+    const bossAt25 = scaledEnemyStats(boss, 25);
+    expect(mothlingAt25).toEqual({ maxHp: 412, attack: 103, defense: 51, speed: 57 });
+    expect(bossAt25).toEqual({ maxHp: 1292, attack: 301, defense: 152, speed: 152 });
+    // The boss's authored ~5x maxHp lead (140 vs 28) should still be a comparably large multiple
+    // at level 25, not collapsed toward parity the way a same-rate growth would.
+    expect(bossAt25.maxHp / mothlingAt25.maxHp).toBeGreaterThan(3);
+  });
+});
+
+describe('rollBossEncounter', () => {
+  it('always places the boss last in the returned array', () => {
+    for (let i = 0; i < 30; i++) {
+      const roster = rollBossEncounter('coalbound-warden');
+      expect(roster[roster.length - 1].id).toBe('coalbound-warden');
+    }
+  });
+
+  it("rolls 0-3 adds, drawn only from the boss region's own encounter tables", () => {
+    const validAddIds = new Set(['mothling', 'greater-mothling', 'restless-miner', 'foreman-wraith',
+      'coal-spirit', 'coal-wraith', 'cliff-wolf', 'ridge-hawk', 'pool-wisp', 'falls-siren',
+      'briar-wraith', 'cemetery-shade']);
+    for (let i = 0; i < 50; i++) {
+      const roster = rollBossEncounter('coalbound-warden');
+      const adds = roster.slice(0, -1);
+      expect(adds.length).toBeGreaterThanOrEqual(0);
+      expect(adds.length).toBeLessThanOrEqual(3);
+      for (const add of adds) {
+        expect(validAddIds.has(add.id)).toBe(true);
+        expect(add.id).not.toBe('coalbound-warden');
+      }
+    }
+  });
+
+  it('throws for a boss with no configured region', () => {
+    expect(() => rollBossEncounter('not-a-real-boss')).toThrow();
   });
 });
 
@@ -677,5 +726,15 @@ describe('computeRewards', () => {
     const reward = computeRewards([{ enemyId: mothling.id, level: 1 }], 0, 1);
     expect(reward.leveledUp).toBe(false);
     expect(reward.statGrowth).toEqual({});
+  });
+
+  it('skipLoot suppresses the lootTable roll (e.g. a boss already defeated before) without touching xp/gold', () => {
+    const boss = ENEMIES['coalbound-warden']; // lootTable: 100% chance of wardens-ember-heart
+    const firstKill = computeRewards([{ enemyId: boss.id, level: 1, skipLoot: false }], 0, 1);
+    const repeatKill = computeRewards([{ enemyId: boss.id, level: 1, skipLoot: true }], 0, 1);
+    expect(firstKill.lootItemIds).toContain('wardens-ember-heart');
+    expect(repeatKill.lootItemIds).not.toContain('wardens-ember-heart');
+    expect(repeatKill.xp).toBe(firstKill.xp);
+    expect(repeatKill.gold).toBe(firstKill.gold);
   });
 });

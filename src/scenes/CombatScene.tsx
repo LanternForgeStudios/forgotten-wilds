@@ -31,8 +31,14 @@ const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
 type Phase = 'starting' | 'playerTurn' | 'resolving' | 'itemMenu' | 'victory' | 'defeat' | 'fled' | 'error';
 
 /** Front row holds up to 3; anything beyond that overflows to a staggered back row - mirrors how
- *  most JRPGs lay out a 1-6 enemy group rather than a single line. */
-function splitFormation<T>(items: T[]): { front: T[]; back: T[] } {
+ *  most JRPGs lay out a 1-6 enemy group rather than a single line. A boss fight is a special case:
+ *  the boss always sits in the back row with its 0-3 "adds" (never more than 3, so they always fit
+ *  the front row) in front, regardless of position in the array - not the same positional split a
+ *  same-tier group of 4-6 regular/elite enemies uses. */
+function splitFormation(items: EncounterEnemy[]): { front: EncounterEnemy[]; back: EncounterEnemy[] } {
+  if (items.some((e) => e.isBoss)) {
+    return { front: items.filter((e) => !e.isBoss), back: items.filter((e) => e.isBoss) };
+  }
   const front = items.slice(0, 3);
   const back = items.slice(3);
   return { front, back };

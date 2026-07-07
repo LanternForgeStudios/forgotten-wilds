@@ -119,7 +119,7 @@ export type CombatSessionStatus = 'active' | 'resolved';
 
 export interface CombatEnemyState {
   enemyId: string;
-  /** 1-50 for a Regular/Elite roll, fixed at BOSS_LEVEL for a boss - see rollEnemyLevel. */
+  /** 1-50 for every enemy, including bosses - see rollEnemyLevel. */
   level: number;
   hp: number;
   maxHp: number;
@@ -129,8 +129,9 @@ export interface CombatSession {
   sessionId: string;
   uid: string;
   locationId: string;
-  /** 1-6 enemies for a regular encounter, always exactly 1 for a boss fight. Array order is fixed
-   *  for the session's lifetime - `targetIndex` in CombatAction refers to this order. */
+  /** 1-6 enemies for a regular encounter, 1-4 for a boss fight (the boss plus 0-3 "adds" - see
+   *  rollBossEncounter). Array order is fixed for the session's lifetime - `targetIndex` in
+   *  CombatAction refers to this order. */
   enemies: CombatEnemyState[];
   round: number;
   status: CombatSessionStatus;
