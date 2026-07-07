@@ -127,8 +127,8 @@ describe('scaledEnemyStats', () => {
     // levelsAboveOne = 24 at level 25 for both.
     const mothlingAt25 = scaledEnemyStats(mothling, 25);
     const bossAt25 = scaledEnemyStats(boss, 25);
-    expect(mothlingAt25).toEqual({ maxHp: 412, attack: 103, defense: 51, speed: 57 });
-    expect(bossAt25).toEqual({ maxHp: 1292, attack: 301, defense: 152, speed: 152 });
+    expect(mothlingAt25).toEqual({ maxHp: 412, attack: 79, defense: 51, speed: 57 });
+    expect(bossAt25).toEqual({ maxHp: 1292, attack: 229, defense: 152, speed: 152 });
     // The boss's authored ~5x maxHp lead (140 vs 28) should still be a comparably large multiple
     // at level 25, not collapsed toward parity the way a same-rate growth would.
     expect(bossAt25.maxHp / mothlingAt25.maxHp).toBeGreaterThan(3);
@@ -220,8 +220,12 @@ describe('resolveRound', () => {
         { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
       ],
     });
-    // Three attackers landing hits should cost noticeably more than a single attacker would.
-    expect(999 - result.playerHp).toBeGreaterThan(mothling.stats.attack);
+    // Each of the 3 enemies attacks (not just the targeted one) - CROWD_DAMAGE_FACTOR
+    // intentionally dampens each individual hit so 3 attackers don't deal ~3x a single attacker's
+    // damage (that N-scaling is exactly what made multi-enemy fights nearly unwinnable before this
+    // fix), but 3 still-nonzero hits (each floored at a minimum of 1) should land, proving every
+    // alive enemy really did get a turn.
+    expect(999 - result.playerHp).toBeGreaterThanOrEqual(3);
   });
 
   it('victory only fires once every enemy in the roster is defeated', () => {
@@ -311,14 +315,18 @@ describe('resolveRound', () => {
   });
 
   it('defend halves damage from every enemy still standing, not just one', () => {
+    // Enemy level 20 (not 1) - crowd-damping's own max(1, ...) floor would otherwise make a
+    // level-1 hit already round down to the 1-damage minimum before Defend gets a chance to halve
+    // it, making the two scenarios indistinguishable at integer resolution for reasons unrelated
+    // to what this test actually checks (that Defend applies to every attacker, not just one).
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const defending = resolveRound({
       action: { type: 'defend' },
       playerStats: stats({ speed: 999, hp: 999, maxHp: 999 }),
       inventory: [],
       enemies: [
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
       ],
     });
     const attacking = resolveRound({
@@ -326,8 +334,8 @@ describe('resolveRound', () => {
       playerStats: stats({ speed: 999, hp: 999, maxHp: 999 }),
       inventory: [],
       enemies: [
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
       ],
     });
     vi.restoreAllMocks();
@@ -337,12 +345,13 @@ describe('resolveRound', () => {
   it('defend halves damage from a mixed-speed group of enemies, faster and slower alike', () => {
     // mothling (speed 9) is faster than the player; restless-miner (speed 6) is slower - a
     // genuinely mixed roster, confirming the fix isn't just "works when the player is fastest" or
-    // "works when the player is slowest against a uniform group."
+    // "works when the player is slowest against a uniform group." Level 20 for the same reason as
+    // the test above (avoids colliding with crowd-damping's 1-damage floor).
     const restlessMiner = ENEMIES['restless-miner'];
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const enemies = [
-      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-      { enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp },
+      { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
+      { enemyId: restlessMiner.id, level: 20, hp: restlessMiner.stats.maxHp },
     ];
     const defending = resolveRound({
       action: { type: 'defend' },
@@ -414,6 +423,29 @@ describe('resolveRound', () => {
     });
     expect(result.itemConsumedIds).toEqual(['healing-poultice']);
     expect(result.playerHp).toBeGreaterThan(10);
+  });
+
+  it('a healing item restores a percentage of maxHp, so the same item heals more at higher maxHp', () => {
+    // healing-poultice is healHpPercent: 0.3. Player still takes their one full round's worth of
+    // enemy damage after healing (speed 999 only guarantees the player acts first, not that the
+    // enemy is skipped) - defense: 9999 pins that chip damage at the engine's 1-point floor
+    // deterministically (base damage goes deeply negative, so Math.random()'s variance can't
+    // change the floored result), isolating the percentage-of-maxHp heal being tested here.
+    const lowMaxHp = resolveRound({
+      action: { type: 'item', itemIds: ['healing-poultice'] },
+      playerStats: stats({ hp: 1, maxHp: 60, speed: 999, defense: 9999 }),
+      inventory: [{ itemId: 'healing-poultice', quantity: 1 }],
+      enemies: soloEnemies(),
+    });
+    const highMaxHp = resolveRound({
+      action: { type: 'item', itemIds: ['healing-poultice'] },
+      playerStats: stats({ hp: 1, maxHp: 852, speed: 999, defense: 9999 }),
+      inventory: [{ itemId: 'healing-poultice', quantity: 1 }],
+      enemies: soloEnemies(),
+    });
+    expect(lowMaxHp.playerHp).toBe(1 + Math.round(60 * 0.3) - 1);
+    expect(highMaxHp.playerHp).toBe(1 + Math.round(852 * 0.3) - 1);
+    expect(highMaxHp.playerHp).toBeGreaterThan(lowMaxHp.playerHp);
   });
 
   it('reports victory once the sole enemy hp reaches zero', () => {
@@ -590,13 +622,16 @@ describe('resolveRound', () => {
     // built the same way applyLevelUp would (STARTING_STATS + STAT_GROWTH_PER_LEVEL*(level-1)),
     // enemy stats at the level rollEnemyLevel would roll (baseLevel = round(playerLevel/2)).
     // variance=1.0 (mocked) removes the +/-10% roll so the expected damage is exact, not a range.
+    // dmgToPlayer values reflect the multi-enemy rebalance's ENEMY_STAT_GROWTH_PER_LEVEL.attack
+    // cut (4->3) - dmgToEnemy is untouched since the player's own attack growth never changed, and
+    // these are solo-enemy fights (crowd damping only applies at 2+ alive non-boss enemies).
     const CHECKPOINTS = [
       { playerLevel: 1, enemyLevel: 1, dmgToEnemy: 13, dmgToPlayer: 11 },
-      { playerLevel: 10, enemyLevel: 5, dmgToEnemy: 18, dmgToPlayer: 15 },
-      { playerLevel: 25, enemyLevel: 13, dmgToEnemy: 25, dmgToPlayer: 23 },
-      { playerLevel: 50, enemyLevel: 25, dmgToEnemy: 38, dmgToPlayer: 35 },
-      { playerLevel: 75, enemyLevel: 38, dmgToEnemy: 50, dmgToPlayer: 48 },
-      { playerLevel: 100, enemyLevel: 50, dmgToEnemy: 63, dmgToPlayer: 60 },
+      { playerLevel: 10, enemyLevel: 5, dmgToEnemy: 18, dmgToPlayer: 13 },
+      { playerLevel: 25, enemyLevel: 13, dmgToEnemy: 25, dmgToPlayer: 17 },
+      { playerLevel: 50, enemyLevel: 25, dmgToEnemy: 38, dmgToPlayer: 23 },
+      { playerLevel: 75, enemyLevel: 38, dmgToEnemy: 50, dmgToPlayer: 30 },
+      { playerLevel: 100, enemyLevel: 50, dmgToEnemy: 63, dmgToPlayer: 35 },
     ];
 
     it.each(CHECKPOINTS)(
@@ -632,9 +667,65 @@ describe('resolveRound', () => {
         expect(hitsToKillEnemy).toBeGreaterThanOrEqual(2);
         expect(hitsToKillEnemy).toBeLessThanOrEqual(20);
         expect(hitsToKillPlayer).toBeGreaterThanOrEqual(2);
-        expect(hitsToKillPlayer).toBeLessThanOrEqual(20);
+        // Widened from 20 to 30: the attack-growth cut (see ENEMY_STAT_GROWTH_PER_LEVEL) widens
+        // the player's safety margin in a 1-on-1 fight - hitsToKillEnemy is unchanged, so the
+        // fight is still won in the same number of rounds as before, this just means the player
+        // can survive more mistakes along the way. Not a stall.
+        expect(hitsToKillPlayer).toBeLessThanOrEqual(30);
       },
     );
+  });
+
+  describe('multi-enemy encounters stay winnable across the level cap', () => {
+    // Real (non-999-speed) player stats built the same way applyLevelUp would - deliberately not
+    // forcing speed:999, since real turn order (enemies are consistently a bit faster than the
+    // player at every checkpoint) is exactly what makes a group fight dangerous and must be
+    // exercised here, not bypassed. A real 3-mothling roster (real maxHp, not the 999999 isolation
+    // trick used above) so HP pools actually deplete over multiple rounds. Simulates the whole
+    // fight by looping resolveRound, single-targeting whichever enemy is still alive first (the
+    // default/simplest play pattern), until a terminal phase - this is the actual gap the fix
+    // needed to close (no earlier test constructed a real N-enemy roster and played out a full
+    // multi-round fight against the player's real HP pool).
+    it.each([10, 25, 50, 75, 100])('player level %i vs a real 3-mothling group is winnable, with real risk', (playerLevel) => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+      const playerMaxHp = 60 + 8 * (playerLevel - 1);
+      let playerHp = playerMaxHp;
+      const playerStats = stats({
+        attack: 8 + 2 * (playerLevel - 1),
+        defense: 5 + (playerLevel - 1),
+        speed: 6 + (playerLevel - 1),
+      });
+      const enemyLevel = Math.max(1, Math.round(playerLevel / 2));
+      let enemies = [
+        { enemyId: mothling.id, level: enemyLevel, hp: mothling.stats.maxHp + 16 * (enemyLevel - 1) },
+        { enemyId: mothling.id, level: enemyLevel, hp: mothling.stats.maxHp + 16 * (enemyLevel - 1) },
+        { enemyId: mothling.id, level: enemyLevel, hp: mothling.stats.maxHp + 16 * (enemyLevel - 1) },
+      ];
+
+      let phase: string = 'continue';
+      let rounds = 0;
+      while (phase === 'continue' && rounds < 200) {
+        const targetIndex = enemies.findIndex((e) => e.hp > 0);
+        const result = resolveRound({
+          action: { type: 'attack', targetIndex },
+          playerStats: { ...playerStats, hp: playerHp, maxHp: playerMaxHp },
+          inventory: [],
+          enemies,
+        });
+        playerHp = result.playerHp;
+        enemies = enemies.map((e, i) => ({ ...e, hp: result.enemyHp[i] }));
+        phase = result.phase;
+        rounds++;
+      }
+      vi.restoreAllMocks();
+
+      expect(phase).toBe('victory');
+      // Genuine risk, not a stomp and not a stall: the player should end the fight meaningfully
+      // hurt (win with real attrition) but never lose outright.
+      const remainingFraction = playerHp / playerMaxHp;
+      expect(remainingFraction).toBeGreaterThan(0.05);
+      expect(remainingFraction).toBeLessThan(0.4);
+    });
   });
 });
 

@@ -98,7 +98,7 @@ export function useLocationExploration({
   const wanderPositions = useWanderingNpcs(map, suspended);
   const dynamicBlockers = useMemo(() => Object.values(wanderPositions), [wanderPositions]);
 
-  const { position, positionRef, facingDelta, attemptMove } = useGridMovement({
+  const { position, positionRef, facingDelta, attemptMove, movementState } = useGridMovement({
     map,
     start: spawnPoint,
     suspended,
@@ -106,5 +106,5 @@ export function useLocationExploration({
     dynamicBlockers,
   });
 
-  return { location, map, position, positionRef, facingDelta, attemptMove, wanderPositions };
+  return { location, map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions };
 }

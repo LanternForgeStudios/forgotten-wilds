@@ -25,6 +25,11 @@ export interface AssetDefinition {
   filePath: string;
   /** null for asset types dimensions don't apply to (audio, Tiled maps). */
   dimensions: AssetDimensions | null;
+  /** One animation frame's size within `dimensions` - present only for sprite sheets. Absent
+   *  means the whole image is a single static frame (every asset today except sprite.player).
+   *  Columns/rows are derived arithmetically (dimensions ÷ frameSize) rather than stored, since no
+   *  consumer needs ragged rows. */
+  frameSize?: AssetDimensions;
   status: AssetStatus;
   notes: string;
 }
@@ -317,11 +322,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player',
     category: 'character',
-    intendedUse: 'Player overworld sprite (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
-    filePath: 'sprites/characters/player.svg',
-    dimensions: { width: 32, height: 32 },
+    intendedUse: 'Player overworld sprite - 4-direction walk+run sheet (8 rows x 4 frames of 32x32)',
+    filePath: 'sprites/characters/player-sprite.png',
+    dimensions: { width: 128, height: 256 },
+    frameSize: { width: 32, height: 32 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: 'User-provided sprite sheet. Row order: walk-down, walk-left, walk-up, walk-right, run-down, run-left, run-up, run-right. Placeholder - user intends to replace it later.',
   },
   {
     id: 'battle.enemy.mothling',

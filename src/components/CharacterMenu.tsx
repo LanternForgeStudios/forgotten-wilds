@@ -298,8 +298,12 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                   )}
                   {selected.itemDef?.effect && (
                     <p className={styles.detailStats}>
-                      {selected.itemDef.effect.healHp ? `Restores ${selected.itemDef.effect.healHp} HP  ` : ''}
-                      {selected.itemDef.effect.healSpirit ? `Restores ${selected.itemDef.effect.healSpirit} Spirit  ` : ''}
+                      {selected.itemDef.effect.healHpPercent
+                        ? `Restores ${Math.round(selected.itemDef.effect.healHpPercent * 100)}% HP  `
+                        : ''}
+                      {selected.itemDef.effect.healSpiritPercent
+                        ? `Restores ${Math.round(selected.itemDef.effect.healSpiritPercent * 100)}% Spirit  `
+                        : ''}
                       {selected.itemDef.effect.reviveOnDefeat ? 'Revives on defeat' : ''}
                     </p>
                   )}

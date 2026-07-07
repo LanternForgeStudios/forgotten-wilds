@@ -209,8 +209,12 @@ export function Shop({ shopId, onClose }: ShopProps) {
             )}
             {'effect' in selectedDef && selectedDef.effect && (
               <p className={styles.detailStats}>
-                {selectedDef.effect.healHp ? `Restores ${selectedDef.effect.healHp} HP  ` : ''}
-                {selectedDef.effect.healSpirit ? `Restores ${selectedDef.effect.healSpirit} Spirit  ` : ''}
+                {selectedDef.effect.healHpPercent
+                  ? `Restores ${Math.round(selectedDef.effect.healHpPercent * 100)}% HP  `
+                  : ''}
+                {selectedDef.effect.healSpiritPercent
+                  ? `Restores ${Math.round(selectedDef.effect.healSpiritPercent * 100)}% Spirit  `
+                  : ''}
               </p>
             )}
           </div>

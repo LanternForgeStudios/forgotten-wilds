@@ -66,8 +66,8 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       const effect = def.effect;
       const wouldHaveEffect =
         !!effect &&
-        ((!!effect.healHp && save.player.stats.hp < save.player.stats.maxHp) ||
-          (!!effect.healSpirit && save.player.stats.spirit < save.player.stats.maxSpirit) ||
+        ((!!effect.healHpPercent && save.player.stats.hp < save.player.stats.maxHp) ||
+          (!!effect.healSpiritPercent && save.player.stats.spirit < save.player.stats.maxSpirit) ||
           (!!effect.restoreOil && save.player.stats.lanternOil < save.player.stats.maxLanternOil));
       if (!wouldHaveEffect) {
         throw new HttpsError('failed-precondition', 'That would have no effect right now.');

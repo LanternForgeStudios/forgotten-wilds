@@ -80,6 +80,9 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   `functions/src/index.ts` for the current exported list, which grows over time).
 - `src/multiplayer/` — typed stub interfaces (party, chat, trade, lodges, world events) for
   systems not built yet; every function throws "not implemented," ready to be filled in.
+- `src/animation/` — sprite-sheet animation layouts (row/facing → frame mapping) for characters;
+  an asset's `frameSize` in the registry opts it into frame-based rendering in
+  `TileGrid`/`TileGrid.module.css`, otherwise it renders as a plain static image.
 
 ## In-game controls
 
@@ -98,5 +101,6 @@ anywhere on the map to move and use the on-screen HUD buttons in place of the ke
   Normal linear play is unaffected either way.
 - Vitest covers the pure combat/quest/equipment engine functions (`functions/src/engine/*.test.ts`)
   but not the Cloud Functions themselves (Firestore transactions) or any client code yet.
-- Character sprites are single-frame placeholders (see `public/CREDITS.md`) rather than full
-  4-direction walk-cycle sheets — swap via `src/assets/registry.ts`, no code changes needed.
+- The player has a real 4-direction walk/run sprite sheet (still a placeholder piece of art per
+  `public/CREDITS.md`, but animated in-game). NPCs are still single-frame placeholders — swap via
+  `src/assets/registry.ts`, no code changes needed for either.

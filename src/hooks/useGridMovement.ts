@@ -87,6 +87,12 @@ export function useGridMovement({
   dynamicBlockers,
 }: UseGridMovementOptions) {
   const [position, setPosition] = useState<GridPosition>({ x: start.x, y: start.y, facing: 'down' });
+  // 'idle' whenever no step has landed recently - set to 'walking'/'running' right after a
+  // successful step, then self-clears via a timeout reset on every subsequent step. Deliberately
+  // not a continuous ticker (no setInterval) - one timer per step, so this doesn't add a second
+  // recurring re-render source alongside the existing per-step setPosition re-render.
+  const [movementState, setMovementState] = useState<'idle' | 'walking' | 'running'>('idle');
+  const movementIdleTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const lastMoveRef = useRef(0);
   const positionRef = useRef(position);
   positionRef.current = position;
@@ -126,11 +132,16 @@ export function useGridMovement({
       lastMoveRef.current = now;
       const next: GridPosition = { x: nextX, y: nextY, facing };
       setPosition(next);
+      setMovementState(options?.isDash ? 'running' : 'walking');
+      clearTimeout(movementIdleTimeoutRef.current);
+      movementIdleTimeoutRef.current = setTimeout(() => setMovementState('idle'), stepIntervalMs + 40);
       onStep?.(next, options?.isDash);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [map, suspended, stepIntervalMs],
   );
+
+  useEffect(() => () => clearTimeout(movementIdleTimeoutRef.current), []);
 
   useEffect(() => {
     if (!map || suspended) return;
@@ -152,5 +163,5 @@ export function useGridMovement({
 
   const facingDelta = useCallback((facing: Facing) => FACING_TO_DELTA[facing], []);
 
-  return { position, positionRef, facingDelta, attemptMove };
+  return { position, positionRef, facingDelta, attemptMove, movementState };
 }

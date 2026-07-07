@@ -91,12 +91,20 @@ export const MIN_ENEMY_LEVEL = 1;
 export const MAX_ENEMY_LEVEL = 50;
 
 /** Per-enemy-level stat growth, additive like the player's own STAT_GROWTH_PER_LEVEL - 2x the
- *  player's rate, because enemy level advances at half the player's rate (baseLevel below), so
- *  over the full 1-100 player range that's 99 player level-ups against only 49 enemy level-ups,
- *  a ratio of ~2.02 that this constant reproduces cleanly. Replaces the old multiplicative
- *  `levelMultiplier` (1 + (level-1)*0.15), which topped out at a shallow 1.6x at the old level-5
- *  cap - far too weak to keep pace with a player whose own stats grow additively to level 100. */
-const ENEMY_STAT_GROWTH_PER_LEVEL = { maxHp: 16, attack: 4, defense: 2, speed: 2 };
+ *  player's rate for maxHp/defense/speed, because enemy level advances at half the player's rate
+ *  (baseLevel below), so over the full 1-100 player range that's 99 player level-ups against only
+ *  49 enemy level-ups, a ratio of ~2.02 that this constant reproduces cleanly. Replaces the old
+ *  multiplicative `levelMultiplier` (1 + (level-1)*0.15), which topped out at a shallow 1.6x at
+ *  the old level-5 cap - far too weak to keep pace with a player whose own stats grow additively
+ *  to level 100.
+ *
+ *  `attack` deliberately breaks the clean 2x pattern (3x instead of 4x): a multi-enemy fight has
+ *  every alive enemy attacking every round while the player can only hit one target per turn, an
+ *  O(N^2)-ish compounding effect a fair 1-on-1 rate doesn't account for - verified numerically
+ *  that even a "fair" 1-on-1 fight already consumed 68-96% of the player's max HP to solo-kill one
+ *  enemy at high levels, leaving no headroom for a group fight's extra rounds. See
+ *  CROWD_DAMAGE_FACTOR below for the other half of this fix (the actual N-attackers mechanism). */
+const ENEMY_STAT_GROWTH_PER_LEVEL = { maxHp: 16, attack: 3, defense: 2, speed: 2 };
 
 /** Bosses grow 3x as fast per level as regular/elite enemies. Applying the same rate to both
  *  (verified numerically) collapses a boss's authored stat lead (e.g. the Coalbound Warden's
@@ -259,6 +267,16 @@ export function hasSufficientQuantity(
 const TARGET_ALL_MISS_CHANCE = 0.15;
 const TARGET_ALL_DAMAGE_FACTOR = 0.6;
 
+/** Dampens each non-boss enemy's own attack damage based on how many non-boss enemies are
+ *  currently alive (self-inclusive) - every alive enemy attacks every round while the player can
+ *  only hit one target per turn, so without this an N-enemy fight is roughly N times harder than
+ *  a 1-on-1 fight even though the underlying per-hit numbers are individually fair (verified
+ *  numerically: undamped, a 3-enemy fight killed the player before they could even finish off the
+ *  first enemy, at every player level). A boss's own attack is never dampened (see enemyAttack) -
+ *  only its "adds" are, and only by how many adds are alive, so a boss fought alone or with 0-1
+ *  adds is completely unaffected by this table. */
+const CROWD_DAMAGE_FACTOR: Record<number, number> = { 1: 1, 2: 0.12, 3: 0.05, 4: 0.035, 5: 0.025, 6: 0.02 };
+
 export function resolveRound(input: RoundInput): RoundResult {
   const { action } = input;
   const log: string[] = [];
@@ -286,6 +304,7 @@ export function resolveRound(input: RoundInput): RoundResult {
 
   const isAlive = (i: number) => enemyHp[i] > 0;
   const aliveIndices = () => enemyHp.map((_, i) => i).filter(isAlive);
+  const aliveNonBossCount = () => aliveIndices().filter((i) => enemyDefs[i].tier !== 'boss').length;
 
   function damageEnemy(i: number, dmg: number, verb: string): boolean {
     const before = enemyHp[i];
@@ -304,6 +323,10 @@ export function resolveRound(input: RoundInput): RoundResult {
     const move = pickEnemyMove(def, hpFraction);
     const skill = SKILLS[move.skillId] ?? SKILLS.attack;
     let dmg = computeDamage(skill.power, stats.attack, input.playerStats.defense);
+    if (def.tier !== 'boss') {
+      const crowdFactor = CROWD_DAMAGE_FACTOR[Math.min(6, aliveNonBossCount())] ?? 1;
+      dmg = Math.max(1, Math.round(dmg * crowdFactor));
+    }
     if (playerDefending) dmg = Math.round(dmg / 2);
     playerHp = Math.max(0, playerHp - dmg);
     damageTakenByPlayer += dmg;
@@ -355,14 +378,16 @@ export function resolveRound(input: RoundInput): RoundResult {
       let healSpiritTotal = 0;
       let restoreOilTotal = 0;
       for (let n = 0; n < count; n++) {
-        if (def.effect.healHp) {
+        if (def.effect.healHpPercent) {
           const before = playerHp;
-          playerHp = Math.min(input.playerStats.maxHp, playerHp + def.effect.healHp);
+          const amount = Math.round(input.playerStats.maxHp * def.effect.healHpPercent);
+          playerHp = Math.min(input.playerStats.maxHp, playerHp + amount);
           healHpTotal += playerHp - before;
         }
-        if (def.effect.healSpirit) {
+        if (def.effect.healSpiritPercent) {
           const before = playerSpirit;
-          playerSpirit = Math.min(input.playerStats.maxSpirit, playerSpirit + def.effect.healSpirit);
+          const amount = Math.round(input.playerStats.maxSpirit * def.effect.healSpiritPercent);
+          playerSpirit = Math.min(input.playerStats.maxSpirit, playerSpirit + amount);
           healSpiritTotal += playerSpirit - before;
         }
         if (def.effect.restoreOil) {

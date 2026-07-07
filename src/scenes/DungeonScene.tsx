@@ -7,6 +7,7 @@ import { Panel } from '@/components/common/Panel';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
+import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -51,7 +52,7 @@ export function DungeonScene() {
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const suspended = message !== null || menuOpen || journalOpen;
-  const { map, position, positionRef, facingDelta, attemptMove } = useLocationExploration({
+  const { map, position, positionRef, facingDelta, attemptMove, movementState } = useLocationExploration({
     locationId: LOCATION_ID,
     suspended,
     onEncounterZoneStep: (chance, pos) => {
@@ -77,7 +78,7 @@ export function DungeonScene() {
       (o) => o.type === 'interactable' && o.x === target.x && o.y === target.y,
     );
     if (obj?.refId === 'miners-lost-lantern') {
-      run(callCollectWorldItem(LOCATION_ID, 'miners-lost-lantern'))
+      run(callCollectWorldItem(LOCATION_ID, 'miners-lost-lantern'), 'Collecting...')
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
@@ -100,7 +101,7 @@ export function DungeonScene() {
         setMessage('Something vast and ember-lit stirs in the dark ahead — but the way feels barred to you, for now.');
       }
     } else if (obj?.refId === 'mine-shrine') {
-      run(callInteractWithShrine(LOCATION_ID, 'mine-shrine'))
+      run(callInteractWithShrine(LOCATION_ID, 'mine-shrine'), 'Interacting with shrine...')
         .then(async () => {
           if (uid) await resyncSave(uid);
           setMessage('A shrine carved into the rock, coated in soot. Something in it still resists the corruption around it.');
@@ -108,7 +109,7 @@ export function DungeonScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
     } else if (obj?.refId?.startsWith('chest-')) {
       const chestId = obj.refId;
-      run(callOpenChest(LOCATION_ID, chestId))
+      run(callOpenChest(LOCATION_ID, chestId), 'Opening chest...')
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           const name =
@@ -183,7 +184,7 @@ export function DungeonScene() {
   return (
     <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
       <PlayerHUD locationId={LOCATION_ID} />
-      {pending && <div className={styles.pendingIndicator}>...</div>}
+      {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
@@ -194,6 +195,8 @@ export function DungeonScene() {
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}
+          playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
+          playerMovementState={movementState}
         />
       </div>
       {isMobile ? (

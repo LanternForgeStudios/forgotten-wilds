@@ -27,12 +27,32 @@ export function useExplorationViewport() {
   const [viewport, setViewport] = useState(() => computeViewport(isMobile));
 
   useEffect(() => {
+    // Debounced (not recomputed on every event) + bails out via reference-equality when the
+    // computed viewport hasn't actually changed. iOS Safari's dynamic URL-bar collapse fires a
+    // rapid burst of native resize events (something a PC window resize never replicates), and
+    // without this, each one forced a fresh re-render/repaint of the large, non-virtualized
+    // TileGrid - compounding into the flash/fail pattern reported when an encounter triggered
+    // mid-burst.
+    let timeout: ReturnType<typeof setTimeout>;
     function handleResize() {
-      setViewport(computeViewport(isMobile));
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setViewport((prev) => {
+          const next = computeViewport(isMobile);
+          return prev.scale === next.scale &&
+            prev.viewportSize.width === next.viewportSize.width &&
+            prev.viewportSize.height === next.viewportSize.height
+            ? prev
+            : next;
+        });
+      }, 150);
     }
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [isMobile]);
 
   return viewport;

@@ -32,6 +32,26 @@
   image-rendering: pixelated;
 }
 
+.spriteFrame {
+  image-rendering: pixelated;
+}
+
+@keyframes walkCycle {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: calc(var(--frame-width) * -4);
+  }
+}
+
+.walking,
+.running {
+  animation-name: walkCycle;
+  animation-timing-function: steps(4);
+  animation-iteration-count: infinite;
+}
+
 .entityLabel {
   position: absolute;
   bottom: 100%;

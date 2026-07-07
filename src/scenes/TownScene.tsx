@@ -10,6 +10,7 @@ import { Inn } from '@/components/Inn';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { Panel } from '@/components/common/Panel';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
+import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -69,7 +70,7 @@ export function TownScene() {
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const suspended = activeNpc !== null || menuOpen || shopOpen || innOpen || journalOpen || message !== null;
-  const { map, position, positionRef, facingDelta, attemptMove, wanderPositions } = useLocationExploration({
+  const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
     onBlockedTransition: setMessage,
@@ -108,7 +109,7 @@ export function TownScene() {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
         setActiveNpc(npc);
-        run(callTalkToNpc(npc.id))
+        run(callTalkToNpc(npc.id), 'Talking...')
           .then(async () => {
             if (uid) await resyncSave(uid);
           })
@@ -121,7 +122,7 @@ export function TownScene() {
     );
     if (shrineObject?.refId) {
       const refId = shrineObject.refId;
-      run(callInteractWithShrine(locationId, refId))
+      run(callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
@@ -203,7 +204,7 @@ export function TownScene() {
   return (
     <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
       <PlayerHUD locationId={locationId} />
-      {pending && <div className={styles.pendingIndicator}>...</div>}
+      {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
@@ -214,6 +215,8 @@ export function TownScene() {
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}
+          playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
+          playerMovementState={movementState}
         />
       </div>
       {isMobile ? (

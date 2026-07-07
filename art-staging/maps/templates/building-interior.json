@@ -1,0 +1,262 @@
+{
+  "width": 7,
+  "height": 6,
+  "tilewidth": 16,
+  "tileheight": 16,
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
+    }
+  ],
+  "layers": [
+    {
+      "type": "tilelayer",
+      "name": "ground",
+      "width": 7,
+      "height": 6,
+      "data": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        25,
+        25,
+        25,
+        25,
+        25,
+        1,
+        1,
+        1,
+        1,
+        25,
+        1,
+        1,
+        1
+      ],
+      "visible": true,
+      "opacity": 1
+    },
+    {
+      "type": "tilelayer",
+      "name": "decorations-1",
+      "width": 7,
+      "height": 6,
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        6,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible": true,
+      "opacity": 1
+    },
+    {
+      "type": "objectgroup",
+      "name": "collisions",
+      "objects": [
+        {
+          "x": 80,
+          "y": 32,
+          "width": 16,
+          "height": 16
+        }
+      ]
+    },
+    {
+      "type": "objectgroup",
+      "name": "objects",
+      "objects": [
+        {
+          "type": "spawnPoint",
+          "x": 48,
+          "y": 64,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-ash-hallow"
+            }
+          ]
+        },
+        {
+          "type": "npc",
+          "x": 48,
+          "y": 32,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "elias-rowan"
+            }
+          ]
+        },
+        {
+          "type": "transition",
+          "x": 48,
+          "y": 80,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "ash-hallow"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-ash-hallow-elias-house"
+            },
+            {
+              "name": "requiredFacing",
+              "type": "string",
+              "value": "down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "tilelayer",
+      "name": "overhang",
+      "width": 7,
+      "height": 6,
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        18,
+        0,
+        0,
+        0
+      ],
+      "visible": true,
+      "opacity": 1
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "name": "tiny-dungeon",
+      "image": "../../../public/assets/tilesets/tiny-dungeon.png",
+      "imagewidth": 192,
+      "imageheight": 176,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 12,
+      "tilecount": 132,
+      "tiles": [
+        {
+          "id": 24,
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

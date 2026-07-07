@@ -8,6 +8,7 @@ import { Panel } from '@/components/common/Panel';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
+import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -73,7 +74,7 @@ export function OverworldScene() {
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const suspended = activeNpc !== null || menuOpen || journalOpen || message !== null;
-  const { map, position, positionRef, facingDelta, attemptMove, wanderPositions } = useLocationExploration({
+  const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
     onEncounterZoneStep: (chance, pos) => {
@@ -105,7 +106,7 @@ export function OverworldScene() {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
         setActiveNpc(npc);
-        run(callTalkToNpc(npc.id))
+        run(callTalkToNpc(npc.id), 'Talking...')
           .then(async () => {
             if (uid) await resyncSave(uid);
           })
@@ -119,7 +120,7 @@ export function OverworldScene() {
     );
     if (obj?.refId?.startsWith('chest-')) {
       const chestId = obj.refId;
-      run(callOpenChest(locationId, chestId))
+      run(callOpenChest(locationId, chestId), 'Opening chest...')
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           const name =
@@ -138,7 +139,7 @@ export function OverworldScene() {
     if (obj?.refId && SHRINE_LANDMARKS.has(obj.refId)) {
       const refId = obj.refId;
       const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
-      run(callInteractWithShrine(locationId, refId))
+      run(callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           if (res.unlockedStamina) {
@@ -155,7 +156,7 @@ export function OverworldScene() {
     if (obj?.refId && VISIT_ONLY_LANDMARKS.has(obj.refId)) {
       const landmarkId = obj.refId;
       const landmarkName = LOCATIONS.find((l) => l.id === landmarkId)?.name ?? landmarkId;
-      run(callVisitLandmark(landmarkId))
+      run(callVisitLandmark(landmarkId), 'Investigating...')
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
@@ -169,7 +170,7 @@ export function OverworldScene() {
     }
     if (obj?.refId && FRAGMENT_LANDMARKS.has(obj.refId)) {
       const refId = obj.refId;
-      run(callCollectWorldItem(locationId, refId))
+      run(callCollectWorldItem(locationId, refId), 'Collecting...')
         .then(async (res) => {
           if (uid) await resyncSave(uid);
           const name = ITEMS.find((i) => i.id === res.itemId)?.name ?? res.itemId;
@@ -244,7 +245,7 @@ export function OverworldScene() {
   return (
     <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
       <PlayerHUD locationId={locationId} />
-      {pending && <div className={styles.pendingIndicator}>...</div>}
+      {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
@@ -255,6 +256,8 @@ export function OverworldScene() {
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}
+          playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
+          playerMovementState={movementState}
         />
       </div>
       {isMobile ? (

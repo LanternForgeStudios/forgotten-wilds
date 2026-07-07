@@ -6,9 +6,14 @@
 export type Tier = 'common' | 'uncommon' | 'rare' | 'mythic' | 'legendary';
 
 export interface ItemEffect {
-  healHp?: number;
-  healSpirit?: number;
-  /** Refills the equipped lantern's Oil, clamped to its capacity. */
+  /** Fraction (0-1) of the player's current maxHp to restore - percentage rather than a flat
+   *  amount so a potion stays proportionally useful as maxHp grows with level, instead of a fixed
+   *  30 HP going from "half your health bar" at level 1 to "a rounding error" at level 100. */
+  healHpPercent?: number;
+  /** Same as healHpPercent, for Spirit. */
+  healSpiritPercent?: number;
+  /** Refills the equipped lantern's Oil, clamped to its capacity. Stays a flat amount - lantern
+   *  oil has no tier ladder today and wasn't part of the percentage-based ask. */
   restoreOil?: number;
 }
 
@@ -28,21 +33,21 @@ export const ITEMS: Record<string, ItemDefinition> = {
     id: 'healing-poultice',
     category: 'consumable',
     usableInCombat: true,
-    effect: { healHp: 30 },
+    effect: { healHpPercent: 0.3 },
     tier: 'common',
   },
   'greater-healing-poultice': {
     id: 'greater-healing-poultice',
     category: 'consumable',
     usableInCombat: true,
-    effect: { healHp: 55 },
+    effect: { healHpPercent: 0.6 },
     tier: 'uncommon',
   },
   'spirit-draught': {
     id: 'spirit-draught',
     category: 'consumable',
     usableInCombat: true,
-    effect: { healSpirit: 20 },
+    effect: { healSpiritPercent: 0.3 },
     tier: 'common',
   },
   'lantern-oil': {

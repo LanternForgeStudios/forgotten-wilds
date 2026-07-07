@@ -11,11 +11,13 @@ export type ItemCategory = 'consumable' | 'equipment' | 'keyItem' | 'lanternUpgr
 export type Tier = 'common' | 'uncommon' | 'rare' | 'mythic' | 'legendary';
 
 export interface ItemEffect {
-  healHp?: number;
-  healSpirit?: number;
+  /** Fraction (0-1) of maxHp/maxSpirit to restore - percentage rather than a flat amount so a
+   *  potion stays proportionally useful as those maxes grow with level. */
+  healHpPercent?: number;
+  healSpiritPercent?: number;
   reviveOnDefeat?: boolean;
   /** Refills the equipped lantern's Oil, clamped to its capacity. Usable in and out of combat,
-   *  same as the other consumable effects. */
+   *  same as the other consumable effects. Stays a flat amount - no tier ladder today. */
   restoreOil?: number;
 }
 
