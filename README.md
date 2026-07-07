@@ -83,6 +83,19 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 - `src/animation/` — sprite-sheet animation layouts (row/facing → frame mapping) for characters;
   an asset's `frameSize` in the registry opts it into frame-based rendering in
   `TileGrid`/`TileGrid.module.css`, otherwise it renders as a plain static image.
+- `src/state/` — one Zustand store per concern (`usePlayerStore`, `useInventoryStore`,
+  `useQuestStore`, `useJournalStore`, `useWorldStateStore`, `useSceneStore`, `useAuthStore`,
+  `useSaveStore`, `useToastStore`). All of them (except scene/auth) are populated only from Cloud
+  Function responses or a save read via `hydrate.ts`'s `hydrateAllStores`/`resyncSave` — never
+  computed client-side.
+- `src/hooks/` — shared client logic, notably `useLocationExploration.ts` (the map-load +
+  spawn/movement/transition logic Town/Overworld/Dungeon all extend rather than copy-paste) and
+  `useGridMovement.ts` (tile-grid movement, dash, animation state).
+- `src/utils/` — small stateless helpers (dialogue-variant resolution, item-effect checks, sell
+  pricing, the browser right-click/copy-paste lockdown, etc.), one file per concern.
+- `src/engine/` — a small client-side mirror of quest-status logic (`quests/questStatus.ts`) used
+  for display-only checks (e.g. the Journal). Distinct from — and much smaller than —
+  `functions/src/engine/` above; don't confuse the two.
 
 ## In-game controls
 
