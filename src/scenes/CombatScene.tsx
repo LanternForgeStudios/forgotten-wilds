@@ -5,6 +5,7 @@ import { getAssetUrl } from '@/assets/assetManager';
 import {
   callResolveCombatAction,
   callStartEncounter,
+  callUseItem,
   type CombatHitResult,
   type EncounterEnemy,
   type ResolveCombatActionResponse,
@@ -28,7 +29,13 @@ const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
   dungeon: 'dungeon',
 };
 
-type Phase = 'starting' | 'playerTurn' | 'resolving' | 'itemMenu' | 'victory' | 'defeat' | 'fled' | 'error';
+const RESTORE_STAT_LABEL: Record<'hp' | 'spirit' | 'lanternOil', string> = {
+  hp: 'HP',
+  spirit: 'Spirit',
+  lanternOil: 'Lantern Oil',
+};
+
+type Phase = 'starting' | 'playerTurn' | 'resolving' | 'itemMenu' | 'usingItems' | 'victory' | 'defeat' | 'fled' | 'error';
 
 /** Front row holds up to 3; anything beyond that overflows to a staggered back row - mirrors how
  *  most JRPGs lay out a 1-6 enemy group rather than a single line. A boss fight is a special case:
@@ -188,6 +195,38 @@ export function CombatScene() {
     });
   }
 
+  // "Done" on the item menu - queued items are used immediately (via the same out-of-combat
+  // useItem Cloud Function the Inventory menu uses, not a combat round: it only ever touches
+  // users/{uid}, never combatSessions/{uid}, so calling it mid-fight is safe and costs no turn).
+  // This is what lets a Spirit Draught or Lantern Oil queued here actually unlock a Skill/Lantern
+  // Ability button on the very next screen, instead of being stuck behind the same round's stale
+  // pre-item stats.
+  async function finishItemMenu() {
+    if (tray.length === 0) {
+      setPhase('playerTurn');
+      return;
+    }
+    const queued = tray;
+    setPhase('usingItems');
+    let failed = false;
+    for (const itemId of queued) {
+      try {
+        await callUseItem(itemId);
+      } catch {
+        // A later item can still be valid even if an earlier one turned out to be a no-op (e.g.
+        // it would have had no effect because an earlier item in the same batch already maxed
+        // that stat) - keep going rather than aborting the whole batch.
+        failed = true;
+      }
+    }
+    setTray([]);
+    if (uid) await resyncSave(uid);
+    if (failed) {
+      useToastStore.getState().push("Some of those items wouldn't have done anything - skipped.");
+    }
+    setPhase('playerTurn');
+  }
+
   function returnToExploration() {
     const targetLocationId = phase === 'defeat' ? 'ash-hallow' : locationId;
     const targetLocation = LOCATIONS.find((l) => l.id === targetLocationId);
@@ -311,7 +350,7 @@ export function CombatScene() {
         </Panel>
 
         <Panel className={styles.actionsPanel}>
-          {phase === 'itemMenu' ? (
+          {phase === 'itemMenu' || phase === 'usingItems' ? (
             <>
               {combatItems.length === 0 && <p style={{ fontSize: 12, gridColumn: '1 / -1' }}>No usable items.</p>}
               {combatItems.map((i) => {
@@ -330,7 +369,7 @@ export function CombatScene() {
                       <button
                         type="button"
                         className={styles.actionButton}
-                        disabled={queued === 0}
+                        disabled={phase === 'usingItems' || queued === 0}
                         onClick={() => dequeueItem(i.itemId)}
                       >
                         -
@@ -338,7 +377,7 @@ export function CombatScene() {
                       <button
                         type="button"
                         className={styles.actionButton}
-                        disabled={!canAdd}
+                        disabled={phase === 'usingItems' || !canAdd}
                         title={wouldHelp ? undefined : 'Already at maximum - using this would have no effect.'}
                         onClick={() => queueItem(i.itemId)}
                       >
@@ -348,15 +387,8 @@ export function CombatScene() {
                   </div>
                 );
               })}
-              <button
-                className={styles.actionButton}
-                disabled={tray.length === 0}
-                onClick={() => act('item')}
-              >
-                Use Items Only
-              </button>
-              <button className={styles.actionButton} onClick={() => setPhase('playerTurn')}>
-                Done
+              <button className={styles.actionButton} disabled={phase === 'usingItems'} onClick={finishItemMenu}>
+                {phase === 'usingItems' ? 'Using items...' : 'Done'}
               </button>
             </>
           ) : (
@@ -420,6 +452,11 @@ export function CombatScene() {
                   {rewards?.itemIds.length ? ` · found: ${rewards.itemIds.join(', ')}` : ''}
                 </p>
                 {rewards?.leveledUp && <p style={{ color: 'var(--fw-accent)' }}>Level up!</p>}
+                {rewards?.restore && (
+                  <p>
+                    A quiet moment restores {rewards.restore.amount} {RESTORE_STAT_LABEL[rewards.restore.stat]}.
+                  </p>
+                )}
               </>
             )}
             {phase === 'defeat' && (

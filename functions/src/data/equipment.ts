@@ -150,7 +150,10 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     slot: 'lantern',
     statBonuses: { maxSpirit: 5 },
     tier: 'legendary',
-    oilCapacity: 20,
+    // 30, not the original 20 - at lantern-flame's 8 oil/cast that was only 2.5 casts/tank,
+    // proportionally stingier than the endgame lantern's 35/10 = 3.5 - 30/8 = 3.75 brings the
+    // starter lantern back in line with (slightly past) what it's meant to be upgraded from.
+    oilCapacity: 30,
     lanternAbilityIds: ['lantern-flame'],
   },
   'miners-lost-lantern-equipped': {

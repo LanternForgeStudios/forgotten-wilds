@@ -16,7 +16,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 12,
     goldReward: 6,
-    lootTable: [{ itemId: 'moth-dust', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'moth-dust', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'healing-poultice', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb:
       'Pale, moon-winged shapes said to be kin to older, half-remembered legends of the ridge.',
   },
@@ -34,7 +37,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 20,
     goldReward: 11,
-    lootTable: [{ itemId: 'moth-dust', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'moth-dust', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'healing-poultice', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'An elder Mothling, wingscales glowing faintly even in daylight.',
   },
   {
@@ -85,7 +91,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 14,
     goldReward: 8,
-    lootTable: [{ itemId: 'ember-shard', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'ember-shard', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'A smoldering ember given shape by grief and old coal-dust.',
   },
   {
@@ -102,7 +111,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 22,
     goldReward: 13,
-    lootTable: [{ itemId: 'ember-shard', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'ember-shard', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'Where a Coal Spirit lingers too long unchecked, it hardens into something angrier.',
   },
   {
@@ -153,7 +165,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 14,
     goldReward: 8,
-    lootTable: [{ itemId: 'silver-droplet', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'silver-droplet', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'A shape of mist and spray that gathers in the still pools below Whisper Falls.',
   },
   {
@@ -170,7 +185,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 22,
     goldReward: 13,
-    lootTable: [{ itemId: 'silver-droplet', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'silver-droplet', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'Its voice carries under the roar of the falls, and travelers who follow it rarely explain why.',
   },
   {

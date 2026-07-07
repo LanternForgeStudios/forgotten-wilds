@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advanceQuests, applyQuestRewards, effectiveStatus } from './questEngine';
+import { advanceQuests, applyQuestRewards, currentNpcDialogueVariantKey, effectiveStatus } from './questEngine';
 import type { PlayerSave, QuestProgress } from '../shared-types';
 
 function emptySave(overrides: Partial<PlayerSave> = {}): PlayerSave {
@@ -140,5 +140,45 @@ describe('applyQuestRewards', () => {
     // correctly remain unsatisfied.
     expect(save.quests['fragments-of-the-first-promise'].objectiveCounts['get-water'] ?? 0).toBe(0);
     expect(save.quests['fragments-of-the-first-promise'].status).toBe('active');
+  });
+});
+
+describe('currentNpcDialogueVariantKey', () => {
+  it("returns 'base' for an NPC with no quest completed yet", () => {
+    expect(currentNpcDialogueVariantKey('hunter-garrick', {})).toBe('base');
+  });
+
+  it('returns the first (most-advanced) completed variant quest, not just any completed one', () => {
+    // hunter-garrick's variants are ordered ['shadows-on-raven-ridge', 'strange-tracks'] -
+    // completing both should still resolve to the first (most-advanced) match.
+    const quests = {
+      'shadows-on-raven-ridge': { status: 'completed' as const, objectiveCounts: {} },
+      'strange-tracks': { status: 'completed' as const, objectiveCounts: {} },
+    };
+    expect(currentNpcDialogueVariantKey('hunter-garrick', quests)).toBe('shadows-on-raven-ridge');
+  });
+
+  it('falls back to a less-advanced variant when only that one is completed', () => {
+    const quests = { 'strange-tracks': { status: 'completed' as const, objectiveCounts: {} } };
+    expect(currentNpcDialogueVariantKey('hunter-garrick', quests)).toBe('strange-tracks');
+  });
+
+  it("returns 'base' for an NPC with no dialogue variants at all", () => {
+    expect(currentNpcDialogueVariantKey('mara-ash', { 'a-new-keeper': { status: 'completed', objectiveCounts: {} } })).toBe(
+      'base',
+    );
+  });
+
+  it('gives a different answer before vs. after the gating quest completes - this is why talkToNpc.ts must compute the key before calling advanceQuests, not after', () => {
+    const quests: Record<string, { status: 'active' | 'completed'; objectiveCounts: Record<string, number> }> = {
+      'shadows-on-raven-ridge': { status: 'active', objectiveCounts: {} },
+    };
+    const keyBeforeCompletion = currentNpcDialogueVariantKey('hunter-garrick', quests);
+    expect(keyBeforeCompletion).toBe('base');
+
+    quests['shadows-on-raven-ridge'].status = 'completed';
+    const keyAfterCompletion = currentNpcDialogueVariantKey('hunter-garrick', quests);
+    expect(keyAfterCompletion).toBe('shadows-on-raven-ridge');
+    expect(keyAfterCompletion).not.toBe(keyBeforeCompletion);
   });
 });

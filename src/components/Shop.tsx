@@ -215,6 +215,9 @@ export function Shop({ shopId, onClose }: ShopProps) {
                 {selectedDef.effect.healSpiritPercent
                   ? `Restores ${Math.round(selectedDef.effect.healSpiritPercent * 100)}% Spirit  `
                   : ''}
+                {selectedDef.effect.restoreOilPercent
+                  ? `Restores ${Math.round(selectedDef.effect.restoreOilPercent * 100)}% Lantern Oil  `
+                  : ''}
               </p>
             )}
           </div>

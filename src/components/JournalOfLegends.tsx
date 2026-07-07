@@ -64,7 +64,8 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const [tab, setTab] = useState<Tab>('quests');
   const [expandedLocations, setExpandedLocations] = useState<Set<string>>(new Set());
   const [questCategoryTab, setQuestCategoryTab] = useState<QuestCategory>('main');
-  const [activeQuestsOnly, setActiveQuestsOnly] = useState(false);
+  const [activeQuestsOnly, setActiveQuestsOnly] = useState(true);
+  const [locationSearch, setLocationSearch] = useState('');
   // Tracks *collapsed* quest regions rather than expanded ones, so every region defaults to open
   // on first view without needing to precompute ids.
   const [collapsedQuestRegions, setCollapsedQuestRegions] = useState<Set<string>>(new Set());
@@ -93,6 +94,12 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
       else next.add(locationId);
       return next;
     });
+  }
+
+  const locationQuery = locationSearch.trim().toLowerCase();
+  function matchesLocationQuery(loc?: { name: string; description: string }): boolean {
+    if (!locationQuery) return true;
+    return !!loc && (loc.name.toLowerCase().includes(locationQuery) || loc.description.toLowerCase().includes(locationQuery));
   }
 
   return (
@@ -240,15 +247,31 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
 
         {tab === 'locations' && (
           <div>
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="Search locations..."
+              value={locationSearch}
+              onChange={(e) => setLocationSearch(e.target.value)}
+            />
             {journal.locationsVisited
               .filter((id) => !LOCATIONS.find((l) => l.id === id)?.parentLocationId)
               .map((id) => {
                 const loc = LOCATIONS.find((l) => l.id === id);
                 const canTravel = loc?.fastTravel && id !== currentLocationId && fastTravelUnlocked;
-                const children = LOCATIONS.filter(
+                const allChildren = LOCATIONS.filter(
                   (l) => l.parentLocationId === id && journal.locationsVisited.includes(l.id),
                 );
-                const expanded = expandedLocations.has(id);
+                const parentMatches = matchesLocationQuery(loc);
+                const matchingChildren = allChildren.filter(matchesLocationQuery);
+                if (locationQuery && !parentMatches && matchingChildren.length === 0) return null;
+                // A parent that only matched because a child did gets its full child list shown
+                // (not just the matching one) so the result still reads as a normal location entry;
+                // a parent that didn't match itself only shows the children that did.
+                const children = parentMatches ? allChildren : matchingChildren;
+                // Auto-expand when the only reason this location is showing at all is a matching
+                // child - otherwise the match would be hidden behind a collapsed toggle.
+                const expanded = expandedLocations.has(id) || (!!locationQuery && !parentMatches && matchingChildren.length > 0);
                 return (
                   <div key={id}>
                     <div

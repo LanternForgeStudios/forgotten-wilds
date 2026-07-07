@@ -12,9 +12,10 @@ export interface ItemEffect {
   healHpPercent?: number;
   /** Same as healHpPercent, for Spirit. */
   healSpiritPercent?: number;
-  /** Refills the equipped lantern's Oil, clamped to its capacity. Stays a flat amount - lantern
-   *  oil has no tier ladder today and wasn't part of the percentage-based ask. */
-  restoreOil?: number;
+  /** Fraction (0-1) of the equipped lantern's maxLanternOil to restore - percentage rather than a
+   *  flat amount so the same item stays useful whether the player is on the 30-oil starter lantern
+   *  or a higher-capacity one found later. */
+  restoreOilPercent?: number;
 }
 
 export interface ItemDefinition {
@@ -54,7 +55,7 @@ export const ITEMS: Record<string, ItemDefinition> = {
     id: 'lantern-oil',
     category: 'consumable',
     usableInCombat: true,
-    effect: { restoreOil: 15 },
+    effect: { restoreOilPercent: 0.5 },
     tier: 'uncommon',
   },
   'moth-dust': { id: 'moth-dust', category: 'keyItem', usableInCombat: false, tier: 'common' },

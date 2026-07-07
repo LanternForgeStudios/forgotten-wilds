@@ -105,7 +105,13 @@ export interface ResolveCombatActionResponse {
   playerLanternOil: number;
   playerMaxLanternOil: number;
   enemies: { index: number; hp: number; maxHp: number }[];
-  rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean } | null;
+  rewards: {
+    xp: number;
+    gold: number;
+    itemIds: string[];
+    leveledUp: boolean;
+    restore: { stat: 'hp' | 'spirit' | 'lanternOil'; amount: number } | null;
+  } | null;
   playerLevel: number;
   playerGold: number;
   currentLocationId: string;

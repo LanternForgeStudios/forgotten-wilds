@@ -1,17 +1,11 @@
 {
+  "compressionlevel": -1,
   "width": 30,
   "height": 18,
-  "tilewidth": 16,
-  "tileheight": 16,
-  "properties": [
-    {
-      "name": "tilesetAssetId",
-      "type": "string",
-      "value": "tileset.tiny-dungeon"
-    }
-  ],
+  "infinite": false,
   "layers": [
     {
+      "id": 1,
       "type": "tilelayer",
       "name": "ground",
       "width": 30,
@@ -559,9 +553,12 @@
         1
       ],
       "visible": true,
-      "opacity": 1
+      "opacity": 1,
+      "x": 0,
+      "y": 0
     },
     {
+      "id": 2,
       "type": "tilelayer",
       "name": "decorations-1",
       "width": 30,
@@ -1109,9 +1106,12 @@
         0
       ],
       "visible": true,
-      "opacity": 1
+      "opacity": 1,
+      "x": 0,
+      "y": 0
     },
     {
+      "id": 3,
       "type": "tilelayer",
       "name": "decorations-2",
       "width": 30,
@@ -1659,28 +1659,49 @@
         0
       ],
       "visible": true,
-      "opacity": 1
+      "opacity": 1,
+      "x": 0,
+      "y": 0
     },
     {
+      "id": 4,
       "type": "objectgroup",
       "name": "collisions",
+      "draworder": "topdown",
       "objects": [
         {
+          "id": 1,
+          "name": "",
+          "type": "",
           "x": 272,
           "y": 96,
           "width": 32,
-          "height": 16
+          "height": 16,
+          "rotation": 0,
+          "visible": true
         }
-      ]
+      ],
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
     },
     {
+      "id": 5,
       "type": "objectgroup",
       "name": "objects",
+      "draworder": "topdown",
       "objects": [
         {
+          "id": 2,
+          "name": "",
           "type": "spawnPoint",
           "x": 16,
           "y": 144,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -1690,9 +1711,15 @@
           ]
         },
         {
+          "id": 3,
+          "name": "",
           "type": "transition",
           "x": 0,
           "y": 144,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -1707,9 +1734,15 @@
           ]
         },
         {
+          "id": 4,
+          "name": "",
           "type": "spawnPoint",
           "x": 448,
           "y": 144,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -1719,9 +1752,15 @@
           ]
         },
         {
+          "id": 5,
+          "name": "",
           "type": "interactable",
           "x": 240,
           "y": 64,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -1731,9 +1770,15 @@
           ]
         },
         {
+          "id": 6,
+          "name": "",
           "type": "interactable",
           "x": 352,
           "y": 192,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -1743,9 +1788,15 @@
           ]
         },
         {
+          "id": 7,
+          "name": "",
           "type": "interactable",
           "x": 320,
           "y": 128,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -1755,9 +1806,15 @@
           ]
         },
         {
+          "id": 8,
+          "name": "",
           "type": "interactable",
           "x": 432,
           "y": 224,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -1767,9 +1824,15 @@
           ]
         },
         {
+          "id": 9,
+          "name": "",
           "type": "encounterZone",
           "x": 64,
           "y": 48,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "encounterChance",
@@ -1779,9 +1842,15 @@
           ]
         },
         {
+          "id": 10,
+          "name": "",
           "type": "encounterZone",
           "x": 128,
           "y": 48,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "encounterChance",
@@ -1791,9 +1860,15 @@
           ]
         },
         {
+          "id": 11,
+          "name": "",
           "type": "encounterZone",
           "x": 192,
           "y": 48,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "encounterChance",
@@ -1803,9 +1878,15 @@
           ]
         },
         {
+          "id": 12,
+          "name": "",
           "type": "encounterZone",
           "x": 64,
           "y": 112,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "encounterChance",
@@ -1815,9 +1896,15 @@
           ]
         },
         {
+          "id": 13,
+          "name": "",
           "type": "encounterZone",
           "x": 128,
           "y": 112,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "encounterChance",
@@ -1827,9 +1914,15 @@
           ]
         },
         {
+          "id": 14,
+          "name": "",
           "type": "encounterZone",
           "x": 192,
           "y": 112,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
           "properties": [
             {
               "name": "encounterChance",
@@ -1838,9 +1931,14 @@
             }
           ]
         }
-      ]
+      ],
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
     },
     {
+      "id": 6,
       "type": "tilelayer",
       "name": "overhang",
       "width": 30,
@@ -2388,7 +2486,25 @@
         0
       ],
       "visible": true,
-      "opacity": 1
+      "opacity": 1,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "nextlayerid": 7,
+  "nextobjectid": 15,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.12.2",
+  "tilewidth": 16,
+  "tileheight": 16,
+  "type": "map",
+  "version": "1.10",
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
     }
   ],
   "tilesets": [

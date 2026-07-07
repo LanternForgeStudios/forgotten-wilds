@@ -16,9 +16,9 @@ export interface ItemEffect {
   healHpPercent?: number;
   healSpiritPercent?: number;
   reviveOnDefeat?: boolean;
-  /** Refills the equipped lantern's Oil, clamped to its capacity. Usable in and out of combat,
-   *  same as the other consumable effects. Stays a flat amount - no tier ladder today. */
-  restoreOil?: number;
+  /** Fraction (0-1) of the equipped lantern's maxLanternOil to restore - percentage rather than a
+   *  flat amount so the same item stays useful across lantern tiers. */
+  restoreOilPercent?: number;
 }
 
 export interface Item {

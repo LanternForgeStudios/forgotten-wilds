@@ -137,7 +137,7 @@ export const QUESTS: Quest[] = [
     category: 'main',
     prerequisiteQuestId: 'rekindling-spirit-grove',
     objectives: [
-      { id: 'talk-garrick-3', type: 'talkToNpc', description: 'Return to Hunter\'s Camp.', targetId: 'hunter-garrick', requiredCount: 1 },
+      { id: 'talk-garrick-3', type: 'talkToNpc', description: "Return to Hunter's Camp and speak with Hunter Garrick.", targetId: 'hunter-garrick', requiredCount: 1 },
       { id: 'reach-ridge', type: 'reachLocation', description: 'Travel through Raven Ridge.', targetId: 'raven-ridge', requiredCount: 1 },
       { id: 'talk-caleb', type: 'talkToNpc', description: 'Meet Ranger Caleb.', targetId: 'ranger-caleb', requiredCount: 1 },
     ],

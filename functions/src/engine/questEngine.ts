@@ -1,4 +1,5 @@
 import { QUESTS, type QuestObjectiveType } from '../data/quests';
+import { NPC_DIALOGUE_VARIANT_QUEST_IDS } from '../data/npcDialogueVariants';
 import { grantItem } from './inventoryEngine';
 import { applyLevelUp } from './levelingEngine';
 import type { PlayerSave, QuestProgress } from '../shared-types';
@@ -16,6 +17,18 @@ export function effectiveStatus(
     return 'locked';
   }
   return 'active';
+}
+
+/** Which dialogue variant an NPC is currently showing, as a key (a gating quest id, or 'base' if
+ *  none of that NPC's variants are unlocked yet) - mirrors the client's resolveNpcDialogue exactly
+ *  (first-completed-quest-wins, most-advanced-first), just returning the key instead of the lines
+ *  themselves (this file has no knowledge of dialogue text, only which quest unlocks which variant -
+ *  see npcDialogueVariants.ts). Used by talkToNpc.ts to track what the player has and hasn't heard. */
+export function currentNpcDialogueVariantKey(npcId: string, quests: Record<string, QuestProgress>): string {
+  for (const questId of NPC_DIALOGUE_VARIANT_QUEST_IDS[npcId] ?? []) {
+    if (effectiveStatus(questId, quests) === 'completed') return questId;
+  }
+  return 'base';
 }
 
 export interface QuestAdvanceEvent {

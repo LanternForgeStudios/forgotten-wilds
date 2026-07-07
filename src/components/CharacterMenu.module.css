@@ -203,3 +203,15 @@
   opacity: 0.7;
   text-align: right;
 }
+
+.searchInput {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}

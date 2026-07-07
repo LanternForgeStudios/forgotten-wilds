@@ -29,6 +29,14 @@
 body {
   margin: 0;
   min-height: 100svh;
+  /* CSS backstop for browserLockdown.ts's selectstart interception - form fields are explicitly
+     exempted so Title/Character Creation inputs stay normally selectable/editable. */
+  user-select: none;
+}
+
+input,
+textarea {
+  user-select: text;
 }
 
 #root {

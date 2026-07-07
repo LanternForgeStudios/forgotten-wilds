@@ -28,7 +28,8 @@ import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS } from '@/data';
 import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
-import { resolveNpcDialogue } from '@/utils/npcDialogue';
+import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
+import { useWorldStateStore } from '@/state/useWorldStateStore';
 import styles from './TownScene.module.css';
 
 const PRESENCE_STALE_AFTER_MS = 60_000;
@@ -66,6 +67,7 @@ export function TownScene() {
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const questProgress = useQuestStore((s) => s.progress);
+  const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const isMobile = useIsMobile();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
@@ -177,6 +179,7 @@ export function TownScene() {
         y: pos.y,
         spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
         label: npc?.name,
+        badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
       };
     });
 

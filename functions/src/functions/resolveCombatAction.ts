@@ -1,6 +1,13 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { resolveRound, computeRewards, aggregateItemCounts, hasSufficientQuantity } from '../engine/combatEngine';
+import {
+  resolveRound,
+  computeRewards,
+  aggregateItemCounts,
+  hasSufficientQuantity,
+  rollVictoryRestore,
+  type VictoryRestore,
+} from '../engine/combatEngine';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
 import { grantItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
@@ -68,7 +75,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         !!effect &&
         ((!!effect.healHpPercent && save.player.stats.hp < save.player.stats.maxHp) ||
           (!!effect.healSpiritPercent && save.player.stats.spirit < save.player.stats.maxSpirit) ||
-          (!!effect.restoreOil && save.player.stats.lanternOil < save.player.stats.maxLanternOil));
+          (!!effect.restoreOilPercent && save.player.stats.lanternOil < save.player.stats.maxLanternOil));
       if (!wouldHaveEffect) {
         throw new HttpsError('failed-precondition', 'That would have no effect right now.');
       }
@@ -115,7 +122,8 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       save.inventory = save.inventory.filter((i) => i.quantity > 0);
     }
 
-    let rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean } | null = null;
+    let rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean; restore: VictoryRestore | null } | null =
+      null;
 
     if (result.phase === 'victory') {
       // A boss already in save.journal.bossesDefeated (before the journal-update loop below
@@ -160,7 +168,25 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       const completions = questEvents.flatMap((event) => advanceQuests(save.quests, event));
       applyQuestRewards(save, completions);
 
-      rewards = { xp: reward.xp, gold: reward.gold, itemIds: grantedItemIds, leveledUp: save.player.level > levelBefore };
+      // Rolled after applyLevelUp so a fresh level's higher maxHp/maxSpirit is what a restore (if
+      // any) is a percentage of, and after the level-up's own stat growth is already applied.
+      const restore = rollVictoryRestore(save.player.stats);
+      if (restore) {
+        const max = { hp: save.player.stats.maxHp, spirit: save.player.stats.maxSpirit, lanternOil: save.player.stats.maxLanternOil }[
+          restore.stat
+        ];
+        save.player.stats[restore.stat] = Math.min(max, save.player.stats[restore.stat] + restore.amount);
+        const label = { hp: 'HP', spirit: 'Spirit', lanternOil: 'Lantern Oil' }[restore.stat];
+        result.log.push(`A quiet moment lets you recover ${restore.amount} ${label}.`);
+      }
+
+      rewards = {
+        xp: reward.xp,
+        gold: reward.gold,
+        itemIds: grantedItemIds,
+        leveledUp: save.player.level > levelBefore,
+        restore,
+      };
     } else if (result.phase === 'defeat') {
       // Soft respawn at the inn - no punishing penalty, per design decision in the plan.
       save.player.stats.hp = Math.round(save.player.stats.maxHp * 0.5);

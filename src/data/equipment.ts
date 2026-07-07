@@ -166,7 +166,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     iconAssetId: 'icon.equipment.keepers-lantern',
     statBonuses: { maxSpirit: 5 },
     tier: 'legendary',
-    oilCapacity: 20,
+    oilCapacity: 30,
     lanternAbilityIds: ['lantern-flame'],
   },
   {

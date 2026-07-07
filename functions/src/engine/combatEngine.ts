@@ -390,9 +390,10 @@ export function resolveRound(input: RoundInput): RoundResult {
           playerSpirit = Math.min(input.playerStats.maxSpirit, playerSpirit + amount);
           healSpiritTotal += playerSpirit - before;
         }
-        if (def.effect.restoreOil) {
+        if (def.effect.restoreOilPercent) {
           const before = playerLanternOil;
-          playerLanternOil = Math.min(input.playerStats.maxLanternOil, playerLanternOil + def.effect.restoreOil);
+          const amount = Math.round(input.playerStats.maxLanternOil * def.effect.restoreOilPercent);
+          playerLanternOil = Math.min(input.playerStats.maxLanternOil, playerLanternOil + amount);
           restoreOilTotal += playerLanternOil - before;
         }
       }
@@ -543,4 +544,29 @@ export function computeRewards(defeated: DefeatedEnemy[], currentXp: number, cur
     : {};
 
   return { xp: totalXp, gold: totalGold, lootItemIds, leveledUp, newLevel, statGrowth };
+}
+
+export interface VictoryRestore {
+  stat: 'hp' | 'spirit' | 'lanternOil';
+  amount: number;
+}
+
+const VICTORY_RESTORE_CHANCE = 0.25;
+const VICTORY_RESTORE_PERCENT = 0.15;
+
+/** A small, chance-based bonus on top of the usual xp/gold/loot - "some battles" (not every one)
+ *  leave the player a little restored, never exceeding any stat's max. Only rolls among stats that
+ *  aren't already at max, so this is a no-op (never fires) at full health/spirit/oil, and
+ *  naturally excludes lanternOil when no lantern is equipped (maxLanternOil is 0 there, so 0 < 0
+ *  is false - no special-casing needed). */
+export function rollVictoryRestore(stats: Stats): VictoryRestore | null {
+  const all: { stat: VictoryRestore['stat']; max: number }[] = [
+    { stat: 'hp', max: stats.maxHp },
+    { stat: 'spirit', max: stats.maxSpirit },
+    { stat: 'lanternOil', max: stats.maxLanternOil },
+  ];
+  const eligible = all.filter(({ stat, max }) => stats[stat] < max);
+  if (eligible.length === 0 || Math.random() >= VICTORY_RESTORE_CHANCE) return null;
+  const pick = eligible[Math.floor(Math.random() * eligible.length)];
+  return { stat: pick.stat, amount: Math.round(pick.max * VICTORY_RESTORE_PERCENT) };
 }

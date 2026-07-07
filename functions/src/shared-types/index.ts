@@ -86,6 +86,10 @@ export interface PlayerSave {
   /** World chest ids this player has already opened - a chest only ever grants its item once per
    *  player, regardless of how many times it's interacted with afterward. */
   openedChests: string[];
+  /** npcId -> the dialogue variant key (a gating quest id, or 'base') the player last heard from
+   *  that NPC - drives the "new dialogue available" indicator above their head. Absent/missing
+   *  entries are treated as 'base', so an NPC never talked to shows the indicator by default. */
+  seenNpcDialogueVariant: Record<string, string>;
   updatedAt: number;
 }
 

@@ -31,7 +31,7 @@ import {
 import { resyncSave } from '@/state/hydrate';
 import { ITEMS, EQUIPMENT, LOCATIONS, NPCS } from '@/data';
 import { isTypingTarget } from '@/utils/keyboard';
-import { resolveNpcDialogue } from '@/utils/npcDialogue';
+import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
 
@@ -65,6 +65,7 @@ export function OverworldScene() {
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
   const openedChests = useWorldStateStore((s) => s.openedChests);
+  const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -227,6 +228,7 @@ export function OverworldScene() {
         y: pos.y,
         spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
         label: npc?.name,
+        badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
       };
     });
 

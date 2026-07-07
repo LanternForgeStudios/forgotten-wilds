@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { advanceQuests, applyQuestRewards, currentNpcDialogueVariantKey } from '../engine/questEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface TalkToNpcRequest {
@@ -41,6 +41,13 @@ export const talkToNpc = onCall<TalkToNpcRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+
+    // Computed *before* advancing quests below, so this reflects the variant the player actually
+    // saw this visit (the client's DialogueBox renders off quest state captured at dialogue-open
+    // time, before the post-talk resync) - not whatever variant this same conversation might have
+    // just unlocked.
+    const shownVariantKey = currentNpcDialogueVariantKey(npcId, save.quests);
+    save.seenNpcDialogueVariant = { ...(save.seenNpcDialogueVariant ?? {}), [npcId]: shownVariantKey };
 
     const completions = advanceQuests(save.quests, { type: 'talkToNpc', targetId: npcId });
     applyQuestRewards(save, completions);

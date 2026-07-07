@@ -36,7 +36,10 @@ export function buildFreshPlayer(uid: string, name: string, now: number): Player
 
 /** The rest of a fresh PlayerSave besides `player` - starting inventory (must include whatever's
  *  equipped by default, since equip/unequip never grant or destroy items) and initial journal. */
-export function buildFreshSaveContent(): Pick<PlayerSave, 'inventory' | 'quests' | 'journal' | 'openedChests'> {
+export function buildFreshSaveContent(): Pick<
+  PlayerSave,
+  'inventory' | 'quests' | 'journal' | 'openedChests' | 'seenNpcDialogueVariant'
+> {
   return {
     inventory: [
       { itemId: 'healing-poultice', quantity: 2 },
@@ -50,5 +53,6 @@ export function buildFreshSaveContent(): Pick<PlayerSave, 'inventory' | 'quests'
       bossesDefeated: [],
     },
     openedChests: [],
+    seenNpcDialogueVariant: {},
   };
 }

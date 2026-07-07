@@ -17,6 +17,9 @@ export interface GridEntity {
   /** Static column to show when not animating (e.g. a resting pose) - defaults to 0. */
   frameColumn?: number;
   movementState?: MovementState;
+  /** Small overlay shown above the entity's label (e.g. "!" for an NPC with unheard dialogue) -
+   *  pure CSS/text, no art asset needed. */
+  badge?: string;
 }
 
 interface TileGridProps {
@@ -161,6 +164,7 @@ export function TileGrid({
             style={{ left: entity.x * tileSize, top: entity.y * tileSize, width: tileSize, height: tileSize }}
           >
             {entity.label && <span className={styles.entityLabel}>{entity.label}</span>}
+            {entity.badge && <span className={styles.entityBadge}>{entity.badge}</span>}
             {renderCharacterSprite(entity.spriteAssetId, entity.frameRow, entity.movementState, entity.frameColumn)}
           </div>
         ))}

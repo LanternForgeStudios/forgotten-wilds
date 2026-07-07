@@ -37,6 +37,16 @@ the first files in the repo to actually show the fuller model in practice.
   stall, boulder, or cave-in) sized 1-2 tiles, just to show the mechanism. Add as many as your real
   map needs.
 
+## Map-level metadata
+
+Beyond the tileset block below, each file also carries the top-level fields a real Tiled install
+needs just to recognize and open the file at all: `type: "map"`, `orientation`, `renderorder`,
+`infinite`, `compressionlevel`, `tiledversion`, `version`, `nextlayerid`, `nextobjectid`, plus a
+unique `id`/`x`/`y` on every layer and `draworder` on every object layer. The game's own loader
+(`src/assets/tiledLoader.ts`) ignores all of these too - they're required by Tiled, not by this
+game. (An earlier pass at these templates omitted them entirely and Tiled refused to open the
+files - confirmed by diffing against a real blank map exported from Tiled.)
+
 ## The tileset block
 
 Unlike the game's own maps — where the loader only reads `firstgid`/`tilecount`/`columns`/

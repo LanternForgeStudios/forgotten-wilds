@@ -15,7 +15,7 @@ export function hydrateAllStores(save: PlayerSave): void {
   useInventoryStore.getState().hydrate(save.inventory);
   useQuestStore.getState().hydrate(save.quests);
   useJournalStore.getState().hydrate(save.journal);
-  useWorldStateStore.getState().hydrate(save.openedChests ?? []);
+  useWorldStateStore.getState().hydrate(save.openedChests ?? [], save.seenNpcDialogueVariant ?? {});
 }
 
 /** Compares quest progress before/after a resync and pushes a toast for anything that changed -

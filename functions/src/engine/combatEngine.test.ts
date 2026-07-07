@@ -10,6 +10,7 @@ import {
   aggregateItemCounts,
   hasSufficientQuantity,
   scaledEnemyStats,
+  rollVictoryRestore,
 } from './combatEngine';
 import { ENEMIES } from '../data/enemies';
 import type { Stats } from '../shared-types';
@@ -412,6 +413,26 @@ describe('resolveRound', () => {
     });
     expect(result.playerLanternOil).toBeGreaterThan(0);
     expect(result.itemConsumedIds).toEqual(['lantern-oil']);
+  });
+
+  it('Lantern Oil restores a percentage of the equipped lantern\'s maxLanternOil, so a bigger tank refills for more', () => {
+    // lantern-oil is restoreOilPercent: 0.5 - two different maxLanternOil values (a smaller and a
+    // bigger lantern) should refill by proportionally different absolute amounts.
+    const smallTank = resolveRound({
+      action: { type: 'item', itemIds: ['lantern-oil'] },
+      playerStats: stats({ speed: 999, lanternOil: 0, maxLanternOil: 30 }),
+      inventory: [{ itemId: 'lantern-oil', quantity: 1 }],
+      enemies: soloEnemies(),
+    });
+    const bigTank = resolveRound({
+      action: { type: 'item', itemIds: ['lantern-oil'] },
+      playerStats: stats({ speed: 999, lanternOil: 0, maxLanternOil: 35 }),
+      inventory: [{ itemId: 'lantern-oil', quantity: 1 }],
+      enemies: soloEnemies(),
+    });
+    expect(smallTank.playerLanternOil).toBe(Math.round(30 * 0.5));
+    expect(bigTank.playerLanternOil).toBe(Math.round(35 * 0.5));
+    expect(bigTank.playerLanternOil).toBeGreaterThan(smallTank.playerLanternOil);
   });
 
   it('using a healing item restores hp and reports the consumed item', () => {
@@ -827,5 +848,43 @@ describe('computeRewards', () => {
     expect(repeatKill.lootItemIds).not.toContain('wardens-ember-heart');
     expect(repeatKill.xp).toBe(firstKill.xp);
     expect(repeatKill.gold).toBe(firstKill.gold);
+  });
+});
+
+describe('rollVictoryRestore', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('returns null when every stat is already at max', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0); // would hit the chance roll if anything were eligible
+    const result = rollVictoryRestore(stats({ hp: 60, spirit: 30, lanternOil: 20, maxLanternOil: 20 }));
+    expect(result).toBeNull();
+  });
+
+  it('returns null when the chance roll misses, even with eligible stats', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99); // >= VICTORY_RESTORE_CHANCE (0.25)
+    const result = rollVictoryRestore(stats({ hp: 1, maxHp: 60 }));
+    expect(result).toBeNull();
+  });
+
+  it('only picks among non-maxed stats and restores 15% of that stat\'s max', () => {
+    // First random() call is the chance roll (must be < 0.25 to fire), second picks which eligible
+    // stat (Math.floor(second * eligible.length)) - mocking a fixed sequence pins both.
+    const values = [0.1, 0];
+    vi.spyOn(Math, 'random').mockImplementation(() => values.shift() ?? 0);
+    // Only hp is below max, so it must be the one picked regardless of the "which stat" roll.
+    const result = rollVictoryRestore(stats({ hp: 1, maxHp: 60, spirit: 30, maxSpirit: 30, lanternOil: 20, maxLanternOil: 20 }));
+    expect(result).toEqual({ stat: 'hp', amount: Math.round(60 * 0.15) });
+  });
+
+  it('excludes lanternOil when no lantern is equipped (maxLanternOil 0)', () => {
+    // eligible = [hp, spirit] only (lanternOil's 0 < 0 is false) - "which stat" roll of 0.99 picks
+    // the last eligible entry, which must be spirit, not lanternOil, since lanternOil never made it
+    // into the eligible list at all.
+    const values = [0.1, 0.99];
+    vi.spyOn(Math, 'random').mockImplementation(() => values.shift() ?? 0);
+    const result = rollVictoryRestore(stats({ hp: 1, maxHp: 60, spirit: 1, maxSpirit: 30, lanternOil: 0, maxLanternOil: 0 }));
+    expect(result?.stat).toBe('spirit');
   });
 });

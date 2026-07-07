@@ -65,3 +65,22 @@
   border-radius: 3px;
   margin-bottom: 2px;
 }
+
+/* Positioned at the entity's own top-right corner (not stacked above the name label, which some
+   entities also show) so the two never collide. */
+.entityBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  color: var(--fw-accent, #ffd166);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

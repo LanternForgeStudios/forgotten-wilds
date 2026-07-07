@@ -38,7 +38,7 @@ export const ITEMS: Item[] = [
     description: "Refined oil for a Keeper's lantern - refills the Oil its ability draws on. Usable in or out of battle.",
     category: 'consumable',
     iconAssetId: 'icon.item.lantern-oil',
-    effect: { restoreOil: 15 },
+    effect: { restoreOilPercent: 0.5 },
     stackable: true,
     tier: 'uncommon',
   },

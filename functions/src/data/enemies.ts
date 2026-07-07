@@ -45,7 +45,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 12,
     goldReward: 6,
-    lootTable: [{ itemId: 'moth-dust', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'moth-dust', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'healing-poultice', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'greater-mothling': {
     id: 'greater-mothling',
@@ -60,7 +63,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 20,
     goldReward: 11,
-    lootTable: [{ itemId: 'moth-dust', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'moth-dust', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'healing-poultice', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'restless-miner': {
     id: 'restless-miner',
@@ -105,7 +111,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 14,
     goldReward: 8,
-    lootTable: [{ itemId: 'ember-shard', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'ember-shard', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'coal-wraith': {
     id: 'coal-wraith',
@@ -120,7 +129,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 22,
     goldReward: 13,
-    lootTable: [{ itemId: 'ember-shard', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'ember-shard', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'cliff-wolf': {
     id: 'cliff-wolf',
@@ -165,7 +177,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 14,
     goldReward: 8,
-    lootTable: [{ itemId: 'silver-droplet', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'silver-droplet', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'falls-siren': {
     id: 'falls-siren',
@@ -180,7 +195,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 22,
     goldReward: 13,
-    lootTable: [{ itemId: 'silver-droplet', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'silver-droplet', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'briar-wraith': {
     id: 'briar-wraith',

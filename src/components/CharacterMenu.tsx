@@ -304,6 +304,9 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       {selected.itemDef.effect.healSpiritPercent
                         ? `Restores ${Math.round(selected.itemDef.effect.healSpiritPercent * 100)}% Spirit  `
                         : ''}
+                      {selected.itemDef.effect.restoreOilPercent
+                        ? `Restores ${Math.round(selected.itemDef.effect.restoreOilPercent * 100)}% Lantern Oil  `
+                        : ''}
                       {selected.itemDef.effect.reviveOnDefeat ? 'Revives on defeat' : ''}
                     </p>
                   )}

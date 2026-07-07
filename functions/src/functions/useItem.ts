@@ -36,7 +36,7 @@ export const useItem = onCall<UseItemRequest>(async (request) => {
     const wouldHaveEffect =
       (!!effect.healHpPercent && save.player.stats.hp < save.player.stats.maxHp) ||
       (!!effect.healSpiritPercent && save.player.stats.spirit < save.player.stats.maxSpirit) ||
-      (!!effect.restoreOil && save.player.stats.lanternOil < save.player.stats.maxLanternOil);
+      (!!effect.restoreOilPercent && save.player.stats.lanternOil < save.player.stats.maxLanternOil);
     if (!wouldHaveEffect) {
       throw new HttpsError('failed-precondition', 'That would have no effect right now.');
     }
@@ -49,11 +49,9 @@ export const useItem = onCall<UseItemRequest>(async (request) => {
       const amount = Math.round(save.player.stats.maxSpirit * effect.healSpiritPercent);
       save.player.stats.spirit = Math.min(save.player.stats.maxSpirit, save.player.stats.spirit + amount);
     }
-    if (effect.restoreOil) {
-      save.player.stats.lanternOil = Math.min(
-        save.player.stats.maxLanternOil,
-        save.player.stats.lanternOil + effect.restoreOil,
-      );
+    if (effect.restoreOilPercent) {
+      const amount = Math.round(save.player.stats.maxLanternOil * effect.restoreOilPercent);
+      save.player.stats.lanternOil = Math.min(save.player.stats.maxLanternOil, save.player.stats.lanternOil + amount);
     }
 
     entry.quantity -= 1;

@@ -89,6 +89,8 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 Arrow keys / WASD to move, Enter/Space to interact, **I** for Inventory/Equipment, **J** for
 Journal of Legends (opens to its Quests tab by default). On touch devices (auto-detected), drag
 anywhere on the map to move and use the on-screen HUD buttons in place of the keyboard shortcuts.
+Right-click, text selection, and copy/cut/paste are disabled everywhere except form fields (Title's
+sign-in inputs, Character Creation's name field) — see `src/utils/browserLockdown.ts`.
 
 ## Known limitations (MVP scope)
 
