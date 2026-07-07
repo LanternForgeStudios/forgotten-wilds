@@ -21,7 +21,9 @@ import {
   callUnblockUser,
   callSendDirectMessage,
   callResetPlayerProgress,
+  callMarkSocialReviewed,
 } from '@/firebase/functionsClient';
+import { resyncSave } from '@/state/hydrate';
 import type { DirectMessage, FriendRequest } from '@/types';
 import styles from './UserProfile.module.css';
 
@@ -70,6 +72,13 @@ export function UserProfile({ onClose }: UserProfileProps) {
       subscribeToIncomingFriendRequests(uid, setIncoming),
       subscribeToOutgoingFriendRequests(uid, setOutgoing),
     ];
+    // Clears the "new social activity" badge in PlayerHUD - fire-and-forget, then resync so the
+    // updated lastReviewedSocialAt actually reaches the store (no live listener on users/{uid}).
+    callMarkSocialReviewed()
+      .then(() => resyncSave(uid))
+      .catch(() => {
+        // Non-critical (just clears a notification badge) - the Friends tab itself still works.
+      });
     return () => unsubs.forEach((u) => u());
   }, [uid, tab]);
 

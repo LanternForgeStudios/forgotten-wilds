@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type Firestore, type Transaction } from 'firebase-admin/firestore';
-import type { FriendRequest, FriendshipDoc } from '../shared-types';
+import type { FriendRequest, FriendshipDoc, PlayerSave } from '../shared-types';
 
 async function isBlockedEitherWay(db: Firestore, uidA: string, uidB: string): Promise<boolean> {
   const [aBlocks, bBlocks] = await Promise.all([
@@ -74,18 +74,28 @@ export const sendFriendRequest = onCall<SendFriendRequestRequest>(async (request
       return { status: 'already-pending' as const };
     }
 
-    const [myDir, toDir] = await Promise.all([
+    const [myDir, toDir, mySave, toSave] = await Promise.all([
       db.collection('userDirectory').doc(uid).get(),
       db.collection('userDirectory').doc(toUid).get(),
+      db.collection('users').doc(uid).get(),
+      db.collection('users').doc(toUid).get(),
     ]);
     if (!toDir.exists) throw new HttpsError('not-found', 'No such user.');
 
+    // Sourced from the authoritative users/{uid} save first - userDirectory is a denormalized
+    // search-index copy written as a separate (non-transactional) call in createCharacter.ts, so
+    // it can drift missing/stale for an account even though the real save always has the name.
+    // Kept as a fallback rather than removed outright, with 'A Keeper' as an absolute last resort.
     const newRequest: FriendRequest = {
       id: forwardId,
       fromUid: uid,
-      fromDisplayName: (myDir.data()?.displayName as string) ?? 'A Keeper',
+      fromDisplayName:
+        (mySave.data() as PlayerSave | undefined)?.displayName ??
+        (myDir.data()?.displayName as string | undefined) ??
+        'A Keeper',
       toUid,
-      toDisplayName: toDir.data()!.displayName as string,
+      toDisplayName:
+        (toSave.data() as PlayerSave | undefined)?.displayName ?? (toDir.data()?.displayName as string),
       status: 'pending',
       createdAt: Date.now(),
     };

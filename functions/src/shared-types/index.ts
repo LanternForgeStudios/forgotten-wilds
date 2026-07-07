@@ -90,6 +90,11 @@ export interface PlayerSave {
    *  that NPC - drives the "new dialogue available" indicator above their head. Absent/missing
    *  entries are treated as 'base', so an NPC never talked to shows the indicator by default. */
   seenNpcDialogueVariant: Record<string, string>;
+  /** Timestamp (ms) of the last time the player opened the Friends tab of their User Profile -
+   *  drives the "new social activity" indicator next to their name in PlayerHUD (any incoming
+   *  friend request or direct message newer than this counts as unreviewed). 0 for a fresh
+   *  character, so any pre-existing activity would show as new. */
+  lastReviewedSocialAt: number;
   updatedAt: number;
 }
 

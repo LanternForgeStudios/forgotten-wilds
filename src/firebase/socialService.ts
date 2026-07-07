@@ -64,3 +64,11 @@ export function subscribeToDirectMessagesWith(
     callback(messages);
   });
 }
+
+/** Every message across every conversation involving `uid` - same query as
+ *  subscribeToDirectMessagesWith minus the single-thread filter, for a global "do I have any
+ *  unread DM" check (see PlayerHUD's "new social activity" indicator). */
+export function subscribeToAllDirectMessages(uid: string, callback: (messages: DirectMessage[]) => void): () => void {
+  const q = query(collection(db, 'directMessages'), where('participants', 'array-contains', uid));
+  return onSnapshot(q, (snap) => callback(snap.docs.map((d) => d.data() as DirectMessage)));
+}

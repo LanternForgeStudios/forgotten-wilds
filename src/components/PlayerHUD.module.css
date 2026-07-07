@@ -17,6 +17,7 @@
 }
 
 .name {
+  position: relative;
   background: transparent;
   border: none;
   font: inherit;
@@ -30,6 +31,16 @@
 
 .name:hover {
   text-decoration: underline;
+}
+
+.socialBadge {
+  position: absolute;
+  top: -3px;
+  right: -8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fw-danger);
 }
 
 .level {

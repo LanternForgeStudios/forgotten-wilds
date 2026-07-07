@@ -259,3 +259,8 @@ export async function callResetPlayerProgress(confirmEmail: string): Promise<voi
   const fn = httpsCallable<{ confirmEmail: string }, unknown>(functions, 'resetPlayerProgress');
   await fn({ confirmEmail });
 }
+
+export async function callMarkSocialReviewed(): Promise<void> {
+  const fn = httpsCallable(functions, 'markSocialReviewed');
+  await fn({});
+}

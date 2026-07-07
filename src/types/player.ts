@@ -40,5 +40,8 @@ export interface PlayerSave {
   /** npcId -> the dialogue variant key (a gating quest id, or 'base') the player last heard from
    *  that NPC - drives the "new dialogue available" indicator above their head. */
   seenNpcDialogueVariant: Record<string, string>;
+  /** Timestamp (ms) of the last time the player opened the Friends tab of their User Profile -
+   *  drives the "new social activity" indicator next to their name in PlayerHUD. */
+  lastReviewedSocialAt: number;
   updatedAt: number;
 }

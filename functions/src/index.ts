@@ -22,3 +22,4 @@ export { sendFriendRequest, respondToFriendRequest, removeFriend } from './funct
 export { blockUser, unblockUser } from './functions/blocking';
 export { sendDirectMessage } from './functions/sendDirectMessage';
 export { resetPlayerProgress } from './functions/resetPlayerProgress';
+export { markSocialReviewed } from './functions/markSocialReviewed';

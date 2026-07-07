@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
+import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useNow } from '@/hooks/useNow';
 import { HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
+import { subscribeToIncomingFriendRequests, subscribeToAllDirectMessages } from '@/firebase/socialService';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
 import { XP_THRESHOLDS, LOCATIONS } from '@/data';
 import { predictedStamina } from '@/utils/staminaRegen';
-import type { OnlinePresence } from '@/types';
+import type { DirectMessage, FriendRequest, OnlinePresence } from '@/types';
 import styles from './PlayerHUD.module.css';
 
 const STALE_AFTER_MS = 60_000;
@@ -42,11 +44,14 @@ interface PlayerHUDProps {
 export function PlayerHUD({ locationId }: PlayerHUDProps) {
   const player = usePlayerStore((s) => s.player);
   const uid = useAuthStore((s) => s.user?.uid);
+  const lastReviewedSocialAt = useWorldStateStore((s) => s.lastReviewedSocialAt);
   const isMobile = useIsMobile();
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
   const [presenceOpen, setPresenceOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
+  const [allMessages, setAllMessages] = useState<DirectMessage[]>([]);
   // Ticks the HUD every quarter-second purely so the Stamina bar visibly climbs back up in real
   // time between Dash calls instead of only updating right after one - display-only, never
   // persisted (see predictedStamina).
@@ -57,6 +62,21 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
     const unsubscribe = subscribeToPresence(setPresences);
     return unsubscribe;
   }, [locationId]);
+
+  // Always-mounted (not gated on the profile modal being open) so the "new social activity"
+  // indicator can appear without the player needing to open their profile first.
+  useEffect(() => {
+    if (!uid) return;
+    const unsubs = [
+      subscribeToIncomingFriendRequests(uid, setIncomingRequests),
+      subscribeToAllDirectMessages(uid, setAllMessages),
+    ];
+    return () => unsubs.forEach((u) => u());
+  }, [uid]);
+
+  const hasNewSocial =
+    incomingRequests.some((r) => r.createdAt > lastReviewedSocialAt) ||
+    allMessages.some((m) => m.fromUid !== uid && m.sentAt > lastReviewedSocialAt);
 
   if (!player) return null;
 
@@ -85,6 +105,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
     <div className={styles.bar} style={{ height: barHeight }}>
       <button className={styles.name} onClick={() => setProfileOpen(true)} title="View your user profile">
         {player.name} <span className={styles.level}>Lv.{player.level}</span>
+        {hasNewSocial && <span className={styles.socialBadge} title="New friend request or message" />}
       </button>
 
       {locationName && <span className={styles.location}>{locationName}</span>}
