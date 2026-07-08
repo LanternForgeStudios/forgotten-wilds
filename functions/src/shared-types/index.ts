@@ -193,3 +193,39 @@ export interface DirectMessage {
   text: string;
   sentAt: number;
 }
+
+export type TradeStatus = 'awaiting_recipient' | 'awaiting_initiator' | 'accepted' | 'declined' | 'cancelled';
+
+export interface TradeOfferSide {
+  items: { itemId: string; quantity: number }[];
+  gold: number;
+}
+
+/** trades/{id} - flat collection, `participants` ([initiatorUid, recipientUid], order meaningful
+ *  unlike directMessages' sorted pair) is what security rules and the client's live query filter
+ *  on. `initiatorOffer` is escrowed (physically removed from the initiator's own save) the moment
+ *  this doc is created; `recipientOffer` is escrowed the same way the moment the recipient
+ *  counters (null until then, since decline never populates it). Only ever mutated by
+ *  trade.ts's four Cloud Functions, inside a transaction, alongside whichever users/{uid} docs
+ *  it's moving escrowed assets to/from. */
+export interface TradeDoc {
+  id: string;
+  participants: [string, string];
+  initiatorUid: string;
+  recipientUid: string;
+  status: TradeStatus;
+  initiatorOffer: TradeOfferSide;
+  recipientOffer: TradeOfferSide | null;
+  createdAt: number;
+  updatedAt: number;
+}
+
+/** activeTradeLocks/{sortedPairKey} ([uidA,uidB].sort().join('_')) - internal bookkeeping only,
+ *  never read by the client (see firestore.rules). Exists so proposeTrade can check "no other
+ *  active trade already exists between this pair" atomically inside its own transaction
+ *  (`tx.get` on a doc ref - every transaction read in this codebase is a doc ref, never a query,
+ *  and a query-then-transact approach here would have a TOCTOU race between two concurrent
+ *  proposals). Deleted in the same transaction whenever a trade reaches a terminal status. */
+export interface ActiveTradeLockDoc {
+  tradeId: string;
+}

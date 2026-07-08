@@ -11,4 +11,5 @@ export * from './tilemap';
 export * from './location';
 export * from './presence';
 export * from './social';
+export * from './trade';
 export * from './future';

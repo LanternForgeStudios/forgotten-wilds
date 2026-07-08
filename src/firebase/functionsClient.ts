@@ -1,5 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
-import type { EnemyTier, PlayerSave } from '@/types';
+import type { EnemyTier, PlayerSave, TradeStatus } from '@/types';
 import { functions } from './firebaseConfig';
 
 export async function callCreateCharacter(name: string): Promise<PlayerSave> {
@@ -278,4 +278,47 @@ export async function callResetPlayerProgress(confirmEmail: string): Promise<voi
 export async function callMarkSocialReviewed(): Promise<void> {
   const fn = httpsCallable(functions, 'markSocialReviewed');
   await fn({});
+}
+
+export interface TradeItemRequest {
+  itemId: string;
+  quantity: number;
+}
+
+export async function callProposeTrade(
+  toUid: string,
+  items: TradeItemRequest[],
+  gold: number,
+): Promise<{ tradeId: string }> {
+  const fn = httpsCallable<{ toUid: string; items: TradeItemRequest[]; gold: number }, { tradeId: string }>(
+    functions,
+    'proposeTrade',
+  );
+  const result = await fn({ toUid, items, gold });
+  return result.data;
+}
+
+export async function callRespondToTradeOffer(
+  tradeId: string,
+  action: 'decline' | 'counter',
+  counter?: { items: TradeItemRequest[]; gold: number },
+): Promise<{ status: TradeStatus }> {
+  const fn = httpsCallable<
+    { tradeId: string; action: 'decline' | 'counter'; items?: TradeItemRequest[]; gold?: number },
+    { status: TradeStatus }
+  >(functions, 'respondToTradeOffer');
+  const result = await fn({ tradeId, action, items: counter?.items, gold: counter?.gold });
+  return result.data;
+}
+
+export async function callFinalizeTrade(tradeId: string, accept: boolean): Promise<{ status: TradeStatus }> {
+  const fn = httpsCallable<{ tradeId: string; accept: boolean }, { status: TradeStatus }>(functions, 'finalizeTrade');
+  const result = await fn({ tradeId, accept });
+  return result.data;
+}
+
+export async function callCancelTrade(tradeId: string): Promise<{ cancelled: boolean; status: TradeStatus }> {
+  const fn = httpsCallable<{ tradeId: string }, { cancelled: boolean; status: TradeStatus }>(functions, 'cancelTrade');
+  const result = await fn({ tradeId });
+  return result.data;
 }

@@ -15,15 +15,6 @@ export interface Party {
   members: PartyMember[];
 }
 
-export interface TradeOffer {
-  id: string;
-  fromUid: string;
-  toUid: string;
-  offeredItemIds: string[];
-  requestedItemIds: string[];
-  status: 'pending' | 'accepted' | 'declined' | 'cancelled';
-}
-
 export interface Lodge {
   id: string;
   name: string;

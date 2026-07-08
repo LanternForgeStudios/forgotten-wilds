@@ -6,12 +6,13 @@ import { useNow } from '@/hooks/useNow';
 import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { subscribeToIncomingFriendRequests, subscribeToAllDirectMessages } from '@/firebase/socialService';
+import { subscribeToMyTrades } from '@/firebase/tradeService';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
 import { XP_THRESHOLDS, LOCATIONS } from '@/data';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { PRESENCE_STALE_AFTER_MS } from '@/utils/presence';
-import type { DirectMessage, FriendRequest, OnlinePresence } from '@/types';
+import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc } from '@/types';
 import styles from './PlayerHUD.module.css';
 
 const MAX_LEVEL = XP_THRESHOLDS.length - 1;
@@ -50,6 +51,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
   const [allMessages, setAllMessages] = useState<DirectMessage[]>([]);
+  const [myTrades, setMyTrades] = useState<TradeDoc[]>([]);
   // Ticks the HUD every quarter-second purely so the Stamina bar visibly climbs back up in real
   // time between Dash calls instead of only updating right after one - display-only, never
   // persisted (see predictedStamina).
@@ -69,13 +71,20 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
     const unsubs = [
       subscribeToIncomingFriendRequests(uid, setIncomingRequests),
       subscribeToAllDirectMessages(uid, setAllMessages),
+      subscribeToMyTrades(uid, setMyTrades),
     ];
     return () => unsubs.forEach((u) => u());
   }, [uid]);
 
   const hasNewSocial =
     incomingRequests.some((r) => r.createdAt > lastReviewedSocialAt) ||
-    allMessages.some((m) => m.fromUid !== uid && m.sentAt > lastReviewedSocialAt);
+    allMessages.some((m) => m.fromUid !== uid && m.sentAt > lastReviewedSocialAt) ||
+    myTrades.some(
+      (t) =>
+        t.updatedAt > lastReviewedSocialAt &&
+        ((t.recipientUid === uid && t.status === 'awaiting_recipient') ||
+          (t.initiatorUid === uid && t.status === 'awaiting_initiator')),
+    );
 
   if (!player) return null;
 
@@ -103,7 +112,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
     <div className={styles.bar} style={{ height: barHeight }}>
       <button className={styles.name} onClick={() => setProfileOpen(true)} title="View your user profile">
         {player.name} <span className={styles.level}>Lv.{player.level}</span>
-        {hasNewSocial && <span className={styles.socialBadge} title="New friend request or message" />}
+        {hasNewSocial && <span className={styles.socialBadge} title="New friend request, message, or trade" />}
       </button>
 
       {locationName && <span className={styles.location}>{locationName}</span>}

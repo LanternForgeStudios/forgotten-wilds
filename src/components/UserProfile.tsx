@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Panel } from './common/Panel';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -22,13 +22,33 @@ import {
   callSendDirectMessage,
   callResetPlayerProgress,
   callMarkSocialReviewed,
+  callProposeTrade,
+  callRespondToTradeOffer,
+  callFinalizeTrade,
+  callCancelTrade,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
+import { subscribeToMyTrades } from '@/firebase/tradeService';
 import { useNow } from '@/hooks/useNow';
 import { isPresenceOnline } from '@/utils/presence';
-import type { DirectMessage, FriendRequest, OnlinePresence } from '@/types';
+import { useToastStore } from '@/state/useToastStore';
+import { TradeOfferPanel } from './TradeOfferPanel';
+import { ITEMS, EQUIPMENT } from '@/data';
+import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc, TradeOfferSide } from '@/types';
 import styles from './UserProfile.module.css';
+
+function tradeItemDisplayName(itemId: string): string {
+  return EQUIPMENT.find((e) => e.id === itemId)?.name ?? ITEMS.find((i) => i.id === itemId)?.name ?? itemId.replace(/-/g, ' ');
+}
+
+/** "2x Healing Poultice, 3x Lantern Oil, 30g" / "nothing" for an empty offer (a legitimate
+ *  counter, e.g. "take it for free"). */
+function formatTradeOffer(offer: TradeOfferSide): string {
+  const parts = offer.items.map((i) => `${i.quantity}x ${tradeItemDisplayName(i.itemId)}`);
+  if (offer.gold > 0) parts.push(`${offer.gold}g`);
+  return parts.length > 0 ? parts.join(', ') : 'nothing';
+}
 
 interface UserProfileProps {
   onClose: () => void;
@@ -65,6 +85,12 @@ export function UserProfile({ onClose }: UserProfileProps) {
   // Only needs to be fresh enough to catch a friend going stale/coming back - not the 250ms tick
   // PlayerHUD's live Stamina bar needs.
   const now = useNow(5000);
+  const [myTrades, setMyTrades] = useState<TradeDoc[]>([]);
+  const [tradeProposalToUid, setTradeProposalToUid] = useState<string | null>(null);
+  const [counterTradeId, setCounterTradeId] = useState<string | null>(null);
+  const [tradeError, setTradeError] = useState<string | null>(null);
+  const prevTradesRef = useRef<TradeDoc[]>([]);
+  const hasLoadedTradesRef = useRef(false);
 
   // --- Reset Progress tab state ---
   const [confirmEmail, setConfirmEmail] = useState('');
@@ -79,6 +105,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
       subscribeToIncomingFriendRequests(uid, setIncoming),
       subscribeToOutgoingFriendRequests(uid, setOutgoing),
       subscribeToPresence(setPresences),
+      subscribeToMyTrades(uid, setMyTrades),
     ];
     // Clears the "new social activity" badge in PlayerHUD - fire-and-forget, then resync so the
     // updated lastReviewedSocialAt actually reaches the store (no live listener on users/{uid}).
@@ -91,11 +118,43 @@ export function UserProfile({ onClose }: UserProfileProps) {
   }, [uid, tab]);
 
   useEffect(() => {
-    const allUids = [...friendUids, ...blockedUids, ...incoming.map((r) => r.fromUid), ...outgoing.map((r) => r.toUid)];
+    const allUids = [
+      ...friendUids,
+      ...blockedUids,
+      ...incoming.map((r) => r.fromUid),
+      ...outgoing.map((r) => r.toUid),
+      ...myTrades.flatMap((t) => t.participants),
+    ];
     const unresolved = Array.from(new Set(allUids)).filter((u) => !names[u]);
     if (unresolved.length === 0) return;
     resolveDisplayNames(unresolved).then((resolved) => setNames((prev) => ({ ...prev, ...resolved })));
-  }, [friendUids, blockedUids, incoming, outgoing, names]);
+  }, [friendUids, blockedUids, incoming, outgoing, myTrades, names]);
+
+  // Pushes one toast the moment a trade transitions into a terminal status - same idea as
+  // hydrate.ts's toastQuestChanges, but implemented locally here since trades aren't part of
+  // PlayerSave (no live listener there to diff against). Terminal trades are filtered out of the
+  // Active Trades list right after (see the render below), so this is the one place their
+  // outcome is ever surfaced. Requires a *previously-seen, non-terminal* version of the trade to
+  // exist before toasting - otherwise the very first subscription delivery (which can already
+  // include old terminal trades from a while back) would spam a toast for every one of them.
+  useEffect(() => {
+    const prev = prevTradesRef.current;
+    if (hasLoadedTradesRef.current) {
+      for (const trade of myTrades) {
+        const prevTrade = prev.find((t) => t.id === trade.id);
+        if (!prevTrade || prevTrade.status === trade.status) continue;
+        if (prevTrade.status !== 'awaiting_recipient' && prevTrade.status !== 'awaiting_initiator') continue;
+        if (trade.status === 'accepted') {
+          const mine = trade.initiatorUid === uid ? trade.recipientOffer : trade.initiatorOffer;
+          useToastStore.getState().push(`Trade completed - you received ${mine ? formatTradeOffer(mine) : 'nothing'}.`);
+        } else if (trade.status === 'declined' || trade.status === 'cancelled') {
+          useToastStore.getState().push('Trade ended - items and gold returned.');
+        }
+      }
+    }
+    hasLoadedTradesRef.current = true;
+    prevTradesRef.current = myTrades;
+  }, [myTrades, uid]);
 
   useEffect(() => {
     if (!uid || !activeDmUid) return;
@@ -163,6 +222,73 @@ export function UserProfile({ onClose }: UserProfileProps) {
     setBusy(true);
     try {
       await callUnblockUser(targetUid);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // Every trade action escrows/releases/grants items+gold on at least one account, including the
+  // caller's own - resyncSave afterward is what makes the Inventory/gold the player sees update
+  // immediately, same as callMarkSocialReviewed's own resync above (gold/inventory have no live
+  // Firestore listener).
+  async function proposeTrade(toUid: string, items: { itemId: string; quantity: number }[], gold: number) {
+    if (busy) return;
+    setBusy(true);
+    setTradeError(null);
+    try {
+      await callProposeTrade(toUid, items, gold);
+      if (uid) await resyncSave(uid);
+      setTradeProposalToUid(null);
+    } catch (err) {
+      setTradeError(err instanceof Error ? err.message : 'Could not propose that trade.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function declineTrade(tradeId: string) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await callRespondToTradeOffer(tradeId, 'decline');
+      if (uid) await resyncSave(uid);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function counterTrade(tradeId: string, items: { itemId: string; quantity: number }[], gold: number) {
+    if (busy) return;
+    setBusy(true);
+    setTradeError(null);
+    try {
+      await callRespondToTradeOffer(tradeId, 'counter', { items, gold });
+      if (uid) await resyncSave(uid);
+      setCounterTradeId(null);
+    } catch (err) {
+      setTradeError(err instanceof Error ? err.message : 'Could not send that counter-offer.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function finalizeTrade(tradeId: string, accept: boolean) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await callFinalizeTrade(tradeId, accept);
+      if (uid) await resyncSave(uid);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function cancelTradeProposal(tradeId: string) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await callCancelTrade(tradeId);
+      if (uid) await resyncSave(uid);
     } finally {
       setBusy(false);
     }
@@ -318,6 +444,11 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   presences.find((p) => p.uid === fUid),
                   now,
                 );
+                const hasActiveTrade = myTrades.some(
+                  (t) =>
+                    t.participants.includes(fUid) &&
+                    (t.status === 'awaiting_recipient' || t.status === 'awaiting_initiator'),
+                );
                 return (
                   <div key={fUid} className={styles.row}>
                     <span
@@ -332,6 +463,14 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     >
                       Message
                     </button>
+                    <button
+                      className={styles.smallButton}
+                      disabled={busy || hasActiveTrade}
+                      title={hasActiveTrade ? 'You already have an active trade with this player.' : undefined}
+                      onClick={() => setTradeProposalToUid((cur) => (cur === fUid ? null : fUid))}
+                    >
+                      Trade
+                    </button>
                     <button className={styles.smallButton} disabled={busy} onClick={() => remove(fUid)}>
                       Remove
                     </button>
@@ -342,6 +481,112 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 );
               })}
             </div>
+
+            {tradeProposalToUid && (
+              <TradeOfferPanel
+                title={`Propose a trade to ${names[tradeProposalToUid] ?? '...'}`}
+                submitLabel="Send Offer"
+                busy={busy}
+                onSubmit={(items, gold) => proposeTrade(tradeProposalToUid, items, gold)}
+                onCancel={() => setTradeProposalToUid(null)}
+              />
+            )}
+            {tradeError && <p className={styles.error}>{tradeError}</p>}
+
+            {myTrades.filter((t) => t.status === 'awaiting_recipient' || t.status === 'awaiting_initiator').length >
+              0 && (
+              <>
+                <h3 className={styles.sectionTitle}>Active Trades</h3>
+                <div className={styles.list}>
+                  {myTrades
+                    .filter((t) => t.status === 'awaiting_recipient' || t.status === 'awaiting_initiator')
+                    .map((t) => {
+                      const otherUid = t.initiatorUid === uid ? t.recipientUid : t.initiatorUid;
+                      const otherName = names[otherUid] ?? '...';
+                      const iAmInitiator = t.initiatorUid === uid;
+
+                      if (t.status === 'awaiting_recipient' && !iAmInitiator) {
+                        // I'm the recipient - decide to decline or counter.
+                        return (
+                          <div key={t.id} className={styles.tradePanel}>
+                            <p className={styles.tradeOfferSummary}>
+                              {otherName} offers: {formatTradeOffer(t.initiatorOffer)}
+                            </p>
+                            {counterTradeId === t.id ? (
+                              <TradeOfferPanel
+                                title="Your counter-offer"
+                                submitLabel="Send Counter-Offer"
+                                busy={busy}
+                                onSubmit={(items, gold) => counterTrade(t.id, items, gold)}
+                                onCancel={() => setCounterTradeId(null)}
+                              />
+                            ) : (
+                              <div className={styles.searchBar}>
+                                <button className={styles.smallButton} disabled={busy} onClick={() => setCounterTradeId(t.id)}>
+                                  Counter
+                                </button>
+                                <button className={styles.dangerButton} disabled={busy} onClick={() => declineTrade(t.id)}>
+                                  Decline
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      if (t.status === 'awaiting_recipient' && iAmInitiator) {
+                        // I'm the initiator, waiting on them - can still back out entirely.
+                        return (
+                          <div key={t.id} className={styles.tradePanel}>
+                            <p className={styles.tradeOfferSummary}>
+                              You offered {otherName}: {formatTradeOffer(t.initiatorOffer)}
+                            </p>
+                            <p className={styles.tradeStatusTag}>Waiting for {otherName} to respond...</p>
+                            <button className={styles.dangerButton} disabled={busy} onClick={() => cancelTradeProposal(t.id)}>
+                              Cancel
+                            </button>
+                          </div>
+                        );
+                      }
+
+                      if (t.status === 'awaiting_initiator' && iAmInitiator && t.recipientOffer) {
+                        // Their counter is in - accept or reject is the final word.
+                        return (
+                          <div key={t.id} className={styles.tradePanel}>
+                            <p className={styles.tradeOfferSummary}>
+                              You offered: {formatTradeOffer(t.initiatorOffer)}
+                            </p>
+                            <p className={styles.tradeOfferSummary}>
+                              {otherName} countered with: {formatTradeOffer(t.recipientOffer)}
+                            </p>
+                            <div className={styles.searchBar}>
+                              <button className={styles.smallButton} disabled={busy} onClick={() => finalizeTrade(t.id, true)}>
+                                Accept
+                              </button>
+                              <button className={styles.dangerButton} disabled={busy} onClick={() => finalizeTrade(t.id, false)}>
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // awaiting_initiator, I'm the recipient - my counter is in, waiting on them.
+                      return (
+                        <div key={t.id} className={styles.tradePanel}>
+                          <p className={styles.tradeOfferSummary}>
+                            You offered: {t.recipientOffer ? formatTradeOffer(t.recipientOffer) : 'nothing'}
+                          </p>
+                          <p className={styles.tradeOfferSummary}>
+                            {otherName} originally offered: {formatTradeOffer(t.initiatorOffer)}
+                          </p>
+                          <p className={styles.tradeStatusTag}>Waiting for {otherName}'s final decision...</p>
+                        </div>
+                      );
+                    })}
+                </div>
+              </>
+            )}
 
             {activeDmUid && (
               <div className={styles.dmPanel}>

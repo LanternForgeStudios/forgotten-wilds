@@ -220,3 +220,34 @@
   opacity: 0.7;
   text-align: right;
 }
+
+.tradePanel {
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border: 1px solid var(--fw-panel-border);
+}
+
+.tradeQuantityInput {
+  width: 64px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-align: right;
+}
+
+.tradeOfferSummary {
+  font-size: 12px;
+  opacity: 0.85;
+  margin: 2px 0;
+}
+
+.tradeStatusTag {
+  font-size: 11px;
+  opacity: 0.7;
+  font-style: italic;
+}

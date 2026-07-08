@@ -70,5 +70,19 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid in resource.data.participants;
       allow write: if false;
     }
+
+    // Trading: friends-only item/gold trades (trade.ts), also server-authoritative.
+
+    match /trades/{tradeId} {
+      allow read: if request.auth != null && request.auth.uid in resource.data.participants;
+      allow write: if false;
+    }
+
+    match /activeTradeLocks/{pairKey} {
+      // Internal bookkeeping only (see trade.ts's sortedPairKey) - nothing in the UI ever needs
+      // to read this, so it's not even readable by its own participants.
+      allow read: if false;
+      allow write: if false;
+    }
   }
 }

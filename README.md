@@ -3,8 +3,9 @@
 **[Play it live](https://lanternforgestudios.github.io/forgotten-wilds/)**
 
 A browser-based JRPG set in Mytherra's Iron Mountains. Single-player exploration, turn-based
-combat, and quests today; live town presence now, with clean seams for future party/chat/trade/
-lodge/world-event systems. See `Forgotten-Wilds_Requirements.txt` for the full design brief.
+combat, and quests today; live town presence, friends/messaging, and player-to-player trading
+now, with clean seams for future party/chat/lodge/world-event systems. See
+`Forgotten-Wilds_Requirements.txt` for the full design brief.
 
 Frontend: React + TypeScript + Vite. Backend: Firebase (Auth, Firestore, Cloud Functions). The
 cloud is the source of truth — the client never writes game state directly; every mutation
@@ -78,8 +79,9 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   Firestore (`cd functions && npm test`, Vitest).
 - `functions/src/functions/` — the callable Cloud Functions (one file per function; see
   `functions/src/index.ts` for the current exported list, which grows over time).
-- `src/multiplayer/` — typed stub interfaces (party, chat, trade, lodges, world events) for
-  systems not built yet; every function throws "not implemented," ready to be filled in.
+- `src/multiplayer/` — typed stub interfaces (party, chat, lodges, world events, clan) for
+  systems not built yet; every function throws "not implemented," ready to be filled in. Trading
+  (formerly a stub here) is fully implemented - see `functions/src/functions/trade.ts`.
 - `src/phaser/` — Phaser 4 owns the canvas-based rendering for both exploration
   (`ExplorationScene.ts`, driven by `src/components/exploration/PhaserExplorationCanvas.tsx`,
   which `TileGrid.tsx` re-exports so Town/Overworld/Dungeon all get it via one import) and combat
