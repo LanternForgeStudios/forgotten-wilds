@@ -30,4 +30,7 @@ export function applyLevelUp(save: PlayerSave): void {
   save.player.stats.speed += STAT_GROWTH_PER_LEVEL.speed * levelsGained;
   save.player.stats.hp = save.player.stats.maxHp;
   save.player.stats.spirit = save.player.stats.maxSpirit;
+  if (save.player.equipment.lantern) {
+    save.player.stats.lanternOil = save.player.stats.maxLanternOil;
+  }
 }

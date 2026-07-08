@@ -62,6 +62,13 @@
   }
 }
 
+/* At normal widths this is invisible to layout - its children (the stat groups + XP button)
+   behave exactly as if they were direct children of .bar, in the same document order as before.
+   Only becomes a real flex row of its own at the narrow-HUD breakpoint below. */
+.vitalsRow {
+  display: contents;
+}
+
 .statGroup {
   display: flex;
   align-items: center;
@@ -224,8 +231,24 @@
 @media (max-width: 480px) {
   .bar {
     gap: 6px;
-    padding: 0 8px;
+    row-gap: 6px;
+    padding: 6px 8px;
     font-size: 11px;
+    /* Wraps onto two rows instead of squeezing name/gold/presence and every stat bar onto one -
+       .vitalsRow (below) forces itself onto its own row via width:100%, so row 1 is always just
+       name/gold/presence and row 2 is always the stat bars, regardless of exact pixel widths.
+       Must match useHudBarHeight's HUD_BAR_HEIGHT.narrow, which every scene's padding-top and
+       this component's own barHeight both use - see useExplorationViewport.ts. */
+    flex-wrap: wrap;
+    align-content: center;
+  }
+
+  .vitalsRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    flex-wrap: wrap;
   }
 
   .statGroup {

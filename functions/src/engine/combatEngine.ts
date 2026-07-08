@@ -119,12 +119,7 @@ const BOSS_STAT_GROWTH_PER_LEVEL = {
   speed: ENEMY_STAT_GROWTH_PER_LEVEL.speed * BOSS_STAT_GROWTH_MULTIPLIER,
 };
 
-/** Reward scaling has its own slope - it doesn't need to move at the same rate as stat scaling.
- *  Multiplicative, so it preserves the boss/trash reward ratio exactly at every level - only
- *  additive stat scaling needed a boss-specific rate (see BOSS_STAT_GROWTH_PER_LEVEL). */
-const REWARD_GROWTH_PER_LEVEL = 0.5;
-
-/** Every enemy (including bosses) rolls a level (1-50) that scales stats and rewards up, tracking
+/** Every enemy (including bosses) rolls a level (1-50) that scales stats up, tracking
  *  the player's own level so encounters stay a fair fight from level 1 through level 100 (see
  *  ENEMY_STAT_GROWTH_PER_LEVEL / BOSS_STAT_GROWTH_PER_LEVEL, which is where boss vs. regular/elite
  *  differentiation now happens - this roll itself no longer depends on which enemy it's for).
@@ -158,13 +153,6 @@ export function scaledEnemyStats(enemy: EnemyDefinition, level: number): ScaledE
     defense: enemy.stats.defense + growth.defense * levelsAboveOne,
     speed: enemy.stats.speed + growth.speed * levelsAboveOne,
   };
-}
-
-/** xp/gold scale the same way (a higher-level roll of the same enemy is worth proportionally more
- *  to defeat), on their own slope independent of how stats scale. */
-export function scaledEnemyRewards(enemy: EnemyDefinition, level: number): { xp: number; gold: number } {
-  const m = 1 + (level - 1) * REWARD_GROWTH_PER_LEVEL;
-  return { xp: Math.round(enemy.xpReward * m), gold: Math.round(enemy.goldReward * m) };
 }
 
 function computeDamage(power: number, attackerAtk: number, defenderDef: number): number {
@@ -223,6 +211,11 @@ export interface EnemyHitResult {
   /** True when this hit was halved by the player's Defend (or a defensive lanternAbility) this
    *  round - see playerDefending, decided once, up front, from the action alone. */
   wasDefended: boolean;
+  /** The exact same line already pushed to RoundResult.log for this attack - duplicated here so
+   *  the client can reveal it in lockstep with this specific attacker's staggered animation
+   *  (BattleScene.playIncomingHits) instead of dumping every round's log lines at once, which
+   *  read as disconnected from a multi-enemy fight's one-attacker-at-a-time presentation. */
+  logLine: string;
 }
 
 export interface RoundResult {
@@ -348,12 +341,11 @@ export function resolveRound(input: RoundInput): RoundResult {
     if (playerDefending) dmg = Math.round(dmg / 2);
     playerHp = Math.max(0, playerHp - dmg);
     damageTakenByPlayer += dmg;
-    enemyHits.push({ attackerIndex: i, damage: dmg, missed: false, wasDefended: playerDefending });
-    log.push(
-      `${def.name} uses ${move.skillId.replace(/-/g, ' ')} for ${dmg} damage${
-        playerDefending ? ' (halved - you defended)' : ''
-      }.`,
-    );
+    const attackLogLine = `${def.name} uses ${move.skillId.replace(/-/g, ' ')} for ${dmg} damage${
+      playerDefending ? ' (halved - you defended)' : ''
+    }.`;
+    enemyHits.push({ attackerIndex: i, damage: dmg, missed: false, wasDefended: playerDefending, logLine: attackLogLine });
+    log.push(attackLogLine);
   }
 
   function resolveTargetIndex(): number | undefined {
@@ -538,7 +530,6 @@ export interface RewardResult {
 
 export interface DefeatedEnemy {
   enemyId: string;
-  level: number;
   /** True to skip this enemy's lootTable roll entirely - used for a boss already defeated before
    *  this fight (being refought): xp/gold still pay out normally, but its guaranteed/special item
    *  drops don't repeat. Explicit rather than relying on those items happening to be marked
@@ -548,17 +539,20 @@ export interface DefeatedEnemy {
 }
 
 /** Sums xp/gold/loot across every enemy defeated in the fight (called once, at full-clear
- *  victory, with the complete roster - not incrementally per kill), scaled by each one's level. */
+ *  victory, with the complete roster - not incrementally per kill). xp/gold are each enemy's
+ *  authored xpReward/goldReward as-is - not scaled by the enemy's rolled level (unlike its
+ *  stats), so progression comes from later regions authoring higher payouts, not from the same
+ *  enemy paying out more just because it happened to roll a higher level against a higher-level
+ *  player. */
 export function computeRewards(defeated: DefeatedEnemy[], currentXp: number, currentLevel: number): RewardResult {
   const lootItemIds: string[] = [];
   let totalXp = 0;
   let totalGold = 0;
 
-  for (const { enemyId, level, skipLoot } of defeated) {
+  for (const { enemyId, skipLoot } of defeated) {
     const enemy = ENEMIES[enemyId];
-    const reward = scaledEnemyRewards(enemy, level);
-    totalXp += reward.xp;
-    totalGold += reward.gold;
+    totalXp += enemy.xpReward;
+    totalGold += enemy.goldReward;
     if (skipLoot) continue;
     for (const drop of enemy.lootTable) {
       if (Math.random() < drop.chance) {

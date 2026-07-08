@@ -5,6 +5,7 @@ import type { MovementState } from '@/animation/characterAnimations';
 import { PLAYER_ANIMATION_LAYOUT } from '@/animation/characterAnimations';
 import { getAssetDefinition, getAssetUrl } from '@/assets/assetManager';
 import { createCharacterAnimations, animationKey } from './animationDefs';
+import { ensureParticleTexture } from './battleEffects';
 import type { GridEntity } from '@/components/exploration/PhaserExplorationCanvas';
 
 /** Matches TileGrid.module.css's `transition: left/top 120ms linear` - the glide-between-tiles feel. */
@@ -15,6 +16,12 @@ const OVERHANG_DEPTH = 1000;
 /** Entities and the player sit between decoration layers and the overhang. Deliberately higher
  *  than any plausible decoration-layer count. */
 const ENTITY_DEPTH = 500;
+/** Same one-time generated 4x4 white-square texture ensureParticleTexture already sets up for
+ *  BattleScene's defeat effect - reused here rather than duplicating the Graphics->texture
+ *  boilerplate, tinted differently per call site. */
+const PARTICLE_TEXTURE_KEY = 'fx-dot';
+/** --fw-text-dim - a dusty tan/grey, reads as ground dust rather than anything magical. */
+const DASH_DUST_COLOR = 0xb8a888;
 
 interface EntityVisual {
   sprite: Phaser.GameObjects.Sprite;
@@ -69,6 +76,7 @@ export class ExplorationScene extends Phaser.Scene {
     // boot completes, so the caller can't safely listen on `scene.events` immediately after
     // `new Phaser.Game(...)` returns (confirmed the hard way: that's exactly what threw
     // "Cannot read properties of undefined (reading 'once')").
+    ensureParticleTexture(this, PARTICLE_TEXTURE_KEY);
     this.onReady?.();
   }
 
@@ -169,6 +177,13 @@ export class ExplorationScene extends Phaser.Scene {
 
     const targetX = pos.x * this.tileSize + this.tileSize / 2;
     const targetY = pos.y * this.tileSize + this.tileSize / 2;
+    // 'running' only ever means mid-Dash today (see useGridMovement.ts) - kick up a puff of dust
+    // from where the player is leaving, behind them as they go. Skipped on an instant snap (a
+    // location transition, not real movement) since there's no "leaving from" position to kick
+    // dust up from.
+    if (!snapInstantly && movementState === 'running') {
+      this.spawnDashDust(sprite.x, sprite.y);
+    }
     if (snapInstantly) {
       this.tweens.killTweensOf(sprite);
       sprite.setPosition(targetX, targetY);
@@ -186,6 +201,23 @@ export class ExplorationScene extends Phaser.Scene {
       sprite.anims.stop();
       sprite.setFrame(frameRow * PLAYER_ANIMATION_LAYOUT.frameCount);
     }
+  }
+
+  /** One small puff of dust, at ground level (behind the player sprite) rather than on top of
+   *  it - a short-lived one-shot emitter, same explode()-then-destroy pattern as BattleScene's
+   *  defeat effect. */
+  private spawnDashDust(x: number, y: number): void {
+    const emitter = this.add.particles(x, y, PARTICLE_TEXTURE_KEY, {
+      tint: DASH_DUST_COLOR,
+      speed: { min: 15, max: 40 },
+      lifespan: 280,
+      scale: { start: 0.8, end: 0 },
+      quantity: 4,
+      emitting: false,
+    });
+    emitter.setDepth(ENTITY_DEPTH - 1);
+    emitter.explode(4);
+    this.time.delayedCall(320, () => emitter.destroy());
   }
 
   /** Reconciles entity sprites/labels/badges against the incoming array - the manual equivalent

@@ -9,6 +9,13 @@ export const COLOR_MISS = 0xb8a888; // --fw-text-dim
 export const COLOR_DEFENDED = 0x7a94a8; // a cooler/dimmer blue-grey, for a successfully-defended hit
 export const COLOR_WHITE = 0xffffff;
 
+/** Delay between each attacking enemy's turn in a multi-enemy round's incoming-hit playback (both
+ *  the visual animation in BattleScene.playIncomingHits and the matching log-line reveal in
+ *  CombatScene.tsx use this same value, kept in one place so they can't drift apart) - long enough
+ *  to actually see one enemy's animation resolve before the next one goes, short enough that a
+ *  5-6 enemy fight doesn't feel sluggish. */
+export const INCOMING_HIT_STAGGER_MS = 1400;
+
 /** One-time 4x4 white square texture for the defeat particle burst - zero new art assets, per the
  *  migration plan. Call once from BattleScene.create(); safe to call again (no-ops if the texture
  *  already exists, e.g. across StrictMode's dev double-invoke). */

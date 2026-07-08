@@ -795,9 +795,9 @@ describe('computeRewards', () => {
     vi.restoreAllMocks();
   });
 
-  it('grants the enemy xp/gold reward at level 1 (no scaling)', () => {
+  it('grants exactly the enemy\'s authored xp/gold reward - no scaling by the enemy\'s rolled level', () => {
     const mothling = ENEMIES.mothling;
-    const reward = computeRewards([{ enemyId: mothling.id, level: 1 }], 0, 1);
+    const reward = computeRewards([{ enemyId: mothling.id }], 0, 1);
     expect(reward.xp).toBe(mothling.xpReward);
     expect(reward.gold).toBe(mothling.goldReward);
   });
@@ -805,11 +805,7 @@ describe('computeRewards', () => {
   it('sums xp/gold across every defeated enemy in a group', () => {
     const mothling = ENEMIES.mothling;
     const reward = computeRewards(
-      [
-        { enemyId: mothling.id, level: 1 },
-        { enemyId: mothling.id, level: 1 },
-        { enemyId: mothling.id, level: 1 },
-      ],
+      [{ enemyId: mothling.id }, { enemyId: mothling.id }, { enemyId: mothling.id }],
       0,
       1,
     );
@@ -817,17 +813,9 @@ describe('computeRewards', () => {
     expect(reward.gold).toBe(mothling.goldReward * 3);
   });
 
-  it('scales xp/gold up for a higher-level roll of the same enemy', () => {
-    const mothling = ENEMIES.mothling;
-    const level1 = computeRewards([{ enemyId: mothling.id, level: 1 }], 0, 1);
-    const level5 = computeRewards([{ enemyId: mothling.id, level: 5 }], 0, 1);
-    expect(level5.xp).toBeGreaterThan(level1.xp);
-    expect(level5.gold).toBeGreaterThan(level1.gold);
-  });
-
   it('flags a level-up and computes stat growth when xp crosses a threshold', () => {
     const boss = ENEMIES['coalbound-warden'];
-    const reward = computeRewards([{ enemyId: boss.id, level: 1 }], 30, 2); // 30 + 150 = 180 xp -> level 4
+    const reward = computeRewards([{ enemyId: boss.id }], 30, 2); // 30 + 150 = 180 xp -> level 4
     expect(reward.leveledUp).toBe(true);
     expect(reward.newLevel).toBeGreaterThan(2);
     expect(reward.statGrowth.maxHp).toBeGreaterThan(0);
@@ -835,15 +823,15 @@ describe('computeRewards', () => {
 
   it('does not flag a level-up for a small xp gain', () => {
     const mothling = ENEMIES.mothling;
-    const reward = computeRewards([{ enemyId: mothling.id, level: 1 }], 0, 1);
+    const reward = computeRewards([{ enemyId: mothling.id }], 0, 1);
     expect(reward.leveledUp).toBe(false);
     expect(reward.statGrowth).toEqual({});
   });
 
   it('skipLoot suppresses the lootTable roll (e.g. a boss already defeated before) without touching xp/gold', () => {
     const boss = ENEMIES['coalbound-warden']; // lootTable: 100% chance of wardens-ember-heart
-    const firstKill = computeRewards([{ enemyId: boss.id, level: 1, skipLoot: false }], 0, 1);
-    const repeatKill = computeRewards([{ enemyId: boss.id, level: 1, skipLoot: true }], 0, 1);
+    const firstKill = computeRewards([{ enemyId: boss.id, skipLoot: false }], 0, 1);
+    const repeatKill = computeRewards([{ enemyId: boss.id, skipLoot: true }], 0, 1);
     expect(firstKill.lootItemIds).toContain('wardens-ember-heart');
     expect(repeatKill.lootItemIds).not.toContain('wardens-ember-heart');
     expect(repeatKill.xp).toBe(firstKill.xp);
@@ -913,6 +901,20 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
     });
     expect(result.enemyHits).toHaveLength(3);
     expect(result.enemyHits.map((h) => h.attackerIndex).sort()).toEqual([0, 1, 2]);
+  });
+
+  it('each enemyHits entry carries the exact same logLine pushed to the round log, naming its own attacker', () => {
+    const result = resolveRound({
+      action: { type: 'attack', targetIndex: 0 },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: threeMothlings(),
+    });
+    for (const hit of result.enemyHits) {
+      expect(hit.logLine).toContain(mothling.name);
+      expect(hit.logLine).toContain(String(hit.damage));
+      expect(result.log).toContain(hit.logLine);
+    }
   });
 
   it('enemyHits damage always sums to damageTakenByPlayer', () => {

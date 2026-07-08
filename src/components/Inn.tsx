@@ -36,12 +36,15 @@ export function Inn({ onClose }: InnProps) {
   }
 
   const canAfford = (player?.gold ?? 0) >= INN_REST_COST;
+  const hasLantern = !!player?.equipment.lantern;
 
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} style={{ width: 'min(400px, 92vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 8px' }}>Juniper Reed's Inn</h2>
-        <p style={{ fontSize: 13 }}>Rest for {INN_REST_COST}g and restore your HP and Spirit fully.</p>
+        <p style={{ fontSize: 13 }}>
+          Rest for {INN_REST_COST}g and restore your HP, Spirit{hasLantern ? ', and Lantern Oil' : ''} fully.
+        </p>
         <p style={{ fontSize: 13 }}>Your gold: {player?.gold ?? 0}g</p>
         {rested ? (
           <p style={{ color: 'var(--fw-spirit)' }}>You feel fully restored.</p>

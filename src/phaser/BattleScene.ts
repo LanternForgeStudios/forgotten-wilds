@@ -7,6 +7,7 @@ import {
   COLOR_INCOMING_DAMAGE,
   COLOR_MISS,
   ensureParticleTexture,
+  INCOMING_HIT_STAGGER_MS,
   playDefeatEffect,
   playFloatingText,
   playIncomingCameraImpact,
@@ -233,22 +234,31 @@ export class BattleScene extends Phaser.Scene {
     }
   }
 
-  /** Enemy attacks landing on the player this round. Per hit: a lunge tween on the attacking
-   *  enemy's own sprite (identifies WHO attacked - the payoff of the structured per-attacker
-   *  data), camera flash+shake scaled to severity, floating "-N" at a fixed bottom-of-arena anchor
-   *  (no player sprite exists in the arena today). */
-  playIncomingHits(hits: { attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean }[], playerMaxHp: number): void {
+  /** Enemy attacks landing on the player this round, staggered one attacker at a time (see
+   *  INCOMING_HIT_STAGGER_MS) rather than all firing at once - in a multi-enemy fight, "everyone
+   *  attacks simultaneously" made it impossible to tell who actually hit you. Per hit: a lunge
+   *  tween on the attacking enemy's own sprite (identifies WHO attacked - the payoff of the
+   *  structured per-attacker data), camera flash+shake scaled to severity, floating "-N" at a
+   *  fixed bottom-of-arena anchor (no player sprite exists in the arena today). CombatScene.tsx
+   *  reveals each hit's log line on this same stagger schedule (see INCOMING_HIT_STAGGER_MS's own
+   *  comment for why that's two independently-scheduled timers rather than one shared clock). */
+  playIncomingHits(
+    hits: { attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean }[],
+    playerMaxHp: number,
+  ): void {
     const { width, height } = this.scale;
     const anchorX = width / 2;
     const anchorY = height * 0.92;
-    for (const hit of hits) {
-      const slot = this.enemySlots.get(hit.attackerIndex);
-      if (slot) playIncomingLunge(this, slot.sprite);
-      if (hit.missed) continue;
-      const color = hit.wasDefended ? COLOR_DEFENDED : COLOR_INCOMING_DAMAGE;
-      playFloatingText(this, anchorX, anchorY, `-${hit.damage}`, color, hit.wasDefended);
-      playIncomingCameraImpact(this, hit.wasDefended ? hit.damage / 2 : hit.damage, playerMaxHp);
-    }
+    hits.forEach((hit, i) => {
+      this.time.delayedCall(i * INCOMING_HIT_STAGGER_MS, () => {
+        const slot = this.enemySlots.get(hit.attackerIndex);
+        if (slot) playIncomingLunge(this, slot.sprite);
+        if (hit.missed) return;
+        const color = hit.wasDefended ? COLOR_DEFENDED : COLOR_INCOMING_DAMAGE;
+        playFloatingText(this, anchorX, anchorY, `-${hit.damage}`, color, hit.wasDefended);
+        playIncomingCameraImpact(this, hit.wasDefended ? hit.damage / 2 : hit.damage, playerMaxHp);
+      });
+    });
   }
 
   /** Fade+scale-down+particle-burst death sequence, then destroys that enemy's sprite/HP-bar/text. */
@@ -270,6 +280,10 @@ export class BattleScene extends Phaser.Scene {
    *  victory/defeat/fled/error, and implicitly on unmount via Game.destroy(). */
   clear(): void {
     this.tweens.killAll();
+    // Cancels any still-pending staggered playIncomingHits/playDefeat delayedCall - without this,
+    // one queued up for a later attacker could fire after the fight has already ended and this
+    // scene's enemy slots are gone, animating against nothing.
+    this.time.removeAllEvents();
     this.background?.destroy();
     this.background = null;
     for (const slot of this.enemySlots.values()) {

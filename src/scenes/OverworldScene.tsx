@@ -12,7 +12,7 @@ import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characte
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useExplorationViewport, HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
+import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
 import { useDash } from '@/hooks/useDash';
 import { useDashKeybind } from '@/hooks/useDashKeybind';
@@ -31,6 +31,7 @@ import {
 import { resyncSave } from '@/state/hydrate';
 import { ITEMS, EQUIPMENT, LOCATIONS, NPCS } from '@/data';
 import { isTypingTarget } from '@/utils/keyboard';
+import { isEncounterCooldownActive } from '@/utils/encounterCooldown';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
@@ -72,6 +73,7 @@ export function OverworldScene() {
   const [journalOpen, setJournalOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const isMobile = useIsMobile();
+  const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const suspended = activeNpc !== null || menuOpen || journalOpen || message !== null;
@@ -79,6 +81,7 @@ export function OverworldScene() {
     locationId,
     suspended,
     onEncounterZoneStep: (chance, pos) => {
+      if (isEncounterCooldownActive()) return;
       if (Math.random() < chance) {
         goTo('combat', { locationId, spawnX: pos.x, spawnY: pos.y });
       }
@@ -245,7 +248,7 @@ export function OverworldScene() {
   const entities = [...npcEntities, ...interactableEntities];
 
   return (
-    <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
+    <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       <PlayerHUD locationId={locationId} />
       {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>

@@ -16,12 +16,13 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useToastStore } from '@/state/useToastStore';
-import { useIsMobile } from '@/hooks/useIsMobile';
-import { HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
+import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useSceneStore, type SceneName } from '@/state/useSceneStore';
 import { ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS } from '@/data';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { itemWouldHaveEffect } from '@/utils/itemEffect';
+import { markEncounterEnded } from '@/utils/encounterCooldown';
+import { INCOMING_HIT_STAGGER_MS } from '@/phaser/battleEffects';
 import styles from './CombatScene.module.css';
 
 const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
@@ -43,7 +44,7 @@ export function CombatScene() {
   const goTo = useSceneStore((s) => s.goTo);
   const uid = useAuthStore((s) => s.user?.uid);
   const inventory = useInventoryStore((s) => s.items);
-  const isMobile = useIsMobile();
+  const hudBarHeight = useHudBarHeight();
   const player = usePlayerStore((s) => s.player);
   const patchStats = usePlayerStore((s) => s.patchStats);
 
@@ -66,6 +67,9 @@ export function CombatScene() {
   const [activeIncomingHits, setActiveIncomingHits] = useState<(EnemyHitResult & { key: number })[]>([]);
   const hitBatchRef = useRef(0);
   const encounterGuardRef = useRef<{ locationId: string; cancelled: boolean } | null>(null);
+  // True once a defeat round's response has arrived but its (already-respawned-at-Ash-Hallow)
+  // hp/spirit haven't been applied to the store yet - see the comment in act() below for why.
+  const pendingDefeatResyncRef = useRef(false);
 
   const locationId = params.locationId ?? 'ironwood-trail';
   const location = LOCATIONS.find((l) => l.id === locationId);
@@ -142,12 +146,36 @@ export function CombatScene() {
         targetIndex: needsTarget && targetMode === 'single' ? targetIndex ?? undefined : undefined,
         targetAll: needsTarget && targetMode === 'all',
       });
-      setLog((prev) => [...prev, ...res.log]);
+      // Each attacking enemy's own log line is revealed on its own stagger schedule below (in
+      // step with BattleScene's staggered animation for that same attacker) instead of appearing
+      // instantly here alongside the rest of the round's log - in a multi-enemy fight, seeing
+      // every attacker's line dumped at once read as disconnected from watching them attack one
+      // at a time. Everything else (the player's own action, damage-dealt-to-enemy, defeat/flee
+      // lines) still appears immediately, unchanged.
+      const enemyAttackLines = new Set(res.enemyHits.map((h) => h.logLine));
+      setLog((prev) => [...prev, ...res.log.filter((line) => !enemyAttackLines.has(line))]);
+      res.enemyHits.forEach((hit, i) => {
+        setTimeout(() => {
+          setLog((prev) => [...prev, hit.logLine]);
+        }, i * INCOMING_HIT_STAGGER_MS);
+      });
       setEnemies((prev) => prev.map((e) => {
         const updated = res.enemies.find((u) => u.index === e.index);
         return updated ? { ...e, hp: updated.hp } : e;
       }));
-      patchStats({ hp: res.playerHp, spirit: res.playerSpirit, lanternOil: res.playerLanternOil });
+      // On a defeat, the server's playerHp/playerSpirit here are already the post-respawn values
+      // (Ash Hallow's soft-respawn restore, applied in the same transaction as the defeat itself -
+      // see resolveCombatAction.ts) - patching them in immediately would show the HUD's HP/Spirit
+      // bars already healed while the defeat overlay is still saying "you were overwhelmed,"
+      // which reads as a contradiction. Leave the store showing whatever HP/Spirit the fight
+      // itself last displayed, and only apply the real (respawned) numbers once the player
+      // actually clicks Continue - see returnToExploration().
+      if (res.phase === 'defeat') {
+        pendingDefeatResyncRef.current = true;
+        patchStats({ lanternOil: res.playerLanternOil });
+      } else {
+        patchStats({ hp: res.playerHp, spirit: res.playerSpirit, lanternOil: res.playerLanternOil });
+      }
       setTray([]);
 
       if (res.damageTakenByPlayer > 0) {
@@ -167,7 +195,9 @@ export function CombatScene() {
       // it must be resynced here too - otherwise the displayed quantity never decrements mid-fight
       // even though the server correctly consumed it, and using it again eventually fails once the
       // real (server-side) stock hits zero while the stale client count still shows some left.
-      if (usedItems && uid) {
+      // Skipped on the round that ends in defeat - a full resync would pull in the same
+      // already-respawned hp/spirit patchStats just avoided above (see returnToExploration()).
+      if (usedItems && uid && res.phase !== 'defeat') {
         await resyncSave(uid);
       }
 
@@ -180,7 +210,7 @@ export function CombatScene() {
         setRewards(res.rewards);
       }
 
-      if (uid) {
+      if (uid && res.phase !== 'defeat') {
         await resyncSave(uid);
       }
       setPhase(res.phase);
@@ -238,7 +268,15 @@ export function CombatScene() {
     setPhase('playerTurn');
   }
 
-  function returnToExploration() {
+  async function returnToExploration() {
+    markEncounterEnded();
+    // The defeat round's real (already-respawned) hp/spirit were deliberately withheld from the
+    // store back in act() so the HUD didn't show them healed while the defeat overlay was still
+    // up - apply them now, right as the player actually leaves for Ash Hallow.
+    if (pendingDefeatResyncRef.current && uid) {
+      pendingDefeatResyncRef.current = false;
+      await resyncSave(uid);
+    }
     const targetLocationId = phase === 'defeat' ? 'ash-hallow' : locationId;
     const targetLocation = LOCATIONS.find((l) => l.id === targetLocationId);
     const scene = targetLocation ? LOCATION_KIND_TO_SCENE[targetLocation.kind] : 'town';
@@ -272,7 +310,7 @@ export function CombatScene() {
     .filter((a): a is NonNullable<typeof a> => !!a);
 
   return (
-    <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
+    <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       <PlayerHUD />
 
       <div className={styles.stage}>

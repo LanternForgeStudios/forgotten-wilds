@@ -52,7 +52,19 @@ const SLOT_FILTER_LABELS: Record<EquipmentSlot, string> = {
   spiritTotem: 'Spirit Totem',
 };
 
-type SortOption = 'name' | 'quantityDesc';
+type SortOption = 'name' | 'quantityDesc' | 'category';
+
+/** Group ordering for the "Category" sort - matches how the subtab filter buttons read left to
+ *  right (Equipment, Consumables, Key Items); 'all'/'unique' never come back from subTabOf()
+ *  itself (that's a cross-cutting filter, not a real category) but are included so the lookup
+ *  type-checks against every InventorySubTab value. */
+const CATEGORY_SORT_ORDER: Record<InventorySubTab, number> = {
+  equipment: 0,
+  consumable: 1,
+  keyItem: 2,
+  all: 99,
+  unique: 99,
+};
 
 interface ResolvedItem {
   itemId: string;
@@ -162,9 +174,12 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
               if (subTab !== 'equipment' || slotFilter === 'all') return true;
               return entry.equipDef?.slot === slotFilter;
             })
-            .sort((a, b) =>
-              sortBy === 'name' ? a.name.localeCompare(b.name) : b.quantity - a.quantity,
-            );
+            .sort((a, b) => {
+              if (sortBy === 'name') return a.name.localeCompare(b.name);
+              if (sortBy === 'quantityDesc') return b.quantity - a.quantity;
+              const categoryDiff = CATEGORY_SORT_ORDER[subTabOf(a)] - CATEGORY_SORT_ORDER[subTabOf(b)];
+              return categoryDiff !== 0 ? categoryDiff : a.name.localeCompare(b.name);
+            });
 
           const selected = selectedItemId ? resolved.find((r) => r.itemId === selectedItemId) : undefined;
 
@@ -192,6 +207,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                 >
                   <option value="name">Sort: Name (A–Z)</option>
                   <option value="quantityDesc">Sort: Quantity (high to low)</option>
+                  <option value="category">Sort: Category</option>
                 </select>
               </div>
 

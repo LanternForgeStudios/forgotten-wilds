@@ -21,7 +21,7 @@ export const QUESTS: Quest[] = [
         requiredCount: 1,
       },
     ],
-    reward: { xp: 100, gold: 20, itemIds: ['travelers-cloak'] },
+    reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'] },
   },
   {
     id: 'ash-hallow-tour',
@@ -40,7 +40,7 @@ export const QUESTS: Quest[] = [
       { id: 'talk-miriam', type: 'talkToNpc', description: 'Visit the Archive.', targetId: 'historian-miriam', requiredCount: 1 },
       { id: 'talk-mayor', type: 'talkToNpc', description: 'Visit Town Hall.', targetId: 'mayor-eleanor-ashcroft', requiredCount: 1 },
     ],
-    reward: { xp: 50, gold: 30, itemIds: ['healing-poultice', 'healing-poultice', 'lantern-oil'] },
+    reward: { xp: 10, gold: 30, itemIds: ['healing-poultice', 'healing-poultice', 'lantern-oil'] },
   },
   {
     id: 'the-first-flame',
@@ -58,7 +58,7 @@ export const QUESTS: Quest[] = [
         requiredCount: 1,
       },
     ],
-    reward: { xp: 60, gold: 20, spiritEssence: 15 },
+    reward: { xp: 10, gold: 20, spiritEssence: 15 },
   },
   {
     id: 'beyond-the-lantern-light',
@@ -72,7 +72,7 @@ export const QUESTS: Quest[] = [
       { id: 'reach-camp', type: 'reachLocation', description: "Discover Hunter's Camp.", targetId: 'hunters-camp', requiredCount: 1 },
       { id: 'talk-garrick', type: 'talkToNpc', description: 'Meet Hunter Garrick.', targetId: 'hunter-garrick', requiredCount: 1 },
     ],
-    reward: { xp: 200, gold: 0 },
+    reward: { xp: 20, gold: 0 },
   },
 
   // --- Iron Mountains, Chapter 1: Echoes in the Woods ---
@@ -88,7 +88,7 @@ export const QUESTS: Quest[] = [
       { id: 'defeat-echo', type: 'defeatEnemies', description: 'Defeat a hostile Echo.', targetId: 'mothling', requiredCount: 1 },
       { id: 'discover-grove', type: 'reachLocation', description: 'Follow the tracks to Spirit Grove.', targetId: 'spirit-grove', requiredCount: 1 },
     ],
-    reward: { xp: 40, gold: 15, spiritEssence: 10 },
+    reward: { xp: 15, gold: 15, spiritEssence: 10 },
   },
   {
     id: 'the-forgotten-shrine',
@@ -101,7 +101,7 @@ export const QUESTS: Quest[] = [
       { id: 'talk-spirit-child', type: 'talkToNpc', description: 'Speak with the Spirit Child.', targetId: 'spirit-child', requiredCount: 1 },
       { id: 'investigate-shrine', type: 'interactWithShrine', description: 'Investigate the shrine at Spirit Grove.', targetId: 'spirit-grove', requiredCount: 1 },
     ],
-    reward: { xp: 30, gold: 10 },
+    reward: { xp: 15, gold: 10 },
   },
   {
     id: 'fragments-of-the-first-promise',
@@ -127,7 +127,7 @@ export const QUESTS: Quest[] = [
     objectives: [
       { id: 'restore-shrine', type: 'interactWithShrine', description: 'Restore the shrine at Spirit Grove.', targetId: 'spirit-grove', requiredCount: 1 },
     ],
-    reward: { xp: 80, gold: 30, spiritEssence: 20 },
+    reward: { xp: 50, gold: 30, spiritEssence: 20 },
   },
   {
     id: 'shadows-on-raven-ridge',
@@ -141,7 +141,7 @@ export const QUESTS: Quest[] = [
       { id: 'reach-ridge', type: 'reachLocation', description: 'Travel through Raven Ridge.', targetId: 'raven-ridge', requiredCount: 1 },
       { id: 'talk-caleb', type: 'talkToNpc', description: 'Meet Ranger Caleb.', targetId: 'ranger-caleb', requiredCount: 1 },
     ],
-    reward: { xp: 40, gold: 20 },
+    reward: { xp: 25, gold: 20 },
   },
   {
     id: 'beneath-hollow-rail',
@@ -154,7 +154,7 @@ export const QUESTS: Quest[] = [
       { id: 'talk-silas-2', type: 'talkToNpc', description: 'Meet with Silas Flint at the Mine Office.', targetId: 'silas-flint', requiredCount: 1 },
       { id: 'reach-mine', type: 'reachLocation', description: 'Reach the Hollow Rail Mine entrance.', targetId: 'hollow-rail-mine', requiredCount: 1 },
     ],
-    reward: { xp: 60, gold: 30, itemIds: ['healing-poultice', 'healing-poultice'] },
+    reward: { xp: 25, gold: 30, itemIds: ['healing-poultice', 'healing-poultice'] },
   },
 
   // --- Iron Mountains, Chapter 2: Echoes of Stone ---
@@ -168,7 +168,7 @@ export const QUESTS: Quest[] = [
     objectives: [
       { id: 'clear-shafts', type: 'defeatEnemies', description: 'Defeat 3 corrupted Echoes in the Upper Shafts.', targetId: 'restless-miner', requiredCount: 3 },
     ],
-    reward: { xp: 50, gold: 20 },
+    reward: { xp: 30, gold: 20 },
   },
   {
     id: 'the-lost-expedition',
@@ -181,7 +181,7 @@ export const QUESTS: Quest[] = [
       { id: 'talk-nell', type: 'talkToNpc', description: 'Speak with Nell Ashby about the old stories.', targetId: 'nell-ashby', requiredCount: 1 },
       { id: 'calm-echoes', type: 'defeatEnemies', description: 'Calm 2 Ghost Miner Echoes.', targetId: 'coal-spirit', requiredCount: 2 },
     ],
-    reward: { xp: 40, gold: 20, spiritEssence: 10 },
+    reward: { xp: 30, gold: 20, spiritEssence: 10 },
   },
   {
     id: 'embers-that-never-faded',
@@ -193,7 +193,7 @@ export const QUESTS: Quest[] = [
     objectives: [
       { id: 'collect-lantern', type: 'collectItem', description: 'Recover the Lantern of Enduring Embers.', targetId: 'miners-lost-lantern', requiredCount: 1 },
     ],
-    reward: { xp: 60, gold: 25, itemIds: ['miners-lost-lantern-equipped'] },
+    reward: { xp: 40, gold: 25, itemIds: ['miners-lost-lantern-equipped'] },
   },
   {
     id: 'the-shrine-below',
@@ -206,7 +206,7 @@ export const QUESTS: Quest[] = [
       { id: 'clear-wraiths', type: 'defeatEnemies', description: 'Defeat 2 Echoes guarding the shrine.', targetId: 'coal-wraith', requiredCount: 2 },
       { id: 'restore-mine-shrine', type: 'interactWithShrine', description: 'Restore the shrine deep in the mine.', targetId: 'mine-shrine', requiredCount: 1 },
     ],
-    reward: { xp: 70, gold: 20 },
+    reward: { xp: 30, gold: 20 },
   },
   {
     id: 'the-coalbound-warden',
@@ -218,7 +218,7 @@ export const QUESTS: Quest[] = [
     objectives: [
       { id: 'defeat-warden', type: 'defeatBoss', description: 'Defeat the Coalbound Warden.', targetId: 'coalbound-warden', requiredCount: 1 },
     ],
-    reward: { xp: 150, gold: 100, itemIds: ['wardens-ember-heart', 'mountain-guardian-totem'] },
+    reward: { xp: 100, gold: 100, itemIds: ['wardens-ember-heart', 'mountain-guardian-totem'] },
   },
   {
     id: 'the-mountain-remembers',
@@ -231,6 +231,6 @@ export const QUESTS: Quest[] = [
       { id: 'talk-elias-final', type: 'talkToNpc', description: 'Report to Elias Rowan.', targetId: 'elias-rowan', requiredCount: 1 },
       { id: 'talk-miriam-final', type: 'talkToNpc', description: 'Meet with Historian Miriam.', targetId: 'historian-miriam', requiredCount: 1 },
     ],
-    reward: { xp: 200, gold: 50, itemIds: ['guardian-memory-fragment-1'] },
+    reward: { xp: 50, gold: 50, itemIds: ['guardian-memory-fragment-1'] },
   },
 ];

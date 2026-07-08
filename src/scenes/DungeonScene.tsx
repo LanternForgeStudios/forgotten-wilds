@@ -11,7 +11,7 @@ import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characte
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useExplorationViewport, HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
+import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
 import { useDash } from '@/hooks/useDash';
 import { useDashKeybind } from '@/hooks/useDashKeybind';
@@ -24,6 +24,7 @@ import { isTypingTarget } from '@/utils/keyboard';
 import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { ITEMS, EQUIPMENT } from '@/data';
+import { isEncounterCooldownActive } from '@/utils/encounterCooldown';
 import styles from './TownScene.module.css';
 
 const LOCATION_ID = 'hollow-rail-mine';
@@ -48,6 +49,7 @@ export function DungeonScene() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const isMobile = useIsMobile();
+  const hudBarHeight = useHudBarHeight();
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
@@ -56,6 +58,7 @@ export function DungeonScene() {
     locationId: LOCATION_ID,
     suspended,
     onEncounterZoneStep: (chance, pos) => {
+      if (isEncounterCooldownActive()) return;
       if (Math.random() < chance) {
         goTo('combat', { locationId: LOCATION_ID, spawnX: pos.x, spawnY: pos.y });
       }
@@ -182,7 +185,7 @@ export function DungeonScene() {
     });
 
   return (
-    <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
+    <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       <PlayerHUD locationId={LOCATION_ID} />
       {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>

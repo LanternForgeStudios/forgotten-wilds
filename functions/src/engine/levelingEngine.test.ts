@@ -80,6 +80,22 @@ describe('applyLevelUp', () => {
     expect(save.player.stats.maxStamina).toBeGreaterThan(40);
   });
 
+  it('tops off lanternOil to max on level-up when a lantern is equipped', () => {
+    const save = saveAtLevel(1, 100);
+    save.player.equipment.lantern = 'keepers-lantern';
+    save.player.stats.lanternOil = 5;
+    applyLevelUp(save);
+    expect(save.player.stats.lanternOil).toBe(save.player.stats.maxLanternOil);
+  });
+
+  it('leaves lanternOil untouched on level-up when no lantern is equipped', () => {
+    const save = saveAtLevel(1, 100);
+    save.player.equipment.lantern = null;
+    save.player.stats.lanternOil = 5;
+    applyLevelUp(save);
+    expect(save.player.stats.lanternOil).toBe(5);
+  });
+
   it('reaches level 50 (checkpoint for the level-100 cap) with the expected stat totals', () => {
     // xpForLevel(50) = 10*50*51 - 20 = 25480
     const save = saveAtLevel(1, 25480);

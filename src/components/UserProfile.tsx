@@ -24,7 +24,10 @@ import {
   callMarkSocialReviewed,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
-import type { DirectMessage, FriendRequest } from '@/types';
+import { subscribeToPresence } from '@/firebase/presenceService';
+import { useNow } from '@/hooks/useNow';
+import { isPresenceOnline } from '@/utils/presence';
+import type { DirectMessage, FriendRequest, OnlinePresence } from '@/types';
 import styles from './UserProfile.module.css';
 
 interface UserProfileProps {
@@ -58,6 +61,10 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const [activeDmUid, setActiveDmUid] = useState<string | null>(null);
   const [dmMessages, setDmMessages] = useState<DirectMessage[]>([]);
   const [dmDraft, setDmDraft] = useState('');
+  const [presences, setPresences] = useState<OnlinePresence[]>([]);
+  // Only needs to be fresh enough to catch a friend going stale/coming back - not the 250ms tick
+  // PlayerHUD's live Stamina bar needs.
+  const now = useNow(5000);
 
   // --- Reset Progress tab state ---
   const [confirmEmail, setConfirmEmail] = useState('');
@@ -71,6 +78,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
       subscribeToBlockList(uid, setBlockedUids),
       subscribeToIncomingFriendRequests(uid, setIncoming),
       subscribeToOutgoingFriendRequests(uid, setOutgoing),
+      subscribeToPresence(setPresences),
     ];
     // Clears the "new social activity" badge in PlayerHUD - fire-and-forget, then resync so the
     // updated lastReviewedSocialAt actually reaches the store (no live listener on users/{uid}).
@@ -305,24 +313,34 @@ export function UserProfile({ onClose }: UserProfileProps) {
             <h3 className={styles.sectionTitle}>Friends</h3>
             <div className={styles.list}>
               {friendUids.length === 0 && <p className={styles.empty}>No friends yet - search above to add one.</p>}
-              {friendUids.map((fUid) => (
-                <div key={fUid} className={styles.row}>
-                  <span className={styles.rowName}>{names[fUid] ?? '...'}</span>
-                  <button
-                    className={styles.smallButton}
-                    disabled={busy}
-                    onClick={() => setActiveDmUid((cur) => (cur === fUid ? null : fUid))}
-                  >
-                    Message
-                  </button>
-                  <button className={styles.smallButton} disabled={busy} onClick={() => remove(fUid)}>
-                    Remove
-                  </button>
-                  <button className={styles.dangerButton} disabled={busy} onClick={() => block(fUid)}>
-                    Block
-                  </button>
-                </div>
-              ))}
+              {friendUids.map((fUid) => {
+                const online = isPresenceOnline(
+                  presences.find((p) => p.uid === fUid),
+                  now,
+                );
+                return (
+                  <div key={fUid} className={styles.row}>
+                    <span
+                      className={online ? styles.presenceDotOnline : styles.presenceDotOffline}
+                      title={online ? 'Online' : 'Offline'}
+                    />
+                    <span className={styles.rowName}>{names[fUid] ?? '...'}</span>
+                    <button
+                      className={styles.smallButton}
+                      disabled={busy}
+                      onClick={() => setActiveDmUid((cur) => (cur === fUid ? null : fUid))}
+                    >
+                      Message
+                    </button>
+                    <button className={styles.smallButton} disabled={busy} onClick={() => remove(fUid)}>
+                      Remove
+                    </button>
+                    <button className={styles.dangerButton} disabled={busy} onClick={() => block(fUid)}>
+                      Block
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             {activeDmUid && (

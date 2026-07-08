@@ -33,7 +33,7 @@ export const QUESTS: Record<string, QuestDef> = {
     id: 'a-new-keeper',
     prerequisiteQuestId: null,
     objectives: [{ id: 'talk-elias', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 }],
-    reward: { xp: 100, gold: 20, itemIds: ['travelers-cloak'] },
+    reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'] },
   },
   'ash-hallow-tour': {
     id: 'ash-hallow-tour',
@@ -48,13 +48,13 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'talk-miriam', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1 },
       { id: 'talk-mayor', type: 'talkToNpc', targetId: 'mayor-eleanor-ashcroft', requiredCount: 1 },
     ],
-    reward: { xp: 50, gold: 30, itemIds: ['healing-poultice', 'healing-poultice', 'lantern-oil'] },
+    reward: { xp: 10, gold: 30, itemIds: ['healing-poultice', 'healing-poultice', 'lantern-oil'] },
   },
   'the-first-flame': {
     id: 'the-first-flame',
     prerequisiteQuestId: 'ash-hallow-tour',
     objectives: [{ id: 'light-shrine', type: 'interactWithShrine', targetId: 'ash-hallow-shrine', requiredCount: 1 }],
-    reward: { xp: 60, gold: 20, spiritEssence: 15 },
+    reward: { xp: 10, gold: 20, spiritEssence: 15 },
   },
   'beyond-the-lantern-light': {
     id: 'beyond-the-lantern-light',
@@ -64,7 +64,7 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'reach-camp', type: 'reachLocation', targetId: 'hunters-camp', requiredCount: 1 },
       { id: 'talk-garrick', type: 'talkToNpc', targetId: 'hunter-garrick', requiredCount: 1 },
     ],
-    reward: { xp: 200, gold: 0 },
+    reward: { xp: 20, gold: 0 },
   },
 
   // --- Iron Mountains, Chapter 1: Echoes in the Woods ---
@@ -76,7 +76,7 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'defeat-echo', type: 'defeatEnemies', targetId: 'mothling', requiredCount: 1 },
       { id: 'discover-grove', type: 'reachLocation', targetId: 'spirit-grove', requiredCount: 1 },
     ],
-    reward: { xp: 40, gold: 15, spiritEssence: 10 },
+    reward: { xp: 15, gold: 15, spiritEssence: 10 },
   },
   'the-forgotten-shrine': {
     id: 'the-forgotten-shrine',
@@ -85,7 +85,7 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'talk-spirit-child', type: 'talkToNpc', targetId: 'spirit-child', requiredCount: 1 },
       { id: 'investigate-shrine', type: 'interactWithShrine', targetId: 'spirit-grove', requiredCount: 1 },
     ],
-    reward: { xp: 30, gold: 10 },
+    reward: { xp: 15, gold: 10 },
   },
   'fragments-of-the-first-promise': {
     id: 'fragments-of-the-first-promise',
@@ -103,7 +103,7 @@ export const QUESTS: Record<string, QuestDef> = {
     objectives: [{ id: 'restore-shrine', type: 'interactWithShrine', targetId: 'spirit-grove', requiredCount: 1 }],
     // Completing this quest is also what unlocks Stamina/Dash - see interactWithShrine.ts, which
     // special-cases granting the base Stamina pool the moment this specific quest completes.
-    reward: { xp: 80, gold: 30, spiritEssence: 20 },
+    reward: { xp: 50, gold: 30, spiritEssence: 20 },
   },
   'shadows-on-raven-ridge': {
     id: 'shadows-on-raven-ridge',
@@ -113,7 +113,7 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'reach-ridge', type: 'reachLocation', targetId: 'raven-ridge', requiredCount: 1 },
       { id: 'talk-caleb', type: 'talkToNpc', targetId: 'ranger-caleb', requiredCount: 1 },
     ],
-    reward: { xp: 40, gold: 20 },
+    reward: { xp: 25, gold: 20 },
   },
   'beneath-hollow-rail': {
     id: 'beneath-hollow-rail',
@@ -122,7 +122,7 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'talk-silas-2', type: 'talkToNpc', targetId: 'silas-flint', requiredCount: 1 },
       { id: 'reach-mine', type: 'reachLocation', targetId: 'hollow-rail-mine', requiredCount: 1 },
     ],
-    reward: { xp: 60, gold: 30, itemIds: ['healing-poultice', 'healing-poultice'] },
+    reward: { xp: 25, gold: 30, itemIds: ['healing-poultice', 'healing-poultice'] },
   },
 
   // --- Iron Mountains, Chapter 2: Echoes of Stone ---
@@ -130,7 +130,7 @@ export const QUESTS: Record<string, QuestDef> = {
     id: 'into-hollow-rail',
     prerequisiteQuestId: 'beneath-hollow-rail',
     objectives: [{ id: 'clear-shafts', type: 'defeatEnemies', targetId: 'restless-miner', requiredCount: 3 }],
-    reward: { xp: 50, gold: 20 },
+    reward: { xp: 30, gold: 20 },
   },
   'the-lost-expedition': {
     id: 'the-lost-expedition',
@@ -139,13 +139,13 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'talk-nell', type: 'talkToNpc', targetId: 'nell-ashby', requiredCount: 1 },
       { id: 'calm-echoes', type: 'defeatEnemies', targetId: 'coal-spirit', requiredCount: 2 },
     ],
-    reward: { xp: 40, gold: 20, spiritEssence: 10 },
+    reward: { xp: 30, gold: 20, spiritEssence: 10 },
   },
   'embers-that-never-faded': {
     id: 'embers-that-never-faded',
     prerequisiteQuestId: 'the-lost-expedition',
     objectives: [{ id: 'collect-lantern', type: 'collectItem', targetId: 'miners-lost-lantern', requiredCount: 1 }],
-    reward: { xp: 60, gold: 25, itemIds: ['miners-lost-lantern-equipped'] },
+    reward: { xp: 40, gold: 25, itemIds: ['miners-lost-lantern-equipped'] },
   },
   'the-shrine-below': {
     id: 'the-shrine-below',
@@ -154,13 +154,13 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'clear-wraiths', type: 'defeatEnemies', targetId: 'coal-wraith', requiredCount: 2 },
       { id: 'restore-mine-shrine', type: 'interactWithShrine', targetId: 'mine-shrine', requiredCount: 1 },
     ],
-    reward: { xp: 70, gold: 20 },
+    reward: { xp: 30, gold: 20 },
   },
   'the-coalbound-warden': {
     id: 'the-coalbound-warden',
     prerequisiteQuestId: 'the-shrine-below',
     objectives: [{ id: 'defeat-warden', type: 'defeatBoss', targetId: 'coalbound-warden', requiredCount: 1 }],
-    reward: { xp: 150, gold: 100, itemIds: ['wardens-ember-heart', 'mountain-guardian-totem'] },
+    reward: { xp: 100, gold: 100, itemIds: ['wardens-ember-heart', 'mountain-guardian-totem'] },
   },
   'the-mountain-remembers': {
     id: 'the-mountain-remembers',
@@ -169,7 +169,7 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'talk-elias-final', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 },
       { id: 'talk-miriam-final', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1 },
     ],
-    reward: { xp: 200, gold: 50, itemIds: ['guardian-memory-fragment-1'] },
+    reward: { xp: 50, gold: 50, itemIds: ['guardian-memory-fragment-1'] },
   },
 };
 

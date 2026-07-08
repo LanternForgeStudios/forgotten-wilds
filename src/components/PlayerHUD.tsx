@@ -2,19 +2,18 @@ import { useEffect, useState } from 'react';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
-import { useIsMobile } from '@/hooks/useIsMobile';
 import { useNow } from '@/hooks/useNow';
-import { HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
+import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { subscribeToIncomingFriendRequests, subscribeToAllDirectMessages } from '@/firebase/socialService';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
 import { XP_THRESHOLDS, LOCATIONS } from '@/data';
 import { predictedStamina } from '@/utils/staminaRegen';
+import { PRESENCE_STALE_AFTER_MS } from '@/utils/presence';
 import type { DirectMessage, FriendRequest, OnlinePresence } from '@/types';
 import styles from './PlayerHUD.module.css';
 
-const STALE_AFTER_MS = 60_000;
 const MAX_LEVEL = XP_THRESHOLDS.length - 1;
 
 /** How far into the current level `xp` is, out of what the next level requires - display-only
@@ -45,7 +44,6 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   const player = usePlayerStore((s) => s.player);
   const uid = useAuthStore((s) => s.user?.uid);
   const lastReviewedSocialAt = useWorldStateStore((s) => s.lastReviewedSocialAt);
-  const isMobile = useIsMobile();
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
   const [presenceOpen, setPresenceOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
@@ -56,6 +54,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   // time between Dash calls instead of only updating right after one - display-only, never
   // persisted (see predictedStamina).
   const now = useNow(250);
+  const barHeight = useHudBarHeight();
 
   useEffect(() => {
     if (!locationId) return;
@@ -86,7 +85,6 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
     player.stats.maxLanternOil > 0
       ? Math.max(0, Math.min(100, (player.stats.lanternOil / player.stats.maxLanternOil) * 100))
       : 0;
-  const barHeight = isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop;
   const xp = xpProgress(player.xp, player.level);
   const xpPct = xp ? Math.max(0, Math.min(100, (xp.intoLevel / xp.span) * 100)) : 100;
 
@@ -96,7 +94,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
       : 0;
   const visiblePresences = locationId
     ? presences
-        .filter((p) => p.locationId === locationId && now - p.lastHeartbeat < STALE_AFTER_MS)
+        .filter((p) => p.locationId === locationId && now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS)
         .sort((a, b) => a.joinedAt - b.joinedAt)
     : [];
   const locationName = locationId ? LOCATIONS.find((l) => l.id === locationId)?.name : undefined;
@@ -110,64 +108,71 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
 
       {locationName && <span className={styles.location}>{locationName}</span>}
 
-      <div className={styles.statGroup}>
-        <span className={styles.barLabel}>HP</span>
-        <div className={styles.barTrack}>
-          <div className={styles.barFillHp} style={{ width: `${hpPct}%` }} />
-          <span className={styles.barValue}>
-            {player.stats.hp}/{player.stats.maxHp}
-          </span>
-        </div>
-      </div>
-
-      <div className={styles.statGroup}>
-        <span className={styles.barLabel}>SP</span>
-        <div className={styles.barTrack}>
-          <div className={styles.barFillSpirit} style={{ width: `${spiritPct}%` }} />
-          <span className={styles.barValue}>
-            {player.stats.spirit}/{player.stats.maxSpirit}
-          </span>
-        </div>
-      </div>
-
-      <div className={styles.statGroup}>
-        <span className={styles.barLabel}>Oil</span>
-        <div className={styles.barTrack}>
-          <div className={styles.barFillOil} style={{ width: `${oilPct}%` }} />
-          <span className={styles.barValue}>
-            {player.stats.lanternOil}/{player.stats.maxLanternOil}
-          </span>
-        </div>
-      </div>
-
-      {player.stats.maxStamina > 0 && (
+      {/* display:contents at normal widths - these lay out as if they were direct children of
+          .bar, preserving the exact same order/flow as before. Only becomes a real (wrapping)
+          flex row of its own below the narrow-HUD breakpoint (see PlayerHUD.module.css and
+          useHudBarHeight, which the parent scenes' padding-top must match), so the stat bars get
+          a fresh full-width row instead of squeezing alongside name/gold/presence. */}
+      <div className={styles.vitalsRow}>
         <div className={styles.statGroup}>
-          <span className={styles.barLabel}>St</span>
+          <span className={styles.barLabel}>HP</span>
           <div className={styles.barTrack}>
-            <div
-              className={styles.barFillStamina}
-              style={{ width: `${Math.max(0, Math.min(100, (displayedStamina / player.stats.maxStamina) * 100))}%` }}
-            />
+            <div className={styles.barFillHp} style={{ width: `${hpPct}%` }} />
             <span className={styles.barValue}>
-              {displayedStamina}/{player.stats.maxStamina}
+              {player.stats.hp}/{player.stats.maxHp}
             </span>
           </div>
         </div>
-      )}
 
-      <button
-        className={`${styles.statGroup} ${styles.xpButton}`}
-        onClick={() => setStatsOpen(true)}
-        title="View character stats"
-      >
-        <span className={styles.barLabel}>XP</span>
-        <div className={styles.barTrack}>
-          <div className={styles.barFillXp} style={{ width: `${xpPct}%` }} />
-          <span className={`${styles.barValue} ${styles.xpValue}`}>
-            {xp ? `${xp.remaining} to Lv.${player.level + 1}` : 'MAX'}
-          </span>
+        <div className={styles.statGroup}>
+          <span className={styles.barLabel}>SP</span>
+          <div className={styles.barTrack}>
+            <div className={styles.barFillSpirit} style={{ width: `${spiritPct}%` }} />
+            <span className={styles.barValue}>
+              {player.stats.spirit}/{player.stats.maxSpirit}
+            </span>
+          </div>
         </div>
-      </button>
+
+        <div className={styles.statGroup}>
+          <span className={styles.barLabel}>Oil</span>
+          <div className={styles.barTrack}>
+            <div className={styles.barFillOil} style={{ width: `${oilPct}%` }} />
+            <span className={styles.barValue}>
+              {player.stats.lanternOil}/{player.stats.maxLanternOil}
+            </span>
+          </div>
+        </div>
+
+        {player.stats.maxStamina > 0 && (
+          <div className={styles.statGroup}>
+            <span className={styles.barLabel}>St</span>
+            <div className={styles.barTrack}>
+              <div
+                className={styles.barFillStamina}
+                style={{ width: `${Math.max(0, Math.min(100, (displayedStamina / player.stats.maxStamina) * 100))}%` }}
+              />
+              <span className={styles.barValue}>
+                {displayedStamina}/{player.stats.maxStamina}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <button
+          className={`${styles.statGroup} ${styles.xpButton}`}
+          onClick={() => setStatsOpen(true)}
+          title="View character stats"
+        >
+          <span className={styles.barLabel}>XP</span>
+          <div className={styles.barTrack}>
+            <div className={styles.barFillXp} style={{ width: `${xpPct}%` }} />
+            <span className={`${styles.barValue} ${styles.xpValue}`}>
+              {xp ? `${xp.remaining} to Lv.${player.level + 1}` : 'MAX'}
+            </span>
+          </div>
+        </button>
+      </div>
 
       <span className={styles.gold}>{player.gold}g</span>
 

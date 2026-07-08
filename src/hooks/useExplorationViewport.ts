@@ -2,12 +2,44 @@ import { useEffect, useState } from 'react';
 import { useIsMobile } from './useIsMobile';
 
 /** Height of the horizontal top HUD bar (PlayerHUD) - shared with the viewport calc below so the
- *  map fills exactly the space left under it, instead of guessing at a fixed tile count. */
-export const HUD_BAR_HEIGHT = { desktop: 52, mobile: 44 };
+ *  map fills exactly the space left under it, instead of guessing at a fixed tile count. `narrow`
+ *  is the taller, two-row height PlayerHUD switches to below NARROW_HUD_BREAKPOINT_PX (see
+ *  useHudBarHeight) so its stat bars wrap onto a second line instead of squeezing unreadably thin
+ *  on very narrow viewports. */
+export const HUD_BAR_HEIGHT = { desktop: 52, mobile: 44, narrow: 84 };
+
+/** Below this viewport width, PlayerHUD wraps onto two rows (see its own matching CSS breakpoint)
+ *  regardless of touch-capability - a narrow desktop window gets the same treatment as a narrow
+ *  phone screen, since the problem is available horizontal space, not input method. */
+const NARROW_HUD_BREAKPOINT_PX = 480;
+
+function computeHudBarHeight(isMobile: boolean): number {
+  if (typeof window !== 'undefined' && window.innerWidth <= NARROW_HUD_BREAKPOINT_PX) return HUD_BAR_HEIGHT.narrow;
+  return isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop;
+}
+
+/** Live pixel height of the top HUD bar - every scene that pads its content below the
+ *  fixed-position PlayerHUD must use this (not a bare isMobile ternary) or the map/content will
+ *  render partially behind the bar once it wraps to two rows on a narrow viewport. */
+export function useHudBarHeight(): number {
+  const isMobile = useIsMobile();
+  const [height, setHeight] = useState(() => computeHudBarHeight(isMobile));
+
+  useEffect(() => {
+    function handleResize() {
+      setHeight(computeHudBarHeight(isMobile));
+    }
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobile]);
+
+  return height;
+}
 
 function computeViewport(isMobile: boolean) {
   const scale = isMobile ? 2 : 3;
-  const hudHeight = isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop;
+  const hudHeight = computeHudBarHeight(isMobile);
   return {
     scale,
     // Exact window pixels, not a tile count multiplied back out - guarantees the viewport box

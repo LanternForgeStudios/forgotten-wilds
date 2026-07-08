@@ -102,6 +102,10 @@ export interface EnemyHitResult {
   missed: boolean;
   /** True when this hit was halved by the player's Defend/a defensive lanternAbility this round. */
   wasDefended: boolean;
+  /** Ready-to-display line naming this specific attacker - reveal it in step with this hit's own
+   *  staggered animation (see BattleScene.playIncomingHits) rather than dumping every round's log
+   *  lines at once. */
+  logLine: string;
 }
 
 export interface ResolveCombatActionResponse {

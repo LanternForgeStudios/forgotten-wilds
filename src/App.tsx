@@ -10,6 +10,19 @@ import { OverworldScene } from '@/scenes/OverworldScene';
 import { DungeonScene } from '@/scenes/DungeonScene';
 import { CombatScene } from '@/scenes/CombatScene';
 import { ToastHost } from '@/components/ToastHost';
+import { LOCATIONS } from '@/data';
+
+/** On a completely fresh page load (not an in-session scene transition - see the "signedIn"
+ *  branch below), always resume in a town rather than exactly wherever the player was standing -
+ *  mid-dungeon or deep in an overworld trail on a cold reload used to force the Town scene onto a
+ *  non-town map, which doesn't render correctly (Town's own object/entity handling doesn't know
+ *  what to do with a dungeon's or overworld's objects). Only one region's town (Ash Hallow) exists
+ *  in the built content today - falls back to it for any non-town location until a real
+ *  region->town mapping exists for a second town. */
+function freshLoadStartLocationId(lastLocationId: string): string {
+  const location = LOCATIONS.find((l) => l.id === lastLocationId);
+  return location?.kind === 'town' ? lastLocationId : 'ash-hallow';
+}
 
 function App() {
   const currentScene = useSceneStore((s) => s.currentScene);
@@ -33,7 +46,7 @@ function App() {
         .then((save) => {
           if (save) {
             hydrateAllStores(save);
-            goTo('town', { locationId: save.player.currentLocationId });
+            goTo('town', { locationId: freshLoadStartLocationId(save.player.currentLocationId) });
           } else {
             goTo('characterCreation');
           }

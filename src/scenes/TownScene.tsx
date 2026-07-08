@@ -14,7 +14,7 @@ import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characte
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useExplorationViewport, HUD_BAR_HEIGHT } from '@/hooks/useExplorationViewport';
+import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
 import { useDash } from '@/hooks/useDash';
 import { useDashKeybind } from '@/hooks/useDashKeybind';
@@ -69,6 +69,7 @@ export function TownScene() {
   const questProgress = useQuestStore((s) => s.progress);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const isMobile = useIsMobile();
+  const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const suspended = activeNpc !== null || menuOpen || shopOpen || innOpen || journalOpen || message !== null;
@@ -205,7 +206,7 @@ export function TownScene() {
   const entities = [...npcEntities, ...buildingEntities, ...shrineEntities, ...otherPlayerEntities];
 
   return (
-    <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
+    <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       <PlayerHUD locationId={locationId} />
       {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>

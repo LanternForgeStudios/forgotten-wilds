@@ -22,6 +22,9 @@ export const restAtInn = onCall(async (request) => {
     save.player.gold -= INN_REST_COST;
     save.player.stats.hp = save.player.stats.maxHp;
     save.player.stats.spirit = save.player.stats.maxSpirit;
+    if (save.player.equipment.lantern) {
+      save.player.stats.lanternOil = save.player.stats.maxLanternOil;
+    }
 
     save.updatedAt = Date.now();
     tx.set(userRef, save);

@@ -131,7 +131,6 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       // out like a regular fight (xp/gold still awarded normally, see computeRewards).
       const defeated = session.enemies.map((e) => ({
         enemyId: e.enemyId,
-        level: e.level,
         skipLoot: !!ENEMIES[e.enemyId]?.isBoss && save.journal.bossesDefeated.includes(e.enemyId),
       }));
       const enemyIds = defeated.map((e) => e.enemyId);
