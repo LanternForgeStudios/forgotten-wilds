@@ -65,6 +65,12 @@ export function CombatScene() {
   // incoming (enemy -> player) hits as separate, differently-shaped lists.
   const [activeOutgoingHits, setActiveOutgoingHits] = useState<(CombatHitResult & { key: number })[]>([]);
   const [activeIncomingHits, setActiveIncomingHits] = useState<(EnemyHitResult & { key: number })[]>([]);
+  // True for the full duration of a round's staggered hit playback (see the timeout below, sized
+  // to actually match that duration) - phase itself returns to 'playerTurn' the instant the
+  // server responds, well before a multi-enemy round's staggered incoming-hit animations finish,
+  // so without this the player could queue up another action mid-animation (reported as "attacking
+  // out of turn" - the enemies' own attacks were still visually resolving).
+  const [playbackActive, setPlaybackActive] = useState(false);
   const hitBatchRef = useRef(0);
   const encounterGuardRef = useRef<{ locationId: string; cancelled: boolean } | null>(null);
   // True once a defeat round's response has arrived but its (already-respawned-at-Ash-Hallow)
@@ -134,7 +140,7 @@ export function CombatScene() {
     type: 'attack' | 'skill' | 'lanternAbility' | 'defend' | 'flee' | 'item',
     options?: { abilityId?: string },
   ) {
-    if (!sessionId || phase === 'resolving') return;
+    if (!sessionId || phase === 'resolving' || playbackActive) return;
     setPhase('resolving');
     try {
       const needsTarget = type === 'attack' || type === 'skill' || type === 'lanternAbility';
@@ -186,10 +192,18 @@ export function CombatScene() {
       const batch = hitBatchRef.current;
       setActiveOutgoingHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
       setActiveIncomingHits(res.enemyHits.map((h) => ({ ...h, key: batch * 1000 + h.attackerIndex })));
+      // Matches BattleScene.playIncomingHits' own stagger schedule: the last incoming hit doesn't
+      // even START playing until (count-1) * INCOMING_HIT_STAGGER_MS, and then needs its own
+      // ~1.4s (playFloatingText's tween duration) to actually finish - a fixed 1500ms here would
+      // cut a 3+ enemy round's animation short and re-enable actions mid-playback.
+      const playbackMs =
+        res.enemyHits.length > 0 ? (res.enemyHits.length - 1) * INCOMING_HIT_STAGGER_MS + 1500 : 1500;
+      setPlaybackActive(true);
       setTimeout(() => {
         setActiveOutgoingHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
         setActiveIncomingHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
-      }, 1500);
+        setPlaybackActive(false);
+      }, playbackMs);
 
       // An item's inventory count only lives in Firestore, not in the combat response above, so
       // it must be resynced here too - otherwise the displayed quantity never decrements mid-fight
@@ -292,7 +306,8 @@ export function CombatScene() {
   }
 
   const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');
-  const canPickTarget = aliveEnemies.length > 1 && phase === 'playerTurn';
+  const canAct = phase === 'playerTurn' && !playbackActive;
+  const canPickTarget = aliveEnemies.length > 1 && canAct;
   const combatEnded = phase === 'victory' || phase === 'defeat' || phase === 'fled' || phase === 'error';
 
   // Attack's identity follows whatever's in the weapon slot - "Fists" when nothing is equipped,
@@ -404,7 +419,7 @@ export function CombatScene() {
             </>
           ) : (
             <>
-              {aliveEnemies.length > 1 && phase === 'playerTurn' && (
+              {aliveEnemies.length > 1 && canAct && (
                 <button
                   className={styles.actionButton}
                   style={{ gridColumn: '1 / -1' }}
@@ -413,12 +428,12 @@ export function CombatScene() {
                   Target: {targetMode === 'all' ? 'All Foes' : 'Single'}
                 </button>
               )}
-              <button className={styles.actionButton} disabled={phase !== 'playerTurn'} onClick={() => act('attack')}>
+              <button className={styles.actionButton} disabled={!canAct} onClick={() => act('attack')}>
                 {weaponName}
               </button>
               <button
                 className={styles.actionButton}
-                disabled={phase !== 'playerTurn' || (player?.stats.spirit ?? 0) < keepersStrikeCost}
+                disabled={!canAct || (player?.stats.spirit ?? 0) < keepersStrikeCost}
                 onClick={() => act('skill')}
               >
                 Keeper's Strike ({keepersStrikeCost} SP)
@@ -427,7 +442,7 @@ export function CombatScene() {
                 <button
                   key={ability.id}
                   className={styles.actionButton}
-                  disabled={phase !== 'playerTurn' || (player?.stats.lanternOil ?? 0) < ability.oilCost}
+                  disabled={!canAct || (player?.stats.lanternOil ?? 0) < ability.oilCost}
                   onClick={() => act('lanternAbility', { abilityId: ability.id })}
                 >
                   {ability.name} ({ability.oilCost} Oil)
@@ -435,15 +450,15 @@ export function CombatScene() {
               ))}
               <button
                 className={styles.actionButton}
-                disabled={phase !== 'playerTurn'}
+                disabled={!canAct}
                 onClick={() => setPhase('itemMenu')}
               >
                 Items{tray.length > 0 ? ` (${tray.length}/3)` : ''}
               </button>
-              <button className={styles.actionButton} disabled={phase !== 'playerTurn'} onClick={() => act('defend')}>
+              <button className={styles.actionButton} disabled={!canAct} onClick={() => act('defend')}>
                 Defend
               </button>
-              <button className={styles.actionButton} disabled={phase !== 'playerTurn'} onClick={() => act('flee')}>
+              <button className={styles.actionButton} disabled={!canAct} onClick={() => act('flee')}>
                 Flee
               </button>
             </>

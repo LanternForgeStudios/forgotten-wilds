@@ -81,6 +81,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const [activeDmUid, setActiveDmUid] = useState<string | null>(null);
   const [dmMessages, setDmMessages] = useState<DirectMessage[]>([]);
   const [dmDraft, setDmDraft] = useState('');
+  const [dmError, setDmError] = useState<string | null>(null);
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
   // Only needs to be fresh enough to catch a friend going stale/coming back - not the 250ms tick
   // PlayerHUD's live Stamina bar needs.
@@ -298,9 +299,12 @@ export function UserProfile({ onClose }: UserProfileProps) {
     const text = dmDraft.trim();
     if (!text || !activeDmUid || busy) return;
     setBusy(true);
+    setDmError(null);
     try {
       await callSendDirectMessage(activeDmUid, text);
       setDmDraft('');
+    } catch (err) {
+      setDmError(err instanceof Error ? err.message : 'Could not send that message.');
     } finally {
       setBusy(false);
     }
@@ -599,6 +603,11 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     </p>
                   ))}
                 </div>
+                <p className={styles.tradeStatusTag}>
+                  For your safety, don't share personal information (phone numbers, emails, or links) - messages
+                  containing them, or offensive language, won't send.
+                </p>
+                {dmError && <p className={styles.error}>{dmError}</p>}
                 <div className={styles.searchBar}>
                   <input
                     className={styles.textInput}

@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
+import { findMessageViolation } from '../engine/messageFilter';
 import type { BlockListDoc, DirectMessage, FriendshipDoc } from '../shared-types';
 
 interface SendDirectMessageRequest {
@@ -22,6 +23,8 @@ export const sendDirectMessage = onCall<SendDirectMessageRequest>(async (request
   if (text.length > MAX_MESSAGE_LENGTH) {
     throw new HttpsError('invalid-argument', `Message must be ${MAX_MESSAGE_LENGTH} characters or fewer.`);
   }
+  const violation = findMessageViolation(text);
+  if (violation) throw new HttpsError('invalid-argument', violation);
 
   const db = getFirestore();
   const [friendsSnap, myBlocksSnap, theirBlocksSnap] = await Promise.all([

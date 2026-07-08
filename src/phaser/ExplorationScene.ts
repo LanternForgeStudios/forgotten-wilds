@@ -167,6 +167,16 @@ export class ExplorationScene extends Phaser.Scene {
     this.mapJustChanged = false;
     if (!this.playerSprite) {
       this.playerSprite = this.add.sprite(0, 0, spriteAssetId).setDepth(ENTITY_DEPTH);
+      // setCamera has its own `if (this.playerSprite) camera.startFollow(...)` check, but
+      // setCamera and setPlayer are two independent React effects that can run in either order -
+      // and setPlayer's own texture load (ensurePlayerAnimations, just awaited above) means the
+      // sprite frequently doesn't exist yet the first time setCamera runs, especially on a slower
+      // connection. Establishing follow here too, the instant the sprite actually exists, means
+      // camera tracking works on the very first load regardless of which effect wins the race,
+      // instead of only recovering once some later, unrelated resize re-triggers setCamera
+      // (confirmed by hand: this is exactly why rotating the phone "fixed" a dead camera - the
+      // resize was incidentally the first thing to re-run setCamera after the sprite existed).
+      this.cameras.main.startFollow(this.playerSprite);
     }
     const sprite = this.playerSprite;
     if (def.frameSize) {

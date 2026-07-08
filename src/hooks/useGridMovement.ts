@@ -98,6 +98,16 @@ export function useGridMovement({
   positionRef.current = position;
   const dynamicBlockersRef = useRef(dynamicBlockers);
   dynamicBlockersRef.current = dynamicBlockers;
+  // attemptMove's own useCallback deliberately excludes onStep from its deps (see below) so
+  // keyboard/drag/D-pad listeners bound to attemptMove don't churn on every render - but that
+  // means attemptMove only picks up a *new* onStep closure when map/suspended/stepIntervalMs also
+  // change. onStep (useLocationExploration's handleStep) is redefined fresh on every render and
+  // closes over that render's own map/locationId/goTo, so calling a stale one can drive a
+  // transition or encounter roll off out-of-date location data. Routing through a ref (same
+  // pattern useDragMovement.ts already uses for attemptMoveRef) guarantees the *current* onStep
+  // is always called regardless of whether attemptMove itself rebuilt this render.
+  const onStepRef = useRef(onStep);
+  onStepRef.current = onStep;
 
   useEffect(() => {
     setPosition({ x: start.x, y: start.y, facing: 'down' });
@@ -135,7 +145,7 @@ export function useGridMovement({
       setMovementState(options?.isDash ? 'running' : 'walking');
       clearTimeout(movementIdleTimeoutRef.current);
       movementIdleTimeoutRef.current = setTimeout(() => setMovementState('idle'), stepIntervalMs + 40);
-      onStep?.(next, options?.isDash);
+      onStepRef.current?.(next, options?.isDash);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [map, suspended, stepIntervalMs],
