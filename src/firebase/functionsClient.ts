@@ -95,6 +95,15 @@ export interface CombatHitResult {
   defeated: boolean;
 }
 
+export interface EnemyHitResult {
+  attackerIndex: number;
+  damage: number;
+  /** Always false today - enemies have no miss roll. */
+  missed: boolean;
+  /** True when this hit was halved by the player's Defend/a defensive lanternAbility this round. */
+  wasDefended: boolean;
+}
+
 export interface ResolveCombatActionResponse {
   log: string[];
   phase: 'continue' | 'victory' | 'defeat' | 'fled';
@@ -119,6 +128,8 @@ export interface ResolveCombatActionResponse {
   damageTakenByPlayer: number;
   /** Every enemy the player damaged/missed this round (attack/skill/offensive lanternAbility). */
   hits: CombatHitResult[];
+  /** Every enemy attack that landed on the player this round, one entry per attacking enemy. */
+  enemyHits: EnemyHitResult[];
 }
 
 export async function callResolveCombatAction(

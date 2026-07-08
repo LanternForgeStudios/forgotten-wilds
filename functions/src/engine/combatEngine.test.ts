@@ -888,3 +888,159 @@ describe('rollVictoryRestore', () => {
     expect(result?.stat).toBe('spirit');
   });
 });
+
+describe('resolveRound - enemyHits (structured per-attacker enemy damage on the player)', () => {
+  const mothling = ENEMIES.mothling;
+
+  function threeMothlings() {
+    return [
+      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+    ];
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('records one entry per attacking enemy, with the correct attackerIndex', () => {
+    const result = resolveRound({
+      action: { type: 'attack', targetIndex: 0 },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }), // enemies act first, deterministic
+      inventory: [],
+      enemies: threeMothlings(),
+    });
+    expect(result.enemyHits).toHaveLength(3);
+    expect(result.enemyHits.map((h) => h.attackerIndex).sort()).toEqual([0, 1, 2]);
+  });
+
+  it('enemyHits damage always sums to damageTakenByPlayer', () => {
+    const result = resolveRound({
+      action: { type: 'attack', targetIndex: 0 },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: threeMothlings(),
+    });
+    const summed = result.enemyHits.reduce((sum, h) => sum + h.damage, 0);
+    expect(summed).toBe(result.damageTakenByPlayer);
+  });
+
+  it('wasDefended reflects the round\'s Defend state, for every attacker', () => {
+    const defending = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: threeMothlings(),
+    });
+    const attacking = resolveRound({
+      action: { type: 'attack', targetIndex: 0 },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: threeMothlings(),
+    });
+    expect(defending.enemyHits.every((h) => h.wasDefended)).toBe(true);
+    expect(attacking.enemyHits.every((h) => !h.wasDefended)).toBe(true);
+  });
+
+  it('wasDefended entries carry the actual halved damage, not just a flag', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const defending = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+    });
+    const attacking = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+    });
+    expect(defending.enemyHits[0].damage).toBeLessThan(attacking.enemyHits[0].damage);
+  });
+
+  it('missed is always false today (enemies have no miss roll)', () => {
+    const results = [
+      resolveRound({
+        action: { type: 'attack', targetIndex: 0 },
+        playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+        inventory: [],
+        enemies: threeMothlings(),
+      }),
+      resolveRound({
+        action: { type: 'defend' },
+        playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+        inventory: [],
+        enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+      }),
+    ];
+    for (const result of results) {
+      expect(result.enemyHits.every((h) => !h.missed)).toBe(true);
+    }
+  });
+
+  it("a boss's own attack is undamped by add count, while its adds' attacks are crowd-dampened", () => {
+    const boss = ENEMIES['coalbound-warden'];
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const bossAlone = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: -999, hp: 9999, maxHp: 9999 }),
+      inventory: [],
+      enemies: [{ enemyId: boss.id, level: 1, hp: boss.stats.maxHp }],
+    });
+    const bossWithAdds = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: -999, hp: 9999, maxHp: 9999 }),
+      inventory: [],
+      enemies: [
+        { enemyId: boss.id, level: 1, hp: boss.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+      ],
+    });
+    // Roster order is [boss, mothling, mothling] in both cases relevant to attackerIndex 0.
+    const bossHitAlone = bossAlone.enemyHits.find((h) => h.attackerIndex === 0)!.damage;
+    const bossHitWithAdds = bossWithAdds.enemyHits.find((h) => h.attackerIndex === 0)!.damage;
+    expect(bossHitWithAdds).toBe(bossHitAlone);
+    // The adds, by contrast, are heavily crowd-dampened at aliveNonBossCount=2 (CROWD_DAMAGE_FACTOR
+    // 0.12) - each add's hit should land well under the boss's own (undamped) hit.
+    const addHits = bossWithAdds.enemyHits.filter((h) => h.attackerIndex !== 0);
+    expect(addHits.length).toBe(2);
+    for (const addHit of addHits) {
+      expect(addHit.damage).toBeLessThan(bossHitAlone);
+    }
+  });
+
+  it('both resolveRound return paths populate enemyHits correctly', () => {
+    // Successful flee: playerStats.speed far above the enemies' average speed clamps fleeChance to
+    // its max (0.9); Math.random mocked to 0 guarantees success - this hits the early `phase:
+    // 'fled'` return, which happens before any enemyAttack call, so enemyHits must be [].
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const successfulFlee = resolveRound({
+      action: { type: 'flee' },
+      playerStats: stats({ speed: 999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: threeMothlings(),
+    });
+    expect(successfulFlee.phase).toBe('fled');
+    expect(successfulFlee.enemyHits).toEqual([]);
+    vi.restoreAllMocks();
+
+    // Failed flee: playerStats.speed far below the enemies' average clamps fleeChance to its min
+    // (0.1); Math.random mocked to 0.99 guarantees failure - falls through to "every foe still
+    // standing gets a free hit" (`for (const i of alive) enemyAttack(i);`), which reaches the
+    // FINAL return statement, not the early one - a real, separate code path from every other test
+    // in this block, which all go through the normal turn-order loop instead.
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    const failedFlee = resolveRound({
+      action: { type: 'flee' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: threeMothlings(),
+    });
+    expect(failedFlee.phase).toBe('continue');
+    expect(failedFlee.enemyHits).toHaveLength(3);
+    expect(failedFlee.enemyHits.map((h) => h.attackerIndex).sort()).toEqual([0, 1, 2]);
+  });
+});

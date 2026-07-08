@@ -80,9 +80,16 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   `functions/src/index.ts` for the current exported list, which grows over time).
 - `src/multiplayer/` — typed stub interfaces (party, chat, trade, lodges, world events) for
   systems not built yet; every function throws "not implemented," ready to be filled in.
+- `src/phaser/` — Phaser 4 owns the canvas-based rendering for both exploration
+  (`ExplorationScene.ts`, driven by `src/components/exploration/PhaserExplorationCanvas.tsx`,
+  which `TileGrid.tsx` re-exports so Town/Overworld/Dungeon all get it via one import) and combat
+  (`BattleScene.ts`, driven by `src/components/combat/PhaserBattleCanvas.tsx`) — background, map
+  tiles, sprites, camera, hit/defeat effects. Every menu/overlay (Journal, Shop, Inventory, the
+  action-selection panels) stays ordinary React+CSS; these Scene classes own zero game logic, just
+  imperative rendering called in response to React state changes.
 - `src/animation/` — sprite-sheet animation layouts (row/facing → frame mapping) for characters;
-  an asset's `frameSize` in the registry opts it into frame-based rendering in
-  `TileGrid`/`TileGrid.module.css`, otherwise it renders as a plain static image.
+  an asset's `frameSize` in the registry opts it into frame-based rendering in `ExplorationScene`,
+  otherwise it renders as a plain static image.
 - `src/state/` — one Zustand store per concern (`usePlayerStore`, `useInventoryStore`,
   `useQuestStore`, `useJournalStore`, `useWorldStateStore`, `useSceneStore`, `useAuthStore`,
   `useSaveStore`, `useToastStore`). All of them (except scene/auth) are populated only from Cloud

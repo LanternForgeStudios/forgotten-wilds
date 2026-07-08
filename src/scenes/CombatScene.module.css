@@ -6,8 +6,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  background-size: cover;
-  background-position: center;
+  background: var(--fw-bg-deep);
   box-sizing: border-box;
 }
 
@@ -37,127 +36,16 @@
   box-sizing: border-box;
 }
 
-.enemyRowBack,
-.enemyRowFront {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.enemyRowBack {
-  opacity: 0.92;
-  transform: scale(0.8);
-  margin-bottom: -8px;
-}
-
-.enemySlot {
+/* Fills the remaining space in .enemyArea's flex column so PhaserBattleCanvas's own
+   ResizeObserver always has a concrete, nonzero size to measure - a canvas mounted into a
+   content-sized (not flex-stretched) parent would never receive a real measurement. The battle
+   stage's actual visuals (background, enemy sprites, HP bars, hit effects) all render inside the
+   Phaser canvas now - see src/phaser/BattleScene.ts. */
+.battleCanvasWrap {
+  flex: 1;
+  width: 100%;
+  min-height: 200px;
   position: relative;
-  background: none;
-  border: none;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-@keyframes enemyBounce {
-  0%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-14px); }
-  55% { transform: translateY(0); }
-  75% { transform: translateY(-6px); }
-}
-
-.enemyBounce {
-  animation: enemyBounce 500ms ease-in-out;
-}
-
-@keyframes floatUp {
-  0% { opacity: 0; transform: translate(-50%, 0); }
-  15% { opacity: 1; }
-  100% { opacity: 0; transform: translate(-50%, -48px); }
-}
-
-.floatingText {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  font-size: 18px;
-  font-weight: bold;
-  pointer-events: none;
-  animation: floatUp 1.4s ease-out forwards;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.floatingDamage {
-  color: var(--fw-danger);
-}
-
-.floatingMiss {
-  color: var(--fw-text-dim);
-  font-style: italic;
-}
-
-.enemySlot:disabled {
-  cursor: default;
-}
-
-.enemySlotTargeted {
-  background: rgba(224, 169, 74, 0.12);
-  outline: 2px solid var(--fw-accent);
-}
-
-.enemySprite {
-  image-rendering: pixelated;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.5));
-}
-
-/* HP bar is anchored directly under each enemy's own sprite, not a single shared bar, since each
-   enemy in a group fight has independent HP. */
-.enemyBar {
-  width: min(160px, 90%);
-  margin-top: 4px;
-}
-
-.enemyName {
-  text-align: center;
-  margin: 0 0 2px;
-  font-size: 12px;
-  color: var(--fw-text);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-.enemyTier {
-  text-align: center;
-  margin: 0 0 4px;
-  font-size: 10px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-}
-
-.hpTrack {
-  height: 8px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.6);
-}
-
-.hpFill {
-  height: 100%;
-  background: var(--fw-hp);
-  transition: width 300ms ease;
-}
-
-.targetMarker {
-  font-size: 10px;
-  color: var(--fw-accent);
-  margin-top: 2px;
 }
 
 .targetHint {

@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Panel } from '@/components/common/Panel';
 import { PlayerHUD } from '@/components/PlayerHUD';
-import { getAssetUrl } from '@/assets/assetManager';
+import { PhaserBattleCanvas } from '@/components/combat/PhaserBattleCanvas';
 import {
   callResolveCombatAction,
   callStartEncounter,
   callUseItem,
   type CombatHitResult,
+  type EnemyHitResult,
   type EncounterEnemy,
   type ResolveCombatActionResponse,
 } from '@/firebase/functionsClient';
@@ -37,20 +38,6 @@ const RESTORE_STAT_LABEL: Record<'hp' | 'spirit' | 'lanternOil', string> = {
 
 type Phase = 'starting' | 'playerTurn' | 'resolving' | 'itemMenu' | 'usingItems' | 'victory' | 'defeat' | 'fled' | 'error';
 
-/** Front row holds up to 3; anything beyond that overflows to a staggered back row - mirrors how
- *  most JRPGs lay out a 1-6 enemy group rather than a single line. A boss fight is a special case:
- *  the boss always sits in the back row with its 0-3 "adds" (never more than 3, so they always fit
- *  the front row) in front, regardless of position in the array - not the same positional split a
- *  same-tier group of 4-6 regular/elite enemies uses. */
-function splitFormation(items: EncounterEnemy[]): { front: EncounterEnemy[]; back: EncounterEnemy[] } {
-  if (items.some((e) => e.isBoss)) {
-    return { front: items.filter((e) => !e.isBoss), back: items.filter((e) => e.isBoss) };
-  }
-  const front = items.slice(0, 3);
-  const back = items.slice(3);
-  return { front, back };
-}
-
 export function CombatScene() {
   const params = useSceneStore((s) => s.params);
   const goTo = useSceneStore((s) => s.goTo);
@@ -71,19 +58,41 @@ export function CombatScene() {
   // Up to 3 item ids queued to ride along with whatever primary action the player takes next
   // (duplicates allowed - e.g. 2x the same potion). Cleared only after a round actually resolves.
   const [tray, setTray] = useState<string[]>([]);
-  // Per-enemy hit results from the most recent round, used to drive the bounce/floating damage-or-
-  // -miss text; batched by id so a stale timeout can't clear a *newer* round's hits.
-  const [activeHits, setActiveHits] = useState<(CombatHitResult & { key: number })[]>([]);
+  // Per-enemy hit results from the most recent round, fed into PhaserBattleCanvas to drive its hit
+  // effects; batched by id so a stale timeout can't clear a *newer* round's hits. Split into two
+  // arrays (one per data direction) since the engine now reports outgoing (player -> enemy) and
+  // incoming (enemy -> player) hits as separate, differently-shaped lists.
+  const [activeOutgoingHits, setActiveOutgoingHits] = useState<(CombatHitResult & { key: number })[]>([]);
+  const [activeIncomingHits, setActiveIncomingHits] = useState<(EnemyHitResult & { key: number })[]>([]);
   const hitBatchRef = useRef(0);
+  const encounterGuardRef = useRef<{ locationId: string; cancelled: boolean } | null>(null);
 
   const locationId = params.locationId ?? 'ironwood-trail';
   const location = LOCATIONS.find((l) => l.id === locationId);
 
+  // React StrictMode's dev-only mount->cleanup->mount double-invoke would otherwise fire
+  // callStartEncounter twice, creating a second combatSessions/{uid} document server-side - and
+  // since the client keeps whichever call's .then() wasn't marked cancelled, while the *server*
+  // keeps whichever write landed last (an unrelated race), the two can end up disagreeing,
+  // stranding the client with a sessionId the server has already superseded ("That combat
+  // session is no longer active." - confirmed by hand, not theoretical). encounterGuardRef makes
+  // this effect a no-op on the second same-locationId invocation instead of firing a duplicate
+  // call, and un-cancels the first call's continuation (which the intervening cleanup marked
+  // cancelled, same as it would for a real unmount) so its response is the one that actually
+  // applies.
   useEffect(() => {
-    let cancelled = false;
+    const guard = encounterGuardRef.current;
+    if (guard && guard.locationId === locationId) {
+      guard.cancelled = false;
+      return;
+    }
+
+    const entry = { locationId, cancelled: false };
+    encounterGuardRef.current = entry;
+
     callStartEncounter(locationId, params.bossId)
       .then((res) => {
-        if (cancelled) return;
+        if (entry.cancelled) return;
         setSessionId(res.sessionId);
         setEnemies(res.enemies);
         setTargetIndex(res.enemies[0]?.index ?? null);
@@ -96,12 +105,12 @@ export function CombatScene() {
         setPhase('playerTurn');
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (entry.cancelled) return;
         setErrorMessage(err instanceof Error ? err.message : 'Could not start the encounter.');
         setPhase('error');
       });
     return () => {
-      cancelled = true;
+      entry.cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationId]);
@@ -147,9 +156,11 @@ export function CombatScene() {
 
       hitBatchRef.current += 1;
       const batch = hitBatchRef.current;
-      setActiveHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
+      setActiveOutgoingHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
+      setActiveIncomingHits(res.enemyHits.map((h) => ({ ...h, key: batch * 1000 + h.attackerIndex })));
       setTimeout(() => {
-        setActiveHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
+        setActiveOutgoingHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
+        setActiveIncomingHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
       }, 1500);
 
       // An item's inventory count only lives in Firestore, not in the combat response above, so
@@ -243,9 +254,8 @@ export function CombatScene() {
   }
 
   const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');
-  const backgroundUrl = location ? getAssetUrl(location.battleBackgroundAssetId) : undefined;
-  const { front, back } = useMemo(() => splitFormation(enemies), [enemies]);
   const canPickTarget = aliveEnemies.length > 1 && phase === 'playerTurn';
+  const combatEnded = phase === 'victory' || phase === 'defeat' || phase === 'fled' || phase === 'error';
 
   // Attack's identity follows whatever's in the weapon slot - "Fists" when nothing is equipped,
   // matching the same pattern lantern abilities use for the lantern slot.
@@ -261,76 +271,39 @@ export function CombatScene() {
     .map((id) => LANTERN_ABILITIES.find((a) => a.id === id))
     .filter((a): a is NonNullable<typeof a> => !!a);
 
-  function renderEnemy(enemy: EncounterEnemy) {
-    const hit = activeHits.find((h) => h.targetIndex === enemy.index);
-    // A killing blow keeps its slot rendered just long enough for the bounce/floating text to
-    // finish, instead of vanishing the instant `enemies` state reflects 0 hp.
-    if (enemy.hp <= 0 && !hit) return null;
-    const def = ENEMIES.find((e) => e.id === enemy.enemyId);
-    const hpPct = enemy.maxHp > 0 ? Math.max(0, (enemy.hp / enemy.maxHp) * 100) : 0;
-    const isTarget = targetMode === 'all' ? true : enemy.index === targetIndex;
-    const size = enemy.isBoss ? 256 : 128;
-    return (
-      <button
-        key={enemy.index}
-        type="button"
-        className={`${styles.enemySlot} ${isTarget ? styles.enemySlotTargeted : ''}`}
-        onClick={() => {
-          setTargetMode('single');
-          setTargetIndex(enemy.index);
-        }}
-        disabled={targetMode !== 'all' && !canPickTarget && enemy.index !== targetIndex}
-      >
-        {def && (
-          <img
-            src={getAssetUrl(def.battleSpriteAssetId)}
-            alt={enemy.name}
-            className={`${styles.enemySprite} ${hit ? styles.enemyBounce : ''}`}
-            width={size}
-            height={size}
-          />
-        )}
-        {hit && (
-          <span
-            key={hit.key}
-            className={`${styles.floatingText} ${hit.missed ? styles.floatingMiss : styles.floatingDamage}`}
-          >
-            {hit.missed ? 'MISS' : `-${hit.damage}`}
-          </span>
-        )}
-        <div className={styles.enemyBar}>
-          <p className={styles.enemyName}>{enemy.name}</p>
-          <p className={styles.enemyTier} style={{ color: ENEMY_TIER_COLORS[enemy.tier] }}>
-            {ENEMY_TIER_LABELS[enemy.tier]}
-            {enemy.tier !== 'boss' && ` · Lv.${enemy.level}`}
-          </p>
-          <div className={styles.hpTrack}>
-            <div className={styles.hpFill} style={{ width: `${hpPct}%` }} />
-          </div>
-        </div>
-        {isTarget && aliveEnemies.length > 1 && <span className={styles.targetMarker}>▼ target</span>}
-      </button>
-    );
-  }
-
   return (
-    <div
-      className={styles.wrap}
-      style={{
-        backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : undefined,
-        paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop,
-      }}
-    >
+    <div className={styles.wrap} style={{ paddingTop: isMobile ? HUD_BAR_HEIGHT.mobile : HUD_BAR_HEIGHT.desktop }}>
       <PlayerHUD />
 
       <div className={styles.stage}>
         <div className={styles.enemyArea}>
-          {phase !== 'starting' && (
-            <>
-              {back.length > 0 && <div className={styles.enemyRowBack}>{back.map(renderEnemy)}</div>}
-              <div className={styles.enemyRowFront}>{front.map(renderEnemy)}</div>
-            </>
-          )}
+          <div className={styles.battleCanvasWrap}>
+            <PhaserBattleCanvas
+              backgroundAssetId={location?.battleBackgroundAssetId ?? ''}
+              enemies={enemies.map((e) => ({
+                index: e.index,
+                spriteAssetId: ENEMIES.find((d) => d.id === e.enemyId)?.battleSpriteAssetId ?? '',
+                name: e.name,
+                tierLabel: ENEMY_TIER_LABELS[e.tier],
+                tierColor: ENEMY_TIER_COLORS[e.tier],
+                level: e.level,
+                hp: e.hp,
+                maxHp: e.maxHp,
+                isBoss: e.isBoss,
+              }))}
+              outgoingHits={activeOutgoingHits}
+              incomingHits={activeIncomingHits}
+              playerMaxHp={player?.stats.maxHp ?? 1}
+              targetIndex={targetIndex}
+              targetMode={targetMode}
+              canPickTarget={canPickTarget}
+              onTargetEnemy={(index) => {
+                setTargetMode('single');
+                setTargetIndex(index);
+              }}
+              combatEnded={combatEnded}
+            />
+          </div>
           {canPickTarget && (
             <p className={styles.targetHint}>
               {targetMode === 'all'

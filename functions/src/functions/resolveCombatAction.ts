@@ -216,6 +216,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       enemies: updatedEnemies.map((e, index) => ({ index, hp: e.hp, maxHp: e.maxHp })),
       damageTakenByPlayer: result.damageTakenByPlayer,
       hits: result.hits,
+      enemyHits: result.enemyHits,
       rewards,
       playerLevel: save.player.level,
       playerGold: save.player.gold,

@@ -11,4 +11,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Phaser is large and changes far less often than app code - splitting it into its own
+        // chunk means a normal app-code deploy doesn't invalidate players' cached copy of it.
+        manualChunks: (id) => (id.includes('node_modules/phaser') ? 'phaser' : undefined),
+      },
+    },
+  },
 })

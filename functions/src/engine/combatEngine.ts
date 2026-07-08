@@ -213,6 +213,18 @@ export interface CombatHitResult {
   defeated: boolean;
 }
 
+export interface EnemyHitResult {
+  attackerIndex: number;
+  damage: number;
+  /** Always false today - enemyAttack has no miss roll (only the player's targetAll mode does).
+   *  Included for shape-symmetry with CombatHitResult, so a future evasion mechanic has a real
+   *  field to key off instead of a breaking client/server contract change. */
+  missed: boolean;
+  /** True when this hit was halved by the player's Defend (or a defensive lanternAbility) this
+   *  round - see playerDefending, decided once, up front, from the action alone. */
+  wasDefended: boolean;
+}
+
 export interface RoundResult {
   log: string[];
   playerHp: number;
@@ -226,7 +238,12 @@ export interface RoundResult {
   itemConsumedIds: string[];
   /** Every enemy the player damaged/missed this round via attack/skill/offensive lanternAbility. */
   hits: CombatHitResult[];
-  /** Sum of all enemy->player damage this round (after Defend halving is applied). */
+  /** Every enemy attack that landed on the player this round, one entry per attacking enemy.
+   *  Always an array, even when empty (e.g. a successful flee). */
+  enemyHits: EnemyHitResult[];
+  /** Sum of all enemy->player damage this round (after Defend halving is applied) - always equal
+   *  to the sum of enemyHits[].damage; kept as its own field since most callers only need the
+   *  aggregate. */
   damageTakenByPlayer: number;
 }
 
@@ -286,6 +303,7 @@ export function resolveRound(input: RoundInput): RoundResult {
   let damageTakenByPlayer = 0;
   const itemConsumedIds: string[] = [];
   const hits: CombatHitResult[] = [];
+  const enemyHits: EnemyHitResult[] = [];
 
   // Decided up front, from the action alone - NOT set mid-loop by playerTurn() - so that every
   // enemy attack this round is halved consistently, regardless of turn-order/speed. Previously
@@ -330,6 +348,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     if (playerDefending) dmg = Math.round(dmg / 2);
     playerHp = Math.max(0, playerHp - dmg);
     damageTakenByPlayer += dmg;
+    enemyHits.push({ attackerIndex: i, damage: dmg, missed: false, wasDefended: playerDefending });
     log.push(
       `${def.name} uses ${move.skillId.replace(/-/g, ' ')} for ${dmg} damage${
         playerDefending ? ' (halved - you defended)' : ''
@@ -457,7 +476,18 @@ export function resolveRound(input: RoundInput): RoundResult {
     const fleeChance = Math.min(0.9, Math.max(0.1, 0.3 + (input.playerStats.speed - avgSpeed) * 0.05));
     if (Math.random() < fleeChance) {
       log.push('You break away and flee the fight.');
-      return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase: 'fled', itemConsumedIds, hits, damageTakenByPlayer };
+      return {
+        log,
+        playerHp,
+        playerSpirit,
+        playerLanternOil,
+        enemyHp,
+        phase: 'fled',
+        itemConsumedIds,
+        hits,
+        enemyHits,
+        damageTakenByPlayer,
+      };
     }
     log.push('You try to flee, but there is no opening! Every foe still standing gets a free hit.');
     for (const i of alive) enemyAttack(i);
@@ -483,7 +513,18 @@ export function resolveRound(input: RoundInput): RoundResult {
   if (allDefeated) phase = 'victory';
   else if (playerHp <= 0) phase = 'defeat';
 
-  return { log, playerHp, playerSpirit, playerLanternOil, enemyHp, phase, itemConsumedIds, hits, damageTakenByPlayer };
+  return {
+    log,
+    playerHp,
+    playerSpirit,
+    playerLanternOil,
+    enemyHp,
+    phase,
+    itemConsumedIds,
+    hits,
+    enemyHits,
+    damageTakenByPlayer,
+  };
 }
 
 export interface RewardResult {
