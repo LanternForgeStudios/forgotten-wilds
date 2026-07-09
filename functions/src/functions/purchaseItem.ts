@@ -45,7 +45,7 @@ export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
       throw new HttpsError('failed-precondition', 'You already own one of those.');
     }
 
-    if (!grantItem(save.inventory, itemId)) {
+    if (!grantItem(save.inventory, itemId, save.journal.itemsDiscovered)) {
       throw new HttpsError('failed-precondition', 'You already own the only one of those.');
     }
     save.player.gold -= price;

@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { ITEMS } from '../data/items';
 import type { PlayerSave } from '../shared-types';
 
 interface CollectWorldItemRequest {
@@ -50,6 +51,13 @@ export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) 
     const alreadyHave = save.inventory.some((i) => i.itemId === itemId);
     if (!alreadyHave) {
       save.inventory.push({ itemId, quantity: 1 });
+      // This bypasses grantItem (its own unique-cap check doesn't apply here - alreadyHave above
+      // already does the equivalent "don't grant a second copy" job for this always-unique world-
+      // item case), so the itemsDiscovered bookkeeping grantItem normally handles has to happen
+      // here too.
+      if (ITEMS[itemId] && !save.journal.itemsDiscovered.includes(itemId)) {
+        save.journal.itemsDiscovered.push(itemId);
+      }
     }
 
     // Always advance quests on this event, even if the item was already collected - a quest

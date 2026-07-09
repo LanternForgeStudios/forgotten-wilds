@@ -41,7 +41,7 @@ function makeSave(inventory: InventoryItem[], gold: number, equipment: PlayerEqu
     },
     inventory,
     quests: {},
-    journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: [], bossesDefeated: [] },
+    journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: [], bossesDefeated: [], itemsDiscovered: [] },
     openedChests: [],
     seenNpcDialogueVariant: {},
     lastReviewedSocialAt: 0,

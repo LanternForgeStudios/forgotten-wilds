@@ -51,6 +51,9 @@ export function buildFreshSaveContent(): Pick<
       locationsVisited: [STARTING_LOCATION_ID],
       loreUnlocked: ['lore-great-silence', 'lore-lantern-keepers'],
       bossesDefeated: [],
+      // healing-poultice (an ITEMS-table entry) is in the starting inventory above - keepers-lantern
+      // isn't included here since it's equipment, not an ITEMS entry (see grantItem's own comment).
+      itemsDiscovered: ['healing-poultice'],
     },
     openedChests: [],
     seenNpcDialogueVariant: {},

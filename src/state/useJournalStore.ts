@@ -11,6 +11,7 @@ const EMPTY_JOURNAL: JournalData = {
   locationsVisited: [],
   loreUnlocked: [],
   bossesDefeated: [],
+  itemsDiscovered: [],
 };
 
 /** Populated only from Cloud Function responses or reads of users/{uid} — never mutated locally. */

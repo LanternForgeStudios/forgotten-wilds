@@ -8,8 +8,11 @@ import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
 import { getAssetUrl } from '@/assets/assetManager';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
+import { TIER_LABELS, TIER_COLORS } from '@/utils/tier';
+import { sellPriceFor } from '@/utils/sellPrice';
+import { useInventoryStore } from '@/state/useInventoryStore';
 import { ENEMIES, ITEMS, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
-import type { Enemy, EnemyTier, Quest, QuestCategory } from '@/types';
+import type { Enemy, EnemyTier, Item, ItemCategory, Quest, QuestCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
 import questStyles from './QuestLog.module.css';
 
@@ -22,15 +25,30 @@ interface JournalOfLegendsProps {
   onClose: () => void;
 }
 
-type Tab = 'quests' | 'locations' | 'echoes' | 'lore' | 'bosses';
+type Tab = 'quests' | 'locations' | 'echoes' | 'items' | 'lore' | 'bosses';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'quests', label: 'Quests' },
   { id: 'locations', label: 'Locations' },
   { id: 'echoes', label: 'Echoes' },
+  { id: 'items', label: 'Items' },
   { id: 'lore', label: 'Lore' },
   { id: 'bosses', label: 'Bosses' },
 ];
+
+const ITEM_CATEGORY_LABELS: Record<ItemCategory, string> = {
+  consumable: 'Consumables',
+  equipment: 'Equipment',
+  keyItem: 'Key Items',
+  lanternUpgrade: 'Lantern Upgrades',
+  materials: 'Materials',
+};
+
+function matchesItemQuery(item: Item | undefined, query: string): boolean {
+  if (!query) return true;
+  if (!item) return false;
+  return item.name.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
+}
 
 const ENEMY_FAMILY_LABELS: Record<Enemy['family'], string> = {
   mothlings: 'Mothlings',
@@ -94,6 +112,10 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   // Shared between the Echoes and Bosses tabs - enemy ids are unique across ENEMIES regardless of
   // which tab opened the card, and only one tab is ever visible at a time.
   const [selectedEnemyId, setSelectedEnemyId] = useState<string | null>(null);
+  const [itemsSearch, setItemsSearch] = useState('');
+  const [itemsCategoryFilter, setItemsCategoryFilter] = useState<ItemCategory | 'all'>('all');
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const inventory = useInventoryStore((s) => s.items);
   useOverlayClose(onClose);
 
   function toggleQuestRegion(id: string) {
@@ -411,6 +433,80 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
           </div>
         )}
 
+        {tab === 'items' &&
+          (() => {
+            const query = itemsSearch.trim().toLowerCase();
+            const discoveredCategories = Array.from(
+              new Set(
+                journal.itemsDiscovered
+                  .map((id) => ITEMS.find((i) => i.id === id)?.category)
+                  .filter((c): c is ItemCategory => !!c),
+              ),
+            );
+            const visible = journal.itemsDiscovered.filter((id) => {
+              const item = ITEMS.find((i) => i.id === id);
+              if (itemsCategoryFilter !== 'all' && item?.category !== itemsCategoryFilter) return false;
+              return matchesItemQuery(item, query);
+            });
+            return (
+              <div>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder="Search items..."
+                  value={itemsSearch}
+                  onChange={(e) => setItemsSearch(e.target.value)}
+                />
+                <div className={styles.subtabs} style={{ marginBottom: 10 }}>
+                  <button
+                    className={`${styles.subtab} ${itemsCategoryFilter === 'all' ? styles.subtabActive : ''}`}
+                    onClick={() => setItemsCategoryFilter('all')}
+                  >
+                    All
+                  </button>
+                  {discoveredCategories.map((category) => (
+                    <button
+                      key={category}
+                      className={`${styles.subtab} ${itemsCategoryFilter === category ? styles.subtabActive : ''}`}
+                      onClick={() => setItemsCategoryFilter(category)}
+                    >
+                      {ITEM_CATEGORY_LABELS[category]}
+                    </button>
+                  ))}
+                </div>
+                {journal.itemsDiscovered.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No items discovered yet.</p>}
+                {journal.itemsDiscovered.length > 0 && visible.length === 0 && (
+                  <p style={{ fontSize: 13, opacity: 0.7 }}>No items match those filters.</p>
+                )}
+                {visible.map((id) => {
+                  const item = ITEMS.find((i) => i.id === id);
+                  const owned = inventory.find((i) => i.itemId === id)?.quantity ?? 0;
+                  return (
+                    <div
+                      key={id}
+                      className={styles.slotRow}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSelectedItemId(id)}
+                    >
+                      {item?.iconAssetId && <img src={getAssetUrl(item.iconAssetId)} alt="" className={styles.icon} />}
+                      <span style={{ fontSize: 13, flex: 1 }}>
+                        <strong>{item?.name ?? id}</strong>
+                        {item && (
+                          <span style={{ fontSize: 10, color: TIER_COLORS[item.tier], marginLeft: 8 }}>
+                            {TIER_LABELS[item.tier]}
+                          </span>
+                        )}
+                        <br />
+                        <span style={{ opacity: 0.7 }}>{item?.description}</span>
+                      </span>
+                      {owned > 0 && <span style={{ fontSize: 11, opacity: 0.6 }}>You own x{owned}</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
         {tab === 'lore' && (
           <div>
             {journal.loreUnlocked.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No lore unlocked yet.</p>}
@@ -557,6 +653,65 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   className={styles.smallButton}
                   style={{ marginTop: 12 }}
                   onClick={() => setSelectedEnemyId(null)}
+                >
+                  Close
+                </button>
+              </Panel>
+            </div>
+          );
+        })()}
+
+      {selectedItemId &&
+        (() => {
+          const item = ITEMS.find((i) => i.id === selectedItemId);
+          if (!item) return null;
+          const owned = inventory.find((i) => i.itemId === selectedItemId)?.quantity ?? 0;
+          const price = sellPriceFor(item.id);
+          const uses: string[] = [];
+          if (item.effect?.healHpPercent) uses.push(`Restores ${Math.round(item.effect.healHpPercent * 100)}% HP`);
+          if (item.effect?.healSpiritPercent) uses.push(`Restores ${Math.round(item.effect.healSpiritPercent * 100)}% Spirit`);
+          if (item.effect?.restoreOilPercent) uses.push(`Restores ${Math.round(item.effect.restoreOilPercent * 100)}% Lantern Oil`);
+          if (item.effect?.reviveOnDefeat) uses.push('Revives on defeat');
+          return (
+            <div
+              className={styles.overlay}
+              style={{ zIndex: 30 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedItemId(null);
+              }}
+            >
+              <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                <div className={styles.detailHeader}>
+                  {item.iconAssetId && <img src={getAssetUrl(item.iconAssetId)} alt="" className={styles.detailIcon} />}
+                  <div>
+                    <p className={styles.detailName} style={{ fontSize: 16 }}>
+                      {item.name}
+                      <span style={{ fontSize: 11, color: TIER_COLORS[item.tier], marginLeft: 8 }}>{TIER_LABELS[item.tier]}</span>
+                    </p>
+                    <p className={styles.detailMeta}>
+                      {ITEM_CATEGORY_LABELS[item.category]}
+                      {owned > 0 && ` · You own x${owned}`}
+                      {item.unique && ' · Unique (cannot be lost, sold, or traded)'}
+                    </p>
+                  </div>
+                </div>
+                <p className={styles.detailDescription}>{item.description}</p>
+
+                <p className={styles.detailStats} style={{ marginBottom: 4 }}>
+                  <strong>Used For</strong>
+                </p>
+                <p className={questStyles.objective}>{uses.length > 0 ? uses.join(', ') : 'No usable effect - a keepsake or crafting material.'}</p>
+
+                <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
+                  <strong>Sale Price</strong>
+                </p>
+                <p className={questStyles.objective}>{price !== undefined ? `${price} gold` : 'Cannot be sold'}</p>
+
+                <button
+                  className={styles.smallButton}
+                  style={{ marginTop: 12 }}
+                  onClick={() => setSelectedItemId(null)}
                 >
                   Close
                 </button>

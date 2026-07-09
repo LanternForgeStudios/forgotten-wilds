@@ -54,7 +54,7 @@ export const openChest = onCall<OpenChestRequest>(async (request) => {
 
     // A unique item already owned some other way (quest reward, etc.) - still mark the chest
     // opened so it doesn't linger as an obviously-reachable freebie, just grant nothing further.
-    grantItem(save.inventory, itemId);
+    grantItem(save.inventory, itemId, save.journal.itemsDiscovered);
 
     save.openedChests = [...openedChests, chestId];
     save.updatedAt = Date.now();

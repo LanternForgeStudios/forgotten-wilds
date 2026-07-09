@@ -26,7 +26,7 @@ function saveAtLevel(level: number, xp: number): PlayerSave {
     },
     inventory: [],
     quests: {},
-    journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: [], bossesDefeated: [] },
+    journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: [], bossesDefeated: [], itemsDiscovered: [] },
     openedChests: [],
     updatedAt: 0,
   };

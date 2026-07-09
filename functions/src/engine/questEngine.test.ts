@@ -25,7 +25,7 @@ function emptySave(overrides: Partial<PlayerSave> = {}): PlayerSave {
     },
     inventory: [],
     quests: {},
-    journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: [], bossesDefeated: [] },
+    journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: [], bossesDefeated: [], itemsDiscovered: [] },
     openedChests: [],
     updatedAt: 0,
     ...overrides,

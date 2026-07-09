@@ -93,7 +93,7 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
     for (const itemId of reward.itemIds ?? []) {
       // A unique reward item already owned some other way is skipped, not an error - the quest
       // still completes and its xp/gold still land.
-      grantItem(save.inventory, itemId);
+      grantItem(save.inventory, itemId, save.journal.itemsDiscovered);
     }
   }
 }

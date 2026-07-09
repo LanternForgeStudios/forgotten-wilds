@@ -144,7 +144,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         // A unique drop (e.g. a boss trophy) never grants a second copy, even if the same boss
         // is challenged and defeated again later - skip it from the reported loot too, so the
         // victory screen doesn't claim an item was found when nothing was actually added.
-        if (grantItem(save.inventory, itemId)) grantedItemIds.push(itemId);
+        if (grantItem(save.inventory, itemId, save.journal.itemsDiscovered)) grantedItemIds.push(itemId);
       }
 
       // Group defeated enemies by id so a quest like "defeat 3 mothlings" advances by the actual
