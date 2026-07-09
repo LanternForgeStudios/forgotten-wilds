@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Facing } from '@/hooks/useGridMovement';
 import styles from './DirectionPad.module.css';
 
@@ -24,6 +24,22 @@ export function DirectionPad({ attemptMove }: DirectionPadProps) {
       intervalRef.current = undefined;
     }
   }
+
+  // Touch devices occasionally never deliver a pointerup/pointercancel to the button that
+  // started the hold (gesture interrupted, finger drags off-screen, browser quirk) - without
+  // this, a dropped event leaves the repeat interval running forever and the player appears
+  // stuck walking in whatever direction was last held. A window-level listener catches the
+  // release wherever it actually lands, and unmounting mid-hold (e.g. an overlay swaps this
+  // component out) can't leak the interval either.
+  useEffect(() => {
+    window.addEventListener('pointerup', stop);
+    window.addEventListener('pointercancel', stop);
+    return () => {
+      window.removeEventListener('pointerup', stop);
+      window.removeEventListener('pointercancel', stop);
+      stop();
+    };
+  }, []);
 
   function directionButton(facing: Facing, label: string, className: string) {
     return (

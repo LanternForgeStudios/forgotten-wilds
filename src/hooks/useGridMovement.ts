@@ -86,6 +86,7 @@ export function useGridMovement({
   stepIntervalMs = 150,
   dynamicBlockers,
 }: UseGridMovementOptions) {
+  const [resolvedStart, setResolvedStart] = useState(start);
   const [position, setPosition] = useState<GridPosition>({ x: start.x, y: start.y, facing: 'down' });
   // 'idle' whenever no step has landed recently - set to 'walking'/'running' right after a
   // successful step, then self-clears via a timeout reset on every subsequent step. Deliberately
@@ -109,9 +110,19 @@ export function useGridMovement({
   const onStepRef = useRef(onStep);
   onStepRef.current = onStep;
 
-  useEffect(() => {
+  // "Adjust state during render" (same pattern useTileMap.ts uses for `map`, and for the same
+  // reason) rather than a useEffect. useLocationExploration's hook instance persists across
+  // location transitions (no remount), so a post-commit effect leaves a one-render window where
+  // a just-loaded map's TileGrid can mount and paint *before* position has been corrected to that
+  // map's real spawn point - confirmed responsible for an intermittent "spawns in the top-left
+  // corner" bug on a location's first (uncached) load, since useLocationExploration's spawnPoint
+  // falls back to {1,1} for the render(s) before the map finishes loading, and that fallback was
+  // otherwise only ever corrected on the *next* effect flush, after the map-loaded render had
+  // already painted it.
+  if (start.x !== resolvedStart.x || start.y !== resolvedStart.y) {
+    setResolvedStart(start);
     setPosition({ x: start.x, y: start.y, facing: 'down' });
-  }, [start.x, start.y]);
+  }
 
   // Single source of truth for "try to move one tile in this direction" - the keyboard handler,
   // the mobile joystick, and any on-screen D-pad all funnel through this so they share the same

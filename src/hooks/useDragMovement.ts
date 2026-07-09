@@ -55,6 +55,12 @@ export function useDragMovement(
     el.addEventListener('pointerup', endDrag);
     el.addEventListener('pointercancel', endDrag);
     el.addEventListener('pointerleave', endDrag);
+    // Element-level pointerup/pointercancel can occasionally never fire on a touch device (the
+    // gesture gets interrupted, the finger leaves the viewport, a browser quirk swallows it) -
+    // a dropped release event would otherwise leave the repeat interval walking forever. Window
+    // listeners catch the release no matter where it lands.
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
 
     return () => {
       el.removeEventListener('pointerdown', handlePointerDown);
@@ -62,6 +68,8 @@ export function useDragMovement(
       el.removeEventListener('pointerup', endDrag);
       el.removeEventListener('pointercancel', endDrag);
       el.removeEventListener('pointerleave', endDrag);
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
       if (intervalId !== undefined) window.clearInterval(intervalId);
     };
   }, [containerRef, active]);
