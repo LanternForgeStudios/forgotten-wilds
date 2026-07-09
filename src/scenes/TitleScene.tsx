@@ -96,7 +96,7 @@ export function TitleScene() {
         >
           {mode === 'signIn' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
         </button>
-        <button type="button" className={styles.linkButton} onClick={handleForgotPassword}>
+        <button type="button" className={styles.linkButton} onClick={handleForgotPassword} disabled={busy}>
           Forgot password?
         </button>
 

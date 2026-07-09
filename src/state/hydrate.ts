@@ -42,12 +42,24 @@ function toastQuestChanges(prev: Record<string, QuestProgress>, next: Record<str
   }
 }
 
+// resyncSave is called independently from many places in quick succession (nearly every scene
+// interaction follows up its own Cloud Function call with one) with no sequencing between calls -
+// without this, two overlapping resyncs can resolve out of order (a slower-to-resolve earlier
+// call finishing after a faster-resolving later one) and the stale response would silently
+// overwrite the fresher state it should have lost to. Same generation-counter guard already used
+// for this exact class of race elsewhere in the codebase (ExplorationScene.ts, CombatScene.tsx).
+let resyncGeneration = 0;
+
 /** Re-reads users/{uid} and re-hydrates every store. Used after any Cloud Function call whose
  *  response doesn't carry the full save (talkToNpc, enterLocation, collectWorldItem, etc). */
 export async function resyncSave(uid: string): Promise<void> {
+  const generation = ++resyncGeneration;
   const prevProgress = useQuestStore.getState().progress;
   const save = await fetchPlayerSave(uid);
   if (!save) return;
+  // A newer resyncSave call has since started - it'll apply its own (more current) result, so
+  // don't let this now-stale one clobber it.
+  if (generation !== resyncGeneration) return;
   toastQuestChanges(prevProgress, save.quests);
   hydrateAllStores(save);
 }

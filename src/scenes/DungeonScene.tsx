@@ -81,8 +81,8 @@ export function DungeonScene() {
       (o) => o.type === 'interactable' && o.x === target.x && o.y === target.y,
     );
     if (obj?.refId === 'miners-lost-lantern') {
-      run(callCollectWorldItem(LOCATION_ID, 'miners-lost-lantern'), 'Collecting...')
-        .then(async (res) => {
+      run(() => callCollectWorldItem(LOCATION_ID, 'miners-lost-lantern'), 'Collecting...')
+        ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
             res.alreadyCollected
@@ -104,16 +104,16 @@ export function DungeonScene() {
         setMessage('Something vast and ember-lit stirs in the dark ahead — but the way feels barred to you, for now.');
       }
     } else if (obj?.refId === 'mine-shrine') {
-      run(callInteractWithShrine(LOCATION_ID, 'mine-shrine'), 'Interacting with shrine...')
-        .then(async () => {
+      run(() => callInteractWithShrine(LOCATION_ID, 'mine-shrine'), 'Interacting with shrine...')
+        ?.then(async () => {
           if (uid) await resyncSave(uid);
           setMessage('A shrine carved into the rock, coated in soot. Something in it still resists the corruption around it.');
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
     } else if (obj?.refId?.startsWith('chest-')) {
       const chestId = obj.refId;
-      run(callOpenChest(LOCATION_ID, chestId), 'Opening chest...')
-        .then(async (res) => {
+      run(() => callOpenChest(LOCATION_ID, chestId), 'Opening chest...')
+        ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           const name =
             EQUIPMENT.find((e) => e.id === res.itemId)?.name ??

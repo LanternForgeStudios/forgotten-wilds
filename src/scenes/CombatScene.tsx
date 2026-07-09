@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Panel } from '@/components/common/Panel';
 import { PlayerHUD } from '@/components/PlayerHUD';
 import { PhaserBattleCanvas } from '@/components/combat/PhaserBattleCanvas';
@@ -87,6 +87,28 @@ export function CombatScene() {
   // True once a defeat round's response has arrived but its (already-respawned-at-Ash-Hallow)
   // hp/spirit haven't been applied to the store yet - see the comment in act() below for why.
   const pendingDefeatResyncRef = useRef(false);
+  // act() schedules several setTimeouts (staggered log-line reveals, the damage toast, clearing
+  // hit-playback state) sized to a multi-enemy round's full ~1-2s animation - long enough that a
+  // player can click "Continue" off the victory/defeat overlay and unmount this scene before they
+  // fire. The two that only touch this component's own state degrade harmlessly (React ignores a
+  // setState on an unmounted component), but the damage toast pushes to the global toast store,
+  // which isn't scoped to this component - without this, it can visibly pop up on Town/Overworld
+  // a second or two after the player has already left combat. Tracked here so every pending
+  // timeout can be cancelled on unmount instead of letting only the toast one misbehave.
+  const pendingTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const trackedTimeout = useCallback((fn: () => void, ms: number) => {
+    const id = setTimeout(() => {
+      pendingTimeoutsRef.current.delete(id);
+      fn();
+    }, ms);
+    pendingTimeoutsRef.current.add(id);
+  }, []);
+  useEffect(() => {
+    return () => {
+      pendingTimeoutsRef.current.forEach((id) => clearTimeout(id));
+      pendingTimeoutsRef.current.clear();
+    };
+  }, []);
 
   const locationId = params.locationId ?? 'ironwood-trail';
   const location = LOCATIONS.find((l) => l.id === locationId);
@@ -174,7 +196,7 @@ export function CombatScene() {
       setLog((prev) => [...prev, ...res.log.filter((line) => !enemyAttackLines.has(line))]);
       res.enemyHits.forEach((hit, i) => {
         const stagger = fastRounds ? 0 : i * INCOMING_HIT_STAGGER_MS;
-        setTimeout(() => {
+        trackedTimeout(() => {
           setLog((prev) => [...prev, hit.logLine]);
         }, PRE_ENEMY_ATTACK_DELAY_MS + stagger);
       });
@@ -209,7 +231,7 @@ export function CombatScene() {
         // Delayed until every enemy has attacked, rather than fired the instant the round
         // resolves - otherwise the "Took N damage" toast (a total across every attacker) showed
         // up before the player had even seen most of the hits it was summing.
-        setTimeout(() => {
+        trackedTimeout(() => {
           useToastStore.getState().push(`Took ${res.damageTakenByPlayer} damage this round.`);
         }, lastAttackStartMs);
       }
@@ -223,7 +245,7 @@ export function CombatScene() {
       // would cut a 3+ enemy round's animation short and re-enable actions mid-playback.
       const playbackMs = lastAttackStartMs + 1500;
       setPlaybackActive(true);
-      setTimeout(() => {
+      trackedTimeout(() => {
         setActiveOutgoingHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
         setActiveIncomingHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
         setPlaybackActive(false);
@@ -296,18 +318,23 @@ export function CombatScene() {
     }
     const queued = tray;
     setPhase('usingItems');
-    setItemsUsedThisTurn((n) => n + queued.length);
+    let usedCount = 0;
     let failed = false;
     for (const itemId of queued) {
       try {
         await callUseItem(itemId);
+        usedCount += 1;
       } catch {
         // A later item can still be valid even if an earlier one turned out to be a no-op (e.g.
         // it would have had no effect because an earlier item in the same batch already maxed
-        // that stat) - keep going rather than aborting the whole batch.
+        // that stat) - keep going rather than aborting the whole batch. A failed call never
+        // actually consumes the item server-side (useItem.ts throws before decrementing
+        // inventory when the item would have no effect), so it shouldn't cost one of the
+        // player's 3 real item-uses for the turn either.
         failed = true;
       }
     }
+    setItemsUsedThisTurn((n) => n + usedCount);
     setTray([]);
     if (uid) await resyncSave(uid);
     if (failed) {
@@ -406,6 +433,15 @@ export function CombatScene() {
           <button
             type="button"
             className={styles.fastRoundsToggle}
+            // Disabled for the same full window canAct already gates on (phase === 'resolving'
+            // covers the network round-trip, playbackActive covers the staggered log-reveal/
+            // toast/hit-playback timeouts that keep running for up to ~1-2s after phase has
+            // already flipped back to 'playerTurn') - act()'s in-flight response handler captures
+            // fastRounds by closure at call time to schedule those timeouts, while
+            // PhaserBattleCanvas reads the live prop when its own effect fires after the response
+            // lands, so toggling anywhere in that window would desync the log text from the
+            // animation for that round.
+            disabled={phase === 'resolving' || playbackActive}
             onClick={() => setFastRounds((f) => !f)}
             title="When multiple enemies attack in the same round, let their attacks land together instead of staggered one at a time."
           >

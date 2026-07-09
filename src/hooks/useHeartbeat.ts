@@ -22,12 +22,14 @@ export function useHeartbeat(
   const positionRef = useRef(position);
   positionRef.current = position;
   const lastPositionSentAtRef = useRef(0);
+  // Computed once and shared by both effects below (previously duplicated in each) - harmless
+  // empty-string fallback when displayName isn't ready yet, since both effects bail out before
+  // ever reading it in that case.
+  const avatarSymbol = displayName ? displayName.slice(0, 2).toUpperCase() : '';
 
   useEffect(() => {
     if (!uid || !displayName) return;
     if (joinedAtRef.current === null) joinedAtRef.current = Date.now();
-
-    const avatarSymbol = displayName.slice(0, 2).toUpperCase();
 
     function beat() {
       updatePresence({
@@ -54,7 +56,6 @@ export function useHeartbeat(
     const now = Date.now();
     if (now - lastPositionSentAtRef.current < POSITION_THROTTLE_MS) return;
     lastPositionSentAtRef.current = now;
-    const avatarSymbol = displayName.slice(0, 2).toUpperCase();
     updatePresence({
       uid,
       displayName,

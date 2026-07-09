@@ -110,8 +110,8 @@ export function OverworldScene() {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
         setActiveNpc(npc);
-        run(callTalkToNpc(npc.id), 'Talking...')
-          .then(async () => {
+        run(() => callTalkToNpc(npc.id), 'Talking...')
+          ?.then(async () => {
             if (uid) await resyncSave(uid);
           })
           .catch((err) => console.error('talkToNpc failed', err));
@@ -124,8 +124,8 @@ export function OverworldScene() {
     );
     if (obj?.refId?.startsWith('chest-')) {
       const chestId = obj.refId;
-      run(callOpenChest(locationId, chestId), 'Opening chest...')
-        .then(async (res) => {
+      run(() => callOpenChest(locationId, chestId), 'Opening chest...')
+        ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           const name =
             EQUIPMENT.find((e) => e.id === res.itemId)?.name ??
@@ -143,8 +143,8 @@ export function OverworldScene() {
     if (obj?.refId && SHRINE_LANDMARKS.has(obj.refId)) {
       const refId = obj.refId;
       const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
-      run(callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
-        .then(async (res) => {
+      run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
+        ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           if (res.unlockedStamina) {
             setMessage(
@@ -160,8 +160,8 @@ export function OverworldScene() {
     if (obj?.refId && VISIT_ONLY_LANDMARKS.has(obj.refId)) {
       const landmarkId = obj.refId;
       const landmarkName = LOCATIONS.find((l) => l.id === landmarkId)?.name ?? landmarkId;
-      run(callVisitLandmark(landmarkId), 'Investigating...')
-        .then(async (res) => {
+      run(() => callVisitLandmark(landmarkId), 'Investigating...')
+        ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
             res.alreadyVisited
@@ -174,8 +174,8 @@ export function OverworldScene() {
     }
     if (obj?.refId && FRAGMENT_LANDMARKS.has(obj.refId)) {
       const refId = obj.refId;
-      run(callCollectWorldItem(locationId, refId), 'Collecting...')
-        .then(async (res) => {
+      run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
+        ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           const name = ITEMS.find((i) => i.id === res.itemId)?.name ?? res.itemId;
           setMessage(

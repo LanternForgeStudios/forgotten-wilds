@@ -34,10 +34,7 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
 
   const db = getFirestore();
   const userRef = db.collection('users').doc(uid);
-  const existing = await userRef.get();
-  if (existing.exists) {
-    throw new HttpsError('already-exists', 'A character already exists for this account.');
-  }
+  const directoryRef = db.collection('userDirectory').doc(uid);
 
   const now = Date.now();
   const save: PlayerSave = {
@@ -49,13 +46,24 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
     updatedAt: now,
   };
 
-  await userRef.set(save);
-  // Public, minimal directory entry so other players can find this account by name to send a
-  // friend request - deliberately excludes email/anything sensitive (see searchUsers.ts).
-  await db.collection('userDirectory').doc(uid).set({
-    uid,
-    displayName: name,
-    displayNameLower: name.toLowerCase(),
+  // Previously a plain get()-then-set() - a double-submit (double-click, or a retry after a slow/
+  // timed-out first response) could fire two concurrent calls that both read existing.exists ===
+  // false before either write landed, both proceed, and have the second set() silently overwrite
+  // the first with a different save (e.g. a different typed name) instead of correctly rejecting
+  // the second with already-exists. A transaction makes Firestore serialize the two attempts.
+  await db.runTransaction(async (tx) => {
+    const existing = await tx.get(userRef);
+    if (existing.exists) {
+      throw new HttpsError('already-exists', 'A character already exists for this account.');
+    }
+    tx.set(userRef, save);
+    // Public, minimal directory entry so other players can find this account by name to send a
+    // friend request - deliberately excludes email/anything sensitive (see searchUsers.ts).
+    tx.set(directoryRef, {
+      uid,
+      displayName: name,
+      displayNameLower: name.toLowerCase(),
+    });
   });
 
   return save;

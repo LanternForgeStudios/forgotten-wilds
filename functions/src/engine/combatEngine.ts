@@ -5,18 +5,28 @@ import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
 import type { CombatAction, Stats } from '../shared-types';
 
+/** Picks one item from `items`, proportional to `weightOf(item)` - shared by every "roll a random
+ *  entry weighted toward some more than others" spot in this file (enemy encounter tables, boss
+ *  add-count, enemy move selection). Callers are expected to only ever pass a non-empty `items`
+ *  (each current call site already guarantees that on its own - an empty encounter table throws
+ *  before reaching here, and pickEnemyMove pre-checks its own filtered list), so this doesn't
+ *  special-case an empty array itself. */
+function weightedPick<T>(items: T[], weightOf: (item: T) => number): T {
+  const totalWeight = items.reduce((sum, item) => sum + weightOf(item), 0);
+  let roll = Math.random() * totalWeight;
+  for (const item of items) {
+    roll -= weightOf(item);
+    if (roll <= 0) return item;
+  }
+  return items[0];
+}
+
 export function rollEnemyForLocation(locationId: string): EnemyDefinition {
   const table = ENCOUNTER_TABLES[locationId];
   if (!table || table.length === 0) {
     throw new Error(`No encounter table for location "${locationId}".`);
   }
-  const totalWeight = table.reduce((sum, e) => sum + e.weight, 0);
-  let roll = Math.random() * totalWeight;
-  for (const entry of table) {
-    roll -= entry.weight;
-    if (roll <= 0) return ENEMIES[entry.enemyId];
-  }
-  return ENEMIES[table[0].enemyId];
+  return ENEMIES[weightedPick(table, (e) => e.weight).enemyId];
 }
 
 const MIN_ENCOUNTER_SIZE = 1;
@@ -52,13 +62,8 @@ export function rollEncounterGroup(locationId: string, playerLevel: number): Ene
 const ADD_COUNT_WEIGHTS = [40, 30, 20, 10];
 
 function rollAddCount(): number {
-  const totalWeight = ADD_COUNT_WEIGHTS.reduce((sum, w) => sum + w, 0);
-  let roll = Math.random() * totalWeight;
-  for (let count = 0; count < ADD_COUNT_WEIGHTS.length; count++) {
-    roll -= ADD_COUNT_WEIGHTS[count];
-    if (roll <= 0) return count;
-  }
-  return 0;
+  const counts = ADD_COUNT_WEIGHTS.map((_, count) => count);
+  return weightedPick(counts, (count) => ADD_COUNT_WEIGHTS[count]);
 }
 
 /** Rolls a boss fight's full roster: 0-3 additional enemies ("adds"), each independently drawn
@@ -162,18 +167,15 @@ function computeDamage(power: number, attackerAtk: number, defenderDef: number):
 }
 
 function pickEnemyMove(enemy: EnemyDefinition, hpFraction: number) {
-  const available = enemy.moves.filter((m) => !m.unlocksAtHpFraction || hpFraction <= m.unlocksAtHpFraction);
+  // `=== undefined`, not a falsy check - an authored unlocksAtHpFraction: 0 ("only once nearly
+  // dead") would otherwise be treated identically to "no threshold at all" (!0 is true) and be
+  // available from full HP instead of gated.
+  const available = enemy.moves.filter((m) => m.unlocksAtHpFraction === undefined || hpFraction <= m.unlocksAtHpFraction);
   // If every one of this enemy's moves is HP-gated above the current threshold (content bug -
   // every authored enemy today has at least one unconditional move), fall back to its first move
   // rather than returning undefined and crashing the transaction.
   if (available.length === 0) return enemy.moves[0];
-  const totalWeight = available.reduce((sum, m) => sum + m.weight, 0);
-  let roll = Math.random() * totalWeight;
-  for (const move of available) {
-    roll -= move.weight;
-    if (roll <= 0) return move;
-  }
-  return available[0];
+  return weightedPick(available, (m) => m.weight);
 }
 
 export interface RoundEnemyInput {

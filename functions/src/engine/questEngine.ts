@@ -1,4 +1,4 @@
-import { QUESTS, type QuestObjectiveType } from '../data/quests';
+import { QUESTS, type QuestDef, type QuestObjectiveType } from '../data/quests';
 import { NPC_DIALOGUE_VARIANT_QUEST_IDS } from '../data/npcDialogueVariants';
 import { grantItem } from './inventoryEngine';
 import { applyLevelUp } from './levelingEngine';
@@ -42,6 +42,24 @@ export interface QuestCompletion {
   reward: { xp: number; gold: number; itemIds?: string[]; spiritEssence?: number };
 }
 
+/** Shared by advanceQuests and reconcileRetroactiveObjectives - both need to check whether a
+ *  just-updated quest's objectiveCounts now satisfy every objective, and if so mark it completed
+ *  and record it for reward-granting. Mutates `progress.status` in place; returns whether it
+ *  completed. */
+function checkQuestCompletion(
+  questId: string,
+  def: QuestDef,
+  progress: QuestProgress,
+  completions: QuestCompletion[],
+): boolean {
+  const allComplete = def.objectives.every((o) => (progress.objectiveCounts[o.id] ?? 0) >= o.requiredCount);
+  if (allComplete) {
+    progress.status = 'completed';
+    completions.push({ questId, reward: def.reward });
+  }
+  return allComplete;
+}
+
 /**
  * Mutates `quests` in place, advancing any active quest whose objective matches the event.
  * Returns the list of quests that became newly completed this call (for granting rewards).
@@ -61,13 +79,7 @@ export function advanceQuests(quests: Record<string, QuestProgress>, event: Ques
     progress.status = 'active';
     quests[questId] = progress;
 
-    const allComplete = def.objectives.every(
-      (o) => (progress.objectiveCounts[o.id] ?? 0) >= o.requiredCount,
-    );
-    if (allComplete) {
-      progress.status = 'completed';
-      completions.push({ questId, reward: def.reward });
-    }
+    checkQuestCompletion(questId, def, progress, completions);
   }
 
   return completions;
@@ -108,12 +120,21 @@ function reconcileRetroactiveObjectives(save: PlayerSave): QuestCompletion[] {
       const progress = save.quests[questId] ?? { status: 'active' as const, objectiveCounts: {} };
       let progressChanged = false;
       for (const o of def.objectives) {
-        if ((progress.objectiveCounts[o.id] ?? 0) >= o.requiredCount) continue;
-        const alreadySatisfied =
-          (o.type === 'collectItem' && save.inventory.some((i) => i.itemId === o.targetId)) ||
-          (o.type === 'reachLocation' && save.journal.locationsVisited.includes(o.targetId));
-        if (alreadySatisfied) {
-          progress.objectiveCounts[o.id] = o.requiredCount;
+        const current = progress.objectiveCounts[o.id] ?? 0;
+        if (current >= o.requiredCount) continue;
+        let retroactiveCount: number | undefined;
+        if (o.type === 'collectItem') {
+          // Clamped to actual owned quantity (matching advanceQuests's own amount-aware
+          // increment above) rather than a blind "owns any amount -> fully satisfied" - only
+          // correct by coincidence today since every collectItem objective happens to use
+          // requiredCount: 1, but would under-require the moment one uses a higher count.
+          const owned = save.inventory.find((i) => i.itemId === o.targetId)?.quantity ?? 0;
+          if (owned > 0) retroactiveCount = Math.min(o.requiredCount, owned);
+        } else if (o.type === 'reachLocation' && save.journal.locationsVisited.includes(o.targetId)) {
+          retroactiveCount = o.requiredCount;
+        }
+        if (retroactiveCount !== undefined && retroactiveCount > current) {
+          progress.objectiveCounts[o.id] = retroactiveCount;
           progressChanged = true;
         }
       }
@@ -121,11 +142,7 @@ function reconcileRetroactiveObjectives(save: PlayerSave): QuestCompletion[] {
       progress.status = 'active';
       save.quests[questId] = progress;
       changed = true;
-      const allComplete = def.objectives.every((o) => (progress.objectiveCounts[o.id] ?? 0) >= o.requiredCount);
-      if (allComplete) {
-        progress.status = 'completed';
-        completions.push({ questId, reward: def.reward });
-      }
+      checkQuestCompletion(questId, def, progress, completions);
     }
   }
   return completions;

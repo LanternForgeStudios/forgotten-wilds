@@ -115,8 +115,8 @@ export function TownScene() {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
         setActiveNpc(npc);
-        run(callTalkToNpc(npc.id), 'Talking...')
-          .then(async () => {
+        run(() => callTalkToNpc(npc.id), 'Talking...')
+          ?.then(async () => {
             if (uid) await resyncSave(uid);
           })
           .catch((err) => console.error('talkToNpc failed', err));
@@ -128,8 +128,8 @@ export function TownScene() {
     );
     if (shrineObject?.refId) {
       const refId = shrineObject.refId;
-      run(callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
-        .then(async (res) => {
+      run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
+        ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           setMessage(
             res.unlockedStamina

@@ -32,6 +32,16 @@ export function useDash({ attemptMove, positionRef }: UseDashOptions) {
   const dashingRef = useRef(false);
   const patchStats = usePlayerStore((s) => s.patchStats);
   const patchPlayer = usePlayerStore((s) => s.patchPlayer);
+  // A dash step landing on a transition tile changes locations mid-loop (handleStep's transition
+  // check runs even for a dash step - only the encounter roll is skipped) - for a same-kind
+  // transition (e.g. Town outdoor -> a building interior) the scene doesn't remount, so this
+  // hook's dash() keeps running with whatever attemptMove it captured at call time, which is now
+  // bound to the *old* map's collision data while positionRef has already moved on to the new
+  // location's spawn point. Reading through a ref (same pattern useDragMovement.ts and
+  // useGridMovement.ts already use for this exact class of bug) guarantees every remaining
+  // iteration of an in-flight dash validates against whichever map is actually current.
+  const attemptMoveRef = useRef(attemptMove);
+  attemptMoveRef.current = attemptMove;
 
   const dash = useCallback(async (requestedFacing?: Facing) => {
     if (dashingRef.current) return;
@@ -56,7 +66,7 @@ export function useDash({ attemptMove, positionRef }: UseDashOptions) {
       const facing = requestedFacing ?? positionRef.current.facing;
       for (let i = 0; i < DASH_TILES; i++) {
         const before = positionRef.current;
-        attemptMove(facing, { isDash: true });
+        attemptMoveRef.current(facing, { isDash: true });
         await wait(DASH_STEP_MS);
         const after = positionRef.current;
         if (after.x === before.x && after.y === before.y) break; // blocked - stop the dash here
@@ -64,7 +74,8 @@ export function useDash({ attemptMove, positionRef }: UseDashOptions) {
     } finally {
       dashingRef.current = false;
     }
-  }, [attemptMove, patchStats, patchPlayer, positionRef]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patchStats, patchPlayer, positionRef]);
 
   return dash;
 }
