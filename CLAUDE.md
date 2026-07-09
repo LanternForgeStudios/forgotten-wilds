@@ -43,10 +43,11 @@ number that affects gameplay (damage, price, drop rate, xp), it has to change in
   about.
 - `functions/src/functions/` — the callable Cloud Functions themselves: read/validate/mutate in a
   Firestore transaction, delegating the actual math to `engine/`.
-- `src/multiplayer/` — typed stub interfaces (party, chat, lodges, world events, clan). Every
-  function throws "not implemented" on purpose — these are placeholders for systems not built
-  yet, not dead code to clean up. Trading (formerly a stub here) is fully implemented — see
-  `functions/src/functions/trade.ts` and `functions/src/engine/tradeEngine.ts`.
+- `src/multiplayer/` — typed stub interfaces (party, lodges, world events, clan). Every function
+  throws "not implemented" on purpose — these are placeholders for systems not built yet, not
+  dead code to clean up. Trading and chat (formerly stubs here) are fully implemented — see
+  `functions/src/functions/trade.ts`/`tradeEngine.ts` and
+  `functions/src/functions/worldChat.ts`/`chatModerationEngine.ts`.
 
 ## Conventions
 

@@ -9,11 +9,13 @@ interface MobileHudProps {
   /** Also where Quests live now (its own tab, opened first by default) - there's no separate
    *  Quests button since the standalone Quest Log was folded into the Journal. */
   onJournal: () => void;
+  /** Omitted outside TownScene - World Chat is only available while in a town. */
+  onChat?: () => void;
 }
 
-/** Touch replacement for the Enter/I/J/Shift+direction keyboard shortcuts, since phones have no
+/** Touch replacement for the Enter/I/J/C/Shift+direction keyboard shortcuts, since phones have no
  *  keyboard to press. */
-export function MobileHud({ onInteract, onDash, onInventory, onJournal }: MobileHudProps) {
+export function MobileHud({ onInteract, onDash, onInventory, onJournal, onChat }: MobileHudProps) {
   return (
     <div className={styles.hud}>
       {onInteract && (
@@ -33,6 +35,11 @@ export function MobileHud({ onInteract, onDash, onInventory, onJournal }: Mobile
         <button className={styles.menuButton} onClick={onJournal}>
           Journal
         </button>
+        {onChat && (
+          <button className={styles.menuButton} onClick={onChat}>
+            Chat
+          </button>
+        )}
       </div>
     </div>
   );

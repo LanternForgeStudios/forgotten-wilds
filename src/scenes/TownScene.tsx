@@ -8,6 +8,7 @@ import { CharacterMenu } from '@/components/CharacterMenu';
 import { Shop } from '@/components/Shop';
 import { Inn } from '@/components/Inn';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
+import { WorldChat } from '@/components/WorldChat';
 import { Panel } from '@/components/common/Panel';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
@@ -62,6 +63,7 @@ export function TownScene() {
   const [activeShopId, setActiveShopId] = useState<string | undefined>();
   const [innOpen, setInnOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
+  const [worldChatOpen, setWorldChatOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
@@ -72,7 +74,8 @@ export function TownScene() {
   const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const suspended = activeNpc !== null || menuOpen || shopOpen || innOpen || journalOpen || message !== null;
+  const suspended =
+    activeNpc !== null || menuOpen || shopOpen || innOpen || journalOpen || worldChatOpen || message !== null;
   const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
@@ -153,13 +156,30 @@ export function TownScene() {
         setJournalOpen((open) => !open);
         return;
       }
+      if (e.key === 'c' || e.key === 'C') {
+        setWorldChatOpen((open) => !open);
+        return;
+      }
       if (e.key !== 'Enter' && e.key !== ' ') return;
       attemptInteract();
     }
     window.addEventListener('keydown', handleInteract);
     return () => window.removeEventListener('keydown', handleInteract);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeNpc, message, menuOpen, shopOpen, innOpen, journalOpen, map, position, facingDelta, uid, wanderPositions]);
+  }, [
+    activeNpc,
+    message,
+    menuOpen,
+    shopOpen,
+    innOpen,
+    journalOpen,
+    worldChatOpen,
+    map,
+    position,
+    facingDelta,
+    uid,
+    wanderPositions,
+  ]);
 
   if (!map) {
     return (
@@ -231,13 +251,14 @@ export function TownScene() {
             onDash={staminaUnlocked ? dash : undefined}
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
+            onChat={() => setWorldChatOpen((open) => !open)}
           />
         </>
       ) : (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Talk: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
-          &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
+          &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Chat: C
         </p>
       )}
       {activeNpc && (
@@ -272,6 +293,7 @@ export function TownScene() {
       {shopOpen && <Shop shopId={activeShopId ?? ''} onClose={() => setShopOpen(false)} />}
       {innOpen && <Inn onClose={() => setInnOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
+      {worldChatOpen && <WorldChat onClose={() => setWorldChatOpen(false)} />}
     </div>
   );
 }

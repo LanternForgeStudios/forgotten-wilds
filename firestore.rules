@@ -84,5 +84,24 @@ service cloud.firestore {
       allow read: if false;
       allow write: if false;
     }
+
+    // World chat: a public, town-only chat room (worldChat.ts), also server-authoritative.
+
+    match /worldChatMessages/{messageId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    match /worldChatModeration/{uid} {
+      // Server-only - the Cloud Function's own rejection message carries "muted for Ns" instead
+      // of the client reading this doc directly.
+      allow read: if false;
+      allow write: if false;
+    }
+
+    match /worldChatMeta/{docId} {
+      allow read: if false;
+      allow write: if false;
+    }
   }
 }

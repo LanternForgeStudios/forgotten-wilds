@@ -79,9 +79,10 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   Firestore (`cd functions && npm test`, Vitest).
 - `functions/src/functions/` — the callable Cloud Functions (one file per function; see
   `functions/src/index.ts` for the current exported list, which grows over time).
-- `src/multiplayer/` — typed stub interfaces (party, chat, lodges, world events, clan) for
-  systems not built yet; every function throws "not implemented," ready to be filled in. Trading
-  (formerly a stub here) is fully implemented - see `functions/src/functions/trade.ts`.
+- `src/multiplayer/` — typed stub interfaces (party, lodges, world events, clan) for systems not
+  built yet; every function throws "not implemented," ready to be filled in. Trading and chat
+  (formerly stubs here) are fully implemented - see `functions/src/functions/trade.ts` and
+  `functions/src/functions/worldChat.ts`.
 - `src/phaser/` — Phaser 4 owns the canvas-based rendering for both exploration
   (`ExplorationScene.ts`, driven by `src/components/exploration/PhaserExplorationCanvas.tsx`,
   which `TileGrid.tsx` re-exports so Town/Overworld/Dungeon all get it via one import) and combat
@@ -109,8 +110,9 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 ## In-game controls
 
 Arrow keys / WASD to move, Enter/Space to interact, **I** for Inventory/Equipment, **J** for
-Journal of Legends (opens to its Quests tab by default). On touch devices (auto-detected), drag
-anywhere on the map to move and use the on-screen HUD buttons in place of the keyboard shortcuts.
+Journal of Legends (opens to its Quests tab by default), **C** for World Chat (town only). On
+touch devices (auto-detected), drag anywhere on the map to move and use the on-screen HUD buttons
+in place of the keyboard shortcuts.
 Right-click, text selection, and copy/cut/paste are disabled everywhere except form fields (Title's
 sign-in inputs, Character Creation's name field) — see `src/utils/browserLockdown.ts`.
 

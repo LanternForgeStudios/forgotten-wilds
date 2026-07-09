@@ -1,0 +1,102 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.panel {
+  width: min(480px, 94vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  margin: 0 0 10px;
+  color: var(--fw-accent);
+}
+
+.messages {
+  flex: 1;
+  min-height: 200px;
+  max-height: 50vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.messageRow {
+  font-size: 12px;
+  margin: 0;
+  word-break: break-word;
+}
+
+.messageName {
+  color: var(--fw-accent);
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.empty {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.warning {
+  font-size: 11px;
+  opacity: 0.7;
+  margin: 0 0 8px;
+}
+
+.error {
+  color: var(--fw-danger);
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+
+.inputRow {
+  display: flex;
+  gap: 8px;
+}
+
+.textInput {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.sendButton {
+  background: var(--fw-accent-dim);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.sendButton:hover:not(:disabled) {
+  background: var(--fw-accent);
+  color: var(--fw-bg-deep);
+}
+
+.sendButton:disabled {
+  opacity: 0.4;
+}
+
+.closeHint {
+  margin-top: 10px;
+  font-size: 12px;
+  opacity: 0.7;
+  text-align: right;
+}

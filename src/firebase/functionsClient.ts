@@ -322,3 +322,8 @@ export async function callCancelTrade(tradeId: string): Promise<{ cancelled: boo
   const result = await fn({ tradeId });
   return result.data;
 }
+
+export async function callSendWorldChatMessage(text: string): Promise<void> {
+  const fn = httpsCallable<{ text: string }, { sent: true }>(functions, 'sendWorldChatMessage');
+  await fn({ text });
+}

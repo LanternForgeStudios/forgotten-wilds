@@ -229,3 +229,33 @@ export interface TradeDoc {
 export interface ActiveTradeLockDoc {
   tradeId: string;
 }
+
+/** worldChatMessages/{id} - flat, global feed (not partitioned per-location - see worldChat.ts).
+ *  `displayName` is frozen at send time from the sender's own save.displayName (never a
+ *  client-supplied value, never userDirectory), same reasoning as FriendRequest's
+ *  fromDisplayName/toDisplayName - a fast-moving multi-party feed needs a name on every line,
+ *  which live per-message resolution doesn't fit the way it does for a DM thread. */
+export interface WorldChatMessage {
+  id: string;
+  uid: string;
+  displayName: string;
+  text: string;
+  sentAt: number;
+}
+
+/** worldChatModeration/{uid} - one doc per account, server-only, never read by the client (the
+ *  Cloud Function's own rejection message carries "muted for Ns" instead of the client reading
+ *  this doc directly). See chatModerationEngine.ts's checkAndRecordMessage for how all three
+ *  fields get updated together. */
+export interface WorldChatModerationDoc {
+  lastMessageAt: number;
+  recentMessageTimestamps: number[];
+  mutedUntil: number;
+}
+
+/** worldChatMeta/cleanup - a single singleton doc tracking when the auto-purge query (messages
+ *  older than 1 hour) last ran, so sendWorldChatMessage doesn't re-run that query on literally
+ *  every message - see worldChat.ts. */
+export interface WorldChatCleanupMeta {
+  lastCleanupAt: number;
+}
