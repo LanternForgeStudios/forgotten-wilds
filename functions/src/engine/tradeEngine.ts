@@ -75,7 +75,7 @@ export function escrowOffer(save: PlayerSave, offer: TradeOfferSide): void {
  *  is ever escrowed, offer.items can never actually contain one - this can't fail. */
 export function releaseOffer(save: PlayerSave, offer: TradeOfferSide): void {
   for (const { itemId, quantity } of offer.items) {
-    grantItem(save.inventory, itemId, save.journal.itemsDiscovered, quantity);
+    grantItem(save, itemId, quantity);
   }
   save.player.gold += offer.gold;
 }
@@ -88,7 +88,7 @@ export function releaseOffer(save: PlayerSave, offer: TradeOfferSide): void {
  *  it was offered - astronomically unlikely, but grantItem already does this check for free. */
 export function mergeOfferInto(save: PlayerSave, offer: TradeOfferSide): void {
   for (const { itemId, quantity } of offer.items) {
-    grantItem(save.inventory, itemId, save.journal.itemsDiscovered, quantity);
+    grantItem(save, itemId, quantity);
   }
   save.player.gold += offer.gold;
 }

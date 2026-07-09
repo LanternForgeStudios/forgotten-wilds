@@ -53,8 +53,9 @@ export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) 
       save.inventory.push({ itemId, quantity: 1 });
       // This bypasses grantItem (its own unique-cap check doesn't apply here - alreadyHave above
       // already does the equivalent "don't grant a second copy" job for this always-unique world-
-      // item case), so the itemsDiscovered bookkeeping grantItem normally handles has to happen
-      // here too.
+      // item case), so the itemsDiscovered bookkeeping grantItem normally handles - including the
+      // backfill for a save read from Firestore before this field existed - has to happen here too.
+      if (!save.journal.itemsDiscovered) save.journal.itemsDiscovered = [];
       if (ITEMS[itemId] && !save.journal.itemsDiscovered.includes(itemId)) {
         save.journal.itemsDiscovered.push(itemId);
       }

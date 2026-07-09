@@ -1,55 +1,69 @@
 import { describe, expect, it } from 'vitest';
 import { grantItem, wouldDuplicateUnique } from './inventoryEngine';
-import type { InventoryItem } from '../shared-types';
+import type { InventoryItem, PlayerSave } from '../shared-types';
+
+/** grantItem only ever touches save.inventory and save.journal.itemsDiscovered - a minimal
+ *  fixture with just those two is enough to exercise it without building a full realistic save. */
+function buildSave(inventory: InventoryItem[] = [], itemsDiscovered: string[] = []): PlayerSave {
+  return {
+    inventory,
+    journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: [], bossesDefeated: [], itemsDiscovered },
+  } as PlayerSave;
+}
 
 describe('grantItem', () => {
   it('pushes a new stack for an item not already owned', () => {
-    const inventory: InventoryItem[] = [];
-    const granted = grantItem(inventory, 'healing-poultice', []);
+    const save = buildSave();
+    const granted = grantItem(save, 'healing-poultice');
     expect(granted).toBe(true);
-    expect(inventory).toEqual([{ itemId: 'healing-poultice', quantity: 1 }]);
+    expect(save.inventory).toEqual([{ itemId: 'healing-poultice', quantity: 1 }]);
   });
 
   it('stacks onto an existing entry instead of duplicating it', () => {
-    const inventory: InventoryItem[] = [{ itemId: 'healing-poultice', quantity: 2 }];
-    grantItem(inventory, 'healing-poultice', [], 3);
-    expect(inventory).toEqual([{ itemId: 'healing-poultice', quantity: 5 }]);
+    const save = buildSave([{ itemId: 'healing-poultice', quantity: 2 }]);
+    grantItem(save, 'healing-poultice', 3);
+    expect(save.inventory).toEqual([{ itemId: 'healing-poultice', quantity: 5 }]);
   });
 
   it('refuses to grant a second copy of a unique item, and mutates nothing', () => {
-    const inventory: InventoryItem[] = [{ itemId: 'miners-lost-lantern-equipped', quantity: 1 }];
-    const granted = grantItem(inventory, 'miners-lost-lantern-equipped', []);
+    const save = buildSave([{ itemId: 'miners-lost-lantern-equipped', quantity: 1 }]);
+    const granted = grantItem(save, 'miners-lost-lantern-equipped');
     expect(granted).toBe(false);
-    expect(inventory).toEqual([{ itemId: 'miners-lost-lantern-equipped', quantity: 1 }]);
+    expect(save.inventory).toEqual([{ itemId: 'miners-lost-lantern-equipped', quantity: 1 }]);
   });
 
   it('allows the first copy of a unique item', () => {
-    const inventory: InventoryItem[] = [];
-    const granted = grantItem(inventory, 'wardens-ember-heart', []);
+    const save = buildSave();
+    const granted = grantItem(save, 'wardens-ember-heart');
     expect(granted).toBe(true);
-    expect(inventory).toEqual([{ itemId: 'wardens-ember-heart', quantity: 1 }]);
+    expect(save.inventory).toEqual([{ itemId: 'wardens-ember-heart', quantity: 1 }]);
   });
 
   it('records a real ITEMS-table entry into itemsDiscovered, once, on first grant', () => {
-    const inventory: InventoryItem[] = [];
-    const itemsDiscovered: string[] = [];
-    grantItem(inventory, 'healing-poultice', itemsDiscovered);
-    grantItem(inventory, 'healing-poultice', itemsDiscovered, 2); // a second grant shouldn't duplicate the entry
-    expect(itemsDiscovered).toEqual(['healing-poultice']);
+    const save = buildSave();
+    grantItem(save, 'healing-poultice');
+    grantItem(save, 'healing-poultice', 2); // a second grant shouldn't duplicate the entry
+    expect(save.journal.itemsDiscovered).toEqual(['healing-poultice']);
   });
 
   it('does not record an equipment id into itemsDiscovered (only ITEMS-table entries count)', () => {
-    const inventory: InventoryItem[] = [];
-    const itemsDiscovered: string[] = [];
-    grantItem(inventory, 'miners-lost-lantern-equipped', itemsDiscovered);
-    expect(itemsDiscovered).toEqual([]);
+    const save = buildSave();
+    grantItem(save, 'miners-lost-lantern-equipped');
+    expect(save.journal.itemsDiscovered).toEqual([]);
   });
 
   it('does not record itemsDiscovered when the grant is refused (duplicate unique)', () => {
-    const inventory: InventoryItem[] = [{ itemId: 'wardens-ember-heart', quantity: 1 }];
-    const itemsDiscovered: string[] = [];
-    grantItem(inventory, 'wardens-ember-heart', itemsDiscovered);
-    expect(itemsDiscovered).toEqual([]);
+    const save = buildSave([{ itemId: 'wardens-ember-heart', quantity: 1 }]);
+    grantItem(save, 'wardens-ember-heart');
+    expect(save.journal.itemsDiscovered).toEqual([]);
+  });
+
+  it('backfills a missing journal.itemsDiscovered (an existing save read before this field existed) instead of throwing', () => {
+    const save = buildSave();
+    // Simulates a real Firestore document from before itemsDiscovered was introduced.
+    delete (save.journal as { itemsDiscovered?: string[] }).itemsDiscovered;
+    expect(() => grantItem(save, 'healing-poultice')).not.toThrow();
+    expect(save.journal.itemsDiscovered).toEqual(['healing-poultice']);
   });
 });
 

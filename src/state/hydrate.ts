@@ -14,7 +14,10 @@ export function hydrateAllStores(save: PlayerSave): void {
   usePlayerStore.getState().hydrate(save.player, save.displayName);
   useInventoryStore.getState().hydrate(save.inventory);
   useQuestStore.getState().hydrate(save.quests);
-  useJournalStore.getState().hydrate(save.journal);
+  // itemsDiscovered is newer than the other journal fields - an existing player's save won't have
+  // it until their next item grant lazily backfills it server-side (grantItem), so this can
+  // arrive as undefined here in the meantime.
+  useJournalStore.getState().hydrate({ ...save.journal, itemsDiscovered: save.journal.itemsDiscovered ?? [] });
   useWorldStateStore
     .getState()
     .hydrate(save.openedChests ?? [], save.seenNpcDialogueVariant ?? {}, save.lastReviewedSocialAt ?? 0);
