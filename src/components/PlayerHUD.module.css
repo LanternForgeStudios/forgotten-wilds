@@ -56,10 +56,24 @@
   padding-left: 14px;
 }
 
-@media (max-width: 720px) {
+/* Hidden only in the cramped single-row range (bar hasn't wrapped to two rows yet, so location
+   would squeeze the stat bars) - visible again both at full desktop width and once .topRow/
+   .vitalsRow split onto their own rows below NARROW_HUD_BREAKPOINT_PX (480px), which is the
+   common case on phones. Previously hidden outright below 720px, which meant it never showed on
+   mobile at all. */
+@media (max-width: 720px) and (min-width: 481px) {
   .location {
     display: none;
   }
+}
+
+/* At normal widths this is invisible to layout - its children (name/location/gold/presence)
+   behave exactly as if they were direct children of .bar, in the same document order as before.
+   Only becomes a real flex row of its own at the narrow-HUD breakpoint below, so it's always on
+   its own line above .vitalsRow regardless of flex-wrap's ordering around that 100%-width
+   sibling. */
+.topRow {
+  display: contents;
 }
 
 /* At normal widths this is invisible to layout - its children (the stat groups + XP button)
@@ -234,13 +248,28 @@
     row-gap: 6px;
     padding: 6px 8px;
     font-size: 11px;
-    /* Wraps onto two rows instead of squeezing name/gold/presence and every stat bar onto one -
-       .vitalsRow (below) forces itself onto its own row via width:100%, so row 1 is always just
-       name/gold/presence and row 2 is always the stat bars, regardless of exact pixel widths.
-       Must match useHudBarHeight's HUD_BAR_HEIGHT.narrow, which every scene's padding-top and
-       this component's own barHeight both use - see useExplorationViewport.ts. */
+    /* Wraps onto two rows instead of squeezing name/location/gold/presence and every stat bar
+       onto one - .topRow and .vitalsRow (below) each force themselves onto their own row via
+       width:100%, so row 1 is always name/location/gold/presence (wrapping further internally if
+       even that doesn't fit) and row 2 is always the stat bars, by construction rather than
+       incidental flex-wrap ordering. Must match useHudBarHeight's HUD_BAR_HEIGHT.narrow, which
+       every scene's padding-top and this component's own barHeight both use - see
+       useExplorationViewport.ts. */
     flex-wrap: wrap;
     align-content: center;
+  }
+
+  .topRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .location {
+    border-left: none;
+    padding-left: 0;
   }
 
   .vitalsRow {

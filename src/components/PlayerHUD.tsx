@@ -110,18 +110,50 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
 
   return (
     <div className={styles.bar} style={{ height: barHeight }}>
-      <button className={styles.name} onClick={() => setProfileOpen(true)} title="View your user profile">
-        {player.name} <span className={styles.level}>Lv.{player.level}</span>
-        {hasNewSocial && <span className={styles.socialBadge} title="New friend request, message, or trade" />}
-      </button>
+      {/* display:contents at normal widths (see .topRow) - name/location/gold/presence lay out as
+          if they were direct children of .bar, identical to before this wrapper existed. Only
+          becomes a real row of its own at the narrow-HUD breakpoint, guaranteeing it always ends
+          up on its own line above .vitalsRow instead of leaving that to flex-wrap's ordering
+          around a 100%-width sibling - the previous fix for narrow viewports was just hiding
+          .location outright below 720px, which meant it never showed on mobile at all. */}
+      <div className={styles.topRow}>
+        <button className={styles.name} onClick={() => setProfileOpen(true)} title="View your user profile">
+          {player.name} <span className={styles.level}>Lv.{player.level}</span>
+          {hasNewSocial && <span className={styles.socialBadge} title="New friend request, message, or trade" />}
+        </button>
 
-      {locationName && <span className={styles.location}>{locationName}</span>}
+        {locationName && <span className={styles.location}>{locationName}</span>}
+
+        <span className={styles.gold}>{player.gold}g</span>
+
+        {locationId && (
+          <div className={styles.presenceWrap}>
+            <button className={styles.presenceButton} onClick={() => setPresenceOpen((open) => !open)}>
+              {visiblePresences.length} here
+            </button>
+            {presenceOpen && (
+              <div className={styles.presencePopover} onMouseLeave={() => setPresenceOpen(false)}>
+                {visiblePresences.length === 0 && <p className={styles.presenceEmpty}>No one else here right now.</p>}
+                {visiblePresences.map((p) => (
+                  <div key={p.uid} className={styles.presenceRow}>
+                    <span className={styles.avatar}>{p.avatarSymbol}</span>
+                    <span className={styles.presenceName}>
+                      {p.displayName}
+                      {p.uid === uid ? ' (you)' : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* display:contents at normal widths - these lay out as if they were direct children of
           .bar, preserving the exact same order/flow as before. Only becomes a real (wrapping)
           flex row of its own below the narrow-HUD breakpoint (see PlayerHUD.module.css and
           useHudBarHeight, which the parent scenes' padding-top must match), so the stat bars get
-          a fresh full-width row instead of squeezing alongside name/gold/presence. */}
+          a fresh full-width row below .topRow instead of squeezing alongside name/gold/presence. */}
       <div className={styles.vitalsRow}>
         <div className={styles.statGroup}>
           <span className={styles.barLabel}>HP</span>
@@ -182,30 +214,6 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
           </div>
         </button>
       </div>
-
-      <span className={styles.gold}>{player.gold}g</span>
-
-      {locationId && (
-        <div className={styles.presenceWrap}>
-          <button className={styles.presenceButton} onClick={() => setPresenceOpen((open) => !open)}>
-            {visiblePresences.length} here
-          </button>
-          {presenceOpen && (
-            <div className={styles.presencePopover} onMouseLeave={() => setPresenceOpen(false)}>
-              {visiblePresences.length === 0 && <p className={styles.presenceEmpty}>No one else here right now.</p>}
-              {visiblePresences.map((p) => (
-                <div key={p.uid} className={styles.presenceRow}>
-                  <span className={styles.avatar}>{p.avatarSymbol}</span>
-                  <span className={styles.presenceName}>
-                    {p.displayName}
-                    {p.uid === uid ? ' (you)' : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {statsOpen && <CharacterStats onClose={() => setStatsOpen(false)} />}
       {profileOpen && <UserProfile onClose={() => setProfileOpen(false)} />}
