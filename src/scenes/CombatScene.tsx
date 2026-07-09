@@ -241,6 +241,15 @@ export function CombatScene() {
     }
   }
 
+  // Victory can award the same item multiple times (e.g. 3 separate Moth Dust drops) - shown as
+  // "3 moth-dust" instead of "moth-dust, moth-dust, moth-dust". Preserves first-seen order rather
+  // than sorting, so the reward text reads in the same order the drops actually resolved in.
+  function summarizeRewardItems(itemIds: string[]): string {
+    const counts = new Map<string, number>();
+    for (const id of itemIds) counts.set(id, (counts.get(id) ?? 0) + 1);
+    return [...counts.entries()].map(([id, count]) => (count > 1 ? `${count} ${id}` : id)).join(', ');
+  }
+
   const queuedCountFor = (itemId: string) => tray.filter((id) => id === itemId).length;
   const canQueueMore = itemsUsedThisTurn + tray.length < 3;
 
@@ -483,7 +492,7 @@ export function CombatScene() {
                 <h2 style={{ color: 'var(--fw-accent)' }}>Victory!</h2>
                 <p>
                   +{rewards?.xp ?? 0} XP · +{rewards?.gold ?? 0} gold
-                  {rewards?.itemIds.length ? ` · found: ${rewards.itemIds.join(', ')}` : ''}
+                  {rewards?.itemIds.length ? ` · found: ${summarizeRewardItems(rewards.itemIds)}` : ''}
                 </p>
                 {rewards?.leveledUp && <p style={{ color: 'var(--fw-accent)' }}>Level up!</p>}
                 {rewards?.restore && (
