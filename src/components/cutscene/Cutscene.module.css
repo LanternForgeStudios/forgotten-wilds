@@ -1,0 +1,53 @@
+.textOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 41;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.box {
+  width: min(720px, 92vw);
+  background: rgba(8, 6, 4, 0.72);
+  border: 1px solid var(--fw-panel-border);
+  border-radius: 6px;
+  padding: 20px 24px;
+}
+
+.text {
+  margin: 0;
+  line-height: 1.6;
+  min-height: 3em;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.skipButton {
+  background: transparent;
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+}
+
+.skipButton:hover {
+  color: var(--fw-text);
+  border-color: var(--fw-accent);
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fw-text-dim);
+}

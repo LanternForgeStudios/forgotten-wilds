@@ -23,6 +23,8 @@ import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { itemWouldHaveEffect } from '@/utils/itemEffect';
 import { markEncounterEnded } from '@/utils/encounterCooldown';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
+import { useCutsceneStore } from '@/state/useCutsceneStore';
+import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
 import styles from './CombatScene.module.css';
 
 const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
@@ -145,7 +147,13 @@ export function CombatScene() {
             ? `${res.enemies.length} foes block your path!`
             : `A ${res.enemies[0]?.name ?? 'foe'} blocks your path!`;
         setLog([intro]);
-        setPhase('playerTurn');
+        // The battle arena (PhaserBattleCanvas) already starts loading behind the cutscene, since
+        // enemies/session are set immediately above - only the actual playerTurn gate waits, so
+        // there's no extra loading flicker once the cutscene dismisses.
+        useCutsceneStore.getState().play({
+          ...battleStartCutscene(res.enemies, location?.battleBackgroundAssetId ?? 'battle-bg.forest'),
+          onComplete: () => setPhase('playerTurn'),
+        });
       })
       .catch((err) => {
         if (entry.cancelled) return;
@@ -345,6 +353,7 @@ export function CombatScene() {
 
   async function returnToExploration() {
     markEncounterEnded();
+    const wasDefeat = phase === 'defeat';
     // The defeat round's real (already-respawned) hp/spirit were deliberately withheld from the
     // store back in act() so the HUD didn't show them healed while the defeat overlay was still
     // up - apply them now, right as the player actually leaves for Ash Hallow.
@@ -352,18 +361,24 @@ export function CombatScene() {
       pendingDefeatResyncRef.current = false;
       await resyncSave(uid);
     }
-    const targetLocationId = phase === 'defeat' ? 'ash-hallow' : locationId;
+    const targetLocationId = wasDefeat ? 'ash-hallow' : locationId;
     const targetLocation = LOCATIONS.find((l) => l.id === targetLocationId);
     const scene = targetLocation ? LOCATION_KIND_TO_SCENE[targetLocation.kind] : 'town';
     // Restore the exact tile the fight was triggered from, rather than dumping the player back at
     // the map's default spawn - but only within the same location; a defeat sends the player to
     // Ash Hallow instead, where the original coordinates from a different map don't apply.
     const preserveSpawn = targetLocationId === locationId;
-    goTo(scene, {
-      locationId: targetLocationId,
-      spawnX: preserveSpawn ? params.spawnX : undefined,
-      spawnY: preserveSpawn ? params.spawnY : undefined,
-    });
+    const goToExploration = () =>
+      goTo(scene, {
+        locationId: targetLocationId,
+        spawnX: preserveSpawn ? params.spawnX : undefined,
+        spawnY: preserveSpawn ? params.spawnY : undefined,
+      });
+    if (wasDefeat) {
+      useCutsceneStore.getState().play({ ...DEFEAT_CUTSCENE, onComplete: goToExploration });
+    } else {
+      goToExploration();
+    }
   }
 
   const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');

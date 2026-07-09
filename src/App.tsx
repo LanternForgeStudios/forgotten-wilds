@@ -10,6 +10,7 @@ import { OverworldScene } from '@/scenes/OverworldScene';
 import { DungeonScene } from '@/scenes/DungeonScene';
 import { CombatScene } from '@/scenes/CombatScene';
 import { ToastHost } from '@/components/ToastHost';
+import { Cutscene } from '@/components/cutscene/Cutscene';
 import { LOCATIONS } from '@/data';
 
 /** On a completely fresh page load (not an in-session scene transition - see the "signedIn"
@@ -90,6 +91,7 @@ function App() {
     <>
       {renderScene()}
       <ToastHost />
+      <Cutscene />
     </>
   );
 }

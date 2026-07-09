@@ -83,13 +83,19 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   built yet; every function throws "not implemented," ready to be filled in. Trading and chat
   (formerly stubs here) are fully implemented - see `functions/src/functions/trade.ts` and
   `functions/src/functions/worldChat.ts`.
-- `src/phaser/` — Phaser 4 owns the canvas-based rendering for both exploration
-  (`ExplorationScene.ts`, driven by `src/components/exploration/PhaserExplorationCanvas.tsx`,
-  which `TileGrid.tsx` re-exports so Town/Overworld/Dungeon all get it via one import) and combat
-  (`BattleScene.ts`, driven by `src/components/combat/PhaserBattleCanvas.tsx`) — background, map
-  tiles, sprites, camera, hit/defeat effects. Every menu/overlay (Journal, Shop, Inventory, the
-  action-selection panels) stays ordinary React+CSS; these Scene classes own zero game logic, just
-  imperative rendering called in response to React state changes.
+- `src/phaser/` — Phaser 4 owns the canvas-based rendering for exploration (`ExplorationScene.ts`,
+  driven by `src/components/exploration/PhaserExplorationCanvas.tsx`, which `TileGrid.tsx`
+  re-exports so Town/Overworld/Dungeon all get it via one import), combat (`BattleScene.ts`,
+  driven by `src/components/combat/PhaserBattleCanvas.tsx`), and cutscenes (`CutsceneScene.ts`,
+  driven by `src/components/cutscene/PhaserCutsceneCanvas.tsx`) — background, map tiles, sprites,
+  camera, hit/defeat effects. Every menu/overlay (Journal, Shop, Inventory, the action-selection
+  panels, the cutscene text box) stays ordinary React+CSS; these Scene classes own zero game
+  logic, just imperative rendering called in response to React state changes.
+- Cutscenes (`src/components/cutscene/Cutscene.tsx`, `src/state/useCutsceneStore.ts`,
+  `src/data/cutscenes.ts`) are a single global overlay mounted once at the app root (`App.tsx`),
+  triggered from anywhere via `useCutsceneStore.getState().play(config)` — a new character's
+  one-time intro, a battle's opening beat (dramatic + camera shake for bosses), the defeat-recovery
+  beat, and a couple of main-story quest completions currently use it.
 - `src/animation/` — sprite-sheet animation layouts (row/facing → frame mapping) for characters;
   an asset's `frameSize` in the registry opts it into frame-based rendering in `ExplorationScene`,
   otherwise it renders as a plain static image.

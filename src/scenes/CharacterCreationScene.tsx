@@ -4,6 +4,8 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { callCreateCharacter } from '@/firebase/functionsClient';
 import { hydrateAllStores } from '@/state/hydrate';
 import { useSceneStore } from '@/state/useSceneStore';
+import { useCutsceneStore } from '@/state/useCutsceneStore';
+import { INTRO_CUTSCENE } from '@/data/cutscenes';
 import styles from './TitleScene.module.css';
 
 export function CharacterCreationScene() {
@@ -19,7 +21,13 @@ export function CharacterCreationScene() {
     try {
       const save = await callCreateCharacter(name.trim());
       hydrateAllStores(save);
-      goTo('town', { locationId: save.player.currentLocationId });
+      // A brand new character's own existence is the "first time" signal - no persisted flag
+      // needed, this only ever runs once per account by construction. Town only loads once the
+      // player dismisses the cutscene, per "before you actually appear in Ash Hallow."
+      useCutsceneStore.getState().play({
+        ...INTRO_CUTSCENE,
+        onComplete: () => goTo('town', { locationId: save.player.currentLocationId }),
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create your character. Please try again.');
     } finally {

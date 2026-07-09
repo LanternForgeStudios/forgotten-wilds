@@ -6,7 +6,9 @@ import { useQuestStore } from './useQuestStore';
 import { useJournalStore } from './useJournalStore';
 import { useWorldStateStore } from './useWorldStateStore';
 import { useToastStore } from './useToastStore';
+import { useCutsceneStore } from './useCutsceneStore';
 import { QUESTS } from '@/data';
+import { QUEST_COMPLETION_CUTSCENES } from '@/data/cutscenes';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
 
 /** Fans a PlayerSave (from a Cloud Function response or a users/{uid} read) out to every store. */
@@ -40,8 +42,21 @@ function toastQuestChanges(prev: Record<string, QuestProgress>, next: Record<str
       }
       continue;
     }
-    if (nextStatus === 'active') push(`Quest Started: ${quest.name}`);
-    else if (nextStatus === 'completed') push(`Quest Completed: ${quest.name}`);
+    if (nextStatus === 'active') {
+      push(`Quest Started: ${quest.name}`);
+    } else if (nextStatus === 'completed') {
+      // A handful of main-story beats get a dramatic cutscene instead of the plain toast - see
+      // QUEST_COMPLETION_CUTSCENES. Only one cutscene can play at a time (see useCutsceneStore's
+      // own doc comment); two of these completing in the exact same resync is unlikely enough
+      // (sequential, prerequisite-gated main-story quests) that a second one simply replacing the
+      // first is an accepted edge case, not worth a queueing mechanism.
+      const cutscene = QUEST_COMPLETION_CUTSCENES[quest.id];
+      if (cutscene) {
+        useCutsceneStore.getState().play(cutscene);
+      } else {
+        push(`Quest Completed: ${quest.name}`);
+      }
+    }
   }
 }
 
