@@ -59,6 +59,12 @@ export function CombatScene() {
   // Up to 3 item ids queued to ride along with whatever primary action the player takes next
   // (duplicates allowed - e.g. 2x the same potion). Cleared only after a round actually resolves.
   const [tray, setTray] = useState<string[]>([]);
+  // Items already used this turn via a *previous* trip through the item menu - finishItemMenu
+  // clears `tray` back to [] the instant it uses a batch, so tray.length alone can't cap "3 items
+  // per turn": without this, reopening Items after clicking Done resets canQueueMore and lets the
+  // player use another 3, repeatedly, all before ever taking their turn's real action. Reset only
+  // when the player actually commits that action (see act()), not when the item menu closes.
+  const [itemsUsedThisTurn, setItemsUsedThisTurn] = useState(0);
   // Per-enemy hit results from the most recent round, fed into PhaserBattleCanvas to drive its hit
   // effects; batched by id so a stale timeout can't clear a *newer* round's hits. Split into two
   // arrays (one per data direction) since the engine now reports outgoing (player -> enemy) and
@@ -142,6 +148,7 @@ export function CombatScene() {
   ) {
     if (!sessionId || phase === 'resolving' || playbackActive) return;
     setPhase('resolving');
+    setItemsUsedThisTurn(0);
     try {
       const needsTarget = type === 'attack' || type === 'skill' || type === 'lanternAbility';
       const usedItems = tray.length > 0;
@@ -235,7 +242,7 @@ export function CombatScene() {
   }
 
   const queuedCountFor = (itemId: string) => tray.filter((id) => id === itemId).length;
-  const canQueueMore = tray.length < 3;
+  const canQueueMore = itemsUsedThisTurn + tray.length < 3;
 
   function queueItem(itemId: string) {
     if (!canQueueMore) return;
@@ -263,6 +270,7 @@ export function CombatScene() {
     }
     const queued = tray;
     setPhase('usingItems');
+    setItemsUsedThisTurn((n) => n + queued.length);
     let failed = false;
     for (const itemId of queued) {
       try {
