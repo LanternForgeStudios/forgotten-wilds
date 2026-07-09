@@ -20,7 +20,9 @@ export interface ItemEffect {
 
 export interface ItemDefinition {
   id: string;
-  category: 'consumable' | 'equipment' | 'keyItem' | 'lanternUpgrade';
+  // 'materials' is for non-unique enemy-drop items with no usable effect of their own - future
+  // crafting-system fodder. 'keyItem' is reserved for unique, story/quest-significant items.
+  category: 'consumable' | 'equipment' | 'keyItem' | 'lanternUpgrade' | 'materials';
   usableInCombat: boolean;
   effect?: ItemEffect;
   tier: Tier;
@@ -58,12 +60,12 @@ export const ITEMS: Record<string, ItemDefinition> = {
     effect: { restoreOilPercent: 0.5 },
     tier: 'uncommon',
   },
-  'moth-dust': { id: 'moth-dust', category: 'keyItem', usableInCombat: false, tier: 'common' },
-  'rusted-token': { id: 'rusted-token', category: 'keyItem', usableInCombat: false, tier: 'common' },
-  'ember-shard': { id: 'ember-shard', category: 'keyItem', usableInCombat: false, tier: 'uncommon' },
-  'wolf-fang': { id: 'wolf-fang', category: 'keyItem', usableInCombat: false, tier: 'common' },
-  'silver-droplet': { id: 'silver-droplet', category: 'keyItem', usableInCombat: false, tier: 'common' },
-  'withered-bramble': { id: 'withered-bramble', category: 'keyItem', usableInCombat: false, tier: 'common' },
+  'moth-dust': { id: 'moth-dust', category: 'materials', usableInCombat: false, tier: 'common' },
+  'rusted-token': { id: 'rusted-token', category: 'materials', usableInCombat: false, tier: 'common' },
+  'ember-shard': { id: 'ember-shard', category: 'materials', usableInCombat: false, tier: 'uncommon' },
+  'wolf-fang': { id: 'wolf-fang', category: 'materials', usableInCombat: false, tier: 'common' },
+  'silver-droplet': { id: 'silver-droplet', category: 'materials', usableInCombat: false, tier: 'common' },
+  'withered-bramble': { id: 'withered-bramble', category: 'materials', usableInCombat: false, tier: 'common' },
   'stone-fragment': { id: 'stone-fragment', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'water-fragment': { id: 'water-fragment', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'wind-fragment': { id: 'wind-fragment', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },

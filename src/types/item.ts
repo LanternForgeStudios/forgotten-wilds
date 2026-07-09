@@ -1,6 +1,10 @@
 import type { EquipmentSlot, Stats } from './stats';
 
-export type ItemCategory = 'consumable' | 'equipment' | 'keyItem' | 'lanternUpgrade';
+// 'materials' is for non-unique enemy-drop items with no usable effect of their own (moth dust,
+// ember shard, etc.) - future crafting-system fodder. 'keyItem' is reserved for unique, story/
+// quest-significant items (Guardian Sigil fragments, boss trophies) that a crafting system would
+// never consume.
+export type ItemCategory = 'consumable' | 'equipment' | 'keyItem' | 'lanternUpgrade' | 'materials';
 
 /** Rarity/power tier shared by every inventory-eligible thing (consumables, key items, and
  *  equipment alike), in ascending order: Common < Uncommon < Rare < Mythic < Legendary. Mythic

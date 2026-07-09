@@ -29,12 +29,13 @@ const SLOT_LABELS: Record<string, string> = {
   spiritTotem: 'Spirit Totem',
 };
 
-type InventorySubTab = 'all' | 'consumable' | 'equipment' | 'keyItem' | 'unique';
+type InventorySubTab = 'all' | 'consumable' | 'equipment' | 'materials' | 'keyItem' | 'unique';
 
 const SUBTAB_LABELS: Record<InventorySubTab, string> = {
   all: 'All',
   consumable: 'Consumables',
   equipment: 'Equipment',
+  materials: 'Materials',
   keyItem: 'Key Items',
   unique: 'Unique',
 };
@@ -62,7 +63,8 @@ type SortOption = 'name' | 'quantityDesc' | 'category';
 const CATEGORY_SORT_ORDER: Record<InventorySubTab, number> = {
   equipment: 0,
   consumable: 1,
-  keyItem: 2,
+  materials: 2,
+  keyItem: 3,
   all: 99,
   unique: 99,
 };
@@ -80,6 +82,7 @@ interface ResolvedItem {
 function subTabOf(entry: ResolvedItem): InventorySubTab {
   if (entry.equipDef) return 'equipment';
   if (entry.itemDef?.category === 'consumable') return 'consumable';
+  if (entry.itemDef?.category === 'materials') return 'materials';
   return 'keyItem'; // keyItem + lanternUpgrade + anything else non-equip, non-potion
 }
 
