@@ -697,17 +697,23 @@ describe('resolveRound', () => {
     );
   });
 
-  describe('multi-enemy encounters stay winnable across the level cap', () => {
+  describe('naively single-targeting a 3-enemy group is a genuine, drawn-out loss', () => {
     // Real (non-999-speed) player stats built the same way applyLevelUp would - deliberately not
     // forcing speed:999, since real turn order (enemies are consistently a bit faster than the
     // player at every checkpoint) is exactly what makes a group fight dangerous and must be
     // exercised here, not bypassed. A real 3-mothling roster (real maxHp, not the 999999 isolation
     // trick used above) so HP pools actually deplete over multiple rounds. Simulates the whole
     // fight by looping resolveRound, single-targeting whichever enemy is still alive first (the
-    // default/simplest play pattern), until a terminal phase - this is the actual gap the fix
-    // needed to close (no earlier test constructed a real N-enemy roster and played out a full
-    // multi-round fight against the player's real HP pool).
-    it.each([10, 25, 50, 75, 100])('player level %i vs a real 3-mothling group is winnable, with real risk', (playerLevel) => {
+    // default/simplest play pattern), until a terminal phase.
+    //
+    // CROWD_DAMAGE_FACTOR was deliberately raised (playtest-driven, see git history) past the
+    // point where this stays winnable - single-targeting one enemy at a time while all 3 attack
+    // back every round is now a losing strategy at every level checkpoint, by design: a 3+ enemy
+    // pack is meant to force smarter play (target-all, items, fleeing, or simply avoiding the
+    // fight) rather than being safely tankable via "attack the same guy every turn." What this
+    // test still guards against is a *stomp* - the fight should take real, escalating attrition
+    // (many rounds, meaningful damage dealt both ways) to lose, not end in the first round or two.
+    it.each([10, 25, 50, 75, 100])('player level %i vs a real 3-mothling group: a real fight, ultimately lost', (playerLevel) => {
       vi.spyOn(Math, 'random').mockReturnValue(0.5);
       const playerMaxHp = 60 + 8 * (playerLevel - 1);
       let playerHp = playerMaxHp;
@@ -740,12 +746,12 @@ describe('resolveRound', () => {
       }
       vi.restoreAllMocks();
 
-      expect(phase).toBe('victory');
-      // Genuine risk, not a stomp and not a stall: the player should end the fight meaningfully
-      // hurt (win with real attrition) but never lose outright.
-      const remainingFraction = playerHp / playerMaxHp;
-      expect(remainingFraction).toBeGreaterThan(0.05);
-      expect(remainingFraction).toBeLessThan(0.4);
+      expect(phase).toBe('defeat');
+      // Not a stomp: at every checkpoint this takes well over a dozen rounds of real attrition
+      // (verified by hand: 15-33 rounds across these 5 levels) before the player actually falls -
+      // a naive single-target strategy against a 3-enemy pack should read as "you fought hard and
+      // lost," not "you were wiped in the opening exchange."
+      expect(rounds).toBeGreaterThanOrEqual(10);
     });
   });
 });
@@ -1006,7 +1012,7 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
     const bossHitWithAdds = bossWithAdds.enemyHits.find((h) => h.attackerIndex === 0)!.damage;
     expect(bossHitWithAdds).toBe(bossHitAlone);
     // The adds, by contrast, are crowd-dampened at aliveNonBossCount=2 (CROWD_DAMAGE_FACTOR
-    // 0.18) - each add's hit should land well under the boss's own (undamped) hit.
+    // 0.3) - each add's hit should land well under the boss's own (undamped) hit.
     const addHits = bossWithAdds.enemyHits.filter((h) => h.attackerIndex !== 0);
     expect(addHits.length).toBe(2);
     for (const addHit of addHits) {
