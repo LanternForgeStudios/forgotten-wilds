@@ -11,6 +11,9 @@ interface PhaserBattleCanvasProps {
   outgoingHits: (CombatHitResult & { key: number })[];
   incomingHits: (EnemyHitResult & { key: number })[];
   playerMaxHp: number;
+  /** Player's per-encounter toggle - collapses the stagger between multiple enemies' attacks so a
+   *  round plays out (and log lines reveal) all at once instead of one attacker at a time. */
+  fastRounds: boolean;
   targetIndex: number | null;
   targetMode: 'single' | 'all';
   canPickTarget: boolean;
@@ -32,8 +35,19 @@ interface PhaserBattleCanvasProps {
  *  enemies, hits, targeting) - this component and BattleScene are pure rendering, same "Phaser
  *  owns canvas, React owns menus" split already proven for exploration. */
 export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
-  const { backgroundAssetId, enemies, outgoingHits, incomingHits, playerMaxHp, targetIndex, targetMode, canPickTarget, onTargetEnemy, combatEnded } =
-    props;
+  const {
+    backgroundAssetId,
+    enemies,
+    outgoingHits,
+    incomingHits,
+    playerMaxHp,
+    fastRounds,
+    targetIndex,
+    targetMode,
+    canPickTarget,
+    onTargetEnemy,
+    combatEnded,
+  } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -138,7 +152,7 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
 
   useEffect(() => {
     if (!sceneReady || incomingHits.length === 0) return;
-    sceneRef.current?.playIncomingHits(incomingHits, playerMaxHp);
+    sceneRef.current?.playIncomingHits(incomingHits, playerMaxHp, fastRounds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneReady, incomingHits]);
 

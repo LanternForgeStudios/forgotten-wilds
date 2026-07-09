@@ -13,8 +13,16 @@ export const COLOR_WHITE = 0xffffff;
  *  the visual animation in BattleScene.playIncomingHits and the matching log-line reveal in
  *  CombatScene.tsx use this same value, kept in one place so they can't drift apart) - long enough
  *  to actually see one enemy's animation resolve before the next one goes, short enough that a
- *  5-6 enemy fight doesn't feel sluggish. */
+ *  5-6 enemy fight doesn't feel sluggish. Skipped entirely when the player has "Fast Rounds"
+ *  enabled (see CombatScene.tsx) - every enemy's hit fires at once instead of one at a time. */
 export const INCOMING_HIT_STAGGER_MS = 1400;
+
+/** One-time pause after the player's own action resolves, before the first enemy attack begins -
+ *  applies regardless of Fast Rounds (that toggle only removes the *stagger between* multiple
+ *  enemies, not this beat before the first one). Without it, an enemy's retaliation felt like it
+ *  landed in the same instant as the player's own attack animation, with no room to read the
+ *  player's hit before the enemy's starts. */
+export const PRE_ENEMY_ATTACK_DELAY_MS = 500;
 
 /** One-time 4x4 white square texture for the defeat particle burst - zero new art assets, per the
  *  migration plan. Call once from BattleScene.create(); safe to call again (no-ops if the texture

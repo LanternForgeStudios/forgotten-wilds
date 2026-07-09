@@ -78,6 +78,22 @@
   gap: 4px;
 }
 
+.fastRoundsToggle {
+  align-self: flex-end;
+  background: transparent;
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+}
+
+.fastRoundsToggle:hover {
+  color: var(--fw-text);
+  border-color: var(--fw-accent);
+}
+
 .actionsPanel {
   width: 340px;
   flex-shrink: 0;

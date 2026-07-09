@@ -8,6 +8,7 @@ import {
   COLOR_MISS,
   ensureParticleTexture,
   INCOMING_HIT_STAGGER_MS,
+  PRE_ENEMY_ATTACK_DELAY_MS,
   playDefeatEffect,
   playFloatingText,
   playIncomingCameraImpact,
@@ -241,16 +242,20 @@ export class BattleScene extends Phaser.Scene {
    *  structured per-attacker data), camera flash+shake scaled to severity, floating "-N" at a
    *  fixed bottom-of-arena anchor (no player sprite exists in the arena today). CombatScene.tsx
    *  reveals each hit's log line on this same stagger schedule (see INCOMING_HIT_STAGGER_MS's own
-   *  comment for why that's two independently-scheduled timers rather than one shared clock). */
+   *  comment for why that's two independently-scheduled timers rather than one shared clock).
+   *  `fastRounds` (CombatScene's own per-encounter toggle) collapses the inter-enemy stagger to 0
+   *  so every hit lands together - PRE_ENEMY_ATTACK_DELAY_MS still applies either way. */
   playIncomingHits(
     hits: { attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean }[],
     playerMaxHp: number,
+    fastRounds: boolean,
   ): void {
     const { width, height } = this.scale;
     const anchorX = width / 2;
     const anchorY = height * 0.92;
     hits.forEach((hit, i) => {
-      this.time.delayedCall(i * INCOMING_HIT_STAGGER_MS, () => {
+      const stagger = fastRounds ? 0 : i * INCOMING_HIT_STAGGER_MS;
+      this.time.delayedCall(PRE_ENEMY_ATTACK_DELAY_MS + stagger, () => {
         const slot = this.enemySlots.get(hit.attackerIndex);
         if (slot) playIncomingLunge(this, slot.sprite);
         if (hit.missed) return;

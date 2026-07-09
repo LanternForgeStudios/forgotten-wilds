@@ -22,7 +22,7 @@ import { ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS } from 
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { itemWouldHaveEffect } from '@/utils/itemEffect';
 import { markEncounterEnded } from '@/utils/encounterCooldown';
-import { INCOMING_HIT_STAGGER_MS } from '@/phaser/battleEffects';
+import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import styles from './CombatScene.module.css';
 
 const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
@@ -77,6 +77,11 @@ export function CombatScene() {
   // so without this the player could queue up another action mid-animation (reported as "attacking
   // out of turn" - the enemies' own attacks were still visually resolving).
   const [playbackActive, setPlaybackActive] = useState(false);
+  // Per-encounter, defaults off - collapses the pause between multiple enemies' attacks (but not
+  // PRE_ENEMY_ATTACK_DELAY_MS itself) so a player who'd rather not sit through a staggered 4-5
+  // enemy round every time can speed through it. Resets to off on a fresh encounter (new
+  // CombatScene mount), not persisted across fights.
+  const [fastRounds, setFastRounds] = useState(false);
   const hitBatchRef = useRef(0);
   const encounterGuardRef = useRef<{ locationId: string; cancelled: boolean } | null>(null);
   // True once a defeat round's response has arrived but its (already-respawned-at-Ash-Hallow)
@@ -168,9 +173,10 @@ export function CombatScene() {
       const enemyAttackLines = new Set(res.enemyHits.map((h) => h.logLine));
       setLog((prev) => [...prev, ...res.log.filter((line) => !enemyAttackLines.has(line))]);
       res.enemyHits.forEach((hit, i) => {
+        const stagger = fastRounds ? 0 : i * INCOMING_HIT_STAGGER_MS;
         setTimeout(() => {
           setLog((prev) => [...prev, hit.logLine]);
-        }, i * INCOMING_HIT_STAGGER_MS);
+        }, PRE_ENEMY_ATTACK_DELAY_MS + stagger);
       });
       setEnemies((prev) => prev.map((e) => {
         const updated = res.enemies.find((u) => u.index === e.index);
@@ -191,20 +197,31 @@ export function CombatScene() {
       }
       setTray([]);
 
+      // Matches BattleScene.playIncomingHits' own schedule (PRE_ENEMY_ATTACK_DELAY_MS before the
+      // first attacker, then INCOMING_HIT_STAGGER_MS between each subsequent one unless Fast
+      // Rounds collapses that gap to 0) - this is when the *last* enemy's attack actually starts.
+      const lastAttackStartMs =
+        res.enemyHits.length > 0
+          ? PRE_ENEMY_ATTACK_DELAY_MS + (fastRounds ? 0 : (res.enemyHits.length - 1) * INCOMING_HIT_STAGGER_MS)
+          : 0;
+
       if (res.damageTakenByPlayer > 0) {
-        useToastStore.getState().push(`Took ${res.damageTakenByPlayer} damage this round.`);
+        // Delayed until every enemy has attacked, rather than fired the instant the round
+        // resolves - otherwise the "Took N damage" toast (a total across every attacker) showed
+        // up before the player had even seen most of the hits it was summing.
+        setTimeout(() => {
+          useToastStore.getState().push(`Took ${res.damageTakenByPlayer} damage this round.`);
+        }, lastAttackStartMs);
       }
 
       hitBatchRef.current += 1;
       const batch = hitBatchRef.current;
       setActiveOutgoingHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
       setActiveIncomingHits(res.enemyHits.map((h) => ({ ...h, key: batch * 1000 + h.attackerIndex })));
-      // Matches BattleScene.playIncomingHits' own stagger schedule: the last incoming hit doesn't
-      // even START playing until (count-1) * INCOMING_HIT_STAGGER_MS, and then needs its own
-      // ~1.4s (playFloatingText's tween duration) to actually finish - a fixed 1500ms here would
-      // cut a 3+ enemy round's animation short and re-enable actions mid-playback.
-      const playbackMs =
-        res.enemyHits.length > 0 ? (res.enemyHits.length - 1) * INCOMING_HIT_STAGGER_MS + 1500 : 1500;
+      // The last incoming hit doesn't even START playing until lastAttackStartMs, and then needs
+      // its own ~1.4s (playFloatingText's tween duration) to actually finish - a fixed 1500ms here
+      // would cut a 3+ enemy round's animation short and re-enable actions mid-playback.
+      const playbackMs = lastAttackStartMs + 1500;
       setPlaybackActive(true);
       setTimeout(() => {
         setActiveOutgoingHits((prev) => prev.filter((h) => Math.floor(h.key / 1000) !== batch));
@@ -364,6 +381,7 @@ export function CombatScene() {
               outgoingHits={activeOutgoingHits}
               incomingHits={activeIncomingHits}
               playerMaxHp={player?.stats.maxHp ?? 1}
+              fastRounds={fastRounds}
               targetIndex={targetIndex}
               targetMode={targetMode}
               canPickTarget={canPickTarget}
@@ -385,6 +403,14 @@ export function CombatScene() {
 
         <div className={styles.bottomPanel}>
         <Panel className={styles.logPanel}>
+          <button
+            type="button"
+            className={styles.fastRoundsToggle}
+            onClick={() => setFastRounds((f) => !f)}
+            title="When multiple enemies attack in the same round, let their attacks land together instead of staggered one at a time."
+          >
+            Fast Rounds: {fastRounds ? 'On' : 'Off'}
+          </button>
           {log.slice(-4).map((line, i) => (
             <p key={i} style={{ margin: 0 }}>
               {line}
