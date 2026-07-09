@@ -1005,8 +1005,8 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
     const bossHitAlone = bossAlone.enemyHits.find((h) => h.attackerIndex === 0)!.damage;
     const bossHitWithAdds = bossWithAdds.enemyHits.find((h) => h.attackerIndex === 0)!.damage;
     expect(bossHitWithAdds).toBe(bossHitAlone);
-    // The adds, by contrast, are heavily crowd-dampened at aliveNonBossCount=2 (CROWD_DAMAGE_FACTOR
-    // 0.12) - each add's hit should land well under the boss's own (undamped) hit.
+    // The adds, by contrast, are crowd-dampened at aliveNonBossCount=2 (CROWD_DAMAGE_FACTOR
+    // 0.18) - each add's hit should land well under the boss's own (undamped) hit.
     const addHits = bossWithAdds.enemyHits.filter((h) => h.attackerIndex !== 0);
     expect(addHits.length).toBe(2);
     for (const addHit of addHits) {
