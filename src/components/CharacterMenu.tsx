@@ -11,6 +11,7 @@ import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { ITEMS, EQUIPMENT } from '@/data';
 import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
 import { formatStatBonuses } from '@/utils/statBonuses';
+import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect } from '@/utils/itemEffect';
 import styles from './CharacterMenu.module.css';
 
@@ -82,6 +83,41 @@ function subTabOf(entry: ResolvedItem): InventorySubTab {
   return 'keyItem'; // keyItem + lanternUpgrade + anything else non-equip, non-potion
 }
 
+/** Marks an equipment card/row as the strongest the player owns for its slot (see
+ *  equipmentScore) - shown regardless of whether that item is currently equipped, so it reads
+ *  the same in the Inventory tab's Equipment view, the Equipment tab's slot rows, and the equip
+ *  picker overlay. */
+function BestBadge() {
+  return (
+    <span
+      style={{
+        fontSize: 9,
+        fontWeight: 'bold',
+        color: 'var(--fw-accent)',
+        border: '1px solid var(--fw-accent)',
+        borderRadius: 3,
+        padding: '1px 4px',
+        textTransform: 'uppercase',
+        letterSpacing: 0.3,
+      }}
+      title="The strongest item you own for this slot"
+    >
+      ★ Best
+    </span>
+  );
+}
+
+/** Shown next to a currently-equipped item that isn't the strongest one owned - the Equipment
+ *  tab's own nudge to go swap it in, since that's the one place an equipped-but-suboptimal item
+ *  would otherwise look no different from an equipped-and-best one. */
+function BetterAvailableHint() {
+  return (
+    <span style={{ fontSize: 10, color: 'var(--fw-danger)', opacity: 0.85 }} title="You own a stronger item for this slot">
+      Better available
+    </span>
+  );
+}
+
 export function CharacterMenu({ onClose }: CharacterMenuProps) {
   const [tab, setTab] = useState<'inventory' | 'equipment'>('inventory');
   const [subTab, setSubTab] = useState<InventorySubTab>('all');
@@ -95,6 +131,21 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
   const uid = useAuthStore((s) => s.user?.uid);
   const [busy, setBusy] = useState(false);
   useOverlayClose(onClose);
+
+  // Every EquipmentItem def the player owns, grouped by slot, purely to drive the "Best" badge -
+  // recomputed each render (inventory is small; no need for useMemo here).
+  const ownedEquipmentBySlot = new Map<EquipmentSlot, (typeof EQUIPMENT)[number][]>();
+  for (const entry of inventory) {
+    const def = EQUIPMENT.find((e) => e.id === entry.itemId);
+    if (!def) continue;
+    const list = ownedEquipmentBySlot.get(def.slot) ?? [];
+    list.push(def);
+    ownedEquipmentBySlot.set(def.slot, list);
+  }
+  const bestIdsBySlot = new Map<EquipmentSlot, Set<string>>();
+  for (const [slot, defs] of ownedEquipmentBySlot) {
+    bestIdsBySlot.set(slot, bestEquipmentIds(defs));
+  }
 
   async function equip(itemId: string, slot: EquipmentSlot) {
     if (busy) return;
@@ -248,6 +299,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       {entry.iconAssetId && <img src={getAssetUrl(entry.iconAssetId)} alt="" className={styles.icon} />}
                       <span className={styles.itemName}>{entry.name}</span>
                       <span style={{ fontSize: 11, opacity: 0.7 }}>x{entry.quantity}</span>
+                      {equipDef && bestIdsBySlot.get(equipDef.slot)?.has(entry.itemId) && <BestBadge />}
                       {equipDef &&
                         (isEquipped ? (
                           <>
@@ -351,6 +403,9 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                             {formatStatBonuses(equipDef.statBonuses)}
                           </span>
                         )}
+                        <span style={{ marginLeft: 8 }}>
+                          {bestIdsBySlot.get(slot)?.has(equipDef.id) ? <BestBadge /> : <BetterAvailableHint />}
+                        </span>
                       </span>
                       <button className={styles.smallButton} disabled={busy} onClick={() => unequip(slot)}>
                         Unequip
@@ -403,7 +458,10 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                     >
                       <img src={getAssetUrl(def.iconAssetId)} alt="" className={styles.icon} />
                       <span className={styles.itemName}>{def.name}</span>
-                      <TierBadge tier={def.tier} />
+                      <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <TierBadge tier={def.tier} />
+                        {bestIdsBySlot.get(equipPickerSlot)?.has(entry.itemId) && <BestBadge />}
+                      </span>
                       <p style={{ fontSize: 11, opacity: 0.85, margin: 0, textAlign: 'center' }}>{def.description}</p>
                       {formatStatBonuses(def.statBonuses) && (
                         <span style={{ fontSize: 10, color: 'var(--fw-spirit)' }}>{formatStatBonuses(def.statBonuses)}</span>
