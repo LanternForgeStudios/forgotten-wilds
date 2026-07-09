@@ -6,8 +6,10 @@ import { useSceneStore } from '@/state/useSceneStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
-import { ENEMIES, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
-import type { Quest, QuestCategory } from '@/types';
+import { getAssetUrl } from '@/assets/assetManager';
+import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
+import { ENEMIES, ITEMS, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
+import type { Enemy, EnemyTier, Quest, QuestCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
 import questStyles from './QuestLog.module.css';
 
@@ -20,15 +22,31 @@ interface JournalOfLegendsProps {
   onClose: () => void;
 }
 
-type Tab = 'quests' | 'locations' | 'creatures' | 'lore' | 'bosses';
+type Tab = 'quests' | 'locations' | 'echoes' | 'lore' | 'bosses';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'quests', label: 'Quests' },
   { id: 'locations', label: 'Locations' },
-  { id: 'creatures', label: 'Creatures' },
+  { id: 'echoes', label: 'Echoes' },
   { id: 'lore', label: 'Lore' },
   { id: 'bosses', label: 'Bosses' },
 ];
+
+const ENEMY_FAMILY_LABELS: Record<Enemy['family'], string> = {
+  mothlings: 'Mothlings',
+  restlessMiners: 'Restless Miners',
+  coalSpirits: 'Coal Spirits',
+  cliffDwellers: 'Cliff Dwellers',
+  waterSpirits: 'Water Spirits',
+  briarSpirits: 'Briar Spirits',
+  boss: 'Boss',
+};
+
+function matchesEnemyQuery(enemy: Enemy | undefined, query: string): boolean {
+  if (!query) return true;
+  if (!enemy) return false;
+  return enemy.name.toLowerCase().includes(query) || enemy.loreBlurb.toLowerCase().includes(query);
+}
 
 /** Quest givers who aren't a regular NPC (e.g. a shrine/landmark interactable) - mapped to the
  *  location they're physically found in, same as any NPC's locationId would resolve to. */
@@ -69,6 +87,13 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   // Tracks *collapsed* quest regions rather than expanded ones, so every region defaults to open
   // on first view without needing to precompute ids.
   const [collapsedQuestRegions, setCollapsedQuestRegions] = useState<Set<string>>(new Set());
+  const [echoesSearch, setEchoesSearch] = useState('');
+  const [echoesFamilyFilter, setEchoesFamilyFilter] = useState<Enemy['family'] | 'all'>('all');
+  const [echoesTierFilter, setEchoesTierFilter] = useState<EnemyTier | 'all'>('all');
+  const [bossesSearch, setBossesSearch] = useState('');
+  // Shared between the Echoes and Bosses tabs - enemy ids are unique across ENEMIES regardless of
+  // which tab opened the card, and only one tab is ever visible at a time.
+  const [selectedEnemyId, setSelectedEnemyId] = useState<string | null>(null);
   useOverlayClose(onClose);
 
   function toggleQuestRegion(id: string) {
@@ -227,23 +252,88 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             );
           })()}
 
-        {tab === 'creatures' && (
-          <div>
-            {journal.creaturesDiscovered.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No creatures discovered yet.</p>}
-            {journal.creaturesDiscovered.map((id) => {
+        {tab === 'echoes' &&
+          (() => {
+            const query = echoesSearch.trim().toLowerCase();
+            const discoveredFamilies = Array.from(
+              new Set(
+                journal.creaturesDiscovered
+                  .map((id) => ENEMIES.find((e) => e.id === id)?.family)
+                  .filter((f): f is Enemy['family'] => !!f && f !== 'boss'),
+              ),
+            );
+            const visible = journal.creaturesDiscovered.filter((id) => {
               const enemy = ENEMIES.find((e) => e.id === id);
-              return (
-                <div key={id} className={styles.slotRow}>
-                  <span style={{ fontSize: 13, flex: 1 }}>
-                    <strong>{enemy?.name ?? id}</strong>
-                    <br />
-                    <span style={{ opacity: 0.7 }}>{enemy?.loreBlurb}</span>
-                  </span>
+              if (echoesFamilyFilter !== 'all' && enemy?.family !== echoesFamilyFilter) return false;
+              if (echoesTierFilter !== 'all' && enemy?.tier !== echoesTierFilter) return false;
+              return matchesEnemyQuery(enemy, query);
+            });
+            return (
+              <div>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder="Search echoes..."
+                  value={echoesSearch}
+                  onChange={(e) => setEchoesSearch(e.target.value)}
+                />
+                <div className={styles.subtabs} style={{ marginBottom: 6 }}>
+                  <button
+                    className={`${styles.subtab} ${echoesFamilyFilter === 'all' ? styles.subtabActive : ''}`}
+                    onClick={() => setEchoesFamilyFilter('all')}
+                  >
+                    All Families
+                  </button>
+                  {discoveredFamilies.map((family) => (
+                    <button
+                      key={family}
+                      className={`${styles.subtab} ${echoesFamilyFilter === family ? styles.subtabActive : ''}`}
+                      onClick={() => setEchoesFamilyFilter(family)}
+                    >
+                      {ENEMY_FAMILY_LABELS[family]}
+                    </button>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
-        )}
+                <div className={styles.subtabs} style={{ marginBottom: 10 }}>
+                  {(['all', 'regular', 'elite'] as const).map((tier) => (
+                    <button
+                      key={tier}
+                      className={`${styles.subtab} ${echoesTierFilter === tier ? styles.subtabActive : ''}`}
+                      onClick={() => setEchoesTierFilter(tier)}
+                    >
+                      {tier === 'all' ? 'All Tiers' : ENEMY_TIER_LABELS[tier]}
+                    </button>
+                  ))}
+                </div>
+                {journal.creaturesDiscovered.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No echoes discovered yet.</p>}
+                {journal.creaturesDiscovered.length > 0 && visible.length === 0 && (
+                  <p style={{ fontSize: 13, opacity: 0.7 }}>No echoes match those filters.</p>
+                )}
+                {visible.map((id) => {
+                  const enemy = ENEMIES.find((e) => e.id === id);
+                  return (
+                    <div
+                      key={id}
+                      className={styles.slotRow}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSelectedEnemyId(id)}
+                    >
+                      <span style={{ fontSize: 13, flex: 1 }}>
+                        <strong>{enemy?.name ?? id}</strong>
+                        {enemy && (
+                          <span style={{ fontSize: 10, color: ENEMY_TIER_COLORS[enemy.tier], marginLeft: 8 }}>
+                            {ENEMY_TIER_LABELS[enemy.tier]}
+                          </span>
+                        )}
+                        <br />
+                        <span style={{ opacity: 0.7 }}>{enemy?.loreBlurb}</span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
         {tab === 'locations' && (
           <div>
@@ -340,24 +430,140 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
           </div>
         )}
 
-        {tab === 'bosses' && (
-          <div>
-            {journal.bossesDefeated.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No bosses defeated yet.</p>}
-            {journal.bossesDefeated.map((id) => {
-              const enemy = ENEMIES.find((e) => e.id === id);
-              return (
-                <div key={id} className={styles.slotRow}>
-                  <span style={{ fontSize: 13, flex: 1 }}>
-                    <strong>{enemy?.name ?? id}</strong> — defeated
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        {tab === 'bosses' &&
+          (() => {
+            const query = bossesSearch.trim().toLowerCase();
+            const visible = journal.bossesDefeated.filter((id) => matchesEnemyQuery(ENEMIES.find((e) => e.id === id), query));
+            return (
+              <div>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder="Search bosses..."
+                  value={bossesSearch}
+                  onChange={(e) => setBossesSearch(e.target.value)}
+                />
+                {journal.bossesDefeated.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No bosses defeated yet.</p>}
+                {journal.bossesDefeated.length > 0 && visible.length === 0 && (
+                  <p style={{ fontSize: 13, opacity: 0.7 }}>No bosses match that search.</p>
+                )}
+                {visible.map((id) => {
+                  const enemy = ENEMIES.find((e) => e.id === id);
+                  return (
+                    <div
+                      key={id}
+                      className={styles.slotRow}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSelectedEnemyId(id)}
+                    >
+                      <span style={{ fontSize: 13, flex: 1 }}>
+                        <strong>{enemy?.name ?? id}</strong> — defeated
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
         <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
+
+      {selectedEnemyId &&
+        (() => {
+          const enemy = ENEMIES.find((e) => e.id === selectedEnemyId);
+          if (!enemy) return null;
+          const moves = enemy.moves
+            .map((m) => SKILLS.find((s) => s.id === m.skillId))
+            .filter((s): s is NonNullable<typeof s> => !!s);
+          const drops = enemy.lootTable
+            .map((d) => ({ ...d, item: ITEMS.find((i) => i.id === d.itemId) }))
+            .filter((d) => !!d.item);
+          return (
+            <div
+              className={styles.overlay}
+              style={{ zIndex: 30 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedEnemyId(null);
+              }}
+            >
+              <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                <div className={styles.detailHeader}>
+                  <img src={getAssetUrl(enemy.battleSpriteAssetId)} alt="" className={styles.detailIcon} style={{ width: 56, height: 56 }} />
+                  <div>
+                    <p className={styles.detailName} style={{ fontSize: 16 }}>
+                      {enemy.name}
+                      <span style={{ fontSize: 11, color: ENEMY_TIER_COLORS[enemy.tier], marginLeft: 8 }}>
+                        {ENEMY_TIER_LABELS[enemy.tier]}
+                      </span>
+                    </p>
+                    <p className={styles.detailMeta}>{ENEMY_FAMILY_LABELS[enemy.family]}</p>
+                  </div>
+                </div>
+                <p className={styles.detailDescription}>{enemy.loreBlurb}</p>
+
+                <p className={styles.detailStats} style={{ marginBottom: 4 }}>
+                  <strong>Base Stats</strong>
+                </p>
+                <p className={questStyles.objective}>
+                  HP {enemy.stats.maxHp} &nbsp;·&nbsp; ATK {enemy.stats.attack} &nbsp;·&nbsp; DEF {enemy.stats.defense} &nbsp;·&nbsp;
+                  SPD {enemy.stats.speed}
+                </p>
+
+                <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
+                  <strong>Special Attacks</strong>
+                </p>
+                {moves.length === 0 && <p className={questStyles.objective}>None known.</p>}
+                {moves.map((move) => (
+                  <p key={move.id} className={questStyles.objective}>
+                    • {move.name} — {move.description}
+                  </p>
+                ))}
+
+                <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
+                  <strong>Weaknesses</strong>
+                </p>
+                <p className={questStyles.objective}>
+                  {enemy.weaknesses && enemy.weaknesses.length > 0 ? enemy.weaknesses.join(', ') : 'Unknown'}
+                </p>
+
+                <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
+                  <strong>Ailments Inflicted</strong>
+                </p>
+                <p className={questStyles.objective}>
+                  {enemy.ailmentsInflicted && enemy.ailmentsInflicted.length > 0 ? enemy.ailmentsInflicted.join(', ') : 'None known'}
+                </p>
+
+                <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
+                  <strong>Drops</strong>
+                </p>
+                {drops.length === 0 && <p className={questStyles.objective}>None known.</p>}
+                {drops.map((d) => (
+                  <p key={d.itemId} className={questStyles.objective}>
+                    • {d.item!.name} ({Math.round(d.chance * 100)}% chance, x{d.minQuantity}
+                    {d.maxQuantity !== d.minQuantity ? `-${d.maxQuantity}` : ''})
+                  </p>
+                ))}
+
+                <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
+                  <strong>Rewards</strong>
+                </p>
+                <p className={questStyles.objective}>
+                  {enemy.xpReward} XP &nbsp;·&nbsp; {enemy.goldReward} gold
+                </p>
+
+                <button
+                  className={styles.smallButton}
+                  style={{ marginTop: 12 }}
+                  onClick={() => setSelectedEnemyId(null)}
+                >
+                  Close
+                </button>
+              </Panel>
+            </div>
+          );
+        })()}
     </div>
   );
 }

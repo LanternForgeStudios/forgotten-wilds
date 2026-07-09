@@ -36,4 +36,12 @@ export interface Enemy {
   goldReward: number;
   lootTable: LootDrop[];
   loreBlurb: string;
+  /** Display-only, for the Journal's Echoes/Bosses detail card - not read by any combat math yet.
+   *  Unset today for every enemy since no elemental/damage-type system exists to make a weakness
+   *  mechanically meaningful; ready for a future elemental-attack system to populate. */
+  weaknesses?: string[];
+  /** Display-only, for the Journal's Echoes/Bosses detail card - not read by any combat math yet.
+   *  Unset today since no ailment system exists; ready for the future ailment system to populate
+   *  (e.g. an enemy whose moves can inflict Poison would list 'poison' here). */
+  ailmentsInflicted?: string[];
 }
