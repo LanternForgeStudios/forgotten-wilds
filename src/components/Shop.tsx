@@ -33,6 +33,13 @@ const SLOT_LABELS: Record<string, string> = {
   spiritTotem: 'Spirit Totem',
 };
 
+interface PendingSale {
+  itemId: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+}
+
 export function Shop({ shopId, onClose }: ShopProps) {
   const [tab, setTab] = useState<'buy' | 'sell'>('buy');
   const player = usePlayerStore((s) => s.player);
@@ -41,6 +48,12 @@ export function Shop({ shopId, onClose }: ShopProps) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  // How many of each item the "Sell" quantity stepper is currently set to - only meaningful for
+  // items owned in stacks of more than 1; defaults to 1 (via ?? below) for anything not touched.
+  const [sellQuantities, setSellQuantities] = useState<Record<string, number>>({});
+  // Set when "Sell" is clicked, before the actual sellItem call - the confirmation overlay reads
+  // this to show exactly what's about to happen, and only calls sell() once the player confirms.
+  const [pendingSale, setPendingSale] = useState<PendingSale | null>(null);
   const pushToast = useToastStore((s) => s.push);
   useOverlayClose(onClose);
 
@@ -59,14 +72,21 @@ export function Shop({ shopId, onClose }: ShopProps) {
     }
   }
 
-  async function sell(itemId: string, name: string, price: number) {
-    if (busy) return;
+  async function confirmSell() {
+    if (!pendingSale || busy) return;
+    const { itemId, name, quantity } = pendingSale;
     setBusy(itemId);
     setError(null);
+    setPendingSale(null);
     try {
-      await callSellItem(itemId, 1);
+      const res = await callSellItem(itemId, quantity);
       if (uid) await resyncSave(uid);
-      pushToast(`Sold ${name} for ${price}g`);
+      pushToast(`Sold ${res.soldQuantity}x ${name} for ${res.goldEarned}g`);
+      setSellQuantities((prev) => {
+        const next = { ...prev };
+        delete next[itemId];
+        return next;
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not sell that item.');
     } finally {
@@ -154,6 +174,7 @@ export function Shop({ shopId, onClose }: ShopProps) {
                 const isEquipped = equippedSlot ? player?.equipment[equippedSlot] === entry.itemId : false;
                 const isBusy = busy === entry.itemId;
                 const isSelected = selectedItemId === entry.itemId;
+                const quantity = Math.min(sellQuantities[entry.itemId] ?? 1, entry.quantity);
                 return (
                   <div
                     key={entry.itemId}
@@ -163,21 +184,46 @@ export function Shop({ shopId, onClose }: ShopProps) {
                     {iconAssetId && <img src={getAssetUrl(iconAssetId)} alt="" className={styles.icon} />}
                     <span className={styles.itemName}>{name}</span>
                     {def?.tier && <TierBadge tier={def.tier} />}
-                    <span style={{ fontSize: 11, opacity: 0.8 }}>x{entry.quantity}</span>
+                    <span style={{ fontSize: 11, opacity: 0.8 }}>x{entry.quantity} owned</span>
                     <span style={{ fontSize: 11, opacity: 0.8 }}>{price}g each</span>
                     {isEquipped ? (
                       <span style={{ fontSize: 11, color: 'var(--fw-spirit)' }}>Equipped</span>
                     ) : (
-                      <button
-                        className={styles.smallButton}
-                        disabled={!!busy}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          sell(entry.itemId, name, price);
-                        }}
-                      >
-                        {isBusy ? 'Selling…' : 'Sell 1'}
-                      </button>
+                      <>
+                        {entry.quantity > 1 && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              className={styles.smallButton}
+                              disabled={!!busy || quantity <= 1}
+                              onClick={() => setSellQuantities((prev) => ({ ...prev, [entry.itemId]: Math.max(1, quantity - 1) }))}
+                            >
+                              −
+                            </button>
+                            <span style={{ fontSize: 12, minWidth: 18, textAlign: 'center' }}>{quantity}</span>
+                            <button
+                              type="button"
+                              className={styles.smallButton}
+                              disabled={!!busy || quantity >= entry.quantity}
+                              onClick={() =>
+                                setSellQuantities((prev) => ({ ...prev, [entry.itemId]: Math.min(entry.quantity, quantity + 1) }))
+                              }
+                            >
+                              +
+                            </button>
+                          </div>
+                        )}
+                        <button
+                          className={styles.smallButton}
+                          disabled={!!busy}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPendingSale({ itemId: entry.itemId, name, quantity, unitPrice: price });
+                          }}
+                        >
+                          {isBusy ? 'Selling…' : `Sell${quantity > 1 ? ` x${quantity}` : ''}`}
+                        </button>
+                      </>
                     )}
                   </div>
                 );
@@ -228,6 +274,32 @@ export function Shop({ shopId, onClose }: ShopProps) {
         )}
         <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
+
+      {pendingSale && (
+        <div
+          className={styles.overlay}
+          style={{ zIndex: 30 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setPendingSale(null);
+          }}
+        >
+          <Panel style={{ width: 'min(360px, 90vw)', textAlign: 'center' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <h3 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>Confirm Sale</h3>
+            <p style={{ fontSize: 13, margin: '0 0 16px' }}>
+              Sell {pendingSale.quantity}x {pendingSale.name} for {pendingSale.quantity * pendingSale.unitPrice}g?
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <button className={styles.smallButton} onClick={() => setPendingSale(null)}>
+                Cancel
+              </button>
+              <button className={styles.smallButton} onClick={confirmSell}>
+                Confirm
+              </button>
+            </div>
+          </Panel>
+        </div>
+      )}
     </div>
   );
 }
