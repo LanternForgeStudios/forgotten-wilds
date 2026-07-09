@@ -452,6 +452,9 @@ describe('resolveRound', () => {
     // enemy is skipped) - defense: 9999 pins that chip damage at the engine's 1-point floor
     // deterministically (base damage goes deeply negative, so Math.random()'s variance can't
     // change the floored result), isolating the percentage-of-maxHp heal being tested here.
+    // Mocked to 0.5 so that chip hit doesn't roll a miss (ENEMY_MISS_CHANCE is well under 0.5),
+    // which would otherwise leave the "- 1" term wrong on however many runs it fired.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const lowMaxHp = resolveRound({
       action: { type: 'item', itemIds: ['healing-poultice'] },
       playerStats: stats({ hp: 1, maxHp: 60, speed: 999, defense: 9999 }),
@@ -464,6 +467,7 @@ describe('resolveRound', () => {
       inventory: [{ itemId: 'healing-poultice', quantity: 1 }],
       enemies: soloEnemies(),
     });
+    vi.restoreAllMocks();
     expect(lowMaxHp.playerHp).toBe(1 + Math.round(60 * 0.3) - 1);
     expect(highMaxHp.playerHp).toBe(1 + Math.round(852 * 0.3) - 1);
     expect(highMaxHp.playerHp).toBeGreaterThan(lowMaxHp.playerHp);
@@ -482,13 +486,16 @@ describe('resolveRound', () => {
 
   it('reports defeat once player hp reaches zero', () => {
     // 1 hp and 0 defense against even a halved (defended) hit is still guaranteed lethal,
-    // regardless of damage variance or turn order.
+    // regardless of damage variance or turn order - mocked to 0.5 so the attack doesn't roll a
+    // miss (ENEMY_MISS_CHANCE is well under 0.5), which would otherwise make this flaky.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const result = resolveRound({
       action: { type: 'defend' },
       playerStats: stats({ hp: 1, maxHp: 60, speed: -999, defense: 0 }),
       inventory: [],
       enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
     });
+    vi.restoreAllMocks();
     expect(result.phase).toBe('defeat');
     expect(result.playerHp).toBe(0);
   });
@@ -910,6 +917,10 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
   });
 
   it('each enemyHits entry carries the exact same logLine pushed to the round log, naming its own attacker', () => {
+    // Mocked to 0.5 so no attacker rolls a miss (ENEMY_MISS_CHANCE is well under 0.5) - a missed
+    // attacker's logLine doesn't mention a damage number at all, which this test specifically
+    // checks for on a hit.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const result = resolveRound({
       action: { type: 'attack', targetIndex: 0 },
       playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
@@ -935,6 +946,10 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
   });
 
   it('wasDefended reflects the round\'s Defend state, for every attacker', () => {
+    // Mocked to 0.5 so every attacker actually connects (ENEMY_MISS_CHANCE is well under 0.5) - a
+    // missed attacker's entry always carries wasDefended:false regardless of the round's Defend
+    // state (there's no damage to have halved), which would otherwise make this flaky.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const defending = resolveRound({
       action: { type: 'defend' },
       playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
@@ -968,24 +983,35 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
     expect(defending.enemyHits[0].damage).toBeLessThan(attacking.enemyHits[0].damage);
   });
 
-  it('missed is always false today (enemies have no miss roll)', () => {
-    const results = [
-      resolveRound({
-        action: { type: 'attack', targetIndex: 0 },
-        playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
-        inventory: [],
-        enemies: threeMothlings(),
-      }),
-      resolveRound({
-        action: { type: 'defend' },
-        playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
-        inventory: [],
-        enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
-      }),
-    ];
-    for (const result of results) {
-      expect(result.enemyHits.every((h) => !h.missed)).toBe(true);
-    }
+  it('an enemy attack can miss (ENEMY_MISS_CHANCE), dealing no damage and not counting toward damageTakenByPlayer', () => {
+    // Below ENEMY_MISS_CHANCE (0.1) - guarantees a miss.
+    vi.spyOn(Math, 'random').mockReturnValue(0.01);
+    const missed = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+    });
+    expect(missed.enemyHits[0].missed).toBe(true);
+    expect(missed.enemyHits[0].damage).toBe(0);
+    expect(missed.damageTakenByPlayer).toBe(0);
+    expect(missed.playerHp).toBe(999);
+    expect(missed.enemyHits[0].logLine).toContain(mothling.name);
+    expect(missed.log).toContain(missed.enemyHits[0].logLine);
+  });
+
+  it('an enemy attack connects when the miss roll fails (ENEMY_MISS_CHANCE)', () => {
+    // Above ENEMY_MISS_CHANCE (0.1) - guarantees a hit.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const hit = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+    });
+    expect(hit.enemyHits[0].missed).toBe(false);
+    expect(hit.enemyHits[0].damage).toBeGreaterThan(0);
+    expect(hit.damageTakenByPlayer).toBe(hit.enemyHits[0].damage);
   });
 
   it("a boss's own attack is undamped by add count, while its adds' attacks are crowd-dampened", () => {

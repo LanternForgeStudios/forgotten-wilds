@@ -276,6 +276,12 @@ export function hasSufficientQuantity(
  *  currently-equipped lantern, before calling this function. */
 const TARGET_ALL_MISS_CHANCE = 0.15;
 const TARGET_ALL_DAMAGE_FACTOR = 0.6;
+/** Flat chance for any enemy attack (boss or non-boss) to miss the player outright, rolled
+ *  independently per attacker per round - previously enemy attacks always connected. Kept well
+ *  under 0.5 deliberately: every balance test in this file mocks Math.random to exactly 0.5, so a
+ *  chance below that never fires under test, leaving the existing deterministic round-by-round
+ *  simulations (e.g. the 3-mothling group fight) unaffected by this addition. */
+const ENEMY_MISS_CHANCE = 0.1;
 
 /** Dampens each non-boss enemy's own attack damage based on how many non-boss enemies are
  *  currently alive (self-inclusive) - every alive enemy attacks every round while the player can
@@ -330,6 +336,14 @@ export function resolveRound(input: RoundInput): RoundResult {
     if (!isAlive(i)) return;
     const def = enemyDefs[i];
     const stats = enemyStats[i];
+
+    if (Math.random() < ENEMY_MISS_CHANCE) {
+      const missLogLine = `${def.name}'s attack goes wide - miss!`;
+      enemyHits.push({ attackerIndex: i, damage: 0, missed: true, wasDefended: false, logLine: missLogLine });
+      log.push(missLogLine);
+      return;
+    }
+
     const hpFraction = enemyHp[i] / stats.maxHp;
     const move = pickEnemyMove(def, hpFraction);
     const skill = SKILLS[move.skillId] ?? SKILLS.attack;

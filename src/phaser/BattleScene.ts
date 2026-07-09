@@ -258,7 +258,10 @@ export class BattleScene extends Phaser.Scene {
       this.time.delayedCall(PRE_ENEMY_ATTACK_DELAY_MS + stagger, () => {
         const slot = this.enemySlots.get(hit.attackerIndex);
         if (slot) playIncomingLunge(this, slot.sprite);
-        if (hit.missed) return;
+        if (hit.missed) {
+          playFloatingText(this, anchorX, anchorY, 'MISS', COLOR_MISS, true);
+          return;
+        }
         const color = hit.wasDefended ? COLOR_DEFENDED : COLOR_INCOMING_DAMAGE;
         playFloatingText(this, anchorX, anchorY, `-${hit.damage}`, color, hit.wasDefended);
         playIncomingCameraImpact(this, hit.wasDefended ? hit.damage / 2 : hit.damage, playerMaxHp);
