@@ -43,6 +43,56 @@ export const ITEMS: Item[] = [
     tier: 'uncommon',
   },
   {
+    id: 'antidote',
+    name: 'Antidote',
+    description: 'A bitter draught that clears venom and toxin from the blood. Cures Poison.',
+    category: 'consumable',
+    iconAssetId: 'icon.item.antidote',
+    effect: { cureAilmentId: 'poison' },
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'burn-salve',
+    name: 'Burn Salve',
+    description: 'A cooling herbal salve for scorched skin. Cures Burn.',
+    category: 'consumable',
+    iconAssetId: 'icon.item.burn-salve',
+    effect: { cureAilmentId: 'burn' },
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'thaw-crystal',
+    name: 'Thaw Crystal',
+    description: 'A warm stone that never quite cools. Cures Freeze.',
+    category: 'consumable',
+    iconAssetId: 'icon.item.thaw-crystal',
+    effect: { cureAilmentId: 'freeze' },
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'eye-drops',
+    name: 'Eye Drops',
+    description: 'A clarifying rinse brewed by Willow herself. Cures Blind.',
+    category: 'consumable',
+    iconAssetId: 'icon.item.eye-drops',
+    effect: { cureAilmentId: 'blind' },
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'echo-herb',
+    name: 'Echo Herb',
+    description: 'Chewed leaves that steady a rattled spirit and restore your voice. Cures Silence.',
+    category: 'consumable',
+    iconAssetId: 'icon.item.echo-herb',
+    effect: { cureAilmentId: 'silence' },
+    stackable: true,
+    tier: 'common',
+  },
+  {
     id: 'moth-dust',
     name: 'Moth Dust',
     description: 'Fine silver dust shed from a Mothling\'s wings. A curious keepsake.',
@@ -164,6 +214,11 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'greater-healing-poultice', price: 45, currency: 'gold' },
   { itemId: 'spirit-draught', price: 18, currency: 'gold' },
   { itemId: 'lantern-oil', price: 20, currency: 'gold' },
+  { itemId: 'antidote', price: 12, currency: 'gold' },
+  { itemId: 'burn-salve', price: 12, currency: 'gold' },
+  { itemId: 'thaw-crystal', price: 12, currency: 'gold' },
+  { itemId: 'eye-drops', price: 12, currency: 'gold' },
+  { itemId: 'echo-herb', price: 12, currency: 'gold' },
   { itemId: 'keepers-lantern', price: 8, currency: 'gold' },
   // Common-tier equipment only, per the canonical rarity progression - Uncommon/Rare gear comes
   // from chests instead. Split with no overlap between the two Ash Hallow gear shops: Blacksmith
@@ -187,10 +242,20 @@ export const SHOP_TITLES: Record<string, string> = {
 };
 
 export const SHOP_CATALOGS: Record<string, string[]> = {
-  'mara-ash-general-store': ['keepers-lantern'],
+  'mara-ash-general-store': ['keepers-lantern', 'antidote', 'eye-drops'],
   'ash-hallow-blacksmith-forge': ['weathered-walking-staff', 'river-stone-charm'],
   'ash-hallow-armory': ['worn-keeper-coat', 'traveler-boots', 'work-gloves'],
-  apothecary: ['healing-poultice', 'greater-healing-poultice', 'spirit-draught', 'lantern-oil'],
+  apothecary: [
+    'healing-poultice',
+    'greater-healing-poultice',
+    'spirit-draught',
+    'lantern-oil',
+    'antidote',
+    'burn-salve',
+    'thaw-crystal',
+    'eye-drops',
+    'echo-herb',
+  ],
 };
 
 export const INN_REST_COST = 10;

@@ -23,6 +23,9 @@ export interface ItemEffect {
   /** Fraction (0-1) of the equipped lantern's maxLanternOil to restore - percentage rather than a
    *  flat amount so the same item stays useful across lantern tiers. */
   restoreOilPercent?: number;
+  /** Immediately removes this ailment (see AILMENTS in data/ailments.ts) if the player currently
+   *  has it - a dedicated cure item (Antidote/Burn Salve/etc.), not layered onto a healing potion. */
+  cureAilmentId?: string;
 }
 
 export interface Item {

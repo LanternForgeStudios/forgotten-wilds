@@ -18,14 +18,25 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 import { useToastStore } from '@/state/useToastStore';
 import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useSceneStore, type SceneName } from '@/state/useSceneStore';
-import { ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS } from '@/data';
+import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS } from '@/data';
+import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { itemWouldHaveEffect } from '@/utils/itemEffect';
 import { markEncounterEnded } from '@/utils/encounterCooldown';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
+import { getAssetUrl } from '@/assets/assetManager';
 import styles from './CombatScene.module.css';
+
+// Which ailment ids gate which UI action - the client's AILMENTS data is a display-only mirror
+// (name/description/icon, no mechanical effect flags - see src/data/ailments.ts), so these small
+// known-id sets are this component's own equivalent of that gating, mirroring the effect flags
+// server-side (functions/src/data/ailments.ts) by hand. The server is what actually enforces this
+// (resolveCombatAction.ts) - this is only for disabling the button before a wasted round-trip.
+const SKILL_BLOCKING_AILMENTS = new Set(['silence']);
+const LANTERN_BLOCKING_AILMENTS = new Set(['freeze']);
+const STUNNING_AILMENTS = new Set(['stun']);
 
 const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
   town: 'town',
@@ -56,6 +67,7 @@ export function CombatScene() {
   const [targetIndex, setTargetIndex] = useState<number | null>(null);
   const [targetMode, setTargetMode] = useState<'single' | 'all'>('single');
   const [log, setLog] = useState<string[]>([]);
+  const [playerAilments, setPlayerAilments] = useState<ActiveAilment[]>([]);
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // Up to 3 item ids queued to ride along with whatever primary action the player takes next
@@ -141,6 +153,7 @@ export function CombatScene() {
         setSessionId(res.sessionId);
         setEnemies(res.enemies);
         setTargetIndex(res.enemies[0]?.index ?? null);
+        setPlayerAilments(res.playerAilments);
         patchStats({ hp: res.playerHp, maxHp: res.playerMaxHp, spirit: res.playerSpirit });
         const intro =
           res.enemies.length > 1
@@ -212,6 +225,7 @@ export function CombatScene() {
         const updated = res.enemies.find((u) => u.index === e.index);
         return updated ? { ...e, hp: updated.hp } : e;
       }));
+      setPlayerAilments(res.playerAilments);
       // On a defeat, the server's playerHp/playerSpirit here are already the post-respawn values
       // (Ash Hallow's soft-respawn restore, applied in the same transaction as the defeat itself -
       // see resolveCombatAction.ts) - patching them in immediately would show the HUD's HP/Spirit
@@ -385,6 +399,9 @@ export function CombatScene() {
   const canAct = phase === 'playerTurn' && !playbackActive;
   const canPickTarget = aliveEnemies.length > 1 && canAct;
   const combatEnded = phase === 'victory' || phase === 'defeat' || phase === 'fled' || phase === 'error';
+  const isSilenced = playerAilments.some((a) => SKILL_BLOCKING_AILMENTS.has(a.ailmentId));
+  const isLanternDisabled = playerAilments.some((a) => LANTERN_BLOCKING_AILMENTS.has(a.ailmentId));
+  const isStunned = playerAilments.some((a) => STUNNING_AILMENTS.has(a.ailmentId));
 
   // Attack's identity follows whatever's in the weapon slot - "Fists" when nothing is equipped,
   // matching the same pattern lantern abilities use for the lantern slot.
@@ -403,6 +420,21 @@ export function CombatScene() {
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       <PlayerHUD />
+
+      {playerAilments.length > 0 && (
+        <div className={styles.ailmentStrip}>
+          {playerAilments.map((a) => {
+            const def = AILMENTS[a.ailmentId];
+            return (
+              <span key={a.ailmentId} className={styles.ailmentBadge} title={def?.description ?? a.ailmentId}>
+                {def?.iconAssetId && <img src={getAssetUrl(def.iconAssetId)} alt="" className={styles.ailmentIcon} />}
+                {def?.name ?? a.ailmentId}
+                {a.turnsRemaining !== undefined ? ` (${a.turnsRemaining})` : ''}
+              </span>
+            );
+          })}
+        </div>
+      )}
 
       <div className={styles.stage}>
         <div className={styles.enemyArea}>
@@ -513,6 +545,9 @@ export function CombatScene() {
             </>
           ) : (
             <>
+              {isStunned && canAct && (
+                <p className={styles.stunnedBanner}>You are stunned and cannot act this turn!</p>
+              )}
               {aliveEnemies.length > 1 && canAct && (
                 <button
                   className={styles.actionButton}
@@ -527,7 +562,8 @@ export function CombatScene() {
               </button>
               <button
                 className={styles.actionButton}
-                disabled={!canAct || (player?.stats.spirit ?? 0) < keepersStrikeCost}
+                disabled={!canAct || (player?.stats.spirit ?? 0) < keepersStrikeCost || isSilenced}
+                title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
                 onClick={() => act('skill')}
               >
                 Keeper's Strike ({keepersStrikeCost} SP)
@@ -536,7 +572,8 @@ export function CombatScene() {
                 <button
                   key={ability.id}
                   className={styles.actionButton}
-                  disabled={!canAct || (player?.stats.lanternOil ?? 0) < ability.oilCost}
+                  disabled={!canAct || (player?.stats.lanternOil ?? 0) < ability.oilCost || isLanternDisabled}
+                  title={isLanternDisabled ? 'Frozen - the Lantern specialty is disabled.' : undefined}
                   onClick={() => act('lanternAbility', { abilityId: ability.id })}
                 >
                   {ability.name} ({ability.oilCost} Oil)

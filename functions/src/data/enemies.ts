@@ -48,6 +48,8 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     lootTable: [
       { itemId: 'moth-dust', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       { itemId: 'healing-poultice', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      // mothling-dustwing inflicts Blind - eye-drops cure it.
+      { itemId: 'eye-drops', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
   },
   'greater-mothling': {
@@ -66,6 +68,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     lootTable: [
       { itemId: 'moth-dust', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
       { itemId: 'healing-poultice', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'eye-drops', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
   },
   'restless-miner': {
@@ -114,6 +117,8 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     lootTable: [
       { itemId: 'ember-shard', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       { itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      // coalspirit-cinderburst inflicts Burn - burn-salve cures it.
+      { itemId: 'burn-salve', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
   },
   'coal-wraith': {
@@ -132,6 +137,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     lootTable: [
       { itemId: 'ember-shard', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
       { itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'burn-salve', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
   },
   'cliff-wolf': {
@@ -147,7 +153,11 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 13,
     goldReward: 7,
-    lootTable: [{ itemId: 'wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      // ridge-ambush inflicts Silence - echo-herb cures it.
+      { itemId: 'echo-herb', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'ridge-hawk': {
     id: 'ridge-hawk',
@@ -162,7 +172,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 21,
     goldReward: 12,
-    lootTable: [{ itemId: 'wolf-fang', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'wolf-fang', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'echo-herb', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'pool-wisp': {
     id: 'pool-wisp',
@@ -180,6 +193,8 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     lootTable: [
       { itemId: 'silver-droplet', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      // wisp-chill inflicts Freeze - thaw-crystal cures it.
+      { itemId: 'thaw-crystal', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
   },
   'falls-siren': {
@@ -198,6 +213,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     lootTable: [
       { itemId: 'silver-droplet', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
       { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'thaw-crystal', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
   },
   'briar-wraith': {
@@ -213,7 +229,11 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 16,
     goldReward: 9,
-    lootTable: [{ itemId: 'withered-bramble', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'withered-bramble', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      // briar-thorn-lash inflicts Poison - antidote cures it.
+      { itemId: 'antidote', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'cemetery-shade': {
     id: 'cemetery-shade',
@@ -228,7 +248,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 24,
     goldReward: 14,
-    lootTable: [{ itemId: 'withered-bramble', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'withered-bramble', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'antidote', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'coalbound-warden': {
     id: 'coalbound-warden',
@@ -244,7 +267,12 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 150,
     goldReward: 80,
-    lootTable: [{ itemId: 'wardens-ember-heart', chance: 1, minQuantity: 1, maxQuantity: 1 }],
+    lootTable: [
+      { itemId: 'wardens-ember-heart', chance: 1, minQuantity: 1, maxQuantity: 1 },
+      // warden-warden-wrath inflicts Burn - a modest chance at a burn-salve alongside the
+      // guaranteed trophy.
+      { itemId: 'burn-salve', chance: 0.25, minQuantity: 1, maxQuantity: 2 },
+    ],
   },
 };
 

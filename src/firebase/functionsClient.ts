@@ -1,5 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
-import type { EnemyTier, PlayerSave, TradeStatus } from '@/types';
+import type { ActiveAilment, EnemyTier, PlayerSave, TradeStatus } from '@/types';
 import { functions } from './firebaseConfig';
 
 export async function callCreateCharacter(name: string): Promise<PlayerSave> {
@@ -26,6 +26,7 @@ export interface StartEncounterResponse {
   playerMaxHp: number;
   playerSpirit: number;
   playerMaxSpirit: number;
+  playerAilments: ActiveAilment[];
 }
 
 export async function callStartEncounter(locationId: string, bossId?: string): Promise<StartEncounterResponse> {
@@ -134,6 +135,9 @@ export interface ResolveCombatActionResponse {
   hits: CombatHitResult[];
   /** Every enemy attack that landed on the player this round, one entry per attacking enemy. */
   enemyHits: EnemyHitResult[];
+  /** The player's ailments after this round - empty on any terminal phase (victory/defeat/fled),
+   *  since ailments never carry past the end of combat. See shared-types' ActiveAilment. */
+  playerAilments: ActiveAilment[];
 }
 
 export async function callResolveCombatAction(

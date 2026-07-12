@@ -19,6 +19,7 @@ export const ENEMIES: Enemy[] = [
     lootTable: [
       { itemId: 'moth-dust', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       { itemId: 'healing-poultice', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'eye-drops', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
     loreBlurb:
       'Pale, moon-winged shapes said to be kin to older, half-remembered legends of the ridge.',
@@ -40,6 +41,7 @@ export const ENEMIES: Enemy[] = [
     lootTable: [
       { itemId: 'moth-dust', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
       { itemId: 'healing-poultice', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'eye-drops', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
     loreBlurb: 'An elder Mothling, wingscales glowing faintly even in daylight.',
   },
@@ -94,6 +96,7 @@ export const ENEMIES: Enemy[] = [
     lootTable: [
       { itemId: 'ember-shard', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       { itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'burn-salve', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
     loreBlurb: 'A smoldering ember given shape by grief and old coal-dust.',
   },
@@ -114,6 +117,7 @@ export const ENEMIES: Enemy[] = [
     lootTable: [
       { itemId: 'ember-shard', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
       { itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'burn-salve', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
     loreBlurb: 'Where a Coal Spirit lingers too long unchecked, it hardens into something angrier.',
   },
@@ -131,7 +135,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 13,
     goldReward: 7,
-    lootTable: [{ itemId: 'wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'echo-herb', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'A lean, sure-footed wolf that hunts the high passes of Raven Ridge.',
   },
   {
@@ -148,7 +155,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 21,
     goldReward: 12,
-    lootTable: [{ itemId: 'wolf-fang', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'wolf-fang', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'echo-herb', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'A hawk large enough to carry off more than field mice, and known to.',
   },
   {
@@ -168,6 +178,7 @@ export const ENEMIES: Enemy[] = [
     lootTable: [
       { itemId: 'silver-droplet', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'thaw-crystal', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
     loreBlurb: 'A shape of mist and spray that gathers in the still pools below Whisper Falls.',
   },
@@ -188,6 +199,7 @@ export const ENEMIES: Enemy[] = [
     lootTable: [
       { itemId: 'silver-droplet', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
       { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'thaw-crystal', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
     loreBlurb: 'Its voice carries under the roar of the falls, and travelers who follow it rarely explain why.',
   },
@@ -205,7 +217,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 16,
     goldReward: 9,
-    lootTable: [{ itemId: 'withered-bramble', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'withered-bramble', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'antidote', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'A shape half-glimpsed among the thornwood of Black Briar Forest, never quite still.',
   },
   {
@@ -222,7 +237,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 24,
     goldReward: 14,
-    lootTable: [{ itemId: 'withered-bramble', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+    lootTable: [
+      { itemId: 'withered-bramble', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'antidote', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'It lingers near the Forgotten Cemetery, tending graves no living hand remembers.',
   },
   {
@@ -240,7 +258,10 @@ export const ENEMIES: Enemy[] = [
     ],
     xpReward: 150,
     goldReward: 80,
-    lootTable: [{ itemId: 'wardens-ember-heart', chance: 1, minQuantity: 1, maxQuantity: 1 }],
+    lootTable: [
+      { itemId: 'wardens-ember-heart', chance: 1, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'burn-salve', chance: 0.25, minQuantity: 1, maxQuantity: 2 },
+    ],
     loreBlurb:
       'Bound to Hollow Rail Mine by grief and buried fire, the Warden guards a collapse it still believes it can undo.',
   },

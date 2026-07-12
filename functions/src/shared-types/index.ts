@@ -141,6 +141,19 @@ export interface CombatEnemyState {
   maxHp: number;
 }
 
+/** One ailment currently afflicting the player mid-battle - see functions/src/data/ailments.ts
+ *  for what each ailmentId actually does. Ailments only ever apply to the player in this system
+ *  (enemies inflict them, nothing currently inflicts them on enemies) and live only on
+ *  CombatSession, never PlayerSave - "all active ailments are automatically removed when combat
+ *  ends" falls out for free from that, since nothing ever reads or writes this once the session
+ *  is resolved. */
+export interface ActiveAilment {
+  ailmentId: string;
+  /** Turns remaining before this auto-expires (see AilmentDefinition.autoExpireAfterTurns) -
+   *  undefined for a "until cured or battle ends" ailment. */
+  turnsRemaining?: number;
+}
+
 export interface CombatSession {
   sessionId: string;
   uid: string;
@@ -153,6 +166,7 @@ export interface CombatSession {
   status: CombatSessionStatus;
   startedAt: number;
   expiresAt: number;
+  playerAilments: ActiveAilment[];
 }
 
 // --- Social: friend search/requests/blocking/DMs. All server-authoritative - clients only ever

@@ -6,6 +6,7 @@ export * from './journal';
 export * from './npc';
 export * from './skill';
 export * from './enemy';
+export * from './ailment';
 export * from './combat';
 export * from './tilemap';
 export * from './location';

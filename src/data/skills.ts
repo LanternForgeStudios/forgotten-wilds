@@ -22,6 +22,7 @@ export const SKILLS: Skill[] = [
     damageType: 'physical',
     power: 10,
     spiritCost: 0,
+    inflictsAilmentId: 'blind',
   },
   {
     id: 'miner-pickaxe-swing',
@@ -31,6 +32,7 @@ export const SKILLS: Skill[] = [
     damageType: 'physical',
     power: 14,
     spiritCost: 0,
+    inflictsAilmentId: 'stun',
   },
   {
     id: 'coalspirit-cinderburst',
@@ -40,6 +42,7 @@ export const SKILLS: Skill[] = [
     damageType: 'spirit',
     power: 16,
     spiritCost: 0,
+    inflictsAilmentId: 'burn',
   },
   {
     id: 'warden-coal-slam',
@@ -58,6 +61,7 @@ export const SKILLS: Skill[] = [
     damageType: 'spirit',
     power: 30,
     spiritCost: 0,
+    inflictsAilmentId: 'burn',
   },
   {
     id: 'ridge-ambush',
@@ -67,6 +71,7 @@ export const SKILLS: Skill[] = [
     damageType: 'physical',
     power: 12,
     spiritCost: 0,
+    inflictsAilmentId: 'silence',
   },
   {
     id: 'wisp-chill',
@@ -76,6 +81,7 @@ export const SKILLS: Skill[] = [
     damageType: 'spirit',
     power: 14,
     spiritCost: 0,
+    inflictsAilmentId: 'freeze',
   },
   {
     id: 'briar-thorn-lash',
@@ -85,5 +91,6 @@ export const SKILLS: Skill[] = [
     damageType: 'physical',
     power: 13,
     spiritCost: 0,
+    inflictsAilmentId: 'poison',
   },
 ];

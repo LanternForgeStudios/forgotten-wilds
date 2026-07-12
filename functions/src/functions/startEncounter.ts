@@ -88,6 +88,9 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
             playerMaxHp: save.player.stats.maxHp,
             playerSpirit: save.player.stats.spirit,
             playerMaxSpirit: save.player.stats.maxSpirit,
+            // Backfill for sessions created before playerAilments existed - see the itemsDiscovered
+            // precedent for this lazy-migration pattern.
+            playerAilments: existing.playerAilments ?? [],
           };
         }
         // Anything else with an existing 'active' session is an abandoned fight (the player closed
@@ -134,6 +137,7 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
       status: 'active',
       startedAt: now,
       expiresAt: now + 30 * 60 * 1000,
+      playerAilments: [],
     };
     tx.set(sessionRef, session);
 
@@ -153,6 +157,7 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
       playerMaxHp: save.player.stats.maxHp,
       playerSpirit: save.player.stats.spirit,
       playerMaxSpirit: save.player.stats.maxSpirit,
+      playerAilments: session.playerAilments,
     };
   });
 });

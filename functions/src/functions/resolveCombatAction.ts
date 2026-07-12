@@ -16,6 +16,7 @@ import { ITEMS } from '../data/items';
 import { SKILLS } from '../data/skills';
 import { EQUIPMENT } from '../data/equipment';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
+import { AILMENTS } from '../data/ailments';
 import type { CombatAction, CombatSession, PlayerSave } from '../shared-types';
 
 interface ResolveCombatActionRequest {
@@ -58,6 +59,26 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       throw new HttpsError('internal', 'Unknown enemy in this session.');
     }
 
+    // Backfill for sessions created before playerAilments existed - see startEncounter.ts's
+    // matching comment.
+    const playerAilments = session.playerAilments ?? [];
+
+    // Data-driven rather than hardcoding "if silence"/"if freeze" - any current or future ailment
+    // whose effect sets blocksSkill/disablesLanternAbility gates the matching action, keyed off
+    // AILMENTS (see data/ailments.ts) rather than a specific ailment id.
+    if (action.type === 'skill') {
+      const blocker = playerAilments.find((a) => AILMENTS[a.ailmentId]?.effect.blocksSkill);
+      if (blocker) {
+        throw new HttpsError('failed-precondition', `You are ${AILMENTS[blocker.ailmentId].name} and cannot use Specialty Attacks.`);
+      }
+    }
+    if (action.type === 'lanternAbility') {
+      const blocker = playerAilments.find((a) => AILMENTS[a.ailmentId]?.effect.disablesLanternAbility);
+      if (blocker) {
+        throw new HttpsError('failed-precondition', `You are ${AILMENTS[blocker.ailmentId].name} and cannot use the Lantern specialty.`);
+      }
+    }
+
     const itemIds = action.itemIds ?? [];
     if (itemIds.length > 3) {
       throw new HttpsError('invalid-argument', 'You can use at most 3 items per turn.');
@@ -75,7 +96,8 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         !!effect &&
         ((!!effect.healHpPercent && save.player.stats.hp < save.player.stats.maxHp) ||
           (!!effect.healSpiritPercent && save.player.stats.spirit < save.player.stats.maxSpirit) ||
-          (!!effect.restoreOilPercent && save.player.stats.lanternOil < save.player.stats.maxLanternOil));
+          (!!effect.restoreOilPercent && save.player.stats.lanternOil < save.player.stats.maxLanternOil) ||
+          (!!effect.cureAilmentId && playerAilments.some((a) => a.ailmentId === effect.cureAilmentId)));
       if (!wouldHaveEffect) {
         throw new HttpsError('failed-precondition', 'That would have no effect right now.');
       }
@@ -108,6 +130,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       playerStats: save.player.stats,
       inventory: save.inventory,
       enemies: session.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
+      playerAilments,
     });
 
     save.player.stats.hp = result.playerHp;
@@ -198,9 +221,11 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
 
     const updatedEnemies = session.enemies.map((e, i) => ({ ...e, hp: result.enemyHp[i] }));
     if (result.phase === 'continue') {
-      tx.update(sessionRef, { enemies: updatedEnemies, round: session.round + 1 });
+      tx.update(sessionRef, { enemies: updatedEnemies, round: session.round + 1, playerAilments: result.playerAilments });
     } else {
-      tx.update(sessionRef, { enemies: updatedEnemies, status: 'resolved' });
+      // All active ailments are dropped once combat ends (see ActiveAilment's doc comment) -
+      // nothing carries over to exploration, regardless of what result.playerAilments says.
+      tx.update(sessionRef, { enemies: updatedEnemies, status: 'resolved', playerAilments: [] });
     }
 
     return {
@@ -220,6 +245,8 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       playerLevel: save.player.level,
       playerGold: save.player.gold,
       currentLocationId: save.player.currentLocationId,
+      // Empty on any terminal phase (victory/defeat/fled) - see the tx.update branch above.
+      playerAilments: result.phase === 'continue' ? result.playerAilments : [],
     };
   });
 });

@@ -1,4 +1,5 @@
 export * from './skills';
+export * from './ailments';
 export * from './lanternAbilities';
 export * from './enemies';
 export * from './items';

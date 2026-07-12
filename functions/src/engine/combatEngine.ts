@@ -1,9 +1,10 @@
 import { BOSS_REGION_LOCATIONS, ENCOUNTER_TABLES, ENEMIES, type EnemyDefinition } from '../data/enemies';
-import { SKILLS } from '../data/skills';
+import { SKILLS, type DamageType } from '../data/skills';
 import { ITEMS } from '../data/items';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
+import { AILMENTS } from '../data/ailments';
 import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
-import type { CombatAction, Stats } from '../shared-types';
+import type { CombatAction, Stats, ActiveAilment } from '../shared-types';
 
 /** Picks one item from `items`, proportional to `weightOf(item)` - shared by every "roll a random
  *  entry weighted toward some more than others" spot in this file (enemy encounter tables, boss
@@ -95,10 +96,10 @@ export const MIN_ENEMY_LEVEL = 1;
 // stats kept climbing without bound).
 export const MAX_ENEMY_LEVEL = 50;
 
-/** Per-enemy-level stat growth, additive like the player's own STAT_GROWTH_PER_LEVEL - 2x the
- *  player's rate for maxHp/defense/speed, because enemy level advances at half the player's rate
+/** Per-enemy-level stat growth, additive like the player's own STAT_GROWTH_PER_LEVEL. defense/
+ *  speed hold to 2x the player's rate, because enemy level advances at half the player's rate
  *  (baseLevel below), so over the full 1-100 player range that's 99 player level-ups against only
- *  49 enemy level-ups, a ratio of ~2.02 that this constant reproduces cleanly. Replaces the old
+ *  49 enemy level-ups, a ratio of ~2.02 that a flat 2x reproduces cleanly. Replaces the old
  *  multiplicative `levelMultiplier` (1 + (level-1)*0.15), which topped out at a shallow 1.6x at
  *  the old level-5 cap - far too weak to keep pace with a player whose own stats grow additively
  *  to level 100.
@@ -108,8 +109,15 @@ export const MAX_ENEMY_LEVEL = 50;
  *  O(N^2)-ish compounding effect a fair 1-on-1 rate doesn't account for - verified numerically
  *  that even a "fair" 1-on-1 fight already consumed 68-96% of the player's max HP to solo-kill one
  *  enemy at high levels, leaving no headroom for a group fight's extra rounds. See
- *  CROWD_DAMAGE_FACTOR below for the other half of this fix (the actual N-attackers mechanism). */
-const ENEMY_STAT_GROWTH_PER_LEVEL = { maxHp: 16, attack: 3, defense: 2, speed: 2 };
+ *  CROWD_DAMAGE_FACTOR below for the other half of this fix (the actual N-attackers mechanism).
+ *
+ *  `maxHp` breaks the 2x pattern too, in the other direction (5, well under the player's own rate
+ *  of 8) - playtest-driven: at the original 2x-parity value (16), a solo non-boss fight climbed
+ *  from 3 rounds at level 1 to 13 rounds at level 100, well past the ~4.2-round target for a
+ *  normal encounter. Verified by hand (see git history) this keeps a solo fight in the 3-5 round
+ *  band across the whole level range while leaving attack/defense/speed - and therefore per-hit
+ *  damage and crowd-fight danger - untouched. */
+const ENEMY_STAT_GROWTH_PER_LEVEL = { maxHp: 5, attack: 3, defense: 2, speed: 2 };
 
 /** Bosses grow 3x as fast per level as regular/elite enemies. Applying the same rate to both
  *  (verified numerically) collapses a boss's authored stat lead (e.g. the Coalbound Warden's
@@ -192,6 +200,9 @@ export interface RoundInput {
   /** Fixed-order roster for this fight - `action.targetIndex` refers to positions in this array.
    *  Already-defeated entries (hp <= 0) are simply skipped for turn order and targeting. */
   enemies: RoundEnemyInput[];
+  /** Ailments the player is entering this round with - see shared-types' ActiveAilment. Whatever
+   *  this round inflicts/cures/expires is reflected in RoundResult.playerAilments, not here. */
+  playerAilments: ActiveAilment[];
 }
 
 export type RoundOutcomePhase = 'continue' | 'victory' | 'defeat' | 'fled';
@@ -240,6 +251,10 @@ export interface RoundResult {
    *  to the sum of enemyHits[].damage; kept as its own field since most callers only need the
    *  aggregate. */
   damageTakenByPlayer: number;
+  /** The player's ailments after this round's infliction rolls, cure-item use, and auto-expiry
+   *  have all been applied - the caller (resolveCombatAction.ts) persists this verbatim onto
+   *  CombatSession.playerAilments. */
+  playerAilments: ActiveAilment[];
 }
 
 /** Groups a (possibly duplicate-laden) list of item ids into counts per id, capped at 3 total uses
@@ -325,6 +340,50 @@ export function resolveRound(input: RoundInput): RoundResult {
   const aliveIndices = () => enemyHp.map((_, i) => i).filter(isAlive);
   const aliveNonBossCount = () => aliveIndices().filter((i) => enemyDefs[i].tier !== 'boss').length;
 
+  // Ailments only ever apply to the player (see shared-types' ActiveAilment doc comment) - copied
+  // rather than mutated in place so a caller that reuses `input` after calling resolveRound never
+  // sees a half-mutated array. `inflictedThisRound` tracks ids inflicted during this same round so
+  // the end-of-round expiry step (below) doesn't immediately decrement a fresh Stun to 0 before it
+  // ever gets the chance to actually skip a turn.
+  const ailments: ActiveAilment[] = input.playerAilments.map((a) => ({ ...a }));
+  const inflictedThisRound = new Set<string>();
+  const playerStunned = ailments.some((a) => a.ailmentId === 'stun');
+
+  function inflictAilment(ailmentId: string) {
+    const def = AILMENTS[ailmentId];
+    if (!def) return;
+    const existingIndex = ailments.findIndex((a) => a.ailmentId === ailmentId);
+    const entry: ActiveAilment = { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
+    if (existingIndex >= 0) ailments[existingIndex] = entry;
+    else ailments.push(entry);
+    inflictedThisRound.add(ailmentId);
+    log.push(`You are afflicted with ${def.name}!`);
+  }
+
+  /** Applied once, right as the player's own turn resolves (whichever branch that turns out to
+   *  be - a normal action, a stunned no-op, or a flee attempt) - matches AilmentEffect's "dealt at
+   *  the end of the afflicted character's own turn" contract for Poison/Burn/Freeze. */
+  function applyAilmentTickDamage() {
+    for (const active of ailments) {
+      if (playerHp <= 0) break;
+      const def = AILMENTS[active.ailmentId];
+      if (!def?.effect.damagePercentPerTurn) continue;
+      const dmg = Math.max(1, Math.round(input.playerStats.maxHp * def.effect.damagePercentPerTurn));
+      playerHp = Math.max(0, playerHp - dmg);
+      log.push(`${def.name} deals ${dmg} damage to you.`);
+    }
+  }
+
+  // Burn's attackMultiplier is the only ailment effect that touches outgoing damage - multiple
+  // stacked ailments with an attackMultiplier (none currently) would compound multiplicatively.
+  const playerAttackMultiplier = ailments.reduce(
+    (mult, a) => mult * (AILMENTS[a.ailmentId]?.effect.attackMultiplier ?? 1),
+    1,
+  );
+  const blindMissChance = ailments.some((a) => a.ailmentId === 'blind')
+    ? 1 - (AILMENTS.blind.effect.physicalAccuracyMultiplier ?? 1)
+    : 0;
+
   function damageEnemy(i: number, dmg: number, verb: string): boolean {
     const before = enemyHp[i];
     enemyHp[i] = Math.max(0, before - dmg);
@@ -362,6 +421,12 @@ export function resolveRound(input: RoundInput): RoundResult {
     }.`;
     enemyHits.push({ attackerIndex: i, damage: dmg, missed: false, wasDefended: playerDefending, logLine: attackLogLine });
     log.push(attackLogLine);
+
+    // Only rolled once the attack itself has already landed (see Skill.inflictAilmentChance's doc
+    // comment) - a missed attack (the branch above, which returns early) never reaches here.
+    if (skill.inflictsAilmentId && Math.random() < (skill.inflictAilmentChance ?? 0)) {
+      inflictAilment(skill.inflictsAilmentId);
+    }
   }
 
   function resolveTargetIndex(): number | undefined {
@@ -375,20 +440,34 @@ export function resolveRound(input: RoundInput): RoundResult {
   /** Shared by attack/skill/offensive-lanternAbility: hits either the resolved single target, or
    *  every living enemy when `action.targetAll` is set and more than one is alive (each rolled and
    *  scaled independently - own defense, own variance, own miss chance). Falls back to normal
-   *  single-target behavior (no reduction, no miss) once only one enemy remains. */
-  function resolveOffensiveHits(power: number, verb: string, bonusMultiplier: (enemyIdx: number) => number = () => 1) {
+   *  single-target behavior (no reduction, no miss) once only one enemy remains.
+   *
+   *  `damageType` defaults to 'physical' (plain Attack has no explicit Skill entry to read it
+   *  from) - Blind's accuracy penalty only ever applies when it's 'physical', per its "reduced
+   *  physical-attack accuracy" spec. A lanternAbility call site passes 'spirit' since a
+   *  lantern-channeled attack isn't a hand-swung physical strike. */
+  function resolveOffensiveHits(
+    power: number,
+    verb: string,
+    bonusMultiplier: (enemyIdx: number) => number = () => 1,
+    damageType: DamageType = 'physical',
+  ) {
     const alive = aliveIndices();
     const useAll = !!action.targetAll && alive.length > 1;
     const targets = useAll ? alive : [resolveTargetIndex()].filter((i): i is number => i !== undefined);
+    const blindApplies = damageType === 'physical' && blindMissChance > 0;
 
     for (const i of targets) {
-      const missed = useAll && Math.random() < TARGET_ALL_MISS_CHANCE;
-      if (missed) {
-        log.push(`Your attack on ${enemyDefs[i].name} goes wide - miss!`);
+      const missedTargetAll = useAll && Math.random() < TARGET_ALL_MISS_CHANCE;
+      const missedBlind = blindApplies && Math.random() < blindMissChance;
+      if (missedTargetAll || missedBlind) {
+        log.push(`Your attack on ${enemyDefs[i].name} goes wide - miss!${missedBlind ? ' (Blind)' : ''}`);
         hits.push({ targetIndex: i, damage: 0, missed: true, defeated: false });
         continue;
       }
-      let dmg = Math.round(computeDamage(power, input.playerStats.attack, enemyStats[i].defense) * bonusMultiplier(i));
+      let dmg = Math.round(
+        computeDamage(power, input.playerStats.attack * playerAttackMultiplier, enemyStats[i].defense) * bonusMultiplier(i),
+      );
       if (useAll) dmg = Math.max(1, Math.round(dmg * TARGET_ALL_DAMAGE_FACTOR));
       const defeated = damageEnemy(i, dmg, verb);
       hits.push({ targetIndex: i, damage: dmg, missed: false, defeated });
@@ -400,6 +479,20 @@ export function resolveRound(input: RoundInput): RoundResult {
       const def = ITEMS[itemId];
       if (!def?.effect) continue;
       for (let n = 0; n < count; n++) itemConsumedIds.push(itemId);
+
+      // Cure items only ever clear one ailment and do nothing else - a repeat use once the
+      // ailment is already gone (e.g. 2x Antidote queued for a single Poison) is simply a no-op
+      // for the second one, not an error (resolveCombatAction.ts's wouldHaveEffect check is what
+      // stops this from being requested in the first place).
+      if (def.effect.cureAilmentId) {
+        const cureId = def.effect.cureAilmentId;
+        const idx = ailments.findIndex((a) => a.ailmentId === cureId);
+        if (idx >= 0) {
+          const curedName = AILMENTS[cureId]?.name ?? cureId;
+          ailments.splice(idx, 1);
+          log.push(`You use ${itemId.replace(/-/g, ' ')} and cure ${curedName}.`);
+        }
+      }
 
       let healHpTotal = 0;
       let healSpiritTotal = 0;
@@ -441,7 +534,7 @@ export function resolveRound(input: RoundInput): RoundResult {
       case 'skill': {
         const skill = SKILLS[action.skillId ?? 'keepers-strike'];
         playerSpirit = Math.max(0, playerSpirit - skill.spiritCost);
-        resolveOffensiveHits(skill.power, "Keeper's Strike hits");
+        resolveOffensiveHits(skill.power, "Keeper's Strike hits", undefined, skill.damageType);
         break;
       }
       case 'lanternAbility': {
@@ -453,6 +546,7 @@ export function resolveRound(input: RoundInput): RoundResult {
             ability.power ?? 0,
             `${ability.name} sears`,
             (i) => (ability.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1),
+            'spirit',
           );
         } else if (ability.category === 'healing') {
           const healed = Math.min(input.playerStats.maxHp - playerHp, ability.healHp ?? 0);
@@ -473,48 +567,81 @@ export function resolveRound(input: RoundInput): RoundResult {
     }
   }
 
-  // Items never cost a turn or trigger an extra enemy attack - they're consumed once, up front,
-  // regardless of what the primary action (attack/skill/lanternAbility/defend/flee/item) turns
-  // out to be.
-  consumeItems(action.itemIds ?? []);
-
-  if (action.type === 'flee') {
-    const alive = aliveIndices();
-    const avgSpeed = alive.length ? alive.reduce((sum, i) => sum + enemyStats[i].speed, 0) / alive.length : 0;
-    const fleeChance = Math.min(0.9, Math.max(0.1, 0.3 + (input.playerStats.speed - avgSpeed) * 0.05));
-    if (Math.random() < fleeChance) {
-      log.push('You break away and flee the fight.');
-      return {
-        log,
-        playerHp,
-        playerSpirit,
-        playerLanternOil,
-        enemyHp,
-        phase: 'fled',
-        itemConsumedIds,
-        hits,
-        enemyHits,
-        damageTakenByPlayer,
-      };
-    }
-    log.push('You try to flee, but there is no opening! Every foe still standing gets a free hit.');
-    for (const i of alive) enemyAttack(i);
-  } else {
-    type Turn = { kind: 'player'; speed: number } | { kind: 'enemy'; index: number; speed: number };
-    const alive = aliveIndices();
-    const turns: Turn[] = [
-      { kind: 'player', speed: input.playerStats.speed },
-      ...alive.map((i): Turn => ({ kind: 'enemy', index: i, speed: enemyStats[i].speed })),
-    ];
-    // Stable sort keeps the player (listed first) ahead of any enemy at the same speed.
-    turns.sort((a, b) => b.speed - a.speed);
-
-    for (const turn of turns) {
+  /** Attacks every still-living enemy in the given indices, speed-sorted - the enemies' half of a
+   *  round where the player's own turn was replaced by a Stun no-op (see below), factored out
+   *  from the normal turn-order loop since Stun bypasses the player entirely rather than taking a
+   *  (do-nothing) slot within it. */
+  function attackAllInSpeedOrder(indices: number[]) {
+    const sorted = [...indices].sort((a, b) => enemyStats[b].speed - enemyStats[a].speed);
+    for (const i of sorted) {
       if (playerHp <= 0) break;
-      if (turn.kind === 'player') playerTurn();
-      else if (isAlive(turn.index)) enemyAttack(turn.index);
+      if (isAlive(i)) enemyAttack(i);
     }
   }
+
+  if (playerStunned) {
+    // Stun skips the entire turn - action, items, everything (see AilmentEffect.skipsTurn) - so
+    // consumeItems() is deliberately never called on this branch.
+    log.push('You are stunned and cannot act!');
+    applyAilmentTickDamage();
+    attackAllInSpeedOrder(aliveIndices());
+  } else {
+    // Items never cost a turn or trigger an extra enemy attack - they're consumed once, up front,
+    // regardless of what the primary action (attack/skill/lanternAbility/defend/flee/item) turns
+    // out to be.
+    consumeItems(action.itemIds ?? []);
+
+    if (action.type === 'flee') {
+      const alive = aliveIndices();
+      const avgSpeed = alive.length ? alive.reduce((sum, i) => sum + enemyStats[i].speed, 0) / alive.length : 0;
+      const fleeChance = Math.min(0.9, Math.max(0.1, 0.3 + (input.playerStats.speed - avgSpeed) * 0.05));
+      if (Math.random() < fleeChance) {
+        log.push('You break away and flee the fight.');
+        return {
+          log,
+          playerHp,
+          playerSpirit,
+          playerLanternOil,
+          enemyHp,
+          phase: 'fled',
+          itemConsumedIds,
+          hits,
+          enemyHits,
+          damageTakenByPlayer,
+          playerAilments: ailments,
+        };
+      }
+      log.push('You try to flee, but there is no opening! Every foe still standing gets a free hit.');
+      applyAilmentTickDamage();
+      for (const i of alive) enemyAttack(i);
+    } else {
+      type Turn = { kind: 'player'; speed: number } | { kind: 'enemy'; index: number; speed: number };
+      const alive = aliveIndices();
+      const turns: Turn[] = [
+        { kind: 'player', speed: input.playerStats.speed },
+        ...alive.map((i): Turn => ({ kind: 'enemy', index: i, speed: enemyStats[i].speed })),
+      ];
+      // Stable sort keeps the player (listed first) ahead of any enemy at the same speed.
+      turns.sort((a, b) => b.speed - a.speed);
+
+      for (const turn of turns) {
+        if (playerHp <= 0) break;
+        if (turn.kind === 'player') {
+          playerTurn();
+          applyAilmentTickDamage();
+        } else if (isAlive(turn.index)) enemyAttack(turn.index);
+      }
+    }
+  }
+
+  // End-of-round ailment expiry - anything inflicted THIS round is left untouched (see
+  // inflictedThisRound's doc comment above) so a fresh Stun actually blocks the player's next
+  // turn instead of expiring before it ever takes effect.
+  const remainingAilments = ailments
+    .map((a) =>
+      a.turnsRemaining === undefined || inflictedThisRound.has(a.ailmentId) ? a : { ...a, turnsRemaining: a.turnsRemaining - 1 },
+    )
+    .filter((a) => a.turnsRemaining === undefined || a.turnsRemaining > 0);
 
   const allDefeated = enemyHp.every((hp) => hp <= 0);
   let phase: RoundOutcomePhase = 'continue';
@@ -532,6 +659,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     hits,
     enemyHits,
     damageTakenByPlayer,
+    playerAilments: remainingAilments,
   };
 }
 

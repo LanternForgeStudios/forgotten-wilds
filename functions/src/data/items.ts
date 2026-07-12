@@ -16,6 +16,10 @@ export interface ItemEffect {
    *  flat amount so the same item stays useful whether the player is on the 30-oil starter lantern
    *  or a higher-capacity one found later. */
   restoreOilPercent?: number;
+  /** Immediately removes this ailment (see ailments.ts) if the player currently has it - a cure
+   *  item with no other effect (a dedicated Antidote/Burn Salve/etc.), not something layered onto
+   *  an existing healing potion. */
+  cureAilmentId?: string;
 }
 
 export interface ItemDefinition {
@@ -60,6 +64,14 @@ export const ITEMS: Record<string, ItemDefinition> = {
     effect: { restoreOilPercent: 0.5 },
     tier: 'uncommon',
   },
+  // Ailment cure items - each does nothing but clear its one matching ailment (see
+  // useItem.ts/resolveCombatAction.ts's wouldHaveEffect check, which requires the player to
+  // actually have that ailment before letting the item be used).
+  antidote: { id: 'antidote', category: 'consumable', usableInCombat: true, effect: { cureAilmentId: 'poison' }, tier: 'common' },
+  'burn-salve': { id: 'burn-salve', category: 'consumable', usableInCombat: true, effect: { cureAilmentId: 'burn' }, tier: 'common' },
+  'thaw-crystal': { id: 'thaw-crystal', category: 'consumable', usableInCombat: true, effect: { cureAilmentId: 'freeze' }, tier: 'common' },
+  'eye-drops': { id: 'eye-drops', category: 'consumable', usableInCombat: true, effect: { cureAilmentId: 'blind' }, tier: 'common' },
+  'echo-herb': { id: 'echo-herb', category: 'consumable', usableInCombat: true, effect: { cureAilmentId: 'silence' }, tier: 'common' },
   'moth-dust': { id: 'moth-dust', category: 'materials', usableInCombat: false, tier: 'common' },
   'rusted-token': { id: 'rusted-token', category: 'materials', usableInCombat: false, tier: 'common' },
   'ember-shard': { id: 'ember-shard', category: 'materials', usableInCombat: false, tier: 'uncommon' },
@@ -97,6 +109,13 @@ export const SHOP_PRICES: Record<string, number> = {
   'greater-healing-poultice': 45,
   'spirit-draught': 18,
   'lantern-oil': 20,
+  // Priced a little below healing-poultice - common, and only ever useful when the matching
+  // ailment is actually active, so they shouldn't cost as much as a potion with guaranteed value.
+  antidote: 12,
+  'burn-salve': 12,
+  'thaw-crystal': 12,
+  'eye-drops': 12,
+  'echo-herb': 12,
   // A spare standard-issue lantern - cheap safety net for anyone who unequips their only one.
   'keepers-lantern': 8,
   // Common-tier equipment only, per the canonical rarity progression (Common: "merchants, enemy
@@ -114,10 +133,20 @@ export const SHOP_PRICES: Record<string, number> = {
 // belongs to the given shopId, not just that it exists somewhere in SHOP_PRICES. Keep in sync by
 // hand with src/data/items.ts's SHOP_CATALOGS (display copy).
 export const SHOP_CATALOGS: Record<string, string[]> = {
-  'mara-ash-general-store': ['keepers-lantern'],
+  'mara-ash-general-store': ['keepers-lantern', 'antidote', 'eye-drops'],
   'ash-hallow-blacksmith-forge': ['weathered-walking-staff', 'river-stone-charm'],
   'ash-hallow-armory': ['worn-keeper-coat', 'traveler-boots', 'work-gloves'],
-  apothecary: ['healing-poultice', 'greater-healing-poultice', 'spirit-draught', 'lantern-oil'],
+  apothecary: [
+    'healing-poultice',
+    'greater-healing-poultice',
+    'spirit-draught',
+    'lantern-oil',
+    'antidote',
+    'burn-salve',
+    'thaw-crystal',
+    'eye-drops',
+    'echo-herb',
+  ],
 };
 
 export const INN_REST_COST = 10;

@@ -10,6 +10,13 @@ export interface Skill {
   power: number;
   spiritCost: number;
   effectiveAgainstFamilies?: string[];
+  /** Ailment id (see data/ailments.ts) this move has a chance to inflict on the player when an
+   *  enemy uses it - only meaningful on an enemy's own signature move, never the player's own
+   *  attack/skill/lanternAbility (nothing currently inflicts an ailment on an enemy). */
+  inflictsAilmentId?: string;
+  /** Rolled independently of the attack's own hit/miss - a missed attack never rolls this at all
+   *  (see enemyAttack in combatEngine.ts), so this is the chance *given* the hit already landed. */
+  inflictAilmentChance?: number;
 }
 
 export const SKILLS: Record<string, Skill> = {
@@ -19,14 +26,39 @@ export const SKILLS: Record<string, Skill> = {
   'keepers-strike': { id: 'keepers-strike', kind: 'skill', damageType: 'physical', power: 18, spiritCost: 10 },
   // Lantern Flame moved to data/lanternAbilities.ts - it's tied to whichever lantern is equipped
   // (fueled by Lantern Oil), not a generally-learned skill like the ones in this file.
-  'mothling-dustwing': { id: 'mothling-dustwing', kind: 'skill', damageType: 'physical', power: 10, spiritCost: 0 },
-  'miner-pickaxe-swing': { id: 'miner-pickaxe-swing', kind: 'skill', damageType: 'physical', power: 14, spiritCost: 0 },
+  //
+  // Every enemy family's signature move below carries a themed chance to inflict an ailment -
+  // dust kicked up by a Mothling's wings blinds, a Restless Miner's pickaxe swing stuns, a Coal
+  // Spirit's ember burst burns, a Ridge predator's ambush unsettles focus (silence), a Water
+  // Spirit's chill freezes, and Briar Spirits' thorns poison. See ENEMIES' moves arrays -
+  // regular/elite pairs within a family share the same signature move (just at different
+  // weight), so tagging it once here covers both tiers.
+  'mothling-dustwing': {
+    id: 'mothling-dustwing',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 10,
+    spiritCost: 0,
+    inflictsAilmentId: 'blind',
+    inflictAilmentChance: 0.3,
+  },
+  'miner-pickaxe-swing': {
+    id: 'miner-pickaxe-swing',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 14,
+    spiritCost: 0,
+    inflictsAilmentId: 'stun',
+    inflictAilmentChance: 0.2,
+  },
   'coalspirit-cinderburst': {
     id: 'coalspirit-cinderburst',
     kind: 'spiritArt',
     damageType: 'spirit',
     power: 16,
     spiritCost: 0,
+    inflictsAilmentId: 'burn',
+    inflictAilmentChance: 0.3,
   },
   'warden-coal-slam': { id: 'warden-coal-slam', kind: 'skill', damageType: 'physical', power: 20, spiritCost: 0 },
   'warden-warden-wrath': {
@@ -35,8 +67,34 @@ export const SKILLS: Record<string, Skill> = {
     damageType: 'spirit',
     power: 30,
     spiritCost: 0,
+    inflictsAilmentId: 'burn',
+    inflictAilmentChance: 0.4,
   },
-  'ridge-ambush': { id: 'ridge-ambush', kind: 'skill', damageType: 'physical', power: 12, spiritCost: 0 },
-  'wisp-chill': { id: 'wisp-chill', kind: 'spiritArt', damageType: 'spirit', power: 14, spiritCost: 0 },
-  'briar-thorn-lash': { id: 'briar-thorn-lash', kind: 'skill', damageType: 'physical', power: 13, spiritCost: 0 },
+  'ridge-ambush': {
+    id: 'ridge-ambush',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 12,
+    spiritCost: 0,
+    inflictsAilmentId: 'silence',
+    inflictAilmentChance: 0.3,
+  },
+  'wisp-chill': {
+    id: 'wisp-chill',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 14,
+    spiritCost: 0,
+    inflictsAilmentId: 'freeze',
+    inflictAilmentChance: 0.3,
+  },
+  'briar-thorn-lash': {
+    id: 'briar-thorn-lash',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 13,
+    spiritCost: 0,
+    inflictsAilmentId: 'poison',
+    inflictAilmentChance: 0.3,
+  },
 };

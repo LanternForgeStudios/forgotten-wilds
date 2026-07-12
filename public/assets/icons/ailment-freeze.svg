@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="40%" r="65%">
+      <stop offset="0" stop-color="#bdeeff"/>
+      <stop offset="1" stop-color="#274c6e"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#g)" stroke="#122a3a" stroke-width="2"/>
+  <text x="50%" y="55%" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#0c2436" text-anchor="middle" dominant-baseline="middle">FRZ</text>
+</svg>
