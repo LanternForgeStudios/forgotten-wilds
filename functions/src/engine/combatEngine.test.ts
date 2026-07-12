@@ -1278,7 +1278,11 @@ describe('resolveRound - ailments', () => {
       playerAilments: [],
       enemies: soloEnemies(),
     });
-    expect(result.playerAilments).toEqual([{ ailmentId: 'blind', turnsRemaining: undefined }]);
+    // toStrictEqual, not toEqual - an ailment with no autoExpireAfterTurns must have its
+    // turnsRemaining key OMITTED entirely, not set to an explicit `undefined`. Firestore's Admin
+    // SDK throws on a literal `undefined` field value, which is exactly the bug this guards
+    // against (tx.update crashed the whole transaction the moment a non-Stun ailment landed).
+    expect(result.playerAilments).toStrictEqual([{ ailmentId: 'blind' }]);
     expect(result.log.some((l) => l.includes('afflicted with Blind'))).toBe(true);
   });
 

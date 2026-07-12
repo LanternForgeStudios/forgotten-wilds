@@ -353,7 +353,12 @@ export function resolveRound(input: RoundInput): RoundResult {
     const def = AILMENTS[ailmentId];
     if (!def) return;
     const existingIndex = ailments.findIndex((a) => a.ailmentId === ailmentId);
-    const entry: ActiveAilment = { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
+    // Omit turnsRemaining entirely rather than setting it to `undefined` - Firestore's Admin SDK
+    // throws on an explicit `undefined` field value (`tx.update`/`tx.set` reject it outright), so
+    // an ailment with no autoExpireAfterTurns (every one except Stun) crashed the whole
+    // transaction the moment it was inflicted, surfacing to the client as a bare "internal" error.
+    const entry: ActiveAilment =
+      def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
     if (existingIndex >= 0) ailments[existingIndex] = entry;
     else ailments.push(entry);
     inflictedThisRound.add(ailmentId);
