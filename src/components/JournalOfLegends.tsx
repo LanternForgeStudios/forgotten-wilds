@@ -12,9 +12,10 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { TIER_LABELS, TIER_COLORS } from '@/utils/tier';
 import { sellPriceFor } from '@/utils/sellPrice';
+import { formatStatBonuses } from '@/utils/statBonuses';
 import { useInventoryStore } from '@/state/useInventoryStore';
-import { AILMENTS, ENEMIES, ITEMS, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
-import type { Enemy, EnemyTier, Item, ItemCategory, Quest, QuestCategory } from '@/types';
+import { AILMENTS, ENEMIES, ITEMS, EQUIPMENT, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
+import type { Enemy, EnemyTier, Item, EquipmentItem, ItemCategory, Quest, QuestCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
 import questStyles from './QuestLog.module.css';
 
@@ -55,10 +56,58 @@ const ITEM_CATEGORY_LABELS: Record<ItemCategory, string> = {
   materials: 'Materials',
 };
 
-function matchesItemQuery(item: Item | undefined, query: string): boolean {
+function matchesItemQuery(item: { name: string; description: string } | undefined, query: string): boolean {
   if (!query) return true;
   if (!item) return false;
   return item.name.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
+}
+
+/** journal.itemsDiscovered holds ids from either the ITEMS or EQUIPMENT table (see grantItem's own
+ *  doc comment in inventoryEngine.ts - equipment is recorded there too so it stays in the Journal
+ *  even after being sold/traded away, unlike the live Equipment tab which only shows current
+ *  holdings) - this resolves either shape into one common display shape the Items tab can render
+ *  and filter uniformly. Every EQUIPMENT-table entry reports as category 'equipment' since
+ *  EquipmentItem has no category field of its own (it has `slot` instead). */
+interface DiscoveredItemEntry {
+  id: string;
+  name: string;
+  description: string;
+  iconAssetId?: string;
+  tier: Item['tier'];
+  category: ItemCategory;
+  unique?: boolean;
+  item?: Item;
+  equipment?: EquipmentItem;
+}
+
+function resolveDiscoveredEntry(id: string): DiscoveredItemEntry | undefined {
+  const item = ITEMS.find((i) => i.id === id);
+  if (item) {
+    return {
+      id,
+      name: item.name,
+      description: item.description,
+      iconAssetId: item.iconAssetId,
+      tier: item.tier,
+      category: item.category,
+      unique: item.unique,
+      item,
+    };
+  }
+  const equipment = EQUIPMENT.find((e) => e.id === id);
+  if (equipment) {
+    return {
+      id,
+      name: equipment.name,
+      description: equipment.description,
+      iconAssetId: equipment.iconAssetId,
+      tier: equipment.tier,
+      category: 'equipment',
+      unique: equipment.unique,
+      equipment,
+    };
+  }
+  return undefined;
 }
 
 const ENEMY_FAMILY_LABELS: Record<Enemy['family'], string> = {
@@ -463,14 +512,14 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             const discoveredCategories = Array.from(
               new Set(
                 journal.itemsDiscovered
-                  .map((id) => ITEMS.find((i) => i.id === id)?.category)
+                  .map((id) => resolveDiscoveredEntry(id)?.category)
                   .filter((c): c is ItemCategory => !!c),
               ),
             );
             const visible = journal.itemsDiscovered.filter((id) => {
-              const item = ITEMS.find((i) => i.id === id);
-              if (itemsCategoryFilter !== 'all' && item?.category !== itemsCategoryFilter) return false;
-              return matchesItemQuery(item, query);
+              const entry = resolveDiscoveredEntry(id);
+              if (itemsCategoryFilter !== 'all' && entry?.category !== itemsCategoryFilter) return false;
+              return matchesItemQuery(entry, query);
             });
             return (
               <div>
@@ -503,7 +552,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   <p style={{ fontSize: 13, opacity: 0.7 }}>No items match those filters.</p>
                 )}
                 {visible.map((id) => {
-                  const item = ITEMS.find((i) => i.id === id);
+                  const entry = resolveDiscoveredEntry(id);
                   const owned = inventory.find((i) => i.itemId === id)?.quantity ?? 0;
                   return (
                     <div
@@ -512,18 +561,21 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                       style={{ cursor: 'pointer' }}
                       onClick={() => setSelectedItemId(id)}
                     >
-                      {item?.iconAssetId && <img src={getAssetUrl(item.iconAssetId)} alt="" className={styles.icon} />}
+                      {entry?.iconAssetId && <img src={getAssetUrl(entry.iconAssetId)} alt="" className={styles.icon} />}
                       <span style={{ fontSize: 13, flex: 1 }}>
-                        <strong>{item?.name ?? id}</strong>
-                        {item && (
-                          <span style={{ fontSize: 10, color: TIER_COLORS[item.tier], marginLeft: 8 }}>
-                            {TIER_LABELS[item.tier]}
+                        <strong>{entry?.name ?? id}</strong>
+                        {entry && (
+                          <span style={{ fontSize: 10, color: TIER_COLORS[entry.tier], marginLeft: 8 }}>
+                            {TIER_LABELS[entry.tier]}
                           </span>
                         )}
                         <br />
-                        <span style={{ opacity: 0.7 }}>{item?.description}</span>
+                        <span style={{ opacity: 0.7 }}>{entry?.description}</span>
                       </span>
                       {owned > 0 && <span style={{ fontSize: 11, opacity: 0.6 }}>You own x{owned}</span>}
+                      {owned === 0 && entry?.equipment && (
+                        <span style={{ fontSize: 11, opacity: 0.5 }}>No longer owned</span>
+                      )}
                     </div>
                   );
                 })}
@@ -687,15 +739,18 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
 
       {selectedItemId &&
         (() => {
-          const item = ITEMS.find((i) => i.id === selectedItemId);
-          if (!item) return null;
+          const entry = resolveDiscoveredEntry(selectedItemId);
+          if (!entry) return null;
           const owned = inventory.find((i) => i.itemId === selectedItemId)?.quantity ?? 0;
-          const price = sellPriceFor(item.id);
+          const price = sellPriceFor(entry.id);
           const uses: string[] = [];
-          if (item.effect?.healHpPercent) uses.push(`Restores ${Math.round(item.effect.healHpPercent * 100)}% HP`);
-          if (item.effect?.healSpiritPercent) uses.push(`Restores ${Math.round(item.effect.healSpiritPercent * 100)}% Spirit`);
-          if (item.effect?.restoreOilPercent) uses.push(`Restores ${Math.round(item.effect.restoreOilPercent * 100)}% Lantern Oil`);
-          if (item.effect?.reviveOnDefeat) uses.push('Revives on defeat');
+          if (entry.item?.effect?.healHpPercent) uses.push(`Restores ${Math.round(entry.item.effect.healHpPercent * 100)}% HP`);
+          if (entry.item?.effect?.healSpiritPercent)
+            uses.push(`Restores ${Math.round(entry.item.effect.healSpiritPercent * 100)}% Spirit`);
+          if (entry.item?.effect?.restoreOilPercent)
+            uses.push(`Restores ${Math.round(entry.item.effect.restoreOilPercent * 100)}% Lantern Oil`);
+          if (entry.item?.effect?.reviveOnDefeat) uses.push('Revives on defeat');
+          const statBonusText = entry.equipment ? formatStatBonuses(entry.equipment.statBonuses) : undefined;
           return (
             <div
               className={styles.overlay}
@@ -707,25 +762,31 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             >
               <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                 <div className={styles.detailHeader}>
-                  {item.iconAssetId && <img src={getAssetUrl(item.iconAssetId)} alt="" className={styles.detailIcon} />}
+                  {entry.iconAssetId && <img src={getAssetUrl(entry.iconAssetId)} alt="" className={styles.detailIcon} />}
                   <div>
                     <p className={styles.detailName} style={{ fontSize: 16 }}>
-                      {item.name}
-                      <span style={{ fontSize: 11, color: TIER_COLORS[item.tier], marginLeft: 8 }}>{TIER_LABELS[item.tier]}</span>
+                      {entry.name}
+                      <span style={{ fontSize: 11, color: TIER_COLORS[entry.tier], marginLeft: 8 }}>{TIER_LABELS[entry.tier]}</span>
                     </p>
                     <p className={styles.detailMeta}>
-                      {ITEM_CATEGORY_LABELS[item.category]}
-                      {owned > 0 && ` · You own x${owned}`}
-                      {item.unique && ' · Unique (cannot be lost, sold, or traded)'}
+                      {ITEM_CATEGORY_LABELS[entry.category]}
+                      {owned > 0 ? ` · You own x${owned}` : entry.equipment ? ' · No longer owned' : ''}
+                      {entry.unique && ' · Unique (cannot be lost, sold, or traded)'}
                     </p>
                   </div>
                 </div>
-                <p className={styles.detailDescription}>{item.description}</p>
+                <p className={styles.detailDescription}>{entry.description}</p>
 
                 <p className={styles.detailStats} style={{ marginBottom: 4 }}>
-                  <strong>Used For</strong>
+                  <strong>{entry.equipment ? 'Bonuses' : 'Used For'}</strong>
                 </p>
-                <p className={questStyles.objective}>{uses.length > 0 ? uses.join(', ') : 'No usable effect - a keepsake or crafting material.'}</p>
+                <p className={questStyles.objective}>
+                  {entry.equipment
+                    ? (statBonusText ?? 'No stat bonuses.')
+                    : uses.length > 0
+                      ? uses.join(', ')
+                      : 'No usable effect - a keepsake or crafting material.'}
+                </p>
 
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Sale Price</strong>

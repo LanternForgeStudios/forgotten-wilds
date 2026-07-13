@@ -5,9 +5,13 @@ import { callDash } from '@/firebase/functionsClient';
 import { usePlayerStore } from '@/state/usePlayerStore';
 
 // Must exceed useGridMovement's own step throttle (220ms default) or each scheduled attemptMove
-// call would just get swallowed by that throttle instead of actually advancing a tile. Also the
-// pacing of each per-tile stamina-debit server call during a hold.
-const DASH_STEP_MS = 170;
+// call would just get swallowed by that throttle instead of actually advancing a tile - the whole
+// hold would then stop after its very first tile, since every subsequent attemptMove call gets
+// silently no-op'd by the movement throttle and the "position didn't change" collision check
+// mistakes that for a wall. Also the pacing of each per-tile stamina-debit server call during a
+// hold. Kept comfortably above stepIntervalMs (not just barely over it) so a slightly slow
+// server round-trip still leaves margin before the next tile's attemptMove call would arrive.
+const DASH_STEP_MS = 260;
 // "Getting ready to run" beat before movement actually starts - the dust effect (see
 // ExplorationScene.playDashRampEffect via onRampUp below) fires immediately; actual tile movement
 // begins once this elapses, unless Dash was released before then.

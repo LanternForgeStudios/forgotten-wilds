@@ -46,10 +46,14 @@ describe('grantItem', () => {
     expect(save.journal.itemsDiscovered).toEqual(['healing-poultice']);
   });
 
-  it('does not record an equipment id into itemsDiscovered (only ITEMS-table entries count)', () => {
+  it('records an EQUIPMENT-table entry into itemsDiscovered too, once, on first grant - so it stays in the Journal even after being sold/traded away', () => {
     const save = buildSave();
-    grantItem(save, 'miners-lost-lantern-equipped');
-    expect(save.journal.itemsDiscovered).toEqual([]);
+    grantItem(save, 'weathered-walking-staff');
+    grantItem(save, 'weathered-walking-staff'); // a second grant shouldn't duplicate the entry
+    expect(save.journal.itemsDiscovered).toEqual(['weathered-walking-staff']);
+    // Selling/removing it from inventory doesn't un-discover it.
+    save.inventory = [];
+    expect(save.journal.itemsDiscovered).toEqual(['weathered-walking-staff']);
   });
 
   it('does not record itemsDiscovered when the grant is refused (duplicate unique)', () => {

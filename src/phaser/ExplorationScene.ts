@@ -25,6 +25,10 @@ const DASH_DUST_COLOR = 0xb8a888;
 
 interface EntityVisual {
   sprite: Phaser.GameObjects.Sprite;
+  /** The spriteAssetId this sprite was last textured with - lets upsertEntity detect a change
+   *  (e.g. another player switching skins via Profile mid-session, presence entity id stays the
+   *  same) and retexture in place instead of leaving the sprite stuck on its original asset. */
+  spriteAssetId: string;
   label?: Phaser.GameObjects.Text;
   badge?: Phaser.GameObjects.Text;
 }
@@ -164,6 +168,10 @@ export class ExplorationScene extends Phaser.Scene {
   async setPlayer(pos: GridPosition, spriteAssetId: string, frameRow: number, movementState: MovementState): Promise<void> {
     this.playerGeneration++;
     const generation = this.playerGeneration;
+    // Captured before ensurePlayerAnimations (which updates playerTextureKey itself) - true only
+    // when an already-created sprite's skin actually changed mid-session (see UserProfile's Skin
+    // tab); always false on the very first setPlayer call, since there's no sprite yet to retexture.
+    const textureChanged = !!this.playerSprite && this.playerTextureKey !== spriteAssetId;
     await this.ensurePlayerAnimations(spriteAssetId);
     // A newer setPlayer call has since superseded this one - its own (more current) state has
     // already been applied, so don't let this stale continuation clobber it.
@@ -188,6 +196,10 @@ export class ExplorationScene extends Phaser.Scene {
       // (confirmed by hand: this is exactly why rotating the phone "fixed" a dead camera - the
       // resize was incidentally the first thing to re-run setCamera after the sprite existed).
       this.cameras.main.startFollow(this.playerSprite);
+    } else if (textureChanged) {
+      // The player changed skin mid-session (Profile's Skin tab) - swap the existing sprite's
+      // texture instead of leaving it stuck on whichever skin it was first created with.
+      this.playerSprite.setTexture(spriteAssetId);
     }
     const sprite = this.playerSprite;
     if (def.frameSize) {
@@ -282,8 +294,16 @@ export class ExplorationScene extends Phaser.Scene {
       if (generation !== this.entityGeneration) return;
       // Same feet-anchor origin as the player sprite (setPlayer above) - see its comment.
       const sprite = this.add.sprite(0, 0, entity.spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
-      visual = { sprite };
+      visual = { sprite, spriteAssetId: entity.spriteAssetId };
       this.entityVisuals.set(entity.id, visual);
+    } else if (visual.spriteAssetId !== entity.spriteAssetId) {
+      // Same entity id (e.g. another player's presence doc), different sprite - most notably
+      // another player switching skins via Profile mid-session. Load (if not already cached) and
+      // retexture in place rather than leaving the sprite stuck on its original asset.
+      await this.loadTexture(entity.spriteAssetId);
+      if (generation !== this.entityGeneration) return;
+      visual.sprite.setTexture(entity.spriteAssetId);
+      visual.spriteAssetId = entity.spriteAssetId;
     }
 
     const def = getAssetDefinition(entity.spriteAssetId);

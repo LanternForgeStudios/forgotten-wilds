@@ -20,13 +20,14 @@ export function wouldDuplicateUnique(inventory: InventoryItem[], itemId: string)
  * where duplicating isn't the player's fault and shouldn't surface as an error).
  *
  * Also records `itemId` into `save.journal.itemsDiscovered` (the Journal's Items tab compendium)
- * the first time it's ever granted - only for real ITEMS-table entries, not equipment
- * (EQUIPMENT[itemId]), since equipment already has full coverage via the Equipment tab.
- * Centralized here rather than at each call site so a future new item-granting path can't forget
- * the bookkeeping. Takes the whole `save` (not just `inventory`) specifically so it can backfill
- * `journal.itemsDiscovered` for an existing player's save read from Firestore before this field
- * existed - self-heals the first time any such save passes through here, since `save` gets
- * written back in the same transaction that called this.
+ * the first time it's ever granted - both real ITEMS-table entries and EQUIPMENT-table entries,
+ * so equipment stays in the player's permanent Journal history even after it's sold/traded away
+ * (the live Equipment tab only ever shows current holdings). Centralized here rather than at each
+ * call site so a future new item-granting path can't forget the bookkeeping. Takes the whole
+ * `save` (not just `inventory`) specifically so it can backfill `journal.itemsDiscovered` for an
+ * existing player's save read from Firestore before this field existed - self-heals the first
+ * time any such save passes through here, since `save` gets written back in the same transaction
+ * that called this.
  */
 export function grantItem(save: PlayerSave, itemId: string, quantity = 1): boolean {
   if (wouldDuplicateUnique(save.inventory, itemId)) return false;
@@ -34,6 +35,8 @@ export function grantItem(save: PlayerSave, itemId: string, quantity = 1): boole
   if (entry) entry.quantity += quantity;
   else save.inventory.push({ itemId, quantity });
   if (!save.journal.itemsDiscovered) save.journal.itemsDiscovered = [];
-  if (ITEMS[itemId] && !save.journal.itemsDiscovered.includes(itemId)) save.journal.itemsDiscovered.push(itemId);
+  if ((ITEMS[itemId] || EQUIPMENT[itemId]) && !save.journal.itemsDiscovered.includes(itemId)) {
+    save.journal.itemsDiscovered.push(itemId);
+  }
   return true;
 }
