@@ -67,7 +67,7 @@ function propValue<T extends string | number | boolean>(
   return properties?.find((p) => p.name === name)?.value as T | undefined;
 }
 
-const KNOWN_TILELAYER_NAMES = /^(ground|decorations-\d+|overhang)$/;
+const KNOWN_TILELAYER_NAMES = /^(ground|decorations-\d+|overhang(-\d+)?)$/;
 
 function objectType(raw: string): MapObjectType {
   if (
@@ -99,7 +99,7 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     for (const l of raw.layers) {
       if (l.type === 'tilelayer' && !KNOWN_TILELAYER_NAMES.test(l.name)) {
         console.warn(
-          `Tiled map "${mapAssetId}": tile layer "${l.name}" doesn't match ground/decorations-N/overhang and will not render.`,
+          `Tiled map "${mapAssetId}": tile layer "${l.name}" doesn't match ground/decorations-N/overhang(-N) and will not render.`,
         );
       }
       if (l.type === 'objectgroup' && l.name !== 'objects' && l.name !== 'collisions') {

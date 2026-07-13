@@ -1,0 +1,23 @@
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--fw-panel-border);
+  border-radius: 4px;
+  background: var(--fw-bg-deep);
+  color: var(--fw-text-dim);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  color: var(--fw-text);
+  border-color: var(--fw-accent);
+}

@@ -17,6 +17,11 @@ Each demonstrates the full layer model documented in `docs/Tiled-Map-Authoring.m
 layer) → `overhang`. Every shipped map today only uses `ground` + `objects` — these templates are
 the first files in the repo to actually show the fuller model in practice.
 
+Each template uses a single, unsuffixed `overhang` layer, which stays valid indefinitely (there's
+no need to rename it). If a map needs more than one overhang layer stacked (e.g. a tree canopy
+above a lower roof), the loader also supports numbered `overhang-1`, `overhang-2`, ... — same
+convention as `decorations-N` — see `docs/Tiled-Map-Authoring.md`'s layer table.
+
 ## What's a faithful copy vs. a trimmed sample
 
 - **Layout and object types** (doors, NPCs, shrines, chests, spawn points, transitions) are close

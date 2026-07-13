@@ -1,27 +1,19 @@
 import { Panel } from './common/Panel';
+import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { getAssetUrl } from '@/assets/assetManager';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
 import { EQUIPMENT, STARTING_STATS, STAT_GROWTH_PER_LEVEL, XP_THRESHOLDS } from '@/data';
-import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
+import { EQUIPMENT_SLOTS } from '@/types';
 import { formatStatBonuses } from '@/utils/statBonuses';
 import { predictedStamina } from '@/utils/staminaRegen';
+import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
 import styles from './CharacterStats.module.css';
 
 interface CharacterStatsProps {
   onClose: () => void;
 }
-
-const SLOT_LABELS: Record<EquipmentSlot, string> = {
-  weapon: 'Weapon',
-  armor: 'Armor',
-  boots: 'Boots',
-  gloves: 'Gloves',
-  charm: 'Charm',
-  lantern: 'Lantern',
-  spiritTotem: 'Spirit Totem',
-};
 
 /** Combat stats that both level growth and equipment can contribute to - the ones worth breaking
  *  down into Base/Equipment/Total. Resource maxes (HP/Spirit) grow the same way but are shown
@@ -60,6 +52,7 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <OverlayCloseButton onClick={onClose} />
         <div className={styles.header}>
           <h2 className={styles.name}>{player.name}</h2>
           <span className={styles.level}>Level {player.level}</span>

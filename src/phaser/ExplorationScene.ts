@@ -121,8 +121,12 @@ export class ExplorationScene extends Phaser.Scene {
     const decorationLayers = map.layers
       .filter((l) => /^decorations-\d+$/.test(l.name))
       .sort((a, b) => Number(a.name.split('-')[1]) - Number(b.name.split('-')[1]));
-    const overhang = map.layers.find((l) => l.name === 'overhang');
-    const orderedLayers = [ground, ...decorationLayers, overhang].filter((l): l is TileLayer => !!l);
+    // 'overhang' (no suffix) and 'overhang-N' are both valid - mirrors decorations-N so a map only
+    // needs a numbered suffix once it actually has more than one overhang layer to stack.
+    const overhangLayers = map.layers
+      .filter((l) => /^overhang(-\d+)?$/.test(l.name))
+      .sort((a, b) => Number(a.name.split('-')[1] ?? 0) - Number(b.name.split('-')[1] ?? 0));
+    const orderedLayers = [ground, ...decorationLayers, ...overhangLayers].filter((l): l is TileLayer => !!l);
 
     const tilemap = this.make.tilemap({
       tileWidth: map.tileWidth,
@@ -140,7 +144,10 @@ export class ExplorationScene extends Phaser.Scene {
         phaserLayer.putTileAt(gid - 1, i % map.width, Math.floor(i / map.width));
       });
       phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(scale);
-      phaserLayer.setDepth(layer.name === 'overhang' ? OVERHANG_DEPTH : index);
+      const overhangMatch = /^overhang(?:-(\d+))?$/.exec(layer.name);
+      // Multiple overhang-N layers stack in numeric order among themselves, all still above every
+      // decoration/entity layer (OVERHANG_DEPTH is already higher than any plausible decoration count).
+      phaserLayer.setDepth(overhangMatch ? OVERHANG_DEPTH + Number(overhangMatch[1] ?? 0) : index);
       this.mapLayers.push(phaserLayer);
     });
   }
@@ -166,7 +173,11 @@ export class ExplorationScene extends Phaser.Scene {
     const snapInstantly = !this.playerSprite || this.mapJustChanged;
     this.mapJustChanged = false;
     if (!this.playerSprite) {
-      this.playerSprite = this.add.sprite(0, 0, spriteAssetId).setDepth(ENTITY_DEPTH);
+      // Origin (0.5, 1) anchors the sprite's feet to its tile position rather than its center, so
+      // taller-than-one-tile art (see the 3/4-view scale spec) lines up with the ground instead of
+      // floating with its vertical midpoint on the tile. Every sprite today happens to render
+      // exactly one tile tall, so this is a pixel-identical no-op until taller art actually lands.
+      this.playerSprite = this.add.sprite(0, 0, spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
       // setCamera has its own `if (this.playerSprite) camera.startFollow(...)` check, but
       // setCamera and setPlayer are two independent React effects that can run in either order -
       // and setPlayer's own texture load (ensurePlayerAnimations, just awaited above) means the
@@ -186,7 +197,7 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     const targetX = pos.x * this.tileSize + this.tileSize / 2;
-    const targetY = pos.y * this.tileSize + this.tileSize / 2;
+    const targetY = pos.y * this.tileSize + this.tileSize;
     // 'running' only ever means mid-Dash today (see useGridMovement.ts) - kick up a puff of dust
     // from where the player is leaving, behind them as they go. Skipped on an instant snap (a
     // location transition, not real movement) since there's no "leaving from" position to kick
@@ -259,14 +270,15 @@ export class ExplorationScene extends Phaser.Scene {
       // before the texture finished loading) - abort rather than create an orphaned sprite for
       // an entity that's no longer part of the current location's entity list.
       if (generation !== this.entityGeneration) return;
-      const sprite = this.add.sprite(0, 0, entity.spriteAssetId).setDepth(ENTITY_DEPTH);
+      // Same feet-anchor origin as the player sprite (setPlayer above) - see its comment.
+      const sprite = this.add.sprite(0, 0, entity.spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
       visual = { sprite };
       this.entityVisuals.set(entity.id, visual);
     }
 
     const def = getAssetDefinition(entity.spriteAssetId);
     const x = entity.x * this.tileSize + this.tileSize / 2;
-    const y = entity.y * this.tileSize + this.tileSize / 2;
+    const y = entity.y * this.tileSize + this.tileSize;
     if (def.frameSize) {
       visual.sprite.setScale(this.tileSize / def.frameSize.width);
       const row = entity.frameRow ?? 0;
@@ -285,9 +297,12 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     const v = visual;
+    // Computed from the sprite's own displayHeight (rather than a fixed tileSize/2) so the label
+    // floats above the actual sprite top - matters once taller-than-one-tile art lands, since the
+    // sprite's origin is now feet-anchored (bottom), not center.
     const repositionAttachments = () => {
-      v.label?.setPosition(v.sprite.x, v.sprite.y - this.tileSize / 2 - 8);
-      v.badge?.setPosition(v.sprite.x + this.tileSize / 2 - 4, v.sprite.y - this.tileSize / 2 - 2);
+      v.label?.setPosition(v.sprite.x, v.sprite.y - v.sprite.displayHeight - 8);
+      v.badge?.setPosition(v.sprite.x + this.tileSize / 2 - 4, v.sprite.y - v.sprite.displayHeight - 2);
     };
     if (justCreated || this.mapJustChanged) {
       this.tweens.killTweensOf(visual.sprite);
@@ -296,7 +311,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.tweens.add({ targets: visual.sprite, x, y, duration: GLIDE_MS, ease: 'Linear', onUpdate: repositionAttachments });
     }
 
-    const labelY = y - this.tileSize / 2 - 8;
+    const labelY = y - visual.sprite.displayHeight - 8;
     if (entity.label) {
       if (!visual.label) {
         visual.label = this.add
@@ -317,7 +332,7 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     const badgeX = x + this.tileSize / 2 - 4;
-    const badgeY = y - this.tileSize / 2 - 2;
+    const badgeY = y - visual.sprite.displayHeight - 2;
     if (entity.badge) {
       if (!visual.badge) {
         visual.badge = this.add

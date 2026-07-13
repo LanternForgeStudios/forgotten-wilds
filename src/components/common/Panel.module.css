@@ -1,4 +1,7 @@
 .panel {
+  /* Positioning context for OverlayCloseButton's absolutely-positioned corner button - has no
+     effect on the panel's own layout (position: relative doesn't change flex/grid participation). */
+  position: relative;
   border-style: solid;
   border-width: 16px;
   border-image-slice: 16 fill;

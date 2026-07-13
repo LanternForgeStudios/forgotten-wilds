@@ -8,7 +8,7 @@ are followed.
 ## Layer model
 
 Rendering order (bottom to top): `ground` → `decorations-1` → `decorations-2` → ... → entities
-(player/NPCs) → `overhang`.
+(player/NPCs) → `overhang` (or `overhang-1` → `overhang-2` → ... if more than one is needed).
 
 | Layer name | Tiled layer type | Purpose |
 |---|---|---|
@@ -16,7 +16,7 @@ Rendering order (bottom to top): `ground` → `decorations-1` → `decorations-2
 | `decorations-1`, `decorations-2`, ... | Tile Layer | Optional cosmetic layers, rendered above ground and below entities, in ascending numeric order. Never affect collision. |
 | `collisions` | Object Layer | Discrete, non-interactive obstacles (fences, rocks, ledges, barriers). Rectangle or point objects. Block movement but never trigger interaction/dialogue. |
 | `objects` | Object Layer | Spawns, transitions, NPCs, interactables, encounter zones. Existing convention, unchanged. |
-| `overhang` | Tile Layer | Optional cosmetic layer rendered above the player/NPCs (roofs, bridges, tree canopies). Never affects collision. |
+| `overhang`, or `overhang-1`, `overhang-2`, ... | Tile Layer | Optional cosmetic layer(s) rendered above the player/NPCs (roofs, bridges, tree canopies). A single unsuffixed `overhang` is fine for one layer; use numbered `overhang-N` (ascending stacking order, same convention as `decorations-N`) only once a map actually needs more than one - e.g. a tree canopy above a lower roof overhang. Never affects collision. |
 
 Layer names are case-sensitive and must match exactly. Anything else is ignored for rendering
 purposes and logged as a warning in the browser dev console (visible when running `npm run dev`),

@@ -22,11 +22,15 @@ Commissioned specifically for this project, no external license concerns:
 - **Battle backgrounds** — `public/assets/backgrounds/ironwood-trail.png`, `raven-ridge.png`, `whisper-falls.png`,
   `black-briar-forest.png`, `hollow-rail-mine.png` — one per region/dungeon with real encounters, replacing the
   generic `battle-bg.forest`/`battle-bg.dungeon` placeholders those locations used before.
+- **Generic forest and shrine battle backgrounds** — `public/assets/backgrounds/forest.png` (`battle-bg.forest`),
+  `shrine.png` (`battle-bg.shrine`) — replacing their earlier SVG placeholders.
+- **Cutscene backgrounds** — `public/assets/backgrounds/quest-rekindling-spirit-grove.png`,
+  `quest-the-mountain-remembers.png`, `defeat-cutscene.png` — one per story-beat cutscene (two quest completions,
+  the post-defeat "waking up" sequence).
 
 ## Generated placeholders
 
-All portraits, character/enemy sprites, item/equipment/currency icons, and the remaining generic battle
-backgrounds (`battle-bg.forest`, still used by Ash Hallow/interiors; `battle-bg.shrine`, currently unused) are
-simple procedurally-generated SVG placeholders (colored panel + label), created for this project. They carry no
-external license and are freely replaceable — see the `notes` field on each entry in `src/assets/registry.ts`
-for details on what final art should replace them with.
+All portraits, character/enemy sprites, and item/equipment/currency icons are simple procedurally-generated SVG
+placeholders (colored panel + label), created for this project. They carry no external license and are freely
+replaceable — see the `notes` field on each entry in `src/assets/registry.ts` for details on what final art
+should replace them with.

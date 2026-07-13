@@ -9,8 +9,10 @@ import { Shop } from '@/components/Shop';
 import { Inn } from '@/components/Inn';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { WorldChat } from '@/components/WorldChat';
+import { MiniMap } from '@/components/MiniMap';
 import { Panel } from '@/components/common/Panel';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
+import { useMapOverlay } from '@/hooks/useMapOverlay';
 import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
@@ -70,12 +72,15 @@ export function TownScene() {
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const questProgress = useQuestStore((s) => s.progress);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
+  const openedChests = useWorldStateStore((s) => s.openedChests);
   const isMobile = useIsMobile();
   const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const suspended =
+  const otherOverlaysOpen =
     activeNpc !== null || menuOpen || shopOpen || innOpen || journalOpen || worldChatOpen || message !== null;
+  const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
+  const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
@@ -160,6 +165,8 @@ export function TownScene() {
         setWorldChatOpen((open) => !open);
         return;
       }
+      // 'm'/'M' is handled by useMapOverlay itself (it owns its own keydown listener) - not
+      // duplicated here.
       if (e.key !== 'Enter' && e.key !== ' ') return;
       attemptInteract();
     }
@@ -252,13 +259,14 @@ export function TownScene() {
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
             onChat={() => setWorldChatOpen((open) => !open)}
+            onMap={toggleMap}
           />
         </>
       ) : (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Talk: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
-          &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Chat: C
+          &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Chat: C &nbsp;·&nbsp; Map: M
         </p>
       )}
       {activeNpc && (
@@ -294,6 +302,16 @@ export function TownScene() {
       {innOpen && <Inn onClose={() => setInnOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
       {worldChatOpen && <WorldChat onClose={() => setWorldChatOpen(false)} />}
+      {mapOpen && (
+        <MiniMap
+          map={map}
+          position={position}
+          locationId={locationId}
+          openedChests={openedChests}
+          questProgress={questProgress}
+          onClose={closeMap}
+        />
+      )}
     </div>
   );
 }

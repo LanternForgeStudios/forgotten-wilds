@@ -28,6 +28,9 @@ export interface BattleEnemyVisual {
   name: string;
   tierLabel: string;
   tierColor: string;
+  /** Drives createEnemySlot's baseSize branch (regular/elite/boss) - separate from tierLabel/
+   *  tierColor, which are already-formatted display strings, not a machine-readable tier. */
+  tier: 'regular' | 'elite' | 'boss';
   level: number;
   hp: number;
   maxHp: number;
@@ -71,9 +74,18 @@ export class BattleScene extends Phaser.Scene {
 
   private loadTexture(assetId: string): Promise<void> {
     if (this.textures.exists(assetId)) return Promise.resolve();
+    const def = getAssetDefinition(assetId);
     const url = getAssetUrl(assetId);
     return new Promise((resolve) => {
-      this.load.image(assetId, url);
+      // Mirrors ExplorationScene.loadTexture's frameSize branch - not exercised by any current
+      // battle asset (every enemy/background sprite today is a single static frame), but wires the
+      // battle canvas to correctly load a future animated sprite sheet (e.g. the FX pack) without
+      // also having to remember to fix this loader gap then.
+      if (def.frameSize) {
+        this.load.spritesheet(assetId, url, { frameWidth: def.frameSize.width, frameHeight: def.frameSize.height });
+      } else {
+        this.load.image(assetId, url);
+      }
       this.load.once(Phaser.Loader.Events.COMPLETE, () => resolve());
       this.load.start();
     });
@@ -126,7 +138,10 @@ export class BattleScene extends Phaser.Scene {
 
   private createEnemySlot(enemy: BattleEnemyVisual, x: number, y: number, scale: number, alpha: number): void {
     const def = getAssetDefinition(enemy.spriteAssetId);
-    const baseSize = enemy.isBoss ? 256 : 128;
+    // Close-up battle-stage sizing convention (not the exploration-tile-grid-scaled sizes from the
+    // 3/4-view scale spec's literal numbers, which govern walking sprites/field-encounter icons
+    // instead - a full-screen battle close-up needs its own, larger scale).
+    const baseSize = enemy.isBoss ? 256 : enemy.tier === 'elite' ? 192 : 128;
     const spriteScale = (baseSize / (def.dimensions?.width ?? baseSize)) * scale;
 
     const sprite = this.add

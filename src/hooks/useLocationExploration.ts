@@ -14,7 +14,11 @@ import { LOCATIONS } from '@/data';
 interface UseLocationExplorationOptions {
   locationId: string;
   suspended?: boolean;
-  onEncounterZoneStep?: (chance: number, pos: GridPosition) => void;
+  /** Called on every completed step (dash included - a visible, deliberately-placed field
+   *  encounter icon isn't the kind of thing Dash should let the player slip past unnoticed, unlike
+   *  the old invisible per-tile probability roll this replaced). The caller owns the actual icon
+   *  set (see useFieldEncounters) and decides what, if anything, happened at this position. */
+  onFieldEncounterStep?: (pos: GridPosition) => void;
   /** Called instead of transitioning when the target location is gated behind an incomplete
    *  quest - the caller decides how to surface it (every scene already has a message Panel). */
   onBlockedTransition?: (message: string) => void;
@@ -24,7 +28,7 @@ interface UseLocationExplorationOptions {
 export function useLocationExploration({
   locationId,
   suspended,
-  onEncounterZoneStep,
+  onFieldEncounterStep,
   onBlockedTransition,
 }: UseLocationExplorationOptions) {
   const location = LOCATIONS.find((l) => l.id === locationId)!;
@@ -58,7 +62,9 @@ export function useLocationExploration({
     // silently reuse whichever spawn point was resolved the very first time that map was loaded.
   }, [map, locationId, params.locationId, params.spawnId, params.spawnX, params.spawnY]);
 
-  const handleStep = (pos: GridPosition, isDash?: boolean) => {
+  // No `isDash` param (unlike the old encounterZone-gated version) - field-encounter icons trigger
+  // regardless of Dash, per the onFieldEncounterStep doc comment above.
+  const handleStep = (pos: GridPosition) => {
     if (!map) return;
 
     const transition = map.objects.find(
@@ -82,15 +88,7 @@ export function useLocationExploration({
       }
     }
 
-    // Dashing through a stretch of trail is exactly what it's for - no encounter roll mid-dash.
-    if (isDash) return;
-
-    const zone = map.objects.find(
-      (o) => o.type === 'encounterZone' && o.x === pos.x && o.y === pos.y,
-    );
-    if (zone) {
-      onEncounterZoneStep?.(zone.encounterChance ?? 0.15, pos);
-    }
+    onFieldEncounterStep?.(pos);
   };
 
   // Paused while an overlay (dialogue, menus, shop, etc.) is open, same as movement - an NPC

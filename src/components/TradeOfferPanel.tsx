@@ -2,7 +2,29 @@ import { useState } from 'react';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { ITEMS, EQUIPMENT } from '@/data';
+import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
+import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './UserProfile.module.css';
+import subtabStyles from './CharacterMenu.module.css';
+
+/** Same filter dimension as Shop.tsx's Sell tab - every real ItemCategory, plus a synthesized
+ *  'equipment' bucket for anything found in EQUIPMENT (which has no `category` field of its own). */
+type TradeTypeFilter = ItemCategory | 'equipment' | 'all';
+
+const TRADE_TYPE_LABELS: Record<Exclude<TradeTypeFilter, 'all'>, string> = {
+  consumable: 'Consumables',
+  equipment: 'Equipment',
+  keyItem: 'Key Items',
+  lanternUpgrade: 'Lantern Upgrades',
+  materials: 'Materials',
+};
+
+const SLOT_FILTER_ORDER: EquipmentSlot[] = ['armor', 'weapon', 'boots', 'gloves', 'lantern', 'charm', 'spiritTotem'];
+
+function tradeTypeOf(itemDef: (typeof ITEMS)[number] | undefined, equipDef: (typeof EQUIPMENT)[number] | undefined): TradeTypeFilter {
+  if (equipDef) return 'equipment';
+  return itemDef?.category ?? 'materials';
+}
 
 interface TradeOfferPanelProps {
   title: string;
@@ -22,12 +44,28 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
   const player = usePlayerStore((s) => s.player);
   const [selected, setSelected] = useState<Record<string, number>>({});
   const [goldInput, setGoldInput] = useState('0');
+  // Component-local, not lifted to UserProfile.tsx - this panel is reused for both a fresh
+  // proposal and a counter-offer across different trade targets, so there's no reason a filter
+  // choice should persist across sessions.
+  const [typeFilter, setTypeFilter] = useState<TradeTypeFilter>('all');
+  const [slotFilter, setSlotFilter] = useState<EquipmentSlot | 'all'>('all');
 
   const equippedItemIds = new Set(Object.values(player?.equipment ?? {}).filter((id): id is string => !!id));
-  const pickable = inventory.filter((entry) => {
-    const isUnique = !!(ITEMS.find((i) => i.id === entry.itemId)?.unique || EQUIPMENT.find((e) => e.id === entry.itemId)?.unique);
-    return !isUnique && !equippedItemIds.has(entry.itemId);
-  });
+  const pickable = inventory
+    .filter((entry) => {
+      const isUnique = !!(ITEMS.find((i) => i.id === entry.itemId)?.unique || EQUIPMENT.find((e) => e.id === entry.itemId)?.unique);
+      return !isUnique && !equippedItemIds.has(entry.itemId);
+    })
+    .filter((entry) => {
+      if (typeFilter === 'all') return true;
+      const itemDef = ITEMS.find((i) => i.id === entry.itemId);
+      const equipDef = EQUIPMENT.find((e) => e.id === entry.itemId);
+      return tradeTypeOf(itemDef, equipDef) === typeFilter;
+    })
+    .filter((entry) => {
+      if (typeFilter !== 'equipment' || slotFilter === 'all') return true;
+      return EQUIPMENT.find((e) => e.id === entry.itemId)?.slot === slotFilter;
+    });
 
   function itemName(itemId: string): string {
     return EQUIPMENT.find((e) => e.id === itemId)?.name ?? ITEMS.find((i) => i.id === itemId)?.name ?? itemId.replace(/-/g, ' ');
@@ -50,6 +88,48 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
   return (
     <div className={styles.tradePanel}>
       <h3 className={styles.sectionTitle}>{title}</h3>
+      <div className={subtabStyles.subtabs} style={{ marginBottom: 8 }}>
+        <button
+          className={`${subtabStyles.subtab} ${typeFilter === 'all' ? subtabStyles.subtabActive : ''}`}
+          onClick={() => {
+            setTypeFilter('all');
+            setSlotFilter('all');
+          }}
+        >
+          All
+        </button>
+        {(Object.keys(TRADE_TYPE_LABELS) as Exclude<TradeTypeFilter, 'all'>[]).map((key) => (
+          <button
+            key={key}
+            className={`${subtabStyles.subtab} ${typeFilter === key ? subtabStyles.subtabActive : ''}`}
+            onClick={() => {
+              setTypeFilter(key);
+              setSlotFilter('all');
+            }}
+          >
+            {TRADE_TYPE_LABELS[key]}
+          </button>
+        ))}
+      </div>
+      {typeFilter === 'equipment' && (
+        <div className={subtabStyles.subtabs} style={{ marginBottom: 8 }}>
+          <button
+            className={`${subtabStyles.subtab} ${slotFilter === 'all' ? subtabStyles.subtabActive : ''}`}
+            onClick={() => setSlotFilter('all')}
+          >
+            All Slots
+          </button>
+          {SLOT_FILTER_ORDER.map((slot) => (
+            <button
+              key={slot}
+              className={`${subtabStyles.subtab} ${slotFilter === slot ? subtabStyles.subtabActive : ''}`}
+              onClick={() => setSlotFilter(slot)}
+            >
+              {SLOT_LABELS[slot]}
+            </button>
+          ))}
+        </div>
+      )}
       <div className={styles.list}>
         {pickable.length === 0 && <p className={styles.empty}>No tradeable items in your inventory.</p>}
         {pickable.map((entry) => (

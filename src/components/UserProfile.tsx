@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Panel } from './common/Panel';
+import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
@@ -330,6 +331,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <OverlayCloseButton onClick={onClose} />
         <h2 className={styles.title}>User Profile</h2>
 
         <div className={styles.tabs}>

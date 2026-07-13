@@ -21,4 +21,9 @@ export interface Location {
   /** For a sub-location (a building interior) - the main area it's nested under in the Journal of
    *  Legends. Omitted for main areas themselves. */
   parentLocationId?: string;
+  /** Which building-marker icon/label the mini-map should use for this location's entrance, if
+   *  it's specifically a shop/inn/apothecary (per the mini-map spec's explicit callouts for those
+   *  three). Omitted means "just a generic building" - still shown as a building marker, just not
+   *  tagged as one of the three special kinds. */
+  buildingKind?: 'shop' | 'inn' | 'apothecary';
 }

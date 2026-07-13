@@ -11,11 +11,12 @@ interface MobileHudProps {
   onJournal: () => void;
   /** Omitted outside TownScene - World Chat is only available while in a town. */
   onChat?: () => void;
+  onMap: () => void;
 }
 
-/** Touch replacement for the Enter/I/J/C/Shift+direction keyboard shortcuts, since phones have no
+/** Touch replacement for the Enter/I/J/C/M/Shift+direction keyboard shortcuts, since phones have no
  *  keyboard to press. */
-export function MobileHud({ onInteract, onDash, onInventory, onJournal, onChat }: MobileHudProps) {
+export function MobileHud({ onInteract, onDash, onInventory, onJournal, onChat, onMap }: MobileHudProps) {
   return (
     <div className={styles.hud}>
       {onInteract && (
@@ -34,6 +35,9 @@ export function MobileHud({ onInteract, onDash, onInventory, onJournal, onChat }
         </button>
         <button className={styles.menuButton} onClick={onJournal}>
           Journal
+        </button>
+        <button className={styles.menuButton} onClick={onMap}>
+          Map
         </button>
         {onChat && (
           <button className={styles.menuButton} onClick={onChat}>

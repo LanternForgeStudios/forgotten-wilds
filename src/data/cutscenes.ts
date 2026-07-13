@@ -20,7 +20,7 @@ export const INTRO_CUTSCENE = {
 /** Shown when the player clicks Continue off a defeat overlay, before returning to Ash Hallow -
  *  see CombatScene.tsx's returnToExploration(). */
 export const DEFEAT_CUTSCENE = {
-  backgroundAssetId: FALLBACK_CUTSCENE_BACKGROUND,
+  backgroundAssetId: 'background.defeat-cutscene',
   lines: [
     'Darkness - the ache of a hundred small hurts, and the weight of a hand on your shoulder.',
     '"Easy now," a voice says. "You\'re safe. We found you on the trail and brought you back."',
@@ -41,9 +41,7 @@ interface QuestCutscene {
  *  else keeps the plain toast. */
 export const QUEST_COMPLETION_CUTSCENES: Record<string, QuestCutscene> = {
   'rekindling-spirit-grove': {
-    // battle-bg.shrine is otherwise unused by any real encounter - reserved for exactly this kind
-    // of shrine-restoration story beat (see art-staging/README.md).
-    backgroundAssetId: 'battle-bg.shrine',
+    backgroundAssetId: 'background.quest-rekindling-spirit-grove',
     lines: [
       'The Guardian Sigil settles into its cradle, and the Lantern of the First Promise catches, low and steady.',
       'For a moment, the grove remembers what it was before the Silence - and something ancient stirs, just out of sight.',
@@ -51,7 +49,7 @@ export const QUEST_COMPLETION_CUTSCENES: Record<string, QuestCutscene> = {
     ],
   },
   'the-mountain-remembers': {
-    backgroundAssetId: FALLBACK_CUTSCENE_BACKGROUND,
+    backgroundAssetId: 'background.quest-the-mountain-remembers',
     lines: [
       'Elias Rowan listens to your account of the mine in silence, then sets a small, worn stone on the table between you.',
       '"A Guardian\'s memory," Miriam says quietly. "The first anyone\'s found in a generation."',

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { useJournalStore } from '@/state/useJournalStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useSceneStore } from '@/state/useSceneStore';
+import { useMapPreferencesStore } from '@/state/useMapPreferencesStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
@@ -116,6 +118,8 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const [itemsCategoryFilter, setItemsCategoryFilter] = useState<ItemCategory | 'all'>('all');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const inventory = useInventoryStore((s) => s.items);
+  const hiddenQuestIds = useMapPreferencesStore((s) => s.hiddenQuestIds);
+  const toggleQuestOnMap = useMapPreferencesStore((s) => s.toggle);
   useOverlayClose(onClose);
 
   function toggleQuestRegion(id: string) {
@@ -152,6 +156,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <OverlayCloseButton onClick={onClose} />
         <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>Journal of Legends</h2>
         <div className={styles.tabs}>
           {TABS.map((t) => (
@@ -264,6 +269,16 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                                   • {o.description} ({Math.min(counts[o.id] ?? 0, o.requiredCount)}/{o.requiredCount})
                                 </p>
                               ))}
+                              {status === 'active' && (
+                                <label style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginTop: 4 }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={!hiddenQuestIds.has(quest.id)}
+                                    onChange={() => toggleQuestOnMap(quest.id)}
+                                  />
+                                  Show on Map
+                                </label>
+                              )}
                             </div>
                           );
                         })}

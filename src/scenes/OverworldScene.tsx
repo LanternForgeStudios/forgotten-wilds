@@ -7,7 +7,10 @@ import { DialogueBox } from '@/components/DialogueBox';
 import { Panel } from '@/components/common/Panel';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
+import { MiniMap } from '@/components/MiniMap';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
+import { useFieldEncounters } from '@/hooks/useFieldEncounters';
+import { useMapOverlay } from '@/hooks/useMapOverlay';
 import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
@@ -31,7 +34,6 @@ import {
 import { resyncSave } from '@/state/hydrate';
 import { ITEMS, EQUIPMENT, LOCATIONS, NPCS } from '@/data';
 import { isTypingTarget } from '@/utils/keyboard';
-import { isEncounterCooldownActive } from '@/utils/encounterCooldown';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
@@ -76,18 +78,19 @@ export function OverworldScene() {
   const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const suspended = activeNpc !== null || menuOpen || journalOpen || message !== null;
+  const otherOverlaysOpen = activeNpc !== null || menuOpen || journalOpen || message !== null;
+  const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
+  const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
-    onEncounterZoneStep: (chance, pos) => {
-      if (isEncounterCooldownActive()) return;
-      if (Math.random() < chance) {
-        goTo('combat', { locationId, spawnX: pos.x, spawnY: pos.y });
-      }
+    onFieldEncounterStep: (pos) => {
+      const icon = consumeFieldEncounterAt(pos.x, pos.y);
+      if (icon) goTo('combat', { locationId, spawnX: pos.x, spawnY: pos.y });
     },
     onBlockedTransition: setMessage,
   });
+  const { icons: fieldEncounterIcons, consumeAt: consumeFieldEncounterAt } = useFieldEncounters(map, locationId, positionRef);
 
   const { pending, run } = usePendingAction();
 
@@ -245,7 +248,14 @@ export function OverworldScene() {
       label: labelForInteractable(o.refId!, openedChests),
     }));
 
-  const entities = [...npcEntities, ...interactableEntities];
+  const fieldEncounterEntities: GridEntity[] = fieldEncounterIcons.map((icon) => ({
+    id: icon.id,
+    x: icon.x,
+    y: icon.y,
+    spriteAssetId: icon.spriteAssetId,
+  }));
+
+  const entities = [...npcEntities, ...interactableEntities, ...fieldEncounterEntities];
 
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
@@ -273,13 +283,14 @@ export function OverworldScene() {
             onDash={staminaUnlocked ? dash : undefined}
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
+            onMap={toggleMap}
           />
         </>
       ) : (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
-          &nbsp;·&nbsp; Watch for danger in the deep grass &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
+          &nbsp;·&nbsp; Avoid or approach enemies to fight &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Map: M
         </p>
       )}
       {activeNpc && (
@@ -312,6 +323,16 @@ export function OverworldScene() {
       )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
+      {mapOpen && (
+        <MiniMap
+          map={map}
+          position={position}
+          locationId={locationId}
+          openedChests={openedChests}
+          questProgress={questProgress}
+          onClose={closeMap}
+        />
+      )}
     </div>
   );
 }

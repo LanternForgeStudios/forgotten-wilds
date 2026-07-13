@@ -167,6 +167,7 @@ export const LOCATIONS: Location[] = [
     npcIds: ['mara-ash'],
     fastTravel: false,
     parentLocationId: 'ash-hallow',
+    buildingKind: 'shop',
   },
   {
     id: 'ash-hallow-inn',
@@ -179,6 +180,7 @@ export const LOCATIONS: Location[] = [
     npcIds: ['juniper-reed'],
     fastTravel: false,
     parentLocationId: 'ash-hallow',
+    buildingKind: 'inn',
   },
   {
     id: 'ash-hallow-blacksmith',
@@ -203,6 +205,7 @@ export const LOCATIONS: Location[] = [
     npcIds: ['willow-briar'],
     fastTravel: false,
     parentLocationId: 'ash-hallow',
+    buildingKind: 'apothecary',
   },
   {
     id: 'ash-hallow-armory',

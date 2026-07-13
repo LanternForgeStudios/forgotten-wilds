@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { TierBadge } from './common/TierBadge';
 import { getAssetUrl } from '@/assets/assetManager';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -11,7 +12,9 @@ import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useToastStore } from '@/state/useToastStore';
 import { sellPriceFor } from '@/utils/sellPrice';
 import { formatStatBonuses } from '@/utils/statBonuses';
+import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
 import { SHOP_LISTINGS, SHOP_TITLES, SHOP_CATALOGS, ITEMS, EQUIPMENT } from '@/data';
+import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
 
 interface ShopProps {
@@ -23,15 +26,26 @@ function defFor(itemId: string) {
   return ITEMS.find((i) => i.id === itemId) ?? EQUIPMENT.find((e) => e.id === itemId);
 }
 
-const SLOT_LABELS: Record<string, string> = {
-  weapon: 'Weapon',
-  armor: 'Armor',
-  boots: 'Boots',
-  gloves: 'Gloves',
-  charm: 'Charm',
-  lantern: 'Lantern',
-  spiritTotem: 'Spirit Totem',
+/** Filter dimension for the Sell tab: every real ItemCategory, plus a synthesized 'equipment'
+ *  bucket for anything found in EQUIPMENT (which has no `category` field of its own - see
+ *  defFor's merge of the two separate item/equipment arrays). */
+type SellTypeFilter = ItemCategory | 'equipment' | 'all';
+
+const SELL_TYPE_LABELS: Record<Exclude<SellTypeFilter, 'all'>, string> = {
+  consumable: 'Consumables',
+  equipment: 'Equipment',
+  keyItem: 'Key Items',
+  lanternUpgrade: 'Lantern Upgrades',
+  materials: 'Materials',
 };
+
+/** Order matches CharacterMenu.tsx's SLOT_FILTER_ORDER convention. */
+const SLOT_FILTER_ORDER: EquipmentSlot[] = ['armor', 'weapon', 'boots', 'gloves', 'lantern', 'charm', 'spiritTotem'];
+
+function sellTypeOf(itemDef: (typeof ITEMS)[number] | undefined, equipDef: (typeof EQUIPMENT)[number] | undefined): SellTypeFilter {
+  if (equipDef) return 'equipment';
+  return itemDef?.category ?? 'materials';
+}
 
 interface PendingSale {
   itemId: string;
@@ -54,6 +68,8 @@ export function Shop({ shopId, onClose }: ShopProps) {
   // Set when "Sell" is clicked, before the actual sellItem call - the confirmation overlay reads
   // this to show exactly what's about to happen, and only calls sell() once the player confirms.
   const [pendingSale, setPendingSale] = useState<PendingSale | null>(null);
+  const [sellTypeFilter, setSellTypeFilter] = useState<SellTypeFilter>('all');
+  const [sellSlotFilter, setSellSlotFilter] = useState<EquipmentSlot | 'all'>('all');
   const pushToast = useToastStore((s) => s.push);
   useOverlayClose(onClose);
 
@@ -104,6 +120,7 @@ export function Shop({ shopId, onClose }: ShopProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <OverlayCloseButton onClick={onClose} />
         <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>{SHOP_TITLES[shopId] ?? 'Shop'}</h2>
         <p style={{ fontSize: 13, marginTop: 0 }}>Your gold: {player?.gold ?? 0}g</p>
 
@@ -161,10 +178,63 @@ export function Shop({ shopId, onClose }: ShopProps) {
         {tab === 'sell' && (() => {
           const sellable = inventory
             .map((entry) => ({ entry, price: sellPriceFor(entry.itemId) }))
-            .filter((row): row is { entry: (typeof inventory)[number]; price: number } => row.price !== undefined);
+            .filter((row): row is { entry: (typeof inventory)[number]; price: number } => row.price !== undefined)
+            .filter(({ entry }) => {
+              if (sellTypeFilter === 'all') return true;
+              const itemDef = ITEMS.find((i) => i.id === entry.itemId);
+              const equipDef = EQUIPMENT.find((e) => e.id === entry.itemId);
+              return sellTypeOf(itemDef, equipDef) === sellTypeFilter;
+            })
+            .filter(({ entry }) => {
+              if (sellTypeFilter !== 'equipment' || sellSlotFilter === 'all') return true;
+              return EQUIPMENT.find((e) => e.id === entry.itemId)?.slot === sellSlotFilter;
+            });
 
           return (
-            <div className={styles.grid}>
+            <div>
+              <div className={styles.subtabs} style={{ marginBottom: 10 }}>
+                <button
+                  className={`${styles.subtab} ${sellTypeFilter === 'all' ? styles.subtabActive : ''}`}
+                  onClick={() => {
+                    setSellTypeFilter('all');
+                    setSellSlotFilter('all');
+                  }}
+                >
+                  All
+                </button>
+                {(Object.keys(SELL_TYPE_LABELS) as Exclude<SellTypeFilter, 'all'>[]).map((key) => (
+                  <button
+                    key={key}
+                    className={`${styles.subtab} ${sellTypeFilter === key ? styles.subtabActive : ''}`}
+                    onClick={() => {
+                      setSellTypeFilter(key);
+                      setSellSlotFilter('all');
+                    }}
+                  >
+                    {SELL_TYPE_LABELS[key]}
+                  </button>
+                ))}
+              </div>
+              {sellTypeFilter === 'equipment' && (
+                <div className={styles.subtabs} style={{ marginBottom: 10 }}>
+                  <button
+                    className={`${styles.subtab} ${sellSlotFilter === 'all' ? styles.subtabActive : ''}`}
+                    onClick={() => setSellSlotFilter('all')}
+                  >
+                    All Slots
+                  </button>
+                  {SLOT_FILTER_ORDER.map((slot) => (
+                    <button
+                      key={slot}
+                      className={`${styles.subtab} ${sellSlotFilter === slot ? styles.subtabActive : ''}`}
+                      onClick={() => setSellSlotFilter(slot)}
+                    >
+                      {SLOT_LABELS[slot]}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className={styles.grid}>
               {sellable.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>Nothing to sell.</p>}
               {sellable.map(({ entry, price }) => {
                 const def = defFor(entry.itemId);
@@ -228,6 +298,7 @@ export function Shop({ shopId, onClose }: ShopProps) {
                   </div>
                 );
               })}
+              </div>
             </div>
           );
         })()}

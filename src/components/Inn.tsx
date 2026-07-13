@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { callRestAtInn } from '@/firebase/functionsClient';
@@ -41,6 +42,7 @@ export function Inn({ onClose }: InnProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} style={{ width: 'min(400px, 92vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <OverlayCloseButton onClick={onClose} />
         <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 8px' }}>Juniper Reed's Inn</h2>
         <p style={{ fontSize: 13 }}>
           Rest for {INN_REST_COST}g and restore your HP, Spirit{hasLantern ? ', and Lantern Oil' : ''} fully.

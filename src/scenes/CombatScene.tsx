@@ -22,7 +22,6 @@ import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKIL
 import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { itemWouldHaveEffect } from '@/utils/itemEffect';
-import { markEncounterEnded } from '@/utils/encounterCooldown';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
@@ -165,6 +164,8 @@ export function CombatScene() {
         // there's no extra loading flicker once the cutscene dismisses.
         useCutsceneStore.getState().play({
           ...battleStartCutscene(res.enemies, location?.battleBackgroundAssetId ?? 'battle-bg.forest'),
+          autoAdvanceMs: 5000,
+          enemies: res.enemies.map((e) => ({ spriteAssetId: ENEMIES.find((d) => d.id === e.enemyId)?.battleSpriteAssetId ?? '' })),
           onComplete: () => setPhase('playerTurn'),
         });
       })
@@ -366,7 +367,6 @@ export function CombatScene() {
   }
 
   async function returnToExploration() {
-    markEncounterEnded();
     const wasDefeat = phase === 'defeat';
     // The defeat round's real (already-respawned) hp/spirit were deliberately withheld from the
     // store back in act() so the HUD didn't show them healed while the defeat overlay was still
@@ -389,7 +389,7 @@ export function CombatScene() {
         spawnY: preserveSpawn ? params.spawnY : undefined,
       });
     if (wasDefeat) {
-      useCutsceneStore.getState().play({ ...DEFEAT_CUTSCENE, onComplete: goToExploration });
+      useCutsceneStore.getState().play({ ...DEFEAT_CUTSCENE, entryEffect: 'wake-up', onComplete: goToExploration });
     } else {
       goToExploration();
     }
@@ -447,6 +447,7 @@ export function CombatScene() {
                 name: e.name,
                 tierLabel: ENEMY_TIER_LABELS[e.tier],
                 tierColor: ENEMY_TIER_COLORS[e.tier],
+                tier: e.tier,
                 level: e.level,
                 hp: e.hp,
                 maxHp: e.maxHp,

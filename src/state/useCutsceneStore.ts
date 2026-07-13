@@ -9,6 +9,18 @@ export interface CutsceneConfig {
   /** Boss/high-stakes flourish: a camera shake + darker flash the instant the cutscene appears,
    *  instead of just fading the background in plainly. */
   dramatic?: boolean;
+  /** Opt-in per config, not a global behavior - only the battle-entry cutscene sets this today.
+   *  A flat countdown for the whole cutscene (not reset per line): once it elapses, Cutscene.tsx
+   *  calls finish() itself, same as if the player had clicked/skipped. An early manual
+   *  advance/skip still wins normally, this is just a ceiling. */
+  autoAdvanceMs?: number;
+  /** Enemies about to be faced, shown arriving via a portal/particle-burst flourish (see
+   *  CutsceneScene.showEnemyArrivals) - only the battle-entry cutscene sets this today. */
+  enemies?: { spriteAssetId: string }[];
+  /** Alternate background entry animation for the one case that isn't a plain fade-in - the
+   *  defeat cutscene's black -> white -> image "waking up" sequence (see
+   *  CutsceneScene.playWakeUpSequence). Omitted means the default loadBackground fade-in. */
+  entryEffect?: 'wake-up';
   /** Called once, when the player dismisses the final line (or skips). Not called on skip if the
    *  caller's own logic depends on every line having been shown - skip still counts as "done"
    *  either way, since nothing here blocks progress on a line actually being read. */

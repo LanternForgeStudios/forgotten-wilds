@@ -28,6 +28,17 @@ export function Cutscene() {
     else setIndex((i) => i + 1);
   }
 
+  // Flat auto-advance for the whole cutscene (not reset per line) - mirrors ToastHost's own
+  // AUTO_DISMISS_MS/setTimeout pattern. Only fires for configs that opt in (autoAdvanceMs set);
+  // cleared on unmount and whenever `active` changes, which covers "user skipped/advanced to the
+  // last line early" for free since finish() nulls `active`, re-running this effect's cleanup.
+  useEffect(() => {
+    if (!active?.autoAdvanceMs) return;
+    const timeoutId = window.setTimeout(() => finish(), active.autoAdvanceMs);
+    return () => window.clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
   useEffect(() => {
     if (!active) return;
     function handleKey(e: KeyboardEvent) {
@@ -49,7 +60,12 @@ export function Cutscene() {
 
   return (
     <>
-      <PhaserCutsceneCanvas backgroundAssetId={active.backgroundAssetId} dramatic={active.dramatic} />
+      <PhaserCutsceneCanvas
+        backgroundAssetId={active.backgroundAssetId}
+        dramatic={active.dramatic}
+        enemies={active.enemies}
+        entryEffect={active.entryEffect}
+      />
       <div className={styles.textOverlay} onClick={advance}>
         <div className={styles.box}>
           <p className={styles.text}>{active.lines[index]}</p>

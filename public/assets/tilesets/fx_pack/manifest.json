@@ -1,0 +1,82 @@
+{
+  "frameWidth": 16,
+  "frameHeight": 16,
+  "framesPerEffect": 4,
+  "effects": {
+    "shadow_moth": {
+      "sheet": "sheets/shadow_moth.png",
+      "single": "singles/shadow_moth.png",
+      "key": "fx-shadow-moth"
+    },
+    "ash": {
+      "sheet": "sheets/ash.png",
+      "single": "singles/ash.png",
+      "key": "fx-ash"
+    },
+    "smoke_puff": {
+      "sheet": "sheets/smoke_puff.png",
+      "single": "singles/smoke_puff.png",
+      "key": "fx-smoke-puff"
+    },
+    "magic_spark": {
+      "sheet": "sheets/magic_spark.png",
+      "single": "singles/magic_spark.png",
+      "key": "fx-magic-spark"
+    },
+    "ember": {
+      "sheet": "sheets/ember.png",
+      "single": "singles/ember.png",
+      "key": "fx-ember"
+    },
+    "poison_cloud": {
+      "sheet": "sheets/poison_cloud.png",
+      "single": "singles/poison_cloud.png",
+      "key": "fx-poison-cloud"
+    },
+    "healing_sparkle": {
+      "sheet": "sheets/healing_sparkle.png",
+      "single": "singles/healing_sparkle.png",
+      "key": "fx-healing-sparkle"
+    },
+    "holy_light": {
+      "sheet": "sheets/holy_light.png",
+      "single": "singles/holy_light.png",
+      "key": "fx-holy-light"
+    },
+    "blood_splatter": {
+      "sheet": "sheets/blood_splatter.png",
+      "single": "singles/blood_splatter.png",
+      "key": "fx-blood-splatter"
+    },
+    "bone_fragment": {
+      "sheet": "sheets/bone_fragment.png",
+      "single": "singles/bone_fragment.png",
+      "key": "fx-bone-fragment"
+    },
+    "ice_shard": {
+      "sheet": "sheets/ice_shard.png",
+      "single": "singles/ice_shard.png",
+      "key": "fx-ice-shard"
+    },
+    "water_drop": {
+      "sheet": "sheets/water_drop.png",
+      "single": "singles/water_drop.png",
+      "key": "fx-water-drop"
+    },
+    "earth_chip": {
+      "sheet": "sheets/earth_chip.png",
+      "single": "singles/earth_chip.png",
+      "key": "fx-earth-chip"
+    },
+    "wind_swirl": {
+      "sheet": "sheets/wind_swirl.png",
+      "single": "singles/wind_swirl.png",
+      "key": "fx-wind-swirl"
+    },
+    "dark_energy": {
+      "sheet": "sheets/dark_energy.png",
+      "single": "singles/dark_energy.png",
+      "key": "fx-dark-energy"
+    }
+  }
+}

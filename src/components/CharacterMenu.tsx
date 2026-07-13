@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { TierBadge } from './common/TierBadge';
 import { getAssetUrl } from '@/assets/assetManager';
 import { useInventoryStore } from '@/state/useInventoryStore';
@@ -13,21 +14,12 @@ import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
 import { formatStatBonuses } from '@/utils/statBonuses';
 import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect } from '@/utils/itemEffect';
+import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
 import styles from './CharacterMenu.module.css';
 
 interface CharacterMenuProps {
   onClose: () => void;
 }
-
-const SLOT_LABELS: Record<string, string> = {
-  weapon: 'Weapon',
-  armor: 'Armor',
-  boots: 'Boots',
-  gloves: 'Gloves',
-  charm: 'Charm',
-  lantern: 'Lantern',
-  spiritTotem: 'Spirit Totem',
-};
 
 type InventorySubTab = 'all' | 'consumable' | 'equipment' | 'materials' | 'keyItem' | 'unique';
 
@@ -188,6 +180,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <OverlayCloseButton onClick={onClose} />
         <div className={styles.tabs}>
           <button
             className={`${styles.tab} ${tab === 'inventory' ? styles.tabActive : ''}`}

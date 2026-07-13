@@ -64,8 +64,11 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 - `src/scenes/` — Title, Character Creation, Town, Overworld, Dungeon, Combat
 - `src/components/` — DialogueBox, CharacterMenu (Inventory/Equipment), Shop, Inn, JournalOfLegends
   (Quests/Locations/Creatures/Lore/Bosses tabs — the Quest Log was folded into its Quests tab),
-  PlayerHUD, ToastHost (transient quest-progress notifications), and shared UI (`common/Panel` —
-  the 9-slice panel used everywhere)
+  PlayerHUD, ToastHost (transient quest-progress notifications), MiniMap (player-invoked, M key or
+  the mobile Map button — canvas-drawn player position/buildings/opened chests/exits/toggleable
+  quest markers, see `src/hooks/useMapOverlay.ts` for its open/close/suspend wiring), and shared UI
+  (`common/Panel` — the 9-slice panel used everywhere; `common/OverlayCloseButton` — the corner
+  close button every top-level overlay panel uses)
 - `src/data/` — display-only seed data (items, equipment, enemies, NPCs, quests, locations, lore)
 - `src/assets/` — the Asset Manager and registry (`registry.ts`); every sprite/tileset/icon/map
   is looked up by id here, never imported by file path directly. See `public/CREDITS.md` for

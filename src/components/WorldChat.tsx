@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Panel } from './common/Panel';
+import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { callSendWorldChatMessage } from '@/firebase/functionsClient';
@@ -54,6 +55,7 @@ export function WorldChat({ onClose }: WorldChatProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        <OverlayCloseButton onClick={onClose} />
         <h2 className={styles.title}>World Chat</h2>
         <div className={styles.messages} ref={messagesRef}>
           {visibleMessages.length === 0 && <p className={styles.empty}>No messages yet - say hello!</p>}

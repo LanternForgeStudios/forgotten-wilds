@@ -6,7 +6,10 @@ import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { Panel } from '@/components/common/Panel';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
+import { MiniMap } from '@/components/MiniMap';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
+import { useFieldEncounters } from '@/hooks/useFieldEncounters';
+import { useMapOverlay } from '@/hooks/useMapOverlay';
 import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
@@ -24,7 +27,6 @@ import { isTypingTarget } from '@/utils/keyboard';
 import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { ITEMS, EQUIPMENT } from '@/data';
-import { isEncounterCooldownActive } from '@/utils/encounterCooldown';
 import styles from './TownScene.module.css';
 
 const LOCATION_ID = 'hollow-rail-mine';
@@ -53,18 +55,19 @@ export function DungeonScene() {
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const suspended = message !== null || menuOpen || journalOpen;
+  const otherOverlaysOpen = message !== null || menuOpen || journalOpen;
+  const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
+  const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, facingDelta, attemptMove, movementState } = useLocationExploration({
     locationId: LOCATION_ID,
     suspended,
-    onEncounterZoneStep: (chance, pos) => {
-      if (isEncounterCooldownActive()) return;
-      if (Math.random() < chance) {
-        goTo('combat', { locationId: LOCATION_ID, spawnX: pos.x, spawnY: pos.y });
-      }
+    onFieldEncounterStep: (pos) => {
+      const icon = consumeFieldEncounterAt(pos.x, pos.y);
+      if (icon) goTo('combat', { locationId: LOCATION_ID, spawnX: pos.x, spawnY: pos.y });
     },
     onBlockedTransition: setMessage,
   });
+  const { icons: fieldEncounterIcons, consumeAt: consumeFieldEncounterAt } = useFieldEncounters(map, LOCATION_ID, positionRef);
 
   const { pending, run } = usePendingAction();
 
@@ -166,7 +169,7 @@ export function DungeonScene() {
     );
   }
 
-  const entities: GridEntity[] = map.objects
+  const interactableEntities: GridEntity[] = map.objects
     .filter((o) => o.type === 'interactable' && o.refId)
     .map((o) => {
       if (o.refId === 'coalbound-warden') {
@@ -183,6 +186,15 @@ export function DungeonScene() {
         label: labelForInteractable(o.refId!, openedChests),
       };
     });
+
+  const fieldEncounterEntities: GridEntity[] = fieldEncounterIcons.map((icon) => ({
+    id: icon.id,
+    x: icon.x,
+    y: icon.y,
+    spriteAssetId: icon.spriteAssetId,
+  }));
+
+  const entities = [...interactableEntities, ...fieldEncounterEntities];
 
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
@@ -210,13 +222,14 @@ export function DungeonScene() {
             onDash={staminaUnlocked ? dash : undefined}
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
+            onMap={toggleMap}
           />
         </>
       ) : (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
-          &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J
+          &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Map: M
         </p>
       )}
       {message && (
@@ -242,6 +255,16 @@ export function DungeonScene() {
       )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
+      {mapOpen && (
+        <MiniMap
+          map={map}
+          position={position}
+          locationId={LOCATION_ID}
+          openedChests={openedChests}
+          questProgress={questProgress}
+          onClose={closeMap}
+        />
+      )}
     </div>
   );
 }

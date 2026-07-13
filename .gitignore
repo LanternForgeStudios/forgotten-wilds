@@ -23,6 +23,9 @@ firestore-debug.log
 ui-debug.log
 *-debug.log
 
+# User's personal scratch folder for editing art before it moves into the staging pipeline
+art-staging/tmp-working/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

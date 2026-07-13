@@ -5,6 +5,8 @@ import { CutsceneScene } from '@/phaser/CutsceneScene';
 interface PhaserCutsceneCanvasProps {
   backgroundAssetId: string;
   dramatic?: boolean;
+  enemies?: { spriteAssetId: string }[];
+  entryEffect?: 'wake-up';
 }
 
 /** Full-screen Phaser canvas behind a cutscene's text box - same create-on-mount/destroy-on-
@@ -12,7 +14,7 @@ interface PhaserCutsceneCanvasProps {
  *  window directly (a plain resize listener) rather than a ResizeObserver on a flex-sized
  *  container, since a cutscene is always a fixed full-viewport overlay, never embedded in a
  *  responsive layout the way the battle stage is. */
-export function PhaserCutsceneCanvas({ backgroundAssetId, dramatic }: PhaserCutsceneCanvasProps) {
+export function PhaserCutsceneCanvas({ backgroundAssetId, dramatic, enemies, entryEffect }: PhaserCutsceneCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
   const sceneRef = useRef<CutsceneScene | null>(null);
@@ -56,9 +58,27 @@ export function PhaserCutsceneCanvas({ backgroundAssetId, dramatic }: PhaserCuts
 
   useEffect(() => {
     if (!sceneReady) return;
-    void sceneRef.current?.loadBackground(backgroundAssetId, viewport.width, viewport.height);
+    let cancelled = false;
+    async function run() {
+      // entryEffect='wake-up' (defeat cutscene) replaces the plain fade-in with the black->white->
+      // image sequence; every other cutscene keeps the default cover-scaled fade-in.
+      if (entryEffect === 'wake-up') {
+        await sceneRef.current?.playWakeUpSequence(backgroundAssetId, viewport.width, viewport.height);
+      } else {
+        await sceneRef.current?.loadBackground(backgroundAssetId, viewport.width, viewport.height);
+      }
+      // Enemy arrivals are sequenced to start after the background is in place, not racing it -
+      // and bail if this effect was superseded (a new cutscene started) before the background
+      // finished loading.
+      if (cancelled || !enemies?.length) return;
+      void sceneRef.current?.showEnemyArrivals(enemies);
+    }
+    void run();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sceneReady, backgroundAssetId]);
+  }, [sceneReady, backgroundAssetId, entryEffect]);
 
   useEffect(() => {
     if (!sceneReady || !dramatic) return;

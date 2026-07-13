@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="128" viewBox="0 0 96 128">
+  <defs>
+    <linearGradient id="trunk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b4426"/>
+      <stop offset="1" stop-color="#3a2414"/>
+    </linearGradient>
+    <radialGradient id="canopy" cx="0.4" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#4f7a3a"/>
+      <stop offset="1" stop-color="#2c4a20"/>
+    </radialGradient>
+  </defs>
+  <rect x="42" y="80" width="12" height="44" rx="2" fill="url(#trunk)" stroke="#2c1c0c" stroke-width="1"/>
+  <ellipse cx="48" cy="52" rx="44" ry="48" fill="url(#canopy)" stroke="#1f3316" stroke-width="1"/>
+  <text x="50%" y="122" font-family="Georgia, serif" font-size="8" fill="#f4e9d8" text-anchor="middle">TREE</text>
+</svg>
