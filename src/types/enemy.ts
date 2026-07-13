@@ -41,7 +41,8 @@ export interface Enemy {
    *  mechanically meaningful; ready for a future elemental-attack system to populate. */
   weaknesses?: string[];
   /** Display-only, for the Journal's Echoes/Bosses detail card - not read by any combat math yet.
-   *  Unset today since no ailment system exists; ready for the future ailment system to populate
-   *  (e.g. an enemy whose moves can inflict Poison would list 'poison' here). */
+   *  Ailment ids (see data/ailments.ts), not display names - JournalOfLegends.tsx resolves each id
+   *  to its AILMENTS name at render time. Derived by hand from this enemy's moves' own
+   *  inflictsAilmentId in functions/src/data/skills.ts - keep in sync if a move's ailment changes. */
   ailmentsInflicted?: string[];
 }

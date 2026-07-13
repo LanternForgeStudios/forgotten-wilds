@@ -14,6 +14,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 3 },
       { skillId: 'mothling-dustwing', weight: 1 },
     ],
+    ailmentsInflicted: ['blind'],
     xpReward: 12,
     goldReward: 6,
     lootTable: [
@@ -36,6 +37,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 2 },
       { skillId: 'mothling-dustwing', weight: 2 },
     ],
+    ailmentsInflicted: ['blind'],
     xpReward: 20,
     goldReward: 11,
     lootTable: [
@@ -57,6 +59,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 3 },
       { skillId: 'miner-pickaxe-swing', weight: 1 },
     ],
+    ailmentsInflicted: ['stun'],
     xpReward: 15,
     goldReward: 9,
     lootTable: [{ itemId: 'rusted-token', chance: 0.35, minQuantity: 1, maxQuantity: 1 }],
@@ -74,6 +77,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 2 },
       { skillId: 'miner-pickaxe-swing', weight: 2 },
     ],
+    ailmentsInflicted: ['stun'],
     xpReward: 24,
     goldReward: 14,
     lootTable: [{ itemId: 'rusted-token', chance: 0.45, minQuantity: 1, maxQuantity: 2 }],
@@ -91,6 +95,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 2 },
       { skillId: 'coalspirit-cinderburst', weight: 2 },
     ],
+    ailmentsInflicted: ['burn'],
     xpReward: 14,
     goldReward: 8,
     lootTable: [
@@ -112,6 +117,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 1 },
       { skillId: 'coalspirit-cinderburst', weight: 3 },
     ],
+    ailmentsInflicted: ['burn'],
     xpReward: 22,
     goldReward: 13,
     lootTable: [
@@ -133,6 +139,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 2 },
       { skillId: 'ridge-ambush', weight: 2 },
     ],
+    ailmentsInflicted: ['silence'],
     xpReward: 13,
     goldReward: 7,
     lootTable: [
@@ -153,6 +160,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 1 },
       { skillId: 'ridge-ambush', weight: 3 },
     ],
+    ailmentsInflicted: ['silence'],
     xpReward: 21,
     goldReward: 12,
     lootTable: [
@@ -173,6 +181,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 2 },
       { skillId: 'wisp-chill', weight: 2 },
     ],
+    ailmentsInflicted: ['freeze'],
     xpReward: 14,
     goldReward: 8,
     lootTable: [
@@ -194,6 +203,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 1 },
       { skillId: 'wisp-chill', weight: 3 },
     ],
+    ailmentsInflicted: ['freeze'],
     xpReward: 22,
     goldReward: 13,
     lootTable: [
@@ -215,6 +225,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 2 },
       { skillId: 'briar-thorn-lash', weight: 2 },
     ],
+    ailmentsInflicted: ['poison'],
     xpReward: 16,
     goldReward: 9,
     lootTable: [
@@ -235,6 +246,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'attack', weight: 1 },
       { skillId: 'briar-thorn-lash', weight: 3 },
     ],
+    ailmentsInflicted: ['poison'],
     xpReward: 24,
     goldReward: 14,
     lootTable: [
@@ -256,6 +268,7 @@ export const ENEMIES: Enemy[] = [
       { skillId: 'warden-coal-slam', weight: 2 },
       { skillId: 'warden-warden-wrath', weight: 2, unlocksAtHpFraction: 0.5 },
     ],
+    ailmentsInflicted: ['burn'],
     xpReward: 150,
     goldReward: 80,
     lootTable: [

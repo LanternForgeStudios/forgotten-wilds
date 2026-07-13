@@ -172,9 +172,17 @@ export async function callRestAtInn(): Promise<void> {
   await fn({});
 }
 
-export async function callUseItem(itemId: string): Promise<void> {
-  const fn = httpsCallable<{ itemId: string }, unknown>(functions, 'useItem');
-  await fn({ itemId });
+interface UseItemResponse {
+  playerAilments: ActiveAilment[];
+}
+
+/** The response's playerAilments is only meaningful mid-combat (a cureAilmentId item, e.g. Eye
+ *  Drops on Blind, used via the free item-menu "Done" path rather than as a full turn action) -
+ *  see useItem.ts. Outside combat it's always []. */
+export async function callUseItem(itemId: string): Promise<UseItemResponse> {
+  const fn = httpsCallable<{ itemId: string }, UseItemResponse>(functions, 'useItem');
+  const res = await fn({ itemId });
+  return res.data;
 }
 
 export async function callInteractWithShrine(

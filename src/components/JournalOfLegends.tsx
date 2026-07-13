@@ -13,7 +13,7 @@ import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { TIER_LABELS, TIER_COLORS } from '@/utils/tier';
 import { sellPriceFor } from '@/utils/sellPrice';
 import { useInventoryStore } from '@/state/useInventoryStore';
-import { ENEMIES, ITEMS, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
+import { AILMENTS, ENEMIES, ITEMS, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
 import type { Enemy, EnemyTier, Item, ItemCategory, Quest, QuestCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
 import questStyles from './QuestLog.module.css';
@@ -643,7 +643,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   <strong>Ailments Inflicted</strong>
                 </p>
                 <p className={questStyles.objective}>
-                  {enemy.ailmentsInflicted && enemy.ailmentsInflicted.length > 0 ? enemy.ailmentsInflicted.join(', ') : 'None known'}
+                  {enemy.ailmentsInflicted && enemy.ailmentsInflicted.length > 0
+                    ? enemy.ailmentsInflicted.map((id) => AILMENTS[id]?.name ?? id).join(', ')
+                    : 'None known'}
                 </p>
 
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>

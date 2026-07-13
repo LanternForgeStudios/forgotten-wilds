@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Panel } from '@/components/common/Panel';
+import { OverlayCloseButton } from '@/components/common/OverlayCloseButton';
 import { PlayerHUD } from '@/components/PlayerHUD';
 import { PhaserBattleCanvas } from '@/components/combat/PhaserBattleCanvas';
 import {
@@ -67,6 +68,7 @@ export function CombatScene() {
   const [targetMode, setTargetMode] = useState<'single' | 'all'>('single');
   const [log, setLog] = useState<string[]>([]);
   const [playerAilments, setPlayerAilments] = useState<ActiveAilment[]>([]);
+  const [selectedAilmentId, setSelectedAilmentId] = useState<string | null>(null);
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // Up to 3 item ids queued to ride along with whatever primary action the player takes next
@@ -345,7 +347,8 @@ export function CombatScene() {
     let failed = false;
     for (const itemId of queued) {
       try {
-        await callUseItem(itemId);
+        const res = await callUseItem(itemId);
+        setPlayerAilments(res.playerAilments);
         usedCount += 1;
       } catch {
         // A later item can still be valid even if an earlier one turned out to be a no-op (e.g.
@@ -426,15 +429,49 @@ export function CombatScene() {
           {playerAilments.map((a) => {
             const def = AILMENTS[a.ailmentId];
             return (
-              <span key={a.ailmentId} className={styles.ailmentBadge} title={def?.description ?? a.ailmentId}>
+              <button
+                key={a.ailmentId}
+                type="button"
+                className={styles.ailmentBadge}
+                title={def?.description ?? a.ailmentId}
+                onClick={() => setSelectedAilmentId((id) => (id === a.ailmentId ? null : a.ailmentId))}
+              >
                 {def?.iconAssetId && <img src={getAssetUrl(def.iconAssetId)} alt="" className={styles.ailmentIcon} />}
                 {def?.name ?? a.ailmentId}
                 {a.turnsRemaining !== undefined ? ` (${a.turnsRemaining})` : ''}
-              </span>
+              </button>
             );
           })}
         </div>
       )}
+
+      {selectedAilmentId &&
+        (() => {
+          const def = AILMENTS[selectedAilmentId];
+          // The cure item's own description already says "Cures X." (see items.ts) - just need to
+          // find which item, if any, cures this ailment. Stun has none by design (it auto-expires
+          // after 1 turn, see AILMENTS' own description text).
+          const cureItem = ITEMS.find((i) => i.effect?.cureAilmentId === selectedAilmentId);
+          return (
+            <div className={styles.overlay} onClick={() => setSelectedAilmentId(null)}>
+              <Panel
+                style={{ width: 'min(360px, 90vw)' }}
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+              >
+                <OverlayCloseButton onClick={() => setSelectedAilmentId(null)} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  {def?.iconAssetId && <img src={getAssetUrl(def.iconAssetId)} alt="" className={styles.ailmentIcon} />}
+                  <h3 style={{ margin: 0, color: 'var(--fw-accent)' }}>{def?.name ?? selectedAilmentId}</h3>
+                </div>
+                <p style={{ fontSize: 13, margin: '0 0 10px' }}>{def?.description ?? 'No further details known.'}</p>
+                <p style={{ fontSize: 13, margin: 0 }}>
+                  <strong>Cure: </strong>
+                  {cureItem ? cureItem.name : 'None - wears off on its own.'}
+                </p>
+              </Panel>
+            </div>
+          );
+        })()}
 
       <div className={styles.stage}>
         <div className={styles.enemyArea}>
@@ -508,7 +545,13 @@ export function CombatScene() {
               {combatItems.length === 0 && <p style={{ fontSize: 12, gridColumn: '1 / -1' }}>No usable items.</p>}
               {combatItems.map((i) => {
                 const def = ITEMS.find((d) => d.id === i.itemId);
-                const wouldHelp = player ? itemWouldHaveEffect(def?.effect, player.stats) : false;
+                const wouldHelp = player
+                  ? itemWouldHaveEffect(
+                      def?.effect,
+                      player.stats,
+                      playerAilments.map((a) => a.ailmentId),
+                    )
+                  : false;
                 const queued = queuedCountFor(i.itemId);
                 const canAdd = wouldHelp && canQueueMore && queued < i.quantity;
                 return (
