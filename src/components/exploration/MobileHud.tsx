@@ -3,8 +3,11 @@ import styles from './MobileHud.module.css';
 interface MobileHudProps {
   onInteract?: () => void;
   /** Omitted until Stamina/Dash is unlocked - there's no keyboard on mobile to hold Shift with,
-   *  so this button is the only way to Dash there. Dashes in whichever direction is currently faced. */
-  onDash?: () => void;
+   *  so this button is the only way to Dash there. Press-and-hold (not a tap), mirroring Shift's
+   *  hold-to-run keyboard behavior - runs in whichever direction is currently faced until
+   *  released, out of Stamina, or blocked. */
+  onDashStart?: () => void;
+  onDashStop?: () => void;
   onInventory: () => void;
   /** Also where Quests live now (its own tab, opened first by default) - there's no separate
    *  Quests button since the standalone Quest Log was folded into the Journal. */
@@ -16,7 +19,7 @@ interface MobileHudProps {
 
 /** Touch replacement for the Enter/I/J/C/M/Shift+direction keyboard shortcuts, since phones have no
  *  keyboard to press. */
-export function MobileHud({ onInteract, onDash, onInventory, onJournal, onChat, onMap }: MobileHudProps) {
+export function MobileHud({ onInteract, onDashStart, onDashStop, onInventory, onJournal, onChat, onMap }: MobileHudProps) {
   return (
     <div className={styles.hud}>
       {onInteract && (
@@ -24,8 +27,14 @@ export function MobileHud({ onInteract, onDash, onInventory, onJournal, onChat, 
           Talk / Interact
         </button>
       )}
-      {onDash && (
-        <button className={styles.interactButton} onClick={() => onDash()}>
+      {onDashStart && (
+        <button
+          className={styles.interactButton}
+          onPointerDown={onDashStart}
+          onPointerUp={onDashStop}
+          onPointerLeave={onDashStop}
+          onPointerCancel={onDashStop}
+        >
           Dash
         </button>
       )}

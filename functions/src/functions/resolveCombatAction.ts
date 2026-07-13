@@ -62,6 +62,10 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     // Backfill for sessions created before playerAilments existed - see startEncounter.ts's
     // matching comment.
     const playerAilments = session.playerAilments ?? [];
+    // Backfill for a save written before knownSkillIds existed - see journal.itemsDiscovered's
+    // matching pattern in inventoryEngine.ts. Persisted below via the unconditional tx.set(userRef,
+    // save), so this only ever needs to run once per player.
+    if (!save.player.knownSkillIds) save.player.knownSkillIds = ['keepers-strike'];
 
     // Data-driven rather than hardcoding "if silence"/"if freeze" - any current or future ailment
     // whose effect sets blocksSkill/disablesLanternAbility gates the matching action, keyed off
@@ -106,8 +110,15 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       throw new HttpsError('failed-precondition', 'You do not have enough of that item.');
     }
     if (action.type === 'skill') {
-      const skill = SKILLS[action.skillId ?? 'keepers-strike'];
+      const skillId = action.skillId ?? 'keepers-strike';
+      const skill = SKILLS[skillId];
       if (!skill) throw new HttpsError('invalid-argument', 'Unknown Specialty Attack.');
+      // SKILLS also holds every enemy's own signature move in the same flat dictionary (see
+      // data/skills.ts) - without this check, a crafted client call could request any of those by
+      // id. Real ownership, not just "does this id exist somewhere."
+      if (!save.player.knownSkillIds.includes(skillId)) {
+        throw new HttpsError('failed-precondition', 'You have not learned that Specialty Attack.');
+      }
       if (save.player.stats.spirit < skill.spiritCost) {
         throw new HttpsError('failed-precondition', 'Not enough Spirit for that.');
       }

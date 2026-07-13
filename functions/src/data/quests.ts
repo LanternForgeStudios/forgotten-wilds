@@ -21,7 +21,16 @@ export interface QuestDef {
   id: string;
   prerequisiteQuestId: string | null;
   objectives: QuestObjectiveDef[];
-  reward: { xp: number; gold: number; itemIds?: string[]; spiritEssence?: number };
+  reward: {
+    xp: number;
+    gold: number;
+    itemIds?: string[];
+    spiritEssence?: number;
+    /** A Specialty Attack id (data/skills.ts) to add to Player.knownSkillIds on completion -
+     *  plumbing for future quest-taught Specialty Attacks (see CombatScene.tsx's "Select Spirit
+     *  Ability" submenu). No quest uses this yet. */
+    grantSkillId?: string;
+  };
 }
 
 // The real Main Story Framework content (docs/Mytherra-MSQ_breakdown.md): Prologue (MSF-P-001-004)

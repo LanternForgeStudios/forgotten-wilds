@@ -279,9 +279,11 @@ export function hasSufficientQuantity(
 }
 
 /** One round of turn-based combat against a roster of 1-6 enemies. Turn order is the player plus
- *  every still-alive enemy, sorted by speed descending (ties favor the player, matching the old
- *  1-enemy `playerFirst = playerSpeed >= enemySpeed` rule). The player's single action can only
- *  target one enemy (attack/skill/lanternAbility); every other living enemy still gets its own
+ *  every still-alive enemy, each rolling initiative (speed + d6, see rollInitiative below) and
+ *  sorted descending - speed still dominates, but the roll gives round-to-round variance instead
+ *  of a fully deterministic sort (ties, now rare, favor the player - the old tie-break rule).
+ *  The player's single action can only target one enemy (attack/skill/lanternAbility); every other
+ *  living enemy still gets its own
  *  turn against the player the same round - that's what makes a group of weaker enemies dangerous
  *  in aggregate even though the player only ever swings at one of them per round. Each enemy's
  *  stats here are its level-scaled stats (see scaledEnemyStats), not its raw authored base.
@@ -434,6 +436,14 @@ export function resolveRound(input: RoundInput): RoundResult {
     }
   }
 
+  /** 1.5x, matching the existing effectiveAgainstFamilies bonus's value, when the move's own
+   *  damageType matches this enemy's authored weaknessDamageType (data/enemies.ts) - shared by all
+   *  three offensive action types so "bring the right damage type" is a real, consistent incentive
+   *  rather than something only lantern abilities' family-effectiveness bonus rewarded before. */
+  function weaknessMultiplier(enemyIdx: number, damageType: DamageType): number {
+    return enemyDefs[enemyIdx].weaknessDamageType === damageType ? 1.5 : 1;
+  }
+
   function resolveTargetIndex(): number | undefined {
     const alive = aliveIndices();
     if (alive.length === 0) return undefined;
@@ -447,10 +457,10 @@ export function resolveRound(input: RoundInput): RoundResult {
    *  scaled independently - own defense, own variance, own miss chance). Falls back to normal
    *  single-target behavior (no reduction, no miss) once only one enemy remains.
    *
-   *  `damageType` defaults to 'physical' (plain Attack has no explicit Skill entry to read it
-   *  from) - Blind's accuracy penalty only ever applies when it's 'physical', per its "reduced
-   *  physical-attack accuracy" spec. A lanternAbility call site passes 'spirit' since a
-   *  lantern-channeled attack isn't a hand-swung physical strike. */
+   *  `damageType` is always passed explicitly by every call site today (attack: 'physical', skill:
+   *  whatever the Skill entry says, lanternAbility: 'lantern') - the 'physical' default only
+   *  matters if a future call site omits it. Blind's accuracy penalty only ever applies when it's
+   *  'physical', per its "reduced physical-attack accuracy" spec. */
   function resolveOffensiveHits(
     power: number,
     verb: string,
@@ -534,12 +544,17 @@ export function resolveRound(input: RoundInput): RoundResult {
   function playerTurn() {
     switch (action.type) {
       case 'attack':
-        resolveOffensiveHits(SKILLS.attack.power, 'You strike');
+        resolveOffensiveHits(SKILLS.attack.power, 'You strike', (i) => weaknessMultiplier(i, 'physical'), 'physical');
         break;
       case 'skill': {
         const skill = SKILLS[action.skillId ?? 'keepers-strike'];
         playerSpirit = Math.max(0, playerSpirit - skill.spiritCost);
-        resolveOffensiveHits(skill.power, "Keeper's Strike hits", undefined, skill.damageType);
+        resolveOffensiveHits(
+          skill.power,
+          "Keeper's Strike hits",
+          (i) => weaknessMultiplier(i, skill.damageType),
+          skill.damageType,
+        );
         break;
       }
       case 'lanternAbility': {
@@ -550,8 +565,10 @@ export function resolveRound(input: RoundInput): RoundResult {
           resolveOffensiveHits(
             ability.power ?? 0,
             `${ability.name} sears`,
-            (i) => (ability.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1),
-            'spirit',
+            (i) =>
+              (ability.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1) *
+              weaknessMultiplier(i, 'lantern'),
+            'lantern',
           );
         } else if (ability.category === 'healing') {
           const healed = Math.min(input.playerStats.maxHp - playerHp, ability.healHp ?? 0);
@@ -620,14 +637,20 @@ export function resolveRound(input: RoundInput): RoundResult {
       applyAilmentTickDamage();
       for (const i of alive) enemyAttack(i);
     } else {
-      type Turn = { kind: 'player'; speed: number } | { kind: 'enemy'; index: number; speed: number };
+      // Initiative = speed + a d6 roll, re-rolled every round - keeps speed the dominant factor
+      // (a big enough lead still reliably goes first) while giving turn order genuine round-to-
+      // round variance instead of the old fully-deterministic sort. Stable sort keeps the player
+      // (listed first) ahead of any enemy that rolls the exact same total.
+      function rollInitiative(speed: number): number {
+        return speed + (1 + Math.floor(Math.random() * 6));
+      }
+      type Turn = { kind: 'player'; roll: number } | { kind: 'enemy'; index: number; roll: number };
       const alive = aliveIndices();
       const turns: Turn[] = [
-        { kind: 'player', speed: input.playerStats.speed },
-        ...alive.map((i): Turn => ({ kind: 'enemy', index: i, speed: enemyStats[i].speed })),
+        { kind: 'player', roll: rollInitiative(input.playerStats.speed) },
+        ...alive.map((i): Turn => ({ kind: 'enemy', index: i, roll: rollInitiative(enemyStats[i].speed) })),
       ];
-      // Stable sort keeps the player (listed first) ahead of any enemy at the same speed.
-      turns.sort((a, b) => b.speed - a.speed);
+      turns.sort((a, b) => b.roll - a.roll);
 
       for (const turn of turns) {
         if (playerHp <= 0) break;

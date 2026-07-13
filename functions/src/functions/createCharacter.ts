@@ -5,6 +5,7 @@ import type { PlayerSave } from '../shared-types';
 
 interface CreateCharacterRequest {
   name: string;
+  skin?: 'male' | 'female';
 }
 
 const NAME_MIN_LENGTH = 2;
@@ -31,6 +32,7 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
   }
 
   const name = validateName(request.data?.name);
+  const skin = request.data?.skin === 'female' ? 'female' : 'male';
 
   const db = getFirestore();
   const userRef = db.collection('users').doc(uid);
@@ -41,7 +43,7 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
     displayName: name,
     createdAt: now,
     lastLoginAt: now,
-    player: buildFreshPlayer(uid, name, now),
+    player: buildFreshPlayer(uid, name, now, skin),
     ...buildFreshSaveContent(),
     updatedAt: now,
   };

@@ -19,6 +19,9 @@ export interface QuestReward {
   gold: number;
   itemIds?: string[];
   spiritEssence?: number;
+  /** A Specialty Attack id (see data/skills.ts) granted on completion - display-only mirror of the
+   *  server's grantSkillId (functions/src/data/quests.ts). No quest uses this yet. */
+  grantSkillId?: string;
 }
 
 /** Display-only grouping for the Quest Log's tabs - not read by any server logic. */

@@ -38,6 +38,15 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'bosses', label: 'Bosses' },
 ];
 
+/** Echoes/Bosses detail card copy for Enemy.weaknessDamageType - matches the 3 attack categories
+ *  a player actually has (see src/types/skill.ts's DamageType): plain Attack, Keeper's Strike/
+ *  future Specialty Attacks, and lantern abilities. */
+const WEAKNESS_LABELS: Record<'physical' | 'spirit' | 'lantern', string> = {
+  physical: 'Vulnerable to physical attacks.',
+  spirit: "Vulnerable to spirit-infused attacks (Keeper's Strike and other Specialty Attacks).",
+  lantern: 'Vulnerable to lantern abilities.',
+};
+
 const ITEM_CATEGORY_LABELS: Record<ItemCategory, string> = {
   consumable: 'Consumables',
   equipment: 'Equipment',
@@ -633,11 +642,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 ))}
 
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
-                  <strong>Weaknesses</strong>
+                  <strong>Weakness</strong>
                 </p>
-                <p className={questStyles.objective}>
-                  {enemy.weaknesses && enemy.weaknesses.length > 0 ? enemy.weaknesses.join(', ') : 'Unknown'}
-                </p>
+                <p className={questStyles.objective}>{WEAKNESS_LABELS[enemy.weaknessDamageType]}</p>
 
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Ailments Inflicted</strong>

@@ -24,6 +24,28 @@
   margin: 0 auto;
 }
 
+/* Blind's "reduced visibility" theme, applied while it's active - see isBlinded in CombatScene.tsx. */
+.stageBlurred {
+  filter: blur(3px);
+  transition: filter 0.3s ease;
+}
+
+/* Reinforces the ailment badge strip with a low-opacity full-screen color wash - see
+   AILMENT_TINT_COLORS in CombatScene.tsx. Multiple stacked .ailmentTint children (one per active
+   ailment with a tint color) so 2+ active ailments visibly compound instead of one overwriting
+   another. pointer-events: none so it never blocks clicking the action buttons underneath. */
+.ailmentTintLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.ailmentTint {
+  position: absolute;
+  inset: 0;
+}
+
 .enemyArea {
   flex: 1;
   display: flex;
@@ -153,6 +175,14 @@
   gap: 8px;
   font-size: 13px;
   padding: 6px 4px;
+  border-radius: 4px;
+}
+
+/* A cure item whose ailment is currently active - stands out among the tray so the player doesn't
+   have to read every row's name to find the one that actually helps right now. */
+.itemRowCureReady {
+  background: rgba(224, 169, 74, 0.18);
+  outline: 1px solid var(--fw-accent);
 }
 
 .actionButton {

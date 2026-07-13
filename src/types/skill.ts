@@ -1,6 +1,9 @@
 export type SkillKind = 'skill' | 'spiritArt';
 
-export type DamageType = 'physical' | 'spirit';
+/** 'lantern' only ever appears on an offensive lantern ability, which is rendered separately (see
+ *  src/data/lanternAbilities.ts) - no entry in this file's SKILLS array uses it, but it's a real
+ *  possible value for an enemy's weaknessDamageType (see src/types/enemy.ts). */
+export type DamageType = 'physical' | 'spirit' | 'lantern';
 
 export interface Skill {
   id: string;

@@ -24,6 +24,12 @@ export interface Player {
    *  regenerated since without a scheduled job ticking every player. Only meaningful once Stamina
    *  is unlocked. */
   staminaUpdatedAt: number;
+  /** Specialty Attacks (data/skills.ts) this player has learned - drives whether CombatScene shows
+   *  a single fixed button or a "Select Spirit Ability" submenu. Always present once hydrated from
+   *  the server (defaults to ['keepers-strike']), even for a save that predates this field. */
+  knownSkillIds: string[];
+  /** Which player sprite variant to render (see registry.ts's sprite.player.male/female). */
+  skin: 'male' | 'female';
 }
 
 export interface PlayerSave {

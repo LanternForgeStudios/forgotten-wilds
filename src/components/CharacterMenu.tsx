@@ -6,15 +6,16 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { callEquipItem, callUnequipItem, callUseItem } from '@/firebase/functionsClient';
+import { callEquipItem, callUnequipItem, callUseItem, callCraftItem } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
-import { ITEMS, EQUIPMENT } from '@/data';
-import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
+import { ITEMS, EQUIPMENT, RECIPES } from '@/data';
+import { EQUIPMENT_SLOTS, type EquipmentSlot, type Item, type Tier } from '@/types';
 import { formatStatBonuses } from '@/utils/statBonuses';
 import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect } from '@/utils/itemEffect';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
+import { TIER_LABELS } from '@/utils/tier';
 import styles from './CharacterMenu.module.css';
 
 interface CharacterMenuProps {
@@ -45,6 +46,31 @@ const SLOT_FILTER_LABELS: Record<EquipmentSlot, string> = {
   lantern: 'Lanterns',
   spiritTotem: 'Spirit Totem',
 };
+
+// Crafting tab: recipes (RECIPES) are keyed by their output item's own id, one recipe per
+// craftable consumable - grouped here by which stat the output restores (or 'cure' for an
+// ailment-cure item) so the tab reads as 4 short lists instead of one flat 17-item grid.
+type CraftGroup = 'hp' | 'spirit' | 'oil' | 'cure';
+
+const CRAFT_GROUP_ORDER: CraftGroup[] = ['hp', 'spirit', 'oil', 'cure'];
+
+const CRAFT_GROUP_LABELS: Record<CraftGroup, string> = {
+  hp: 'Healing Poultices',
+  spirit: 'Spirit Draughts',
+  oil: 'Lantern Oil',
+  cure: 'Ailment Cures',
+};
+
+const TIER_ORDER: Record<Tier, number> = { common: 0, uncommon: 1, rare: 2, mythic: 3, legendary: 4 };
+
+function craftGroupOf(itemDef: Item | undefined): CraftGroup | undefined {
+  if (!itemDef?.effect) return undefined;
+  if (itemDef.effect.healHpPercent) return 'hp';
+  if (itemDef.effect.healSpiritPercent) return 'spirit';
+  if (itemDef.effect.restoreOilPercent) return 'oil';
+  if (itemDef.effect.cureAilmentId) return 'cure';
+  return undefined;
+}
 
 type SortOption = 'name' | 'quantityDesc' | 'category';
 
@@ -114,12 +140,13 @@ function BetterAvailableHint() {
 }
 
 export function CharacterMenu({ onClose }: CharacterMenuProps) {
-  const [tab, setTab] = useState<'inventory' | 'equipment'>('inventory');
+  const [tab, setTab] = useState<'inventory' | 'equipment' | 'crafting'>('inventory');
   const [subTab, setSubTab] = useState<InventorySubTab>('all');
   const [slotFilter, setSlotFilter] = useState<EquipmentSlot | 'all'>('all');
   const [sortBy, setSortBy] = useState<SortOption>('name');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [equipPickerSlot, setEquipPickerSlot] = useState<EquipmentSlot | null>(null);
+  const [craftingSelectedId, setCraftingSelectedId] = useState<string | null>(null);
   const inventory = useInventoryStore((s) => s.items);
   const player = usePlayerStore((s) => s.player);
   const patchEquipment = usePlayerStore((s) => s.patchEquipment);
@@ -177,6 +204,17 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
     }
   }
 
+  async function craft(recipeId: string) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await callCraftItem(recipeId);
+      if (uid) await resyncSave(uid);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
@@ -193,6 +231,12 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
             onClick={() => setTab('equipment')}
           >
             Equipment
+          </button>
+          <button
+            className={`${styles.tab} ${tab === 'crafting' ? styles.tabActive : ''}`}
+            onClick={() => setTab('crafting')}
+          >
+            Crafting
           </button>
         </div>
 
@@ -422,6 +466,100 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
             })}
           </div>
         )}
+
+        {tab === 'crafting' && (() => {
+          const recipeIds = Object.keys(RECIPES);
+          const groups = CRAFT_GROUP_ORDER.map((group) => ({
+            group,
+            recipeIds: recipeIds
+              .filter((id) => craftGroupOf(ITEMS.find((i) => i.id === RECIPES[id].outputItemId)) === group)
+              .sort((a, b) => {
+                const tierA = ITEMS.find((i) => i.id === RECIPES[a].outputItemId)?.tier;
+                const tierB = ITEMS.find((i) => i.id === RECIPES[b].outputItemId)?.tier;
+                return (tierA ? TIER_ORDER[tierA] : 0) - (tierB ? TIER_ORDER[tierB] : 0);
+              }),
+          })).filter((g) => g.recipeIds.length > 0);
+
+          const selectedRecipe = craftingSelectedId ? RECIPES[craftingSelectedId] : undefined;
+          const selectedItem = selectedRecipe ? ITEMS.find((i) => i.id === selectedRecipe.outputItemId) : undefined;
+          const canCraft =
+            !!selectedRecipe &&
+            selectedRecipe.materials.every(
+              (m) => (inventory.find((entry) => entry.itemId === m.itemId)?.quantity ?? 0) >= m.quantity,
+            );
+
+          return (
+            <div>
+              {groups.map(({ group, recipeIds: ids }) => (
+                <div key={group} style={{ marginBottom: 14 }}>
+                  <p className={styles.detailStats} style={{ margin: '0 0 6px' }}>
+                    <strong>{CRAFT_GROUP_LABELS[group]}</strong>
+                  </p>
+                  <div className={styles.grid}>
+                    {ids.map((recipeId) => {
+                      const item = ITEMS.find((i) => i.id === RECIPES[recipeId].outputItemId);
+                      if (!item) return null;
+                      const isSelected = craftingSelectedId === recipeId;
+                      return (
+                        <div
+                          key={recipeId}
+                          className={`${styles.itemCard} ${isSelected ? styles.itemCardSelected : ''}`}
+                          onClick={() => setCraftingSelectedId(recipeId)}
+                        >
+                          {item.iconAssetId && <img src={getAssetUrl(item.iconAssetId)} alt="" className={styles.icon} />}
+                          <span className={styles.itemName}>{item.name}</span>
+                          <TierBadge tier={item.tier} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              {selectedRecipe && selectedItem && (
+                <div className={styles.detailPanel}>
+                  <div className={styles.detailHeader}>
+                    {selectedItem.iconAssetId && (
+                      <img src={getAssetUrl(selectedItem.iconAssetId)} alt="" className={styles.detailIcon} />
+                    )}
+                    <div>
+                      <p className={styles.detailName}>
+                        {selectedItem.name} <TierBadge tier={selectedItem.tier} style={{ marginLeft: 6 }} />
+                      </p>
+                      <p className={styles.detailMeta}>{TIER_LABELS[selectedItem.tier]} recipe</p>
+                    </div>
+                  </div>
+                  <p className={styles.detailDescription}>{selectedItem.description}</p>
+                  <p className={styles.detailStats} style={{ marginBottom: 4 }}>
+                    <strong>Materials needed</strong>
+                  </p>
+                  {selectedRecipe.materials.map((m) => {
+                    const owned = inventory.find((entry) => entry.itemId === m.itemId)?.quantity ?? 0;
+                    const short = owned < m.quantity;
+                    const materialName = ITEMS.find((i) => i.id === m.itemId)?.name ?? m.itemId.replace(/-/g, ' ');
+                    return (
+                      <p
+                        key={m.itemId}
+                        style={{ fontSize: 12, margin: '2px 0', color: short ? 'var(--fw-danger)' : 'var(--fw-text)' }}
+                      >
+                        {materialName}: {owned} / {m.quantity}
+                        {short ? ` (need ${m.quantity - owned} more)` : ''}
+                      </p>
+                    );
+                  })}
+                  <button
+                    className={styles.smallButton}
+                    style={{ marginTop: 10 }}
+                    disabled={busy || !canCraft}
+                    onClick={() => craft(craftingSelectedId!)}
+                  >
+                    Craft
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>

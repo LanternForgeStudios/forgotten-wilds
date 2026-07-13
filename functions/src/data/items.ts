@@ -36,6 +36,11 @@ export interface ItemDefinition {
 }
 
 export const ITEMS: Record<string, ItemDefinition> = {
+  // Replenishment items form a common/uncommon/rare/mythic ladder at 30/50/75/100% of the
+  // relevant max stat, one line per stat (HP/Spirit/Lantern Oil) - see docs on the crafting
+  // recipes (data/recipes.ts) that produce most of these. 'lantern-oil' keeps its existing id
+  // (predates this ladder) even though it doesn't carry a tier-matching name prefix; every item
+  // newly added here for this ladder follows greater-/superior-/pristine- for uncommon/rare/mythic.
   'healing-poultice': {
     id: 'healing-poultice',
     category: 'consumable',
@@ -47,8 +52,22 @@ export const ITEMS: Record<string, ItemDefinition> = {
     id: 'greater-healing-poultice',
     category: 'consumable',
     usableInCombat: true,
-    effect: { healHpPercent: 0.6 },
+    effect: { healHpPercent: 0.5 },
     tier: 'uncommon',
+  },
+  'superior-healing-poultice': {
+    id: 'superior-healing-poultice',
+    category: 'consumable',
+    usableInCombat: true,
+    effect: { healHpPercent: 0.75 },
+    tier: 'rare',
+  },
+  'pristine-healing-poultice': {
+    id: 'pristine-healing-poultice',
+    category: 'consumable',
+    usableInCombat: true,
+    effect: { healHpPercent: 1 },
+    tier: 'mythic',
   },
   'spirit-draught': {
     id: 'spirit-draught',
@@ -57,12 +76,56 @@ export const ITEMS: Record<string, ItemDefinition> = {
     effect: { healSpiritPercent: 0.3 },
     tier: 'common',
   },
+  'greater-spirit-draught': {
+    id: 'greater-spirit-draught',
+    category: 'consumable',
+    usableInCombat: true,
+    effect: { healSpiritPercent: 0.5 },
+    tier: 'uncommon',
+  },
+  'superior-spirit-draught': {
+    id: 'superior-spirit-draught',
+    category: 'consumable',
+    usableInCombat: true,
+    effect: { healSpiritPercent: 0.75 },
+    tier: 'rare',
+  },
+  'pristine-spirit-draught': {
+    id: 'pristine-spirit-draught',
+    category: 'consumable',
+    usableInCombat: true,
+    effect: { healSpiritPercent: 1 },
+    tier: 'mythic',
+  },
+  // 'thin-lantern-oil' fills the common slot below 'lantern-oil' (already the uncommon/50% entry)
+  // rather than renaming it - thematically, a thinned-down batch that burns dimmer/shorter.
+  'thin-lantern-oil': {
+    id: 'thin-lantern-oil',
+    category: 'consumable',
+    usableInCombat: true,
+    effect: { restoreOilPercent: 0.3 },
+    tier: 'common',
+  },
   'lantern-oil': {
     id: 'lantern-oil',
     category: 'consumable',
     usableInCombat: true,
     effect: { restoreOilPercent: 0.5 },
     tier: 'uncommon',
+  },
+  'superior-lantern-oil': {
+    id: 'superior-lantern-oil',
+    category: 'consumable',
+    usableInCombat: true,
+    effect: { restoreOilPercent: 0.75 },
+    tier: 'rare',
+  },
+  'pristine-lantern-oil': {
+    id: 'pristine-lantern-oil',
+    category: 'consumable',
+    usableInCombat: true,
+    effect: { restoreOilPercent: 1 },
+    tier: 'mythic',
   },
   // Ailment cure items - each does nothing but clear its one matching ailment (see
   // useItem.ts/resolveCombatAction.ts's wouldHaveEffect check, which requires the player to
@@ -149,4 +212,4 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
   ],
 };
 
-export const INN_REST_COST = 10;
+export const INN_REST_COST = 100;

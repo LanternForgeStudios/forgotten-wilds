@@ -41,6 +41,10 @@ interface PhaserExplorationCanvasProps {
    *  `entities`, so it gets its own pair of animation props here. */
   playerFrameRow?: number;
   playerMovementState?: MovementState;
+  /** Bumped (any change in value, e.g. a counter) each time Dash's 1s ramp-up begins - triggers a
+   *  one-off stationary dust puff (see ExplorationScene.playDashRampEffect) distinct from the
+   *  per-step dust that already fires automatically once playerMovementState is 'running'. */
+  dashRampTrigger?: number;
 }
 
 /** Phaser-backed replacement for the old DOM/CSS TileGrid - same prop shape, so every scene's JSX
@@ -122,6 +126,12 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
     if (!sceneReady) return;
     sceneRef.current?.setViewport({ width: viewportWidthPx, height: viewportHeightPx });
   }, [sceneReady, viewportWidthPx, viewportHeightPx]);
+
+  useEffect(() => {
+    if (!sceneReady || props.dashRampTrigger === undefined) return;
+    sceneRef.current?.playDashRampEffect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneReady, props.dashRampTrigger]);
 
   return <div ref={containerRef} style={{ width: viewportWidthPx, height: viewportHeightPx, overflow: 'hidden' }} />;
 }

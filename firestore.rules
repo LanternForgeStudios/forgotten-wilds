@@ -27,7 +27,7 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if request.auth != null
         && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['displayName', 'avatarSymbol', 'locationId', 'lastHeartbeat', 'joinedAt', 'x', 'y'])
+        && request.resource.data.keys().hasOnly(['displayName', 'avatarSymbol', 'locationId', 'lastHeartbeat', 'joinedAt', 'x', 'y', 'skin'])
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() <= 40
         && request.resource.data.avatarSymbol is string
@@ -35,7 +35,8 @@ service cloud.firestore {
         && request.resource.data.lastHeartbeat is number
         && request.resource.data.joinedAt is number
         && request.resource.data.x is number
-        && request.resource.data.y is number;
+        && request.resource.data.y is number
+        && request.resource.data.skin in ['male', 'female'];
     }
 
     // Social: friend search/requests/blocking/DMs. All server-authoritative, same anti-cheat

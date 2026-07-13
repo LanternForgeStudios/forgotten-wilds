@@ -54,6 +54,15 @@ export interface Player {
   /** Server clock reading the last time Stamina was reconciled - lets the dash function compute
    *  how much has regenerated since without a scheduled job ticking every player. */
   staminaUpdatedAt: number;
+  /** Specialty Attacks (data/skills.ts) this player has learned - 'skill' actions may only request
+   *  a skillId in this list (see resolveCombatAction.ts). Defaults to ['keepers-strike'] for a
+   *  fresh character (newCharacter.ts) and as a read-time fallback for any save that predates this
+   *  field - never absent/undefined once read, even though older Firestore documents lack it. */
+  knownSkillIds: string[];
+  /** Which player sprite variant to render (see registry.ts's sprite.player.male/female) - chosen
+   *  at character creation, changeable any time via setPlayerSkin.ts. Only two options today; the
+   *  shape is a plain string union (not an enum) so a future third option is a one-line type edit. */
+  skin: 'male' | 'female';
 }
 
 export interface InventoryItem {

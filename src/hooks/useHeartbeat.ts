@@ -17,10 +17,13 @@ export function useHeartbeat(
   displayName: string | undefined,
   locationId: string,
   position: { x: number; y: number } | undefined,
+  skin?: 'male' | 'female',
 ) {
   const joinedAtRef = useRef<number | null>(null);
   const positionRef = useRef(position);
   positionRef.current = position;
+  const skinRef = useRef(skin);
+  skinRef.current = skin;
   const lastPositionSentAtRef = useRef(0);
   // Computed once and shared by both effects below (previously duplicated in each) - harmless
   // empty-string fallback when displayName isn't ready yet, since both effects bail out before
@@ -41,6 +44,7 @@ export function useHeartbeat(
         joinedAt: joinedAtRef.current!,
         x: positionRef.current?.x ?? 0,
         y: positionRef.current?.y ?? 0,
+        skin: skinRef.current,
       }).catch(() => {
         // Best-effort — a missed heartbeat just makes this player look offline a bit sooner.
       });
@@ -65,6 +69,7 @@ export function useHeartbeat(
       joinedAt: joinedAtRef.current,
       x: position.x,
       y: position.y,
+      skin: skinRef.current,
     }).catch(() => {
       // Best-effort, same as the periodic heartbeat above.
     });

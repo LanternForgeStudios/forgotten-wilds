@@ -811,6 +811,155 @@ describe('resolveRound', () => {
   });
 });
 
+describe('resolveRound - elemental weakness bonus', () => {
+  // Mutates ENEMIES[id].weaknessDamageType directly (then restores it) to isolate the weakness
+  // variable on the exact same enemy - a cross-enemy comparison would confound the result with
+  // each enemy's own differing attack/defense stats.
+  const restlessMiner = ENEMIES['restless-miner']; // family restlessMiners - not lantern-flame's
+  // effectiveAgainstFamilies (coalSpirits), so its own family bonus can't confound this.
+  const originalWeakness = restlessMiner.weaknessDamageType;
+
+  afterEach(() => {
+    restlessMiner.weaknessDamageType = originalWeakness;
+  });
+
+  it('a plain Attack deals 1.5x damage against an enemy weak to physical', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    restlessMiner.weaknessDamageType = 'physical';
+    const weak = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+    });
+    restlessMiner.weaknessDamageType = 'spirit';
+    const notWeak = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+    });
+    vi.restoreAllMocks();
+    const weakDamage = restlessMiner.stats.maxHp - weak.enemyHp[0];
+    const notWeakDamage = restlessMiner.stats.maxHp - notWeak.enemyHp[0];
+    expect(weakDamage).toBe(Math.round(notWeakDamage * 1.5));
+  });
+
+  it("Keeper's Strike (spirit) deals 1.5x damage against an enemy weak to spirit", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    restlessMiner.weaknessDamageType = 'spirit';
+    const weak = resolveRound({
+      action: { type: 'skill' },
+      playerStats: stats({ speed: 999, spirit: 30, maxSpirit: 30 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+    });
+    restlessMiner.weaknessDamageType = 'physical';
+    const notWeak = resolveRound({
+      action: { type: 'skill' },
+      playerStats: stats({ speed: 999, spirit: 30, maxSpirit: 30 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+    });
+    vi.restoreAllMocks();
+    const weakDamage = restlessMiner.stats.maxHp - weak.enemyHp[0];
+    const notWeakDamage = restlessMiner.stats.maxHp - notWeak.enemyHp[0];
+    expect(weakDamage).toBe(Math.round(notWeakDamage * 1.5));
+  });
+
+  it('an offensive lantern ability deals 1.5x damage against an enemy weak to lantern, stacking with (not replacing) its own effectiveAgainstFamilies bonus', () => {
+    // Level 20 (not 1) - lantern-flame's power (22) is high enough that a 1.5x hit on a level-1
+    // restless-miner (34 maxHp) would exceed and clamp at 0, making weakDamage measure the HP pool
+    // instead of the actual bonus. A level-20 pool has plenty of headroom above either hit.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const level = 20;
+    const maxHp = scaledEnemyStats(restlessMiner, level).maxHp;
+    restlessMiner.weaknessDamageType = 'lantern';
+    const weak = resolveRound({
+      action: { type: 'lanternAbility', abilityId: 'lantern-flame' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: restlessMiner.id, level, hp: maxHp }],
+    });
+    restlessMiner.weaknessDamageType = 'physical';
+    const notWeak = resolveRound({
+      action: { type: 'lanternAbility', abilityId: 'lantern-flame' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: restlessMiner.id, level, hp: maxHp }],
+    });
+    vi.restoreAllMocks();
+    const weakDamage = maxHp - weak.enemyHp[0];
+    const notWeakDamage = maxHp - notWeak.enemyHp[0];
+    expect(weakDamage).toBe(Math.round(notWeakDamage * 1.5));
+  });
+});
+
+describe('resolveRound - initiative roll', () => {
+  it('gives every combatant genuine round-to-round turn-order variance instead of a fixed sort', () => {
+    // A d20-losing-by-default speed gap (enemy speed 6, player speed 7) should still occasionally
+    // let the enemy act first once a d6 roll is added on both sides - sample many rounds and
+    // confirm the enemy's attack sometimes lands before any player action could have defeated it
+    // (i.e. genuine variance), by checking the mothling's own move sometimes still connects even
+    // when the player's single hit this round would otherwise have been guaranteed to kill it.
+    const mothling = ENEMIES.mothling;
+    let enemyActedAtLeastOnce = false;
+    let playerWonInitiativeAtLeastOnce = false;
+    for (let i = 0; i < 60; i++) {
+      const result = resolveRound({
+        action: { type: 'attack' },
+        playerStats: stats({ speed: 7, attack: 999, hp: 999, maxHp: 999 }), // guaranteed one-shot kill
+        inventory: [],
+        playerAilments: [],
+        enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+      });
+      if (result.enemyHits.length > 0) enemyActedAtLeastOnce = true;
+      else playerWonInitiativeAtLeastOnce = true;
+    }
+    // Both outcomes should occur across enough rolls - proves initiative isn't hardcoded to
+    // "player always wins" purely because playerSpeed (7) > mothling speed (9)... in this case the
+    // mothling's raw speed (9) is actually faster, so this also proves the roll doesn't invert
+    // ordering into "always the higher raw speed wins" (which is what deterministic sorting alone
+    // would have produced, just always favoring the mothling instead) - real variance either way.
+    expect(enemyActedAtLeastOnce).toBe(true);
+    expect(playerWonInitiativeAtLeastOnce).toBe(true);
+  });
+});
+
+describe('resolveRound - defeated-enemy-cannot-attack regression test', () => {
+  it('a mid-round targetAll kill excludes that enemy from enemyHits, even though it was slower than the player', () => {
+    const mothling = ENEMIES.mothling;
+    // 0.5 is comfortably above TARGET_ALL_MISS_CHANCE (0.15), so every targetAll swing this round
+    // lands - a real miss here would leave that one mothling alive and falsify the test for the
+    // wrong reason (an unlucky roll, not a real regression).
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const result = resolveRound({
+      action: { type: 'attack', targetAll: true },
+      // Guaranteed one-shot kill of every target, guaranteed to act first.
+      playerStats: stats({ speed: 999, attack: 999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+      ],
+    });
+    vi.restoreAllMocks();
+    expect(result.enemyHp.every((hp) => hp <= 0)).toBe(true);
+    expect(result.phase).toBe('victory');
+    // Every enemy was defeated by the player's own targetAll swing this same round - none of them
+    // should have gotten a turn afterward.
+    expect(result.enemyHits).toEqual([]);
+  });
+});
+
 describe('aggregateItemCounts', () => {
   it('groups duplicate ids within the first 3 entries', () => {
     const counts = aggregateItemCounts(['a', 'a', 'b']);
@@ -1244,9 +1393,13 @@ describe('resolveRound - ailments', () => {
   });
 
   it('an ailment inflicted mid-round is not decremented until the following round', () => {
-    // Sequence of Math.random() calls inside enemyAttack(), in order: the miss-chance check, the
-    // weighted move pick, computeDamage's variance roll, then the ailment infliction roll.
+    // Sequence of Math.random() calls: the player's and the (one) enemy's initiative rolls first
+    // (speed:999 dominates either roll, so their values here don't affect ordering), then inside
+    // enemyAttack() - the miss-chance check, the weighted move pick, computeDamage's variance roll,
+    // then the ailment infliction roll.
     vi.spyOn(Math, 'random')
+      .mockReturnValueOnce(0.5) // player initiative roll
+      .mockReturnValueOnce(0.5) // restless-miner's initiative roll
       .mockReturnValueOnce(0.5) // no miss
       .mockReturnValueOnce(0.9) // weightedPick: (0.9*4=3.6) - attack(3) = 0.6, - pickaxe(1) = -0.4 <= 0 -> picks miner-pickaxe-swing
       .mockReturnValueOnce(0.5) // damage variance
@@ -1264,9 +1417,11 @@ describe('resolveRound - ailments', () => {
   });
 
   it('a landed enemy attack rolls its move\'s ailment-infliction chance and can apply the ailment', () => {
-    // Same call sequence as above (miss check, move pick, damage variance, infliction roll), but
-    // against a Mothling so the inflicted move is mothling-dustwing -> Blind.
+    // Same call sequence as above (2 initiative rolls, miss check, move pick, damage variance,
+    // infliction roll), but against a Mothling so the inflicted move is mothling-dustwing -> Blind.
     vi.spyOn(Math, 'random')
+      .mockReturnValueOnce(0.5) // player initiative roll
+      .mockReturnValueOnce(0.5) // mothling's initiative roll
       .mockReturnValueOnce(0.5)
       .mockReturnValueOnce(0.9) // picks mothling-dustwing (weight 1 of 4, same math as restless-miner's pickaxe)
       .mockReturnValueOnce(0.5)

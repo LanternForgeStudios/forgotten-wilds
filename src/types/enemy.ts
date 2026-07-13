@@ -36,10 +36,10 @@ export interface Enemy {
   goldReward: number;
   lootTable: LootDrop[];
   loreBlurb: string;
-  /** Display-only, for the Journal's Echoes/Bosses detail card - not read by any combat math yet.
-   *  Unset today for every enemy since no elemental/damage-type system exists to make a weakness
-   *  mechanically meaningful; ready for a future elemental-attack system to populate. */
-  weaknesses?: string[];
+  /** The one of the 3 player damage types (see src/types/skill.ts's DamageType) this enemy takes
+   *  1.5x damage from - combatEngine.ts's resolveOffensiveHits applies the bonus server-side; this
+   *  client copy is display-only, for the Journal's Echoes/Bosses detail card. */
+  weaknessDamageType: 'physical' | 'spirit' | 'lantern';
   /** Display-only, for the Journal's Echoes/Bosses detail card - not read by any combat math yet.
    *  Ailment ids (see data/ailments.ts), not display names - JournalOfLegends.tsx resolves each id
    *  to its AILMENTS name at render time. Derived by hand from this enemy's moves' own

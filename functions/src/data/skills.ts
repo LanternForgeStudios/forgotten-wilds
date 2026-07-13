@@ -1,7 +1,10 @@
 // Authoritative — the client's src/data/skills.ts is a display copy only.
 
 export type SkillKind = 'skill' | 'spiritArt';
-export type DamageType = 'physical' | 'spirit';
+/** 'lantern' only ever appears as the damageType passed into resolveOffensiveHits for an offensive
+ *  lanternAbility call (see combatEngine.ts) - no Skill entry in this table itself uses 'lantern',
+ *  since lantern abilities are entirely data-driven from data/lanternAbilities.ts instead. */
+export type DamageType = 'physical' | 'spirit' | 'lantern';
 
 export interface Skill {
   id: string;
@@ -23,7 +26,7 @@ export const SKILLS: Record<string, Skill> = {
   attack: { id: 'attack', kind: 'skill', damageType: 'physical', power: 10, spiritCost: 0 },
   // A Specialty Attack, gated by Spirit rather than a cooldown - see data/specialAttacks.ts for
   // the roster/unlock metadata; this entry is just its combat math.
-  'keepers-strike': { id: 'keepers-strike', kind: 'skill', damageType: 'physical', power: 18, spiritCost: 10 },
+  'keepers-strike': { id: 'keepers-strike', kind: 'skill', damageType: 'spirit', power: 18, spiritCost: 10 },
   // Lantern Flame moved to data/lanternAbilities.ts - it's tied to whichever lantern is equipped
   // (fueled by Lantern Oil), not a generally-learned skill like the ones in this file.
   //

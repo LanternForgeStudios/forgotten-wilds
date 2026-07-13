@@ -16,6 +16,7 @@ export async function updatePresence(presence: OnlinePresence): Promise<void> {
     joinedAt: presence.joinedAt,
     x: presence.x,
     y: presence.y,
+    skin: presence.skin ?? 'male',
   });
 }
 

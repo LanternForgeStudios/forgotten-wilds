@@ -2,9 +2,15 @@ import { httpsCallable } from 'firebase/functions';
 import type { ActiveAilment, EnemyTier, PlayerSave, TradeStatus } from '@/types';
 import { functions } from './firebaseConfig';
 
-export async function callCreateCharacter(name: string): Promise<PlayerSave> {
-  const fn = httpsCallable<{ name: string }, PlayerSave>(functions, 'createCharacter');
-  const result = await fn({ name });
+export async function callCreateCharacter(name: string, skin: 'male' | 'female' = 'male'): Promise<PlayerSave> {
+  const fn = httpsCallable<{ name: string; skin: 'male' | 'female' }, PlayerSave>(functions, 'createCharacter');
+  const result = await fn({ name, skin });
+  return result.data;
+}
+
+export async function callSetPlayerSkin(skin: 'male' | 'female'): Promise<{ skin: 'male' | 'female' }> {
+  const fn = httpsCallable<{ skin: 'male' | 'female' }, { skin: 'male' | 'female' }>(functions, 'setPlayerSkin');
+  const result = await fn({ skin });
   return result.data;
 }
 
@@ -197,12 +203,14 @@ export async function callInteractWithShrine(
   return result.data;
 }
 
-export async function callDash(): Promise<{ stamina: number; maxStamina: number; staminaUpdatedAt: number }> {
-  const fn = httpsCallable<Record<string, never>, { stamina: number; maxStamina: number; staminaUpdatedAt: number }>(
+export async function callDash(
+  options: { isDashStart?: boolean } = {},
+): Promise<{ stamina: number; maxStamina: number; staminaUpdatedAt: number }> {
+  const fn = httpsCallable<{ isDashStart?: boolean }, { stamina: number; maxStamina: number; staminaUpdatedAt: number }>(
     functions,
     'dash',
   );
-  const result = await fn({});
+  const result = await fn(options);
   return result.data;
 }
 
@@ -215,6 +223,15 @@ export async function callOpenChest(
     { alreadyOpened: boolean; itemId: string }
   >(functions, 'openChest');
   const result = await fn({ locationId, chestId });
+  return result.data;
+}
+
+export async function callCraftItem(recipeId: string): Promise<{ inventory: { itemId: string; quantity: number }[] }> {
+  const fn = httpsCallable<{ recipeId: string }, { inventory: { itemId: string; quantity: number }[] }>(
+    functions,
+    'craftItem',
+  );
+  const result = await fn({ recipeId });
   return result.data;
 }
 

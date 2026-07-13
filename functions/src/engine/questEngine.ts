@@ -39,7 +39,7 @@ export interface QuestAdvanceEvent {
 
 export interface QuestCompletion {
   questId: string;
-  reward: { xp: number; gold: number; itemIds?: string[]; spiritEssence?: number };
+  reward: { xp: number; gold: number; itemIds?: string[]; spiritEssence?: number; grantSkillId?: string };
 }
 
 /** Shared by advanceQuests and reconcileRetroactiveObjectives - both need to check whether a
@@ -94,6 +94,12 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
       // A unique reward item already owned some other way is skipped, not an error - the quest
       // still completes and its xp/gold still land.
       grantItem(save, itemId);
+    }
+    // Already-known is a no-op, not an error - same "safe to re-grant" spirit as the item case
+    // above (matters if this quest is ever re-completable, or the player already learned it some
+    // other way).
+    if (reward.grantSkillId && !save.player.knownSkillIds.includes(reward.grantSkillId)) {
+      save.player.knownSkillIds.push(reward.grantSkillId);
     }
   }
 }

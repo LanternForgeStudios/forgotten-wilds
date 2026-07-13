@@ -29,6 +29,11 @@ export interface EnemyDefinition {
   xpReward: number;
   goldReward: number;
   lootTable: LootDrop[];
+  /** The one of the 3 player damage types (see data/skills.ts's DamageType) this family takes 1.5x
+   *  damage from - checked in combatEngine.ts's resolveOffensiveHits against whichever damageType
+   *  the player's attack/skill/lanternAbility actually used. Also what the Journal's Echoes card
+   *  displays as this enemy's Weakness. */
+  weaknessDamageType: 'physical' | 'spirit' | 'lantern';
 }
 
 export const ENEMIES: Record<string, EnemyDefinition> = {
@@ -38,6 +43,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'mothlings',
     tier: 'regular',
     isBoss: false,
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 28, attack: 7, defense: 3, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 3 },
@@ -58,6 +64,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'mothlings',
     tier: 'elite',
     isBoss: false,
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 42, attack: 10, defense: 5, speed: 11 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -77,6 +84,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'restlessMiners',
     tier: 'regular',
     isBoss: false,
+    weaknessDamageType: 'physical',
     stats: { maxHp: 34, attack: 9, defense: 6, speed: 6 },
     moves: [
       { skillId: 'attack', weight: 3 },
@@ -92,6 +100,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'restlessMiners',
     tier: 'elite',
     isBoss: false,
+    weaknessDamageType: 'physical',
     stats: { maxHp: 50, attack: 12, defense: 8, speed: 7 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -107,6 +116,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'coalSpirits',
     tier: 'regular',
     isBoss: false,
+    weaknessDamageType: 'spirit',
     stats: { maxHp: 30, attack: 8, defense: 4, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -127,6 +137,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'coalSpirits',
     tier: 'elite',
     isBoss: false,
+    weaknessDamageType: 'spirit',
     stats: { maxHp: 46, attack: 11, defense: 6, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -146,6 +157,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'cliffDwellers',
     tier: 'regular',
     isBoss: false,
+    weaknessDamageType: 'physical',
     stats: { maxHp: 30, attack: 8, defense: 4, speed: 10 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -165,6 +177,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'cliffDwellers',
     tier: 'elite',
     isBoss: false,
+    weaknessDamageType: 'physical',
     stats: { maxHp: 44, attack: 11, defense: 6, speed: 12 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -183,6 +196,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'waterSpirits',
     tier: 'regular',
     isBoss: false,
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 29, attack: 7, defense: 4, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -203,6 +217,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'waterSpirits',
     tier: 'elite',
     isBoss: false,
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 45, attack: 10, defense: 6, speed: 11 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -222,6 +237,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'briarSpirits',
     tier: 'regular',
     isBoss: false,
+    weaknessDamageType: 'spirit',
     stats: { maxHp: 32, attack: 9, defense: 5, speed: 7 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -241,6 +257,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'briarSpirits',
     tier: 'elite',
     isBoss: false,
+    weaknessDamageType: 'spirit',
     stats: { maxHp: 48, attack: 12, defense: 7, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -259,6 +276,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     family: 'boss',
     tier: 'boss',
     isBoss: true,
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 140, attack: 13, defense: 8, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 2 },

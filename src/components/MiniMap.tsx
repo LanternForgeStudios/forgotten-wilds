@@ -214,21 +214,26 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
       }
     }
 
-    // Fixed-size label (not scaled with cellSize, which can be as small as 3px on a large map),
-    // drawn to the right of the marker - dark outline + light fill for legibility over either the
-    // walkable or blocked tile color underneath.
+    // Fixed-size label (not scaled with cellSize, which can be as small as 3px on a large map) -
+    // dark outline + light fill for legibility over either the walkable or blocked tile color
+    // underneath. Drawn to the right of the marker by default, but flipped to the left when it
+    // would otherwise run past the canvas's right edge (measured against this same effect's own
+    // `width`) - without this, a landmark near the right side of a wide map got its label clipped
+    // by the popup pane instead of just reading on the other side of its marker.
     function drawLabel(x: number, y: number, text: string) {
       const cx = x * cellSize + cellSize / 2;
       const cy = y * cellSize + cellSize / 2;
       const r = Math.max(2, cellSize * 0.4);
-      const tx = cx + r + 3;
       ctx.font = LABEL_FONT;
       ctx.textBaseline = 'middle';
-      ctx.textAlign = 'left';
       ctx.lineWidth = 3;
       ctx.strokeStyle = 'rgba(27, 22, 17, 0.9)';
-      ctx.strokeText(text, tx, cy);
       ctx.fillStyle = '#ece1cf';
+      const rightTx = cx + r + 3;
+      const wouldOverflow = rightTx + ctx.measureText(text).width > width;
+      const tx = wouldOverflow ? cx - r - 3 : rightTx;
+      ctx.textAlign = wouldOverflow ? 'right' : 'left';
+      ctx.strokeText(text, tx, cy);
       ctx.fillText(text, tx, cy);
     }
 
@@ -337,6 +342,18 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
           if (npc) {
             const npcName = NPCS.find((n) => n.id === objective.targetId)?.name ?? objective.targetId;
             drawMarkerWithLabel(npc.x, npc.y, COLOR_QUEST, 'circle', npcName);
+          } else {
+            // The target NPC isn't on this map at all - they may live inside a building that IS
+            // on this map (e.g. Ash Hallow's "Visit the General Store" objective actually targets
+            // mara-ash, who lives at location ash-hallow-mara-shop, not on the town map itself).
+            // Resolve NPC -> their home location's id, then find that location's own building
+            // marker on this map (already drawn by the buildings loop above) and accent it -
+            // reusing the existing marker instead of drawing a second, redundant one.
+            const npcLocationId = NPCS.find((n) => n.id === objective.targetId)?.locationId;
+            const building = npcLocationId
+              ? map.objects.find((o) => o.type === 'transition' && o.refId === npcLocationId)
+              : undefined;
+            if (building) drawQuestAccent(building.x, building.y);
           }
         }
       }

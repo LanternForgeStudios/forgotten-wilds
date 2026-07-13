@@ -224,6 +224,16 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
+  /** Dash's 1s "getting ready to run" ramp-up (see useDash.ts) - a stationary dust puff at the
+   *  player's current position, distinct from spawnDashDust's per-step puffs kicked up once actual
+   *  movement starts (those fire automatically from setPlayer whenever movementState is 'running';
+   *  this one fires on demand, before any tile has moved, so the player gets an immediate cue that
+   *  the hold registered even during the beat before running actually begins). */
+  playDashRampEffect(): void {
+    if (!this.playerSprite) return;
+    this.spawnDashDust(this.playerSprite.x, this.playerSprite.y);
+  }
+
   /** One small puff of dust, at ground level (behind the player sprite) rather than on top of
    *  it - a short-lived one-shot emitter, same explode()-then-destroy pattern as BattleScene's
    *  defeat effect. */

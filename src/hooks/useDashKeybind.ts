@@ -1,23 +1,63 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { isTypingTarget } from '@/utils/keyboard';
 import { KEY_TO_FACING, type Facing } from './useGridMovement';
 
-/** Shift+direction triggers Dash - a normal (non-shift) press of the same keys still just takes a
- *  single step, handled separately by useGridMovement (which explicitly ignores shift-held
- *  keydowns so the two don't both fire from one keypress). Passes the held direction through so
- *  Dash goes that way even if it doesn't match whichever way the player was last facing - without
- *  this, Shift+Right while facing up would dash up instead of right. */
-export function useDashKeybind(dash: (facing?: Facing) => void, enabled: boolean) {
+/** Shift alone starts Dash - held down, it runs in whichever direction the player is currently
+ *  facing until released, out of Stamina, or blocked (see useDash.ts). A direction key pressed
+ *  while Shift is already held steers the ongoing dash to that new facing instead of taking a
+ *  normal step (useGridMovement's own keydown handler explicitly ignores shift-held keydowns so
+ *  the two never both fire from one keypress) - startDash itself treats an already-running hold as
+ *  "just update the facing," not a second overlapping dash. */
+export function useDashKeybind(startDash: (facing?: Facing) => void, stopDash: () => void, enabled: boolean) {
+  const shiftHeldRef = useRef(false);
+
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      if (shiftHeldRef.current) {
+        shiftHeldRef.current = false;
+        stopDash();
+      }
+      return;
+    }
+
     function handleKeyDown(e: KeyboardEvent) {
       if (isTypingTarget(e)) return;
+      if (e.key === 'Shift') {
+        if (!shiftHeldRef.current) {
+          shiftHeldRef.current = true;
+          startDash();
+        }
+        return;
+      }
+      if (!e.shiftKey) return;
       const facing = KEY_TO_FACING[e.key];
-      if (!e.shiftKey || !facing) return;
+      if (!facing) return;
       e.preventDefault();
-      dash(facing);
+      startDash(facing);
     }
+
+    function handleKeyUp(e: KeyboardEvent) {
+      if (e.key !== 'Shift') return;
+      shiftHeldRef.current = false;
+      stopDash();
+    }
+
+    // Losing focus (alt-tab, clicking outside the game) never fires a keyup for whatever was held
+    // - without this, the hold would keep running (or the browser would eventually deliver a keyup
+    // for the wrong key entirely) until some unrelated keypress happened to touch Shift again.
+    function handleBlur() {
+      if (!shiftHeldRef.current) return;
+      shiftHeldRef.current = false;
+      stopDash();
+    }
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [dash, enabled]);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, [startDash, stopDash, enabled]);
 }

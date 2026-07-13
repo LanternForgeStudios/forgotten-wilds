@@ -7,7 +7,7 @@ export const SKILLS: Skill[] = [
     name: "Keeper's Strike",
     description: 'A focused blow channeling lantern-light through the blade, striking harder than a plain attack.',
     kind: 'skill',
-    damageType: 'physical',
+    damageType: 'spirit',
     power: 18,
     spiritCost: 10,
   },

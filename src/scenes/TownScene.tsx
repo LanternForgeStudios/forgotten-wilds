@@ -70,6 +70,7 @@ export function TownScene() {
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
+  const skin = usePlayerStore((s) => s.player?.skin ?? 'male');
   const questProgress = useQuestStore((s) => s.progress);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const openedChests = useWorldStateStore((s) => s.openedChests);
@@ -89,10 +90,15 @@ export function TownScene() {
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
   const { pending, run } = usePendingAction();
 
-  useHeartbeat(uid, displayName, locationId, position);
+  useHeartbeat(uid, displayName, locationId, position, skin);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const dash = useDash({ attemptMove, positionRef });
-  useDashKeybind(dash, staminaUnlocked && !suspended);
+  const [dashRampKey, setDashRampKey] = useState(0);
+  const { startDash, stopDash } = useDash({
+    attemptMove,
+    positionRef,
+    onRampUp: () => setDashRampKey((k) => k + 1),
+  });
+  useDashKeybind(startDash, stopDash, staminaUnlocked && !suspended);
 
   useEffect(() => subscribeToPresence(setPresences), []);
 
@@ -228,7 +234,13 @@ export function TownScene() {
       (p) =>
         p.uid !== uid && p.locationId === locationId && now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS,
     )
-    .map((p) => ({ id: `player-${p.uid}`, x: p.x, y: p.y, spriteAssetId: 'sprite.player', label: p.displayName }));
+    .map((p) => ({
+      id: `player-${p.uid}`,
+      x: p.x,
+      y: p.y,
+      spriteAssetId: p.skin === 'female' ? 'sprite.player.female' : 'sprite.player.male',
+      label: p.displayName,
+    }));
 
   const entities = [...npcEntities, ...buildingEntities, ...shrineEntities, ...otherPlayerEntities];
 
@@ -242,12 +254,13 @@ export function TownScene() {
           tilesetAssetId="tileset.tiny-dungeon"
           tilesetColumns={map.columns}
           player={position}
-          playerSpriteAssetId="sprite.player"
+          playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}
           playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
           playerMovementState={movementState}
+          dashRampTrigger={dashRampKey}
         />
       </div>
       {isMobile ? (
@@ -255,7 +268,8 @@ export function TownScene() {
           <DirectionPad attemptMove={attemptMove} />
           <MobileHud
             onInteract={attemptInteract}
-            onDash={staminaUnlocked ? dash : undefined}
+            onDashStart={staminaUnlocked ? () => startDash() : undefined}
+            onDashStop={staminaUnlocked ? stopDash : undefined}
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
             onChat={() => setWorldChatOpen((open) => !open)}
@@ -265,7 +279,7 @@ export function TownScene() {
       ) : (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Talk: Enter / Space
-          {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
+          {staminaUnlocked && <>&nbsp;·&nbsp; Dash: hold Shift</>}
           &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Chat: C &nbsp;·&nbsp; Map: M
         </p>
       )}

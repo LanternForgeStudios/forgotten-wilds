@@ -9,6 +9,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'regular',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.mothling',
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 28, attack: 7, defense: 3, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 3 },
@@ -32,6 +33,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'elite',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.greater-mothling',
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 42, attack: 10, defense: 5, speed: 11 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -54,6 +56,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'regular',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.restless-miner',
+    weaknessDamageType: 'physical',
     stats: { maxHp: 34, attack: 9, defense: 6, speed: 6 },
     moves: [
       { skillId: 'attack', weight: 3 },
@@ -72,6 +75,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'elite',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.foreman-wraith',
+    weaknessDamageType: 'physical',
     stats: { maxHp: 50, attack: 12, defense: 8, speed: 7 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -90,6 +94,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'regular',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.coal-spirit',
+    weaknessDamageType: 'spirit',
     stats: { maxHp: 30, attack: 8, defense: 4, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -112,6 +117,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'elite',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.coal-wraith',
+    weaknessDamageType: 'spirit',
     stats: { maxHp: 46, attack: 11, defense: 6, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -134,6 +140,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'regular',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.cliff-wolf',
+    weaknessDamageType: 'physical',
     stats: { maxHp: 30, attack: 8, defense: 4, speed: 10 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -155,6 +162,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'elite',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.ridge-hawk',
+    weaknessDamageType: 'physical',
     stats: { maxHp: 44, attack: 11, defense: 6, speed: 12 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -176,6 +184,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'regular',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.pool-wisp',
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 29, attack: 7, defense: 4, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -198,6 +207,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'elite',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.falls-siren',
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 45, attack: 10, defense: 6, speed: 11 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -220,6 +230,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'regular',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.briar-wraith',
+    weaknessDamageType: 'spirit',
     stats: { maxHp: 32, attack: 9, defense: 5, speed: 7 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -241,6 +252,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'elite',
     isBoss: false,
     battleSpriteAssetId: 'battle.enemy.cemetery-shade',
+    weaknessDamageType: 'spirit',
     stats: { maxHp: 48, attack: 12, defense: 7, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -262,6 +274,7 @@ export const ENEMIES: Enemy[] = [
     tier: 'boss',
     isBoss: true,
     battleSpriteAssetId: 'battle.enemy.coalbound-warden',
+    weaknessDamageType: 'lantern',
     stats: { maxHp: 140, attack: 13, defense: 8, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 2 },

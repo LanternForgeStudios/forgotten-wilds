@@ -53,6 +53,7 @@ export function DungeonScene() {
   const isMobile = useIsMobile();
   const hudBarHeight = useHudBarHeight();
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
+  const skin = usePlayerStore((s) => s.player?.skin ?? 'male');
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const otherOverlaysOpen = message !== null || menuOpen || journalOpen;
@@ -71,10 +72,15 @@ export function DungeonScene() {
 
   const { pending, run } = usePendingAction();
 
-  useHeartbeat(uid, displayName, LOCATION_ID, position);
+  useHeartbeat(uid, displayName, LOCATION_ID, position, skin);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const dash = useDash({ attemptMove, positionRef });
-  useDashKeybind(dash, staminaUnlocked && !suspended);
+  const [dashRampKey, setDashRampKey] = useState(0);
+  const { startDash, stopDash } = useDash({
+    attemptMove,
+    positionRef,
+    onRampUp: () => setDashRampKey((k) => k + 1),
+  });
+  useDashKeybind(startDash, stopDash, staminaUnlocked && !suspended);
 
   function attemptInteract() {
     if (suspended || !map) return;
@@ -206,12 +212,13 @@ export function DungeonScene() {
           tilesetAssetId="tileset.tiny-dungeon"
           tilesetColumns={map.columns}
           player={position}
-          playerSpriteAssetId="sprite.player"
+          playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}
           playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
           playerMovementState={movementState}
+          dashRampTrigger={dashRampKey}
         />
       </div>
       {isMobile ? (
@@ -219,7 +226,8 @@ export function DungeonScene() {
           <DirectionPad attemptMove={attemptMove} />
           <MobileHud
             onInteract={attemptInteract}
-            onDash={staminaUnlocked ? dash : undefined}
+            onDashStart={staminaUnlocked ? () => startDash() : undefined}
+            onDashStop={staminaUnlocked ? stopDash : undefined}
             onInventory={() => setMenuOpen((open) => !open)}
             onJournal={() => setJournalOpen((open) => !open)}
             onMap={toggleMap}
@@ -228,7 +236,7 @@ export function DungeonScene() {
       ) : (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
-          {staminaUnlocked && <>&nbsp;·&nbsp; Dash: Shift + direction</>}
+          {staminaUnlocked && <>&nbsp;·&nbsp; Dash: hold Shift</>}
           &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Map: M
         </p>
       )}

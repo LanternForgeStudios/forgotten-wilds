@@ -83,7 +83,7 @@ export function useGridMovement({
   start,
   suspended,
   onStep,
-  stepIntervalMs = 150,
+  stepIntervalMs = 220,
   dynamicBlockers,
 }: UseGridMovementOptions) {
   const [resolvedStart, setResolvedStart] = useState(start);

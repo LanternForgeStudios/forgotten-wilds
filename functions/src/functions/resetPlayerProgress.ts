@@ -35,7 +35,9 @@ export const resetPlayerProgress = onCall<ResetPlayerProgressRequest>(async (req
     const save = snap.data() as PlayerSave;
 
     const now = Date.now();
-    const freshPlayer = buildFreshPlayer(uid, save.player.name, now);
+    // Skin is a cosmetic account preference, not "progress" - a reset shouldn't silently revert it
+    // to the default.
+    const freshPlayer = buildFreshPlayer(uid, save.player.name, now, save.player.skin ?? 'male');
     freshPlayer.premiumCurrency = save.player.premiumCurrency;
 
     const fresh: PlayerSave = {

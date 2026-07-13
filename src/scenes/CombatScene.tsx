@@ -38,6 +38,18 @@ const SKILL_BLOCKING_AILMENTS = new Set(['silence']);
 const LANTERN_BLOCKING_AILMENTS = new Set(['freeze']);
 const STUNNING_AILMENTS = new Set(['stun']);
 
+// Reinforces the ailment badge with a low-opacity full-screen color wash while it's active - each
+// stacks additively (rare, but a Burn+Poison round should read as visibly "worse" than either
+// alone, not one silently overwriting the other). Blind gets a blur filter on the stage instead of
+// a tint (per its own "reduced visibility" theme) rather than a color, since a color wash doesn't
+// read as "hard to see." Stun has no tint - the existing stunnedBanner text already covers it.
+const AILMENT_TINT_COLORS: Record<string, string> = {
+  poison: 'rgba(76, 175, 80, 0.22)',
+  burn: 'rgba(211, 47, 47, 0.22)',
+  freeze: 'rgba(41, 121, 255, 0.22)',
+  silence: 'rgba(156, 39, 176, 0.22)',
+};
+
 const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
   town: 'town',
   overworld: 'overworld',
@@ -69,6 +81,7 @@ export function CombatScene() {
   const [log, setLog] = useState<string[]>([]);
   const [playerAilments, setPlayerAilments] = useState<ActiveAilment[]>([]);
   const [selectedAilmentId, setSelectedAilmentId] = useState<string | null>(null);
+  const [showSkillMenu, setShowSkillMenu] = useState(false);
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // Up to 3 item ids queued to ride along with whatever primary action the player takes next
@@ -195,7 +208,7 @@ export function CombatScene() {
 
   async function act(
     type: 'attack' | 'skill' | 'lanternAbility' | 'defend' | 'flee' | 'item',
-    options?: { abilityId?: string },
+    options?: { abilityId?: string; skillId?: string },
   ) {
     if (!sessionId || phase === 'resolving' || playbackActive) return;
     setPhase('resolving');
@@ -206,6 +219,7 @@ export function CombatScene() {
       const res = await callResolveCombatAction(sessionId, {
         type,
         abilityId: options?.abilityId,
+        skillId: options?.skillId,
         itemIds: tray,
         targetIndex: needsTarget && targetMode === 'single' ? targetIndex ?? undefined : undefined,
         targetAll: needsTarget && targetMode === 'all',
@@ -405,12 +419,21 @@ export function CombatScene() {
   const isSilenced = playerAilments.some((a) => SKILL_BLOCKING_AILMENTS.has(a.ailmentId));
   const isLanternDisabled = playerAilments.some((a) => LANTERN_BLOCKING_AILMENTS.has(a.ailmentId));
   const isStunned = playerAilments.some((a) => STUNNING_AILMENTS.has(a.ailmentId));
+  const isBlinded = playerAilments.some((a) => a.ailmentId === 'blind');
+  const activeTintColors = playerAilments.map((a) => AILMENT_TINT_COLORS[a.ailmentId]).filter((c): c is string => !!c);
 
   // Attack's identity follows whatever's in the weapon slot - "Fists" when nothing is equipped,
   // matching the same pattern lantern abilities use for the lantern slot.
   const weaponId = player?.equipment.weapon;
   const weaponName = weaponId ? EQUIPMENT.find((e) => e.id === weaponId)?.name ?? 'Attack' : 'Fists';
-  const keepersStrikeCost = SKILLS.find((s) => s.id === 'keepers-strike')?.spiritCost ?? 0;
+
+  // A fresh/pre-Phase-3 save might not have knownSkillIds hydrated yet (see the server's own
+  // backfill in resolveCombatAction.ts) - default to the one Specialty Attack every player has
+  // always had, same fallback value the server itself backfills to.
+  const knownSkillIds = player?.knownSkillIds ?? ['keepers-strike'];
+  const knownSkills = knownSkillIds
+    .map((id) => SKILLS.find((s) => s.id === id))
+    .filter((s): s is NonNullable<typeof s> => !!s);
 
   // The equipped lantern determines which Lantern Ability button(s) show up - swap lanterns and
   // the options here change with it, same as any other equipment-driven capability.
@@ -422,6 +445,13 @@ export function CombatScene() {
 
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
+      {activeTintColors.length > 0 && (
+        <div className={styles.ailmentTintLayer}>
+          {activeTintColors.map((color, i) => (
+            <div key={i} className={styles.ailmentTint} style={{ background: color }} />
+          ))}
+        </div>
+      )}
       <PlayerHUD />
 
       {playerAilments.length > 0 && (
@@ -473,7 +503,32 @@ export function CombatScene() {
           );
         })()}
 
-      <div className={styles.stage}>
+      {showSkillMenu && (
+        <div className={styles.overlay} onClick={() => setShowSkillMenu(false)}>
+          <Panel style={{ width: 'min(360px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <OverlayCloseButton onClick={() => setShowSkillMenu(false)} />
+            <h3 style={{ margin: '0 0 10px', color: 'var(--fw-accent)' }}>Select Spirit Ability</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {knownSkills.map((skill) => (
+                <button
+                  key={skill.id}
+                  type="button"
+                  className={styles.actionButton}
+                  disabled={(player?.stats.spirit ?? 0) < skill.spiritCost}
+                  onClick={() => {
+                    setShowSkillMenu(false);
+                    act('skill', { skillId: skill.id });
+                  }}
+                >
+                  {skill.name} ({skill.spiritCost} SP)
+                </button>
+              ))}
+            </div>
+          </Panel>
+        </div>
+      )}
+
+      <div className={isBlinded ? `${styles.stage} ${styles.stageBlurred}` : styles.stage}>
         <div className={styles.enemyArea}>
           <div className={styles.battleCanvasWrap}>
             <PhaserBattleCanvas
@@ -545,6 +600,7 @@ export function CombatScene() {
               {combatItems.length === 0 && <p style={{ fontSize: 12, gridColumn: '1 / -1' }}>No usable items.</p>}
               {combatItems.map((i) => {
                 const def = ITEMS.find((d) => d.id === i.itemId);
+                const cureAilmentId = def?.effect?.cureAilmentId;
                 const wouldHelp = player
                   ? itemWouldHaveEffect(
                       def?.effect,
@@ -552,14 +608,21 @@ export function CombatScene() {
                       playerAilments.map((a) => a.ailmentId),
                     )
                   : false;
+                // A cure item with no matching active ailment isn't "Full" (that wording implies a
+                // capped stat bar) - it's simply not needed right now. Conversely, when it DOES
+                // match an active ailment, highlight the row so the right cure stands out among
+                // the tray instead of making the player read every item's name to find it.
                 const queued = queuedCountFor(i.itemId);
                 const canAdd = wouldHelp && canQueueMore && queued < i.quantity;
                 return (
-                  <div key={i.itemId} className={styles.itemRow}>
+                  <div
+                    key={i.itemId}
+                    className={cureAilmentId && wouldHelp ? `${styles.itemRow} ${styles.itemRowCureReady}` : styles.itemRow}
+                  >
                     <span>
                       {i.itemId.replace(/-/g, ' ')} x{i.quantity}
                       {queued > 0 && ` — queued: ${queued}`}
-                      {!wouldHelp && ' (Full)'}
+                      {!wouldHelp && (cureAilmentId ? ' (Not needed)' : ' (Full)')}
                     </span>
                     <div style={{ display: 'flex', gap: 4 }}>
                       <button
@@ -574,7 +637,13 @@ export function CombatScene() {
                         type="button"
                         className={styles.actionButton}
                         disabled={phase === 'usingItems' || !canAdd}
-                        title={wouldHelp ? undefined : 'Already at maximum - using this would have no effect.'}
+                        title={
+                          wouldHelp
+                            ? undefined
+                            : cureAilmentId
+                              ? 'Not needed right now - you do not have that ailment.'
+                              : 'Already at maximum - using this would have no effect.'
+                        }
                         onClick={() => queueItem(i.itemId)}
                       >
                         +
@@ -604,14 +673,25 @@ export function CombatScene() {
               <button className={styles.actionButton} disabled={!canAct} onClick={() => act('attack')}>
                 {weaponName}
               </button>
-              <button
-                className={styles.actionButton}
-                disabled={!canAct || (player?.stats.spirit ?? 0) < keepersStrikeCost || isSilenced}
-                title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
-                onClick={() => act('skill')}
-              >
-                Keeper's Strike ({keepersStrikeCost} SP)
-              </button>
+              {knownSkills.length <= 1 ? (
+                <button
+                  className={styles.actionButton}
+                  disabled={!canAct || (player?.stats.spirit ?? 0) < (knownSkills[0]?.spiritCost ?? 0) || isSilenced}
+                  title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
+                  onClick={() => act('skill', { skillId: knownSkills[0]?.id })}
+                >
+                  {knownSkills[0]?.name ?? "Keeper's Strike"} ({knownSkills[0]?.spiritCost ?? 0} SP)
+                </button>
+              ) : (
+                <button
+                  className={styles.actionButton}
+                  disabled={!canAct || isSilenced}
+                  title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
+                  onClick={() => setShowSkillMenu(true)}
+                >
+                  Select Spirit Ability
+                </button>
+              )}
               {lanternAbilities.map((ability) => (
                 <button
                   key={ability.id}

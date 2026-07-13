@@ -9,3 +9,4 @@ export * from './quests';
 export * from './locations';
 export * from './lore';
 export * from './leveling';
+export * from './recipes';

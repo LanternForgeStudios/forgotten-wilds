@@ -5,6 +5,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { signOutUser } from '@/firebase/auth';
+import { getAssetUrl } from '@/assets/assetManager';
 import {
   subscribeToFriendship,
   subscribeToBlockList,
@@ -27,6 +28,7 @@ import {
   callRespondToTradeOffer,
   callFinalizeTrade,
   callCancelTrade,
+  callSetPlayerSkin,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
@@ -55,7 +57,12 @@ interface UserProfileProps {
   onClose: () => void;
 }
 
-type ProfileTab = 'profile' | 'friends' | 'clan' | 'reset';
+type ProfileTab = 'profile' | 'friends' | 'clan' | 'skin' | 'reset';
+
+const SKIN_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
+  { id: 'male', label: 'Male', assetId: 'sprite.player.male' },
+  { id: 'female', label: 'Female', assetId: 'sprite.player.female' },
+];
 
 export function UserProfile({ onClose }: UserProfileProps) {
   const [tab, setTab] = useState<ProfileTab>('profile');
@@ -229,6 +236,17 @@ export function UserProfile({ onClose }: UserProfileProps) {
     }
   }
 
+  async function changeSkin(skin: 'male' | 'female') {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await callSetPlayerSkin(skin);
+      if (uid) await resyncSave(uid);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   // Every trade action escrows/releases/grants items+gold on at least one account, including the
   // caller's own - resyncSave afterward is what makes the Inventory/gold the player sees update
   // immediately, same as callMarkSocialReviewed's own resync above (gold/inventory have no live
@@ -343,6 +361,9 @@ export function UserProfile({ onClose }: UserProfileProps) {
           </button>
           <button className={`${styles.tab} ${tab === 'clan' ? styles.tabActive : ''}`} onClick={() => setTab('clan')}>
             Clan
+          </button>
+          <button className={`${styles.tab} ${tab === 'skin' ? styles.tabActive : ''}`} onClick={() => setTab('skin')}>
+            Skin
           </button>
           <button className={`${styles.tab} ${tab === 'reset' ? styles.tabActive : ''}`} onClick={() => setTab('reset')}>
             Reset Progress
@@ -648,6 +669,43 @@ export function UserProfile({ onClose }: UserProfileProps) {
             <p className={styles.empty}>
               Clans are not yet available - a future home for a smaller, tighter-knit group than a Lodge.
             </p>
+          </div>
+        )}
+
+        {tab === 'skin' && player && (
+          <div className={styles.section}>
+            <p style={{ fontSize: 13, opacity: 0.85, marginTop: 0 }}>
+              Choose how your character appears to yourself and other players. More options may be added later.
+            </p>
+            <div style={{ display: 'flex', gap: 12 }}>
+              {SKIN_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => changeSkin(option.id)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 4,
+                    background: player.skin === option.id ? 'var(--fw-accent-dim)' : 'transparent',
+                    border: `1px solid ${player.skin === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
+                    borderRadius: 6,
+                    padding: '8px 14px',
+                    cursor: busy ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  <img
+                    src={getAssetUrl(option.assetId)}
+                    alt={option.label}
+                    style={{ width: 48, height: 64, imageRendering: 'pixelated' }}
+                  />
+                  <span style={{ fontSize: 12 }}>{option.label}</span>
+                  {player.skin === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
