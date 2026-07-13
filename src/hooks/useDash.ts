@@ -8,10 +8,10 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 // call would just get swallowed by that throttle instead of actually advancing a tile - the whole
 // hold would then stop after its very first tile, since every subsequent attemptMove call gets
 // silently no-op'd by the movement throttle and the "position didn't change" collision check
-// mistakes that for a wall. Also the pacing of each per-tile stamina-debit server call during a
-// hold. Kept comfortably above stepIntervalMs (not just barely over it) so a slightly slow
-// server round-trip still leaves margin before the next tile's attemptMove call would arrive.
-const DASH_STEP_MS = 260;
+// mistakes that for a wall. This no longer has to also budget for a server round-trip (see the
+// stamina-debit comment in startDash below), so it's kept just comfortably above stepIntervalMs
+// rather than padded for network latency - the closer to it, the smoother a held dash feels.
+const DASH_STEP_MS = 240;
 // "Getting ready to run" beat before movement actually starts - the dust effect (see
 // ExplorationScene.playDashRampEffect via onRampUp below) fires immediately; actual tile movement
 // begins once this elapses, unless Dash was released before then.
@@ -37,11 +37,11 @@ interface UseDashOptions {
  *  button) until Stamina runs out, the held direction changes to something new, or movement is
  *  blocked by collision - replacing the old fixed "5 tiles for a flat upfront cost" model. A 1s
  *  ramp-up (dust effect, no movement yet) precedes the actual run. Stamina is debited per tile via
- *  the server-authoritative dash Cloud Function (functions/src/functions/dash.ts) - each tile's
- *  move only proceeds once the server confirms that tile's debit, so a network hiccup or an empty
- *  Stamina bar mid-run stops the hold exactly where the server says it can afford, never ahead of
- *  it. Call `startDash` on press (optionally with an explicit facing) and `stopDash` on release -
- *  see useDashKeybind.ts (keyboard: Shift held) and MobileHud.tsx (touch: press-and-hold). */
+ *  the server-authoritative dash Cloud Function (functions/src/functions/dash.ts), fired
+ *  fire-and-forget alongside each tile's movement rather than gating it - see the loop's own
+ *  comment for why. Call `startDash` on press (optionally with an explicit facing) and `stopDash`
+ *  on release - see useDashKeybind.ts (keyboard: Shift held) and MobileHud.tsx (touch:
+ *  press-and-hold). */
 export function useDash({ attemptMove, positionRef, onRampUp }: UseDashOptions) {
   const lastDashEndedAtRef = useRef(0);
   const dashingRef = useRef(false);
@@ -90,21 +90,29 @@ export function useDash({ attemptMove, positionRef, onRampUp }: UseDashOptions) 
         return;
       }
 
+      // Each tile's stamina debit is fired but NOT awaited before the next tile's attemptMove -
+      // waiting on that round-trip every single tile is what made a held dash visibly stutter
+      // (move, pause, move, pause) even on fast local latency, since the server call always
+      // outlasted GLIDE_MS's 120ms glide. The move itself was never server-persisted state to
+      // begin with (only the Stamina cost is), so this trades a small amount of debit strictness
+      // (a rejected call's tile has already visually happened by the time the rejection arrives -
+      // at most one tile's worth) for genuinely smooth, continuous movement. staminaExhausted is
+      // set the instant any call rejects, stopping the loop before the *next* tile fires.
+      let isDashStart = true;
+      let staminaExhausted = false;
       try {
-        let isDashStart = true;
-        while (facingRef.current !== null) {
+        while (facingRef.current !== null && !staminaExhausted) {
           const before = positionRef.current;
-          let result;
-          try {
-            result = await callDash({ isDashStart });
-          } catch {
-            break; // out of Stamina (or, rarely, still on cooldown) - stop the hold here
-          }
-          isDashStart = false;
-          patchStats({ stamina: result.stamina, maxStamina: result.maxStamina });
-          patchPlayer({ staminaUpdatedAt: result.staminaUpdatedAt });
-          if (facingRef.current === null) break; // released while the server call was in flight
           attemptMoveRef.current(facingRef.current, { isDash: true });
+          callDash({ isDashStart })
+            .then((result) => {
+              patchStats({ stamina: result.stamina, maxStamina: result.maxStamina });
+              patchPlayer({ staminaUpdatedAt: result.staminaUpdatedAt });
+            })
+            .catch(() => {
+              staminaExhausted = true; // out of Stamina (or, rarely, still on cooldown)
+            });
+          isDashStart = false;
           await wait(DASH_STEP_MS);
           const after = positionRef.current;
           if (after.x === before.x && after.y === before.y) break; // blocked - stop the dash here
