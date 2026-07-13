@@ -1,8 +1,7 @@
 # Forgotten Wilds
 
-Browser JRPG (React + TypeScript + Vite client, Firebase backend). Full design brief:
-`Forgotten-Wilds_Requirements.txt`. Setup/run/deploy instructions: `README.md`. This file is about
-*how to work on this codebase*, not how to run it.
+Browser JRPG (React + TypeScript + Vite client, Firebase backend). Setup/run/deploy instructions:
+`README.md`. This file is about *how to work on this codebase*, not how to run it.
 
 ## The one rule that shapes everything else
 

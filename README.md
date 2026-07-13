@@ -4,8 +4,7 @@
 
 A browser-based JRPG set in Mytherra's Iron Mountains. Single-player exploration, turn-based
 combat, and quests today; live town presence, friends/messaging, and player-to-player trading
-now, with clean seams for future party/chat/lodge/world-event systems. See
-`Forgotten-Wilds_Requirements.txt` for the full design brief.
+now, with clean seams for future party/chat/lodge/world-event systems.
 
 Frontend: React + TypeScript + Vite. Backend: Firebase (Auth, Firestore, Cloud Functions). The
 cloud is the source of truth — the client never writes game state directly; every mutation
