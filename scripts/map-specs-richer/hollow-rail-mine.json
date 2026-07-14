@@ -1,0 +1,43 @@
+{
+  "width": 38,
+  "height": 24,
+  "tilesets": [
+    {
+      "assetId": "tileset.tiny-dungeon",
+      "name": "tiny-dungeon",
+      "image": "tiny-dungeon.png",
+      "imageWidth": 192,
+      "imageHeight": 176,
+      "tileSize": 16,
+      "walkableIds": [24, 25]
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 24 },
+    "border": { "tileset": 0, "id": 0 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 10, "y": 8, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 24, "y": 17, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 30, "y": 10, "tileId": { "tileset": 0, "id": 25 } }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 1, "y": 12, "refId": "from-black-briar-forest" },
+    { "type": "spawnPoint", "x": 1, "y": 12, "refId": "default" },
+    { "type": "transition", "x": 0, "y": 12, "refId": "black-briar-forest", "targetSpawnId": "from-hollow-rail-mine" },
+    { "type": "spawnPoint", "x": 36, "y": 12, "refId": "from-ash-hallow-mine-office" },
+    { "type": "transition", "x": 37, "y": 12, "refId": "ash-hallow-mine-office", "targetSpawnId": "from-mine-office" },
+    { "type": "interactable", "x": 19, "y": 6, "refId": "miners-lost-lantern" },
+    { "type": "interactable", "x": 34, "y": 18, "refId": "coalbound-warden" },
+    { "type": "interactable", "x": 6, "y": 12, "refId": "chest-mine-1" },
+    { "type": "interactable", "x": 28, "y": 14, "refId": "chest-mine-2" },
+    { "type": "interactable", "x": 33, "y": 7, "refId": "chest-mine-3" },
+    { "type": "interactable", "x": 19, "y": 12, "refId": "mine-shrine" }
+  ]
+}

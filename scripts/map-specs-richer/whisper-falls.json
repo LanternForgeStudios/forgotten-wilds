@@ -1,0 +1,61 @@
+{
+  "width": 34,
+  "height": 22,
+  "tilesets": [
+    {
+      "assetId": "tileset.ground-tiles",
+      "name": "ground-tiles",
+      "image": "ground-tiles.png",
+      "imageWidth": 416,
+      "imageHeight": 384,
+      "tileSize": 32,
+      "walkableIds": [118, 126]
+    },
+    {
+      "assetId": "tileset.trees-signs-rocks-bridge",
+      "name": "trees-props",
+      "image": "trees-signs-rocks-bridge.png",
+      "imageWidth": 512,
+      "imageHeight": 864,
+      "tileSize": 32
+    },
+    {
+      "assetId": "tileset.water-animation-demo",
+      "name": "water-rapids",
+      "image": "water_animation_demo.png",
+      "imageWidth": 192,
+      "imageHeight": 128,
+      "tileSize": 64
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 118 },
+    "regions": [
+      { "x": 14, "y": 6, "width": 7, "height": 6, "tileId": { "tileset": 0, "id": 2 } },
+      { "x": 1, "y": 13, "width": 32, "height": 2, "tileId": { "tileset": 0, "id": 126 } }
+    ]
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 13, "y": 5, "tileId": { "tileset": 2, "id": 0 } },
+        { "x": 21, "y": 11, "tileId": { "tileset": 2, "id": 1 } }
+      ],
+      "scatter": [
+        { "region": { "x": 1, "y": 1, "width": 32, "height": 20 }, "tileIds": [{ "tileset": 1, "id": 4 }, { "tileset": 1, "id": 6 }],
+          "count": 26, "seed": 33,
+          "avoid": [ { "x": 1, "y": 11 }, { "x": 32, "y": 11 }, { "x": 17, "y": 9 } ] }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 1, "y": 11, "refId": "default" },
+    { "type": "spawnPoint", "x": 1, "y": 11, "refId": "from-raven-ridge" },
+    { "type": "transition", "x": 0, "y": 11, "refId": "raven-ridge", "targetSpawnId": "from-whisper-falls" },
+    { "type": "spawnPoint", "x": 32, "y": 11, "refId": "from-black-briar-forest" },
+    { "type": "transition", "x": 33, "y": 11, "refId": "black-briar-forest", "targetSpawnId": "from-whisper-falls" },
+    { "type": "interactable", "x": 17, "y": 9, "refId": "water-fragment" }
+  ]
+}

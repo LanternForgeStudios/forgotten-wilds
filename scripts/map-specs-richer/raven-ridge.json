@@ -1,0 +1,49 @@
+{
+  "width": 34,
+  "height": 22,
+  "tilesets": [
+    {
+      "assetId": "tileset.ground-tiles",
+      "name": "ground-tiles",
+      "image": "ground-tiles.png",
+      "imageWidth": 416,
+      "imageHeight": 384,
+      "tileSize": 32,
+      "walkableIds": [126, 118]
+    },
+    {
+      "assetId": "tileset.trees-signs-rocks-bridge",
+      "name": "trees-props",
+      "image": "trees-signs-rocks-bridge.png",
+      "imageWidth": 512,
+      "imageHeight": 864,
+      "tileSize": 32
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 126 },
+    "regions": [
+      { "x": 6, "y": 8, "width": 22, "height": 6, "tileId": { "tileset": 0, "id": 118 } }
+    ]
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [],
+      "scatter": [
+        { "region": { "x": 1, "y": 1, "width": 32, "height": 20 }, "tileIds": [{ "tileset": 1, "id": 6 }, { "tileset": 1, "id": 7 }],
+          "count": 24, "seed": 21,
+          "avoid": [ { "x": 1, "y": 11 }, { "x": 32, "y": 11 }, { "x": 17, "y": 11 } ] }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 1, "y": 11, "refId": "default" },
+    { "type": "spawnPoint", "x": 1, "y": 11, "refId": "from-ironwood-trail" },
+    { "type": "transition", "x": 0, "y": 11, "refId": "ironwood-trail", "targetSpawnId": "from-raven-ridge" },
+    { "type": "spawnPoint", "x": 32, "y": 11, "refId": "from-whisper-falls" },
+    { "type": "transition", "x": 33, "y": 11, "refId": "whisper-falls", "targetSpawnId": "from-raven-ridge" },
+    { "type": "npc", "x": 17, "y": 11, "refId": "ranger-caleb" }
+  ]
+}

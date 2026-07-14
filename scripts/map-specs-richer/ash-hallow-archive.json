@@ -1,0 +1,82 @@
+{
+  "width": 13,
+  "height": 10,
+  "tilesets": [
+    {
+      "assetId": "tileset.tiny-dungeon",
+      "name": "tiny-dungeon",
+      "image": "tiny-dungeon.png",
+      "imageWidth": 192,
+      "imageHeight": 176,
+      "tileSize": 16,
+      "walkableIds": [
+        24,
+        25
+      ]
+    },
+    {
+      "assetId": "tileset.velmora-environments",
+      "name": "velmora-environments",
+      "image": "VelmoraRealms-Environments_Free.png",
+      "imageWidth": 320,
+      "imageHeight": 208,
+      "tileSize": 32
+    }
+  ],
+  "ground": {
+    "fill": {
+      "tileset": 0,
+      "id": 24
+    },
+    "border": {
+      "tileset": 0,
+      "id": 0
+    }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        {
+          "x": 2,
+          "y": 2,
+          "tileId": {
+            "tileset": 1,
+            "id": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 2,
+          "tileId": {
+            "tileset": 1,
+            "id": 0
+          }
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    {
+      "type": "spawnPoint",
+      "x": 6,
+      "y": 8,
+      "refId": "from-ash-hallow"
+    },
+    {
+      "type": "npc",
+      "x": 6,
+      "y": 3,
+      "refId": "historian-miriam"
+    },
+    {
+      "type": "transition",
+      "x": 6,
+      "y": 9,
+      "refId": "ash-hallow",
+      "targetSpawnId": "from-ash-hallow-archive",
+      "requiredFacing": "down"
+    }
+  ]
+}
