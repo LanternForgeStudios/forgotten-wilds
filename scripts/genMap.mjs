@@ -21,7 +21,8 @@
 // All x/y in the spec are TILE coordinates (the script multiplies by tilewidth=16 for the output
 // JSON, matching every existing hand-authored map's convention - tiledLoader.ts divides back down
 // on load). The generated room is a solid border of non-walkable tile (gid 1) with a fully
-// walkable interior (gid 25), same tileset convention as every existing map in this repo.
+// walkable interior (gid 25) - walkability defaults to true for any populated ground tile, so only
+// the border tile needs an explicit walkable:false marking, not the floor tile.
 //
 // This script only ever produces a `ground` tile layer plus an `objects` layer - it has no concept
 // of the richer decorations-N/collisions/overhang layers the Tiled editor workflow supports (see
@@ -86,7 +87,7 @@ function buildMapJson(spec) {
       {
         firstgid: 1,
         tilecount: 132,
-        tiles: [{ id: 24, properties: [{ name: 'walkable', type: 'bool', value: true }] }],
+        tiles: [{ id: 0, properties: [{ name: 'walkable', type: 'bool', value: false }] }],
       },
     ],
   };

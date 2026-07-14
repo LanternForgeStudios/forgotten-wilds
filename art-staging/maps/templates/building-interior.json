@@ -300,22 +300,12 @@
       ],
       "tiles": [
         {
-          "id": 24,
+          "id": 0,
           "properties": [
             {
               "name": "walkable",
               "type": "bool",
-              "value": true
-            }
-          ]
-        },
-        {
-          "id": 25,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         }

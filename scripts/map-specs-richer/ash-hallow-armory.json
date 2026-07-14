@@ -9,9 +9,8 @@
       "imageWidth": 192,
       "imageHeight": 176,
       "tileSize": 16,
-      "walkableIds": [
-        24,
-        25
+      "nonWalkableIds": [
+        0
       ]
     },
     {

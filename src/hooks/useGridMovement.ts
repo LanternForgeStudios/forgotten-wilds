@@ -43,7 +43,9 @@ export function isWalkable(map: TileMap, x: number, y: number, facing?: Facing):
   const ground = map.layers.find((l) => l.name === 'ground');
   if (!ground) return false;
   const gid = ground.data[y * map.width + x];
-  if (!map.walkableTileIds.includes(gid)) return false;
+  // Any populated ground tile is walkable by default - only an explicit walkable:false exception
+  // (walls, water, ...) or an empty tile (gid 0, nothing painted there) blocks movement.
+  if (gid <= 0 || map.nonWalkableTileIds.includes(gid)) return false;
   // Discrete collision-only obstacles authored on the Tiled 'collisions' layer (fences, rocks,
   // ledges, barriers). Purely geometric - blocks movement but never triggers interaction logic,
   // unlike an 'interactable' MapObject.
@@ -164,8 +166,36 @@ export function useGridMovement({
 
   useEffect(() => () => clearTimeout(movementIdleTimeoutRef.current), []);
 
+  // Held-direction movement drives its own interval instead of relying on the browser's keyboard
+  // auto-repeat: OS key-repeat has a long initial delay (~500ms, tuned for text editing) before it
+  // starts firing repeat keydowns, which is longer than stepIntervalMs - holding a direction would
+  // take one instant step, then visibly stutter/pause until the OS repeat caught up. Polling
+  // attemptMove ourselves on a short interval (well under stepIntervalMs - attemptMove's own
+  // throttle still gates the actual move rate, so over-calling it is harmless) removes that dead
+  // pause entirely, same fix already applied to Dash via useDashKeybind's held-Shift tracking.
+  const heldFacingRef = useRef<Facing | null>(null);
+  const attemptMoveRef = useRef(attemptMove);
+  attemptMoveRef.current = attemptMove;
+
   useEffect(() => {
     if (!map || suspended) return;
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+
+    function startHolding(facing: Facing) {
+      heldFacingRef.current = facing;
+      attemptMoveRef.current(facing);
+      if (intervalId === undefined) {
+        intervalId = setInterval(() => {
+          if (heldFacingRef.current) attemptMoveRef.current(heldFacingRef.current);
+        }, 50);
+      }
+    }
+
+    function stopHolding() {
+      heldFacingRef.current = null;
+      clearInterval(intervalId);
+      intervalId = undefined;
+    }
 
     function handleKeyDown(e: KeyboardEvent) {
       if (isTypingTarget(e)) return;
@@ -175,12 +205,34 @@ export function useGridMovement({
       const facing = KEY_TO_FACING[e.key];
       if (!facing) return;
       e.preventDefault();
-      attemptMove(facing);
+      // The OS's own auto-repeat re-fires keydown for the still-held key - ignore those (the
+      // interval above already has it covered) rather than restarting the loop every repeat.
+      if (heldFacingRef.current === facing) return;
+      startHolding(facing);
+    }
+
+    function handleKeyUp(e: KeyboardEvent) {
+      const facing = KEY_TO_FACING[e.key];
+      if (!facing || heldFacingRef.current !== facing) return;
+      stopHolding();
+    }
+
+    // Losing focus (alt-tab, clicking outside the game) never fires a keyup for whatever was held
+    // - without this the interval would keep calling attemptMove indefinitely.
+    function handleBlur() {
+      stopHolding();
     }
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [map, suspended, attemptMove]);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
+      stopHolding();
+    };
+  }, [map, suspended]);
 
   const facingDelta = useCallback((facing: Facing) => FACING_TO_DELTA[facing], []);
 

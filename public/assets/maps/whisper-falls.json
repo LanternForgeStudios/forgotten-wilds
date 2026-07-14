@@ -1688,22 +1688,12 @@
       ],
       "tiles": [
         {
-          "id": 118,
+          "id": 2,
           "properties": [
             {
               "name": "walkable",
               "type": "bool",
-              "value": true
-            }
-          ]
-        },
-        {
-          "id": 126,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         }

@@ -9,7 +9,7 @@
       "imageWidth": 416,
       "imageHeight": 384,
       "tileSize": 32,
-      "walkableIds": [118, 126]
+      "nonWalkableIds": []
     },
     {
       "assetId": "tileset.trees-signs-rocks-bridge",
@@ -21,61 +21,329 @@
     }
   ],
   "ground": {
-    "fill": { "tileset": 0, "id": 118 },
+    "fill": {
+      "tileset": 0,
+      "id": 118
+    },
     "regions": [
-      { "x": 4, "y": 5, "width": 26, "height": 2, "tileId": { "tileset": 0, "id": 126 } },
-      { "x": 4, "y": 15, "width": 22, "height": 2, "tileId": { "tileset": 0, "id": 126 } },
-      { "x": 15, "y": 5, "width": 2, "height": 12, "tileId": { "tileset": 0, "id": 126 } }
+      {
+        "x": 4,
+        "y": 5,
+        "width": 26,
+        "height": 2,
+        "tileId": {
+          "tileset": 0,
+          "id": 126
+        }
+      },
+      {
+        "x": 4,
+        "y": 15,
+        "width": 22,
+        "height": 2,
+        "tileId": {
+          "tileset": 0,
+          "id": 126
+        }
+      },
+      {
+        "x": 15,
+        "y": 5,
+        "width": 2,
+        "height": 12,
+        "tileId": {
+          "tileset": 0,
+          "id": 126
+        }
+      }
     ]
   },
   "decorations": [
     {
       "name": "decorations-1",
       "tiles": [
-        { "x": 1, "y": 1, "tileId": { "tileset": 1, "id": 1 } },
-        { "x": 32, "y": 1, "tileId": { "tileset": 1, "id": 1 } },
-        { "x": 1, "y": 20, "tileId": { "tileset": 1, "id": 1 } },
-        { "x": 32, "y": 20, "tileId": { "tileset": 1, "id": 1 } },
-        { "x": 20, "y": 8, "tileId": { "tileset": 1, "id": 4 } },
-        { "x": 22, "y": 8, "tileId": { "tileset": 1, "id": 4 } }
+        {
+          "x": 1,
+          "y": 1,
+          "tileId": {
+            "tileset": 1,
+            "id": 1
+          }
+        },
+        {
+          "x": 32,
+          "y": 1,
+          "tileId": {
+            "tileset": 1,
+            "id": 1
+          }
+        },
+        {
+          "x": 1,
+          "y": 20,
+          "tileId": {
+            "tileset": 1,
+            "id": 1
+          }
+        },
+        {
+          "x": 32,
+          "y": 20,
+          "tileId": {
+            "tileset": 1,
+            "id": 1
+          }
+        },
+        {
+          "x": 20,
+          "y": 8,
+          "tileId": {
+            "tileset": 1,
+            "id": 4
+          }
+        },
+        {
+          "x": 22,
+          "y": 8,
+          "tileId": {
+            "tileset": 1,
+            "id": 4
+          }
+        }
       ],
       "scatter": [
-        { "region": { "x": 2, "y": 2, "width": 30, "height": 18 }, "tileIds": [{ "tileset": 1, "id": 4 }, { "tileset": 1, "id": 5 }], "count": 14, "seed": 7,
+        {
+          "region": {
+            "x": 2,
+            "y": 2,
+            "width": 30,
+            "height": 18
+          },
+          "tileIds": [
+            {
+              "tileset": 1,
+              "id": 4
+            },
+            {
+              "tileset": 1,
+              "id": 5
+            }
+          ],
+          "count": 14,
+          "seed": 7,
           "avoid": [
-            { "x": 5, "y": 5 }, { "x": 9, "y": 5 }, { "x": 14, "y": 5 }, { "x": 18, "y": 5 }, { "x": 23, "y": 5 },
-            { "x": 5, "y": 16 }, { "x": 9, "y": 16 }, { "x": 14, "y": 16 }, { "x": 18, "y": 16 },
-            { "x": 14, "y": 11 }, { "x": 28, "y": 11 }, { "x": 16, "y": 17 }
-          ] }
+            {
+              "x": 5,
+              "y": 5
+            },
+            {
+              "x": 9,
+              "y": 5
+            },
+            {
+              "x": 14,
+              "y": 5
+            },
+            {
+              "x": 18,
+              "y": 5
+            },
+            {
+              "x": 23,
+              "y": 5
+            },
+            {
+              "x": 5,
+              "y": 16
+            },
+            {
+              "x": 9,
+              "y": 16
+            },
+            {
+              "x": 14,
+              "y": 16
+            },
+            {
+              "x": 18,
+              "y": 16
+            },
+            {
+              "x": 14,
+              "y": 11
+            },
+            {
+              "x": 28,
+              "y": 11
+            },
+            {
+              "x": 16,
+              "y": 17
+            }
+          ]
+        }
       ]
     }
   ],
   "overhang": [],
   "objects": [
-    { "type": "spawnPoint", "x": 16, "y": 17, "refId": "default" },
-    { "type": "spawnPoint", "x": 29, "y": 11, "refId": "from-ironwood-trail" },
-    { "type": "transition", "x": 33, "y": 11, "refId": "ironwood-trail", "targetSpawnId": "from-ash-hallow" },
-
-    { "type": "transition", "x": 5, "y": 5, "refId": "ash-hallow-elias-house", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 5, "y": 5, "refId": "from-ash-hallow-elias-house" },
-    { "type": "transition", "x": 9, "y": 5, "refId": "ash-hallow-mara-shop", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 9, "y": 5, "refId": "from-ash-hallow-mara-shop" },
-    { "type": "transition", "x": 14, "y": 5, "refId": "ash-hallow-blacksmith", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 14, "y": 5, "refId": "from-ash-hallow-blacksmith" },
-    { "type": "transition", "x": 18, "y": 5, "refId": "ash-hallow-apothecary", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 18, "y": 5, "refId": "from-ash-hallow-apothecary" },
-    { "type": "transition", "x": 23, "y": 5, "refId": "ash-hallow-armory", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 23, "y": 5, "refId": "from-ash-hallow-armory" },
-
-    { "type": "transition", "x": 5, "y": 16, "refId": "ash-hallow-inn", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 5, "y": 16, "refId": "from-ash-hallow-inn" },
-    { "type": "transition", "x": 9, "y": 16, "refId": "ash-hallow-archive", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 9, "y": 16, "refId": "from-ash-hallow-archive" },
-    { "type": "transition", "x": 14, "y": 16, "refId": "ash-hallow-mine-office", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 14, "y": 16, "refId": "from-ash-hallow-mine-office" },
-    { "type": "transition", "x": 18, "y": 16, "refId": "ash-hallow-town-hall", "targetSpawnId": "from-ash-hallow", "requiredFacing": "up" },
-    { "type": "spawnPoint", "x": 18, "y": 16, "refId": "from-ash-hallow-town-hall" },
-
-    { "type": "npc", "x": 14, "y": 11, "refId": "nell-ashby", "wanderRadius": 2 },
-    { "type": "interactable", "x": 28, "y": 11, "refId": "ash-hallow-shrine" }
+    {
+      "type": "spawnPoint",
+      "x": 16,
+      "y": 17,
+      "refId": "default"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 29,
+      "y": 11,
+      "refId": "from-ironwood-trail"
+    },
+    {
+      "type": "transition",
+      "x": 33,
+      "y": 11,
+      "refId": "ironwood-trail",
+      "targetSpawnId": "from-ash-hallow"
+    },
+    {
+      "type": "transition",
+      "x": 5,
+      "y": 5,
+      "refId": "ash-hallow-elias-house",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 5,
+      "y": 5,
+      "refId": "from-ash-hallow-elias-house"
+    },
+    {
+      "type": "transition",
+      "x": 9,
+      "y": 5,
+      "refId": "ash-hallow-mara-shop",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 9,
+      "y": 5,
+      "refId": "from-ash-hallow-mara-shop"
+    },
+    {
+      "type": "transition",
+      "x": 14,
+      "y": 5,
+      "refId": "ash-hallow-blacksmith",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 14,
+      "y": 5,
+      "refId": "from-ash-hallow-blacksmith"
+    },
+    {
+      "type": "transition",
+      "x": 18,
+      "y": 5,
+      "refId": "ash-hallow-apothecary",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 18,
+      "y": 5,
+      "refId": "from-ash-hallow-apothecary"
+    },
+    {
+      "type": "transition",
+      "x": 23,
+      "y": 5,
+      "refId": "ash-hallow-armory",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 23,
+      "y": 5,
+      "refId": "from-ash-hallow-armory"
+    },
+    {
+      "type": "transition",
+      "x": 5,
+      "y": 16,
+      "refId": "ash-hallow-inn",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 5,
+      "y": 16,
+      "refId": "from-ash-hallow-inn"
+    },
+    {
+      "type": "transition",
+      "x": 9,
+      "y": 16,
+      "refId": "ash-hallow-archive",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 9,
+      "y": 16,
+      "refId": "from-ash-hallow-archive"
+    },
+    {
+      "type": "transition",
+      "x": 14,
+      "y": 16,
+      "refId": "ash-hallow-mine-office",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 14,
+      "y": 16,
+      "refId": "from-ash-hallow-mine-office"
+    },
+    {
+      "type": "transition",
+      "x": 18,
+      "y": 16,
+      "refId": "ash-hallow-town-hall",
+      "targetSpawnId": "from-ash-hallow",
+      "requiredFacing": "up"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 18,
+      "y": 16,
+      "refId": "from-ash-hallow-town-hall"
+    },
+    {
+      "type": "npc",
+      "x": 14,
+      "y": 11,
+      "refId": "nell-ashby",
+      "wanderRadius": 2
+    },
+    {
+      "type": "interactable",
+      "x": 28,
+      "y": 11,
+      "refId": "ash-hallow-shrine"
+    }
   ]
 }

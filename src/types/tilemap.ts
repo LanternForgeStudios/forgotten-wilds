@@ -73,5 +73,12 @@ export interface TileMap {
   /** Discrete static collision-only obstacles from the 'collisions' object layer. Empty if the map
    *  has no such layer. Purely geometric - never interactable, never a transition. */
   collisionObjects: CollisionRect[];
-  walkableTileIds: number[];
+  /** Any populated `ground` tile (gid > 0) is walkable *by default* - this is the opt-out list:
+   *  gids explicitly marked `walkable: false` on their tileset (Tiled's Tileset Editor -> a tile's
+   *  Custom Properties), for walls/water/chasms/etc. Inverted on purpose from an opt-in allow-list
+   *  (which this used to be) - most of a hand-authored map's ground *is* walkable, so painting a
+   *  new floor variant "just working" without also remembering to flag it walkable elsewhere is far
+   *  less error-prone than the reverse (forgetting to flag an obstacle non-walkable is much rarer
+   *  and more visually obvious - you can see the wall/water sitting there). */
+  nonWalkableTileIds: number[];
 }

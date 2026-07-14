@@ -9,7 +9,7 @@
       "imageWidth": 416,
       "imageHeight": 384,
       "tileSize": 32,
-      "walkableIds": [118, 126]
+      "nonWalkableIds": []
     },
     {
       "assetId": "tileset.trees-signs-rocks-bridge",
@@ -29,35 +29,165 @@
     }
   ],
   "ground": {
-    "fill": { "tileset": 0, "id": 118 },
+    "fill": {
+      "tileset": 0,
+      "id": 118
+    },
     "regions": [
-      { "x": 1, "y": 13, "width": 32, "height": 2, "tileId": { "tileset": 0, "id": 126 } },
-      { "x": 20, "y": 4, "width": 8, "height": 6, "tileId": { "tileset": 0, "id": 126 } }
+      {
+        "x": 1,
+        "y": 13,
+        "width": 32,
+        "height": 2,
+        "tileId": {
+          "tileset": 0,
+          "id": 126
+        }
+      },
+      {
+        "x": 20,
+        "y": 4,
+        "width": 8,
+        "height": 6,
+        "tileId": {
+          "tileset": 0,
+          "id": 126
+        }
+      }
     ]
   },
   "decorations": [
     {
       "name": "decorations-1",
       "tiles": [
-        { "x": 21, "y": 5, "tileId": { "tileset": 2, "id": 23 } },
-        { "x": 23, "y": 5, "tileId": { "tileset": 2, "id": 24 } },
-        { "x": 25, "y": 5, "tileId": { "tileset": 2, "id": 25 } },
-        { "x": 22, "y": 7, "tileId": { "tileset": 2, "id": 32 } },
-        { "x": 26, "y": 7, "tileId": { "tileset": 2, "id": 6 } }
+        {
+          "x": 21,
+          "y": 5,
+          "tileId": {
+            "tileset": 2,
+            "id": 23
+          }
+        },
+        {
+          "x": 23,
+          "y": 5,
+          "tileId": {
+            "tileset": 2,
+            "id": 24
+          }
+        },
+        {
+          "x": 25,
+          "y": 5,
+          "tileId": {
+            "tileset": 2,
+            "id": 25
+          }
+        },
+        {
+          "x": 22,
+          "y": 7,
+          "tileId": {
+            "tileset": 2,
+            "id": 32
+          }
+        },
+        {
+          "x": 26,
+          "y": 7,
+          "tileId": {
+            "tileset": 2,
+            "id": 6
+          }
+        }
       ],
       "scatter": [
-        { "region": { "x": 1, "y": 1, "width": 32, "height": 20 }, "tileIds": [{ "tileset": 1, "id": 4 }, { "tileset": 1, "id": 8 }],
-          "count": 40, "seed": 55,
-          "avoid": [ { "x": 1, "y": 11 }, { "x": 32, "y": 11 }, { "x": 21, "y": 5 }, { "x": 23, "y": 5 }, { "x": 25, "y": 5 }, { "x": 22, "y": 7 }, { "x": 26, "y": 7 } ] }
+        {
+          "region": {
+            "x": 1,
+            "y": 1,
+            "width": 32,
+            "height": 20
+          },
+          "tileIds": [
+            {
+              "tileset": 1,
+              "id": 4
+            },
+            {
+              "tileset": 1,
+              "id": 8
+            }
+          ],
+          "count": 40,
+          "seed": 55,
+          "avoid": [
+            {
+              "x": 1,
+              "y": 11
+            },
+            {
+              "x": 32,
+              "y": 11
+            },
+            {
+              "x": 21,
+              "y": 5
+            },
+            {
+              "x": 23,
+              "y": 5
+            },
+            {
+              "x": 25,
+              "y": 5
+            },
+            {
+              "x": 22,
+              "y": 7
+            },
+            {
+              "x": 26,
+              "y": 7
+            }
+          ]
+        }
       ]
     }
   ],
   "overhang": [],
   "objects": [
-    { "type": "spawnPoint", "x": 1, "y": 11, "refId": "default" },
-    { "type": "spawnPoint", "x": 1, "y": 11, "refId": "from-whisper-falls" },
-    { "type": "transition", "x": 0, "y": 11, "refId": "whisper-falls", "targetSpawnId": "from-black-briar-forest" },
-    { "type": "spawnPoint", "x": 32, "y": 11, "refId": "from-hollow-rail-mine" },
-    { "type": "transition", "x": 33, "y": 11, "refId": "hollow-rail-mine", "targetSpawnId": "from-black-briar-forest" }
+    {
+      "type": "spawnPoint",
+      "x": 1,
+      "y": 11,
+      "refId": "default"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 1,
+      "y": 11,
+      "refId": "from-whisper-falls"
+    },
+    {
+      "type": "transition",
+      "x": 0,
+      "y": 11,
+      "refId": "whisper-falls",
+      "targetSpawnId": "from-black-briar-forest"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 32,
+      "y": 11,
+      "refId": "from-hollow-rail-mine"
+    },
+    {
+      "type": "transition",
+      "x": 33,
+      "y": 11,
+      "refId": "hollow-rail-mine",
+      "targetSpawnId": "from-black-briar-forest"
+    }
   ]
 }

@@ -19,7 +19,7 @@
 //   "width": 34, "height": 22,
 //   "tilesets": [
 //     { "assetId": "tileset.ground-tiles", "name": "ground-tiles", "image": "ground-tiles.png",
-//       "imageWidth": 416, "imageHeight": 384, "tileSize": 16, "walkableIds": [0,1,2] },
+//       "imageWidth": 416, "imageHeight": 384, "tileSize": 16, "nonWalkableIds": [5] },
 //     { "assetId": "tileset.trees-signs-rocks-bridge", "name": "trees-props", "image": "trees-signs-rocks-bridge.png",
 //       "imageWidth": 512, "imageHeight": 864, "tileSize": 32 }
 //   ],
@@ -208,9 +208,11 @@ function buildTilesetBlock(ts, firstgid) {
   const tileSize = ts.tileSize ?? MAP_GRID_TILE_SIZE;
   const columns = Math.floor(ts.imageWidth / tileSize);
   const rows = Math.floor(ts.imageHeight / tileSize);
-  const tiles = (ts.walkableIds ?? []).map((id) => ({
+  // Opt-out, not opt-in: any populated ground tile is walkable by default (see
+  // src/assets/tiledLoader.ts), so only the exceptions (walls, water, ...) need marking.
+  const tiles = (ts.nonWalkableIds ?? []).map((id) => ({
     id,
-    properties: [{ name: 'walkable', type: 'bool', value: true }],
+    properties: [{ name: 'walkable', type: 'bool', value: false }],
   }));
   return {
     firstgid,

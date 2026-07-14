@@ -12,10 +12,10 @@ Rendering order (bottom to top): `ground` → `decorations-1` → `decorations-2
 
 | Layer name | Tiled layer type | Purpose |
 |---|---|---|
-| `ground` | Tile Layer | Base terrain. Drives walkability via each tile's `walkable` custom property. Required. |
+| `ground` | Tile Layer | Base terrain. Any populated tile is walkable *by default* - see "Walkability" below. Required. |
 | `decorations-1`, `decorations-2`, ... | Tile Layer | Optional cosmetic layers, rendered above ground and below entities, in ascending numeric order. Never affect collision. |
 | `collisions` | Object Layer | Discrete, non-interactive obstacles (fences, rocks, ledges, barriers). Rectangle or point objects. Block movement but never trigger interaction/dialogue. |
-| `objects` | Object Layer | Spawns, transitions, NPCs, interactables, encounter zones. Existing convention, unchanged. |
+| `objects` | Object Layer | Spawns, transitions, NPCs, interactables, walk-in zones. |
 | `overhang`, or `overhang-1`, `overhang-2`, ... | Tile Layer | Optional cosmetic layer(s) rendered above the player/NPCs (roofs, bridges, tree canopies). A single unsuffixed `overhang` is fine for one layer; use numbered `overhang-N` (ascending stacking order, same convention as `decorations-N`) only once a map actually needs more than one - e.g. a tree canopy above a lower roof overhang. Never affects collision. |
 
 Layer names are case-sensitive and must match exactly. Anything else is ignored for rendering
@@ -33,7 +33,22 @@ single-tile obstacle) over anything that should block movement without being int
 fence, a rock, a ledge. The object's Class/Type field is ignored entirely, so it can be left blank.
 This is a different mechanism from `objects`' `interactable` type: an `interactable` object is both
 a collision blocker *and* something the player can walk up to and interact with (a chest, a
-shrine); a `collisions` object is scenery only.
+shrine); a `collisions` object is scenery only. It's also a separate mechanism from `walkable:
+false` on a `ground` tile (see "Walkability" above) - `collisions` is the right tool when you want
+to block an area *without* it being tied to a specific ground tile (an irregular fence line cutting
+across otherwise-walkable grass, for example), and `walkable: false` is the right tool when the
+ground tile itself inherently shouldn't be stood on everywhere it's placed (water, a chasm). Use
+whichever is more convenient for a given obstacle - they compose freely.
+
+**Snap rectangles to the tile grid.** The player moves tile-by-tile - there's no sub-tile
+positioning - so a `collisions` rectangle can only ever block whole tiles, never "half" one. Enable
+Tiled's **Snap to Grid** (View → Snapping, or the magnet icon in the toolbar) before drawing
+collision rectangles, and size/position them as exact multiples of the tile size. If you don't, two
+things make the blocked area look bigger in-game than the rectangle looked in Tiled: (1) any
+non-tile-aligned rectangle still blocks *every* whole tile it overlaps at all, even by one pixel,
+and (2) a rectangle smaller than one tile still blocks that entire tile - there's no way to
+represent "partially blocked." Grid-snapped rectangles sidestep both: what you see in Tiled is
+exactly the tiles that block in-game, with no rounding ambiguity.
 
 ## The `objects` layer
 
@@ -62,13 +77,23 @@ corresponds to - set that with a **Tileset → Properties** custom property name
 `tilesetAssetId` property below, for backward compatibility with maps authored before multi-tileset
 support existed - but any additional tileset must set its own.)
 
+## Walkability
+
+Any populated `ground` tile (a real tile, not an empty cell) is walkable **by default**. Set a
+per-tile custom property `walkable` (bool) to `false`, in the Tileset Editor, only on the
+exceptions — walls, water, chasms, anything the player shouldn't be able to stand on. This is
+deliberately an opt-*out* list, not an opt-in one: most of a hand-authored map's ground genuinely
+is walkable, so a newly-painted floor variant works immediately without also having to remember to
+flag it walkable somewhere else — you only ever need to think about this for the (usually much
+smaller) set of tiles that should block movement.
+
 ## Custom properties
 
 - **Map Properties → Custom Properties**: `tilesetAssetId` (string) — the game asset-registry id for
   the map's first/primary tileset (e.g. `tileset.tiny-dungeon`), not a filename. See "Multiple
   tilesets per map" above for maps with more than one.
-- **Tileset editor, per tile**: `walkable` (bool) — set `true` on any `ground`-layer tile the
-  player can stand on.
+- **Tileset editor, per tile**: `walkable` (bool) — see "Walkability" above. Omit entirely for any
+  tile that should just be walkable.
 
 ## Export settings — hard constraints
 
@@ -81,8 +106,10 @@ wrong.
 - **Tileset embedding**: the tileset must be **embedded** in the map JSON (inline `tiles`/
   `tilecount`/`columns`), not referenced as an external `.tsx` file. When creating the tileset in
   Tiled, make sure "Embed in map" is used (or export with `--embed-tilesets` if scripting the
-  export). An externally-referenced tileset will silently lose its `walkable` tile properties and
-  column count.
+  export). An externally-referenced tileset silently loses its `walkable: false` exceptions and
+  column count - since walkability now defaults to true, that makes walls/water/etc. silently
+  *walkable* instead of the reverse. The dev-console (`npm run dev`) warns loudly if a loaded
+  tileset looks externally-referenced, specifically so this doesn't fail silently.
 
 ## Where the file goes
 

@@ -78,6 +78,32 @@ function propValue<T extends string | number | boolean>(
   return properties?.find((p) => p.name === name)?.value as T | undefined;
 }
 
+/** Converts a pixel-space rectangle (Tiled's own object coordinates - free-form, not necessarily
+ *  grid-aligned) into the tile span it touches: any tile the rectangle overlaps even partially is
+ *  included (floor of the start edge, ceil of the end edge), never fewer. This is deliberately
+ *  "any overlap counts" rather than nearest-tile rounding - the player moves tile-by-tile with no
+ *  sub-tile position, so a rectangle can only ever block whole tiles anyway; "any overlap blocks"
+ *  is the one interpretation that's fully consistent (a rounding-based conversion could go either
+ *  way depending on exactly where the fractional edge landed, which read as arbitrary/surprising -
+ *  a rectangle drawn without Tiled's Snap to Grid enabled could end up blocking a tile it barely
+ *  grazed, or failing to block one it mostly covered). Authors should still snap to the grid for a
+ *  precise 1:1 match between what's drawn in Tiled and what blocks in-game - this just makes the
+ *  unsnapped case predictable instead of ambiguous. */
+function pixelRectToTileSpan(
+  px: number,
+  py: number,
+  pixelWidth: number,
+  pixelHeight: number,
+  tileWidth: number,
+  tileHeight: number,
+): { x: number; y: number; width: number; height: number } {
+  const startX = Math.floor(px / tileWidth);
+  const startY = Math.floor(py / tileHeight);
+  const endX = Math.ceil((px + pixelWidth) / tileWidth);
+  const endY = Math.ceil((py + pixelHeight) / tileHeight);
+  return { x: startX, y: startY, width: Math.max(1, endX - startX), height: Math.max(1, endY - startY) };
+}
+
 const KNOWN_TILELAYER_NAMES = /^(ground|decorations-\d+|overhang(-\d+)?)$/;
 
 function objectType(raw: string): MapObjectType {
@@ -134,6 +160,21 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
         console.warn(`Tiled map "${mapAssetId}": object layer "${l.name}" is not "objects" or "collisions" and will be ignored.`);
       }
     }
+    // A tileset saved as an *external* reference (a "source": "foo.tsx" entry, instead of the
+    // embedded columns/tilecount/tiles this loader reads) silently loses its `walkable: false`
+    // exceptions and column count - since walkability now defaults to true for any populated tile,
+    // losing this data makes walls/water/etc. silently *walkable* with no other symptom. Tiled
+    // defaults new tilesets to embedded, but "Save Tileset As" or an unchecked "Embed in map" box
+    // can flip this on save - surface it loudly instead of degrading silently.
+    raw.tilesets.forEach((t, i) => {
+      if (!t.tiles && !t.columns) {
+        console.warn(
+          `Tiled map "${mapAssetId}": tileset #${i} looks like an *external* reference (no embedded ` +
+            `tiles/columns) - its walkable:false exceptions (walls/water/etc.) will be lost, making ` +
+            `them walkable. Re-embed it in Tiled (make sure "Embed in map" was used on export).`,
+        );
+      }
+    });
   }
 
   const layers: TileLayer[] = raw.layers
@@ -150,19 +191,23 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
   const objects: MapObject[] = raw.layers
     .filter((l): l is TiledObjectGroup => l.type === 'objectgroup' && l.name !== 'collisions')
     .flatMap((l) => l.objects)
-    .map((o) => ({
-      type: objectType(o.type),
-      x: Math.floor(o.x / raw.tilewidth),
-      y: Math.floor(o.y / raw.tileheight),
-      refId: propValue<string>(o.properties, 'refId'),
-      targetSpawnId: propValue<string>(o.properties, 'targetSpawnId'),
+    .map((o) => {
       // Only 'zone' objects are ever authored as real Tiled rectangles (every other object type is
-      // a point) - width/height fall out naturally as undefined for the rest.
-      width: o.width ? Math.max(1, Math.round(o.width / raw.tilewidth)) : undefined,
-      height: o.height ? Math.max(1, Math.round(o.height / raw.tileheight)) : undefined,
-      wanderRadius: propValue<number>(o.properties, 'wanderRadius'),
-      requiredFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'requiredFacing'),
-    }));
+      // a point) - width/height (and the tile-span x/y below) fall out as the point's own single
+      // tile for those, same as before.
+      const span = o.width || o.height ? pixelRectToTileSpan(o.x, o.y, o.width ?? 0, o.height ?? 0, raw.tilewidth, raw.tileheight) : null;
+      return {
+        type: objectType(o.type),
+        x: span?.x ?? Math.floor(o.x / raw.tilewidth),
+        y: span?.y ?? Math.floor(o.y / raw.tileheight),
+        refId: propValue<string>(o.properties, 'refId'),
+        targetSpawnId: propValue<string>(o.properties, 'targetSpawnId'),
+        width: span?.width,
+        height: span?.height,
+        wanderRadius: propValue<number>(o.properties, 'wanderRadius'),
+        requiredFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'requiredFacing'),
+      };
+    });
 
   // 'collisions' is an object layer of discrete, non-interactive obstacles (fences, rocks, ledges,
   // barriers). Parsed entirely separately from `objects` above - it never flows through
@@ -170,18 +215,16 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
   const collisionObjects: CollisionRect[] = raw.layers
     .filter((l): l is TiledObjectGroup => l.type === 'objectgroup' && l.name === 'collisions')
     .flatMap((l) => l.objects)
-    .map((o) => ({
-      x: Math.floor(o.x / raw.tilewidth),
-      y: Math.floor(o.y / raw.tileheight),
-      width: Math.max(1, Math.round((o.width || raw.tilewidth) / raw.tilewidth)),
-      height: Math.max(1, Math.round((o.height || raw.tileheight) / raw.tileheight)),
-    }));
+    .map((o) => pixelRectToTileSpan(o.x, o.y, o.width || raw.tilewidth, o.height || raw.tileheight, raw.tilewidth, raw.tileheight));
 
-  const walkableTileIds: number[] = [];
+  // Opt-out, not opt-in: any populated ground tile is walkable unless its own tileset explicitly
+  // marks it `walkable: false` (walls, water, chasms, ...). Checks strictly against `=== false` -
+  // a tile with no `walkable` property at all (propValue returns undefined) defaults to walkable.
+  const nonWalkableTileIds: number[] = [];
   for (const tileset of raw.tilesets) {
     for (const tile of tileset.tiles ?? []) {
-      if (propValue<boolean>(tile.properties, 'walkable')) {
-        walkableTileIds.push(tileset.firstgid + tile.id);
+      if (propValue<boolean>(tile.properties, 'walkable') === false) {
+        nonWalkableTileIds.push(tileset.firstgid + tile.id);
       }
     }
   }
@@ -200,6 +243,6 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     layers,
     objects,
     collisionObjects,
-    walkableTileIds,
+    nonWalkableTileIds,
   };
 }

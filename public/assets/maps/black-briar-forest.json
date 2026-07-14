@@ -1667,28 +1667,6 @@
           "type": "string",
           "value": "tileset.ground-tiles"
         }
-      ],
-      "tiles": [
-        {
-          "id": 118,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": true
-            }
-          ]
-        },
-        {
-          "id": 126,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": true
-            }
-          ]
-        }
       ]
     },
     {

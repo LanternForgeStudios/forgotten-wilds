@@ -23,7 +23,7 @@ function isTerrainWalkable(map: TileMap, x: number, y: number): boolean {
   const ground = map.layers.find((l) => l.name === 'ground');
   if (!ground) return false;
   const gid = ground.data[y * map.width + x];
-  if (!map.walkableTileIds.includes(gid)) return false;
+  if (gid <= 0 || map.nonWalkableTileIds.includes(gid)) return false;
   const collisionBlocked = map.collisionObjects.some(
     (r) => x >= r.x && x < r.x + r.width && y >= r.y && y < r.y + r.height,
   );
