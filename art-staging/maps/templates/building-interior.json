@@ -1,8 +1,17 @@
 {
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
   "compressionlevel": -1,
+  "infinite": false,
+  "tiledversion": "1.12.2",
+  "version": "1.10",
   "width": 7,
   "height": 6,
-  "infinite": false,
+  "tilewidth": 16,
+  "tileheight": 16,
+  "nextlayerid": 6,
+  "nextobjectid": 5,
   "layers": [
     {
       "id": 1,
@@ -74,6 +83,7 @@
         0,
         0,
         0,
+        133,
         0,
         0,
         0,
@@ -88,7 +98,6 @@
         0,
         0,
         0,
-        6,
         0,
         0,
         0,
@@ -116,6 +125,61 @@
     },
     {
       "id": 3,
+      "type": "tilelayer",
+      "name": "overhang",
+      "width": 7,
+      "height": 6,
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        19,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible": true,
+      "opacity": 1,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 4,
       "type": "objectgroup",
       "name": "collisions",
       "draworder": "topdown",
@@ -138,7 +202,7 @@
       "y": 0
     },
     {
-      "id": 4,
+      "id": 5,
       "type": "objectgroup",
       "name": "objects",
       "draworder": "topdown",
@@ -212,77 +276,6 @@
       "visible": true,
       "x": 0,
       "y": 0
-    },
-    {
-      "id": 5,
-      "type": "tilelayer",
-      "name": "overhang",
-      "width": 7,
-      "height": 6,
-      "data": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        18,
-        0,
-        0,
-        0
-      ],
-      "visible": true,
-      "opacity": 1,
-      "x": 0,
-      "y": 0
-    }
-  ],
-  "nextlayerid": 6,
-  "nextobjectid": 5,
-  "orientation": "orthogonal",
-  "renderorder": "right-down",
-  "tiledversion": "1.12.2",
-  "tilewidth": 16,
-  "tileheight": 16,
-  "type": "map",
-  "version": "1.10",
-  "properties": [
-    {
-      "name": "tilesetAssetId",
-      "type": "string",
-      "value": "tileset.tiny-dungeon"
     }
   ],
   "tilesets": [
@@ -298,6 +291,13 @@
       "spacing": 0,
       "columns": 12,
       "tilecount": 132,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.tiny-dungeon"
+        }
+      ],
       "tiles": [
         {
           "id": 24,
@@ -308,8 +308,45 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": 25,
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
         }
       ]
+    },
+    {
+      "firstgid": 133,
+      "name": "velmora-environments",
+      "image": "../../../public/assets/tilesets/VelmoraRealms-Environments_Free.png",
+      "imagewidth": 320,
+      "imageheight": 208,
+      "tilewidth": 32,
+      "tileheight": 32,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 10,
+      "tilecount": 60,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.velmora-environments"
+        }
+      ]
+    }
+  ],
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
     }
   ]
 }

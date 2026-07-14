@@ -122,7 +122,7 @@ export class ExplorationScene extends Phaser.Scene {
     for (const layer of this.mapLayers) layer.destroy();
     this.mapLayers = [];
 
-    await this.loadTexture(map.tilesetAssetId);
+    await Promise.all(map.tilesets.map((t) => this.loadTexture(t.assetId)));
     // A newer loadMap call (a second, rapid location transition) has since superseded this one -
     // abort rather than build tile layers for a location we've already left.
     if (generation !== this.mapGeneration) return;
@@ -144,11 +144,27 @@ export class ExplorationScene extends Phaser.Scene {
       width: map.width,
       height: map.height,
     });
-    const tileset = tilemap.addTilesetImage(map.tilesetAssetId, map.tilesetAssetId, map.tileWidth, map.tileHeight)!;
+    // One Phaser tileset object per embedded tileset the map declares, each anchored at its own
+    // firstgid so a single layer can freely mix tiles from more than one source image (e.g. a grass
+    // ground pack + a separate tree/prop pack) - standard Phaser/Tiled multi-tileset usage.
+    // putTileAt below passes `gid - 1` (a 0-based index, since Tiled gid 0 means "empty"), so
+    // addTilesetImage's own `gid` (its internal *0-based* index-space anchor - confirmed by reading
+    // Phaser's source: BuildTilesetIndex populates `tiles[firstgid..firstgid+total-1]`, and the old
+    // single-tileset call never passed a `gid` at all, defaulting to 0) must be `t.firstgid - 1`,
+    // not the raw 1-based Tiled firstgid - passing the raw value left `tiles[0]` (and every other
+    // index in tileset 0's range) unpopulated, throwing inside Phaser's PutTileAt on the very first
+    // tile and aborting the whole layer build silently (the map rendered as a blank room).
+    // Each tileset's OWN tileWidth/tileHeight (t.tileWidth/t.tileHeight) is used here, not the map's
+    // - a tileset can have a different native tile size than the map's grid (e.g. a 32px prop sheet
+    // on this 16px-grid map), same as Tiled itself always does. Passing the map's size for every
+    // tileset instead cropped the wrong sub-region of any tileset whose native size differed from
+    // it - exactly why the game's tiles looked different/wrong compared to opening the same file in
+    // the real Tiled editor, which always reads each tileset's own declared size correctly.
+    const tilesets = map.tilesets.map((t) => tilemap.addTilesetImage(t.assetId, t.assetId, t.tileWidth, t.tileHeight, 0, 0, t.firstgid - 1)!);
 
     const scale = tileSize / map.tileWidth;
     orderedLayers.forEach((layer, index) => {
-      const phaserLayer = tilemap.createBlankLayer(layer.name, tileset, 0, 0, map.width, map.height)!;
+      const phaserLayer = tilemap.createBlankLayer(layer.name, tilesets, 0, 0, map.width, map.height)!;
       layer.data.forEach((gid, i) => {
         if (gid <= 0) return;
         phaserLayer.putTileAt(gid - 1, i % map.width, Math.floor(i / map.width));

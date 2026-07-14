@@ -2,7 +2,7 @@
 // One-off map-authoring helper - NOT shipped game code, not imported by the app. Emits the exact
 // Tiled-schema JSON shape src/assets/tiledLoader.ts parses (bordered rectangular room, walkable
 // interior via the `walkable: true` tile-property convention, objectgroup entries for
-// npc/transition/interactable/encounterZone/spawnPoint), from a small JSON spec, so new maps
+// npc/transition/interactable/zone/spawnPoint), from a small JSON spec, so new maps
 // aren't hand-typed tile array by tile array.
 //
 // Usage: node scripts/genMap.mjs <spec.json> <output.json>
@@ -14,8 +14,7 @@
 //     { "type": "spawnPoint", "x": 6, "y": 7, "refId": "default" },
 //     { "type": "transition", "x": 3, "y": 3, "refId": "some-location", "targetSpawnId": "from-x", "requiredFacing": "up" },
 //     { "type": "npc", "x": 9, "y": 3, "refId": "some-npc", "wanderRadius": 2 },
-//     { "type": "interactable", "x": 5, "y": 5, "refId": "some-thing" },
-//     { "type": "encounterZone", "x": 3, "y": 2, "encounterChance": 0.2 }
+//     { "type": "interactable", "x": 5, "y": 5, "refId": "some-thing" }
 //   ]
 // }
 //
@@ -41,7 +40,6 @@ function propsFor(obj) {
   if (obj.targetSpawnId !== undefined) props.push({ name: 'targetSpawnId', type: 'string', value: obj.targetSpawnId });
   if (obj.requiredFacing !== undefined) props.push({ name: 'requiredFacing', type: 'string', value: obj.requiredFacing });
   if (obj.wanderRadius !== undefined) props.push({ name: 'wanderRadius', type: 'int', value: obj.wanderRadius });
-  if (obj.encounterChance !== undefined) props.push({ name: 'encounterChance', type: 'float', value: obj.encounterChance });
   return props;
 }
 

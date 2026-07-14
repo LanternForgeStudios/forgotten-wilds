@@ -38,18 +38,26 @@ import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
 
-/** Landmarks are pure "visit and see" sub-areas within a larger overworld map - visiting records
- *  Journal coverage and quest progress but doesn't grant an item. */
-const VISIT_ONLY_LANDMARKS = new Set(['hunters-camp']);
 /** Shrine-style landmarks route through interactWithShrine instead - see KNOWN_SHRINES in
  *  interactWithShrine.ts. That function fires both an interactWithShrine event (for
  *  investigate/restore quests) and a reachLocation event (for discovery quests) on every call, so
- *  the same tile naturally supports "first find it" and "later restore it" as separate quests. */
+ *  the same tile naturally supports "first find it" and "later restore it" as separate quests.
+ *  Spirit Grove's shrine is a distinct point `interactable` object placed inside the walk-in
+ *  `spirit-grove` zone (see ZONE_VISIT_ONLY below) - the grove clearing and its shrine share the
+ *  same refId but are two separate map objects/interactions. */
 const SHRINE_LANDMARKS = new Set(['spirit-grove']);
 /** Landmarks that grant a key item the first time they're visited, routed through
  *  callCollectWorldItem - purely a client-side dispatch decision (which call to make), not an
- *  item-identity lookup; the granted item's id comes back in that call's own response. */
-const FRAGMENT_LANDMARKS = new Set(['mossy-creek', 'fallen-watchtower', 'water-fragment']);
+ *  item-identity lookup; the granted item's id comes back in that call's own response. Only ones
+ *  that are still single-tile *targets* you approach and Interact with, not walk-in areas - see
+ *  ZONE_FRAGMENT below for Mossy Creek, which moved to the walk-in mechanic. */
+const FRAGMENT_LANDMARKS = new Set(['fallen-watchtower', 'water-fragment']);
+/** Walk-in sub-areas (the `zone` object type) that fire a plain "you found this place" call the
+ *  instant the player's tile enters them - no Interact needed. Hunter's Camp and Spirit Grove (the
+ *  clearing, not its shrine) are pure discovery; Mossy Creek is the one walk-in area that also
+ *  grants a key item, so it still routes through collectWorldItem. */
+const ZONE_VISIT_ONLY = new Set(['hunters-camp', 'spirit-grove']);
+const ZONE_FRAGMENT = new Set(['mossy-creek']);
 
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
@@ -82,6 +90,38 @@ export function OverworldScene() {
   const otherOverlaysOpen = activeNpc !== null || menuOpen || journalOpen || message !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
+  const { pending, run } = usePendingAction();
+
+  function handleZoneEnter(refId: string) {
+    if (ZONE_FRAGMENT.has(refId)) {
+      run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
+        ?.then(async (res) => {
+          if (uid) await resyncSave(uid);
+          const name = ITEMS.find((i) => i.id === res.itemId)?.name ?? res.itemId;
+          setMessage(
+            res.alreadyCollected
+              ? "There's nothing left to find here."
+              : `You recover ${name}. It feels like part of something larger.`,
+          );
+        })
+        .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
+      return;
+    }
+    if (ZONE_VISIT_ONLY.has(refId)) {
+      const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
+      run(() => callVisitLandmark(refId), 'Investigating...')
+        ?.then(async (res) => {
+          if (uid) await resyncSave(uid);
+          setMessage(
+            res.alreadyVisited
+              ? `You've already explored ${landmarkName}.`
+              : `You find ${landmarkName}. Perhaps it will mean something, in time.`,
+          );
+        })
+        .catch((err) => setMessage(err instanceof Error ? err.message : 'You cannot linger here.'));
+    }
+  }
+
   const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
     locationId,
     suspended,
@@ -90,10 +130,9 @@ export function OverworldScene() {
       if (icon) goTo('combat', { locationId, spawnX: pos.x, spawnY: pos.y });
     },
     onBlockedTransition: setMessage,
+    onZoneEnter: handleZoneEnter,
   });
   const { icons: fieldEncounterIcons, consumeAt: consumeFieldEncounterAt } = useFieldEncounters(map, locationId, positionRef);
-
-  const { pending, run } = usePendingAction();
 
   useHeartbeat(uid, displayName, locationId, position, skin);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
@@ -164,21 +203,6 @@ export function OverworldScene() {
           }
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
-      return;
-    }
-    if (obj?.refId && VISIT_ONLY_LANDMARKS.has(obj.refId)) {
-      const landmarkId = obj.refId;
-      const landmarkName = LOCATIONS.find((l) => l.id === landmarkId)?.name ?? landmarkId;
-      run(() => callVisitLandmark(landmarkId), 'Investigating...')
-        ?.then(async (res) => {
-          if (uid) await resyncSave(uid);
-          setMessage(
-            res.alreadyVisited
-              ? `You've already explored ${landmarkName}.`
-              : `You find ${landmarkName}. Perhaps it will mean something, in time.`,
-          );
-        })
-        .catch((err) => setMessage(err instanceof Error ? err.message : 'You cannot linger here.'));
       return;
     }
     if (obj?.refId && FRAGMENT_LANDMARKS.has(obj.refId)) {
@@ -261,7 +285,13 @@ export function OverworldScene() {
     spriteAssetId: icon.spriteAssetId,
   }));
 
-  const entities = [...npcEntities, ...interactableEntities, ...fieldEncounterEntities];
+  // Every transition (region-to-region crossings) gets a visible marker instead of looking like
+  // plain ground - the generic structure.door placeholder, same as TownScene's interior exits.
+  const exitEntities: GridEntity[] = map.objects
+    .filter((o) => o.type === 'transition' && o.refId)
+    .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+
+  const entities = [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
 
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
@@ -270,7 +300,7 @@ export function OverworldScene() {
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
-          tilesetAssetId="tileset.tiny-dungeon"
+          tilesetAssetId={map.tilesetAssetId}
           tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}

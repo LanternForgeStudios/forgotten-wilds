@@ -22,6 +22,10 @@ interface UseLocationExplorationOptions {
   /** Called instead of transitioning when the target location is gated behind an incomplete
    *  quest - the caller decides how to surface it (every scene already has a message Panel). */
   onBlockedTransition?: (message: string) => void;
+  /** Called once when the player's tile steps into a `zone` object's rectangle it wasn't already
+   *  standing in (not on every step while inside, not on exit) - the caller decides what visiting
+   *  that landmark actually does (visitLandmark/collectWorldItem/etc., see OverworldScene.tsx). */
+  onZoneEnter?: (refId: string) => void;
 }
 
 /** Shared map-load + spawn-resolution + movement + transition logic for Town/Overworld/Dungeon scenes. */
@@ -30,6 +34,7 @@ export function useLocationExploration({
   suspended,
   onFieldEncounterStep,
   onBlockedTransition,
+  onZoneEnter,
 }: UseLocationExplorationOptions) {
   const location = LOCATIONS.find((l) => l.id === locationId)!;
   const { map } = useTileMap(locationId, location.mapAssetId);
@@ -62,10 +67,33 @@ export function useLocationExploration({
     // silently reuse whichever spawn point was resolved the very first time that map was loaded.
   }, [map, locationId, params.locationId, params.spawnId, params.spawnX, params.spawnY]);
 
+  // Tracks the tile the player stepped from, purely to detect a zone's entering edge (see
+  // handleStep's zone check below) - reset whenever locationId changes so a brand-new map's first
+  // step never compares against a stale position from wherever the player just left.
+  const prevPosRef = useRef<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    prevPosRef.current = null;
+  }, [locationId]);
+
   // No `isDash` param (unlike the old encounterZone-gated version) - field-encounter icons trigger
   // regardless of Dash, per the onFieldEncounterStep doc comment above.
   const handleStep = (pos: GridPosition) => {
     if (!map) return;
+
+    const prevPos = prevPosRef.current;
+    prevPosRef.current = { x: pos.x, y: pos.y };
+    if (onZoneEnter) {
+      for (const zone of map.objects) {
+        if (zone.type !== 'zone' || !zone.refId) continue;
+        const w = zone.width ?? 1;
+        const h = zone.height ?? 1;
+        const insideNow = pos.x >= zone.x && pos.x < zone.x + w && pos.y >= zone.y && pos.y < zone.y + h;
+        if (!insideNow) continue;
+        const insideBefore =
+          !!prevPos && prevPos.x >= zone.x && prevPos.x < zone.x + w && prevPos.y >= zone.y && prevPos.y < zone.y + h;
+        if (!insideBefore) onZoneEnter(zone.refId);
+      }
+    }
 
     const transition = map.objects.find(
       (o) =>

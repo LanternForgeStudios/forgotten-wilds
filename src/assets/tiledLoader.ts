@@ -47,7 +47,18 @@ interface TiledEmbeddedTileset {
   firstgid: number;
   tilecount: number;
   columns?: number;
+  /** This tileset's own native tile size - can legitimately differ from the map's own tilewidth/
+   *  tileheight (e.g. a 32px prop sheet embedded in a 16px-grid map). Tiled itself always reads and
+   *  renders using each tileset's own declared size, so the loader must carry it through instead of
+   *  assuming every tileset matches the map grid. */
+  tilewidth?: number;
+  tileheight?: number;
   tiles?: TiledTilesetTile[];
+  /** Tiled's own per-tileset custom properties (Tileset Editor -> Properties) - this is where a
+   *  multi-tileset map tells the loader which registry asset each embedded tileset resolves to,
+   *  since Tiled itself has no concept of this game's asset ids. See `tilesetAssetIdFor` below for
+   *  the single-tileset fallback (the map-level `tilesetAssetId` property every existing map uses). */
+  properties?: TiledProperty[];
 }
 
 interface TiledMapJson {
@@ -74,12 +85,25 @@ function objectType(raw: string): MapObjectType {
     raw === 'npc' ||
     raw === 'transition' ||
     raw === 'interactable' ||
-    raw === 'encounterZone' ||
+    raw === 'zone' ||
     raw === 'spawnPoint'
   ) {
     return raw;
   }
-  throw new Error(`Unknown Tiled object type "${raw}" — expected npc/transition/interactable/encounterZone/spawnPoint.`);
+  throw new Error(`Unknown Tiled object type "${raw}" — expected npc/transition/interactable/zone/spawnPoint.`);
+}
+
+/** Resolves which registry asset id an embedded tileset (by its position in `raw.tilesets`)
+ *  supplies tiles from. A multi-tileset map sets its own `tilesetAssetId` custom property on each
+ *  individual tileset (Tiled's Tileset Editor -> Properties - a real, standard Tiled mechanism, not
+ *  a hack). Every existing single-tileset map predates that convention and only ever set the
+ *  property on the *map itself*, so tileset #0 falls back to that map-level property if it doesn't
+ *  carry its own. */
+function tilesetAssetIdFor(tileset: TiledEmbeddedTileset, index: number, mapLevelAssetId: string | undefined): string {
+  const ownId = propValue<string>(tileset.properties, 'tilesetAssetId');
+  if (ownId) return ownId;
+  if (index === 0 && mapLevelAssetId) return mapLevelAssetId;
+  throw new Error(`Tiled map: embedded tileset #${index} is missing a "tilesetAssetId" custom property.`);
 }
 
 export async function loadTiledMap(locationId: string, mapAssetId: string): Promise<TileMap> {
@@ -90,10 +114,14 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
   }
   const raw: TiledMapJson = await response.json();
 
-  const tilesetAssetId = propValue<string>(raw.properties, 'tilesetAssetId');
-  if (!tilesetAssetId) {
-    throw new Error(`Tiled map "${mapAssetId}" is missing a "tilesetAssetId" custom property.`);
-  }
+  const mapLevelAssetId = propValue<string>(raw.properties, 'tilesetAssetId');
+  const tilesets = raw.tilesets.map((t, i) => ({
+    assetId: tilesetAssetIdFor(t, i, mapLevelAssetId),
+    firstgid: t.firstgid,
+    tileWidth: t.tilewidth ?? raw.tilewidth,
+    tileHeight: t.tileheight ?? raw.tileheight,
+  }));
+  const tilesetAssetId = tilesets[0].assetId;
 
   if (import.meta.env.DEV) {
     for (const l of raw.layers) {
@@ -128,7 +156,10 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
       y: Math.floor(o.y / raw.tileheight),
       refId: propValue<string>(o.properties, 'refId'),
       targetSpawnId: propValue<string>(o.properties, 'targetSpawnId'),
-      encounterChance: propValue<number>(o.properties, 'encounterChance'),
+      // Only 'zone' objects are ever authored as real Tiled rectangles (every other object type is
+      // a point) - width/height fall out naturally as undefined for the rest.
+      width: o.width ? Math.max(1, Math.round(o.width / raw.tilewidth)) : undefined,
+      height: o.height ? Math.max(1, Math.round(o.height / raw.tileheight)) : undefined,
       wanderRadius: propValue<number>(o.properties, 'wanderRadius'),
       requiredFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'requiredFacing'),
     }));
@@ -163,6 +194,7 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     tileHeight: raw.tileheight,
     width: raw.width,
     height: raw.height,
+    tilesets,
     tilesetAssetId,
     columns,
     layers,

@@ -11,18 +11,20 @@ export interface TileLayer {
   opacity: number;
 }
 
-export type MapObjectType = 'npc' | 'transition' | 'interactable' | 'encounterZone' | 'spawnPoint';
+export type MapObjectType = 'npc' | 'transition' | 'interactable' | 'zone' | 'spawnPoint';
 
 export interface MapObject {
   type: MapObjectType;
   x: number;
   y: number;
-  /** npc id, target locationId, shop/inn id, etc. depending on type */
+  /** npc id, target locationId, shop/inn id, landmark id (for `zone`), etc. depending on type */
   refId?: string;
   /** for transition objects: which spawnPoint id to place the player at in the target location */
   targetSpawnId?: string;
-  /** for encounterZone: chance per step, 0-1 */
-  encounterChance?: number;
+  /** for zone objects only: tile-unit rectangle size (a zone is a walk-in area, not a single tile) -
+   *  same rectangle convention as CollisionRect below. Undefined/1x1 for every other object type. */
+  width?: number;
+  height?: number;
   /** for npc objects: max tile distance the npc will wander from this spawn point (cosmetic client-side
    *  animation only, not server state). Omitted/undefined means the npc stands still. */
   wanderRadius?: number;
@@ -50,8 +52,21 @@ export interface TileMap {
   tileHeight: number;
   width: number;
   height: number;
+  /** Every embedded tileset this map draws tiles from, in gid order - a map can span more than one
+   *  source image (e.g. a grass ground pack + a separate tree/prop pack), same as a real multi-
+   *  tileset Tiled map. `tileWidth`/`tileHeight` here are that *tileset's own* native tile size
+   *  (Tiled itself always reads and renders using each tileset's own declared size - a tileset can
+   *  legitimately differ from the map's grid size, e.g. a 32px prop sheet on a 16px-grid map), which
+   *  ExplorationScene.ts must pass to Phaser's addTilesetImage instead of the map's own tileWidth/
+   *  tileHeight below - using the map's size for every tileset previously cropped the wrong
+   *  sub-region of any tileset whose native size differed from it. `tilesetAssetId`/`columns` below
+   *  are convenience aliases for `tilesets[0]`, kept only because a couple of now-dead
+   *  prop-passthrough call sites still read them. */
+  tilesets: { assetId: string; firstgid: number; tileWidth: number; tileHeight: number }[];
   tilesetAssetId: string;
-  /** Column count of the tileset's sprite sheet, used for gid -> row/col lookup when rendering. */
+  /** Column count of the *first* tileset's sprite sheet - retained for the same dead-prop-parity
+   *  reason as tilesetAssetId above; rendering itself never needs this (Phaser derives columns from
+   *  each tileset image's own pixel width once loaded). */
   columns: number;
   layers: TileLayer[];
   objects: MapObject[];

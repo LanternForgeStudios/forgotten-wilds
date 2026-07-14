@@ -200,7 +200,14 @@ export function DungeonScene() {
     spriteAssetId: icon.spriteAssetId,
   }));
 
-  const entities = [...interactableEntities, ...fieldEncounterEntities];
+  // Every transition (the entrance from Black Briar Forest, the exit to the Mine Office) gets a
+  // visible marker instead of looking like plain ground - same generic structure.door placeholder
+  // TownScene/OverworldScene use for their own exits.
+  const exitEntities: GridEntity[] = map.objects
+    .filter((o) => o.type === 'transition' && o.refId)
+    .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+
+  const entities = [...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
 
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
@@ -209,7 +216,7 @@ export function DungeonScene() {
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
-          tilesetAssetId="tileset.tiny-dungeon"
+          tilesetAssetId={map.tilesetAssetId}
           tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}

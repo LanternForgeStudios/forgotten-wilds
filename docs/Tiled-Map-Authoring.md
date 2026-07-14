@@ -35,16 +35,38 @@ This is a different mechanism from `objects`' `interactable` type: an `interacta
 a collision blocker *and* something the player can walk up to and interact with (a chest, a
 shrine); a `collisions` object is scenery only.
 
-## The `objects` layer (unchanged)
+## The `objects` layer
 
 Still an **Object Layer** named `objects`, with each object's Class/Type field set to one of:
-`npc`, `transition`, `interactable`, `encounterZone`, `spawnPoint`. Any other value here will fail
-to load (this layer is validated strictly, unlike `collisions`).
+`npc`, `transition`, `interactable`, `zone`, `spawnPoint`. Any other value here will fail to load
+(this layer is validated strictly, unlike `collisions`).
+
+`zone` is a **rectangle** object (unlike the others, which are points) - a walk-in sub-area that
+fires once the player's tile steps into it (no explicit Interact needed), e.g. a named clearing or
+camp within a larger overworld map. Give it a `refId` custom property the same way a `transition`/
+`interactable` would; each scene decides what actually happens on entry (see
+`useLocationExploration.ts`'s `onZoneEnter` option and `OverworldScene.tsx`'s dispatch for a real
+example). A `zone` and a same-refId point `interactable` can coexist (e.g. a walk-in clearing that
+also contains a separate shrine you still approach and Interact with) - they're independent objects.
+
+## Multiple tilesets per map
+
+A map isn't limited to one embedded tileset - add as many **Tileset → New Tileset** entries as you
+need (e.g. a grass ground pack plus a separate tree/prop pack), same as any real multi-tileset Tiled
+map. Each tile placement just references whichever tileset's gid range it falls into; `ground`,
+`decorations-N`, and `overhang(-N)` layers can all freely mix tiles from any of the map's tilesets.
+
+The one thing Tiled itself doesn't know about is which game asset-registry id each tileset image
+corresponds to - set that with a **Tileset → Properties** custom property named `tilesetAssetId`
+(string) on *every* embedded tileset. (The very first tileset can instead rely on the map-level
+`tilesetAssetId` property below, for backward compatibility with maps authored before multi-tileset
+support existed - but any additional tileset must set its own.)
 
 ## Custom properties
 
-- **Map Properties → Custom Properties**: `tilesetAssetId` (string) — must be set to the game's
-  asset-registry id for the tileset (e.g. `tileset.tiny-dungeon`), not a filename.
+- **Map Properties → Custom Properties**: `tilesetAssetId` (string) — the game asset-registry id for
+  the map's first/primary tileset (e.g. `tileset.tiny-dungeon`), not a filename. See "Multiple
+  tilesets per map" above for maps with more than one.
 - **Tileset editor, per tile**: `walkable` (bool) — set `true` on any `ground`-layer tile the
   player can stand on.
 
@@ -70,10 +92,14 @@ registry (`src/assets/registry.ts`).
 
 ## What this doesn't cover
 
-- `scripts/genMap.mjs` + `scripts/map-specs/*.json` is a separate, older helper that only ever
-  generates a `ground` + `objects` map (a bordered rectangular room). It has no concept of
-  decorations/collisions/overhang. Use it only for a quick simple-room stub; author anything
-  richer directly in Tiled instead.
+- `scripts/genMap.mjs` is a separate, older helper that only ever generates a `ground` + `objects`
+  map (a single-tileset, bordered rectangular room) from a small JSON spec. It has no concept of
+  decorations/collisions/overhang/multiple tilesets/zones. Use it only for a quick simple-room stub.
+- `scripts/genMapRicher.mjs` is the richer sibling - it emits this full richer format (multiple
+  tilesets, ground regions, decoration/overhang scatter, collisions, zones) from a spec (see
+  `scripts/map-specs-richer/*.json` for real examples), still producing genuinely Tiled-compliant
+  JSON you can open and re-export from Tiled directly. Prefer authoring straight in Tiled once a map
+  needs anything the spec format can't express cleanly (irregular hand-painted terrain, etc.).
 - Object visuals (which sprite an `npc`/`interactable` renders as) are still resolved by each
   scene's own lookup tables (`src/scenes/TownScene.tsx`, `OverworldScene.tsx`, `DungeonScene.tsx`),
   not by map data. Adding a new NPC or interactable to a map still requires wiring its sprite in

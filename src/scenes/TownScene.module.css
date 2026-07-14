@@ -15,6 +15,11 @@
   font-size: 12px;
   color: var(--fw-text-dim);
   z-index: 10;
+  background: var(--fw-panel);
+  border: 1px solid var(--fw-panel-border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  white-space: nowrap;
 }
 
 /** Shown the instant an interaction (talk/chest/shrine/landmark) is fired, before its Cloud

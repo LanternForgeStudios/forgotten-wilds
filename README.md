@@ -71,9 +71,12 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 - `src/data/` — display-only seed data (items, equipment, enemies, NPCs, quests, locations, lore)
 - `src/assets/` — the Asset Manager and registry (`registry.ts`); every sprite/tileset/icon/map
   is looked up by id here, never imported by file path directly. See `public/CREDITS.md` for
-  what's real CC0 art (Kenney.nl) vs. generated placeholder. Maps are authored in (a subset of)
-  the Tiled editor's JSON export format — see `docs/Tiled-Map-Authoring.md` for the supported
-  layer model and required export settings.
+  what's real CC0 art (Kenney.nl) vs. generated placeholder. Maps are genuinely Tiled-compliant
+  JSON (open any `public/assets/maps/*.json` directly in the Tiled editor) — see
+  `docs/Tiled-Map-Authoring.md` for the layer model, multi-tileset support, and required export
+  settings. `scripts/genMapRicher.mjs` (+ specs in `scripts/map-specs-richer/`) generates this
+  format from a small spec instead of hand-typing tile arrays; `scripts/genMap.mjs` is an older,
+  simpler single-tileset-room-only generator kept for quick stubs.
 - `functions/src/data/` — the **authoritative** copies of the same content (prices, stats, loot,
   quest definitions) that the client's copies must stay in sync with by hand; the client copies
   are for display only and are never trusted for anything that persists.

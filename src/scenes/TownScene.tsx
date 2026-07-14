@@ -228,6 +228,14 @@ export function TownScene() {
     .filter((o) => o.type === 'interactable' && o.refId && SHRINES.has(o.refId))
     .map((o) => ({ id: o.refId!, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' }));
 
+  // Every transition that doesn't already get a building facade (buildingEntities above) - mainly
+  // each interior's own door back outside, which previously had no visual marker at all and just
+  // looked like plain floor. Reuses the generic structure.door placeholder, stub-registered for
+  // exactly this "map-edge/doorway marker" purpose but never actually wired in until now.
+  const exitEntities: GridEntity[] = map.objects
+    .filter((o) => o.type === 'transition' && o.refId && !BUILDING_MARKERS[o.refId])
+    .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+
   const now = Date.now();
   const otherPlayerEntities: GridEntity[] = presences
     .filter(
@@ -242,7 +250,7 @@ export function TownScene() {
       label: p.displayName,
     }));
 
-  const entities = [...npcEntities, ...buildingEntities, ...shrineEntities, ...otherPlayerEntities];
+  const entities = [...npcEntities, ...buildingEntities, ...shrineEntities, ...exitEntities, ...otherPlayerEntities];
 
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
@@ -251,7 +259,7 @@ export function TownScene() {
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
-          tilesetAssetId="tileset.tiny-dungeon"
+          tilesetAssetId={map.tilesetAssetId}
           tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
