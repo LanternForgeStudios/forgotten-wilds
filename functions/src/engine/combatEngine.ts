@@ -619,13 +619,19 @@ export function resolveRound(input: RoundInput): RoundResult {
       const fleeChance = Math.min(0.9, Math.max(0.1, 0.3 + (input.playerStats.speed - avgSpeed) * 0.05));
       if (Math.random() < fleeChance) {
         log.push('You break away and flee the fight.');
+        // A successful flee still resolves the player's own turn, so lingering Poison/Burn/Freeze
+        // damage applies here too (see applyAilmentTickDamage's own doc comment) - this early
+        // return previously skipped it, the one branch of the three that did.
+        applyAilmentTickDamage();
         return {
           log,
           playerHp,
           playerSpirit,
           playerLanternOil,
           enemyHp,
-          phase: 'fled',
+          // Vanishingly rare, but consistent with how the rest of this function treats it: dying to
+          // that same tick damage while fleeing is a defeat, not an escape.
+          phase: playerHp <= 0 ? 'defeat' : 'fled',
           itemConsumedIds,
           hits,
           enemyHits,

@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { INN_REST_COST } from '../data/items';
+import { restoreFullVitals } from '../engine/levelingEngine';
 import type { PlayerSave } from '../shared-types';
 
 // Only one inn exists today, so unlike openChest.ts/interactWithShrine.ts this doesn't need a
@@ -32,11 +33,7 @@ export const restAtInn = onCall(async (request) => {
     }
 
     save.player.gold -= INN_REST_COST;
-    save.player.stats.hp = save.player.stats.maxHp;
-    save.player.stats.spirit = save.player.stats.maxSpirit;
-    if (save.player.equipment.lantern) {
-      save.player.stats.lanternOil = save.player.stats.maxLanternOil;
-    }
+    restoreFullVitals(save);
 
     save.updatedAt = Date.now();
     tx.set(userRef, save);

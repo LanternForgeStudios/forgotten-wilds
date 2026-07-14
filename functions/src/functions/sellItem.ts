@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { sellPriceFor } from '../engine/pricingEngine';
+import { isItemEquipped } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface SellItemRequest {
@@ -37,8 +38,7 @@ export const sellItem = onCall<SellItemRequest>(async (request) => {
     if (!entry || entry.quantity < 1) {
       throw new HttpsError('failed-precondition', 'You do not own that item.');
     }
-    const isEquipped = Object.values(save.player.equipment).includes(itemId);
-    if (isEquipped) {
+    if (isItemEquipped(save.player.equipment, itemId)) {
       throw new HttpsError('failed-precondition', 'Unequip that item before selling it.');
     }
 

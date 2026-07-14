@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
-import { ITEMS } from '../data/items';
+import { grantItem } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface CollectWorldItemRequest {
@@ -48,17 +48,14 @@ export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) 
       throw new HttpsError('failed-precondition', 'You are not at that location.');
     }
 
+    // `alreadyHave` is this function's own "don't grant a second copy" gate (every current
+    // WORLD_ITEMS entry is a always-one-per-world-node pickup) - grantItem's own unique-cap check
+    // is redundant with it but harmless, and calling grantItem directly (instead of hand-copying
+    // its inventory-push + itemsDiscovered bookkeeping inline) means this can never silently drift
+    // from grantItem's actual behavior the way the old inline copy already had.
     const alreadyHave = save.inventory.some((i) => i.itemId === itemId);
     if (!alreadyHave) {
-      save.inventory.push({ itemId, quantity: 1 });
-      // This bypasses grantItem (its own unique-cap check doesn't apply here - alreadyHave above
-      // already does the equivalent "don't grant a second copy" job for this always-unique world-
-      // item case), so the itemsDiscovered bookkeeping grantItem normally handles - including the
-      // backfill for a save read from Firestore before this field existed - has to happen here too.
-      if (!save.journal.itemsDiscovered) save.journal.itemsDiscovered = [];
-      if (ITEMS[itemId] && !save.journal.itemsDiscovered.includes(itemId)) {
-        save.journal.itemsDiscovered.push(itemId);
-      }
+      grantItem(save, itemId);
     }
 
     // Always advance quests on this event, even if the item was already collected - a quest

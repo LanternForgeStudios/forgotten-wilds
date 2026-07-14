@@ -9,6 +9,19 @@ interface PurchaseItemRequest {
   shopId: string;
 }
 
+// Which location the player must actually be standing in to buy from a given shopId - shopId
+// itself is an NPC/shop-identity id, not the same string as the building's locationId, so this
+// can't be derived automatically. Without this, shopId/itemId pairing alone let a purchase go
+// through regardless of which building (if any) the player was actually in, unlike every other
+// location-bound interaction (restAtInn.ts/openChest.ts/interactWithShrine.ts/talkToNpc.ts all
+// validate currentLocationId).
+const SHOP_LOCATIONS: Record<string, string> = {
+  'mara-ash-general-store': 'ash-hallow-mara-shop',
+  'ash-hallow-blacksmith-forge': 'ash-hallow-blacksmith',
+  'ash-hallow-armory': 'ash-hallow-armory',
+  apothecary: 'ash-hallow-apothecary',
+};
+
 export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
@@ -31,6 +44,10 @@ export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+
+    if (save.player.currentLocationId !== SHOP_LOCATIONS[shopId]) {
+      throw new HttpsError('failed-precondition', 'You are not at that location.');
+    }
 
     if (save.player.gold < price) {
       throw new HttpsError('failed-precondition', 'Not enough gold.');

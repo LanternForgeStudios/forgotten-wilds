@@ -1,6 +1,6 @@
 import { ITEMS } from '../data/items';
 import { EQUIPMENT } from '../data/equipment';
-import { grantItem } from './inventoryEngine';
+import { grantItem, isItemEquipped } from './inventoryEngine';
 import type { InventoryItem, PlayerEquipment, PlayerSave, TradeOfferSide } from '../shared-types';
 
 export interface TradeItemRequest {
@@ -45,7 +45,7 @@ export function validateTradeOfferItems(
     if (ITEMS[itemId]?.unique || EQUIPMENT[itemId]?.unique) {
       return { ok: false, message: 'Unique items cannot be traded.' };
     }
-    if (Object.values(equipment).includes(itemId)) {
+    if (isItemEquipped(equipment, itemId)) {
       return { ok: false, message: 'Unequip that item before offering it in a trade.' };
     }
     const owned = inventory.find((i) => i.itemId === itemId)?.quantity ?? 0;

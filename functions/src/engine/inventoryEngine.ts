@@ -1,6 +1,13 @@
 import { ITEMS } from '../data/items';
 import { EQUIPMENT } from '../data/equipment';
-import type { InventoryItem, PlayerSave } from '../shared-types';
+import type { InventoryItem, PlayerEquipment, PlayerSave } from '../shared-types';
+
+/** Whether an item is currently equipped in any slot - shared by sellItem.ts (can't sell something
+ *  you're wearing) and tradeEngine.ts's validateTradeOfferItems (can't offer it in a trade either),
+ *  so both enforce the exact same "unequip first" rule via one implementation. */
+export function isItemEquipped(equipment: PlayerEquipment, itemId: string): boolean {
+  return Object.values(equipment).includes(itemId);
+}
 
 /** Whether granting one more copy of this item would violate its `unique` cap - a one-of-a-kind
  *  trophy/relic (checked against both `ITEMS` and `EQUIPMENT`, since either table can mark an id

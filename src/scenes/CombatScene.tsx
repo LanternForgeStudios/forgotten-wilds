@@ -18,11 +18,12 @@ import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useToastStore } from '@/state/useToastStore';
 import { useHudBarHeight } from '@/hooks/useExplorationViewport';
-import { useSceneStore, type SceneName } from '@/state/useSceneStore';
+import { useSceneStore } from '@/state/useSceneStore';
 import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS } from '@/data';
 import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { itemWouldHaveEffect } from '@/utils/itemEffect';
+import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
@@ -48,12 +49,6 @@ const AILMENT_TINT_COLORS: Record<string, string> = {
   burn: 'rgba(211, 47, 47, 0.22)',
   freeze: 'rgba(41, 121, 255, 0.22)',
   silence: 'rgba(156, 39, 176, 0.22)',
-};
-
-const LOCATION_KIND_TO_SCENE: Record<string, SceneName> = {
-  town: 'town',
-  overworld: 'overworld',
-  dungeon: 'dungeon',
 };
 
 const RESTORE_STAT_LABEL: Record<'hp' | 'spirit' | 'lanternOil', string> = {
@@ -318,7 +313,11 @@ export function CombatScene() {
         setRewards(res.rewards);
       }
 
-      if (uid && res.phase !== 'defeat') {
+      // Skipped if the usedItems resync above already ran this same round (only reachable here for
+      // victory/fled, since 'continue' already returned) - that resync is a full save refetch, so
+      // it already covers everything this one would; without this guard, a victory/fled round that
+      // also used items paid for the same resync twice in a row.
+      if (uid && res.phase !== 'defeat' && !usedItems) {
         await resyncSave(uid);
       }
       setPhase(res.phase);
@@ -403,7 +402,7 @@ export function CombatScene() {
     }
     const targetLocationId = wasDefeat ? 'ash-hallow' : locationId;
     const targetLocation = LOCATIONS.find((l) => l.id === targetLocationId);
-    const scene = targetLocation ? LOCATION_KIND_TO_SCENE[targetLocation.kind] : 'town';
+    const scene = targetLocation ? sceneForLocationKind(targetLocation.kind) : 'town';
     // Restore the exact tile the fight was triggered from, rather than dumping the player back at
     // the map's default spawn - but only within the same location; a defeat sends the player to
     // Ash Hallow instead, where the original coordinates from a different map don't apply.

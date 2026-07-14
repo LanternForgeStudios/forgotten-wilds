@@ -2,10 +2,16 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import type { FriendRequest, FriendshipDoc, PlayerSave } from '../shared-types';
 
-async function isBlockedEitherWay(db: Firestore, uidA: string, uidB: string): Promise<boolean> {
+/** Reads through the given transaction (not a plain `.get()`) so this participates in the same
+ *  optimistic-concurrency check as the rest of sendFriendRequest's transaction - a concurrent
+ *  blockUser call writes blocks/{uid}, so reading it inside the transaction means Firestore
+ *  automatically retries this transaction (and re-observes the fresh block) if the two race,
+ *  instead of a pre-transaction plain read letting a request slip through half a moment before the
+ *  block actually lands. */
+async function isBlockedEitherWay(db: Firestore, tx: Transaction, uidA: string, uidB: string): Promise<boolean> {
   const [aBlocks, bBlocks] = await Promise.all([
-    db.collection('blocks').doc(uidA).get(),
-    db.collection('blocks').doc(uidB).get(),
+    tx.get(db.collection('blocks').doc(uidA)),
+    tx.get(db.collection('blocks').doc(uidB)),
   ]);
   const aBlockedUids: string[] = aBlocks.data()?.blockedUids ?? [];
   const bBlockedUids: string[] = bBlocks.data()?.blockedUids ?? [];
@@ -46,22 +52,29 @@ export const sendFriendRequest = onCall<SendFriendRequestRequest>(async (request
 
   const db = getFirestore();
 
-  if (await isBlockedEitherWay(db, uid, toUid)) {
-    throw new HttpsError('failed-precondition', 'You cannot send a friend request to this user.');
-  }
-
-  const myFriendsSnap = await db.collection('friendships').doc(uid).get();
-  if (((myFriendsSnap.data() as FriendshipDoc | undefined)?.friendUids ?? []).includes(toUid)) {
-    throw new HttpsError('failed-precondition', 'You are already friends.');
-  }
-
   const forwardId = `${uid}_${toUid}`;
   const reverseId = `${toUid}_${uid}`;
   const forwardRef = db.collection('friendRequests').doc(forwardId);
   const reverseRef = db.collection('friendRequests').doc(reverseId);
+  const myFriendsRef = db.collection('friendships').doc(uid);
 
   return db.runTransaction(async (tx) => {
-    const [forwardSnap, reverseSnap] = await Promise.all([tx.get(forwardRef), tx.get(reverseRef)]);
+    // Both read through this same transaction (not a plain pre-transaction .get()) so a concurrent
+    // blockUser/friendship-mutating call can't race past this check - see isBlockedEitherWay's own
+    // comment.
+    const [blocked, myFriendsSnap, forwardSnap, reverseSnap] = await Promise.all([
+      isBlockedEitherWay(db, tx, uid, toUid),
+      tx.get(myFriendsRef),
+      tx.get(forwardRef),
+      tx.get(reverseRef),
+    ]);
+    if (blocked) {
+      throw new HttpsError('failed-precondition', 'You cannot send a friend request to this user.');
+    }
+    if (((myFriendsSnap.data() as FriendshipDoc | undefined)?.friendUids ?? []).includes(toUid)) {
+      throw new HttpsError('failed-precondition', 'You are already friends.');
+    }
+
     const reverseData = reverseSnap.data() as FriendRequest | undefined;
     if (reverseSnap.exists && reverseData?.status === 'pending') {
       await acceptFriendshipInTransaction(db, tx, uid, toUid);

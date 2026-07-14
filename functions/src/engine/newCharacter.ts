@@ -54,9 +54,11 @@ export function buildFreshSaveContent(): Pick<
       locationsVisited: [STARTING_LOCATION_ID],
       loreUnlocked: ['lore-great-silence', 'lore-lantern-keepers'],
       bossesDefeated: [],
-      // healing-poultice (an ITEMS-table entry) is in the starting inventory above - keepers-lantern
-      // isn't included here since it's equipment, not an ITEMS entry (see grantItem's own comment).
-      itemsDiscovered: ['healing-poultice'],
+      // Both starting inventory entries above, matching grantItem's own behavior (it records both
+      // ITEMS-table and EQUIPMENT-table ids into itemsDiscovered) - a fresh character already
+      // starts owning/wearing keepers-lantern, so it should already read as "discovered" in the
+      // Journal's Items tab too, not just healing-poultice.
+      itemsDiscovered: ['healing-poultice', 'keepers-lantern'],
     },
     openedChests: [],
     seenNpcDialogueVariant: {},

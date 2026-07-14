@@ -76,8 +76,16 @@ export const dash = onCall<DashRequest>(async (request) => {
 
     save.player.stats.stamina -= DASH_COST_PER_TILE;
     save.player.staminaUpdatedAt = now;
-    save.updatedAt = now;
-    tx.set(userRef, save);
+    // A targeted field update, not tx.set(userRef, save) - this is the single hottest-called
+    // mutation in the codebase (fired roughly every DASH_STEP_MS for the whole duration of a held
+    // Dash), and only these 3 fields ever change here; every other Cloud Function's tx.set(save)
+    // round-trips the player's entire inventory/quests/journal/equipment payload for no reason on
+    // top of the 3 fields it actually touched.
+    tx.update(userRef, {
+      'player.stats.stamina': save.player.stats.stamina,
+      'player.staminaUpdatedAt': save.player.staminaUpdatedAt,
+      updatedAt: now,
+    });
 
     return {
       stamina: save.player.stats.stamina,

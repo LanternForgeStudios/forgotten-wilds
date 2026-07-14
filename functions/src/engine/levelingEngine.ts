@@ -1,6 +1,17 @@
 import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
 import type { PlayerSave } from '../shared-types';
 
+/** Fully restores HP/Spirit (and Lantern Oil, if a lantern is equipped) - shared by a level-up
+ *  (below) and restAtInn.ts's own "pay gold, fully heal" effect, so what "fully rested" means only
+ *  has to be defined in one place. */
+export function restoreFullVitals(save: PlayerSave): void {
+  save.player.stats.hp = save.player.stats.maxHp;
+  save.player.stats.spirit = save.player.stats.maxSpirit;
+  if (save.player.equipment.lantern) {
+    save.player.stats.lanternOil = save.player.stats.maxLanternOil;
+  }
+}
+
 /** Recomputes level from the player's current xp and, if it increased, applies stat growth for
  *  every level gained (handles multi-level jumps from a single large xp grant correctly, since
  *  levelForXp always resolves to the right level regardless of how far past a threshold xp sits).
@@ -28,9 +39,5 @@ export function applyLevelUp(save: PlayerSave): void {
   save.player.stats.attack += STAT_GROWTH_PER_LEVEL.attack * levelsGained;
   save.player.stats.defense += STAT_GROWTH_PER_LEVEL.defense * levelsGained;
   save.player.stats.speed += STAT_GROWTH_PER_LEVEL.speed * levelsGained;
-  save.player.stats.hp = save.player.stats.maxHp;
-  save.player.stats.spirit = save.player.stats.maxSpirit;
-  if (save.player.equipment.lantern) {
-    save.player.stats.lanternOil = save.player.stats.maxLanternOil;
-  }
+  restoreFullVitals(save);
 }
