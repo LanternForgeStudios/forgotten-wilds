@@ -11,12 +11,23 @@ import {
   PRE_ENEMY_ATTACK_DELAY_MS,
   playDefeatEffect,
   playFloatingText,
+  playFxBurst,
   playIncomingCameraImpact,
   playIncomingLunge,
   playOutgoingHitOnSprite,
 } from './battleEffects';
 
 const PARTICLE_TEXTURE_KEY = 'fx-dot';
+const DEFEAT_FX_ASSET_ID = 'fx.smoke-puff';
+const DEFEAT_FX_FRAMES = [0, 1, 2, 3];
+// Maps a playerAilments entry to the FX-pack sheet that visualizes it - only ailments with a real
+// per-round "something is happening to you" effect get one (silence/stun already read clearly from
+// their own UI banners, no burst needed).
+const AILMENT_FX_ASSET: Record<string, string> = {
+  poison: 'fx.poison-cloud',
+  burn: 'fx.ember',
+  freeze: 'fx.ice-shard',
+};
 const FRONT_ROW_Y_FRACTION = 0.72;
 const BACK_ROW_Y_FRACTION = 0.42;
 const BACK_ROW_SCALE = 0.8;
@@ -69,6 +80,10 @@ export class BattleScene extends Phaser.Scene {
 
   create() {
     ensureParticleTexture(this, PARTICLE_TEXTURE_KEY);
+    // Fire-and-forget: the defeat effect (playDefeat below) checks textures.exists before using
+    // this, falling back to the dot texture on the (rare) chance a fight's first kill lands before
+    // this finishes loading.
+    this.loadTexture(DEFEAT_FX_ASSET_ID).catch(() => {});
     this.onReady?.();
   }
 
@@ -289,14 +304,38 @@ export class BattleScene extends Phaser.Scene {
     const slot = this.enemySlots.get(enemyIndex);
     if (!slot) return;
     this.enemySlots.delete(enemyIndex);
-    playDefeatEffect(this, slot.sprite, PARTICLE_TEXTURE_KEY, () => {
-      slot.sprite.destroy();
-      slot.hpTrackBg.destroy();
-      slot.hpTrackFill.destroy();
-      slot.nameText.destroy();
-      slot.tierText.destroy();
-      slot.targetRing?.destroy();
-    });
+    const useFxSmoke = this.textures.exists(DEFEAT_FX_ASSET_ID);
+    playDefeatEffect(
+      this,
+      slot.sprite,
+      useFxSmoke ? DEFEAT_FX_ASSET_ID : PARTICLE_TEXTURE_KEY,
+      () => {
+        slot.sprite.destroy();
+        slot.hpTrackBg.destroy();
+        slot.hpTrackFill.destroy();
+        slot.nameText.destroy();
+        slot.tierText.destroy();
+        slot.targetRing?.destroy();
+      },
+      useFxSmoke ? DEFEAT_FX_FRAMES : undefined,
+    );
+  }
+
+  /** Bursts the FX-pack sheet matching each of the player's currently-active ailments (poison/burn/
+   *  freeze - see AILMENT_FX_ASSET) at a fixed bottom-of-arena anchor, same position
+   *  playIncomingHits already uses for the player's own floating damage text. Called once per
+   *  round (see PhaserBattleCanvas's ailmentFxEvent prop) so a lingering DoT ailment gets a fresh
+   *  visual cue each round it's still ticking, not just on the round it was first inflicted. */
+  async playAilmentEffects(ailmentIds: string[]): Promise<void> {
+    const { width, height } = this.scale;
+    const anchorX = width / 2;
+    const anchorY = height * 0.92;
+    for (const ailmentId of ailmentIds) {
+      const assetId = AILMENT_FX_ASSET[ailmentId];
+      if (!assetId) continue;
+      await this.loadTexture(assetId);
+      playFxBurst(this, anchorX, anchorY, assetId);
+    }
   }
 
   /** Stops every tween/emitter, destroys all visuals. Called on phase transition to

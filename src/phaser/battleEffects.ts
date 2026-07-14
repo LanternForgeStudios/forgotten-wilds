@@ -114,15 +114,19 @@ export function playIncomingCameraImpact(scene: Phaser.Scene, damage: number, pl
 
 /** Fade+scale-down tween paired with a one-shot particle burst - the defeat sequence, replacing
  *  the old "stays rendered until a 1500ms timeout expires" trick. `onComplete` is where the caller
- *  should actually destroy the enemy's sprite/HP-bar/text - this function only animates. */
+ *  should actually destroy the enemy's sprite/HP-bar/text - this function only animates.
+ *  `frames` is set when `particleTextureKey` is a real animated FX-pack sheet (e.g. the smoke-puff
+ *  burst) rather than the generated 4x4 dot texture - Phaser needs explicit frame indices to cycle
+ *  through a spritesheet's frames instead of always rendering frame 0. */
 export function playDefeatEffect(
   scene: Phaser.Scene,
   sprite: Phaser.GameObjects.Sprite,
   particleTextureKey: string,
   onComplete: () => void,
+  frames?: number[],
 ): void {
   const emitter = scene.add.particles(sprite.x, sprite.y, particleTextureKey, {
-    tint: [0x888888, 0xa8762c],
+    ...(frames ? { frame: frames } : { tint: [0x888888, 0xa8762c] }),
     speed: { min: 60, max: 140 },
     lifespan: 400,
     scale: { start: 1, end: 0 },
@@ -141,4 +145,24 @@ export function playDefeatEffect(
     ease: 'Cubic.easeIn',
     onComplete,
   });
+}
+
+/** One-shot animated particle burst from a 4-frame FX-pack sheet (16x16 frames, indices 0-3 - see
+ *  public/assets/tilesets/fx_pack/manifest.json) at a fixed point - the shared shape behind every
+ *  ailment-effect burst (poison/burn/freeze) and reusable for any future FX-pack wiring. Caller
+ *  must have already loaded `textureKey` as a spritesheet (BattleScene.loadTexture handles this
+ *  generically for any registry id with a frameSize). */
+export function playFxBurst(scene: Phaser.Scene, x: number, y: number, textureKey: string, quantity = 10): void {
+  const emitter = scene.add.particles(x, y, textureKey, {
+    frame: [0, 1, 2, 3],
+    lifespan: { min: 500, max: 900 },
+    speed: { min: 20, max: 70 },
+    angle: { min: 200, max: 340 },
+    alpha: { start: 1, end: 0 },
+    scale: { start: 1.6, end: 0.4 },
+    rotate: { min: -180, max: 180 },
+    emitting: false,
+  });
+  emitter.explode(quantity);
+  scene.time.delayedCall(1100, () => emitter.destroy());
 }

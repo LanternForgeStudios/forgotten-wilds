@@ -22,6 +22,9 @@ const ENTITY_DEPTH = 500;
 const PARTICLE_TEXTURE_KEY = 'fx-dot';
 /** --fw-text-dim - a dusty tan/grey, reads as ground dust rather than anything magical. */
 const DASH_DUST_COLOR = 0xb8a888;
+/** Real FX-pack sheet for the Dash dust puff, replacing the generated dot texture once loaded -
+ *  see spawnDashDust's textures.exists guard for the (rare) fallback path. */
+const DASH_DUST_FX_ASSET_ID = 'fx.smoke-puff';
 
 interface EntityVisual {
   sprite: Phaser.GameObjects.Sprite;
@@ -81,6 +84,9 @@ export class ExplorationScene extends Phaser.Scene {
     // `new Phaser.Game(...)` returns (confirmed the hard way: that's exactly what threw
     // "Cannot read properties of undefined (reading 'once')").
     ensureParticleTexture(this, PARTICLE_TEXTURE_KEY);
+    // Fire-and-forget: spawnDashDust checks textures.exists before using this, falling back to the
+    // dot texture on the rare chance a dash is triggered before this finishes loading.
+    this.loadTexture(DASH_DUST_FX_ASSET_ID).catch(() => {});
     this.onReady?.();
   }
 
@@ -248,10 +254,15 @@ export class ExplorationScene extends Phaser.Scene {
 
   /** One small puff of dust, at ground level (behind the player sprite) rather than on top of
    *  it - a short-lived one-shot emitter, same explode()-then-destroy pattern as BattleScene's
-   *  defeat effect. */
+   *  defeat effect. Uses the real FX-pack smoke-puff sheet once loaded; falls back to the
+   *  generated dot texture (tinted dust-brown) for the rare dash that fires before create()'s
+   *  fire-and-forget load finishes. Not routed through battleEffects' playFxBurst - this needs its
+   *  own emitter reference to set depth (dust renders behind the player sprite), which that shared
+   *  helper doesn't expose. */
   private spawnDashDust(x: number, y: number): void {
-    const emitter = this.add.particles(x, y, PARTICLE_TEXTURE_KEY, {
-      tint: DASH_DUST_COLOR,
+    const useFx = this.textures.exists(DASH_DUST_FX_ASSET_ID);
+    const emitter = this.add.particles(x, y, useFx ? DASH_DUST_FX_ASSET_ID : PARTICLE_TEXTURE_KEY, {
+      ...(useFx ? { frame: [0, 1, 2, 3] } : { tint: DASH_DUST_COLOR }),
       speed: { min: 15, max: 40 },
       lifespan: 280,
       scale: { start: 0.8, end: 0 },

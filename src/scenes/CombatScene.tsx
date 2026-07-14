@@ -80,6 +80,14 @@ export function CombatScene() {
   const [targetMode, setTargetMode] = useState<'single' | 'all'>('single');
   const [log, setLog] = useState<string[]>([]);
   const [playerAilments, setPlayerAilments] = useState<ActiveAilment[]>([]);
+  // Drives PhaserBattleCanvas's FX-pack ailment bursts (poison/burn/freeze) - key increments every
+  // resolved round (see act() below) so a still-active DoT ailment re-triggers its burst each
+  // round even though playerAilments' own contents may be unchanged; key===0 is the pre-first-round
+  // sentinel PhaserBattleCanvas skips.
+  const [ailmentFxEvent, setAilmentFxEvent] = useState<{ ailmentIds: string[]; key: number }>({
+    ailmentIds: [],
+    key: 0,
+  });
   const [selectedAilmentId, setSelectedAilmentId] = useState<string | null>(null);
   const [showSkillMenu, setShowSkillMenu] = useState(false);
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
@@ -279,6 +287,7 @@ export function CombatScene() {
       const batch = hitBatchRef.current;
       setActiveOutgoingHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
       setActiveIncomingHits(res.enemyHits.map((h) => ({ ...h, key: batch * 1000 + h.attackerIndex })));
+      setAilmentFxEvent({ ailmentIds: res.playerAilments.map((a) => a.ailmentId), key: batch });
       // The last incoming hit doesn't even START playing until lastAttackStartMs, and then needs
       // its own ~1.4s (playFloatingText's tween duration) to actually finish - a fixed 1500ms here
       // would cut a 3+ enemy round's animation short and re-enable actions mid-playback.
@@ -557,6 +566,7 @@ export function CombatScene() {
                 setTargetIndex(index);
               }}
               combatEnded={combatEnded}
+              ailmentFxEvent={ailmentFxEvent}
             />
           </div>
           {canPickTarget && (

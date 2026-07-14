@@ -23,6 +23,12 @@ interface PhaserBattleCanvasProps {
    *  this component (the Phaser.Game instance survives until CombatScene itself unmounts via
    *  returnToExploration()). */
   combatEnded: boolean;
+  /** The player's active ailment ids as of the most recently resolved round, plus a `key` that
+   *  changes every round (even if the ailment list itself didn't) - BattleScene.playAilmentEffects
+   *  fires a fresh FX-pack burst per still-active DoT ailment each round, so this needs to
+   *  re-trigger on `key` alone rather than on ailmentIds' own (possibly-unchanged) identity.
+   *  `key === 0` is the pre-first-round sentinel and is skipped. */
+  ailmentFxEvent: { ailmentIds: string[]; key: number };
 }
 
 /** Phaser-backed battle stage - background, enemy formation, HP bars, hit/defeat effects. Same
@@ -47,6 +53,7 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
     canPickTarget,
     onTargetEnemy,
     combatEnded,
+    ailmentFxEvent,
   } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -160,6 +167,12 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
     if (!sceneReady || !combatEnded) return;
     sceneRef.current?.clear();
   }, [sceneReady, combatEnded]);
+
+  useEffect(() => {
+    if (!sceneReady || ailmentFxEvent.key === 0) return;
+    sceneRef.current?.playAilmentEffects(ailmentFxEvent.ailmentIds).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneReady, ailmentFxEvent.key]);
 
   // position:absolute + inset:0 against .battleCanvasWrap's own position:relative, not
   // width/height:100% - a flex item sized only by flex-grow/min-height (no explicit `height`) is
