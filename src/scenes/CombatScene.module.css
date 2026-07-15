@@ -22,12 +22,14 @@
   min-height: 480px;
   max-height: 1100px;
   margin: 0 auto;
+  /* Declared on the base rule too (not just .stageBlurred below), so removing that class
+     transitions the blur back out smoothly as well, not just transitioning it in. */
+  transition: filter 0.3s ease;
 }
 
 /* Blind's "reduced visibility" theme, applied while it's active - see isBlinded in CombatScene.tsx. */
 .stageBlurred {
   filter: blur(3px);
-  transition: filter 0.3s ease;
 }
 
 /* Reinforces the ailment badge strip with a low-opacity full-screen color wash - see
@@ -41,9 +43,25 @@
   pointer-events: none;
 }
 
+/* An `animation` (not `transition`) so the fade-in reliably plays the moment this div is first
+   mounted (a newly-inflicted ailment's tint appearing for the very first time) - transition alone
+   only animates a value *change* on an already-existing element, so it would silently skip the
+   very first ailment (the layer itself, and this div, don't exist at all until one is active). By
+   design this settles in just after BattleScene.playAilmentTakesHold's multi-burst FX moment
+   finishes playing, rather than popping in instantly alongside it. */
 .ailmentTint {
   position: absolute;
   inset: 0;
+  animation: ailmentTintFadeIn 0.6s ease-out 0.5s backwards;
+}
+
+@keyframes ailmentTintFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .enemyArea {
@@ -112,13 +130,26 @@
   text-align: center;
 }
 
+/* Absolutely positioned over .battleCanvasWrap (not a flex sibling of the canvas) so showing/
+   hiding it never changes the canvas's own flex-allocated size - it used to be a normal flex
+   child, which meant the Phaser canvas visibly shrank to make room for this text every time
+   target-picking mode toggled on, pushing the enemy sprites/HP bars up and out of view.
+   pointer-events: none so it never blocks tapping an enemy sprite underneath it. */
 .targetHint {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  text-align: center;
   font-size: 12px;
   color: var(--fw-text-dim);
   background: rgba(0, 0, 0, 0.5);
   padding: 4px 10px;
   border-radius: 12px;
   margin: 0;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .bottomPanel {

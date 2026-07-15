@@ -65,10 +65,11 @@ export function playFloatingText(
   text: string,
   color: number,
   italic = false,
+  fontSize = 18,
 ): void {
   const label = scene.add
     .text(x, y, text, {
-      fontSize: '18px',
+      fontSize: `${fontSize}px`,
       fontStyle: italic ? 'italic bold' : 'bold',
       color: `#${color.toString(16).padStart(6, '0')}`,
     })

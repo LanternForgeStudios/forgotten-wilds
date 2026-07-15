@@ -252,11 +252,13 @@ export class BattleScene extends Phaser.Scene {
    *  attacks simultaneously" made it impossible to tell who actually hit you. Per hit: a lunge
    *  tween on the attacking enemy's own sprite (identifies WHO attacked - the payoff of the
    *  structured per-attacker data), camera flash+shake scaled to severity, floating "-N" at a
-   *  fixed bottom-of-arena anchor (no player sprite exists in the arena today). CombatScene.tsx
-   *  reveals each hit's log line on this same stagger schedule (see INCOMING_HIT_STAGGER_MS's own
-   *  comment for why that's two independently-scheduled timers rather than one shared clock).
-   *  `fastRounds` (CombatScene's own per-encounter toggle) collapses the inter-enemy stagger to 0
-   *  so every hit lands together - PRE_ENEMY_ATTACK_DELAY_MS still applies either way. */
+   *  central arena anchor (no player sprite exists in the arena today) - large and centered rather
+   *  than tucked near the bottom edge, so it reads as clearly as the outgoing damage numbers do
+   *  against the enemies themselves. CombatScene.tsx reveals each hit's log line on this same
+   *  stagger schedule (see INCOMING_HIT_STAGGER_MS's own comment for why that's two independently-
+   *  scheduled timers rather than one shared clock). `fastRounds` (CombatScene's own per-encounter
+   *  toggle) collapses the inter-enemy stagger to 0 so every hit lands together -
+   *  PRE_ENEMY_ATTACK_DELAY_MS still applies either way. */
   playIncomingHits(
     hits: { attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean }[],
     playerMaxHp: number,
@@ -264,18 +266,19 @@ export class BattleScene extends Phaser.Scene {
   ): void {
     const { width, height } = this.scale;
     const anchorX = width / 2;
-    const anchorY = height * 0.92;
+    const anchorY = height * 0.5;
+    const INCOMING_TEXT_SIZE = 36;
     hits.forEach((hit, i) => {
       const stagger = fastRounds ? 0 : i * INCOMING_HIT_STAGGER_MS;
       this.time.delayedCall(PRE_ENEMY_ATTACK_DELAY_MS + stagger, () => {
         const slot = this.enemySlots.get(hit.attackerIndex);
         if (slot) playIncomingLunge(this, slot.sprite);
         if (hit.missed) {
-          playFloatingText(this, anchorX, anchorY, 'MISS', COLOR_MISS, true);
+          playFloatingText(this, anchorX, anchorY, 'MISS', COLOR_MISS, true, INCOMING_TEXT_SIZE);
           return;
         }
         const color = hit.wasDefended ? COLOR_DEFENDED : COLOR_INCOMING_DAMAGE;
-        playFloatingText(this, anchorX, anchorY, `-${hit.damage}`, color, hit.wasDefended);
+        playFloatingText(this, anchorX, anchorY, `-${hit.damage}`, color, hit.wasDefended, INCOMING_TEXT_SIZE);
         playIncomingCameraImpact(this, hit.wasDefended ? hit.damage / 2 : hit.damage, playerMaxHp);
       });
     });
@@ -317,6 +320,30 @@ export class BattleScene extends Phaser.Scene {
       if (!assetId) continue;
       await loadSceneTexture(this, assetId);
       playFxBurst(this, anchorX, anchorY, assetId);
+    }
+  }
+
+  /** The dramatic, one-time "this ailment just landed" moment - several staggered bursts of the
+   *  same FX-pack sheet playAilmentEffects uses, at random positions scattered across the whole
+   *  arena (not the single fixed bottom anchor), so the instant an ailment first takes hold reads
+   *  as a much bigger deal than the quieter per-round reapplication burst. Called once, the round
+   *  an ailment is newly inflicted (see CombatScene.tsx's before/after playerAilments diff) -
+   *  never for an ailment that was already active and is just continuing to tick. */
+  async playAilmentTakesHold(ailmentIds: string[]): Promise<void> {
+    const { width, height } = this.scale;
+    const BURST_COUNT = 5;
+    const BURST_STAGGER_MS = 130;
+    for (const ailmentId of ailmentIds) {
+      const assetId = AILMENT_FX_ASSET[ailmentId];
+      if (!assetId) continue;
+      await loadSceneTexture(this, assetId);
+      for (let i = 0; i < BURST_COUNT; i++) {
+        this.time.delayedCall(i * BURST_STAGGER_MS, () => {
+          const x = width * (0.15 + Math.random() * 0.7);
+          const y = height * (0.2 + Math.random() * 0.6);
+          playFxBurst(this, x, y, assetId, 8);
+        });
+      }
     }
   }
 

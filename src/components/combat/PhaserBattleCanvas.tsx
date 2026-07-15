@@ -29,6 +29,11 @@ interface PhaserBattleCanvasProps {
    *  re-trigger on `key` alone rather than on ailmentIds' own (possibly-unchanged) identity.
    *  `key === 0` is the pre-first-round sentinel and is skipped. */
   ailmentFxEvent: { ailmentIds: string[]; key: number };
+  /** Only the ailment ids newly inflicted this round (already-active/still-ticking ailments are
+   *  excluded - see ailmentFxEvent above for those) - triggers BattleScene's bigger, multi-burst
+   *  "this just took hold" moment instead of the quieter per-round reapplication burst. Same
+   *  key-changes-every-round shape as ailmentFxEvent, for the same reason. */
+  ailmentTakesHoldEvent: { ailmentIds: string[]; key: number };
 }
 
 /** Phaser-backed battle stage - background, enemy formation, HP bars, hit/defeat effects. Same
@@ -54,6 +59,7 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
     onTargetEnemy,
     combatEnded,
     ailmentFxEvent,
+    ailmentTakesHoldEvent,
   } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -173,6 +179,12 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
     sceneRef.current?.playAilmentEffects(ailmentFxEvent.ailmentIds).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneReady, ailmentFxEvent.key]);
+
+  useEffect(() => {
+    if (!sceneReady || ailmentTakesHoldEvent.key === 0 || ailmentTakesHoldEvent.ailmentIds.length === 0) return;
+    sceneRef.current?.playAilmentTakesHold(ailmentTakesHoldEvent.ailmentIds).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneReady, ailmentTakesHoldEvent.key]);
 
   // position:absolute + inset:0 against .battleCanvasWrap's own position:relative, not
   // width/height:100% - a flex item sized only by flex-grow/min-height (no explicit `height`) is

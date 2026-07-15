@@ -75,6 +75,14 @@ export function CombatScene() {
     ailmentIds: [],
     key: 0,
   });
+  // Same shape/key convention as ailmentFxEvent above, but only ever holds ailment ids that are
+  // newly inflicted this round (see act() below's before/after diff) - drives
+  // PhaserBattleCanvas's bigger multi-burst "this just took hold" moment instead of the quieter
+  // per-round reapplication burst ailmentFxEvent triggers for an already-active ailment.
+  const [ailmentTakesHoldEvent, setAilmentTakesHoldEvent] = useState<{ ailmentIds: string[]; key: number }>({
+    ailmentIds: [],
+    key: 0,
+  });
   const [selectedAilmentId, setSelectedAilmentId] = useState<string | null>(null);
   const [showSkillMenu, setShowSkillMenu] = useState(false);
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
@@ -238,6 +246,13 @@ export function CombatScene() {
         const updated = res.enemies.find((u) => u.index === e.index);
         return updated ? { ...e, hp: updated.hp } : e;
       }));
+      // Diffed against `playerAilments` (the pre-this-round state, captured by closure before the
+      // await above) rather than after setPlayerAilments below - an ailment already active last
+      // round and still ticking should only get the quieter per-round burst (ailmentFxEvent), not
+      // the big "just took hold" one every single round it continues.
+      const newlyInflictedAilmentIds = res.playerAilments
+        .filter((a) => !playerAilments.some((old) => old.ailmentId === a.ailmentId))
+        .map((a) => a.ailmentId);
       setPlayerAilments(res.playerAilments);
       // On a defeat, the server's playerHp/playerSpirit here are already the post-respawn values
       // (Ash Hallow's soft-respawn restore, applied in the same transaction as the defeat itself -
@@ -278,6 +293,9 @@ export function CombatScene() {
       setActiveOutgoingHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
       setActiveIncomingHits(res.enemyHits.map((h) => ({ ...h, key: batch * 1000 + h.attackerIndex })));
       setAilmentFxEvent({ ailmentIds: res.playerAilments.map((a) => a.ailmentId), key: batch });
+      if (newlyInflictedAilmentIds.length > 0) {
+        setAilmentTakesHoldEvent({ ailmentIds: newlyInflictedAilmentIds, key: batch });
+      }
       // The last incoming hit doesn't even START playing until lastAttackStartMs, and then needs
       // its own ~1.4s (playFloatingText's tween duration) to actually finish - a fixed 1500ms here
       // would cut a 3+ enemy round's animation short and re-enable actions mid-playback.
@@ -476,8 +494,12 @@ export function CombatScene() {
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       {activeTintColors.length > 0 && (
         <div className={styles.ailmentTintLayer}>
-          {activeTintColors.map((color, i) => (
-            <div key={i} className={styles.ailmentTint} style={{ background: color }} />
+          {activeTintColors.map((color) => (
+            // Keyed by the (stable, per-ailment-type) color itself rather than array index, so an
+            // already-active ailment's tint div isn't unmounted/remounted (re-triggering its
+            // mount-in fade animation) just because a different ailment was added or cleared
+            // elsewhere in the list.
+            <div key={color} className={styles.ailmentTint} style={{ background: color }} />
           ))}
         </div>
       )}
@@ -576,15 +598,16 @@ export function CombatScene() {
               }}
               combatEnded={combatEnded}
               ailmentFxEvent={ailmentFxEvent}
+              ailmentTakesHoldEvent={ailmentTakesHoldEvent}
             />
+            {canPickTarget && (
+              <p className={styles.targetHint}>
+                {targetMode === 'all'
+                  ? 'Attacking all foes at once - reduced damage each, chance to miss.'
+                  : 'Tap an enemy to choose your target'}
+              </p>
+            )}
           </div>
-          {canPickTarget && (
-            <p className={styles.targetHint}>
-              {targetMode === 'all'
-                ? 'Attacking all foes at once - reduced damage each, chance to miss.'
-                : 'Tap an enemy to choose your target'}
-            </p>
-          )}
         </div>
 
         <div className={styles.bottomPanel}>
