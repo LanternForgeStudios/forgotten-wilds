@@ -29,8 +29,15 @@ const AILMENT_FX_ASSET: Record<string, string> = {
   burn: 'fx.ember',
   freeze: 'fx.ice-shard',
 };
-const FRONT_ROW_Y_FRACTION = 0.72;
-const BACK_ROW_Y_FRACTION = 0.42;
+// Anchors the enemy sprite's own center - the HP bar/name/tier-text stack renders *below* that
+// (see createEnemySlot: barY = sprite bottom edge + ~14px, then name/tier further down still),
+// so a low anchor combined with a tall sprite (a boss's displayHeight can be 2x a regular
+// enemy's) pushed that whole stack close to or past the canvas's bottom edge on a shorter
+// viewport - independent of the target-hint overlay, which just made the crowding worse.
+// Previously 0.72/0.42; raised so the full stack comfortably clears the bottom on typical
+// battle-canvas heights, not just tall ones.
+const FRONT_ROW_Y_FRACTION = 0.52;
+const BACK_ROW_Y_FRACTION = 0.28;
 const BACK_ROW_SCALE = 0.8;
 const BACK_ROW_ALPHA = 0.92;
 
@@ -266,7 +273,10 @@ export class BattleScene extends Phaser.Scene {
   ): void {
     const { width, height } = this.scale;
     const anchorX = width / 2;
-    const anchorY = height * 0.5;
+    // Sits in the visual gap between the back and front enemy rows (BACK_ROW_Y_FRACTION 0.28 /
+    // FRONT_ROW_Y_FRACTION 0.52 above) rather than dead-center - centering on 0.5 would land right
+    // on top of the front row's own sprites now that they've been raised higher in the arena.
+    const anchorY = height * 0.4;
     const INCOMING_TEXT_SIZE = 36;
     hits.forEach((hit, i) => {
       const stagger = fastRounds ? 0 : i * INCOMING_HIT_STAGGER_MS;
@@ -306,44 +316,50 @@ export class BattleScene extends Phaser.Scene {
     );
   }
 
-  /** Bursts the FX-pack sheet matching each of the player's currently-active ailments (poison/burn/
-   *  freeze - see AILMENT_FX_ASSET) at a fixed bottom-of-arena anchor, same position
-   *  playIncomingHits already uses for the player's own floating damage text. Called once per
-   *  round (see PhaserBattleCanvas's ailmentFxEvent prop) so a lingering DoT ailment gets a fresh
-   *  visual cue each round it's still ticking, not just on the round it was first inflicted. */
-  async playAilmentEffects(ailmentIds: string[]): Promise<void> {
+  /** Several staggered bursts of `assetId` at random positions scattered across the whole arena -
+   *  shared by both playAilmentEffects (every round a damage-dealing ailment ticks) and
+   *  playAilmentTakesHold (the bigger moment an ailment is newly inflicted, which just uses a
+   *  higher `burstCount`). Every ailment with an FX asset (poison/burn/freeze - see
+   *  AILMENT_FX_ASSET) deals real per-turn damage, so there's no "quiet" tick that should read as
+   *  less dramatic than this. */
+  private burstAilmentFxAcrossArena(assetId: string, burstCount: number): void {
     const { width, height } = this.scale;
-    const anchorX = width / 2;
-    const anchorY = height * 0.92;
-    for (const ailmentId of ailmentIds) {
-      const assetId = AILMENT_FX_ASSET[ailmentId];
-      if (!assetId) continue;
-      await loadSceneTexture(this, assetId);
-      playFxBurst(this, anchorX, anchorY, assetId);
+    const BURST_STAGGER_MS = 110;
+    for (let i = 0; i < burstCount; i++) {
+      this.time.delayedCall(i * BURST_STAGGER_MS, () => {
+        const x = width * (0.15 + Math.random() * 0.7);
+        const y = height * (0.2 + Math.random() * 0.6);
+        playFxBurst(this, x, y, assetId);
+      });
     }
   }
 
-  /** The dramatic, one-time "this ailment just landed" moment - several staggered bursts of the
-   *  same FX-pack sheet playAilmentEffects uses, at random positions scattered across the whole
-   *  arena (not the single fixed bottom anchor), so the instant an ailment first takes hold reads
-   *  as a much bigger deal than the quieter per-round reapplication burst. Called once, the round
-   *  an ailment is newly inflicted (see CombatScene.tsx's before/after playerAilments diff) -
-   *  never for an ailment that was already active and is just continuing to tick. */
-  async playAilmentTakesHold(ailmentIds: string[]): Promise<void> {
-    const { width, height } = this.scale;
-    const BURST_COUNT = 5;
-    const BURST_STAGGER_MS = 130;
+  /** Fires for every currently-active damage-dealing ailment (poison/burn/freeze), once per round
+   *  (see PhaserBattleCanvas's ailmentFxEvent prop) - a still-ticking ailment gets this every round
+   *  it deals its damage, not just the round it was first inflicted (see playAilmentTakesHold for
+   *  that bigger moment). */
+  async playAilmentEffects(ailmentIds: string[]): Promise<void> {
+    const PER_ROUND_BURST_COUNT = 4;
     for (const ailmentId of ailmentIds) {
       const assetId = AILMENT_FX_ASSET[ailmentId];
       if (!assetId) continue;
       await loadSceneTexture(this, assetId);
-      for (let i = 0; i < BURST_COUNT; i++) {
-        this.time.delayedCall(i * BURST_STAGGER_MS, () => {
-          const x = width * (0.15 + Math.random() * 0.7);
-          const y = height * (0.2 + Math.random() * 0.6);
-          playFxBurst(this, x, y, assetId, 8);
-        });
-      }
+      this.burstAilmentFxAcrossArena(assetId, PER_ROUND_BURST_COUNT);
+    }
+  }
+
+  /** The even bigger, one-time "this ailment just landed" moment - more bursts than a regular
+   *  per-round tick (playAilmentEffects), so newly taking an ailment still reads as a distinctly
+   *  bigger deal than it continuing to tick. Called once, the round an ailment is newly inflicted
+   *  (see CombatScene.tsx's before/after playerAilments diff) - never for an ailment that was
+   *  already active and is just continuing to tick. */
+  async playAilmentTakesHold(ailmentIds: string[]): Promise<void> {
+    const TAKES_HOLD_BURST_COUNT = 8;
+    for (const ailmentId of ailmentIds) {
+      const assetId = AILMENT_FX_ASSET[ailmentId];
+      if (!assetId) continue;
+      await loadSceneTexture(this, assetId);
+      this.burstAilmentFxAcrossArena(assetId, TAKES_HOLD_BURST_COUNT);
     }
   }
 

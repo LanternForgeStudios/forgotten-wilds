@@ -153,17 +153,17 @@ export function playDefeatEffect(
  *  ailment-effect burst (poison/burn/freeze) and reusable for any future FX-pack wiring. Caller
  *  must have already loaded `textureKey` as a spritesheet (BattleScene.loadTexture handles this
  *  generically for any registry id with a frameSize). */
-export function playFxBurst(scene: Phaser.Scene, x: number, y: number, textureKey: string, quantity = 10): void {
+export function playFxBurst(scene: Phaser.Scene, x: number, y: number, textureKey: string, quantity = 14): void {
   const emitter = scene.add.particles(x, y, textureKey, {
     frame: [0, 1, 2, 3],
-    lifespan: { min: 500, max: 900 },
-    speed: { min: 20, max: 70 },
+    lifespan: { min: 600, max: 1100 },
+    speed: { min: 30, max: 110 },
     angle: { min: 200, max: 340 },
     alpha: { start: 1, end: 0 },
-    scale: { start: 1.6, end: 0.4 },
+    scale: { start: 2.1, end: 0.5 },
     rotate: { min: -180, max: 180 },
     emitting: false,
   });
   emitter.explode(quantity);
-  scene.time.delayedCall(1100, () => emitter.destroy());
+  scene.time.delayedCall(1300, () => emitter.destroy());
 }
