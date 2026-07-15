@@ -1,3 +1,4 @@
+import { playSound } from '@/audio/audioService';
 import styles from './OverlayCloseButton.module.css';
 
 interface OverlayCloseButtonProps {
@@ -15,6 +16,7 @@ export function OverlayCloseButton({ onClick }: OverlayCloseButtonProps) {
       className={styles.closeButton}
       onClick={(e) => {
         e.stopPropagation();
+        void playSound('sfx.ui-close');
         onClick();
       }}
       aria-label="Close"

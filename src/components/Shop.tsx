@@ -14,6 +14,7 @@ import { sellPriceFor } from '@/utils/sellPrice';
 import { formatStatBonuses } from '@/utils/statBonuses';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
 import { SHOP_LISTINGS, SHOP_TITLES, SHOP_CATALOGS, ITEMS, EQUIPMENT } from '@/data';
+import { playSound } from '@/audio/audioService';
 import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
 
@@ -81,8 +82,10 @@ export function Shop({ shopId, onClose }: ShopProps) {
       await callPurchaseItem(itemId, shopId);
       if (uid) await resyncSave(uid);
       pushToast(`Bought ${name} for ${price}g`);
+      void playSound('sfx.purchase');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not complete that purchase.');
+      void playSound('sfx.ui-error');
     } finally {
       setBusy(null);
     }
@@ -98,6 +101,7 @@ export function Shop({ shopId, onClose }: ShopProps) {
       const res = await callSellItem(itemId, quantity);
       if (uid) await resyncSave(uid);
       pushToast(`Sold ${res.soldQuantity}x ${name} for ${res.goldEarned}g`);
+      void playSound('sfx.sell');
       setSellQuantities((prev) => {
         const next = { ...prev };
         delete next[itemId];
@@ -105,6 +109,7 @@ export function Shop({ shopId, onClose }: ShopProps) {
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not sell that item.');
+      void playSound('sfx.ui-error');
     } finally {
       setBusy(null);
     }

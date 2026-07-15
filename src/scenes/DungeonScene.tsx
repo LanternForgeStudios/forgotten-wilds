@@ -26,6 +26,7 @@ import { isTypingTarget } from '@/utils/keyboard';
 import { itemDisplayName } from '@/utils/itemName';
 import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { playMusic, playSound } from '@/audio/audioService';
 import styles from './TownScene.module.css';
 
 const LOCATION_ID = 'hollow-rail-mine';
@@ -46,6 +47,9 @@ export function DungeonScene() {
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
   const openedChests = useWorldStateStore((s) => s.openedChests);
+  useEffect(() => {
+    void playMusic('music.dungeon');
+  }, []);
   const [message, setMessage] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
@@ -109,6 +113,7 @@ export function DungeonScene() {
       run(() => callInteractWithShrine(LOCATION_ID, 'mine-shrine'), 'Interacting with shrine...')
         ?.then(async () => {
           if (uid) await resyncSave(uid);
+          void playSound('sfx.shrine');
           setMessage('A shrine carved into the rock, coated in soot. Something in it still resists the corruption around it.');
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
@@ -117,6 +122,7 @@ export function DungeonScene() {
       run(() => callOpenChest(LOCATION_ID, chestId), 'Opening chest...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
+          if (!res.alreadyOpened) void playSound('sfx.chest-open');
           const name = itemDisplayName(res.itemId);
           setMessage(
             res.alreadyOpened

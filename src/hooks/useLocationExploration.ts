@@ -9,6 +9,7 @@ import { callEnterLocation } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { getBlockedMessage } from '@/utils/locationGates';
+import { playSound } from '@/audio/audioService';
 import { LOCATIONS } from '@/data';
 
 interface UseLocationExplorationOptions {
@@ -111,6 +112,7 @@ export function useLocationExploration({
       const targetLocation = LOCATIONS.find((l) => l.id === transition.refId);
       const scene = targetLocation ? sceneForLocationKind(targetLocation.kind) : undefined;
       if (scene) {
+        void playSound('sfx.transition');
         goTo(scene, { locationId: transition.refId, spawnId: transition.targetSpawnId });
         return;
       }

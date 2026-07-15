@@ -16,6 +16,7 @@ import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect } from '@/utils/itemEffect';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
 import { TIER_LABELS } from '@/utils/tier';
+import { playSound } from '@/audio/audioService';
 import styles from './CharacterMenu.module.css';
 
 interface CharacterMenuProps {
@@ -176,6 +177,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
     try {
       await callEquipItem(itemId);
       if (uid) await resyncSave(uid);
+      void playSound('sfx.equip');
     } finally {
       setBusy(false);
     }
@@ -188,6 +190,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
     try {
       await callUnequipItem(slot);
       if (uid) await resyncSave(uid);
+      void playSound('sfx.equip');
     } finally {
       setBusy(false);
     }
@@ -199,6 +202,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
     try {
       await callUseItem(itemId);
       if (uid) await resyncSave(uid);
+      void playSound('sfx.item-use');
     } finally {
       setBusy(false);
     }
@@ -210,6 +214,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
     try {
       await callCraftItem(recipeId);
       if (uid) await resyncSave(uid);
+      void playSound('sfx.craft-success');
     } finally {
       setBusy(false);
     }

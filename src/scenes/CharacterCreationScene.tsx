@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Panel } from '@/components/common/Panel';
 import { getAssetUrl } from '@/assets/assetManager';
 import { callCreateCharacter } from '@/firebase/functionsClient';
@@ -6,6 +6,7 @@ import { hydrateAllStores } from '@/state/hydrate';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { INTRO_CUTSCENE } from '@/data/cutscenes';
+import { playMusic } from '@/audio/audioService';
 import styles from './TitleScene.module.css';
 
 const SKIN_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
@@ -14,6 +15,12 @@ const SKIN_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] 
 ];
 
 export function CharacterCreationScene() {
+  // Same title theme as TitleScene - a no-op if it's already playing (see playMusic), so this
+  // adjacent screen in the same sign-in flow doesn't restart or interrupt the track.
+  useEffect(() => {
+    void playMusic('music.title');
+  }, []);
+
   const [name, setName] = useState('');
   const [skin, setSkin] = useState<'male' | 'female'>('male');
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +85,7 @@ export function CharacterCreationScene() {
                   cursor: 'pointer',
                 }}
               >
-                <img src={getAssetUrl(option.assetId)} alt={option.label} style={{ width: 48, height: 64, imageRendering: 'pixelated' }} />
+                <img src={getAssetUrl(option.assetId)} alt={option.label} style={{ width: 72, height: 96, imageRendering: 'pixelated' }} />
                 <span style={{ fontSize: 12, color: 'var(--fw-text)' }}>{option.label}</span>
               </button>
             ))}

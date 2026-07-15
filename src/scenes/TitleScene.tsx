@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Panel } from '@/components/common/Panel';
 import { getAssetUrl } from '@/assets/assetManager';
 import {
@@ -8,11 +8,16 @@ import {
   signInWithGoogle,
   signUpWithEmail,
 } from '@/firebase/auth';
+import { playMusic } from '@/audio/audioService';
 import styles from './TitleScene.module.css';
 
 type Mode = 'signIn' | 'signUp';
 
 export function TitleScene() {
+  useEffect(() => {
+    void playMusic('music.title');
+  }, []);
+
   const [mode, setMode] = useState<Mode>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

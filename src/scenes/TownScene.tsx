@@ -32,6 +32,7 @@ import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
+import { playMusic, playSound } from '@/audio/audioService';
 import styles from './TownScene.module.css';
 
 const PRESENCE_STALE_AFTER_MS = 60_000;
@@ -58,6 +59,11 @@ const SHRINES = new Set(['ash-hallow-shrine']);
 
 export function TownScene() {
   const locationId = useSceneStore((s) => s.params.locationId) ?? 'ash-hallow';
+  // One theme for Ash Hallow and all its interiors - playMusic no-ops if it's already playing, so
+  // moving between the town square and a building doesn't restart the track.
+  useEffect(() => {
+    void playMusic('music.town');
+  }, []);
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
@@ -119,6 +125,7 @@ export function TownScene() {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
         setActiveNpc(npc);
+        void playSound('sfx.npc-talk');
         run(() => callTalkToNpc(npc.id), 'Talking...')
           ?.then(async () => {
             if (uid) await resyncSave(uid);
@@ -135,6 +142,7 @@ export function TownScene() {
       run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
+          void playSound('sfx.shrine');
           setMessage(
             res.unlockedStamina
               ? 'The shrine kindles fully alight once more. You feel the trail\'s strength answer you - Stamina is yours to command now.'

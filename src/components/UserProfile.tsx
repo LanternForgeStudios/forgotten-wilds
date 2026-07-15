@@ -36,6 +36,7 @@ import { subscribeToMyTrades } from '@/firebase/tradeService';
 import { useNow } from '@/hooks/useNow';
 import { isPresenceOnline } from '@/utils/presence';
 import { useToastStore } from '@/state/useToastStore';
+import { useAudioSettingsStore } from '@/state/useAudioSettingsStore';
 import { TradeOfferPanel } from './TradeOfferPanel';
 import { ITEMS, EQUIPMENT } from '@/data';
 import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc, TradeOfferSide } from '@/types';
@@ -57,7 +58,7 @@ interface UserProfileProps {
   onClose: () => void;
 }
 
-type ProfileTab = 'profile' | 'friends' | 'clan' | 'skin' | 'reset';
+type ProfileTab = 'profile' | 'friends' | 'clan' | 'skin' | 'settings' | 'reset';
 
 const SKIN_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
   { id: 'male', label: 'Male', assetId: 'sprite.player.male' },
@@ -68,6 +69,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const [tab, setTab] = useState<ProfileTab>('profile');
   const authUser = useAuthStore((s) => s.user);
   const player = usePlayerStore((s) => s.player);
+  const audioSettings = useAudioSettingsStore();
   useOverlayClose(onClose);
 
   const uid = authUser?.uid;
@@ -364,6 +366,9 @@ export function UserProfile({ onClose }: UserProfileProps) {
           </button>
           <button className={`${styles.tab} ${tab === 'skin' ? styles.tabActive : ''}`} onClick={() => setTab('skin')}>
             Skin
+          </button>
+          <button className={`${styles.tab} ${tab === 'settings' ? styles.tabActive : ''}`} onClick={() => setTab('settings')}>
+            Settings
           </button>
           <button className={`${styles.tab} ${tab === 'reset' ? styles.tabActive : ''}`} onClick={() => setTab('reset')}>
             Reset Progress
@@ -699,12 +704,64 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   <img
                     src={getAssetUrl(option.assetId)}
                     alt={option.label}
-                    style={{ width: 48, height: 64, imageRendering: 'pixelated' }}
+                    style={{ width: 72, height: 96, imageRendering: 'pixelated' }}
                   />
                   <span style={{ fontSize: 12 }}>{option.label}</span>
                   {player.skin === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {tab === 'settings' && (
+          <div className={styles.section}>
+            <p style={{ fontSize: 13, opacity: 0.85, marginTop: 0 }}>
+              Music and sound effect preferences, saved on this device only.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={audioSettings.musicEnabled}
+                    onChange={(e) => audioSettings.setMusicEnabled(e.target.checked)}
+                  />
+                  Music
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={audioSettings.musicVolume}
+                  disabled={!audioSettings.musicEnabled}
+                  onChange={(e) => audioSettings.setMusicVolume(Number(e.target.value))}
+                  style={{ width: '100%', marginTop: 6 }}
+                  aria-label="Music volume"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={audioSettings.sfxEnabled}
+                    onChange={(e) => audioSettings.setSfxEnabled(e.target.checked)}
+                  />
+                  Sound Effects
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={audioSettings.sfxVolume}
+                  disabled={!audioSettings.sfxEnabled}
+                  onChange={(e) => audioSettings.setSfxVolume(Number(e.target.value))}
+                  style={{ width: '100%', marginTop: 6 }}
+                  aria-label="Sound effects volume"
+                />
+              </div>
             </div>
           </div>
         )}

@@ -10,6 +10,7 @@ import { useCutsceneStore } from './useCutsceneStore';
 import { QUESTS } from '@/data';
 import { QUEST_COMPLETION_CUTSCENES } from '@/data/cutscenes';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
+import { playSound } from '@/audio/audioService';
 
 /** Fans a PlayerSave (from a Cloud Function response or a users/{uid} read) out to every store. */
 export function hydrateAllStores(save: PlayerSave): void {
@@ -39,12 +40,15 @@ function toastQuestChanges(prev: Record<string, QuestProgress>, next: Record<str
       const nextCount = Object.values(next[quest.id]?.objectiveCounts ?? {}).reduce((a, b) => a + b, 0);
       if (nextStatus === 'active' && nextCount > prevCount) {
         push(`Quest Progress: ${quest.name}`);
+        void playSound('sfx.quest-progress');
       }
       continue;
     }
     if (nextStatus === 'active') {
       push(`Quest Started: ${quest.name}`);
+      void playSound('sfx.quest-started');
     } else if (nextStatus === 'completed') {
+      void playSound('sfx.quest-completed');
       // A handful of main-story beats get a dramatic cutscene instead of the plain toast - see
       // QUEST_COMPLETION_CUTSCENES. Only one cutscene can play at a time (see useCutsceneStore's
       // own doc comment); two of these completing in the exact same resync is unlikely enough

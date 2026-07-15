@@ -35,6 +35,7 @@ import { LOCATIONS, NPCS } from '@/data';
 import { itemDisplayName } from '@/utils/itemName';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
+import { playMusic, playSound } from '@/audio/audioService';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
 
@@ -73,6 +74,12 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
 export function OverworldScene() {
   const locationId = useSceneStore((s) => s.params.locationId) ?? 'ironwood-trail';
   const goTo = useSceneStore((s) => s.goTo);
+  // One generic overworld theme for all regions this MVP pass (per-region variants are a
+  // follow-up) - playMusic no-ops if it's already playing, so crossing between regions doesn't
+  // restart the track.
+  useEffect(() => {
+    void playMusic('music.overworld');
+  }, []);
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
@@ -154,6 +161,7 @@ export function OverworldScene() {
       const npc = NPCS.find((n) => n.id === npcObject.refId);
       if (npc) {
         setActiveNpc(npc);
+        void playSound('sfx.npc-talk');
         run(() => callTalkToNpc(npc.id), 'Talking...')
           ?.then(async () => {
             if (uid) await resyncSave(uid);
@@ -171,6 +179,7 @@ export function OverworldScene() {
       run(() => callOpenChest(locationId, chestId), 'Opening chest...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
+          if (!res.alreadyOpened) void playSound('sfx.chest-open');
           const name = itemDisplayName(res.itemId);
           setMessage(
             res.alreadyOpened
@@ -187,6 +196,7 @@ export function OverworldScene() {
       run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
+          void playSound('sfx.shrine');
           if (res.unlockedStamina) {
             setMessage(
               `The shrine at ${landmarkName} kindles fully alight once more. You feel the trail's strength answer you - Stamina is yours to command now.`,

@@ -28,6 +28,7 @@ import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/bat
 import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
 import { getAssetUrl } from '@/assets/assetManager';
+import { playMusic, playSound } from '@/audio/audioService';
 import styles from './CombatScene.module.css';
 
 // Reinforces the ailment badge with a low-opacity full-screen color wash while it's active - each
@@ -160,6 +161,7 @@ export function CombatScene() {
         if (entry.cancelled) return;
         setSessionId(res.sessionId);
         setEnemies(res.enemies);
+        void playMusic(res.enemies.some((e) => e.isBoss) ? 'music.combat-boss' : 'music.combat');
         setTargetIndex(res.enemies[0]?.index ?? null);
         setPlayerAilments(res.playerAilments);
         patchStats({ hp: res.playerHp, maxHp: res.playerMaxHp, spirit: res.playerSpirit });
@@ -271,6 +273,8 @@ export function CombatScene() {
 
       hitBatchRef.current += 1;
       const batch = hitBatchRef.current;
+      if (res.hits.some((h) => !h.missed) || res.enemyHits.length > 0) void playSound('sfx.combat-hit');
+      if (res.hits.some((h) => h.defeated)) void playSound('sfx.enemy-defeated');
       setActiveOutgoingHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
       setActiveIncomingHits(res.enemyHits.map((h) => ({ ...h, key: batch * 1000 + h.attackerIndex })));
       setAilmentFxEvent({ ailmentIds: res.playerAilments.map((a) => a.ailmentId), key: batch });
@@ -302,6 +306,11 @@ export function CombatScene() {
 
       if (res.phase === 'victory') {
         setRewards(res.rewards);
+        void playSound('sfx.victory');
+        if (res.rewards?.leveledUp) void playSound('sfx.level-up');
+      } else if (res.phase === 'defeat') {
+        void playSound('sfx.defeat');
+        void playMusic('music.defeat');
       }
 
       // Skipped if the usedItems resync above already ran this same round (only reachable here for

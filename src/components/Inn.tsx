@@ -7,6 +7,7 @@ import { callRestAtInn } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { INN_REST_COST } from '@/data';
+import { playSound } from '@/audio/audioService';
 import styles from './CharacterMenu.module.css';
 
 interface InnProps {
@@ -29,8 +30,10 @@ export function Inn({ onClose }: InnProps) {
       await callRestAtInn();
       if (uid) await resyncSave(uid);
       setRested(true);
+      void playSound('sfx.rest');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not rest right now.');
+      void playSound('sfx.ui-error');
     } finally {
       setBusy(false);
     }

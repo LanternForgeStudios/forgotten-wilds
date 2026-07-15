@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
@@ -12,6 +12,7 @@ import { UserProfile } from './UserProfile';
 import { XP_THRESHOLDS, LOCATIONS } from '@/data';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { PRESENCE_STALE_AFTER_MS } from '@/utils/presence';
+import { playSound } from '@/audio/audioService';
 import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc } from '@/types';
 import styles from './PlayerHUD.module.css';
 
@@ -85,6 +86,14 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
         ((t.recipientUid === uid && t.status === 'awaiting_recipient') ||
           (t.initiatorUid === uid && t.status === 'awaiting_initiator')),
     );
+
+  // Only the false->true edge, not "while true" - otherwise every unrelated re-render while a
+  // notification is still unread would replay the ping.
+  const prevHasNewSocialRef = useRef(false);
+  useEffect(() => {
+    if (hasNewSocial && !prevHasNewSocialRef.current) void playSound('sfx.social-ping');
+    prevHasNewSocialRef.current = hasNewSocial;
+  }, [hasNewSocial]);
 
   if (!player) return null;
 
