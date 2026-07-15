@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a5a2c"/>
+      <stop offset="1" stop-color="#4a2e14"/>
+    </linearGradient>
+  </defs>
+  <!-- Body (empty, no gem/clasp - already looted) -->
+  <rect x="6" y="20" width="36" height="20" rx="2" fill="url(#g)" stroke="#2c1c0c" stroke-width="1"/>
+  <!-- Dark empty interior, visible now that the lid is open -->
+  <rect x="9" y="21" width="30" height="8" rx="1" fill="#1c120a"/>
+  <!-- Open lid, tilted back on its rear hinge -->
+  <path d="M 6 20 L 6 12 L 36 6 L 42 12 L 42 20 Z" fill="#a5703a" stroke="#2c1c0c" stroke-width="1"/>
+</svg>

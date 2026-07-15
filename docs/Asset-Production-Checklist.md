@@ -124,9 +124,10 @@ facade with a carved sigil), Mine Office (a lantern-post and mining-cart rail ne
 **Shrine marker**: 72×72, same conventions - a small weathered stone shrine, moss-covered, with a
 faint spiritual glow (matches "a small stone shrine, half-forgotten" from its in-game flavor text).
 
-**Chest**: **48×48 PNG**, transparent background - a simple wooden treasure chest, iron banding,
-closed lid (the same sprite is reused for the opened state, distinguished by in-game label text
-only, so a single closed-chest image is sufficient).
+**Chest**: **48×48 PNG**, transparent background, two states needed - `structure.chest` (closed,
+wooden treasure chest, iron banding) and `structure.chest-open` (same chest, lid open, empty dark
+interior) - these are now genuinely separate sprites, not the same image reused with a different
+label.
 
 **Door**: **48×96 PNG**, transparent background - a standalone wooden door (not currently placed on
 any map, but stubbed for future building-entrance use). Rustic plank door, iron hinges.
@@ -162,11 +163,11 @@ path sheets, and more - see the `tileset` category in `src/assets/registry.ts` f
 with dimensions). **Before generating new tileset art, look through these first** - most outdoor/
 dungeon terrain needs are probably already covered.
 
-Two bookkeeping items worth fixing when convenient (not art to generate, just registry
-housekeeping): `tileset.tx-player` and `tileset.velmora-slime-animation` are actually *character*
-sprite sheets mislabeled under the `tileset` category, and `tileset.npc-1` through `tileset.npc-12`
-(12 uploaded 256×512 sheets) look like character art too, not literal tile grids - worth
-re-examining and re-categorizing (or using directly as NPC art) rather than generating replacements.
+(Done: the 14 mislabeled entries that used to live here - `tx-player`, `velmora-slime-animation`,
+and the 12 uploaded `npc-N` sheets - have been moved to `sprites/characters/`/`sprites/enemies/`
+and re-categorized as `character`/`enemy`. They're available to use directly as NPC/enemy art
+whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, and
+`sprite.npc-1`...`sprite.npc-12`.)
 
 ---
 

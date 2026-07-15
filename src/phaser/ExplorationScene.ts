@@ -337,7 +337,7 @@ export class ExplorationScene extends Phaser.Scene {
     const def = getAssetDefinition(entity.spriteAssetId);
     const x = entity.x * this.tileSize + this.tileSize / 2;
     const y = entity.y * this.tileSize + this.tileSize;
-    visual.sprite.setScale(this.viewportScale / REFERENCE_VIEWPORT_SCALE);
+    visual.sprite.setScale((this.viewportScale / REFERENCE_VIEWPORT_SCALE) * (entity.displayScale ?? 1));
     if (def.frameSize) {
       const row = entity.frameRow ?? 0;
       const column = entity.frameColumn ?? 0;

@@ -20,6 +20,13 @@ export interface GridEntity {
   movementState?: MovementState;
   /** Small overlay shown above the entity's label (e.g. "!" for an NPC with unheard dialogue). */
   badge?: string;
+  /** Multiplier on top of ExplorationScene's normal viewport-relative scale (see
+   *  REFERENCE_VIEWPORT_SCALE) - for a caller that wants to render this specific entity's existing
+   *  art smaller/larger than its native pixel size would otherwise imply, without needing new art
+   *  at a different resolution. Used for field-encounter/boss map icons, whose battle sprites
+   *  (128x128/256x256) are sized for the combat screen, not for a small "something's nearby" map
+   *  marker. Defaults to 1 (no change) when omitted. */
+  displayScale?: number;
 }
 
 interface PhaserExplorationCanvasProps {

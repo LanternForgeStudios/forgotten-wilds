@@ -24,6 +24,7 @@ import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { isTypingTarget } from '@/utils/keyboard';
 import { itemDisplayName } from '@/utils/itemName';
+import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { playMusic, playSound } from '@/audio/audioService';
@@ -174,7 +175,14 @@ export function DungeonScene() {
       .filter((o) => o.type === 'interactable' && o.refId)
       .map((o) => {
         if (o.refId === 'coalbound-warden') {
-          return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'battle.enemy.coalbound-warden', label: '???' };
+          return {
+            id: o.refId,
+            x: o.x,
+            y: o.y,
+            spriteAssetId: 'battle.enemy.coalbound-warden',
+            label: '???',
+            displayScale: enemyMapIconScale('battle.enemy.coalbound-warden', true),
+          };
         }
         if (o.refId === 'mine-shrine') {
           return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' };
@@ -183,7 +191,11 @@ export function DungeonScene() {
           id: o.refId!,
           x: o.x,
           y: o.y,
-          spriteAssetId: o.refId!.startsWith('chest-') ? 'structure.chest' : 'icon.item.miners-lost-lantern',
+          spriteAssetId: o.refId!.startsWith('chest-')
+            ? openedChests.includes(o.refId!)
+              ? 'structure.chest-open'
+              : 'structure.chest'
+            : 'icon.item.miners-lost-lantern',
           label: labelForInteractable(o.refId!, openedChests),
         };
       });
@@ -193,6 +205,7 @@ export function DungeonScene() {
       x: icon.x,
       y: icon.y,
       spriteAssetId: icon.spriteAssetId,
+      displayScale: enemyMapIconScale(icon.spriteAssetId, icon.isBoss),
     }));
 
     // Every transition (the entrance from Black Briar Forest, the exit to the Mine Office) gets a

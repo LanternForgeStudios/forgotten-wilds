@@ -10,6 +10,10 @@ export interface FieldEncounterIcon {
   y: number;
   enemyId: string;
   spriteAssetId: string;
+  /** Whether this icon's enemy is a boss - field encounters never actually roll a boss today (see
+   *  data/locations.ts's encounterTable), but this is still resolved here rather than assumed, so
+   *  the map-icon scale (see utils/enemyMapIcon.ts) stays correct if that ever changes. */
+  isBoss: boolean;
 }
 
 const MIN_ICONS = 8;
@@ -69,8 +73,16 @@ function generateIcons(
 
     const enemyId = weightedPick(encounterTable);
     if (!enemyId) continue;
-    const spriteAssetId = ENEMIES.find((e) => e.id === enemyId)?.battleSpriteAssetId ?? '';
-    icons.push({ id: `field-encounter-${x}-${y}-${Date.now()}-${icons.length}`, x, y, enemyId, spriteAssetId });
+    const enemyDef = ENEMIES.find((e) => e.id === enemyId);
+    const spriteAssetId = enemyDef?.battleSpriteAssetId ?? '';
+    icons.push({
+      id: `field-encounter-${x}-${y}-${Date.now()}-${icons.length}`,
+      x,
+      y,
+      enemyId,
+      spriteAssetId,
+      isBoss: !!enemyDef?.isBoss,
+    });
   }
   // A small/dense map may legitimately not fit the full target count - that's fine, don't force it.
   return icons;

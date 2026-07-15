@@ -33,6 +33,7 @@ import {
 import { resyncSave } from '@/state/hydrate';
 import { LOCATIONS, NPCS } from '@/data';
 import { itemDisplayName } from '@/utils/itemName';
+import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import { playMusic, playSound } from '@/audio/audioService';
@@ -272,19 +273,27 @@ export function OverworldScene() {
 
     const interactableEntities: GridEntity[] = map.objects
       .filter((o) => o.type === 'interactable' && o.refId)
-      .map((o) => ({
-        id: o.refId!,
-        x: o.x,
-        y: o.y,
-        spriteAssetId: o.refId!.startsWith('chest-') ? 'structure.chest' : 'structure.shrine',
-        label: labelForInteractable(o.refId!, openedChests),
-      }));
+      .map((o) => {
+        const isChest = o.refId!.startsWith('chest-');
+        return {
+          id: o.refId!,
+          x: o.x,
+          y: o.y,
+          spriteAssetId: isChest
+            ? openedChests.includes(o.refId!)
+              ? 'structure.chest-open'
+              : 'structure.chest'
+            : 'structure.shrine',
+          label: labelForInteractable(o.refId!, openedChests),
+        };
+      });
 
     const fieldEncounterEntities: GridEntity[] = fieldEncounterIcons.map((icon) => ({
       id: icon.id,
       x: icon.x,
       y: icon.y,
       spriteAssetId: icon.spriteAssetId,
+      displayScale: enemyMapIconScale(icon.spriteAssetId, icon.isBoss),
     }));
 
     // Every transition (region-to-region crossings) gets a visible marker instead of looking like
