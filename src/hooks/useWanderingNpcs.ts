@@ -51,6 +51,11 @@ export function useWanderingNpcs(map: TileMap | null, paused?: boolean): Record<
       if (!currentMap) return;
       if (pausedRef.current) return;
       setPositions((prev) => {
+        // Returning `prev` itself (not just an equivalent copy) when no wanderer actually moved
+        // this tick lets React bail out of re-rendering everything that reads these positions -
+        // most ticks roll no movement at all (MOVE_CHANCE, radius, or collision), so without this
+        // every consumer would re-render every STEP_INTERVAL_MS for a no-op update.
+        let changed = false;
         const next = { ...prev };
         for (const home of wanderers) {
           if (Math.random() > MOVE_CHANCE) continue;
@@ -64,8 +69,9 @@ export function useWanderingNpcs(map: TileMap | null, paused?: boolean): Record<
           const withinHomeRadius = Math.abs(candidateX - home.x) <= radius && Math.abs(candidateY - home.y) <= radius;
           if (!withinHomeRadius || !isWalkable(currentMap, candidateX, candidateY)) continue;
           next[home.refId] = { x: candidateX, y: candidateY };
+          changed = true;
         }
-        return next;
+        return changed ? next : prev;
       });
     }, STEP_INTERVAL_MS);
 

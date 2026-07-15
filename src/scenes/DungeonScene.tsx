@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { PlayerHUD } from '@/components/PlayerHUD';
 import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
-import { Panel } from '@/components/common/Panel';
+import { MessageOverlay } from '@/components/exploration/MessageOverlay';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { MiniMap } from '@/components/MiniMap';
@@ -16,17 +16,16 @@ import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
-import { useDash } from '@/hooks/useDash';
-import { useDashKeybind } from '@/hooks/useDashKeybind';
+import { useExplorationDash } from '@/hooks/useExplorationDash';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { isTypingTarget } from '@/utils/keyboard';
+import { itemDisplayName } from '@/utils/itemName';
 import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
-import { ITEMS, EQUIPMENT } from '@/data';
 import styles from './TownScene.module.css';
 
 const LOCATION_ID = 'hollow-rail-mine';
@@ -74,13 +73,7 @@ export function DungeonScene() {
 
   useHeartbeat(uid, displayName, LOCATION_ID, position, skin);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const [dashRampKey, setDashRampKey] = useState(0);
-  const { startDash, stopDash } = useDash({
-    attemptMove,
-    positionRef,
-    onRampUp: () => setDashRampKey((k) => k + 1),
-  });
-  useDashKeybind(startDash, stopDash, staminaUnlocked && !suspended);
+  const { startDash, stopDash, dashRampKey } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
 
   function attemptInteract() {
     if (suspended || !map) return;
@@ -124,10 +117,7 @@ export function DungeonScene() {
       run(() => callOpenChest(LOCATION_ID, chestId), 'Opening chest...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          const name =
-            EQUIPMENT.find((e) => e.id === res.itemId)?.name ??
-            ITEMS.find((i) => i.id === res.itemId)?.name ??
-            res.itemId;
+          const name = itemDisplayName(res.itemId);
           setMessage(
             res.alreadyOpened
               ? 'You already emptied this chest.'
@@ -167,6 +157,48 @@ export function DungeonScene() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
 
+  // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
+  // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
+  // setEntities(entities) whenever this reference changes, which is wasted work when nothing
+  // about the entities themselves actually changed. Must run unconditionally (before the `!map`
+  // early return below) - hooks can never be skipped on some renders and not others.
+  const entities = useMemo<GridEntity[]>(() => {
+    if (!map) return [];
+    const interactableEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'interactable' && o.refId)
+      .map((o) => {
+        if (o.refId === 'coalbound-warden') {
+          return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'battle.enemy.coalbound-warden', label: '???' };
+        }
+        if (o.refId === 'mine-shrine') {
+          return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' };
+        }
+        return {
+          id: o.refId!,
+          x: o.x,
+          y: o.y,
+          spriteAssetId: o.refId!.startsWith('chest-') ? 'structure.chest' : 'icon.item.miners-lost-lantern',
+          label: labelForInteractable(o.refId!, openedChests),
+        };
+      });
+
+    const fieldEncounterEntities: GridEntity[] = fieldEncounterIcons.map((icon) => ({
+      id: icon.id,
+      x: icon.x,
+      y: icon.y,
+      spriteAssetId: icon.spriteAssetId,
+    }));
+
+    // Every transition (the entrance from Black Briar Forest, the exit to the Mine Office) gets a
+    // visible marker instead of looking like plain ground - same generic structure.door
+    // placeholder TownScene/OverworldScene use for their own exits.
+    const exitEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'transition' && o.refId)
+      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+
+    return [...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
+  }, [map, openedChests, fieldEncounterIcons]);
+
   if (!map) {
     return (
       <div className={styles.wrap}>
@@ -175,40 +207,6 @@ export function DungeonScene() {
     );
   }
 
-  const interactableEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'interactable' && o.refId)
-    .map((o) => {
-      if (o.refId === 'coalbound-warden') {
-        return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'battle.enemy.coalbound-warden', label: '???' };
-      }
-      if (o.refId === 'mine-shrine') {
-        return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' };
-      }
-      return {
-        id: o.refId!,
-        x: o.x,
-        y: o.y,
-        spriteAssetId: o.refId!.startsWith('chest-') ? 'structure.chest' : 'icon.item.miners-lost-lantern',
-        label: labelForInteractable(o.refId!, openedChests),
-      };
-    });
-
-  const fieldEncounterEntities: GridEntity[] = fieldEncounterIcons.map((icon) => ({
-    id: icon.id,
-    x: icon.x,
-    y: icon.y,
-    spriteAssetId: icon.spriteAssetId,
-  }));
-
-  // Every transition (the entrance from Black Briar Forest, the exit to the Mine Office) gets a
-  // visible marker instead of looking like plain ground - same generic structure.door placeholder
-  // TownScene/OverworldScene use for their own exits.
-  const exitEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'transition' && o.refId)
-    .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
-
-  const entities = [...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       <PlayerHUD locationId={LOCATION_ID} />
@@ -216,8 +214,6 @@ export function DungeonScene() {
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
-          tilesetAssetId={map.tilesetAssetId}
-          tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
           entities={entities}
@@ -247,27 +243,7 @@ export function DungeonScene() {
           &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Map: M
         </p>
       )}
-      {message && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            padding: 24,
-            zIndex: 20,
-          }}
-          onClick={() => setMessage(null)}
-        >
-          <Panel style={{ width: 'min(600px, 90vw)' }}>
-            <p style={{ margin: 0 }}>{message}</p>
-            <p style={{ fontSize: 12, opacity: 0.7, textAlign: 'right', margin: '8px 0 0' }}>
-              Click or Esc to close
-            </p>
-          </Panel>
-        </div>
-      )}
+      <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
       {mapOpen && (

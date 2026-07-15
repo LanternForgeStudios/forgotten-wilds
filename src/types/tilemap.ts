@@ -59,15 +59,8 @@ export interface TileMap {
    *  legitimately differ from the map's grid size, e.g. a 32px prop sheet on a 16px-grid map), which
    *  ExplorationScene.ts must pass to Phaser's addTilesetImage instead of the map's own tileWidth/
    *  tileHeight below - using the map's size for every tileset previously cropped the wrong
-   *  sub-region of any tileset whose native size differed from it. `tilesetAssetId`/`columns` below
-   *  are convenience aliases for `tilesets[0]`, kept only because a couple of now-dead
-   *  prop-passthrough call sites still read them. */
+   *  sub-region of any tileset whose native size differed from it. */
   tilesets: { assetId: string; firstgid: number; tileWidth: number; tileHeight: number }[];
-  tilesetAssetId: string;
-  /** Column count of the *first* tileset's sprite sheet - retained for the same dead-prop-parity
-   *  reason as tilesetAssetId above; rendering itself never needs this (Phaser derives columns from
-   *  each tileset image's own pixel width once loaded). */
-  columns: number;
   layers: TileLayer[];
   objects: MapObject[];
   /** Discrete static collision-only obstacles from the 'collisions' object layer. Empty if the map

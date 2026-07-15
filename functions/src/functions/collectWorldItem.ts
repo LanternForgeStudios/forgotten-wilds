@@ -2,28 +2,13 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
 import { grantItem } from '../engine/inventoryEngine';
+import { WORLD_ITEMS } from '../data/locations';
 import type { PlayerSave } from '../shared-types';
 
 interface CollectWorldItemRequest {
   locationId: string;
   refId: string;
 }
-
-/** Server-side source of truth for what a given map's world-item interactable actually grants. */
-const WORLD_ITEMS: Record<string, Record<string, string>> = {
-  'hollow-rail-mine': {
-    'miners-lost-lantern': 'miners-lost-lantern',
-  },
-  // Mossy Creek and Fallen Watchtower are landmarks within the Ironwood Trail map, not their own
-  // locations, so their refId is looked up under 'ironwood-trail' here.
-  'ironwood-trail': {
-    'mossy-creek': 'stone-fragment',
-    'fallen-watchtower': 'wind-fragment',
-  },
-  'whisper-falls': {
-    'water-fragment': 'water-fragment',
-  },
-};
 
 export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) => {
   const uid = request.auth?.uid;

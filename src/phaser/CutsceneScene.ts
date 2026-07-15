@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { getAssetDefinition, getAssetUrl } from '@/assets/assetManager';
+import { getAssetDefinition } from '@/assets/assetManager';
 import { ensureParticleTexture } from './battleEffects';
+import { loadSceneTexture } from './textureLoader';
 
 const PARTICLE_TEXTURE_KEY = 'fx-dot';
 /** Sums to ~5s total, matching the defeat cutscene's "waking up" spec - named so the split is easy
@@ -35,21 +36,11 @@ export class CutsceneScene extends Phaser.Scene {
     this.onReady?.();
   }
 
-  private loadTexture(assetId: string): Promise<void> {
-    if (this.textures.exists(assetId)) return Promise.resolve();
-    const url = getAssetUrl(assetId);
-    return new Promise((resolve) => {
-      this.load.image(assetId, url);
-      this.load.once(Phaser.Loader.Events.COMPLETE, () => resolve());
-      this.load.start();
-    });
-  }
-
   /** Loads and displays a full-screen "cover"-scaled background - same cover-scale formula as
    *  BattleScene.renderBackground, since a cutscene background follows the exact same "fill the
    *  screen, crop to fit" rule battle backgrounds already do. */
   async loadBackground(assetId: string, viewportW: number, viewportH: number): Promise<void> {
-    await this.loadTexture(assetId);
+    await loadSceneTexture(this, assetId);
     this.background?.destroy();
     const def = getAssetDefinition(assetId);
     const imgW = def.dimensions?.width ?? viewportW;
@@ -75,7 +66,7 @@ export class CutsceneScene extends Phaser.Scene {
    *  white cross-fading over it) rather than a numeric color-lerp, matching this codebase's
    *  existing alpha-tween idiom (see loadBackground's own tween) instead of a new technique. */
   async playWakeUpSequence(assetId: string, viewportW: number, viewportH: number): Promise<void> {
-    const loadPromise = this.loadTexture(assetId);
+    const loadPromise = loadSceneTexture(this, assetId);
 
     this.wakeBlackRect?.destroy();
     this.wakeWhiteRect?.destroy();
@@ -131,7 +122,7 @@ export class CutsceneScene extends Phaser.Scene {
    *  front/back battle formation) - this is a brief flourish, not positional parity with the fight. */
   async showEnemyArrivals(enemies: { spriteAssetId: string }[]): Promise<void> {
     if (enemies.length === 0) return;
-    await Promise.all(enemies.map((e) => this.loadTexture(e.spriteAssetId)));
+    await Promise.all(enemies.map((e) => loadSceneTexture(this, e.spriteAssetId)));
 
     for (const sprite of this.arrivalSprites) sprite.destroy();
     this.arrivalSprites = [];

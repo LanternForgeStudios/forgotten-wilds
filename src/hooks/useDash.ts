@@ -93,7 +93,7 @@ export function useDash({ attemptMove, positionRef, onRampUp }: UseDashOptions) 
       // Each tile's stamina debit is fired but NOT awaited before the next tile's attemptMove -
       // waiting on that round-trip every single tile is what made a held dash visibly stutter
       // (move, pause, move, pause) even on fast local latency, since the server call always
-      // outlasted GLIDE_MS's 120ms glide. The move itself was never server-persisted state to
+      // outlasted GLIDE_MS's glide duration. The move itself was never server-persisted state to
       // begin with (only the Stamina cost is), so this trades a small amount of debit strictness
       // (a rejected call's tile has already visually happened by the time the rejection arrives -
       // at most one tile's worth) for genuinely smooth, continuous movement. staminaExhausted is

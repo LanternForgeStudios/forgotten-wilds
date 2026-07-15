@@ -30,6 +30,10 @@ export interface QuestDef {
      *  plumbing for future quest-taught Specialty Attacks (see CombatScene.tsx's "Select Spirit
      *  Ability" submenu). No quest uses this yet. */
     grantSkillId?: string;
+    /** Unlocks Stamina/Dash on completion (see interactWithShrine.ts) - a generic reward flag
+     *  rather than a hardcoded quest id check, the same way grantSkillId is generic rather than a
+     *  hardcoded skill-quest special case. Only 'rekindling-spirit-grove' sets this today. */
+    grantsStaminaUnlock?: boolean;
   };
 }
 
@@ -111,8 +115,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'fragments-of-the-first-promise',
     objectives: [{ id: 'restore-shrine', type: 'interactWithShrine', targetId: 'spirit-grove', requiredCount: 1 }],
     // Completing this quest is also what unlocks Stamina/Dash - see interactWithShrine.ts, which
-    // special-cases granting the base Stamina pool the moment this specific quest completes.
-    reward: { xp: 50, gold: 30, spiritEssence: 20 },
+    // grants the base Stamina pool the moment any quest with grantsStaminaUnlock completes.
+    reward: { xp: 50, gold: 30, spiritEssence: 20, grantsStaminaUnlock: true },
   },
   'shadows-on-raven-ridge': {
     id: 'shadows-on-raven-ridge',

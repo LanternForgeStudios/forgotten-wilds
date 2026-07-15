@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { ITEMS } from '../data/items';
+import { itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import type { CombatSession, PlayerSave } from '../shared-types';
 
 interface UseItemRequest {
@@ -41,12 +42,7 @@ export const useItem = onCall<UseItemRequest>(async (request) => {
       throw new HttpsError('failed-precondition', 'You do not have that item.');
     }
 
-    const wouldHaveEffect =
-      (!!effect.healHpPercent && save.player.stats.hp < save.player.stats.maxHp) ||
-      (!!effect.healSpiritPercent && save.player.stats.spirit < save.player.stats.maxSpirit) ||
-      (!!effect.restoreOilPercent && save.player.stats.lanternOil < save.player.stats.maxLanternOil) ||
-      (!!effect.cureAilmentId && playerAilments.some((a) => a.ailmentId === effect.cureAilmentId));
-    if (!wouldHaveEffect) {
+    if (!itemWouldHaveEffect(effect, save.player.stats, playerAilments)) {
       throw new HttpsError('failed-precondition', 'That would have no effect right now.');
     }
 
@@ -67,8 +63,7 @@ export const useItem = onCall<UseItemRequest>(async (request) => {
       updatedAilments = playerAilments.filter((a) => a.ailmentId !== effect.cureAilmentId);
     }
 
-    entry.quantity -= 1;
-    save.inventory = save.inventory.filter((i) => i.quantity > 0);
+    removeItem(save, itemId);
 
     save.updatedAt = Date.now();
     tx.set(userRef, save);

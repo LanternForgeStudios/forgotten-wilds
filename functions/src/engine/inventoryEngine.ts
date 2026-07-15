@@ -1,6 +1,7 @@
 import { ITEMS } from '../data/items';
 import { EQUIPMENT } from '../data/equipment';
-import type { InventoryItem, PlayerEquipment, PlayerSave } from '../shared-types';
+import type { ItemEffect } from '../data/items';
+import type { ActiveAilment, InventoryItem, PlayerEquipment, PlayerSave, Stats } from '../shared-types';
 
 /** Whether an item is currently equipped in any slot - shared by sellItem.ts (can't sell something
  *  you're wearing) and tradeEngine.ts's validateTradeOfferItems (can't offer it in a trade either),
@@ -46,4 +47,30 @@ export function grantItem(save: PlayerSave, itemId: string, quantity = 1): boole
     save.journal.itemsDiscovered.push(itemId);
   }
   return true;
+}
+
+/** Removes `quantity` of `itemId` from `save.inventory` (dropping the entry entirely once it
+ * hits zero) - grantItem's inverse, and the "consume an item" mutation shared by every call site
+ * that debits inventory directly: selling, using, escrowing into a trade, and combat's per-turn
+ * item consumption. No-ops if the item isn't present - callers that need a "do they have enough"
+ * error message validate that themselves beforehand, since the right wording differs per call site.
+ */
+export function removeItem(save: PlayerSave, itemId: string, quantity = 1): void {
+  const entry = save.inventory.find((i) => i.itemId === itemId);
+  if (entry) entry.quantity -= quantity;
+  save.inventory = save.inventory.filter((i) => i.quantity > 0);
+}
+
+/** Whether using an item with this effect would actually do anything right now - shared by
+ * useItem.ts (free item use outside a combat round) and resolveCombatAction.ts (items queued
+ * alongside a combat action), so "that would have no effect right now" means the same thing in
+ * both places. `playerAilments` is only ever non-empty mid-combat; outside combat a cureAilmentId
+ * item simply can never have an effect, which is correct - there's nothing to cure. */
+export function itemWouldHaveEffect(effect: ItemEffect, stats: Stats, playerAilments: ActiveAilment[]): boolean {
+  return (
+    (!!effect.healHpPercent && stats.hp < stats.maxHp) ||
+    (!!effect.healSpiritPercent && stats.spirit < stats.maxSpirit) ||
+    (!!effect.restoreOilPercent && stats.lanternOil < stats.maxLanternOil) ||
+    (!!effect.cureAilmentId && playerAilments.some((a) => a.ailmentId === effect.cureAilmentId))
+  );
 }

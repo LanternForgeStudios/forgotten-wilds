@@ -25,7 +25,15 @@ interface PlayerState {
 export const usePlayerStore = create<PlayerState>((set, get) => ({
   player: null,
   displayName: null,
-  hydrate: (player, displayName) => set({ player, displayName }),
+  hydrate: (player, displayName) => {
+    // resyncSave calls this after nearly every scene interaction, always with a freshly
+    // deserialized `player` object even when nothing about it actually changed (e.g. a resync
+    // triggered by an inventory-only or quest-only mutation) - skip the `set()` in that case so
+    // every component selecting `player` doesn't re-render for a no-op update.
+    const current = get();
+    if (current.displayName === displayName && JSON.stringify(current.player) === JSON.stringify(player)) return;
+    set({ player, displayName });
+  },
   patchEquipment: (slot, itemId) => {
     const { player } = get();
     if (!player) return;

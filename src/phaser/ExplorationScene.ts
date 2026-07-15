@@ -3,13 +3,19 @@ import type { TileLayer, TileMap } from '@/types';
 import type { GridPosition } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
 import { PLAYER_ANIMATION_LAYOUT } from '@/animation/characterAnimations';
-import { getAssetDefinition, getAssetUrl } from '@/assets/assetManager';
+import { getAssetDefinition } from '@/assets/assetManager';
 import { createCharacterAnimations, animationKey } from './animationDefs';
 import { ensureParticleTexture } from './battleEffects';
+import { loadSceneTexture } from './textureLoader';
 import type { GridEntity } from '@/components/exploration/PhaserExplorationCanvas';
 
-/** Matches TileGrid.module.css's `transition: left/top 120ms linear` - the glide-between-tiles feel. */
-const GLIDE_MS = 120;
+/** The glide-between-tiles animation duration - matches useGridMovement.ts's own default
+ *  `stepIntervalMs` (220ms, the throttle gating how often a new step is allowed) so one tile's
+ *  glide finishes exactly as the next step becomes available, instead of visibly sitting still for
+ *  the gap between them. Previously 120ms against a 220ms throttle, which left ~100ms of dead time
+ *  at the end of every single tile - the actual cause of movement reading as "choppy, one block at
+ *  a time" despite already being tweened, not a missing-tween problem. */
+const GLIDE_MS = 220;
 /** Always renders above every tile layer and every entity/player sprite - same as the old DOM
  *  renderer's document order (overhang divs are always painted last). */
 const OVERHANG_DEPTH = 1000;
@@ -20,6 +26,16 @@ const ENTITY_DEPTH = 500;
  *  BattleScene's defeat effect - reused here rather than duplicating the Graphics->texture
  *  boilerplate, tinted differently per call site. */
 const PARTICLE_TEXTURE_KEY = 'fx-dot';
+/** The viewport zoom level (see useExplorationViewport.ts's desktop `scale`) that every character/
+ *  structure/decoration asset's own pixel dimensions are authored against - a 48x64 sprite is
+ *  meant to render at exactly 48x64 screen pixels at this reference zoom, not be force-fit to
+ *  exactly one tile's width. Player/entity render scale is this reference's ratio to whatever the
+ *  actual current viewport scale is (1.0 on desktop, ~0.67 on mobile's 2x scale), so an asset
+ *  authored larger or smaller than one tile stays proportionally larger or smaller than a tile at
+ *  any zoom level, instead of every entity being stretched/squashed to exactly fill one tile -
+ *  which is what silently made the 48x64 player placeholder (48 native width happens to equal one
+ *  tile's width at 3x) look barely taller than a 32x32 NPC placeholder than intended. */
+const REFERENCE_VIEWPORT_SCALE = 3;
 /** --fw-text-dim - a dusty tan/grey, reads as ground dust rather than anything magical. */
 const DASH_DUST_COLOR = 0xb8a888;
 /** Real FX-pack sheet for the Dash dust puff, replacing the generated dot texture once loaded -
@@ -43,6 +59,10 @@ interface EntityVisual {
  *  (collision, spawn, transitions) at all, that all stays in the existing React hooks. */
 export class ExplorationScene extends Phaser.Scene {
   private tileSize = 48;
+  /** tileSize ÷ the map's own native tile pixel size (map.tileWidth) - the actual current viewport
+   *  zoom level (3 on desktop, 2 on mobile - see useExplorationViewport.ts), used to scale
+   *  character/entity sprites relative to REFERENCE_VIEWPORT_SCALE. Set once per loadMap call. */
+  private viewportScale = REFERENCE_VIEWPORT_SCALE;
   private mapLayers: Phaser.Tilemaps.TilemapLayer[] = [];
   private currentMapKey: string | null = null;
   /** Set whenever loadMap actually swaps to a different location - consumed by the next
@@ -86,25 +106,8 @@ export class ExplorationScene extends Phaser.Scene {
     ensureParticleTexture(this, PARTICLE_TEXTURE_KEY);
     // Fire-and-forget: spawnDashDust checks textures.exists before using this, falling back to the
     // dot texture on the rare chance a dash is triggered before this finishes loading.
-    this.loadTexture(DASH_DUST_FX_ASSET_ID).catch(() => {});
+    loadSceneTexture(this, DASH_DUST_FX_ASSET_ID).catch(() => {});
     this.onReady?.();
-  }
-
-  /** Loads (if not already cached) a plain image or spritesheet texture and resolves once ready.
-   *  Safe to call for a texture that's already loaded (resolves immediately, no re-fetch). */
-  private loadTexture(assetId: string): Promise<void> {
-    if (this.textures.exists(assetId)) return Promise.resolve();
-    const def = getAssetDefinition(assetId);
-    const url = getAssetUrl(assetId);
-    return new Promise((resolve) => {
-      if (def.frameSize) {
-        this.load.spritesheet(assetId, url, { frameWidth: def.frameSize.width, frameHeight: def.frameSize.height });
-      } else {
-        this.load.image(assetId, url);
-      }
-      this.load.once(Phaser.Loader.Events.COMPLETE, () => resolve());
-      this.load.start();
-    });
   }
 
   /** Builds the tilemap for a location from the already-parsed TileMap (see the plan's "Tiled
@@ -113,6 +116,10 @@ export class ExplorationScene extends Phaser.Scene {
    *  prop change from React, not just on a real location transition. */
   async loadMap(map: TileMap, tileSize: number): Promise<void> {
     this.tileSize = tileSize;
+    // Kept current even on the early-return no-op path below (a resize/mobile-toggle while
+    // staying in the same location still changes tileSize, and setPlayer/setEntities read this
+    // independently of whether the tile layers themselves get rebuilt).
+    this.viewportScale = tileSize / map.tileWidth;
     if (this.currentMapKey === map.locationId) return;
     this.currentMapKey = map.locationId;
     this.mapJustChanged = true;
@@ -122,7 +129,7 @@ export class ExplorationScene extends Phaser.Scene {
     for (const layer of this.mapLayers) layer.destroy();
     this.mapLayers = [];
 
-    await Promise.all(map.tilesets.map((t) => this.loadTexture(t.assetId)));
+    await Promise.all(map.tilesets.map((t) => loadSceneTexture(this, t.assetId)));
     // A newer loadMap call (a second, rapid location transition) has since superseded this one -
     // abort rather than build tile layers for a location we've already left.
     if (generation !== this.mapGeneration) return;
@@ -162,14 +169,13 @@ export class ExplorationScene extends Phaser.Scene {
     // the real Tiled editor, which always reads each tileset's own declared size correctly.
     const tilesets = map.tilesets.map((t) => tilemap.addTilesetImage(t.assetId, t.assetId, t.tileWidth, t.tileHeight, 0, 0, t.firstgid - 1)!);
 
-    const scale = tileSize / map.tileWidth;
     orderedLayers.forEach((layer, index) => {
       const phaserLayer = tilemap.createBlankLayer(layer.name, tilesets, 0, 0, map.width, map.height)!;
       layer.data.forEach((gid, i) => {
         if (gid <= 0) return;
         phaserLayer.putTileAt(gid - 1, i % map.width, Math.floor(i / map.width));
       });
-      phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(scale);
+      phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(this.viewportScale);
       const overhangMatch = /^overhang(?:-(\d+))?$/.exec(layer.name);
       // Multiple overhang-N layers stack in numeric order among themselves, all still above every
       // decoration/entity layer (OVERHANG_DEPTH is already higher than any plausible decoration count).
@@ -180,7 +186,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   private async ensurePlayerAnimations(spriteAssetId: string): Promise<void> {
     if (this.playerTextureKey === spriteAssetId) return;
-    await this.loadTexture(spriteAssetId);
+    await loadSceneTexture(this, spriteAssetId);
     createCharacterAnimations(this.anims, spriteAssetId, PLAYER_ANIMATION_LAYOUT);
     this.playerTextureKey = spriteAssetId;
   }
@@ -198,15 +204,14 @@ export class ExplorationScene extends Phaser.Scene {
     // A newer setPlayer call has since superseded this one - its own (more current) state has
     // already been applied, so don't let this stale continuation clobber it.
     if (generation !== this.playerGeneration) return;
-    const def = getAssetDefinition(spriteAssetId);
 
     const snapInstantly = !this.playerSprite || this.mapJustChanged;
     this.mapJustChanged = false;
     if (!this.playerSprite) {
       // Origin (0.5, 1) anchors the sprite's feet to its tile position rather than its center, so
-      // taller-than-one-tile art (see the 3/4-view scale spec) lines up with the ground instead of
-      // floating with its vertical midpoint on the tile. Every sprite today happens to render
-      // exactly one tile tall, so this is a pixel-identical no-op until taller art actually lands.
+      // taller-than-one-tile art (see the 3/4-view scale spec and REFERENCE_VIEWPORT_SCALE above)
+      // lines up with the ground instead of floating with its vertical midpoint on the tile - the
+      // 48x64 player placeholder is already taller than one 48px tile at desktop's reference scale.
       this.playerSprite = this.add.sprite(0, 0, spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
       // setCamera has its own `if (this.playerSprite) camera.startFollow(...)` check, but
       // setCamera and setPlayer are two independent React effects that can run in either order -
@@ -224,11 +229,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.playerSprite.setTexture(spriteAssetId);
     }
     const sprite = this.playerSprite;
-    if (def.frameSize) {
-      sprite.setScale(this.tileSize / def.frameSize.width);
-    } else {
-      sprite.setScale(this.tileSize / (def.dimensions?.width ?? this.tileSize));
-    }
+    sprite.setScale(this.viewportScale / REFERENCE_VIEWPORT_SCALE);
 
     const targetX = pos.x * this.tileSize + this.tileSize / 2;
     const targetY = pos.y * this.tileSize + this.tileSize;
@@ -314,7 +315,7 @@ export class ExplorationScene extends Phaser.Scene {
     let justCreated = false;
     if (!visual) {
       justCreated = true;
-      await this.loadTexture(entity.spriteAssetId);
+      await loadSceneTexture(this, entity.spriteAssetId);
       // A newer setEntities call has since superseded this one (the player left this location
       // before the texture finished loading) - abort rather than create an orphaned sprite for
       // an entity that's no longer part of the current location's entity list.
@@ -327,7 +328,7 @@ export class ExplorationScene extends Phaser.Scene {
       // Same entity id (e.g. another player's presence doc), different sprite - most notably
       // another player switching skins via Profile mid-session. Load (if not already cached) and
       // retexture in place rather than leaving the sprite stuck on its original asset.
-      await this.loadTexture(entity.spriteAssetId);
+      await loadSceneTexture(this, entity.spriteAssetId);
       if (generation !== this.entityGeneration) return;
       visual.sprite.setTexture(entity.spriteAssetId);
       visual.spriteAssetId = entity.spriteAssetId;
@@ -336,8 +337,8 @@ export class ExplorationScene extends Phaser.Scene {
     const def = getAssetDefinition(entity.spriteAssetId);
     const x = entity.x * this.tileSize + this.tileSize / 2;
     const y = entity.y * this.tileSize + this.tileSize;
+    visual.sprite.setScale(this.viewportScale / REFERENCE_VIEWPORT_SCALE);
     if (def.frameSize) {
-      visual.sprite.setScale(this.tileSize / def.frameSize.width);
       const row = entity.frameRow ?? 0;
       const column = entity.frameColumn ?? 0;
       if (entity.movementState === 'walking' || entity.movementState === 'running') {
@@ -349,8 +350,6 @@ export class ExplorationScene extends Phaser.Scene {
         visual.sprite.anims.stop();
         visual.sprite.setFrame(row * PLAYER_ANIMATION_LAYOUT.frameCount + column);
       }
-    } else {
-      visual.sprite.setScale(this.tileSize / (def.dimensions?.width ?? this.tileSize));
     }
 
     const v = visual;

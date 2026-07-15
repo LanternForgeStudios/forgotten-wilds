@@ -17,17 +17,15 @@ import styles from './MiniMap.module.css';
  *  paint every interactable's tile as a plain dark "wall" square indistinguishable from a real
  *  wall, and for an unopened chest (deliberately left unmarked so it can't be spotted), that dark
  *  square was exactly the unlabeled black-square artifact being fixed here. The mini-map's
- *  background should reflect real floor-vs-wall terrain (ground tile + discrete collision
- *  obstacles like fences/rocks) only, not momentary "can't stand here right now" occupancy. */
+ *  background reflects only the `ground` layer's own tile walkability - the `collisions` object
+ *  layer (fences/rocks/discrete obstacles authored separately from ground tiles) is deliberately
+ *  excluded, so a collision box drawn over otherwise-walkable ground doesn't show up as a dark
+ *  "wall" square the player never actually sees rendered as one. */
 function isTerrainWalkable(map: TileMap, x: number, y: number): boolean {
   const ground = map.layers.find((l) => l.name === 'ground');
   if (!ground) return false;
   const gid = ground.data[y * map.width + x];
-  if (gid <= 0 || map.nonWalkableTileIds.includes(gid)) return false;
-  const collisionBlocked = map.collisionObjects.some(
-    (r) => x >= r.x && x < r.x + r.width && y >= r.y && y < r.y + r.height,
-  );
-  return !collisionBlocked;
+  return gid > 0 && !map.nonWalkableTileIds.includes(gid);
 }
 
 interface MiniMapProps {

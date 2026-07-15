@@ -24,11 +24,6 @@ export interface GridEntity {
 
 interface PhaserExplorationCanvasProps {
   map: TileMap;
-  /** Kept for prop-shape parity with the pre-Phaser TileGrid (every scene still passes these as
-   *  literal JSX props) - not read here, since ExplorationScene.loadMap derives the tileset
-   *  straight from `map.tilesetAssetId`/its own tilemap parsing instead of a separate prop. */
-  tilesetAssetId: string;
-  tilesetColumns: number;
   player: GridPosition;
   playerSpriteAssetId: string;
   entities?: GridEntity[];

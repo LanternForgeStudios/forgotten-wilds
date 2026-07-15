@@ -1,6 +1,6 @@
 import { ITEMS } from '../data/items';
 import { EQUIPMENT } from '../data/equipment';
-import { grantItem, isItemEquipped } from './inventoryEngine';
+import { grantItem, isItemEquipped, removeItem } from './inventoryEngine';
 import type { InventoryItem, PlayerEquipment, PlayerSave, TradeOfferSide } from '../shared-types';
 
 export interface TradeItemRequest {
@@ -63,10 +63,8 @@ export function validateTradeOfferItems(
  *  point, simply absent from the offering player's own save. */
 export function escrowOffer(save: PlayerSave, offer: TradeOfferSide): void {
   for (const { itemId, quantity } of offer.items) {
-    const entry = save.inventory.find((i) => i.itemId === itemId);
-    if (entry) entry.quantity -= quantity;
+    removeItem(save, itemId, quantity);
   }
-  save.inventory = save.inventory.filter((i) => i.quantity > 0);
   save.player.gold -= offer.gold;
 }
 

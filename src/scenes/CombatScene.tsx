@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Panel } from '@/components/common/Panel';
 import { OverlayCloseButton } from '@/components/common/OverlayCloseButton';
 import { PlayerHUD } from '@/components/PlayerHUD';
@@ -29,15 +29,6 @@ import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
 import { getAssetUrl } from '@/assets/assetManager';
 import styles from './CombatScene.module.css';
-
-// Which ailment ids gate which UI action - the client's AILMENTS data is a display-only mirror
-// (name/description/icon, no mechanical effect flags - see src/data/ailments.ts), so these small
-// known-id sets are this component's own equivalent of that gating, mirroring the effect flags
-// server-side (functions/src/data/ailments.ts) by hand. The server is what actually enforces this
-// (resolveCombatAction.ts) - this is only for disabling the button before a wasted round-trip.
-const SKILL_BLOCKING_AILMENTS = new Set(['silence']);
-const LANTERN_BLOCKING_AILMENTS = new Set(['freeze']);
-const STUNNING_AILMENTS = new Set(['stun']);
 
 // Reinforces the ailment badge with a low-opacity full-screen color wash while it's active - each
 // stacks additively (rare, but a Burn+Poison round should read as visibly "worse" than either
@@ -424,10 +415,10 @@ export function CombatScene() {
   const canAct = phase === 'playerTurn' && !playbackActive;
   const canPickTarget = aliveEnemies.length > 1 && canAct;
   const combatEnded = phase === 'victory' || phase === 'defeat' || phase === 'fled' || phase === 'error';
-  const isSilenced = playerAilments.some((a) => SKILL_BLOCKING_AILMENTS.has(a.ailmentId));
-  const isLanternDisabled = playerAilments.some((a) => LANTERN_BLOCKING_AILMENTS.has(a.ailmentId));
-  const isStunned = playerAilments.some((a) => STUNNING_AILMENTS.has(a.ailmentId));
-  const isBlinded = playerAilments.some((a) => a.ailmentId === 'blind');
+  const isSilenced = playerAilments.some((a) => AILMENTS[a.ailmentId]?.effect.blocksSkill);
+  const isLanternDisabled = playerAilments.some((a) => AILMENTS[a.ailmentId]?.effect.disablesLanternAbility);
+  const isStunned = playerAilments.some((a) => AILMENTS[a.ailmentId]?.effect.skipsTurn);
+  const isBlinded = playerAilments.some((a) => AILMENTS[a.ailmentId]?.effect.physicalAccuracyMultiplier);
   const activeTintColors = playerAilments.map((a) => AILMENT_TINT_COLORS[a.ailmentId]).filter((c): c is string => !!c);
 
   // Attack's identity follows whatever's in the weapon slot - "Fists" when nothing is equipped,
@@ -450,6 +441,27 @@ export function CombatScene() {
   const lanternAbilities = (lanternDef?.lanternAbilityIds ?? [])
     .map((id) => LANTERN_ABILITIES.find((a) => a.id === id))
     .filter((a): a is NonNullable<typeof a> => !!a);
+
+  // Memoized so a re-render caused by unrelated state (menu selection, message text, etc.) doesn't
+  // hand PhaserBattleCanvas a brand-new array reference every time - it re-runs its own enemy sync
+  // effect whenever this reference changes, which is wasted work when the enemies themselves
+  // haven't actually changed.
+  const battleEnemies = useMemo(
+    () =>
+      enemies.map((e) => ({
+        index: e.index,
+        spriteAssetId: ENEMIES.find((d) => d.id === e.enemyId)?.battleSpriteAssetId ?? '',
+        name: e.name,
+        tierLabel: ENEMY_TIER_LABELS[e.tier],
+        tierColor: ENEMY_TIER_COLORS[e.tier],
+        tier: e.tier,
+        level: e.level,
+        hp: e.hp,
+        maxHp: e.maxHp,
+        isBoss: e.isBoss,
+      })),
+    [enemies],
+  );
 
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
@@ -541,18 +553,7 @@ export function CombatScene() {
           <div className={styles.battleCanvasWrap}>
             <PhaserBattleCanvas
               backgroundAssetId={location?.battleBackgroundAssetId ?? ''}
-              enemies={enemies.map((e) => ({
-                index: e.index,
-                spriteAssetId: ENEMIES.find((d) => d.id === e.enemyId)?.battleSpriteAssetId ?? '',
-                name: e.name,
-                tierLabel: ENEMY_TIER_LABELS[e.tier],
-                tierColor: ENEMY_TIER_COLORS[e.tier],
-                tier: e.tier,
-                level: e.level,
-                hp: e.hp,
-                maxHp: e.maxHp,
-                isBoss: e.isBoss,
-              }))}
+              enemies={battleEnemies}
               outgoingHits={activeOutgoingHits}
               incomingHits={activeIncomingHits}
               playerMaxHp={player?.stats.maxHp ?? 1}

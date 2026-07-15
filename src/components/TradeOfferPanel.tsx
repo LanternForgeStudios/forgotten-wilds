@@ -3,6 +3,7 @@ import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { ITEMS, EQUIPMENT } from '@/data';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
+import { itemDisplayName } from '@/utils/itemName';
 import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './UserProfile.module.css';
 import subtabStyles from './CharacterMenu.module.css';
@@ -66,10 +67,6 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
       if (typeFilter !== 'equipment' || slotFilter === 'all') return true;
       return EQUIPMENT.find((e) => e.id === entry.itemId)?.slot === slotFilter;
     });
-
-  function itemName(itemId: string): string {
-    return EQUIPMENT.find((e) => e.id === itemId)?.name ?? ITEMS.find((i) => i.id === itemId)?.name ?? itemId.replace(/-/g, ' ');
-  }
 
   function setQuantity(itemId: string, quantity: number, max: number) {
     const clamped = Math.max(0, Math.min(max, Math.floor(quantity) || 0));
@@ -135,7 +132,7 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
         {pickable.map((entry) => (
           <div key={entry.itemId} className={styles.row}>
             <span className={styles.rowName}>
-              {itemName(entry.itemId)} (own {entry.quantity})
+              {itemDisplayName(entry.itemId)} (own {entry.quantity})
             </span>
             <input
               className={styles.tradeQuantityInput}

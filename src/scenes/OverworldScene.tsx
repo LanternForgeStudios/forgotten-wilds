@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { PlayerHUD } from '@/components/PlayerHUD';
 import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { DialogueBox } from '@/components/DialogueBox';
-import { Panel } from '@/components/common/Panel';
+import { MessageOverlay } from '@/components/exploration/MessageOverlay';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { MiniMap } from '@/components/MiniMap';
@@ -17,8 +17,7 @@ import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
-import { useDash } from '@/hooks/useDash';
-import { useDashKeybind } from '@/hooks/useDashKeybind';
+import { useExplorationDash } from '@/hooks/useExplorationDash';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -32,32 +31,34 @@ import {
   callTalkToNpc,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
-import { ITEMS, EQUIPMENT, LOCATIONS, NPCS } from '@/data';
+import { LOCATIONS, NPCS } from '@/data';
+import { itemDisplayName } from '@/utils/itemName';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
 
-/** Shrine-style landmarks route through interactWithShrine instead - see KNOWN_SHRINES in
- *  interactWithShrine.ts. That function fires both an interactWithShrine event (for
- *  investigate/restore quests) and a reachLocation event (for discovery quests) on every call, so
- *  the same tile naturally supports "first find it" and "later restore it" as separate quests.
- *  Spirit Grove's shrine is a distinct point `interactable` object placed inside the walk-in
- *  `spirit-grove` zone (see ZONE_VISIT_ONLY below) - the grove clearing and its shrine share the
- *  same refId but are two separate map objects/interactions. */
-const SHRINE_LANDMARKS = new Set(['spirit-grove']);
-/** Landmarks that grant a key item the first time they're visited, routed through
- *  callCollectWorldItem - purely a client-side dispatch decision (which call to make), not an
- *  item-identity lookup; the granted item's id comes back in that call's own response. Only ones
- *  that are still single-tile *targets* you approach and Interact with, not walk-in areas - see
- *  ZONE_FRAGMENT below for Mossy Creek, which moved to the walk-in mechanic. */
-const FRAGMENT_LANDMARKS = new Set(['fallen-watchtower', 'water-fragment']);
-/** Walk-in sub-areas (the `zone` object type) that fire a plain "you found this place" call the
- *  instant the player's tile enters them - no Interact needed. Hunter's Camp and Spirit Grove (the
- *  clearing, not its shrine) are pure discovery; Mossy Creek is the one walk-in area that also
- *  grants a key item, so it still routes through collectWorldItem. */
-const ZONE_VISIT_ONLY = new Set(['hunters-camp', 'spirit-grove']);
-const ZONE_FRAGMENT = new Set(['mossy-creek']);
+/** Which Cloud Function a point `interactable` landmark's Interact-key press routes through - a
+ *  single source of truth (rather than one Set per kind, which made it easy to add a refId to one
+ *  and forget another) for a purely client-side dispatch decision, not an item-identity lookup;
+ *  the granted item's id (for 'fragment') always comes back in that call's own response. Separate
+ *  from ZONE_LANDMARK_KIND below since a walk-in `zone`'s refId and a point `interactable`'s refId
+ *  are dispatched from two different code paths - Spirit Grove's shrine is a distinct point
+ *  object placed inside its own walk-in `spirit-grove` zone (the clearing and its shrine share a
+ *  refId but are two separate map objects/interactions), so it appears in both tables. */
+const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
+  'spirit-grove': 'shrine',
+  'fallen-watchtower': 'fragment',
+  'water-fragment': 'fragment',
+};
+/** Which Cloud Function a walk-in `zone` landmark fires the instant the player's tile enters it -
+ *  no Interact needed. Hunter's Camp and Spirit Grove (the clearing, not its shrine) are pure
+ *  discovery ('visitOnly'); Mossy Creek also grants a key item ('fragment'). */
+const ZONE_LANDMARK_KIND: Record<string, 'visitOnly' | 'fragment'> = {
+  'hunters-camp': 'visitOnly',
+  'spirit-grove': 'visitOnly',
+  'mossy-creek': 'fragment',
+};
 
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
@@ -93,11 +94,12 @@ export function OverworldScene() {
   const { pending, run } = usePendingAction();
 
   function handleZoneEnter(refId: string) {
-    if (ZONE_FRAGMENT.has(refId)) {
+    const kind = ZONE_LANDMARK_KIND[refId];
+    if (kind === 'fragment') {
       run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          const name = ITEMS.find((i) => i.id === res.itemId)?.name ?? res.itemId;
+          const name = itemDisplayName(res.itemId);
           setMessage(
             res.alreadyCollected
               ? "There's nothing left to find here."
@@ -107,7 +109,7 @@ export function OverworldScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
       return;
     }
-    if (ZONE_VISIT_ONLY.has(refId)) {
+    if (kind === 'visitOnly') {
       const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
       run(() => callVisitLandmark(refId), 'Investigating...')
         ?.then(async (res) => {
@@ -136,13 +138,7 @@ export function OverworldScene() {
 
   useHeartbeat(uid, displayName, locationId, position, skin);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const [dashRampKey, setDashRampKey] = useState(0);
-  const { startDash, stopDash } = useDash({
-    attemptMove,
-    positionRef,
-    onRampUp: () => setDashRampKey((k) => k + 1),
-  });
-  useDashKeybind(startDash, stopDash, staminaUnlocked && !suspended);
+  const { startDash, stopDash, dashRampKey } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
 
   function attemptInteract() {
     if (suspended || !map) return;
@@ -175,10 +171,7 @@ export function OverworldScene() {
       run(() => callOpenChest(locationId, chestId), 'Opening chest...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          const name =
-            EQUIPMENT.find((e) => e.id === res.itemId)?.name ??
-            ITEMS.find((i) => i.id === res.itemId)?.name ??
-            res.itemId;
+          const name = itemDisplayName(res.itemId);
           setMessage(
             res.alreadyOpened
               ? 'You already emptied this chest.'
@@ -188,7 +181,7 @@ export function OverworldScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The chest will not open.'));
       return;
     }
-    if (obj?.refId && SHRINE_LANDMARKS.has(obj.refId)) {
+    if (obj?.refId && POINT_LANDMARK_KIND[obj.refId] === 'shrine') {
       const refId = obj.refId;
       const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
       run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
@@ -205,12 +198,12 @@ export function OverworldScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
       return;
     }
-    if (obj?.refId && FRAGMENT_LANDMARKS.has(obj.refId)) {
+    if (obj?.refId && POINT_LANDMARK_KIND[obj.refId] === 'fragment') {
       const refId = obj.refId;
       run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          const name = ITEMS.find((i) => i.id === res.itemId)?.name ?? res.itemId;
+          const name = itemDisplayName(res.itemId);
           setMessage(
             res.alreadyCollected
               ? "There's nothing left to find here."
@@ -245,6 +238,54 @@ export function OverworldScene() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeNpc, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
 
+  // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
+  // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
+  // setEntities(entities) whenever this reference changes, which is wasted work when nothing
+  // about the entities themselves actually changed. Must run unconditionally (before the `!map`
+  // early return below) - hooks can never be skipped on some renders and not others.
+  const entities = useMemo<GridEntity[]>(() => {
+    if (!map) return [];
+    const npcEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'npc' && o.refId)
+      .map((o) => {
+        const npc = NPCS.find((n) => n.id === o.refId);
+        const pos = wanderPositions[o.refId!] ?? { x: o.x, y: o.y };
+        return {
+          id: o.refId!,
+          x: pos.x,
+          y: pos.y,
+          spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
+          label: npc?.name,
+          badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
+        };
+      });
+
+    const interactableEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'interactable' && o.refId)
+      .map((o) => ({
+        id: o.refId!,
+        x: o.x,
+        y: o.y,
+        spriteAssetId: o.refId!.startsWith('chest-') ? 'structure.chest' : 'structure.shrine',
+        label: labelForInteractable(o.refId!, openedChests),
+      }));
+
+    const fieldEncounterEntities: GridEntity[] = fieldEncounterIcons.map((icon) => ({
+      id: icon.id,
+      x: icon.x,
+      y: icon.y,
+      spriteAssetId: icon.spriteAssetId,
+    }));
+
+    // Every transition (region-to-region crossings) gets a visible marker instead of looking like
+    // plain ground - the generic structure.door placeholder, same as TownScene's interior exits.
+    const exitEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'transition' && o.refId)
+      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+
+    return [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
+  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, openedChests, fieldEncounterIcons]);
+
   if (!map) {
     return (
       <div className={styles.wrap}>
@@ -253,46 +294,6 @@ export function OverworldScene() {
     );
   }
 
-  const npcEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'npc' && o.refId)
-    .map((o) => {
-      const npc = NPCS.find((n) => n.id === o.refId);
-      const pos = wanderPositions[o.refId!] ?? { x: o.x, y: o.y };
-      return {
-        id: o.refId!,
-        x: pos.x,
-        y: pos.y,
-        spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
-        label: npc?.name,
-        badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
-      };
-    });
-
-  const interactableEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'interactable' && o.refId)
-    .map((o) => ({
-      id: o.refId!,
-      x: o.x,
-      y: o.y,
-      spriteAssetId: o.refId!.startsWith('chest-') ? 'structure.chest' : 'structure.shrine',
-      label: labelForInteractable(o.refId!, openedChests),
-    }));
-
-  const fieldEncounterEntities: GridEntity[] = fieldEncounterIcons.map((icon) => ({
-    id: icon.id,
-    x: icon.x,
-    y: icon.y,
-    spriteAssetId: icon.spriteAssetId,
-  }));
-
-  // Every transition (region-to-region crossings) gets a visible marker instead of looking like
-  // plain ground - the generic structure.door placeholder, same as TownScene's interior exits.
-  const exitEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'transition' && o.refId)
-    .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
-
-  const entities = [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       <PlayerHUD locationId={locationId} />
@@ -300,8 +301,6 @@ export function OverworldScene() {
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
-          tilesetAssetId={map.tilesetAssetId}
-          tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
           entities={entities}
@@ -338,27 +337,7 @@ export function OverworldScene() {
           onClose={() => setActiveNpc(null)}
         />
       )}
-      {message && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            padding: 24,
-            zIndex: 20,
-          }}
-          onClick={() => setMessage(null)}
-        >
-          <Panel style={{ width: 'min(600px, 90vw)' }}>
-            <p style={{ margin: 0 }}>{message}</p>
-            <p style={{ fontSize: 12, opacity: 0.7, textAlign: 'right', margin: '8px 0 0' }}>
-              Click or Esc to close
-            </p>
-          </Panel>
-        </div>
-      )}
+      <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
       {mapOpen && (

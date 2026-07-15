@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { LANDMARK_PARENT_LOCATION } from '../data/locations';
 import type { PlayerSave } from '../shared-types';
 
 interface VisitLandmarkRequest {
@@ -11,14 +12,6 @@ interface VisitLandmarkRequest {
  *  Trail) - visiting one records Journal coverage and advances quests the same way arriving at a
  *  full location would, but does NOT change `player.currentLocationId` since the player never
  *  actually left the parent map. */
-/** Which parent map's location each landmark lives within - used to confirm the player is
- *  actually there before granting anything, the same way enterLocation.ts/collectWorldItem.ts do. */
-const LANDMARK_PARENT_LOCATION: Record<string, string> = {
-  'hunters-camp': 'ironwood-trail',
-  'spirit-grove': 'ironwood-trail',
-  'mossy-creek': 'ironwood-trail',
-  'fallen-watchtower': 'ironwood-trail',
-};
 const KNOWN_LANDMARK_IDS = new Set(Object.keys(LANDMARK_PARENT_LOCATION));
 
 export const visitLandmark = onCall<VisitLandmarkRequest>(async (request) => {

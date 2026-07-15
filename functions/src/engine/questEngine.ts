@@ -39,8 +39,36 @@ export interface QuestAdvanceEvent {
 
 export interface QuestCompletion {
   questId: string;
-  reward: { xp: number; gold: number; itemIds?: string[]; spiritEssence?: number; grantSkillId?: string };
+  reward: QuestDef['reward'];
 }
+
+/** Every quest's objectives, indexed by `${type}:${targetId}` - lets advanceQuests jump straight
+ *  to the (usually 0-2) quests that could possibly care about a given event instead of scanning
+ *  every quest in the game and re-`.find()`-ing its objectives on every single combat/NPC/quest
+ *  event fired. Built once at module load since QUESTS is static content, not per-player data. */
+const OBJECTIVE_INDEX = new Map<string, { questId: string; objective: QuestDef['objectives'][number] }[]>();
+for (const [questId, def] of Object.entries(QUESTS)) {
+  // No quest today defines two objectives with the same type+targetId, but guard against it
+  // anyway so this stays equivalent to the old code's `.find()` (first-objective-wins) semantics
+  // rather than crediting the same event against a quest twice.
+  const seenKeysForQuest = new Set<string>();
+  for (const objective of def.objectives) {
+    const key = `${objective.type}:${objective.targetId}`;
+    if (seenKeysForQuest.has(key)) continue;
+    seenKeysForQuest.add(key);
+    const entries = OBJECTIVE_INDEX.get(key);
+    if (entries) entries.push({ questId, objective });
+    else OBJECTIVE_INDEX.set(key, [{ questId, objective }]);
+  }
+}
+
+/** Quest ids with at least one retroactively-satisfiable objective (collectItem/reachLocation) -
+ *  lets reconcileRetroactiveObjectives skip every quest that only has talkToNpc/defeatEnemies/
+ *  defeatBoss/interactWithShrine objectives (the majority) without checking each one's status. */
+const RETROACTIVE_OBJECTIVE_TYPES = new Set<QuestObjectiveType>(['collectItem', 'reachLocation']);
+const RETROACTIVE_QUEST_IDS = Object.entries(QUESTS)
+  .filter(([, def]) => def.objectives.some((o) => RETROACTIVE_OBJECTIVE_TYPES.has(o.type)))
+  .map(([questId]) => questId);
 
 /** Shared by advanceQuests and reconcileRetroactiveObjectives - both need to check whether a
  *  just-updated quest's objectiveCounts now satisfy every objective, and if so mark it completed
@@ -66,12 +94,11 @@ function checkQuestCompletion(
  */
 export function advanceQuests(quests: Record<string, QuestProgress>, event: QuestAdvanceEvent): QuestCompletion[] {
   const completions: QuestCompletion[] = [];
+  const matches = OBJECTIVE_INDEX.get(`${event.type}:${event.targetId}`) ?? [];
 
-  for (const questId of Object.keys(QUESTS)) {
+  for (const { questId, objective } of matches) {
     if (effectiveStatus(questId, quests) !== 'active') continue;
     const def = QUESTS[questId];
-    const objective = def.objectives.find((o) => o.type === event.type && o.targetId === event.targetId);
-    if (!objective) continue;
 
     const progress = quests[questId] ?? { status: 'active', objectiveCounts: {} };
     const current = progress.objectiveCounts[objective.id] ?? 0;
@@ -116,7 +143,7 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
  *  require the real action once the quest is active. */
 function reconcileRetroactiveObjectives(save: PlayerSave): QuestCompletion[] {
   const completions: QuestCompletion[] = [];
-  const questIds = Object.keys(QUESTS);
+  const questIds = RETROACTIVE_QUEST_IDS;
   let changed = true;
   for (let pass = 0; changed && pass < questIds.length; pass++) {
     changed = false;

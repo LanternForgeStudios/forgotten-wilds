@@ -34,6 +34,10 @@ export interface EnemyDefinition {
    *  the player's attack/skill/lanternAbility actually used. Also what the Journal's Echoes card
    *  displays as this enemy's Weakness. */
   weaknessDamageType: 'physical' | 'spirit' | 'lantern';
+  /** Boss-only: which quest must be completed before startEncounter.ts will let this boss be
+   *  challenged. Data-driven per-boss rather than a separate hardcoded id-to-quest map, so a new
+   *  boss's prerequisite lives right alongside its other authored content. */
+  prerequisiteQuestId?: string;
 }
 
 export const ENEMIES: Record<string, EnemyDefinition> = {
@@ -277,6 +281,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'boss',
     isBoss: true,
     weaknessDamageType: 'lantern',
+    prerequisiteQuestId: 'the-shrine-below',
     stats: { maxHp: 140, attack: 13, defense: 8, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 2 },

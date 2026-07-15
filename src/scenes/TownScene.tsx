@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
+import { MessageOverlay } from '@/components/exploration/MessageOverlay';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { DialogueBox } from '@/components/DialogueBox';
@@ -10,7 +11,6 @@ import { Inn } from '@/components/Inn';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { WorldChat } from '@/components/WorldChat';
 import { MiniMap } from '@/components/MiniMap';
-import { Panel } from '@/components/common/Panel';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useMapOverlay } from '@/hooks/useMapOverlay';
 import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
@@ -19,8 +19,7 @@ import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
-import { useDash } from '@/hooks/useDash';
-import { useDashKeybind } from '@/hooks/useDashKeybind';
+import { useExplorationDash } from '@/hooks/useExplorationDash';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
@@ -92,13 +91,7 @@ export function TownScene() {
 
   useHeartbeat(uid, displayName, locationId, position, skin);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const [dashRampKey, setDashRampKey] = useState(0);
-  const { startDash, stopDash } = useDash({
-    attemptMove,
-    positionRef,
-    onRampUp: () => setDashRampKey((k) => k + 1),
-  });
-  useDashKeybind(startDash, stopDash, staminaUnlocked && !suspended);
+  const { startDash, stopDash, dashRampKey } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
 
   useEffect(() => subscribeToPresence(setPresences), []);
 
@@ -194,6 +187,65 @@ export function TownScene() {
     wanderPositions,
   ]);
 
+  // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
+  // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
+  // setEntities(entities) whenever this reference changes, which is wasted work when nothing
+  // about the entities themselves actually changed. Must run unconditionally (before the `!map`
+  // early return below) - hooks can never be skipped on some renders and not others.
+  const entities = useMemo<GridEntity[]>(() => {
+    if (!map) return [];
+    const npcEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'npc' && o.refId)
+      .map((o) => {
+        const npc = NPCS.find((n) => n.id === o.refId);
+        const pos = wanderPositions[o.refId!] ?? { x: o.x, y: o.y };
+        return {
+          id: o.refId!,
+          x: pos.x,
+          y: pos.y,
+          spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
+          label: npc?.name,
+          badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
+        };
+      });
+
+    const buildingEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'transition' && o.refId && BUILDING_MARKERS[o.refId])
+      .map((o) => {
+        const marker = BUILDING_MARKERS[o.refId!];
+        return { id: `building-${o.refId}`, x: o.x, y: o.y, spriteAssetId: marker.spriteAssetId, label: marker.label };
+      });
+
+    const shrineEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'interactable' && o.refId && SHRINES.has(o.refId))
+      .map((o) => ({ id: o.refId!, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' }));
+
+    // Every transition that doesn't already get a building facade (buildingEntities above) -
+    // mainly each interior's own door back outside, which previously had no visual marker at all
+    // and just looked like plain floor. Reuses the generic structure.door placeholder,
+    // stub-registered for exactly this "map-edge/doorway marker" purpose but never actually wired
+    // in until now.
+    const exitEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'transition' && o.refId && !BUILDING_MARKERS[o.refId])
+      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+
+    const now = Date.now();
+    const otherPlayerEntities: GridEntity[] = presences
+      .filter(
+        (p) =>
+          p.uid !== uid && p.locationId === locationId && now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS,
+      )
+      .map((p) => ({
+        id: `player-${p.uid}`,
+        x: p.x,
+        y: p.y,
+        spriteAssetId: p.skin === 'female' ? 'sprite.player.female' : 'sprite.player.male',
+        label: p.displayName,
+      }));
+
+    return [...npcEntities, ...buildingEntities, ...shrineEntities, ...exitEntities, ...otherPlayerEntities];
+  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, presences, uid, locationId]);
+
   if (!map) {
     return (
       <div className={styles.wrap}>
@@ -202,56 +254,6 @@ export function TownScene() {
     );
   }
 
-  const npcEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'npc' && o.refId)
-    .map((o) => {
-      const npc = NPCS.find((n) => n.id === o.refId);
-      const pos = wanderPositions[o.refId!] ?? { x: o.x, y: o.y };
-      return {
-        id: o.refId!,
-        x: pos.x,
-        y: pos.y,
-        spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
-        label: npc?.name,
-        badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
-      };
-    });
-
-  const buildingEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'transition' && o.refId && BUILDING_MARKERS[o.refId])
-    .map((o) => {
-      const marker = BUILDING_MARKERS[o.refId!];
-      return { id: `building-${o.refId}`, x: o.x, y: o.y, spriteAssetId: marker.spriteAssetId, label: marker.label };
-    });
-
-  const shrineEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'interactable' && o.refId && SHRINES.has(o.refId))
-    .map((o) => ({ id: o.refId!, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' }));
-
-  // Every transition that doesn't already get a building facade (buildingEntities above) - mainly
-  // each interior's own door back outside, which previously had no visual marker at all and just
-  // looked like plain floor. Reuses the generic structure.door placeholder, stub-registered for
-  // exactly this "map-edge/doorway marker" purpose but never actually wired in until now.
-  const exitEntities: GridEntity[] = map.objects
-    .filter((o) => o.type === 'transition' && o.refId && !BUILDING_MARKERS[o.refId])
-    .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
-
-  const now = Date.now();
-  const otherPlayerEntities: GridEntity[] = presences
-    .filter(
-      (p) =>
-        p.uid !== uid && p.locationId === locationId && now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS,
-    )
-    .map((p) => ({
-      id: `player-${p.uid}`,
-      x: p.x,
-      y: p.y,
-      spriteAssetId: p.skin === 'female' ? 'sprite.player.female' : 'sprite.player.male',
-      label: p.displayName,
-    }));
-
-  const entities = [...npcEntities, ...buildingEntities, ...shrineEntities, ...exitEntities, ...otherPlayerEntities];
-
   return (
     <div className={styles.wrap} style={{ paddingTop: hudBarHeight }}>
       <PlayerHUD locationId={locationId} />
@@ -259,8 +261,6 @@ export function TownScene() {
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
           map={map}
-          tilesetAssetId={map.tilesetAssetId}
-          tilesetColumns={map.columns}
           player={position}
           playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
           entities={entities}
@@ -298,27 +298,7 @@ export function TownScene() {
           onClose={handleDialogueClose}
         />
       )}
-      {message && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            padding: 24,
-            zIndex: 20,
-          }}
-          onClick={() => setMessage(null)}
-        >
-          <Panel style={{ width: 'min(600px, 90vw)' }}>
-            <p style={{ margin: 0 }}>{message}</p>
-            <p style={{ fontSize: 12, opacity: 0.7, textAlign: 'right', margin: '8px 0 0' }}>
-              Click or Esc to close
-            </p>
-          </Panel>
-        </div>
-      )}
+      <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {shopOpen && <Shop shopId={activeShopId ?? ''} onClose={() => setShopOpen(false)} />}
       {innOpen && <Inn onClose={() => setInnOpen(false)} />}

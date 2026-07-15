@@ -147,7 +147,6 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     tileWidth: t.tilewidth ?? raw.tilewidth,
     tileHeight: t.tileheight ?? raw.tileheight,
   }));
-  const tilesetAssetId = tilesets[0].assetId;
 
   if (import.meta.env.DEV) {
     for (const l of raw.layers) {
@@ -229,8 +228,6 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     }
   }
 
-  const columns = raw.tilesets[0]?.columns ?? 12;
-
   return {
     locationId,
     tileWidth: raw.tilewidth,
@@ -238,8 +235,6 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     width: raw.width,
     height: raw.height,
     tilesets,
-    tilesetAssetId,
-    columns,
     layers,
     objects,
     collisionObjects,

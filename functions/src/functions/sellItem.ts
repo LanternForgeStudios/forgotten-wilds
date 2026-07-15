@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { sellPriceFor } from '../engine/pricingEngine';
-import { isItemEquipped } from '../engine/inventoryEngine';
+import { isItemEquipped, removeItem } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface SellItemRequest {
@@ -43,8 +43,7 @@ export const sellItem = onCall<SellItemRequest>(async (request) => {
     }
 
     const sellQuantity = Math.min(requestedQuantity, entry.quantity);
-    entry.quantity -= sellQuantity;
-    save.inventory = save.inventory.filter((i) => i.quantity > 0);
+    removeItem(save, itemId, sellQuantity);
 
     const goldEarned = price * sellQuantity;
     save.player.gold += goldEarned;

@@ -11,11 +11,6 @@ interface StartEncounterRequest {
   bossId?: string;
 }
 
-/** Which quest must be completed before a given boss can be challenged. */
-const BOSS_PREREQUISITE_QUEST: Record<string, string> = {
-  'coalbound-warden': 'the-shrine-below',
-};
-
 /** Which location a given boss must actually be fought at - the generic `currentLocationId !==
  *  locationId` check above only verifies the player is wherever the request *claims*, not that
  *  the claimed location is this boss's real lair, so without this a client could pass any
@@ -103,7 +98,7 @@ export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
 
     let enemies;
     if (bossId) {
-      const prerequisite = BOSS_PREREQUISITE_QUEST[bossId];
+      const prerequisite = ENEMIES[bossId]?.prerequisiteQuestId;
       const questsDone = !prerequisite || effectiveStatus(prerequisite, save.quests) === 'completed';
       const atRequiredLocation = BOSS_REQUIRED_LOCATION[bossId] === locationId;
       if (!ENEMIES[bossId]?.isBoss || !questsDone || !atRequiredLocation) {

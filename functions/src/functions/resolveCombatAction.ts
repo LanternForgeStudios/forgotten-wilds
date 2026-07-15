@@ -9,7 +9,7 @@ import {
   type VictoryRestore,
 } from '../engine/combatEngine';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
-import { grantItem } from '../engine/inventoryEngine';
+import { grantItem, itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
 import { ENEMIES } from '../data/enemies';
 import { ITEMS } from '../data/items';
@@ -96,13 +96,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         throw new HttpsError('failed-precondition', 'You cannot use that item right now.');
       }
       const effect = def.effect;
-      const wouldHaveEffect =
-        !!effect &&
-        ((!!effect.healHpPercent && save.player.stats.hp < save.player.stats.maxHp) ||
-          (!!effect.healSpiritPercent && save.player.stats.spirit < save.player.stats.maxSpirit) ||
-          (!!effect.restoreOilPercent && save.player.stats.lanternOil < save.player.stats.maxLanternOil) ||
-          (!!effect.cureAilmentId && playerAilments.some((a) => a.ailmentId === effect.cureAilmentId)));
-      if (!wouldHaveEffect) {
+      if (!effect || !itemWouldHaveEffect(effect, save.player.stats, playerAilments)) {
         throw new HttpsError('failed-precondition', 'That would have no effect right now.');
       }
     }
@@ -148,12 +142,8 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     save.player.stats.spirit = result.playerSpirit;
     save.player.stats.lanternOil = result.playerLanternOil;
 
-    if (result.itemConsumedIds.length > 0) {
-      for (const [itemId, count] of aggregateItemCounts(result.itemConsumedIds)) {
-        const entry = save.inventory.find((i) => i.itemId === itemId);
-        if (entry) entry.quantity -= count;
-      }
-      save.inventory = save.inventory.filter((i) => i.quantity > 0);
+    for (const [itemId, count] of aggregateItemCounts(result.itemConsumedIds)) {
+      removeItem(save, itemId, count);
     }
 
     let rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean; restore: VictoryRestore | null } | null =

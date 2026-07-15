@@ -29,18 +29,20 @@ export const craftItem = onCall<CraftItemRequest>(async (request) => {
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
 
-    for (const material of recipe.materials) {
-      const owned = save.inventory.find((i) => i.itemId === material.itemId)?.quantity ?? 0;
-      if (owned < material.quantity) {
+    // One find per material, not two: each material's inventory entry is looked up once here and
+    // the same reference reused below, rather than re-finding it in a second loop.
+    const materialEntries = recipe.materials.map((material) => ({
+      material,
+      entry: save.inventory.find((i) => i.itemId === material.itemId),
+    }));
+    for (const { material, entry } of materialEntries) {
+      if ((entry?.quantity ?? 0) < material.quantity) {
         throw new HttpsError('failed-precondition', 'You do not have the materials for that recipe.');
       }
     }
 
-    for (const material of recipe.materials) {
-      // Existence already confirmed by the ownership check above - this loop only ever runs once
-      // every material passed it.
-      const entry = save.inventory.find((i) => i.itemId === material.itemId)!;
-      entry.quantity -= material.quantity;
+    for (const { material, entry } of materialEntries) {
+      entry!.quantity -= material.quantity;
     }
     save.inventory = save.inventory.filter((i) => i.quantity > 0);
 

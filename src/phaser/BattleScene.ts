@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { getAssetDefinition, getAssetUrl } from '@/assets/assetManager';
+import { getAssetDefinition } from '@/assets/assetManager';
 import { splitFormation } from './battleFormation';
+import { loadSceneTexture } from './textureLoader';
 import {
   COLOR_DAMAGE,
   COLOR_DEFENDED,
@@ -83,27 +84,8 @@ export class BattleScene extends Phaser.Scene {
     // Fire-and-forget: the defeat effect (playDefeat below) checks textures.exists before using
     // this, falling back to the dot texture on the (rare) chance a fight's first kill lands before
     // this finishes loading.
-    this.loadTexture(DEFEAT_FX_ASSET_ID).catch(() => {});
+    loadSceneTexture(this, DEFEAT_FX_ASSET_ID).catch(() => {});
     this.onReady?.();
-  }
-
-  private loadTexture(assetId: string): Promise<void> {
-    if (this.textures.exists(assetId)) return Promise.resolve();
-    const def = getAssetDefinition(assetId);
-    const url = getAssetUrl(assetId);
-    return new Promise((resolve) => {
-      // Mirrors ExplorationScene.loadTexture's frameSize branch - not exercised by any current
-      // battle asset (every enemy/background sprite today is a single static frame), but wires the
-      // battle canvas to correctly load a future animated sprite sheet (e.g. the FX pack) without
-      // also having to remember to fix this loader gap then.
-      if (def.frameSize) {
-        this.load.spritesheet(assetId, url, { frameWidth: def.frameSize.width, frameHeight: def.frameSize.height });
-      } else {
-        this.load.image(assetId, url);
-      }
-      this.load.once(Phaser.Loader.Events.COMPLETE, () => resolve());
-      this.load.start();
-    });
   }
 
   /** Loads the background + every enemy's sprite texture (parallel), builds the front/back
@@ -113,7 +95,7 @@ export class BattleScene extends Phaser.Scene {
     this.encounterGeneration++;
     const generation = this.encounterGeneration;
 
-    await Promise.all([this.loadTexture(backgroundAssetId), ...enemies.map((e) => this.loadTexture(e.spriteAssetId))]);
+    await Promise.all([loadSceneTexture(this, backgroundAssetId), ...enemies.map((e) => loadSceneTexture(this, e.spriteAssetId))]);
     // Defensive, not fixing a currently-reachable bug (CombatScene only ever calls this once per
     // BattleScene instance's life under the current one-Game-per-encounter lifecycle) - see the
     // migration plan's risk assessment.
@@ -333,7 +315,7 @@ export class BattleScene extends Phaser.Scene {
     for (const ailmentId of ailmentIds) {
       const assetId = AILMENT_FX_ASSET[ailmentId];
       if (!assetId) continue;
-      await this.loadTexture(assetId);
+      await loadSceneTexture(this, assetId);
       playFxBurst(this, anchorX, anchorY, assetId);
     }
   }
