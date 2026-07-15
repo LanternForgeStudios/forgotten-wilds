@@ -22,6 +22,9 @@ export interface QuestReward {
   /** A Specialty Attack id (see data/skills.ts) granted on completion - display-only mirror of the
    *  server's grantSkillId (functions/src/data/quests.ts). No quest uses this yet. */
   grantSkillId?: string;
+  /** A lore entry id (see data/lore.ts) granted on completion - display-only mirror of the
+   *  server's grantLoreId (functions/src/data/quests.ts). */
+  grantLoreId?: string;
 }
 
 /** Display-only grouping for the Quest Log's tabs - not read by any server logic. */

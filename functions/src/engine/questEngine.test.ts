@@ -119,6 +119,19 @@ describe('applyQuestRewards', () => {
     expect(save.player.stats.maxHp).toBeGreaterThan(60);
   });
 
+  it('adds a grantLoreId reward to the journal, without duplicating an already-unlocked entry', () => {
+    const save = emptySave({ journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: ['lore-great-silence'], bossesDefeated: [], itemsDiscovered: [] } });
+    applyQuestRewards(save, [
+      { questId: 'frostbound-pages', reward: { xp: 0, gold: 0, grantLoreId: 'forgotten-treatise-i' } },
+    ]);
+    expect(save.journal.loreUnlocked).toEqual(['lore-great-silence', 'forgotten-treatise-i']);
+
+    applyQuestRewards(save, [
+      { questId: 'frostbound-pages', reward: { xp: 0, gold: 0, grantLoreId: 'forgotten-treatise-i' } },
+    ]);
+    expect(save.journal.loreUnlocked).toEqual(['lore-great-silence', 'forgotten-treatise-i']);
+  });
+
   it('auto-credits a collectItem objective the player already satisfies once its quest activates', () => {
     // Player found a stone-fragment while exploring, well before 'fragments-of-the-first-promise'
     // (which needs it) ever unlocked - completing its prerequisite here should immediately credit

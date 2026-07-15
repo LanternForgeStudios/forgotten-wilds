@@ -52,6 +52,8 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   'spirit-grove': 'shrine',
   'fallen-watchtower': 'fragment',
   'water-fragment': 'fragment',
+  'frostbound-treatise-cache': 'fragment',
+  'ember-codex-tunnel': 'fragment',
 };
 /** Which Cloud Function a walk-in `zone` landmark fires the instant the player's tile enters it -
  *  no Interact needed. Hunter's Camp and Spirit Grove (the clearing, not its shrine) are pure
@@ -67,6 +69,8 @@ const ZONE_LANDMARK_KIND: Record<string, 'visitOnly' | 'fragment'> = {
 function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId.startsWith('chest-')) return openedChests.includes(refId) ? 'Empty Chest' : 'Chest';
   if (refId === 'water-fragment') return 'a faint glimmer in the pool';
+  if (refId === 'frostbound-treatise-cache') return 'a hidden cache behind the falls';
+  if (refId === 'ember-codex-tunnel') return 'an overlooked maintenance tunnel';
   const landmark = LOCATIONS.find((l) => l.id === refId);
   if (landmark) return landmark.name;
   return 'something';

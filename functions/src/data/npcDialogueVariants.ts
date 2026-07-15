@@ -7,6 +7,8 @@
 // completed match), most-advanced-quest first. Keep in sync by hand with src/data/npcs.ts.
 export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   'elias-rowan': [
+    'embers-beneath-stone',
+    'frostbound-pages',
     'the-mountain-remembers',
     'the-coalbound-warden',
     'beyond-the-lantern-light',
@@ -15,7 +17,13 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   ],
   'silas-flint': ['the-shrine-below', 'into-hollow-rail', 'beneath-hollow-rail'],
   'nell-ashby': ['embers-that-never-faded', 'the-lost-expedition'],
-  'historian-miriam': ['the-mountain-remembers', 'fragments-of-the-first-promise', 'the-first-flame'],
+  'historian-miriam': [
+    'embers-beneath-stone',
+    'frostbound-pages',
+    'the-mountain-remembers',
+    'fragments-of-the-first-promise',
+    'the-first-flame',
+  ],
   'hunter-garrick': ['shadows-on-raven-ridge', 'strange-tracks'],
   'spirit-child': ['rekindling-spirit-grove', 'the-forgotten-shrine'],
 };

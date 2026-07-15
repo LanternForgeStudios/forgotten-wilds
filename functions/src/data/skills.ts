@@ -100,4 +100,25 @@ export const SKILLS: Record<string, Skill> = {
     inflictsAilmentId: 'poison',
     inflictAilmentChance: 0.3,
   },
+
+  // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Forgotten Treatises).
+  // Themed around Freeze/Burn via name/description and the effectiveAgainstFamilies bonus below,
+  // but this game's ailment system is player-only (see this file's inflictsAilmentId doc comment) -
+  // pure spirit damage, no ailment inflicted on the enemy.
+  'frost-lance': {
+    id: 'frost-lance',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['coalSpirits'],
+  },
+  'ember-burst': {
+    id: 'ember-burst',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['waterSpirits', 'briarSpirits'],
+  },
 };

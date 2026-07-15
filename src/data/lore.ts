@@ -43,4 +43,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "Silas mentions her only once, and won't be drawn on it again. A story for another day, he says.",
     unlockedAt: 0,
   },
+  {
+    id: 'forgotten-treatise-i',
+    title: 'History of Early Spirit Disciplines',
+    body: 'The Frostbound Treatise, recovered from a hidden cache behind Whisper Falls and translated by Historian Miriam: before the Great Silence, Lantern Keepers drew upon the essence of calm winter spirits not to destroy their enemies, but to still raging Echoes. The restored technique is known today as Frost Lance.',
+    unlockedAt: 0,
+  },
+  {
+    id: 'forgotten-treatise-ii',
+    title: 'Forge Spirits of the Iron Mountains',
+    body: 'The Ember Codex, recovered from an overlooked maintenance tunnel at Raven Ridge: Lantern Keepers who traveled alongside the miners of Hollow Rail learned to harness the warmth of forge spirits, burning away corruption rather than consuming it. The restored technique is known today as Ember Burst.',
+    unlockedAt: 0,
+  },
 ];

@@ -165,6 +165,9 @@ export const ITEMS: Record<string, ItemDefinition> = {
     tier: 'legendary',
     unique: true,
   },
+  // Iron Mountains Side Quests (docs/Mytherra-SQ_breakdown.md): The Forgotten Treatises
+  'frostbound-treatise': { id: 'frostbound-treatise', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'ember-codex': { id: 'ember-codex', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
 };
 
 export const SHOP_PRICES: Record<string, number> = {

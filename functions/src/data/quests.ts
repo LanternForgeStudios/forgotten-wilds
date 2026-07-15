@@ -34,6 +34,9 @@ export interface QuestDef {
      *  rather than a hardcoded quest id check, the same way grantSkillId is generic rather than a
      *  hardcoded skill-quest special case. Only 'rekindling-spirit-grove' sets this today. */
     grantsStaminaUnlock?: boolean;
+    /** A lore entry id (src/data/lore.ts - client-display-only, no server-side copy of the text)
+     *  to add to JournalState.loreUnlocked on completion. */
+    grantLoreId?: string;
   };
 }
 
@@ -184,6 +187,28 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 50, gold: 50, itemIds: ['guardian-memory-fragment-1'] },
   },
+
+  // --- Iron Mountains Side Quests (docs/Mytherra-SQ_breakdown.md): The Forgotten Treatises ---
+  'frostbound-pages': {
+    id: 'frostbound-pages',
+    prerequisiteQuestId: 'the-mountain-remembers',
+    objectives: [
+      { id: 'get-frostbound-treatise', type: 'collectItem', targetId: 'frostbound-treatise', requiredCount: 1 },
+      { id: 'talk-elias-frostbound', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 },
+      { id: 'talk-miriam-frostbound', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'frost-lance', grantLoreId: 'forgotten-treatise-i' },
+  },
+  'embers-beneath-stone': {
+    id: 'embers-beneath-stone',
+    prerequisiteQuestId: 'frostbound-pages',
+    objectives: [
+      { id: 'get-ember-codex', type: 'collectItem', targetId: 'ember-codex', requiredCount: 1 },
+      { id: 'talk-elias-embers', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 },
+      { id: 'talk-miriam-embers', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'ember-burst', grantLoreId: 'forgotten-treatise-ii' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -204,4 +229,6 @@ export const QUEST_ORDER = [
   'the-shrine-below',
   'the-coalbound-warden',
   'the-mountain-remembers',
+  'frostbound-pages',
+  'embers-beneath-stone',
 ];

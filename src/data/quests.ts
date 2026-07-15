@@ -233,4 +233,34 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 50, gold: 50, itemIds: ['guardian-memory-fragment-1'] },
   },
+
+  // --- Iron Mountains Side Quests (docs/Mytherra-SQ_breakdown.md): The Forgotten Treatises ---
+  {
+    id: 'frostbound-pages',
+    name: 'The Frostbound Pages',
+    giverNpcId: 'elias-rowan',
+    description: 'Recover a lost Lantern Keeper treatise describing how to calm winter spirits.',
+    category: 'side',
+    prerequisiteQuestId: 'the-mountain-remembers',
+    objectives: [
+      { id: 'get-frostbound-treatise', type: 'collectItem', description: 'Recover the Frostbound Treatise from behind the falls at Whisper Falls.', targetId: 'frostbound-treatise', requiredCount: 1 },
+      { id: 'talk-elias-frostbound', type: 'talkToNpc', description: "Return to Elias Rowan's House.", targetId: 'elias-rowan', requiredCount: 1 },
+      { id: 'talk-miriam-frostbound', type: 'talkToNpc', description: 'Deliver the treatise to Historian Miriam at the Ash Hallow Archive.', targetId: 'historian-miriam', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'frost-lance', grantLoreId: 'forgotten-treatise-i' },
+  },
+  {
+    id: 'embers-beneath-stone',
+    name: 'Embers Beneath Stone',
+    giverNpcId: 'elias-rowan',
+    description: 'Recover a second forgotten manuscript, describing Spirit techniques forged alongside mountain blacksmiths.',
+    category: 'side',
+    prerequisiteQuestId: 'frostbound-pages',
+    objectives: [
+      { id: 'get-ember-codex', type: 'collectItem', description: 'Recover the Ember Codex from the maintenance tunnel at Raven Ridge.', targetId: 'ember-codex', requiredCount: 1 },
+      { id: 'talk-elias-embers', type: 'talkToNpc', description: "Return to Elias Rowan's House.", targetId: 'elias-rowan', requiredCount: 1 },
+      { id: 'talk-miriam-embers', type: 'talkToNpc', description: 'Deliver the codex to Historian Miriam at the Ash Hallow Archive.', targetId: 'historian-miriam', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'ember-burst', grantLoreId: 'forgotten-treatise-ii' },
+  },
 ];

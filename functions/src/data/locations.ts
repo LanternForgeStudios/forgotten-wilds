@@ -21,6 +21,10 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   },
   'whisper-falls': {
     'water-fragment': 'water-fragment',
+    'frostbound-treatise-cache': 'frostbound-treatise',
+  },
+  'raven-ridge': {
+    'ember-codex-tunnel': 'ember-codex',
   },
 };
 

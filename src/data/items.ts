@@ -286,6 +286,26 @@ export const ITEMS: Item[] = [
     tier: 'legendary',
     unique: true,
   },
+  {
+    id: 'frostbound-treatise',
+    name: 'Frostbound Treatise',
+    description: 'An ancient Lantern Keeper manuscript, recovered from a hidden cache behind Whisper Falls.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.frostbound-treatise',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'ember-codex',
+    name: 'Ember Codex',
+    description: 'A second forgotten manuscript, recovered from an overlooked maintenance tunnel at Raven Ridge.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.ember-codex',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/prices.ts is authoritative for purchaseItem.

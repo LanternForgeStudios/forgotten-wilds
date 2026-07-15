@@ -93,4 +93,25 @@ export const SKILLS: Skill[] = [
     spiritCost: 0,
     inflictsAilmentId: 'poison',
   },
+  // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Forgotten Treatises)
+  {
+    id: 'frost-lance',
+    name: 'Frost Lance',
+    description: 'A restored Lantern Keeper technique, once used to calm winter spirits - a lance of biting cold.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['coalSpirits'],
+  },
+  {
+    id: 'ember-burst',
+    name: 'Ember Burst',
+    description: 'A restored Lantern Keeper technique, drawn from forge spirits deep in the Iron Mountains.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['waterSpirits', 'briarSpirits'],
+  },
 ];

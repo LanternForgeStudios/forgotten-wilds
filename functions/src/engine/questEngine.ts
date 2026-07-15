@@ -128,6 +128,9 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
     if (reward.grantSkillId && !save.player.knownSkillIds.includes(reward.grantSkillId)) {
       save.player.knownSkillIds.push(reward.grantSkillId);
     }
+    if (reward.grantLoreId && !save.journal.loreUnlocked.includes(reward.grantLoreId)) {
+      save.journal.loreUnlocked.push(reward.grantLoreId);
+    }
   }
 }
 

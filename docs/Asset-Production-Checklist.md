@@ -132,18 +132,21 @@ label.
 **Door**: **48×96 PNG**, transparent background - a standalone wooden door (not currently placed on
 any map, but stubbed for future building-entrance use). Rustic plank door, iron hinges.
 
-## Icons (52 - inventory/equipment/currency)
+## Icons (54 - inventory/equipment/currency)
 
-**64×64 tier (48 items)**: consumables, ailment-cure items, the 6 battlefield ailment status icons,
-and all named equipment (21 pieces across 7 rarity families - Walking Staff, Keeper Coat, Traveler
-Boots, Work Gloves, Mountain Charm, Mountain Spirits totems, and 2 unique lanterns).
+**64×64 tier (50 items)**: consumables, ailment-cure items, the 6 battlefield ailment status icons,
+all named equipment (21 pieces across 7 rarity families - Walking Staff, Keeper Coat, Traveler
+Boots, Work Gloves, Mountain Charm, Mountain Spirits totems, and 2 unique lanterns), and the two
+Iron Mountains Side Quest key items (`icon.item.frostbound-treatise`, `icon.item.ember-codex` -
+docs/Mytherra-SQ_breakdown.md).
 **Spec**: 64×64 PNG, transparent background, single centered object, simple flat lighting (these are
 small UI icons, not illustrations - avoid busy detail that won't read at 64px).
 
 Generation prompt template: "Simple flat-shaded fantasy game icon of a [item], centered, transparent
 background, warm muted color palette, readable at small size." Fill in `[item]` per id - e.g.
 "a glass vial of glowing green healing poultice," "a small lit brass lantern," "a pair of worn
-leather traveler's boots," "a carved wolf-totem charm."
+leather traveler's boots," "a carved wolf-totem charm," "a weathered leather-bound manuscript rimed
+with frost" (frostbound-treatise), "a scorched, ember-warm leather codex" (ember-codex).
 
 **32×32 tier (4 currency icons)**: `icon.currency.gold`, `spirit-essence`, `festival-tokens`,
 `premium-currency`. Same flat-icon spec, smaller. Generation prompt: "Simple flat fantasy currency

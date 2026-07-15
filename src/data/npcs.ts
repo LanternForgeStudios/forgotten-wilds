@@ -21,9 +21,31 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['a-new-keeper', 'ash-hallow-tour', 'beyond-the-lantern-light', 'the-coalbound-warden', 'the-mountain-remembers'],
+      questIds: [
+        'a-new-keeper',
+        'ash-hallow-tour',
+        'beyond-the-lantern-light',
+        'the-coalbound-warden',
+        'the-mountain-remembers',
+        'frostbound-pages',
+        'embers-beneath-stone',
+      ],
     },
     dialogueVariants: [
+      {
+        questId: 'embers-beneath-stone',
+        lines: [
+          { speaker: 'Elias Rowan', text: "The Ember Codex, whole and translated. Two forgotten disciplines recovered in as many months — the Order is stronger for it." },
+          { speaker: 'Elias Rowan', text: "You've earned a rest. There will be more manuscripts to find, in time, but not tonight." },
+        ],
+      },
+      {
+        questId: 'frostbound-pages',
+        lines: [
+          { speaker: 'Elias Rowan', text: "Frost Lance, restored after all this time. Miriam tells me there's a second volume that may belong to the same collection." },
+          { speaker: 'Elias Rowan', text: "Worth chasing, if you're willing. The mountains don't give up their history easily." },
+        ],
+      },
       {
         questId: 'the-mountain-remembers',
         lines: [
@@ -224,8 +246,25 @@ export const NPCS: Npc[] = [
       { speaker: 'Historian Miriam', text: "Ash Hallow wasn't always the name. Before the Silence, the old maps called it something else entirely." },
       { speaker: 'Historian Miriam', text: "I've got three shelves of that history and no one to read it to but the mice. Ask me anytime." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-first-flame', 'fragments-of-the-first-promise', 'the-mountain-remembers'] },
+    gameplayHook: {
+      type: 'questGiver',
+      questIds: ['the-first-flame', 'fragments-of-the-first-promise', 'the-mountain-remembers', 'frostbound-pages', 'embers-beneath-stone'],
+    },
     dialogueVariants: [
+      {
+        questId: 'embers-beneath-stone',
+        lines: [
+          { speaker: 'Historian Miriam', text: "The Ember Codex confirms it — Lantern Keepers who traveled with the Hollow Rail miners, learning to burn away corruption instead of consuming it." },
+          { speaker: 'Historian Miriam', text: "Ember Burst is yours now. Two disciplines restored. I wonder how many more are still buried in these mountains." },
+        ],
+      },
+      {
+        questId: 'frostbound-pages',
+        lines: [
+          { speaker: 'Historian Miriam', text: "The Frostbound Treatise, translated at last. Lantern Keepers once calmed winter spirits rather than fought them — Frost Lance is the proof of it." },
+          { speaker: 'Historian Miriam', text: "There may be a second volume. If it's out there, I'd very much like to read it." },
+        ],
+      },
       {
         questId: 'the-mountain-remembers',
         lines: [

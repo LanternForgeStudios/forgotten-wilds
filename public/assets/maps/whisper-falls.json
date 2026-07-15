@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 7,
+  "nextobjectid": 8,
   "layers": [
     {
       "id": 1,
@@ -1656,6 +1656,24 @@
               "name": "refId",
               "type": "string",
               "value": "water-fragment"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "name": "",
+          "type": "interactable",
+          "x": 224,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "frostbound-treatise-cache"
             }
           ]
         }
