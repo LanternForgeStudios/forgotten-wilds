@@ -351,3 +351,68 @@ export interface ClanInvite {
   status: ClanInviteStatus;
   createdAt: number;
 }
+
+// --- Multiplayer Battle System, Phase B: the party/PvP combat session itself (see
+// functions/src/engine/partyCombatEngine.ts). Endless Battle's wave progression (Phase C) and PvP
+// matchmaking (Phase D) both create/consume partyBattles/{battleId} docs, but neither exists yet -
+// this phase only builds the shared round-resolution mechanism they'll both sit on top of.
+
+export type PartyBattleMode = 'endless' | 'pvp';
+export type PartyBattleStatus = 'active' | 'victory' | 'defeated' | 'withdrawn';
+
+/** One participant's combat-relevant stats, snapshotted onto the battle doc at battle start (full
+ *  HP/Spirit/Oil per the design doc's "every player restored to 100% at battle start") and
+ *  updated in place as rounds resolve - deliberately not a live read of users/{uid} mid-battle, so
+ *  a party fight has one authoritative, self-contained state rather than depending on a second
+ *  document staying in sync. */
+export interface PartyBattleParticipantStats {
+  hp: number;
+  maxHp: number;
+  spirit: number;
+  maxSpirit: number;
+  lanternOil: number;
+  maxLanternOil: number;
+  attack: number;
+  defense: number;
+  speed: number;
+  ailments: ActiveAilment[];
+}
+
+export interface PartyBattleEnemyState {
+  enemyId: string;
+  level: number;
+  hp: number;
+  maxHp: number;
+}
+
+/** The last round's resolution, persisted onto the doc (not just returned from whichever client's
+ *  submitPartyBattleAction call happened to trigger it) - unlike solo combat's resolveCombatAction,
+ *  every participant needs to see what just happened via their own onSnapshot listener, not only
+ *  the one caller who got the function response. Overwritten each round, not accumulated. */
+export interface PartyBattleRoundResult {
+  round: number;
+  log: string[];
+  resolvedAt: number;
+}
+
+/** partyBattles/{battleId} - auto-id, `participants` is the trades-style array
+ *  firestore.rules/the client's live query filter on. `pendingActions[uid]` is null until that
+ *  participant submits for the current round; a round resolves (via submitPartyBattleAction, see
+ *  its own doc comment for the client-triggered timeout model) once every participant has
+ *  submitted or `turnDeadlineAt` has passed, whichever comes first. */
+export interface PartyBattleSession {
+  id: string;
+  clanId: string | null;
+  mode: PartyBattleMode;
+  participants: string[];
+  wave: number;
+  enemies: PartyBattleEnemyState[];
+  round: number;
+  status: PartyBattleStatus;
+  turnDeadlineAt: number;
+  pendingActions: Record<string, CombatAction | null>;
+  participantStats: Record<string, PartyBattleParticipantStats>;
+  lastRoundResult: PartyBattleRoundResult | null;
+  startedAt: number;
+  updatedAt: number;
+}

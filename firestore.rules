@@ -122,5 +122,14 @@ service cloud.firestore {
         && (request.auth.uid == resource.data.fromUid || request.auth.uid == resource.data.toUid);
       allow write: if false;
     }
+
+    // Multiplayer Battle System, Phase B: the shared party/PvP combat session (partyBattle.ts).
+    // Same participants-array pattern as trades - every participant can read the live doc via
+    // onSnapshot, but every mutation is server-only (submitPartyBattleAction).
+
+    match /partyBattles/{battleId} {
+      allow read: if request.auth != null && request.auth.uid in resource.data.participants;
+      allow write: if false;
+    }
   }
 }

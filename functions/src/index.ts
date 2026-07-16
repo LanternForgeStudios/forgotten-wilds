@@ -37,3 +37,4 @@ export {
   transferClanLeadership,
   disbandClan,
 } from './functions/clan';
+export { submitPartyBattleAction } from './functions/partyBattle';

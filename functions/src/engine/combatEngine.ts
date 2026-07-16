@@ -4,23 +4,8 @@ import { ITEMS } from '../data/items';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { AILMENTS } from '../data/ailments';
 import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
+import { computeDamage, pickEnemyMove, weightedPick } from './combatMath';
 import type { CombatAction, Stats, ActiveAilment } from '../shared-types';
-
-/** Picks one item from `items`, proportional to `weightOf(item)` - shared by every "roll a random
- *  entry weighted toward some more than others" spot in this file (enemy encounter tables, boss
- *  add-count, enemy move selection). Callers are expected to only ever pass a non-empty `items`
- *  (each current call site already guarantees that on its own - an empty encounter table throws
- *  before reaching here, and pickEnemyMove pre-checks its own filtered list), so this doesn't
- *  special-case an empty array itself. */
-function weightedPick<T>(items: T[], weightOf: (item: T) => number): T {
-  const totalWeight = items.reduce((sum, item) => sum + weightOf(item), 0);
-  let roll = Math.random() * totalWeight;
-  for (const item of items) {
-    roll -= weightOf(item);
-    if (roll <= 0) return item;
-  }
-  return items[0];
-}
 
 export function rollEnemyForLocation(locationId: string): EnemyDefinition {
   const table = ENCOUNTER_TABLES[locationId];
@@ -166,24 +151,6 @@ export function scaledEnemyStats(enemy: EnemyDefinition, level: number): ScaledE
     defense: enemy.stats.defense + growth.defense * levelsAboveOne,
     speed: enemy.stats.speed + growth.speed * levelsAboveOne,
   };
-}
-
-function computeDamage(power: number, attackerAtk: number, defenderDef: number): number {
-  const base = power + attackerAtk * 0.5 - defenderDef * 0.5;
-  const variance = 0.9 + Math.random() * 0.2;
-  return Math.max(1, Math.round(base * variance));
-}
-
-function pickEnemyMove(enemy: EnemyDefinition, hpFraction: number) {
-  // `=== undefined`, not a falsy check - an authored unlocksAtHpFraction: 0 ("only once nearly
-  // dead") would otherwise be treated identically to "no threshold at all" (!0 is true) and be
-  // available from full HP instead of gated.
-  const available = enemy.moves.filter((m) => m.unlocksAtHpFraction === undefined || hpFraction <= m.unlocksAtHpFraction);
-  // If every one of this enemy's moves is HP-gated above the current threshold (content bug -
-  // every authored enemy today has at least one unconditional move), fall back to its first move
-  // rather than returning undefined and crashing the transaction.
-  if (available.length === 0) return enemy.moves[0];
-  return weightedPick(available, (m) => m.weight);
 }
 
 export interface RoundEnemyInput {
