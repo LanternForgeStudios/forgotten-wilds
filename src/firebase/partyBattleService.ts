@@ -17,11 +17,21 @@ export function subscribeToPartyBattle(battleId: string, callback: (battle: Part
  *  whoever happened to click "Start". `participants array-contains uid` can only ever match a
  *  small number of docs at once in practice (a player is never in more than one active battle -
  *  see endlessBattle.ts's lock mechanism), so filtering terminal statuses out client-side is fine
- *  here, same "everything, caller filters" shape as subscribeToMyTrades. */
+ *  here, same "everything, caller filters" shape as subscribeToMyTrades.
+ *
+ *  Also excludes anything missing `turnOrder` - a battle doc created before the sequential-turn
+ *  redesign shipped (pendingActions-based, no turnOrder/currentTurnIndex) can't be resolved by
+ *  today's client or Cloud Function code either way, and would otherwise crash every panel that
+ *  tries to read `battle.turnOrder[battle.currentTurnIndex]` on it. Its stale
+ *  partyBattleLocks/{uid} entry self-heals the next time that player tries to start a new battle
+ *  (see endlessBattle.ts's resolveStaleLocks) - this guard only stops the client from crashing
+ *  trying to *show* the unplayable leftover in the meantime. */
 export function subscribeToMyActivePartyBattle(uid: string, callback: (battleId: string | null) => void): () => void {
   const q = query(collection(db, 'partyBattles'), where('participants', 'array-contains', uid));
   return onSnapshot(q, (snap) => {
-    const active = snap.docs.map((d) => d.data() as PartyBattleSession).find((b) => !TERMINAL_STATUSES.has(b.status));
+    const active = snap.docs
+      .map((d) => d.data() as PartyBattleSession)
+      .find((b) => !TERMINAL_STATUSES.has(b.status) && Array.isArray(b.turnOrder));
     callback(active?.id ?? null);
   });
 }
