@@ -5,7 +5,7 @@ export const ITEMS: Item[] = [
   {
     id: 'healing-poultice',
     name: 'Healing Poultice',
-    description: 'A folk remedy of mountain herbs. Restores a modest amount of HP.',
+    description: 'A folk remedy of mountain herbs. Restores 30% of your max HP.',
     category: 'consumable',
     iconAssetId: 'icon.item.healing-poultice',
     effect: { healHpPercent: 0.3 },
@@ -15,7 +15,7 @@ export const ITEMS: Item[] = [
   {
     id: 'greater-healing-poultice',
     name: 'Greater Healing Poultice',
-    description: 'A stronger brew, harder to come by - restores considerably more HP than the common poultice.',
+    description: 'A stronger brew, harder to come by - restores 50% of your max HP.',
     category: 'consumable',
     iconAssetId: 'icon.item.healing-poultice',
     effect: { healHpPercent: 0.5 },
@@ -25,7 +25,7 @@ export const ITEMS: Item[] = [
   {
     id: 'superior-healing-poultice',
     name: 'Superior Healing Poultice',
-    description: 'A carefully brewed poultice, rare in its potency - restores a large amount of HP.',
+    description: 'A carefully brewed poultice, rare in its potency - restores 75% of your max HP.',
     category: 'consumable',
     iconAssetId: 'icon.item.healing-poultice',
     effect: { healHpPercent: 0.75 },
@@ -35,7 +35,7 @@ export const ITEMS: Item[] = [
   {
     id: 'pristine-healing-poultice',
     name: 'Pristine Healing Poultice',
-    description: 'A flawless brew of the highest quality. Restores HP fully.',
+    description: 'A flawless brew of the highest quality. Restores 100% of your max HP.',
     category: 'consumable',
     iconAssetId: 'icon.item.healing-poultice',
     effect: { healHpPercent: 1 },
@@ -45,7 +45,7 @@ export const ITEMS: Item[] = [
   {
     id: 'spirit-draught',
     name: 'Spirit Draught',
-    description: 'Bottled starlight and creekwater. Restores a modest amount of Spirit.',
+    description: 'Bottled starlight and creekwater. Restores 30% of your max Spirit.',
     category: 'consumable',
     iconAssetId: 'icon.item.spirit-draught',
     effect: { healSpiritPercent: 0.3 },
@@ -55,7 +55,7 @@ export const ITEMS: Item[] = [
   {
     id: 'greater-spirit-draught',
     name: 'Greater Spirit Draught',
-    description: 'A richer bottling, harder to come by - restores considerably more Spirit.',
+    description: 'A richer bottling, harder to come by - restores 50% of your max Spirit.',
     category: 'consumable',
     iconAssetId: 'icon.item.spirit-draught',
     effect: { healSpiritPercent: 0.5 },
@@ -65,7 +65,7 @@ export const ITEMS: Item[] = [
   {
     id: 'superior-spirit-draught',
     name: 'Superior Spirit Draught',
-    description: 'A rare, carefully distilled draught - restores a large amount of Spirit.',
+    description: 'A rare, carefully distilled draught - restores 75% of your max Spirit.',
     category: 'consumable',
     iconAssetId: 'icon.item.spirit-draught',
     effect: { healSpiritPercent: 0.75 },
@@ -75,7 +75,7 @@ export const ITEMS: Item[] = [
   {
     id: 'pristine-spirit-draught',
     name: 'Pristine Spirit Draught',
-    description: 'A flawless bottling of the highest quality. Restores Spirit fully.',
+    description: 'A flawless bottling of the highest quality. Restores 100% of your max Spirit.',
     category: 'consumable',
     iconAssetId: 'icon.item.spirit-draught',
     effect: { healSpiritPercent: 1 },
@@ -85,7 +85,7 @@ export const ITEMS: Item[] = [
   {
     id: 'thin-lantern-oil',
     name: 'Thin Lantern Oil',
-    description: 'A thinned, low-grade batch that burns dim and short. Restores a modest amount of Lantern Oil.',
+    description: 'A thinned, low-grade batch that burns dim and short. Restores 30% of your max Lantern Oil.',
     category: 'consumable',
     iconAssetId: 'icon.item.lantern-oil',
     effect: { restoreOilPercent: 0.3 },
@@ -95,7 +95,7 @@ export const ITEMS: Item[] = [
   {
     id: 'lantern-oil',
     name: 'Lantern Oil',
-    description: "Refined oil for a Keeper's lantern - refills the Oil its ability draws on. Usable in or out of battle.",
+    description: "Refined oil for a Keeper's lantern - restores 50% of your max Lantern Oil. Usable in or out of battle.",
     category: 'consumable',
     iconAssetId: 'icon.item.lantern-oil',
     effect: { restoreOilPercent: 0.5 },
@@ -105,7 +105,7 @@ export const ITEMS: Item[] = [
   {
     id: 'superior-lantern-oil',
     name: 'Superior Lantern Oil',
-    description: 'A rare, finely refined oil - restores a large amount of Lantern Oil.',
+    description: 'A rare, finely refined oil - restores 75% of your max Lantern Oil.',
     category: 'consumable',
     iconAssetId: 'icon.item.lantern-oil',
     effect: { restoreOilPercent: 0.75 },
@@ -115,7 +115,7 @@ export const ITEMS: Item[] = [
   {
     id: 'pristine-lantern-oil',
     name: 'Pristine Lantern Oil',
-    description: 'A flawless, brilliant-burning oil of the highest quality. Restores Lantern Oil fully.',
+    description: 'A flawless, brilliant-burning oil of the highest quality. Restores 100% of your max Lantern Oil.',
     category: 'consumable',
     iconAssetId: 'icon.item.lantern-oil',
     effect: { restoreOilPercent: 1 },
