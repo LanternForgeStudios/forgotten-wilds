@@ -14,6 +14,12 @@ export async function callSetPlayerSkin(skin: 'male' | 'female'): Promise<{ skin
   return result.data;
 }
 
+export async function callSetDisplayName(name: string): Promise<{ displayName: string }> {
+  const fn = httpsCallable<{ name: string }, { displayName: string }>(functions, 'setDisplayName');
+  const result = await fn({ name });
+  return result.data;
+}
+
 export interface EncounterEnemy {
   index: number;
   enemyId: string;

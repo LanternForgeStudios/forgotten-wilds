@@ -38,6 +38,7 @@ import {
   callTransferClanLeadership,
   callDisbandClan,
   callStartEndlessBattle,
+  callSetDisplayName,
 } from '@/firebase/functionsClient';
 import { EndlessBattlePanel } from './EndlessBattlePanel';
 import { resyncSave } from '@/state/hydrate';
@@ -125,6 +126,12 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const [clanInviteQuery, setClanInviteQuery] = useState('');
   const [clanInviteResults, setClanInviteResults] = useState<{ uid: string; displayName: string }[]>([]);
   const [endlessBattleId, setEndlessBattleId] = useState<string | null>(null);
+
+  // --- Profile tab: character name editing ---
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState('');
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [nameBusy, setNameBusy] = useState(false);
 
   // --- Reset Progress tab state ---
   const [confirmEmail, setConfirmEmail] = useState('');
@@ -277,6 +284,21 @@ export function UserProfile({ onClose }: UserProfileProps) {
       await callUnblockUser(targetUid);
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function saveName() {
+    if (nameBusy) return;
+    setNameBusy(true);
+    setNameError(null);
+    try {
+      await callSetDisplayName(nameDraft.trim());
+      if (uid) await resyncSave(uid);
+      setEditingName(false);
+    } catch (err) {
+      setNameError(err instanceof Error ? err.message : 'Could not save that name.');
+    } finally {
+      setNameBusy(false);
     }
   }
 
@@ -548,8 +570,48 @@ export function UserProfile({ onClose }: UserProfileProps) {
             </div>
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>Character</span>
-              <span>{player.name}</span>
+              {editingName ? (
+                <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <input
+                    className={styles.textInput}
+                    style={{ width: 140 }}
+                    value={nameDraft}
+                    maxLength={24}
+                    onChange={(e) => setNameDraft(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && saveName()}
+                    autoFocus
+                  />
+                  <button className={styles.smallButton} disabled={nameBusy} onClick={saveName}>
+                    Save
+                  </button>
+                  <button
+                    className={styles.smallButton}
+                    disabled={nameBusy}
+                    onClick={() => {
+                      setEditingName(false);
+                      setNameError(null);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </span>
+              ) : (
+                <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  {player.name}
+                  <button
+                    className={styles.smallButton}
+                    onClick={() => {
+                      setNameDraft(player.name);
+                      setNameError(null);
+                      setEditingName(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                </span>
+              )}
             </div>
+            {nameError && <p className={styles.error}>{nameError}</p>}
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>Level</span>
               <span>{player.level}</span>

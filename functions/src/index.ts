@@ -39,3 +39,4 @@ export {
 } from './functions/clan';
 export { submitPartyBattleAction } from './functions/partyBattle';
 export { startEndlessBattle, voteContinueEndlessBattle } from './functions/endlessBattle';
+export { setDisplayName } from './functions/setDisplayName';
