@@ -10,10 +10,10 @@ import { subscribeToMyTrades } from '@/firebase/tradeService';
 import { callSendFriendRequest, callClaimDailyChest, type DailyChestRewards } from '@/firebase/functionsClient';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
+import { ChestRewardReveal } from './ChestRewardReveal';
 import { XP_THRESHOLDS, LOCATIONS, CHEST_CLAIM_INTERVAL_MS, ELITE_CHEST_LEVEL_THRESHOLD } from '@/data';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { PRESENCE_STALE_AFTER_MS } from '@/utils/presence';
-import { itemDisplayName } from '@/utils/itemName';
 import { resyncSave } from '@/state/hydrate';
 import { playSound } from '@/audio/audioService';
 import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc } from '@/types';
@@ -156,6 +156,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
       const { tier, rewards } = await callClaimDailyChest();
       if (uid) await resyncSave(uid);
       setChestResult({ tier, rewards });
+      setChestOpen(false);
       void playSound('sfx.chest-open');
     } catch (err) {
       setChestError(err instanceof Error ? err.message : 'Could not claim the chest.');
@@ -226,39 +227,15 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
           </button>
           {chestOpen && (
             <div className={styles.chestPopover} onMouseLeave={() => setChestOpen(false)}>
-              {chestResult ? (
-                <>
-                  <p className={styles.chestResultTitle}>
-                    {chestResult.tier === 'elite' ? 'Elite' : 'Standard'} Chest opened!
-                  </p>
-                  <ul className={styles.chestResultList}>
-                    <li>{chestResult.rewards.gold}g</li>
-                    {chestResult.rewards.premiumCurrency > 0 && (
-                      <li>{chestResult.rewards.premiumCurrency} premium currency</li>
-                    )}
-                    {chestResult.rewards.itemIds.map((id, i) => (
-                      <li key={`${id}-${i}`}>{itemDisplayName(id)}</li>
-                    ))}
-                  </ul>
-                  <button className={styles.chestCloseButton} onClick={() => setChestResult(null)}>
-                    Close
-                  </button>
-                </>
+              <p className={styles.chestPopoverTitle}>{chestTier === 'elite' ? 'Elite' : 'Standard'} Chest</p>
+              {chestReady ? (
+                <button className={styles.chestClaimButton} disabled={chestClaiming} onClick={() => void claimChest()}>
+                  {chestClaiming ? 'Opening...' : 'Claim'}
+                </button>
               ) : (
-                <>
-                  <p className={styles.chestPopoverTitle}>
-                    {chestTier === 'elite' ? 'Elite' : 'Standard'} Chest
-                  </p>
-                  {chestReady ? (
-                    <button className={styles.chestClaimButton} disabled={chestClaiming} onClick={() => void claimChest()}>
-                      {chestClaiming ? 'Opening...' : 'Claim'}
-                    </button>
-                  ) : (
-                    <p className={styles.chestCountdown}>Next chest in {formatCountdown(msUntilChest)}</p>
-                  )}
-                  {chestError && <p className={styles.chestError}>{chestError}</p>}
-                </>
+                <p className={styles.chestCountdown}>Next chest in {formatCountdown(msUntilChest)}</p>
               )}
+              {chestError && <p className={styles.chestError}>{chestError}</p>}
             </div>
           )}
         </div>
@@ -369,6 +346,9 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
 
       {statsOpen && <CharacterStats onClose={() => setStatsOpen(false)} />}
       {profileOpen && <UserProfile onClose={() => setProfileOpen(false)} />}
+      {chestResult && (
+        <ChestRewardReveal tier={chestResult.tier} rewards={chestResult.rewards} onClose={() => setChestResult(null)} />
+      )}
     </div>
   );
 }

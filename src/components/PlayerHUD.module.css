@@ -213,8 +213,7 @@
   text-align: center;
 }
 
-.chestPopoverTitle,
-.chestResultTitle {
+.chestPopoverTitle {
   margin: 0 0 8px;
   font-size: 12px;
   font-weight: bold;
@@ -240,29 +239,6 @@
 .chestClaimButton:disabled {
   cursor: default;
   opacity: 0.7;
-}
-
-.chestResultList {
-  list-style: none;
-  margin: 0 0 8px;
-  padding: 0;
-  font-size: 11px;
-  text-align: left;
-}
-
-.chestResultList li {
-  padding: 2px 0;
-}
-
-.chestCloseButton {
-  width: 100%;
-  padding: 4px;
-  border-radius: 4px;
-  border: 1px solid var(--fw-panel-border);
-  background: transparent;
-  color: var(--fw-text-dim);
-  font-size: 11px;
-  cursor: pointer;
 }
 
 .chestError {
