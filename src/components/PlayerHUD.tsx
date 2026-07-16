@@ -5,7 +5,7 @@ import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useNow } from '@/hooks/useNow';
 import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
-import { subscribeToIncomingFriendRequests, subscribeToAllDirectMessages } from '@/firebase/socialService';
+import { subscribeToIncomingFriendRequests, subscribeToAllDirectMessages, subscribeToFriendship } from '@/firebase/socialService';
 import { subscribeToMyTrades } from '@/firebase/tradeService';
 import { callSendFriendRequest, callClaimDailyChest, type DailyChestRewards } from '@/firebase/functionsClient';
 import { CharacterStats } from './CharacterStats';
@@ -78,6 +78,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   const uid = useAuthStore((s) => s.user?.uid);
   const lastReviewedSocialAt = useWorldStateStore((s) => s.lastReviewedSocialAt);
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
+  const [friendUids, setFriendUids] = useState<string[]>([]);
   const [presenceOpen, setPresenceOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -114,6 +115,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
       subscribeToIncomingFriendRequests(uid, setIncomingRequests),
       subscribeToAllDirectMessages(uid, setAllMessages),
       subscribeToMyTrades(uid, setMyTrades),
+      subscribeToFriendship(uid, setFriendUids),
     ];
     return () => unsubs.forEach((u) => u());
   }, [uid]);
@@ -189,7 +191,10 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   // re-validated server-side in claimDailyChest.ts, so this can never grant early even if the
   // client's clock is off.
   const chestTier: 'standard' | 'elite' = player.level >= ELITE_CHEST_LEVEL_THRESHOLD ? 'elite' : 'standard';
-  const msSinceLastClaim = now - player.lastChestClaimedAt;
+  // Defaults to 0 ("eligible immediately") for a save written before this field existed - the same
+  // fallback claimDailyChest.ts applies server-side, needed here too since this display math reads
+  // the field directly rather than through that backfill.
+  const msSinceLastClaim = now - (player.lastChestClaimedAt ?? 0);
   const chestReady = msSinceLastClaim >= CHEST_CLAIM_INTERVAL_MS;
   const msUntilChest = CHEST_CLAIM_INTERVAL_MS - msSinceLastClaim;
 
@@ -273,18 +278,21 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
                       {p.displayName}
                       {p.uid === uid ? ' (you)' : ''}
                     </span>
-                    {p.uid !== uid && (
-                      <button
-                        className={styles.addFriendButton}
-                        disabled={['sending', 'sent', 'accepted', 'already-pending'].includes(
-                          friendRequestStatus[p.uid],
-                        )}
-                        onClick={() => void sendFriendRequestTo(p.uid)}
-                        title="Send a friend request"
-                      >
-                        {friendRequestLabel(friendRequestStatus[p.uid])}
-                      </button>
-                    )}
+                    {p.uid !== uid &&
+                      (friendUids.includes(p.uid) ? (
+                        <span className={styles.alreadyFriends}>Already friends</span>
+                      ) : (
+                        <button
+                          className={styles.addFriendButton}
+                          disabled={['sending', 'sent', 'accepted', 'already-pending'].includes(
+                            friendRequestStatus[p.uid],
+                          )}
+                          onClick={() => void sendFriendRequestTo(p.uid)}
+                          title="Send a friend request"
+                        >
+                          {friendRequestLabel(friendRequestStatus[p.uid])}
+                        </button>
+                      ))}
                   </div>
                 ))}
               </div>
