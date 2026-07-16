@@ -1,7 +1,12 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { resolvePartyRound, type PartyPlayerInput } from '../engine/partyCombatEngine';
-import type { CombatAction, CombatActionType, PartyBattleSession } from '../shared-types';
+import { computeRewards } from '../engine/combatEngine';
+import { rollChestRewards } from '../engine/dailyChestEngine';
+import { isMilestoneWave, milestoneChestTier } from '../engine/endlessBattleEngine';
+import { grantItem } from '../engine/inventoryEngine';
+import { applyLevelUp } from '../engine/levelingEngine';
+import type { CombatAction, CombatActionType, PartyBattleSession, PartyBattleWaveRewards, PlayerSave } from '../shared-types';
 
 /** Per the design doc: "if no action is selected within 20 seconds, the character automatically
  *  performs Defend, and combat immediately proceeds to the next turn." */
@@ -115,8 +120,26 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     const nextRound = battle.round + 1;
     const nextPendingActions = Object.fromEntries(battle.participants.map((p) => [p, null]));
 
+    const isEndless = battle.mode === 'endless';
     const status: PartyBattleSession['status'] =
-      result.phase === 'victory' ? 'victory' : result.phase === 'partyDefeated' ? 'defeated' : 'active';
+      result.phase === 'victory'
+        ? isEndless
+          ? 'awaitingContinueVote'
+          : 'victory'
+        : result.phase === 'partyDefeated'
+          ? 'defeated'
+          : 'active';
+
+    // Endless Battle grants per-wave rewards on every win (independent per player, per the design
+    // doc) and fully restores every participant's real save once the run ends (victory doesn't
+    // end the run - only 'defeated' does here; a voluntary exit is voteContinueEndlessBattle's own
+    // job). PvP's reward/restore handling is Phase D's concern, not built yet.
+    let lastWaveRewards: Record<string, PartyBattleWaveRewards> | null = battle.lastWaveRewards;
+    if (isEndless && status === 'awaitingContinueVote') {
+      lastWaveRewards = await grantWaveRewards(tx, db, alive, battle.wave, battle.enemies);
+    } else if (isEndless && status === 'defeated') {
+      await restoreAllParticipants(tx, db, battle.participants);
+    }
 
     tx.update(battleRef, {
       participantStats: nextParticipantStats,
@@ -126,9 +149,87 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       pendingActions: status === 'active' ? nextPendingActions : battle.pendingActions,
       turnDeadlineAt: status === 'active' ? now + TURN_TIMEOUT_MS : battle.turnDeadlineAt,
       lastRoundResult: { round: battle.round, log: result.log, resolvedAt: now },
+      lastWaveRewards,
+      continueVotes: status === 'awaitingContinueVote' ? {} : battle.continueVotes,
       updatedAt: now,
     });
 
     return { resolved: true, status, phase: result.phase };
   });
 });
+
+/** Grants independent xp/gold/loot to every alive participant for the wave just won, plus a bonus
+ *  chest roll on milestone waves (5, 10, 15, 20...) - see endlessBattleEngine.ts. Every enemy on
+ *  the wave roster counts as "defeated" for reward purposes (skipLoot is never set - Endless
+ *  Battle enemies are never a real named boss with a bossesDefeated-tracked unique drop the way
+ *  solo combat's are). Returns the per-uid summary for the battle doc's lastWaveRewards field. */
+async function grantWaveRewards(
+  tx: Transaction,
+  db: Firestore,
+  aliveUids: string[],
+  wave: number,
+  waveEnemies: { enemyId: string }[],
+): Promise<Record<string, PartyBattleWaveRewards>> {
+  const userRefs = aliveUids.map((uid) => db.collection('users').doc(uid));
+  const snaps = await Promise.all(userRefs.map((ref) => tx.get(ref)));
+  const defeated = waveEnemies.map((e) => ({ enemyId: e.enemyId }));
+  const chestTier = isMilestoneWave(wave) ? milestoneChestTier(wave) : null;
+
+  const summary: Record<string, PartyBattleWaveRewards> = {};
+  snaps.forEach((snap, i) => {
+    const uid = aliveUids[i];
+    if (!snap.exists) return;
+    const save = snap.data() as PlayerSave;
+
+    const reward = computeRewards(defeated, save.player.xp, save.player.level);
+    let totalXp = reward.xp;
+    let totalGold = reward.gold;
+    save.player.xp += reward.xp;
+    save.player.gold += reward.gold;
+    const grantedItemIds: string[] = [];
+    for (const itemId of reward.lootItemIds) {
+      if (grantItem(save, itemId)) grantedItemIds.push(itemId);
+    }
+
+    // Bonus chest roll on milestone waves (5, 10, 15, 20...) - reuses the Daily Chest reward
+    // tables rather than a third parallel loot system (see endlessBattleEngine.ts).
+    if (chestTier) {
+      const chest = rollChestRewards(chestTier);
+      totalGold += chest.gold;
+      save.player.gold += chest.gold;
+      save.player.premiumCurrency += chest.premiumCurrency;
+      for (const itemId of chest.itemIds) {
+        if (grantItem(save, itemId)) grantedItemIds.push(itemId);
+      }
+    }
+
+    applyLevelUp(save);
+    save.updatedAt = Date.now();
+    tx.set(userRefs[i], save);
+    summary[uid] = { xp: totalXp, gold: totalGold, itemIds: grantedItemIds };
+  });
+
+  return summary;
+}
+
+/** Restores every participant's real save to full HP/Spirit/Oil - "after the run ends... every
+ *  player is automatically restored... before returning to town" (applies to both a defeated run
+ *  and a voluntary exit, see voteContinueEndlessBattle). Downed participants are included, not
+ *  just currently-alive ones - the whole party gets the same clean slate regardless of who was
+ *  still standing when the run ended. */
+async function restoreAllParticipants(tx: Transaction, db: Firestore, uids: string[]): Promise<void> {
+  const userRefs = uids.map((uid) => db.collection('users').doc(uid));
+  const snaps = await Promise.all(userRefs.map((ref) => tx.get(ref)));
+  snaps.forEach((snap, i) => {
+    if (!snap.exists) return;
+    const save = snap.data() as PlayerSave;
+    save.player.stats.hp = save.player.stats.maxHp;
+    save.player.stats.spirit = save.player.stats.maxSpirit;
+    if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
+    save.updatedAt = Date.now();
+    tx.set(userRefs[i], save);
+  });
+  // Frees each participant to start (or be invited into) another battle - matches
+  // endlessBattle.ts's own endRun on a voluntary exit.
+  for (const uid of uids) tx.delete(db.collection('partyBattleLocks').doc(uid));
+}

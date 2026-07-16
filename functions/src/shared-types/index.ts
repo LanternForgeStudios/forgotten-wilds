@@ -352,13 +352,17 @@ export interface ClanInvite {
   createdAt: number;
 }
 
-// --- Multiplayer Battle System, Phase B: the party/PvP combat session itself (see
-// functions/src/engine/partyCombatEngine.ts). Endless Battle's wave progression (Phase C) and PvP
-// matchmaking (Phase D) both create/consume partyBattles/{battleId} docs, but neither exists yet -
-// this phase only builds the shared round-resolution mechanism they'll both sit on top of.
+// --- Multiplayer Battle System: the shared party/PvP combat session (see
+// functions/src/engine/partyCombatEngine.ts for round resolution). Phase C (functions/src/
+// functions/endlessBattle.ts) is the first real consumer - PvP matchmaking (Phase D) is still
+// unbuilt and will reuse this same doc/round-resolution mechanism with mode: 'pvp'.
 
 export type PartyBattleMode = 'endless' | 'pvp';
-export type PartyBattleStatus = 'active' | 'victory' | 'defeated' | 'withdrawn';
+/** 'awaitingContinueVote' is Endless Battle-only (see endlessBattleEngine.ts/endlessBattle.ts) -
+ *  submitPartyBattleAction transitions a victory to this instead of the plain 'victory' terminal
+ *  state when `mode === 'endless'`, since a wave win isn't the end of the run. PvP (once built)
+ *  will use 'victory'/'defeated' as real terminal states directly. */
+export type PartyBattleStatus = 'active' | 'awaitingContinueVote' | 'victory' | 'defeated' | 'withdrawn';
 
 /** One participant's combat-relevant stats, snapshotted onto the battle doc at battle start (full
  *  HP/Spirit/Oil per the design doc's "every player restored to 100% at battle start") and
@@ -395,6 +399,12 @@ export interface PartyBattleRoundResult {
   resolvedAt: number;
 }
 
+export interface PartyBattleWaveRewards {
+  xp: number;
+  gold: number;
+  itemIds: string[];
+}
+
 /** partyBattles/{battleId} - auto-id, `participants` is the trades-style array
  *  firestore.rules/the client's live query filter on. `pendingActions[uid]` is null until that
  *  participant submits for the current round; a round resolves (via submitPartyBattleAction, see
@@ -405,6 +415,13 @@ export interface PartyBattleSession {
   clanId: string | null;
   mode: PartyBattleMode;
   participants: string[];
+  /** Where the party was standing when the run started - fixed for the run's lifetime, used to
+   *  reroll each new wave's enemies from the same encounter table (see endlessBattleEngine.ts). */
+  locationId: string;
+  /** The party's average real level at battle start, frozen for the whole run - each wave's
+   *  difficulty escalates from this fixed baseline (see endlessBattleEngine.ts's
+   *  effectiveLevelForWave), not from real characters' levels changing mid-run as rewards land. */
+  partyAverageLevel: number;
   wave: number;
   enemies: PartyBattleEnemyState[];
   round: number;
@@ -413,6 +430,20 @@ export interface PartyBattleSession {
   pendingActions: Record<string, CombatAction | null>;
   participantStats: Record<string, PartyBattleParticipantStats>;
   lastRoundResult: PartyBattleRoundResult | null;
+  /** Independent per-player rewards from the wave just won - see endlessBattle.ts. null until the
+   *  first wave is cleared; endless-mode only (PvP grants rewards once, at the very end). */
+  lastWaveRewards: Record<string, PartyBattleWaveRewards> | null;
+  /** Endless-mode only, meaningful only while status === 'awaitingContinueVote' - see
+   *  endlessBattle.ts's voteContinueEndlessBattle. Reset to {} every time a new vote opens. */
+  continueVotes: Record<string, boolean>;
   startedAt: number;
   updatedAt: number;
+}
+
+/** partyBattleLocks/{uid} - one doc per account, mirrors activeTradeLocks' own reasoning: lets
+ *  startEndlessBattle check "is this player already in a battle" atomically inside its own
+ *  transaction (a doc-ref read, never a query), and prevents them from being started into a
+ *  second one. Deleted the moment their battle reaches any terminal status. */
+export interface PartyBattleLockDoc {
+  battleId: string;
 }

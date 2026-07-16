@@ -16,4 +16,5 @@ export * from './trade';
 export * from './worldChat';
 export * from './recipe';
 export * from './clan';
+export * from './partyBattle';
 export * from './future';

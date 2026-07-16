@@ -1,5 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
-import type { ActiveAilment, EnemyTier, PlayerSave, TradeStatus } from '@/types';
+import type { ActiveAilment, CombatAction, EnemyTier, PartyBattleStatus, PlayerSave, TradeStatus } from '@/types';
 import { functions } from './firebaseConfig';
 
 export async function callCreateCharacter(name: string, skin: 'male' | 'female' = 'male'): Promise<PlayerSave> {
@@ -421,5 +421,35 @@ export async function callTransferClanLeadership(toUid: string): Promise<{ newLe
 export async function callDisbandClan(): Promise<{ disbanded: true }> {
   const fn = httpsCallable<void, { disbanded: true }>(functions, 'disbandClan');
   const result = await fn();
+  return result.data;
+}
+
+export async function callStartEndlessBattle(participantUids: string[]): Promise<{ battleId: string }> {
+  const fn = httpsCallable<{ participantUids: string[] }, { battleId: string }>(functions, 'startEndlessBattle');
+  const result = await fn({ participantUids });
+  return result.data;
+}
+
+export async function callVoteContinueEndlessBattle(
+  battleId: string,
+  wantsToContinue: boolean,
+): Promise<{ status: PartyBattleStatus; wave?: number }> {
+  const fn = httpsCallable<{ battleId: string; continue: boolean }, { status: PartyBattleStatus; wave?: number }>(
+    functions,
+    'voteContinueEndlessBattle',
+  );
+  const result = await fn({ battleId, continue: wantsToContinue });
+  return result.data;
+}
+
+export async function callSubmitPartyBattleAction(
+  battleId: string,
+  action?: CombatAction,
+): Promise<{ resolved: boolean; status: PartyBattleStatus }> {
+  const fn = httpsCallable<{ battleId: string; action?: CombatAction }, { resolved: boolean; status: PartyBattleStatus }>(
+    functions,
+    'submitPartyBattleAction',
+  );
+  const result = await fn({ battleId, action });
   return result.data;
 }

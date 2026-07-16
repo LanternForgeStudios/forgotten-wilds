@@ -37,7 +37,9 @@ import {
   callRemoveFromClan,
   callTransferClanLeadership,
   callDisbandClan,
+  callStartEndlessBattle,
 } from '@/firebase/functionsClient';
+import { EndlessBattlePanel } from './EndlessBattlePanel';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { subscribeToMyTrades } from '@/firebase/tradeService';
@@ -122,6 +124,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const [newClanTag, setNewClanTag] = useState('');
   const [clanInviteQuery, setClanInviteQuery] = useState('');
   const [clanInviteResults, setClanInviteResults] = useState<{ uid: string; displayName: string }[]>([]);
+  const [endlessBattleId, setEndlessBattleId] = useState<string | null>(null);
 
   // --- Reset Progress tab state ---
   const [confirmEmail, setConfirmEmail] = useState('');
@@ -455,6 +458,24 @@ export function UserProfile({ onClose }: UserProfileProps) {
       await callDisbandClan();
     } catch (err) {
       setClanError(err instanceof Error ? err.message : 'Could not disband the clan.');
+    } finally {
+      setClanBusy(false);
+    }
+  }
+
+  async function startEndlessBattle() {
+    if (clanBusy || !clan) return;
+    setClanBusy(true);
+    setClanError(null);
+    try {
+      const { battleId } = await callStartEndlessBattle(clan.memberUids);
+      setEndlessBattleId(battleId);
+    } catch (err) {
+      setClanError(
+        err instanceof Error
+          ? err.message
+          : 'Could not start a battle - make sure every clan member is standing together.',
+      );
     } finally {
       setClanBusy(false);
     }
@@ -918,6 +939,17 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   </>
                 )}
 
+                {clan.memberUids.length >= 2 && (
+                  <div style={{ marginTop: 12 }}>
+                    <button className={styles.smallButton} disabled={clanBusy} onClick={startEndlessBattle}>
+                      Start Endless Battle
+                    </button>
+                    <p className={styles.empty} style={{ marginTop: 6 }}>
+                      Everyone in the clan must be standing at the same location to start.
+                    </p>
+                  </div>
+                )}
+
                 <div style={{ marginTop: 12 }}>
                   {clan.leaderUid === uid ? (
                     <button className={styles.dangerButton} disabled={clanBusy} onClick={disbandClan}>
@@ -1061,6 +1093,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
 
         <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
+      {endlessBattleId && <EndlessBattlePanel battleId={endlessBattleId} onClose={() => setEndlessBattleId(null)} />}
     </div>
   );
 }

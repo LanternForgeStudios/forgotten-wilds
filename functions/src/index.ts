@@ -38,3 +38,4 @@ export {
   disbandClan,
 } from './functions/clan';
 export { submitPartyBattleAction } from './functions/partyBattle';
+export { startEndlessBattle, voteContinueEndlessBattle } from './functions/endlessBattle';

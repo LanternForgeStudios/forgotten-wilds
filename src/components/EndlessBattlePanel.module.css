@@ -1,0 +1,174 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.panel {
+  width: min(560px, 94vw);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.title {
+  margin: 0 0 12px;
+  color: var(--fw-accent);
+}
+
+.sectionTitle {
+  margin: 14px 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.rowName {
+  flex: 1;
+  font-size: 13px;
+}
+
+.targetButton,
+.targetSelected {
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--fw-panel-border);
+  background: transparent;
+  color: var(--fw-text-dim);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.targetSelected {
+  border-color: var(--fw-accent);
+  color: var(--fw-accent);
+}
+
+.barTrack {
+  position: relative;
+  flex: 1;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--fw-bg-deep);
+  overflow: hidden;
+}
+
+.barFillHp {
+  position: absolute;
+  inset: 0;
+  background: var(--fw-hp, #4a9d5f);
+  transition: width 0.3s ease;
+}
+
+.barFillEnemy {
+  position: absolute;
+  inset: 0;
+  background: var(--fw-danger);
+  transition: width 0.3s ease;
+}
+
+.barValue {
+  position: relative;
+  display: block;
+  text-align: center;
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--fw-text);
+}
+
+.log {
+  margin-top: 10px;
+  padding: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid var(--fw-panel-border);
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.log p {
+  margin: 2px 0;
+}
+
+.countdown {
+  margin: 10px 0 6px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.rewardLine {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--fw-accent);
+}
+
+.actionRow {
+  display: flex;
+  gap: 8px;
+}
+
+.smallButton {
+  background: var(--fw-accent-dim);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.smallButton:hover {
+  background: var(--fw-accent);
+  color: var(--fw-bg-deep);
+}
+
+.smallButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.dangerButton {
+  background: transparent;
+  border: 1px solid var(--fw-danger);
+  color: var(--fw-danger);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dangerButton:hover {
+  background: var(--fw-danger);
+  color: var(--fw-bg-deep);
+}
+
+.error {
+  margin: 8px 0;
+  font-size: 12px;
+  color: var(--fw-danger);
+}
+
+.empty {
+  margin: 8px 0;
+  font-size: 13px;
+  opacity: 0.7;
+  font-style: italic;
+}
