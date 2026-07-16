@@ -104,5 +104,23 @@ service cloud.firestore {
       allow read: if false;
       allow write: if false;
     }
+
+    // Clans: small standing groups (clan.ts), also server-authoritative.
+
+    match /clans/{clanId} {
+      allow read: if request.auth != null && request.auth.uid in resource.data.memberUids;
+      allow write: if false;
+    }
+
+    match /clanMemberships/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /clanInvites/{inviteId} {
+      allow read: if request.auth != null
+        && (request.auth.uid == resource.data.fromUid || request.auth.uid == resource.data.toUid);
+      allow write: if false;
+    }
   }
 }

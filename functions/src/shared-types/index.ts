@@ -306,3 +306,48 @@ export interface WorldChatModerationDoc {
 export interface WorldChatCleanupMeta {
   lastCleanupAt: number;
 }
+
+export const MAX_CLAN_SIZE = 6;
+
+/** clans/{clanId} - one doc per clan, auto-id. `memberUids` always includes `leaderUid` (checked
+ *  by every clan.ts mutation, not enforced by the doc shape itself). `level`/`xp`/
+ *  `highestEndlessWave` are placeholders written by the future Endless Battle phase - clan.ts's
+ *  functions only ever initialize them to 0, never advance them. */
+export interface ClanDoc {
+  id: string;
+  name: string;
+  tag: string;
+  leaderUid: string;
+  memberUids: string[];
+  level: number;
+  xp: number;
+  highestEndlessWave: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+/** clanMemberships/{uid} - one doc per account, mirrors friendships/{uid}'s "one doc per account"
+ *  pattern - lets any function answer "what clan is this player in, if any" with a single doc
+ *  read by uid instead of scanning the clans collection. `clanId: null` means not in a clan.
+ *  Kept in sync by hand inside every clan.ts mutation that changes membership. */
+export interface ClanMembershipDoc {
+  clanId: string | null;
+}
+
+export type ClanInviteStatus = 'pending' | 'accepted' | 'declined';
+
+/** clanInvites/{id} - flat collection, auto-id (unlike friendRequests' deterministic
+ *  `${fromUid}_${toUid}` id, a player could plausibly hold pending invites from more than one
+ *  clan before accepting one, so there's no single natural deterministic key here). Mirrors
+ *  FriendRequest's shape otherwise, including freezing display names at invite time. */
+export interface ClanInvite {
+  id: string;
+  clanId: string;
+  clanName: string;
+  fromUid: string;
+  fromDisplayName: string;
+  toUid: string;
+  toDisplayName: string;
+  status: ClanInviteStatus;
+  createdAt: number;
+}

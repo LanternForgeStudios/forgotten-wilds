@@ -375,3 +375,51 @@ export async function callSendWorldChatMessage(text: string): Promise<void> {
   const fn = httpsCallable<{ text: string }, { sent: true }>(functions, 'sendWorldChatMessage');
   await fn({ text });
 }
+
+export async function callCreateClan(name: string, tag: string): Promise<{ clanId: string }> {
+  const fn = httpsCallable<{ name: string; tag: string }, { clanId: string }>(functions, 'createClan');
+  const result = await fn({ name, tag });
+  return result.data;
+}
+
+export async function callInviteToClan(clanId: string, toUid: string): Promise<{ status: 'sent' }> {
+  const fn = httpsCallable<{ clanId: string; toUid: string }, { status: 'sent' }>(functions, 'inviteToClan');
+  const result = await fn({ clanId, toUid });
+  return result.data;
+}
+
+export async function callRespondToClanInvite(
+  inviteId: string,
+  accept: boolean,
+): Promise<{ status: 'accepted' | 'declined' }> {
+  const fn = httpsCallable<{ inviteId: string; accept: boolean }, { status: 'accepted' | 'declined' }>(
+    functions,
+    'respondToClanInvite',
+  );
+  const result = await fn({ inviteId, accept });
+  return result.data;
+}
+
+export async function callLeaveClan(): Promise<{ left: true }> {
+  const fn = httpsCallable<void, { left: true }>(functions, 'leaveClan');
+  const result = await fn();
+  return result.data;
+}
+
+export async function callRemoveFromClan(uid: string): Promise<{ removed: true }> {
+  const fn = httpsCallable<{ uid: string }, { removed: true }>(functions, 'removeFromClan');
+  const result = await fn({ uid });
+  return result.data;
+}
+
+export async function callTransferClanLeadership(toUid: string): Promise<{ newLeaderUid: string }> {
+  const fn = httpsCallable<{ toUid: string }, { newLeaderUid: string }>(functions, 'transferClanLeadership');
+  const result = await fn({ toUid });
+  return result.data;
+}
+
+export async function callDisbandClan(): Promise<{ disbanded: true }> {
+  const fn = httpsCallable<void, { disbanded: true }>(functions, 'disbandClan');
+  const result = await fn();
+  return result.data;
+}

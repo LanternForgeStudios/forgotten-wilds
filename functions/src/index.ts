@@ -28,3 +28,12 @@ export { resetPlayerProgress } from './functions/resetPlayerProgress';
 export { markSocialReviewed } from './functions/markSocialReviewed';
 export { proposeTrade, respondToTradeOffer, finalizeTrade, cancelTrade } from './functions/trade';
 export { sendWorldChatMessage } from './functions/worldChat';
+export {
+  createClan,
+  inviteToClan,
+  respondToClanInvite,
+  leaveClan,
+  removeFromClan,
+  transferClanLeadership,
+  disbandClan,
+} from './functions/clan';

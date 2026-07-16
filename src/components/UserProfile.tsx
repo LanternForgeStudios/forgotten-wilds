@@ -14,6 +14,7 @@ import {
   subscribeToDirectMessagesWith,
   resolveDisplayNames,
 } from '@/firebase/socialService';
+import { subscribeToClanMembership, subscribeToClan, subscribeToIncomingClanInvites } from '@/firebase/clanService';
 import {
   callSearchUsers,
   callSendFriendRequest,
@@ -29,6 +30,13 @@ import {
   callFinalizeTrade,
   callCancelTrade,
   callSetPlayerSkin,
+  callCreateClan,
+  callInviteToClan,
+  callRespondToClanInvite,
+  callLeaveClan,
+  callRemoveFromClan,
+  callTransferClanLeadership,
+  callDisbandClan,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
@@ -39,7 +47,8 @@ import { useToastStore } from '@/state/useToastStore';
 import { useAudioSettingsStore } from '@/state/useAudioSettingsStore';
 import { TradeOfferPanel } from './TradeOfferPanel';
 import { ITEMS, EQUIPMENT } from '@/data';
-import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc, TradeOfferSide } from '@/types';
+import { MAX_CLAN_SIZE } from '@/types';
+import type { ClanDoc, ClanInvite, DirectMessage, FriendRequest, OnlinePresence, TradeDoc, TradeOfferSide } from '@/types';
 import styles from './UserProfile.module.css';
 
 function tradeItemDisplayName(itemId: string): string {
@@ -103,6 +112,17 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const prevTradesRef = useRef<TradeDoc[]>([]);
   const hasLoadedTradesRef = useRef(false);
 
+  // --- Clan tab state ---
+  const [clanId, setClanId] = useState<string | null>(null);
+  const [clan, setClan] = useState<ClanDoc | null>(null);
+  const [incomingClanInvites, setIncomingClanInvites] = useState<ClanInvite[]>([]);
+  const [clanBusy, setClanBusy] = useState(false);
+  const [clanError, setClanError] = useState<string | null>(null);
+  const [newClanName, setNewClanName] = useState('');
+  const [newClanTag, setNewClanTag] = useState('');
+  const [clanInviteQuery, setClanInviteQuery] = useState('');
+  const [clanInviteResults, setClanInviteResults] = useState<{ uid: string; displayName: string }[]>([]);
+
   // --- Reset Progress tab state ---
   const [confirmEmail, setConfirmEmail] = useState('');
   const [resetError, setResetError] = useState<string | null>(null);
@@ -128,6 +148,23 @@ export function UserProfile({ onClose }: UserProfileProps) {
     return () => unsubs.forEach((u) => u());
   }, [uid, tab]);
 
+  // Clan membership is subscribed whenever the profile is open (not gated to tab === 'clan'), the
+  // same "always mounted" reasoning as the friend-request/DM/trade subscriptions above - a clan
+  // invite arriving should be knowable without the player first clicking into the Clan tab.
+  useEffect(() => {
+    if (!uid) return;
+    const unsubs = [subscribeToClanMembership(uid, setClanId), subscribeToIncomingClanInvites(uid, setIncomingClanInvites)];
+    return () => unsubs.forEach((u) => u());
+  }, [uid]);
+
+  useEffect(() => {
+    if (!clanId) {
+      setClan(null);
+      return;
+    }
+    return subscribeToClan(clanId, setClan);
+  }, [clanId]);
+
   useEffect(() => {
     const allUids = [
       ...friendUids,
@@ -135,11 +172,13 @@ export function UserProfile({ onClose }: UserProfileProps) {
       ...incoming.map((r) => r.fromUid),
       ...outgoing.map((r) => r.toUid),
       ...myTrades.flatMap((t) => t.participants),
+      ...(clan?.memberUids ?? []),
+      ...incomingClanInvites.map((i) => i.fromUid),
     ];
     const unresolved = Array.from(new Set(allUids)).filter((u) => !names[u]);
     if (unresolved.length === 0) return;
     resolveDisplayNames(unresolved).then((resolved) => setNames((prev) => ({ ...prev, ...resolved })));
-  }, [friendUids, blockedUids, incoming, outgoing, myTrades, names]);
+  }, [friendUids, blockedUids, incoming, outgoing, myTrades, clan, incomingClanInvites, names]);
 
   // Pushes one toast the moment a trade transitions into a terminal status - same idea as
   // hydrate.ts's toastQuestChanges, but implemented locally here since trades aren't part of
@@ -313,6 +352,111 @@ export function UserProfile({ onClose }: UserProfileProps) {
       if (uid) await resyncSave(uid);
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function createClan() {
+    if (clanBusy) return;
+    setClanBusy(true);
+    setClanError(null);
+    try {
+      await callCreateClan(newClanName, newClanTag);
+      setNewClanName('');
+      setNewClanTag('');
+    } catch (err) {
+      setClanError(err instanceof Error ? err.message : 'Could not create clan.');
+    } finally {
+      setClanBusy(false);
+    }
+  }
+
+  async function searchForClanInvite() {
+    setClanError(null);
+    setClanInviteResults([]);
+    try {
+      const res = await callSearchUsers(clanInviteQuery);
+      setClanInviteResults(res.results);
+    } catch (err) {
+      setClanError(err instanceof Error ? err.message : 'Search failed.');
+    }
+  }
+
+  async function sendClanInvite(toUid: string) {
+    if (clanBusy || !clan) return;
+    setClanBusy(true);
+    setClanError(null);
+    try {
+      await callInviteToClan(clan.id, toUid);
+      setClanInviteResults((prev) => prev.filter((r) => r.uid !== toUid));
+    } catch (err) {
+      setClanError(err instanceof Error ? err.message : 'Could not send that invite.');
+    } finally {
+      setClanBusy(false);
+    }
+  }
+
+  async function respondToClanInvite(inviteId: string, accept: boolean) {
+    if (clanBusy) return;
+    setClanBusy(true);
+    setClanError(null);
+    try {
+      await callRespondToClanInvite(inviteId, accept);
+    } catch (err) {
+      setClanError(err instanceof Error ? err.message : 'Could not respond to that invite.');
+    } finally {
+      setClanBusy(false);
+    }
+  }
+
+  async function leaveClan() {
+    if (clanBusy) return;
+    setClanBusy(true);
+    setClanError(null);
+    try {
+      await callLeaveClan();
+    } catch (err) {
+      setClanError(err instanceof Error ? err.message : 'Could not leave the clan.');
+    } finally {
+      setClanBusy(false);
+    }
+  }
+
+  async function removeClanMember(memberUid: string) {
+    if (clanBusy) return;
+    setClanBusy(true);
+    setClanError(null);
+    try {
+      await callRemoveFromClan(memberUid);
+    } catch (err) {
+      setClanError(err instanceof Error ? err.message : 'Could not remove that member.');
+    } finally {
+      setClanBusy(false);
+    }
+  }
+
+  async function transferClanLeadership(memberUid: string) {
+    if (clanBusy) return;
+    setClanBusy(true);
+    setClanError(null);
+    try {
+      await callTransferClanLeadership(memberUid);
+    } catch (err) {
+      setClanError(err instanceof Error ? err.message : 'Could not transfer leadership.');
+    } finally {
+      setClanBusy(false);
+    }
+  }
+
+  async function disbandClan() {
+    if (clanBusy) return;
+    setClanBusy(true);
+    setClanError(null);
+    try {
+      await callDisbandClan();
+    } catch (err) {
+      setClanError(err instanceof Error ? err.message : 'Could not disband the clan.');
+    } finally {
+      setClanBusy(false);
     }
   }
 
@@ -671,9 +815,128 @@ export function UserProfile({ onClose }: UserProfileProps) {
 
         {tab === 'clan' && (
           <div className={styles.section}>
-            <p className={styles.empty}>
-              Clans are not yet available - a future home for a smaller, tighter-knit group than a Lodge.
-            </p>
+            {clanError && <p className={styles.error}>{clanError}</p>}
+
+            {incomingClanInvites.length > 0 && (
+              <>
+                <h3 className={styles.sectionTitle}>Clan Invites</h3>
+                <div className={styles.list}>
+                  {incomingClanInvites.map((inv) => (
+                    <div key={inv.id} className={styles.row}>
+                      <span className={styles.rowName}>
+                        {inv.clanName} (from {names[inv.fromUid] ?? inv.fromDisplayName})
+                      </span>
+                      <button className={styles.smallButton} disabled={clanBusy} onClick={() => respondToClanInvite(inv.id, true)}>
+                        Accept
+                      </button>
+                      <button className={styles.smallButton} disabled={clanBusy} onClick={() => respondToClanInvite(inv.id, false)}>
+                        Decline
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {!clanId && (
+              <>
+                <h3 className={styles.sectionTitle}>Create a Clan</h3>
+                <div className={styles.searchBar}>
+                  <input
+                    className={styles.textInput}
+                    placeholder="Clan name"
+                    value={newClanName}
+                    onChange={(e) => setNewClanName(e.target.value)}
+                  />
+                  <input
+                    className={styles.textInput}
+                    placeholder="Tag (2-5 letters)"
+                    value={newClanTag}
+                    onChange={(e) => setNewClanTag(e.target.value)}
+                    style={{ maxWidth: 100 }}
+                  />
+                  <button className={styles.smallButton} disabled={clanBusy} onClick={createClan}>
+                    Create
+                  </button>
+                </div>
+              </>
+            )}
+
+            {clan && (
+              <>
+                <h3 className={styles.sectionTitle}>
+                  {clan.name} [{clan.tag}] - {clan.memberUids.length}/{MAX_CLAN_SIZE}
+                </h3>
+                <div className={styles.list}>
+                  {clan.memberUids.map((memberUid) => (
+                    <div key={memberUid} className={styles.row}>
+                      <span className={styles.rowName}>
+                        {names[memberUid] ?? '...'}
+                        {memberUid === clan.leaderUid ? ' (Leader)' : ''}
+                      </span>
+                      {clan.leaderUid === uid && memberUid !== uid && (
+                        <>
+                          <button className={styles.smallButton} disabled={clanBusy} onClick={() => transferClanLeadership(memberUid)}>
+                            Make Leader
+                          </button>
+                          <button className={styles.dangerButton} disabled={clanBusy} onClick={() => removeClanMember(memberUid)}>
+                            Remove
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {clan.leaderUid === uid && clan.memberUids.length < MAX_CLAN_SIZE && (
+                  <>
+                    <h3 className={styles.sectionTitle}>Invite a Player</h3>
+                    <div className={styles.searchBar}>
+                      <input
+                        className={styles.textInput}
+                        placeholder="Search by character name..."
+                        value={clanInviteQuery}
+                        onChange={(e) => setClanInviteQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && searchForClanInvite()}
+                      />
+                      <button className={styles.smallButton} onClick={searchForClanInvite} disabled={clanBusy}>
+                        Search
+                      </button>
+                    </div>
+                    {clanInviteResults.length > 0 && (
+                      <div className={styles.list}>
+                        {clanInviteResults.map((r) => (
+                          <div key={r.uid} className={styles.row}>
+                            <span className={styles.rowName}>{r.displayName}</span>
+                            <button className={styles.smallButton} disabled={clanBusy} onClick={() => sendClanInvite(r.uid)}>
+                              Invite
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                <div style={{ marginTop: 12 }}>
+                  {clan.leaderUid === uid ? (
+                    <button className={styles.dangerButton} disabled={clanBusy} onClick={disbandClan}>
+                      Disband Clan
+                    </button>
+                  ) : (
+                    <button className={styles.dangerButton} disabled={clanBusy} onClick={leaveClan}>
+                      Leave Clan
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+
+            {!clanId && incomingClanInvites.length === 0 && (
+              <p className={styles.empty} style={{ marginTop: 12 }}>
+                Not in a clan yet - create one above, or wait for an invite.
+              </p>
+            )}
           </div>
         )}
 
