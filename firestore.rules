@@ -138,5 +138,22 @@ service cloud.firestore {
       allow read: if false;
       allow write: if false;
     }
+
+    // Multiplayer Battle System, Phase D: casual PvP (pvpBattle.ts). Challenges mirror
+    // friendRequests' pattern; the queue is one doc per waiting account.
+
+    match /pvpChallenges/{challengeId} {
+      allow read: if request.auth != null
+        && (request.auth.uid == resource.data.fromUid || request.auth.uid == resource.data.toUid);
+      allow write: if false;
+    }
+
+    match /pvpQueue/{uid} {
+      // A queued player doesn't need to read their own queue doc - joinPvpQueue's own response
+      // already tells the caller whether they matched immediately, and a live "you're queued"
+      // indicator isn't part of this pass's UI.
+      allow read: if false;
+      allow write: if false;
+    }
   }
 }

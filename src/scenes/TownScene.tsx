@@ -97,7 +97,7 @@ export function TownScene() {
 
   useHeartbeat(uid, displayName, locationId, position, skin);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const { startDash, stopDash, dashRampKey } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
+  const { startDash, stopDash } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
 
   useEffect(() => subscribeToPresence(setPresences), []);
 
@@ -303,7 +303,6 @@ export function TownScene() {
           viewportSize={viewportSize}
           playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
           playerMovementState={movementState}
-          dashRampTrigger={dashRampKey}
         />
       </div>
       {isMobile ? (

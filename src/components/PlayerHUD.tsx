@@ -7,10 +7,12 @@ import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { subscribeToIncomingFriendRequests, subscribeToAllDirectMessages, subscribeToFriendship } from '@/firebase/socialService';
 import { subscribeToMyTrades } from '@/firebase/tradeService';
+import { subscribeToMyActivePartyBattle } from '@/firebase/partyBattleService';
 import { callSendFriendRequest, callClaimDailyChest, type DailyChestRewards } from '@/firebase/functionsClient';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
 import { ChestRewardReveal } from './ChestRewardReveal';
+import { ActiveBattleOverlay } from './ActiveBattleOverlay';
 import { XP_THRESHOLDS, LOCATIONS, CHEST_CLAIM_INTERVAL_MS, ELITE_CHEST_LEVEL_THRESHOLD } from '@/data';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { PRESENCE_STALE_AFTER_MS } from '@/utils/presence';
@@ -95,6 +97,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   );
   const [allMessages, setAllMessages] = useState<DirectMessage[]>([]);
   const [myTrades, setMyTrades] = useState<TradeDoc[]>([]);
+  const [activeBattleId, setActiveBattleId] = useState<string | null>(null);
   // Ticks the HUD every quarter-second purely so the Stamina bar visibly climbs back up in real
   // time between Dash calls instead of only updating right after one - display-only, never
   // persisted (see predictedStamina).
@@ -116,6 +119,10 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
       subscribeToAllDirectMessages(uid, setAllMessages),
       subscribeToMyTrades(uid, setMyTrades),
       subscribeToFriendship(uid, setFriendUids),
+      // Every participant in an Endless Battle or PvP fight gets shown it automatically via this
+      // global subscription, not just whoever clicked "Start"/accepted the challenge - see
+      // subscribeToMyActivePartyBattle's own doc comment.
+      subscribeToMyActivePartyBattle(uid, setActiveBattleId),
     ];
     return () => unsubs.forEach((u) => u());
   }, [uid]);
@@ -349,6 +356,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
       {chestResult && (
         <ChestRewardReveal tier={chestResult.tier} rewards={chestResult.rewards} onClose={() => setChestResult(null)} />
       )}
+      {activeBattleId && <ActiveBattleOverlay battleId={activeBattleId} onClose={() => setActiveBattleId(null)} />}
     </div>
   );
 }

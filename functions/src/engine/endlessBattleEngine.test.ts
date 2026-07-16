@@ -41,9 +41,9 @@ describe('milestoneChestTier', () => {
 });
 
 describe('rollWaveEnemies', () => {
-  it('rolls a real enemy group scaled to the wave, for a known location', () => {
+  it('rolls a real enemy group scaled to the wave, drawn from the full roster (no location)', () => {
     for (let i = 0; i < 10; i++) {
-      const enemies = rollWaveEnemies('ironwood-trail', 3, 10);
+      const enemies = rollWaveEnemies(3, 10);
       expect(enemies.length).toBeGreaterThanOrEqual(1);
       for (const e of enemies) {
         expect(e.hp).toBeGreaterThan(0);
@@ -55,12 +55,28 @@ describe('rollWaveEnemies', () => {
 
   it('later waves roll tougher enemies on average than wave 1', () => {
     let wave1TotalHp = 0;
-    let wave10TotalHp = 0;
+    let wave3TotalHp = 0;
     const trials = 30;
     for (let i = 0; i < trials; i++) {
-      wave1TotalHp += rollWaveEnemies('ironwood-trail', 1, 5).reduce((sum, e) => sum + e.maxHp, 0);
-      wave10TotalHp += rollWaveEnemies('ironwood-trail', 10, 5).reduce((sum, e) => sum + e.maxHp, 0);
+      // Wave 3, not 10 - wave 10 is a milestone and always includes a boss (see below), which
+      // would make this comparison true for a different reason than plain level escalation.
+      wave1TotalHp += rollWaveEnemies(1, 5).reduce((sum, e) => sum + e.maxHp, 0);
+      wave3TotalHp += rollWaveEnemies(3, 5).reduce((sum, e) => sum + e.maxHp, 0);
     }
-    expect(wave10TotalHp / trials).toBeGreaterThan(wave1TotalHp / trials);
+    expect(wave3TotalHp / trials).toBeGreaterThan(wave1TotalHp / trials);
+  });
+
+  it('always includes a boss-tier enemy on milestone waves (5, 10, 15...)', () => {
+    for (const wave of [5, 10, 15]) {
+      const enemies = rollWaveEnemies(wave, 20);
+      expect(enemies.some((e) => e.enemyId === 'coalbound-warden')).toBe(true);
+    }
+  });
+
+  it('never includes a boss-tier enemy on a non-milestone wave', () => {
+    for (let i = 0; i < 30; i++) {
+      const enemies = rollWaveEnemies(3, 20);
+      expect(enemies.some((e) => e.enemyId === 'coalbound-warden')).toBe(false);
+    }
   });
 });

@@ -2,11 +2,19 @@
 // Battle System Design" - Endless Battle and casual PvP). A PARALLEL engine to combatEngine.ts,
 // not a rewrite of it - solo quest combat never routes through here. The two engines share their
 // core damage/ailment math via combatMath.ts so they can't silently drift on how a hit is computed
-// (see that file's own doc comment); everything specific to "more than one player" - turn order
-// across N players, which player an enemy targets, per-player Defend, party-size-aware crowd
-// damage - lives only here, since combatEngine.ts's RoundInput/RoundResult are hardcoded to
-// exactly one player and were never actually generic (see src/multiplayer/party.ts's comment
-// claiming otherwise - that claim was wrong, this file is the real generalization).
+// (see that file's own doc comment); everything specific to "more than one player" lives only
+// here, since combatEngine.ts's RoundInput/RoundResult are hardcoded to exactly one player and
+// were never actually generic (see src/multiplayer/party.ts's comment claiming otherwise - that
+// claim was wrong, this file is the real generalization).
+//
+// Resolution is deliberately SEQUENTIAL, one player at a time, not a single batch given every
+// player's pre-chosen action at once: resolvePartyPlayerTurn is called once per alive party
+// member, in turn order, threading each call's updated enemy board into the next player's call.
+// That's what stops two players from both targeting an enemy the first one's hit already
+// defeated (a real bug in an earlier "collect everyone's action, then resolve all at once"
+// design - a second player's attack would land on an enemy that had already vanished from the
+// first player's hit). Enemies only act once every party member has had their turn this round -
+// see resolvePartyEnemyPhase, called separately by the caller after the last player's turn.
 
 import { ENEMIES, type EnemyDefinition } from '../data/enemies';
 import { SKILLS, type DamageType } from '../data/skills';
@@ -22,7 +30,6 @@ import {
   inflictAilment,
   isStunned,
   pickEnemyMove,
-  rollInitiative,
 } from './combatMath';
 import type { ActiveAilment, CombatAction, Stats } from '../shared-types';
 
@@ -34,15 +41,6 @@ export interface PartyPlayerInput {
   ailments: ActiveAilment[];
 }
 
-export interface PartyRoundInput {
-  /** Only players with hp > 0 take a turn or can be targeted by an enemy this round - a downed
-   *  player stays in this array (so the caller can still render them) but is otherwise inert. */
-  players: PartyPlayerInput[];
-  enemies: RoundEnemyInput[];
-}
-
-export type PartyRoundPhase = 'continue' | 'victory' | 'partyDefeated';
-
 export interface PartyCombatHitResult {
   uid: string;
   targetIndex: number;
@@ -51,83 +49,53 @@ export interface PartyCombatHitResult {
   defeated: boolean;
 }
 
-export interface PartyEnemyHitResult {
-  attackerIndex: number;
-  targetUid: string;
-  damage: number;
-  missed: boolean;
-  wasDefended: boolean;
-  logLine: string;
-}
-
-export interface PartyPlayerResult {
-  uid: string;
-  hp: number;
-  spirit: number;
-  lanternOil: number;
-  ailments: ActiveAilment[];
-  itemConsumedIds: string[];
-}
-
-export interface PartyRoundResult {
-  log: string[];
-  players: PartyPlayerResult[];
-  enemyHp: number[];
-  phase: PartyRoundPhase;
-  hits: PartyCombatHitResult[];
-  enemyHits: PartyEnemyHitResult[];
-}
-
 const TARGET_ALL_MISS_CHANCE = 0.15;
 const TARGET_ALL_DAMAGE_FACTOR = 0.6;
-const ENEMY_MISS_CHANCE = 0.1;
-
-/** combatEngine.ts's CROWD_DAMAGE_FACTOR dampens each non-boss enemy's damage because *one*
- *  player faces every alive enemy's attack every round. In a party, that same imbalance doesn't
- *  scale the same way - damage is already spread across whichever player each enemy happens to
- *  target (see pickEnemyTargetUid), so a party of P players facing E enemies isn't automatically
- *  P times harder the way a solo player facing E enemies is. Deliberately reusing the *same*
- *  per-enemy-count table (not inventing a second axis) for this reason - real balance tuning
- *  happens once Phase C's actual wave content exists to playtest against, not by guessing a
- *  party-size formula with nothing to verify it against yet. */
-const CROWD_DAMAGE_FACTOR: Record<number, number> = { 1: 1, 2: 0.3, 3: 0.25, 4: 0.2, 5: 0.15, 6: 0.1 };
 
 function weaknessMultiplier(enemy: EnemyDefinition, damageType: DamageType): number {
   return enemy.weaknessDamageType === damageType ? 1.5 : 1;
 }
 
-export function resolvePartyRound(input: PartyRoundInput): PartyRoundResult {
-  const log: string[] = [];
+export interface PartyPlayerTurnResult {
+  log: string[];
+  /** The enemy board after this player's turn - feed this into the next player's
+   *  resolvePartyPlayerTurn call (or into resolvePartyEnemyPhase, if this was the last player). */
+  enemyHp: number[];
+  hits: PartyCombatHitResult[];
+  hp: number;
+  spirit: number;
+  lanternOil: number;
+  ailments: ActiveAilment[];
+  itemConsumedIds: string[];
+  /** Whether this player chose Defend (or fled, treated the same way - see the 'flee' case below)
+   *  this turn - the enemy phase halves an attack against a defending player. Decided from the
+   *  action alone, the same "up front, not mid-resolution" reasoning solo combat's own
+   *  playerDefending has, just per-player instead of per-round. */
+  defending: boolean;
+}
 
-  const enemyHp = input.enemies.map((e) => e.hp);
-  const enemyDefs = input.enemies.map((e) => ENEMIES[e.enemyId]);
-  const enemyStats = input.enemies.map((e, i) => scaledEnemyStats(enemyDefs[i], e.level));
+/** Resolves exactly one player's turn (item use, then their primary action) against the given
+ *  live enemy board - callers advance through every alive party member this way, one at a time,
+ *  each call's `enemyHp` feeding the next player's `enemies` input (see this file's own top
+ *  comment for why). A stunned player's turn is a no-op regardless of what action they submitted
+ *  (or didn't get to, if the caller auto-skips a stunned player's action-selection entirely) -
+ *  ailment tick damage still applies either way, matching solo combat's own per-turn timing. */
+export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundEnemyInput[]): PartyPlayerTurnResult {
+  const log: string[] = [];
+  const enemyHp = enemies.map((e) => e.hp);
+  const enemyDefs = enemies.map((e) => ENEMIES[e.enemyId]);
+  const enemyStats = enemies.map((e, i) => scaledEnemyStats(enemyDefs[i], e.level));
   const isEnemyAlive = (i: number) => enemyHp[i] > 0;
   const aliveEnemyIndices = () => enemyHp.map((_, i) => i).filter(isEnemyAlive);
-  const aliveNonBossEnemyCount = () => aliveEnemyIndices().filter((i) => enemyDefs[i].tier !== 'boss').length;
 
-  // Per-player working state, keyed by uid - each player's hp/spirit/oil/ailments/defending status
-  // only ever affects hits ON that same player, unlike solo combat's single implicit "the player."
-  const hpByUid = new Map(input.players.map((p) => [p.uid, p.stats.hp]));
-  const spiritByUid = new Map(input.players.map((p) => [p.uid, p.stats.spirit]));
-  const oilByUid = new Map(input.players.map((p) => [p.uid, p.stats.lanternOil]));
-  const ailmentsByUid = new Map(input.players.map((p) => [p.uid, p.ailments.map((a) => ({ ...a }))]));
-  const inflictedThisRoundByUid = new Map(input.players.map((p) => [p.uid, new Set<string>()]));
-  const itemConsumedByUid = new Map<string, string[]>(input.players.map((p) => [p.uid, []]));
-  // Decided up front, from each player's submitted action alone - NOT set mid-loop as each
-  // player's own turn resolves - so a player's Defend this round halves an enemy's attack on them
-  // consistently regardless of turn-order/speed (an enemy faster than every player would otherwise
-  // attack before any player's turn had a chance to "activate" their own Defend). Mirrors
-  // combatEngine.ts's resolveRound's own documented reasoning for playerDefending, generalized to
-  // one flag per player instead of one flag for the whole round.
-  // Individual flee has no defined meaning in a party fight yet (see the 'flee' case in
-  // playerTurn) - treated as Defend here too, for the same reason.
-  const defendingByUid = new Map(input.players.map((p) => [p.uid, p.action.type === 'defend' || p.action.type === 'flee']));
+  let hp = player.stats.hp;
+  let spirit = player.stats.spirit;
+  let lanternOil = player.stats.lanternOil;
+  let ailments = player.ailments.map((a) => ({ ...a }));
+  const inflictedThisTurn = new Set<string>();
+  const itemConsumedIds: string[] = [];
   const hits: PartyCombatHitResult[] = [];
-  const enemyHits: PartyEnemyHitResult[] = [];
-
-  const isPlayerAlive = (uid: string) => (hpByUid.get(uid) ?? 0) > 0;
-  const alivePlayers = () => input.players.filter((p) => isPlayerAlive(p.uid));
+  const defending = player.action.type === 'defend' || player.action.type === 'flee';
 
   function damageEnemy(i: number, dmg: number, verb: string): boolean {
     const before = enemyHp[i];
@@ -145,114 +113,82 @@ export function resolvePartyRound(input: PartyRoundInput): PartyRoundResult {
     return alive[0];
   }
 
-  function resolveOffensiveHits(
-    player: PartyPlayerInput,
-    power: number,
-    verb: string,
-    bonusMultiplier: (enemyIdx: number) => number,
-    damageType: DamageType,
-  ) {
-    const ailments = ailmentsByUid.get(player.uid)!;
+  function resolveOffensiveHits(power: number, verb: string, bonusMultiplier: (i: number) => number, damageType: DamageType) {
     const attackMultiplier = ailmentAttackMultiplier(ailments);
     const blindChance = damageType === 'physical' ? blindMissChance(ailments) : 0;
     const alive = aliveEnemyIndices();
     const useAll = !!player.action.targetAll && alive.length > 1;
-    const targets = useAll
-      ? alive
-      : [resolveTargetIndex(player.action.targetIndex)].filter((i): i is number => i !== undefined);
+    const targets = useAll ? alive : [resolveTargetIndex(player.action.targetIndex)].filter((i): i is number => i !== undefined);
 
     for (const i of targets) {
       const missedTargetAll = useAll && Math.random() < TARGET_ALL_MISS_CHANCE;
       const missedBlind = blindChance > 0 && Math.random() < blindChance;
       if (missedTargetAll || missedBlind) {
-        log.push(`${player.uid}'s attack on ${enemyDefs[i].name} goes wide - miss!`);
+        log.push(`Your attack on ${enemyDefs[i].name} goes wide - miss!`);
         hits.push({ uid: player.uid, targetIndex: i, damage: 0, missed: true, defeated: false });
         continue;
       }
-      let dmg = Math.round(
-        computeDamage(power, player.stats.attack * attackMultiplier, enemyStats[i].defense) * bonusMultiplier(i),
-      );
+      let dmg = Math.round(computeDamage(power, player.stats.attack * attackMultiplier, enemyStats[i].defense) * bonusMultiplier(i));
       if (useAll) dmg = Math.max(1, Math.round(dmg * TARGET_ALL_DAMAGE_FACTOR));
       const defeated = damageEnemy(i, dmg, verb);
       hits.push({ uid: player.uid, targetIndex: i, damage: dmg, missed: false, defeated });
     }
   }
 
-  function consumeItems(player: PartyPlayerInput) {
+  function consumeItems() {
     const itemIds = player.action.itemIds ?? [];
     const counts = new Map<string, number>();
     for (const id of itemIds.slice(0, 3)) counts.set(id, (counts.get(id) ?? 0) + 1);
-    const consumed = itemConsumedByUid.get(player.uid)!;
 
     for (const [itemId, count] of counts) {
       const def = ITEMS[itemId];
       if (!def?.effect) continue;
-      for (let n = 0; n < count; n++) consumed.push(itemId);
+      for (let n = 0; n < count; n++) itemConsumedIds.push(itemId);
 
       if (def.effect.cureAilmentId) {
-        const ailments = ailmentsByUid.get(player.uid)!;
         const idx = ailments.findIndex((a) => a.ailmentId === def.effect!.cureAilmentId);
         if (idx >= 0) {
           const curedName = AILMENTS[def.effect.cureAilmentId]?.name ?? def.effect.cureAilmentId;
-          ailmentsByUid.set(
-            player.uid,
-            ailments.filter((_, i) => i !== idx),
-          );
-          log.push(`${player.uid} uses ${itemId.replace(/-/g, ' ')} and cures ${curedName}.`);
+          ailments = ailments.filter((_, i) => i !== idx);
+          log.push(`You use ${itemId.replace(/-/g, ' ')} and cure ${curedName}.`);
         }
       }
-
       for (let n = 0; n < count; n++) {
-        if (def.effect.healHpPercent) {
-          const hp = hpByUid.get(player.uid)!;
-          hpByUid.set(player.uid, Math.min(player.stats.maxHp, hp + Math.round(player.stats.maxHp * def.effect.healHpPercent)));
-        }
+        if (def.effect.healHpPercent) hp = Math.min(player.stats.maxHp, hp + Math.round(player.stats.maxHp * def.effect.healHpPercent));
         if (def.effect.healSpiritPercent) {
-          const spirit = spiritByUid.get(player.uid)!;
-          spiritByUid.set(
-            player.uid,
-            Math.min(player.stats.maxSpirit, spirit + Math.round(player.stats.maxSpirit * def.effect.healSpiritPercent)),
-          );
+          spirit = Math.min(player.stats.maxSpirit, spirit + Math.round(player.stats.maxSpirit * def.effect.healSpiritPercent));
         }
         if (def.effect.restoreOilPercent) {
-          const oil = oilByUid.get(player.uid)!;
-          oilByUid.set(
-            player.uid,
-            Math.min(player.stats.maxLanternOil, oil + Math.round(player.stats.maxLanternOil * def.effect.restoreOilPercent)),
-          );
+          lanternOil = Math.min(player.stats.maxLanternOil, lanternOil + Math.round(player.stats.maxLanternOil * def.effect.restoreOilPercent));
         }
       }
     }
   }
 
-  function playerTurn(player: PartyPlayerInput) {
-    const action = player.action;
-    switch (action.type) {
+  if (isStunned(ailments)) {
+    log.push(`${player.uid} is stunned and cannot act!`);
+  } else {
+    consumeItems();
+    switch (player.action.type) {
       case 'attack':
-        resolveOffensiveHits(player, SKILLS.attack.power, `${player.uid} strikes`, (i) => weaknessMultiplier(enemyDefs[i], 'physical'), 'physical');
+        resolveOffensiveHits(SKILLS.attack.power, 'You strike', (i) => weaknessMultiplier(enemyDefs[i], 'physical'), 'physical');
         break;
       case 'skill': {
-        const skill = SKILLS[action.skillId ?? 'keepers-strike'] ?? SKILLS['keepers-strike'];
-        spiritByUid.set(player.uid, Math.max(0, spiritByUid.get(player.uid)! - skill.spiritCost));
-        resolveOffensiveHits(
-          player,
-          skill.power,
-          `${player.uid}'s ${skill.id} hits`,
-          (i) => weaknessMultiplier(enemyDefs[i], skill.damageType),
-          skill.damageType,
-        );
+        const skill = SKILLS[player.action.skillId ?? 'keepers-strike'] ?? SKILLS['keepers-strike'];
+        spirit = Math.max(0, spirit - skill.spiritCost);
+        resolveOffensiveHits(skill.power, "Keeper's Strike hits", (i) => weaknessMultiplier(enemyDefs[i], skill.damageType), skill.damageType);
         break;
       }
       case 'item':
-        break; // fully handled by consumeItems(), called unconditionally before this switch
+        break; // fully handled by consumeItems() above
       case 'defend':
         log.push(`${player.uid} braces, ready to absorb the next blow.`);
         break;
       case 'flee':
-        // Individual flee has no defined meaning in a party fight yet (Endless Battle uses a
-        // group continue/withdraw vote instead - see the Phase C plan; PvP forfeit is Phase D's
-        // own concern) - treated as Defend for now rather than inventing solo-flee semantics that
-        // don't fit a shared-enemy-roster fight (see the up-front defendingByUid computation below).
+        // Individual flee has no defined meaning in a party fight yet (Endless Battle uses a group
+        // continue/withdraw vote instead; PvP forfeit is Phase D's own concern) - treated as
+        // Defend for now rather than inventing solo-flee semantics that don't fit a shared-enemy-
+        // roster fight.
         log.push(`${player.uid} has nowhere to flee to and braces instead.`);
         break;
       case 'lanternAbility':
@@ -264,21 +200,214 @@ export function resolvePartyRound(input: PartyRoundInput): PartyRoundResult {
     }
   }
 
-  function pickEnemyTargetUid(): string | undefined {
-    // Naturally distributes attacks across the party (per the design doc) - uniform random choice
-    // among currently-alive players, independently per attacking enemy. A future enemy-specific
-    // "priority target" mechanic would override this per-enemy, not change the default here.
-    const candidates = alivePlayers();
-    if (candidates.length === 0) return undefined;
-    return candidates[Math.floor(Math.random() * candidates.length)].uid;
+  hp = applyAilmentTickDamage(hp, player.stats.maxHp, ailments, log);
+  ailments = expireAilments(ailments, inflictedThisTurn);
+
+  return { log, enemyHp, hits, hp, spirit, lanternOil, ailments, itemConsumedIds, defending };
+}
+
+export interface PvpDefenderInput {
+  hp: number;
+  maxHp: number;
+  defense: number;
+}
+
+export interface PvpTurnResult {
+  log: string[];
+  hp: number;
+  spirit: number;
+  lanternOil: number;
+  ailments: ActiveAilment[];
+  itemConsumedIds: string[];
+  defending: boolean;
+  /** The opponent's hp after this turn's attack - unchanged from `defender.hp` on a Defend/item/
+   *  forfeit turn, since only an offensive action ever touches the opponent. */
+  defenderHp: number;
+  /** True only for a 'flee' action - PvP is 1-on-1, so unlike a party fight against shared enemies
+   *  (where individual flee has no defined meaning - see resolvePartyPlayerTurn's 'flee' case),
+   *  forfeiting here has a real, immediate effect: the match ends in the opponent's favor. */
+  forfeited: boolean;
+}
+
+/** Resolves exactly one player's turn in a 1-on-1 PvP duel against the given live opponent (hp/
+ *  defense snapshotted onto the battle doc, same as every other participant - see
+ *  PartyBattleParticipantStats). Deliberately its own function rather than a thin wrapper around
+ *  resolvePartyPlayerTurn: that function's damage math targets an *enemy* board (stats derived
+ *  from scaledEnemyStats/ENEMIES data), where a PvP opponent is a real player with their own
+ *  attack/defense - the two aren't interchangeable inputs. Mirrors resolvePartyPlayerTurn's
+ *  item/attack/skill/defend structure closely (including its own consumeItems), the same
+ *  parallel-structure tradeoff this file's top comment already accepts between this engine and
+ *  combatEngine.ts, rather than forcing a shared helper through both single-target and
+ *  enemy-board shapes. */
+export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderInput): PvpTurnResult {
+  const log: string[] = [];
+  let hp = player.stats.hp;
+  let spirit = player.stats.spirit;
+  let lanternOil = player.stats.lanternOil;
+  let ailments = player.ailments.map((a) => ({ ...a }));
+  const inflictedThisTurn = new Set<string>();
+  const itemConsumedIds: string[] = [];
+  const defending = player.action.type === 'defend';
+  let forfeited = false;
+  let defenderHp = defender.hp;
+
+  function damageDefender(dmg: number, verb: string): void {
+    defenderHp = Math.max(0, defenderHp - dmg);
+    log.push(`${verb} your opponent for ${dmg} damage.`);
+    if (defenderHp <= 0) log.push('Your opponent is defeated!');
   }
 
-  function enemyAttack(i: number) {
-    if (!isEnemyAlive(i)) return;
-    const targetUid = pickEnemyTargetUid();
+  function resolveOffensiveHit(power: number, verb: string, damageType: DamageType) {
+    const attackMultiplier = ailmentAttackMultiplier(ailments);
+    const blindChance = damageType === 'physical' ? blindMissChance(ailments) : 0;
+    if (blindChance > 0 && Math.random() < blindChance) {
+      log.push('Your attack goes wide - miss!');
+      return;
+    }
+    const dmg = Math.round(computeDamage(power, player.stats.attack * attackMultiplier, defender.defense));
+    damageDefender(dmg, verb);
+  }
+
+  function consumeItems() {
+    const itemIds = player.action.itemIds ?? [];
+    const counts = new Map<string, number>();
+    for (const id of itemIds.slice(0, 3)) counts.set(id, (counts.get(id) ?? 0) + 1);
+
+    for (const [itemId, count] of counts) {
+      const def = ITEMS[itemId];
+      if (!def?.effect) continue;
+      for (let n = 0; n < count; n++) itemConsumedIds.push(itemId);
+
+      if (def.effect.cureAilmentId) {
+        const idx = ailments.findIndex((a) => a.ailmentId === def.effect!.cureAilmentId);
+        if (idx >= 0) {
+          const curedName = AILMENTS[def.effect.cureAilmentId]?.name ?? def.effect.cureAilmentId;
+          ailments = ailments.filter((_, i) => i !== idx);
+          log.push(`You use ${itemId.replace(/-/g, ' ')} and cure ${curedName}.`);
+        }
+      }
+      for (let n = 0; n < count; n++) {
+        if (def.effect.healHpPercent) hp = Math.min(player.stats.maxHp, hp + Math.round(player.stats.maxHp * def.effect.healHpPercent));
+        if (def.effect.healSpiritPercent) {
+          spirit = Math.min(player.stats.maxSpirit, spirit + Math.round(player.stats.maxSpirit * def.effect.healSpiritPercent));
+        }
+        if (def.effect.restoreOilPercent) {
+          lanternOil = Math.min(player.stats.maxLanternOil, lanternOil + Math.round(player.stats.maxLanternOil * def.effect.restoreOilPercent));
+        }
+      }
+    }
+  }
+
+  if (isStunned(ailments)) {
+    log.push('You are stunned and cannot act!');
+  } else {
+    consumeItems();
+    switch (player.action.type) {
+      case 'attack':
+        resolveOffensiveHit(SKILLS.attack.power, 'You strike', 'physical');
+        break;
+      case 'skill': {
+        const skill = SKILLS[player.action.skillId ?? 'keepers-strike'] ?? SKILLS['keepers-strike'];
+        spirit = Math.max(0, spirit - skill.spiritCost);
+        resolveOffensiveHit(skill.power, "Keeper's Strike hits", skill.damageType);
+        break;
+      }
+      case 'item':
+        break; // fully handled by consumeItems() above
+      case 'defend':
+        log.push('You brace, ready to absorb the next blow.');
+        break;
+      case 'flee':
+        forfeited = true;
+        log.push('You forfeit the match.');
+        break;
+      case 'lanternAbility':
+        log.push("Your lantern flickers, but its ability isn't usable in PvP yet.");
+        break;
+    }
+  }
+
+  hp = applyAilmentTickDamage(hp, player.stats.maxHp, ailments, log);
+  ailments = expireAilments(ailments, inflictedThisTurn);
+
+  return { log, hp, spirit, lanternOil, ailments, itemConsumedIds, defending, defenderHp, forfeited };
+}
+
+export interface PartyEnemyHitResult {
+  attackerIndex: number;
+  targetUid: string;
+  damage: number;
+  missed: boolean;
+  wasDefended: boolean;
+  logLine: string;
+}
+
+export interface PartyEnemyPhasePlayerState {
+  uid: string;
+  hp: number;
+  maxHp: number;
+  defense: number;
+  ailments: ActiveAilment[];
+  defending: boolean;
+}
+
+export interface PartyEnemyPhasePlayerResult {
+  uid: string;
+  hp: number;
+  ailments: ActiveAilment[];
+}
+
+export interface PartyEnemyPhaseResult {
+  log: string[];
+  players: PartyEnemyPhasePlayerResult[];
+  enemyHits: PartyEnemyHitResult[];
+}
+
+const ENEMY_MISS_CHANCE = 0.1;
+
+/** combatEngine.ts's CROWD_DAMAGE_FACTOR dampens each non-boss enemy's damage because *one*
+ *  player faces every alive enemy's attack every round. In a party, that same imbalance doesn't
+ *  scale the same way - damage is already spread across whichever player each enemy happens to
+ *  target, so a party of P players facing E enemies isn't automatically P times harder the way a
+ *  solo player facing E enemies is. Deliberately reusing the *same* per-enemy-count table (not
+ *  inventing a second axis) for this reason - real balance tuning happens once Endless Battle
+ *  actually gets played, not by guessing a party-size formula with nothing to verify it against
+ *  yet. */
+const CROWD_DAMAGE_FACTOR: Record<number, number> = { 1: 1, 2: 0.3, 3: 0.25, 4: 0.2, 5: 0.15, 6: 0.1 };
+
+/** Resolves every alive enemy's attack once, called after every party member has had their turn
+ *  this round (see this file's own top comment) - each enemy independently picks a random alive
+ *  player to target (per the design doc's "naturally distribute attacks across the party"),
+ *  applying that player's own Defend status and ailment tick damage the same way solo combat
+ *  would. Only `players` passed in are eligible targets - a caller filters to alive party members
+ *  before calling this. */
+export function resolvePartyEnemyPhase(
+  players: PartyEnemyPhasePlayerState[],
+  enemies: RoundEnemyInput[],
+): PartyEnemyPhaseResult {
+  const log: string[] = [];
+  const enemyHits: PartyEnemyHitResult[] = [];
+  const enemyDefs = enemies.map((e) => ENEMIES[e.enemyId]);
+  const enemyStats = enemies.map((e, i) => scaledEnemyStats(enemyDefs[i], e.level));
+  const aliveNonBossEnemyCount = enemies.filter((e, i) => e.hp > 0 && enemyDefs[i].tier !== 'boss').length;
+
+  const hpByUid = new Map(players.map((p) => [p.uid, p.hp]));
+  const ailmentsByUid = new Map(players.map((p) => [p.uid, p.ailments.map((a) => ({ ...a }))]));
+  const inflictedThisPhaseByUid = new Map(players.map((p) => [p.uid, new Set<string>()]));
+
+  function pickTargetUid(): string | undefined {
+    const alive = players.filter((p) => (hpByUid.get(p.uid) ?? 0) > 0);
+    if (alive.length === 0) return undefined;
+    return alive[Math.floor(Math.random() * alive.length)].uid;
+  }
+
+  enemies.forEach((enemy, i) => {
+    if (enemy.hp <= 0) return;
+    const targetUid = pickTargetUid();
     if (!targetUid) return;
     const def = enemyDefs[i];
     const stats = enemyStats[i];
+    const target = players.find((p) => p.uid === targetUid)!;
 
     if (Math.random() < ENEMY_MISS_CHANCE) {
       const missLogLine = `${def.name}'s attack goes wide - miss!`;
@@ -287,75 +416,36 @@ export function resolvePartyRound(input: PartyRoundInput): PartyRoundResult {
       return;
     }
 
-    const hpFraction = enemyHp[i] / stats.maxHp;
+    const hpFraction = enemy.hp / stats.maxHp;
     const move = pickEnemyMove(def, hpFraction);
     const skill = SKILLS[move.skillId] ?? SKILLS.attack;
-    const targetDefense = input.players.find((p) => p.uid === targetUid)!.stats.defense;
-    let dmg = computeDamage(skill.power, stats.attack, targetDefense);
+    let dmg = computeDamage(skill.power, stats.attack, target.defense);
     if (def.tier !== 'boss') {
-      const crowdFactor = CROWD_DAMAGE_FACTOR[Math.min(6, aliveNonBossEnemyCount())] ?? 1;
+      const crowdFactor = CROWD_DAMAGE_FACTOR[Math.min(6, aliveNonBossEnemyCount)] ?? 1;
       dmg = Math.max(1, Math.round(dmg * crowdFactor));
     }
-    const targetDefending = defendingByUid.get(targetUid) ?? false;
-    if (targetDefending) dmg = Math.round(dmg / 2);
+    if (target.defending) dmg = Math.round(dmg / 2);
     hpByUid.set(targetUid, Math.max(0, hpByUid.get(targetUid)! - dmg));
     const attackLogLine = `${def.name} uses ${move.skillId.replace(/-/g, ' ')} on ${targetUid} for ${dmg} damage${
-      targetDefending ? ' (halved - defended)' : ''
+      target.defending ? ' (halved - defended)' : ''
     }.`;
-    enemyHits.push({ attackerIndex: i, targetUid, damage: dmg, missed: false, wasDefended: targetDefending, logLine: attackLogLine });
+    enemyHits.push({ attackerIndex: i, targetUid, damage: dmg, missed: false, wasDefended: target.defending, logLine: attackLogLine });
     log.push(attackLogLine);
 
     if (skill.inflictsAilmentId && Math.random() < (skill.inflictAilmentChance ?? 0)) {
       const ailments = ailmentsByUid.get(targetUid)!;
       ailmentsByUid.set(targetUid, inflictAilment(ailments, skill.inflictsAilmentId, log));
-      inflictedThisRoundByUid.get(targetUid)!.add(skill.inflictsAilmentId);
+      inflictedThisPhaseByUid.get(targetUid)!.add(skill.inflictsAilmentId);
     }
-  }
+  });
 
-  // Turn order: every alive player + every alive enemy rolls initiative, sorted descending -
-  // structurally identical to solo combat's own turn loop, just with N player entries instead of
-  // exactly 1.
-  type Turn = { kind: 'player'; player: PartyPlayerInput; roll: number } | { kind: 'enemy'; index: number; roll: number };
-  const turns: Turn[] = [
-    ...alivePlayers().map((p): Turn => ({ kind: 'player', player: p, roll: rollInitiative(p.stats.speed) })),
-    ...aliveEnemyIndices().map((i): Turn => ({ kind: 'enemy', index: i, roll: rollInitiative(enemyStats[i].speed) })),
-  ];
-  turns.sort((a, b) => b.roll - a.roll);
-
-  for (const turn of turns) {
-    if (aliveEnemyIndices().length === 0) break;
-    if (turn.kind === 'enemy') {
-      if (isEnemyAlive(turn.index)) enemyAttack(turn.index);
-      continue;
-    }
-    const { player } = turn;
-    if (!isPlayerAlive(player.uid)) continue; // downed mid-round by an earlier enemy turn
-
-    const ailments = ailmentsByUid.get(player.uid)!;
-    if (isStunned(ailments)) {
-      log.push(`${player.uid} is stunned and cannot act!`);
-    } else {
-      consumeItems(player);
-      playerTurn(player);
-    }
-    const hp = hpByUid.get(player.uid)!;
-    hpByUid.set(player.uid, applyAilmentTickDamage(hp, player.stats.maxHp, ailmentsByUid.get(player.uid)!, log));
-  }
-
-  const players: PartyPlayerResult[] = input.players.map((p) => ({
-    uid: p.uid,
-    hp: hpByUid.get(p.uid)!,
-    spirit: spiritByUid.get(p.uid)!,
-    lanternOil: oilByUid.get(p.uid)!,
-    ailments: expireAilments(ailmentsByUid.get(p.uid)!, inflictedThisRoundByUid.get(p.uid)!),
-    itemConsumedIds: itemConsumedByUid.get(p.uid)!,
-  }));
-
-  const allEnemiesDefeated = enemyHp.every((hp) => hp <= 0);
-  const allPlayersDown = players.every((p) => p.hp <= 0);
-  let phase: PartyRoundPhase = 'continue';
-  if (allEnemiesDefeated) phase = 'victory';
-  else if (allPlayersDown) phase = 'partyDefeated';
-
-  return { log, players, enemyHp, phase, hits, enemyHits };
+  return {
+    log,
+    players: players.map((p) => ({
+      uid: p.uid,
+      hp: hpByUid.get(p.uid)!,
+      ailments: expireAilments(ailmentsByUid.get(p.uid)!, inflictedThisPhaseByUid.get(p.uid)!),
+    })),
+    enemyHits,
+  };
 }

@@ -459,3 +459,33 @@ export async function callSubmitPartyBattleAction(
   const result = await fn({ battleId, action });
   return result.data;
 }
+
+export async function callChallengeToPvp(toUid: string): Promise<{ status: 'sent' | 'already-pending' }> {
+  const fn = httpsCallable<{ toUid: string }, { status: 'sent' | 'already-pending' }>(functions, 'challengeToPvp');
+  const result = await fn({ toUid });
+  return result.data;
+}
+
+export async function callRespondToPvpChallenge(
+  challengeId: string,
+  accept: boolean,
+): Promise<{ status: 'accepted' | 'declined'; battleId?: string }> {
+  const fn = httpsCallable<{ challengeId: string; accept: boolean }, { status: 'accepted' | 'declined'; battleId?: string }>(
+    functions,
+    'respondToPvpChallenge',
+  );
+  const result = await fn({ challengeId, accept });
+  return result.data;
+}
+
+export async function callJoinPvpQueue(): Promise<{ matched: boolean; battleId?: string }> {
+  const fn = httpsCallable<void, { matched: boolean; battleId?: string }>(functions, 'joinPvpQueue');
+  const result = await fn();
+  return result.data;
+}
+
+export async function callLeavePvpQueue(): Promise<{ left: true }> {
+  const fn = httpsCallable<void, { left: true }>(functions, 'leavePvpQueue');
+  const result = await fn();
+  return result.data;
+}

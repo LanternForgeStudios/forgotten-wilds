@@ -2,9 +2,18 @@
 // separate from partyCombatEngine.ts (which only resolves one round at a time and has no notion
 // of "waves" at all) so both stay independently testable.
 
-import { rollEncounterGroup, rollEnemyLevel, scaledEnemyStats } from './combatEngine';
+import { ENEMIES, type EnemyDefinition } from '../data/enemies';
+import { maxEncounterSizeForLevel, rollEnemyLevel, scaledEnemyStats } from './combatEngine';
 import type { ChestTier } from './dailyChestEngine';
 import type { PartyBattleEnemyState } from '../shared-types';
+
+const MIN_ENCOUNTER_SIZE = 1;
+const NON_BOSS_ENEMIES = Object.values(ENEMIES).filter((e) => e.tier !== 'boss');
+const BOSS_ENEMIES = Object.values(ENEMIES).filter((e) => e.tier === 'boss');
+
+function rollAnyNonBossEnemy(): EnemyDefinition {
+  return NON_BOSS_ENEMIES[Math.floor(Math.random() * NON_BOSS_ENEMIES.length)];
+}
 
 /** Escalates a wave's enemy difficulty from the party's own average level, rather than the fixed
  *  level a solo encounter rolls at - waves 1+ get progressively harder relative to *this party*,
@@ -19,15 +28,31 @@ export function effectiveLevelForWave(wave: number, partyAverageLevel: number): 
   return Math.min(100, Math.max(1, Math.round(partyAverageLevel + (wave - 1) * 3)));
 }
 
-/** Rolls one wave's enemy roster, reusing the exact same group-size/level-scaling machinery a
- *  solo encounter uses (rollEncounterGroup/rollEnemyLevel/scaledEnemyStats) against an escalating
- *  "virtual" player level instead of anyone's real one - see effectiveLevelForWave. Throws the
- *  same way rollEncounterGroup does if `locationId` has no encounter table (see the caller for
- *  how that's surfaced). */
-export function rollWaveEnemies(locationId: string, wave: number, partyAverageLevel: number): PartyBattleEnemyState[] {
+/** Rolls one wave's enemy roster from every non-boss enemy defined in the game, not any one
+ *  region's encounter table - Endless Battle is a clan activity fought wherever the party happens
+ *  to gather (a Town, since that's the only place clan members can actually see each other - see
+ *  endlessBattle.ts), not tied to a specific wilderness area the way a solo encounter is. Group
+ *  size still scales with effective level via the same maxEncounterSizeForLevel a solo encounter
+ *  uses. Milestone waves (5, 10, 15, 20...) always include one random boss-tier enemy - the design
+ *  doc's "boss encounters every 5 or 10 waves" - alongside 0-2 regular "adds", mirroring
+ *  rollBossEncounter's own adds concept but drawn from the full roster instead of one boss's
+ *  region. */
+export function rollWaveEnemies(wave: number, partyAverageLevel: number): PartyBattleEnemyState[] {
   const effectiveLevel = effectiveLevelForWave(wave, partyAverageLevel);
-  const enemies = rollEncounterGroup(locationId, effectiveLevel);
-  return enemies.map((enemy) => {
+  const roster: EnemyDefinition[] = [];
+
+  if (isMilestoneWave(wave) && BOSS_ENEMIES.length > 0) {
+    const boss = BOSS_ENEMIES[Math.floor(Math.random() * BOSS_ENEMIES.length)];
+    const addCount = Math.floor(Math.random() * 3); // 0-2 adds alongside the boss
+    for (let i = 0; i < addCount; i++) roster.push(rollAnyNonBossEnemy());
+    roster.push(boss); // last, same "boss is the default final target" ordering as rollBossEncounter
+  } else {
+    const maxSize = maxEncounterSizeForLevel(effectiveLevel);
+    const count = MIN_ENCOUNTER_SIZE + Math.floor(Math.random() * (maxSize - MIN_ENCOUNTER_SIZE + 1));
+    for (let i = 0; i < count; i++) roster.push(rollAnyNonBossEnemy());
+  }
+
+  return roster.map((enemy) => {
     const level = rollEnemyLevel(effectiveLevel);
     const stats = scaledEnemyStats(enemy, level);
     return { enemyId: enemy.id, level, hp: stats.maxHp, maxHp: stats.maxHp };

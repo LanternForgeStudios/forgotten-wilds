@@ -5,8 +5,10 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
 import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
+import { resolveDisplayNames } from '@/firebase/socialService';
 import { callSubmitPartyBattleAction, callVoteContinueEndlessBattle } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { getAssetUrl } from '@/assets/assetManager';
 import { ENEMIES } from '@/data';
 import { itemDisplayName } from '@/utils/itemName';
 import type { PartyBattleSession } from '@/types';
@@ -17,25 +19,36 @@ interface EndlessBattlePanelProps {
   onClose: () => void;
 }
 
-/** A functional-but-plain UI for Endless Battle - Panel/list/button chrome shared with the rest of
- *  the app's overlays, not a Phaser battle scene. Solo combat's animated canvas
- *  (BattleScene.ts/CombatScene.tsx) represents a lot of accumulated polish; matching that for a
- *  brand-new multiplayer mode in one pass wasn't a realistic bar to clear here, so this trades
- *  presentation for actually being playable end-to-end. A production-quality battle scene for this
- *  mode is a reasonable follow-up once the mechanic itself has been played and tuned. */
+/** A Panel/list/button-chrome UI for Endless Battle, not a Phaser battle scene - solo combat's
+ *  animated canvas (BattleScene.ts/CombatScene.tsx) represents a lot of accumulated polish that a
+ *  brand-new multiplayer mode can't match in one pass. It borrows the one piece of that
+ *  presentation that matters most for the "looks like a normal encounter" ask cheaply - a full-
+ *  screen battle background image behind the panel, driven by the same battleBackgroundAssetId the
+ *  server rolls once per run - plus a clear "whose turn is it" indicator matching the new
+ *  sequential per-player turn order. A production-quality animated battle scene for this mode
+ *  remains a reasonable larger follow-up. */
 export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProps) {
   const uid = useAuthStore((s) => s.user?.uid);
   const [battle, setBattle] = useState<PartyBattleSession | null>(null);
   const [selectedTarget, setSelectedTarget] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
   useOverlayClose(onClose);
 
   useEffect(() => subscribeToPartyBattle(battleId, setBattle), [battleId]);
 
-  // Any client can nudge a round/timeout check even without a new action - covers the case where
-  // this player already submitted and is just waiting on the others or the 20s deadline.
+  useEffect(() => {
+    if (!battle) return;
+    const unresolved = battle.participants.filter((p) => !names[p]);
+    if (unresolved.length === 0) return;
+    resolveDisplayNames(unresolved).then((resolved) => setNames((prev) => ({ ...prev, ...resolved })));
+  }, [battle, names]);
+
+  // Any client can nudge a turn/timeout check even without a new action - covers the case where
+  // it's not this player's turn yet and they're just waiting on the active player or the 20s
+  // per-turn deadline.
   const lastPollRef = useRef(0);
   useEffect(() => {
     if (!battle || battle.status !== 'active') return;
@@ -70,7 +83,8 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   }
 
   const me = battle.participantStats[uid];
-  const iSubmitted = !!battle.pendingActions[uid];
+  const activeUid = battle.turnOrder[battle.currentTurnIndex];
+  const isMyTurn = activeUid === uid;
   const aliveEnemies = battle.enemies.filter((e) => e.hp > 0);
   const secondsLeft = Math.max(0, Math.ceil((battle.turnDeadlineAt - now) / 1000));
 
@@ -101,7 +115,10 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   }
 
   return (
-    <div className={styles.overlay}>
+    <div
+      className={styles.overlay}
+      style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.7)), url(${getAssetUrl(battle.battleBackgroundAssetId)})` }}
+    >
       <Panel className={styles.panel}>
         <OverlayCloseButton onClick={onClose} />
         <h2 className={styles.title}>Endless Battle - Wave {battle.wave}</h2>
@@ -112,7 +129,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
             <div key={i} className={styles.row} style={{ opacity: e.hp <= 0 ? 0.4 : 1 }}>
               <button
                 className={i === selectedTarget ? styles.targetSelected : styles.targetButton}
-                disabled={e.hp <= 0}
+                disabled={e.hp <= 0 || !isMyTurn}
                 onClick={() => setSelectedTarget(i)}
               >
                 {ENEMIES.find((def) => def.id === e.enemyId)?.name ?? e.enemyId} (Lv.{e.level})
@@ -131,12 +148,17 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
         <div className={styles.list}>
           {battle.participants.map((p) => {
             const stats = battle.participantStats[p];
+            const displayName = p === uid ? 'You' : (names[p] ?? '...');
+            const isActive = battle.status === 'active' && stats.hp > 0;
+            const isTheirTurn = isActive && p === activeUid;
             return (
               <div key={p} className={styles.row} style={{ opacity: stats.hp <= 0 ? 0.4 : 1 }}>
-                <span className={styles.rowName}>
-                  {p === uid ? 'You' : p}
-                  {battle.status === 'active' && battle.pendingActions[p] ? ' ✓' : ''}
-                </span>
+                <span className={styles.rowName}>{displayName}</span>
+                {isActive && (
+                  <span className={isTheirTurn ? styles.playerActing : styles.playerReady}>
+                    {isTheirTurn ? "Acting..." : 'Waiting'}
+                  </span>
+                )}
                 <div className={styles.barTrack}>
                   <div className={styles.barFillHp} style={{ width: `${(stats.hp / stats.maxHp) * 100}%` }} />
                   <span className={styles.barValue}>
@@ -148,9 +170,9 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
           })}
         </div>
 
-        {battle.lastRoundResult && (
+        {battle.lastTurnResult && (
           <div className={styles.log}>
-            {battle.lastRoundResult.log.map((line, i) => (
+            {battle.lastTurnResult.log.map((line, i) => (
               <p key={i}>{line}</p>
             ))}
           </div>
@@ -160,8 +182,10 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
 
         {battle.status === 'active' && me && me.hp > 0 && (
           <>
-            <p className={styles.countdown}>{iSubmitted ? 'Waiting for your party...' : `${secondsLeft}s to act`}</p>
-            {!iSubmitted && (
+            <p className={styles.countdown}>
+              {isMyTurn ? `${secondsLeft}s to act` : `Waiting for ${names[activeUid] ?? '...'} to act...`}
+            </p>
+            {isMyTurn && (
               <div className={styles.actionRow}>
                 <button
                   className={styles.smallButton}

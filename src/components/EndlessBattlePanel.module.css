@@ -5,7 +5,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.6);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .panel {
@@ -43,6 +46,19 @@
 .rowName {
   flex: 1;
   font-size: 13px;
+}
+
+.playerReady {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--fw-accent);
+}
+
+.playerActing {
+  flex-shrink: 0;
+  font-size: 11px;
+  opacity: 0.6;
+  font-style: italic;
 }
 
 .targetButton,

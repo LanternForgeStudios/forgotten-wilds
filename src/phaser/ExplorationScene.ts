@@ -16,6 +16,10 @@ import type { GridEntity } from '@/components/exploration/PhaserExplorationCanva
  *  at the end of every single tile - the actual cause of movement reading as "choppy, one block at
  *  a time" despite already being tweened, not a missing-tween problem. */
 const GLIDE_MS = 220;
+/** Dash's own faster glide duration - matches useGridMovement.ts's dashStepIntervalMs (100ms
+ *  default), the same "glide finishes exactly as the next step becomes available" reasoning as
+ *  GLIDE_MS above, just at Dash's higher step rate. */
+const DASH_GLIDE_MS = 100;
 /** Always renders above every tile layer and every entity/player sprite - same as the old DOM
  *  renderer's document order (overhang divs are always painted last). */
 const OVERHANG_DEPTH = 1000;
@@ -244,7 +248,8 @@ export class ExplorationScene extends Phaser.Scene {
       this.tweens.killTweensOf(sprite);
       sprite.setPosition(targetX, targetY);
     } else {
-      this.tweens.add({ targets: sprite, x: targetX, y: targetY, duration: GLIDE_MS, ease: 'Linear' });
+      const duration = movementState === 'running' ? DASH_GLIDE_MS : GLIDE_MS;
+      this.tweens.add({ targets: sprite, x: targetX, y: targetY, duration, ease: 'Linear' });
     }
 
     if (movementState === 'walking' || movementState === 'running') {
@@ -257,16 +262,6 @@ export class ExplorationScene extends Phaser.Scene {
       sprite.anims.stop();
       sprite.setFrame(frameRow * PLAYER_ANIMATION_LAYOUT.frameCount);
     }
-  }
-
-  /** Dash's 1s "getting ready to run" ramp-up (see useDash.ts) - a stationary dust puff at the
-   *  player's current position, distinct from spawnDashDust's per-step puffs kicked up once actual
-   *  movement starts (those fire automatically from setPlayer whenever movementState is 'running';
-   *  this one fires on demand, before any tile has moved, so the player gets an immediate cue that
-   *  the hold registered even during the beat before running actually begins). */
-  playDashRampEffect(): void {
-    if (!this.playerSprite) return;
-    this.spawnDashDust(this.playerSprite.x, this.playerSprite.y);
   }
 
   /** One small puff of dust, at ground level (behind the player sprite) rather than on top of

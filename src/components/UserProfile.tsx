@@ -15,6 +15,7 @@ import {
   resolveDisplayNames,
 } from '@/firebase/socialService';
 import { subscribeToClanMembership, subscribeToClan, subscribeToIncomingClanInvites } from '@/firebase/clanService';
+import { subscribeToIncomingPvpChallenges } from '@/firebase/partyBattleService';
 import {
   callSearchUsers,
   callSendFriendRequest,
@@ -39,8 +40,11 @@ import {
   callDisbandClan,
   callStartEndlessBattle,
   callSetDisplayName,
+  callChallengeToPvp,
+  callRespondToPvpChallenge,
+  callJoinPvpQueue,
+  callLeavePvpQueue,
 } from '@/firebase/functionsClient';
-import { EndlessBattlePanel } from './EndlessBattlePanel';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { subscribeToMyTrades } from '@/firebase/tradeService';
@@ -51,7 +55,16 @@ import { useAudioSettingsStore } from '@/state/useAudioSettingsStore';
 import { TradeOfferPanel } from './TradeOfferPanel';
 import { ITEMS, EQUIPMENT } from '@/data';
 import { MAX_CLAN_SIZE } from '@/types';
-import type { ClanDoc, ClanInvite, DirectMessage, FriendRequest, OnlinePresence, TradeDoc, TradeOfferSide } from '@/types';
+import type {
+  ClanDoc,
+  ClanInvite,
+  DirectMessage,
+  FriendRequest,
+  OnlinePresence,
+  PvpChallengeDoc,
+  TradeDoc,
+  TradeOfferSide,
+} from '@/types';
 import styles from './UserProfile.module.css';
 
 function tradeItemDisplayName(itemId: string): string {
@@ -125,7 +138,11 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const [newClanTag, setNewClanTag] = useState('');
   const [clanInviteQuery, setClanInviteQuery] = useState('');
   const [clanInviteResults, setClanInviteResults] = useState<{ uid: string; displayName: string }[]>([]);
-  const [endlessBattleId, setEndlessBattleId] = useState<string | null>(null);
+
+  // --- PvP (Phase D) state - challenges/matchmaking, shown from the Friends tab ---
+  const [incomingPvpChallenges, setIncomingPvpChallenges] = useState<PvpChallengeDoc[]>([]);
+  const [pvpError, setPvpError] = useState<string | null>(null);
+  const [pvpQueueStatus, setPvpQueueStatus] = useState<'idle' | 'queued' | 'joining'>('idle');
 
   // --- Profile tab: character name editing ---
   const [editingName, setEditingName] = useState(false);
@@ -145,7 +162,6 @@ export function UserProfile({ onClose }: UserProfileProps) {
       subscribeToBlockList(uid, setBlockedUids),
       subscribeToIncomingFriendRequests(uid, setIncoming),
       subscribeToOutgoingFriendRequests(uid, setOutgoing),
-      subscribeToPresence(setPresences),
       subscribeToMyTrades(uid, setMyTrades),
     ];
     // Clears the "new social activity" badge in PlayerHUD - fire-and-forget, then resync so the
@@ -158,12 +174,19 @@ export function UserProfile({ onClose }: UserProfileProps) {
     return () => unsubs.forEach((u) => u());
   }, [uid, tab]);
 
-  // Clan membership is subscribed whenever the profile is open (not gated to tab === 'clan'), the
-  // same "always mounted" reasoning as the friend-request/DM/trade subscriptions above - a clan
-  // invite arriving should be knowable without the player first clicking into the Clan tab.
+  // Clan membership and presence are subscribed whenever the profile is open (not gated to any
+  // one tab), the same "always mounted" reasoning as the friend-request/DM/trade subscriptions
+  // above - a clan invite arriving should be knowable without first clicking into the Clan tab,
+  // and starting an Endless Battle (see startEndlessBattle below) needs to know who's actually
+  // online/nearby regardless of which tab is open when the button is clicked.
   useEffect(() => {
     if (!uid) return;
-    const unsubs = [subscribeToClanMembership(uid, setClanId), subscribeToIncomingClanInvites(uid, setIncomingClanInvites)];
+    const unsubs = [
+      subscribeToClanMembership(uid, setClanId),
+      subscribeToIncomingClanInvites(uid, setIncomingClanInvites),
+      subscribeToPresence(setPresences),
+      subscribeToIncomingPvpChallenges(uid, setIncomingPvpChallenges),
+    ];
     return () => unsubs.forEach((u) => u());
   }, [uid]);
 
@@ -252,6 +275,65 @@ export function UserProfile({ onClose }: UserProfileProps) {
       await callRespondToFriendRequest(requestId, accept);
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function challengePvp(toUid: string) {
+    if (busy) return;
+    setBusy(true);
+    setPvpError(null);
+    try {
+      // Doesn't need the result beyond errors - the target sees the challenge appear via their
+      // own subscribeToIncomingPvpChallenges listener, same "server state, not a callback payload,
+      // is what drives the UI" pattern as everything else here.
+      await callChallengeToPvp(toUid);
+    } catch (err) {
+      setPvpError(err instanceof Error ? err.message : 'Could not send that challenge.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function respondPvp(challengeId: string, accept: boolean) {
+    if (busy) return;
+    setBusy(true);
+    setPvpError(null);
+    try {
+      // Doesn't need the returned battleId - PlayerHUD's global active-battle subscription shows
+      // it automatically for both participants, same as callStartEndlessBattle above.
+      await callRespondToPvpChallenge(challengeId, accept);
+    } catch (err) {
+      setPvpError(err instanceof Error ? err.message : 'Could not respond to that challenge.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function joinPvpQueue() {
+    if (pvpQueueStatus !== 'idle') return;
+    setPvpQueueStatus('joining');
+    setPvpError(null);
+    try {
+      const { matched } = await callJoinPvpQueue();
+      // A match either shows up immediately (the same global active-battle subscription picks it
+      // up) or this player is now queued, waiting for someone else's join to match them instead -
+      // there's no separate "you're queued" doc to read (see firestore.rules), so this local flag
+      // is the only source of that state until a match lands or Cancel is clicked.
+      setPvpQueueStatus(matched ? 'idle' : 'queued');
+    } catch (err) {
+      setPvpError(err instanceof Error ? err.message : 'Could not join the PvP queue.');
+      setPvpQueueStatus('idle');
+    }
+  }
+
+  async function leavePvpQueue() {
+    setPvpQueueStatus('idle');
+    try {
+      await callLeavePvpQueue();
+    } catch {
+      // Best-effort - a stale queue doc left behind after a failed cancel just means a slightly
+      // stale matchmaking candidate, not a stuck player (they still show 'idle' locally and can
+      // rejoin any time).
     }
   }
 
@@ -486,12 +568,26 @@ export function UserProfile({ onClose }: UserProfileProps) {
   }
 
   async function startEndlessBattle() {
-    if (clanBusy || !clan) return;
+    if (clanBusy || !clan || !uid || !player) return;
     setClanBusy(true);
     setClanError(null);
     try {
-      const { battleId } = await callStartEndlessBattle(clan.memberUids);
-      setEndlessBattleId(battleId);
+      // Only clan members actually online and standing at the same location as me - passing the
+      // whole clan roster blindly would include offline/elsewhere members whose stale
+      // currentLocationId can never match, making the server's "everyone must be standing
+      // together" check fail even for a lone player who's perfectly able to fight solo.
+      const nearbyClanUids = clan.memberUids.filter(
+        (memberUid) =>
+          memberUid === uid ||
+          (isPresenceOnline(
+            presences.find((p) => p.uid === memberUid),
+            now,
+          ) &&
+            presences.find((p) => p.uid === memberUid)?.locationId === player.currentLocationId),
+      );
+      // Doesn't need the returned battleId - PlayerHUD subscribes to "am I in an active battle"
+      // globally and shows it automatically for every participant, not just whoever clicked here.
+      await callStartEndlessBattle(nearbyClanUids);
     } catch (err) {
       setClanError(
         err instanceof Error
@@ -695,6 +791,42 @@ export function UserProfile({ onClose }: UserProfileProps) {
               </>
             )}
 
+            {incomingPvpChallenges.length > 0 && (
+              <>
+                <h3 className={styles.sectionTitle}>Duel Challenges</h3>
+                <div className={styles.list}>
+                  {incomingPvpChallenges.map((c) => (
+                    <div key={c.id} className={styles.row}>
+                      <span className={styles.rowName}>{c.fromDisplayName} challenges you to a duel!</span>
+                      <button className={styles.smallButton} disabled={busy} onClick={() => respondPvp(c.id, true)}>
+                        Accept
+                      </button>
+                      <button className={styles.smallButton} disabled={busy} onClick={() => respondPvp(c.id, false)}>
+                        Decline
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <h3 className={styles.sectionTitle}>Casual PvP</h3>
+            <div className={styles.searchBar}>
+              {pvpQueueStatus === 'queued' ? (
+                <>
+                  <span className={styles.pendingTag}>Searching for an opponent...</span>
+                  <button className={styles.dangerButton} onClick={() => void leavePvpQueue()}>
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button className={styles.smallButton} disabled={pvpQueueStatus === 'joining'} onClick={() => void joinPvpQueue()}>
+                  Find a Match
+                </button>
+              )}
+            </div>
+            {pvpError && <p className={styles.error}>{pvpError}</p>}
+
             <h3 className={styles.sectionTitle}>Friends</h3>
             <div className={styles.list}>
               {friendUids.length === 0 && <p className={styles.empty}>No friends yet - search above to add one.</p>}
@@ -729,6 +861,9 @@ export function UserProfile({ onClose }: UserProfileProps) {
                       onClick={() => setTradeProposalToUid((cur) => (cur === fUid ? null : fUid))}
                     >
                       Trade
+                    </button>
+                    <button className={styles.smallButton} disabled={busy} onClick={() => challengePvp(fUid)}>
+                      Duel
                     </button>
                     <button className={styles.smallButton} disabled={busy} onClick={() => remove(fUid)}>
                       Remove
@@ -957,6 +1092,11 @@ export function UserProfile({ onClose }: UserProfileProps) {
                         {names[memberUid] ?? '...'}
                         {memberUid === clan.leaderUid ? ' (Leader)' : ''}
                       </span>
+                      {memberUid !== uid && (
+                        <button className={styles.smallButton} disabled={busy} onClick={() => challengePvp(memberUid)}>
+                          Duel
+                        </button>
+                      )}
                       {clan.leaderUid === uid && memberUid !== uid && (
                         <>
                           <button className={styles.smallButton} disabled={clanBusy} onClick={() => transferClanLeadership(memberUid)}>
@@ -1001,16 +1141,15 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   </>
                 )}
 
-                {clan.memberUids.length >= 2 && (
-                  <div style={{ marginTop: 12 }}>
-                    <button className={styles.smallButton} disabled={clanBusy} onClick={startEndlessBattle}>
-                      Start Endless Battle
-                    </button>
-                    <p className={styles.empty} style={{ marginTop: 6 }}>
-                      Everyone in the clan must be standing at the same location to start.
-                    </p>
-                  </div>
-                )}
+                <div style={{ marginTop: 12 }}>
+                  <button className={styles.smallButton} disabled={clanBusy} onClick={startEndlessBattle}>
+                    Start Endless Battle
+                  </button>
+                  <p className={styles.empty} style={{ marginTop: 6 }}>
+                    Starts from a Town (like Ash Hallow) - solo is fine, or bring along any clan
+                    members standing there with you.
+                  </p>
+                </div>
 
                 <div style={{ marginTop: 12 }}>
                   {clan.leaderUid === uid ? (
@@ -1155,7 +1294,6 @@ export function UserProfile({ onClose }: UserProfileProps) {
 
         <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
-      {endlessBattleId && <EndlessBattlePanel battleId={endlessBattleId} onClose={() => setEndlessBattleId(null)} />}
     </div>
   );
 }

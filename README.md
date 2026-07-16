@@ -84,10 +84,14 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   Firestore (`cd functions && npm test`, Vitest).
 - `functions/src/functions/` — the callable Cloud Functions (one file per function; see
   `functions/src/index.ts` for the current exported list, which grows over time).
-- `src/multiplayer/` — typed stub interfaces (party, lodges, world events, clan) for systems not
-  built yet; every function throws "not implemented," ready to be filled in. Trading and chat
-  (formerly stubs here) are fully implemented - see `functions/src/functions/trade.ts` and
-  `functions/src/functions/worldChat.ts`.
+- `src/multiplayer/` — typed stub interfaces (party, lodges, world events) for systems not built
+  yet; every function throws "not implemented," ready to be filled in. Trading, chat, and clans
+  (formerly stubs here) are fully implemented - see `functions/src/functions/trade.ts`,
+  `functions/src/functions/worldChat.ts`, and `functions/src/functions/clan.ts`. The Multiplayer
+  Battle System - cooperative Endless Battle wave-survival and casual 1-on-1 PvP duels, both built
+  on a shared turn-based party-combat engine - is also implemented; see
+  `functions/src/functions/endlessBattle.ts`, `functions/src/functions/pvpBattle.ts`, and
+  `functions/src/engine/partyCombatEngine.ts`.
 - `src/phaser/` — Phaser 4 owns the canvas-based rendering for exploration (`ExplorationScene.ts`,
   driven by `src/components/exploration/PhaserExplorationCanvas.tsx`, which `TileGrid.tsx`
   re-exports so Town/Overworld/Dungeon all get it via one import), combat (`BattleScene.ts`,

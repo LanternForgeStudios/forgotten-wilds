@@ -1,16 +1,65 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { getFirestore, type Firestore, type Transaction } from 'firebase-admin/firestore';
-import { resolvePartyRound, type PartyPlayerInput } from '../engine/partyCombatEngine';
+import { getFirestore, type DocumentReference, type Firestore, type Transaction } from 'firebase-admin/firestore';
+import { resolvePartyPlayerTurn, resolvePartyEnemyPhase, resolvePvpTurn } from '../engine/partyCombatEngine';
 import { computeRewards } from '../engine/combatEngine';
 import { rollChestRewards } from '../engine/dailyChestEngine';
 import { isMilestoneWave, milestoneChestTier } from '../engine/endlessBattleEngine';
 import { grantItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
-import type { CombatAction, CombatActionType, PartyBattleSession, PartyBattleWaveRewards, PlayerSave } from '../shared-types';
+import type {
+  CombatAction,
+  CombatActionType,
+  PartyBattleParticipantStats,
+  PartyBattleSession,
+  PartyBattleStatus,
+  PartyBattleWaveRewards,
+  PlayerSave,
+} from '../shared-types';
+
+/** partyBattles/{battleId}'s one participantStats entry for a save that's already been (or is
+ *  about to be) restored to full - shared by startEndlessBattle and startPvpBattle so the two
+ *  don't duplicate this shape twice. Reads only the save's max-value fields, so it's correct
+ *  whether called before or after the save's own hp/spirit/oil are actually written back to max. */
+export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattleParticipantStats {
+  return {
+    hp: save.player.stats.maxHp,
+    maxHp: save.player.stats.maxHp,
+    spirit: save.player.stats.maxSpirit,
+    maxSpirit: save.player.stats.maxSpirit,
+    lanternOil: save.player.stats.maxLanternOil,
+    maxLanternOil: save.player.stats.maxLanternOil,
+    attack: save.player.stats.attack,
+    defense: save.player.stats.defense,
+    speed: save.player.stats.speed,
+    ailments: [],
+    defending: false,
+  };
+}
 
 /** Per the design doc: "if no action is selected within 20 seconds, the character automatically
- *  performs Defend, and combat immediately proceeds to the next turn." */
-const TURN_TIMEOUT_MS = 20_000;
+ *  performs Defend, and combat immediately proceeds to the next turn." Now applies per-player-turn
+ *  (not per round) since resolution is sequential - see partyCombatEngine.ts's own top comment.
+ *  Exported for endlessBattle.ts/pvpBattle.ts to reuse when they set a battle doc's first
+ *  turnDeadlineAt, rather than each redeclaring the same constant. */
+export const TURN_TIMEOUT_MS = 20_000;
+
+/** Mirrors registry.ts's overworld battle-background asset ids (functions/ can't import from
+ *  src/ - see CLAUDE.md's client/server data-split convention). Deliberately excludes
+ *  battle-bg.hollow-rail-mine (a dungeon backdrop) and battle-bg.shrine (story/boss-specific) so
+ *  both Endless Battle and PvP always roll a generic "random overworld" scene per the "looks like
+ *  a normal encounter" design ask. Shared here (not endlessBattle.ts-only) since PvP needs the
+ *  exact same pool. */
+const PARTY_BATTLE_BACKGROUND_ASSET_IDS = [
+  'battle-bg.forest',
+  'battle-bg.ironwood-trail',
+  'battle-bg.raven-ridge',
+  'battle-bg.whisper-falls',
+  'battle-bg.black-briar-forest',
+];
+
+export function rollBattleBackgroundAssetId(): string {
+  return PARTY_BATTLE_BACKGROUND_ASSET_IDS[Math.floor(Math.random() * PARTY_BATTLE_BACKGROUND_ASSET_IDS.length)];
+}
 
 const VALID_ACTION_TYPES: CombatActionType[] = ['attack', 'skill', 'lanternAbility', 'item', 'defend', 'flee'];
 
@@ -32,21 +81,23 @@ function validateAction(raw: unknown): CombatAction {
 
 interface SubmitPartyBattleActionRequest {
   battleId: string;
-  /** Omittable - a client can call this purely to check/force-resolve a round it didn't have a
-   *  new action for (the "any client's periodic poll" half of the client-triggered timeout model,
-   *  see the plan's Phase B notes), without that counting as "I chose to Defend" on its own. */
+  /** Omittable - a client can call this purely to check/force-resolve a turn it didn't have a new
+   *  action for (the "any client's periodic poll" half of the client-triggered timeout model, see
+   *  the plan's Phase B notes), without that counting as "I chose to Defend" on its own. */
   action?: unknown;
 }
 
 /**
- * Records the caller's action for the current round, then resolves the round the instant either
- * every participant has one recorded or `turnDeadlineAt` has passed (whichever comes first) -
- * whichever client's call happens to satisfy that condition is the one that triggers the actual
- * resolution, guarded by this being a single Firestore transaction so it can only ever fire once.
- * No scheduled/background job enforces the 20s deadline - a client that never calls back in
- * (every participant's tab closed right at the deadline) simply leaves the round unresolved until
- * someone reconnects and calls this again. Accepted trade-off, decided with the user up front (see
- * the Phase B plan) rather than adding this project's first scheduled-compute infrastructure.
+ * Resolves exactly one player's turn - whoever `turnOrder[currentTurnIndex]` is - against the
+ * LIVE enemy board, then advances to the next player. Only that active player's own submitted
+ * action is accepted; once the 20s deadline passes, any client's poll (with no action of its own)
+ * can force that turn to resolve with Defend substituted. Once every player in `turnOrder` has
+ * gone this round, the enemy phase resolves once and a new round begins - see
+ * partyCombatEngine.ts's own top comment for why resolution is sequential rather than
+ * collect-everyone-then-resolve-at-once (two players could otherwise both target an enemy the
+ * first one's hit had already defeated). Whichever client's call happens to satisfy the "it's my
+ * turn" or "the deadline passed" condition is the one that triggers the actual resolution, guarded
+ * by this being a single Firestore transaction so it can only ever fire once.
  */
 export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(async (request) => {
   const uid = request.auth?.uid;
@@ -69,94 +120,279 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       return { resolved: false, status: battle.status };
     }
 
-    const pendingActions = { ...battle.pendingActions };
-    if (action) pendingActions[uid] = action;
-
+    const activeUid = battle.turnOrder[battle.currentTurnIndex];
     const now = Date.now();
-    const alive = battle.participants.filter((p) => battle.participantStats[p].hp > 0);
-    const everyAliveSubmitted = alive.every((p) => !!pendingActions[p]);
     const deadlinePassed = now >= battle.turnDeadlineAt;
 
-    if (!everyAliveSubmitted && !deadlinePassed) {
-      tx.update(battleRef, { [`pendingActions.${uid}`]: action ?? null, updatedAt: now });
-      return { resolved: false, status: 'active' as const, waitingOn: alive.filter((p) => !pendingActions[p]) };
+    if (action && uid !== activeUid) {
+      throw new HttpsError('failed-precondition', "It isn't your turn yet.");
+    }
+    if (!action && !deadlinePassed) {
+      // A poll with nothing to submit and no timeout yet - just report whose turn it is.
+      return { resolved: false, status: 'active' as const, activeUid };
     }
 
-    // Timeout auto-Defend: any alive participant who hasn't submitted gets Defend substituted,
-    // per the design doc. A downed (hp <= 0) participant is excluded from resolvePartyRound
-    // entirely - it already treats anyone not in `players` as simply absent from the round.
-    const players: PartyPlayerInput[] = alive.map((p) => {
-      const stats = battle.participantStats[p];
-      return {
-        uid: p,
-        action: pendingActions[p] ?? { type: 'defend' },
+    const resolvedAction: CombatAction = action ?? { type: 'defend' };
+    const activeStats = battle.participantStats[activeUid];
+
+    if (battle.mode === 'pvp') {
+      return resolvePvpBattleTurn(tx, db, battleRef, battle, activeUid, activeStats, resolvedAction, now);
+    }
+
+    const turnResult = resolvePartyPlayerTurn(
+      {
+        uid: activeUid,
+        action: resolvedAction,
         // Party battles don't track Stamina (no Dash mid-fight) - 0/0 is the same "not applicable"
         // convention STARTING_STATS uses before Stamina is unlocked.
-        stats: { ...stats, stamina: 0, maxStamina: 0 },
-        // Real inventory-backed item usage (reading/validating/debiting each participant's own
-        // users/{uid} save) is Phase C/D's job, once there's an actual battle-start/reward flow to
-        // wire it into - this phase's engine already accepts itemIds and simulates their effect,
-        // it's just not yet connected to a real inventory here.
+        stats: { ...activeStats, stamina: 0, maxStamina: 0 },
+        // Real inventory-backed item usage is Phase C/D's job (see the original design note) -
+        // the engine already accepts itemIds and simulates their effect, just not yet wired to a
+        // real per-participant inventory here.
         inventory: [],
-        ailments: stats.ailments,
-      };
-    });
-    const result = resolvePartyRound({
-      players,
-      enemies: battle.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
-    });
+        ailments: activeStats.ailments,
+      },
+      battle.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
+    );
 
-    const nextParticipantStats = { ...battle.participantStats };
-    for (const p of result.players) {
-      nextParticipantStats[p.uid] = {
-        ...nextParticipantStats[p.uid],
-        hp: p.hp,
-        spirit: p.spirit,
-        lanternOil: p.lanternOil,
-        ailments: p.ailments,
-      };
-    }
-    const nextEnemies = battle.enemies.map((e, i) => ({ ...e, hp: result.enemyHp[i] }));
-    const nextRound = battle.round + 1;
-    const nextPendingActions = Object.fromEntries(battle.participants.map((p) => [p, null]));
+    const nextParticipantStats: Record<string, PartyBattleParticipantStats> = { ...battle.participantStats };
+    nextParticipantStats[activeUid] = {
+      ...activeStats,
+      hp: turnResult.hp,
+      spirit: turnResult.spirit,
+      lanternOil: turnResult.lanternOil,
+      ailments: turnResult.ailments,
+      defending: turnResult.defending,
+    };
+    const nextEnemies = battle.enemies.map((e, i) => ({ ...e, hp: turnResult.enemyHp[i] }));
+    const nextTurnIndex = battle.currentTurnIndex + 1;
+    const roundComplete = nextTurnIndex >= battle.turnOrder.length;
 
-    const isEndless = battle.mode === 'endless';
-    const status: PartyBattleSession['status'] =
-      result.phase === 'victory'
-        ? isEndless
-          ? 'awaitingContinueVote'
-          : 'victory'
-        : result.phase === 'partyDefeated'
-          ? 'defeated'
-          : 'active';
-
-    // Endless Battle grants per-wave rewards on every win (independent per player, per the design
-    // doc) and fully restores every participant's real save once the run ends (victory doesn't
-    // end the run - only 'defeated' does here; a voluntary exit is voteContinueEndlessBattle's own
-    // job). PvP's reward/restore handling is Phase D's concern, not built yet.
-    let lastWaveRewards: Record<string, PartyBattleWaveRewards> | null = battle.lastWaveRewards;
-    if (isEndless && status === 'awaitingContinueVote') {
-      lastWaveRewards = await grantWaveRewards(tx, db, alive, battle.wave, battle.enemies);
-    } else if (isEndless && status === 'defeated') {
-      await restoreAllParticipants(tx, db, battle.participants);
+    if (!roundComplete) {
+      tx.update(battleRef, {
+        participantStats: nextParticipantStats,
+        enemies: nextEnemies,
+        currentTurnIndex: nextTurnIndex,
+        turnDeadlineAt: now + TURN_TIMEOUT_MS,
+        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now },
+        updatedAt: now,
+      });
+      return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };
     }
 
+    // Every alive participant this round has now gone - check for victory before running the
+    // enemy phase (no point letting an already-cleared board "attack back" after the last blow).
+    const enemiesDefeated = nextEnemies.every((e) => e.hp <= 0);
+    if (enemiesDefeated) {
+      const isEndless = battle.mode === 'endless';
+      const status: PartyBattleStatus = isEndless ? 'awaitingContinueVote' : 'victory';
+      let lastWaveRewards = battle.lastWaveRewards;
+      if (isEndless) {
+        const aliveUids = battle.participants.filter((p) => nextParticipantStats[p].hp > 0);
+        lastWaveRewards = await grantWaveRewards(tx, db, aliveUids, battle.wave, battle.enemies);
+      }
+      tx.update(battleRef, {
+        participantStats: nextParticipantStats,
+        enemies: nextEnemies,
+        status,
+        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now },
+        lastWaveRewards,
+        continueVotes: status === 'awaitingContinueVote' ? {} : battle.continueVotes,
+        updatedAt: now,
+      });
+      return { resolved: true, status, phase: 'victory' as const };
+    }
+
+    // Enemy phase: every currently-alive participant takes a hit, once, now that everyone's gone.
+    const alivePlayersForEnemyPhase = battle.participants
+      .filter((p) => nextParticipantStats[p].hp > 0)
+      .map((p) => ({
+        uid: p,
+        hp: nextParticipantStats[p].hp,
+        maxHp: nextParticipantStats[p].maxHp,
+        defense: nextParticipantStats[p].defense,
+        ailments: nextParticipantStats[p].ailments,
+        defending: nextParticipantStats[p].defending,
+      }));
+    const enemyPhase = resolvePartyEnemyPhase(
+      alivePlayersForEnemyPhase,
+      nextEnemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
+    );
+    for (const p of enemyPhase.players) {
+      nextParticipantStats[p.uid] = { ...nextParticipantStats[p.uid], hp: p.hp, ailments: p.ailments, defending: false };
+    }
+    // Anyone excluded above (already down before the enemy phase ran) also clears defending, same
+    // as everyone else once a round fully resolves.
+    for (const p of battle.participants) {
+      if (!alivePlayersForEnemyPhase.some((ap) => ap.uid === p)) {
+        nextParticipantStats[p] = { ...nextParticipantStats[p], defending: false };
+      }
+    }
+
+    const combinedLog = [...turnResult.log, ...enemyPhase.log];
+    const partyDefeated = battle.participants.every((p) => nextParticipantStats[p].hp <= 0);
+
+    if (partyDefeated) {
+      if (battle.mode === 'endless') {
+        await restoreParticipantsAndClearLocks(tx, db, battle.participants);
+      }
+      tx.update(battleRef, {
+        participantStats: nextParticipantStats,
+        enemies: nextEnemies,
+        status: 'defeated',
+        lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now },
+        updatedAt: now,
+      });
+      return { resolved: true, status: 'defeated' as const };
+    }
+
+    // New round: recompute turn order from currently-alive participants (see PartyBattleSession's
+    // own doc comment on turnOrder).
+    const newTurnOrder = battle.participants.filter((p) => nextParticipantStats[p].hp > 0);
     tx.update(battleRef, {
       participantStats: nextParticipantStats,
       enemies: nextEnemies,
-      round: nextRound,
-      status,
-      pendingActions: status === 'active' ? nextPendingActions : battle.pendingActions,
-      turnDeadlineAt: status === 'active' ? now + TURN_TIMEOUT_MS : battle.turnDeadlineAt,
-      lastRoundResult: { round: battle.round, log: result.log, resolvedAt: now },
-      lastWaveRewards,
-      continueVotes: status === 'awaitingContinueVote' ? {} : battle.continueVotes,
+      round: battle.round + 1,
+      turnOrder: newTurnOrder,
+      currentTurnIndex: 0,
+      turnDeadlineAt: now + TURN_TIMEOUT_MS,
+      lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now },
       updatedAt: now,
     });
-
-    return { resolved: true, status, phase: result.phase };
+    return { resolved: true, status: 'active' as const, phase: 'enemyPhase' as const };
   });
 });
+
+/** PvP has no enemy board and no wave/enemy-phase structure - it's exactly two participants taking
+ *  turns attacking each other directly (see resolvePvpTurn's own doc comment for why that's a
+ *  separate engine function rather than a reuse of resolvePartyPlayerTurn). Turns simply alternate
+ *  between the two participants until one is defeated or forfeits (flee) - no round-level enemy
+ *  phase to run afterward, unlike Endless Battle. */
+async function resolvePvpBattleTurn(
+  tx: Transaction,
+  db: Firestore,
+  battleRef: DocumentReference,
+  battle: PartyBattleSession,
+  activeUid: string,
+  activeStats: PartyBattleParticipantStats,
+  resolvedAction: CombatAction,
+  now: number,
+) {
+  const opponentUid = battle.participants.find((p) => p !== activeUid)!;
+  const opponentStats = battle.participantStats[opponentUid];
+
+  const turnResult = resolvePvpTurn(
+    {
+      uid: activeUid,
+      action: resolvedAction,
+      stats: { ...activeStats, stamina: 0, maxStamina: 0 },
+      inventory: [],
+      ailments: activeStats.ailments,
+    },
+    { hp: opponentStats.hp, maxHp: opponentStats.maxHp, defense: opponentStats.defense },
+  );
+
+  const nextParticipantStats: Record<string, PartyBattleParticipantStats> = {
+    ...battle.participantStats,
+    [activeUid]: {
+      ...activeStats,
+      hp: turnResult.hp,
+      spirit: turnResult.spirit,
+      lanternOil: turnResult.lanternOil,
+      ailments: turnResult.ailments,
+      defending: turnResult.defending,
+    },
+    [opponentUid]: { ...opponentStats, hp: turnResult.defenderHp },
+  };
+
+  const matchOver = turnResult.forfeited || turnResult.defenderHp <= 0;
+  if (matchOver) {
+    const winnerUid = turnResult.forfeited ? opponentUid : activeUid;
+    const loserUid = turnResult.forfeited ? activeUid : opponentUid;
+    // Restore-to-full and reward-grant both write the same two user docs, so they're combined
+    // into one function/one tx.set per user rather than called separately - two independent
+    // writes to the same doc in one transaction would each read the same pre-transaction
+    // snapshot and the later tx.set would silently clobber the earlier one's changes.
+    await restoreAndRewardPvpParticipants(tx, db, winnerUid, loserUid, battle.partyAverageLevel);
+    for (const p of battle.participants) tx.delete(db.collection('partyBattleLocks').doc(p));
+    tx.update(battleRef, {
+      participantStats: nextParticipantStats,
+      status: 'victory',
+      winnerUid,
+      lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now },
+      updatedAt: now,
+    });
+    return { resolved: true, status: 'victory' as const, winnerUid };
+  }
+
+  const nextTurnIndex = (battle.currentTurnIndex + 1) % battle.turnOrder.length;
+  tx.update(battleRef, {
+    participantStats: nextParticipantStats,
+    currentTurnIndex: nextTurnIndex,
+    round: nextTurnIndex === 0 ? battle.round + 1 : battle.round,
+    turnDeadlineAt: now + TURN_TIMEOUT_MS,
+    lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now },
+    updatedAt: now,
+  });
+  return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };
+}
+
+/** Casual PvP has no enemy to loot - "winner takes normal rewards, loser gets a small
+ *  participation reward, no gold/materials ever lost" per the design doc. Deliberately a simple
+ *  level-scaled flat award rather than reusing computeRewards (that function's whole shape is
+ *  keyed on ENEMIES' authored xpReward/goldReward/lootTable, which doesn't apply to a defeated
+ *  player). Tuning these two constants is a balance call for later playtesting, not a correctness
+ *  concern. */
+const PVP_WINNER_BASE_XP = 40;
+const PVP_WINNER_XP_PER_LEVEL = 4;
+const PVP_WINNER_BASE_GOLD = 15;
+const PVP_WINNER_GOLD_PER_LEVEL = 2;
+const PVP_LOSER_XP_FRACTION = 0.25;
+
+/** Restores both real saves to full HP/Spirit/Oil ("full restore before and after" per the design
+ *  doc) and grants the winner/loser their end-of-match rewards, in one read-modify-write per user
+ *  doc - see this function's one call site for why restore and reward can't be two separate writes
+ *  within the same transaction. */
+async function restoreAndRewardPvpParticipants(
+  tx: Transaction,
+  db: Firestore,
+  winnerUid: string,
+  loserUid: string,
+  level: number,
+): Promise<void> {
+  const winnerXp = PVP_WINNER_BASE_XP + level * PVP_WINNER_XP_PER_LEVEL;
+  const winnerGold = PVP_WINNER_BASE_GOLD + level * PVP_WINNER_GOLD_PER_LEVEL;
+  const loserXp = Math.round(winnerXp * PVP_LOSER_XP_FRACTION);
+
+  const winnerRef = db.collection('users').doc(winnerUid);
+  const loserRef = db.collection('users').doc(loserUid);
+  const [winnerSnap, loserSnap] = await Promise.all([tx.get(winnerRef), tx.get(loserRef)]);
+  const now = Date.now();
+
+  function restore(save: PlayerSave): void {
+    save.player.stats.hp = save.player.stats.maxHp;
+    save.player.stats.spirit = save.player.stats.maxSpirit;
+    if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
+  }
+
+  if (winnerSnap.exists) {
+    const save = winnerSnap.data() as PlayerSave;
+    restore(save);
+    save.player.xp += winnerXp;
+    save.player.gold += winnerGold;
+    applyLevelUp(save);
+    save.updatedAt = now;
+    tx.set(winnerRef, save);
+  }
+  if (loserSnap.exists) {
+    const save = loserSnap.data() as PlayerSave;
+    restore(save);
+    save.player.xp += loserXp;
+    applyLevelUp(save);
+    save.updatedAt = now;
+    tx.set(loserRef, save);
+  }
+}
 
 /** Grants independent xp/gold/loot to every alive participant for the wave just won, plus a bonus
  *  chest roll on milestone waves (5, 10, 15, 20...) - see endlessBattleEngine.ts. Every enemy on
@@ -217,7 +453,7 @@ async function grantWaveRewards(
  *  and a voluntary exit, see voteContinueEndlessBattle). Downed participants are included, not
  *  just currently-alive ones - the whole party gets the same clean slate regardless of who was
  *  still standing when the run ended. */
-async function restoreAllParticipants(tx: Transaction, db: Firestore, uids: string[]): Promise<void> {
+export async function restoreParticipantsAndClearLocks(tx: Transaction, db: Firestore, uids: string[]): Promise<void> {
   const userRefs = uids.map((uid) => db.collection('users').doc(uid));
   const snaps = await Promise.all(userRefs.map((ref) => tx.get(ref)));
   snaps.forEach((snap, i) => {
@@ -230,6 +466,6 @@ async function restoreAllParticipants(tx: Transaction, db: Firestore, uids: stri
     tx.set(userRefs[i], save);
   });
   // Frees each participant to start (or be invited into) another battle - matches
-  // endlessBattle.ts's own endRun on a voluntary exit.
+  // endlessBattle.ts's own restoreParticipantsAndClearLocks on a voluntary exit.
   for (const uid of uids) tx.delete(db.collection('partyBattleLocks').doc(uid));
 }

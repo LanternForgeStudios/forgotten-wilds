@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { getFirestore, type Firestore, type Transaction } from 'firebase-admin/firestore';
+import { getFirestore, type DocumentReference, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { rollWaveEnemies } from '../engine/endlessBattleEngine';
+import { restoreParticipantsAndClearLocks, fullyRestoredParticipantStats, rollBattleBackgroundAssetId, TURN_TIMEOUT_MS } from './partyBattle';
 import { MAX_CLAN_SIZE } from '../shared-types';
 import type {
   ClanDoc,
@@ -11,25 +12,75 @@ import type {
   PlayerSave,
 } from '../shared-types';
 
-const TURN_TIMEOUT_MS = 20_000;
+/** Endless Battle can only be started from a Town - the only place clan members can actually see
+ *  each other via presence (Overworld/Dungeon scenes don't track it - see PlayerHUD.tsx's own doc
+ *  comment). Wave enemies themselves aren't tied to this location at all (see
+ *  endlessBattleEngine.ts) - this set exists purely to gate *where a party can form*. */
+const TOWN_LOCATION_IDS = new Set(['ash-hallow']);
+
+/** A non-terminal battle with no activity for this long is treated as abandoned (e.g. every
+ *  participant's tab closed before the run ever reached a real end) rather than permanently
+ *  blocking its participants from starting a new one - see resolveStaleLocks below. */
+const STALE_BATTLE_TIMEOUT_MS = 10 * 60 * 1000;
+const TERMINAL_STATUSES = new Set<PartyBattleSession['status']>(['victory', 'defeated', 'withdrawn']);
 
 interface StartEndlessBattleRequest {
   participantUids: string[];
 }
 
 /**
- * Forms a party from 2-6 fellow clan members standing at the same location as the caller,
- * restores every one of them to full HP/Spirit/Oil (their real save is updated immediately, per
- * the design doc), and rolls Wave 1. Any clan member can start a run (not leader-only - forming a
- * party is a group activity, unlike clan administration).
+ * Reads through every distinct battle the requested participants' locks point to and decides,
+ * for each, whether it's safe to clear automatically: gone/orphaned, already terminal (should
+ * have been cleared already, but defensively handled), or non-terminal but stale (no updates for
+ * STALE_BATTLE_TIMEOUT_MS - almost certainly abandoned, e.g. every client closed before the run
+ * ever reached a real end). Throws if any referenced battle is still genuinely active. Returns the
+ * stale battles that need restoring/unlocking, for the caller to apply (a query result isn't a
+ * write - the caller does the actual tx.set/tx.delete calls, keeping every write together).
+ */
+async function resolveStaleLocks(
+  tx: Transaction,
+  db: Firestore,
+  lockSnaps: FirebaseFirestore.DocumentSnapshot[],
+): Promise<{ ref: DocumentReference; battle: PartyBattleSession }[]> {
+  const battleIds = Array.from(
+    new Set(lockSnaps.filter((s) => s.exists).map((s) => (s.data() as PartyBattleLockDoc).battleId)),
+  );
+  if (battleIds.length === 0) return [];
+
+  const battleRefs = battleIds.map((id) => db.collection('partyBattles').doc(id));
+  const battleSnaps = await Promise.all(battleRefs.map((ref) => tx.get(ref)));
+
+  const now = Date.now();
+  const stale: { ref: DocumentReference; battle: PartyBattleSession }[] = [];
+  battleSnaps.forEach((snap, i) => {
+    if (!snap.exists) return; // orphaned lock - nothing to restore, just gets deleted below
+    const battle = snap.data() as PartyBattleSession;
+    if (TERMINAL_STATUSES.has(battle.status)) return; // already resolved - lock should already be gone
+    if (now - battle.updatedAt > STALE_BATTLE_TIMEOUT_MS) {
+      stale.push({ ref: battleRefs[i], battle });
+      return;
+    }
+    throw new HttpsError('failed-precondition', 'One of those players is already in an active battle.');
+  });
+  return stale;
+}
+
+/**
+ * Forms a party of 1-6 fellow clan members standing together in a Town (a lone clan member can
+ * still fight solo - Endless Battle doesn't require company), restores every one of them to full
+ * HP/Spirit/Oil (their real save is updated immediately, per the design doc), and rolls Wave 1.
+ * Any clan member can start a run (not leader-only - forming a party is a group activity, unlike
+ * clan administration).
  */
 export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const participantUids = Array.from(new Set(request.data?.participantUids ?? []));
   if (!participantUids.includes(uid)) participantUids.push(uid);
-  if (participantUids.length < 2 || participantUids.length > MAX_CLAN_SIZE) {
-    throw new HttpsError('invalid-argument', `A party needs 2-${MAX_CLAN_SIZE} players.`);
+  // A solo clan member (or a clan where only one member happens to be around) can still fight -
+  // Endless Battle just runs with a party of one, the same as any other party size structurally.
+  if (participantUids.length > MAX_CLAN_SIZE) {
+    throw new HttpsError('invalid-argument', `A party can have at most ${MAX_CLAN_SIZE} players.`);
   }
 
   const db = getFirestore();
@@ -53,28 +104,30 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
     if (!participantUids.every((p) => clan.memberUids.includes(p))) {
       throw new HttpsError('failed-precondition', 'Every player must be a member of your clan.');
     }
-    if (lockSnaps.some((snap) => snap.exists)) {
-      throw new HttpsError('failed-precondition', 'One of those players is already in a battle.');
-    }
     if (userSnaps.some((snap) => !snap.exists)) {
       throw new HttpsError('failed-precondition', 'A character could not be found.');
     }
+
+    // Self-heals stale/abandoned locks (see resolveStaleLocks's own doc comment) instead of
+    // permanently blocking these players - still throws if any lock points to a genuinely active
+    // battle.
+    const staleBattles = await resolveStaleLocks(tx, db, lockSnaps);
 
     const saves = userSnaps.map((snap) => snap.data() as PlayerSave);
     const locationId = saves[0].player.currentLocationId;
     if (!saves.every((s) => s.player.currentLocationId === locationId)) {
       throw new HttpsError('failed-precondition', 'Every player must be standing together to start a battle.');
     }
+    if (!TOWN_LOCATION_IDS.has(locationId)) {
+      throw new HttpsError('failed-precondition', 'Endless Battle can only be started from a Town.');
+    }
 
-    const partyAverageLevel = Math.round(
-      saves.reduce((sum, s) => sum + s.player.level, 0) / saves.length,
-    );
+    const partyAverageLevel = Math.round(saves.reduce((sum, s) => sum + s.player.level, 0) / saves.length);
+    const enemies = rollWaveEnemies(1, partyAverageLevel);
 
-    let enemies;
-    try {
-      enemies = rollWaveEnemies(locationId, 1, partyAverageLevel);
-    } catch {
-      throw new HttpsError('invalid-argument', `No enemies are known to roam "${locationId}".`);
+    // Clear out anything self-healed above before writing the new battle/locks.
+    for (const { battle } of staleBattles) {
+      await restoreParticipantsAndClearLocks(tx, db, battle.participants);
     }
 
     const now = Date.now();
@@ -92,18 +145,7 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
       save.updatedAt = now;
       tx.set(userRefs[i], save);
 
-      participantStats[p] = {
-        hp: save.player.stats.maxHp,
-        maxHp: save.player.stats.maxHp,
-        spirit: save.player.stats.maxSpirit,
-        maxSpirit: save.player.stats.maxSpirit,
-        lanternOil: save.player.stats.maxLanternOil,
-        maxLanternOil: save.player.stats.maxLanternOil,
-        attack: save.player.stats.attack,
-        defense: save.player.stats.defense,
-        speed: save.player.stats.speed,
-        ailments: [],
-      };
+      participantStats[p] = fullyRestoredParticipantStats(save);
     });
 
     const battle: PartyBattleSession = {
@@ -113,16 +155,19 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
       participants: participantUids,
       locationId,
       partyAverageLevel,
+      battleBackgroundAssetId: rollBattleBackgroundAssetId(),
       wave: 1,
       enemies,
       round: 1,
       status: 'active',
+      turnOrder: [...participantUids],
+      currentTurnIndex: 0,
       turnDeadlineAt: now + TURN_TIMEOUT_MS,
-      pendingActions: Object.fromEntries(participantUids.map((p) => [p, null])),
       participantStats,
-      lastRoundResult: null,
+      lastTurnResult: null,
       lastWaveRewards: null,
       continueVotes: {},
+      winnerUid: null,
       startedAt: now,
       updatedAt: now,
     };
@@ -136,21 +181,6 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
 interface VoteContinueEndlessBattleRequest {
   battleId: string;
   continue: boolean;
-}
-
-async function endRun(tx: Transaction, db: Firestore, battle: PartyBattleSession): Promise<void> {
-  const userRefs = battle.participants.map((p) => db.collection('users').doc(p));
-  const snaps = await Promise.all(userRefs.map((ref) => tx.get(ref)));
-  snaps.forEach((snap, i) => {
-    if (!snap.exists) return;
-    const save = snap.data() as PlayerSave;
-    save.player.stats.hp = save.player.stats.maxHp;
-    save.player.stats.spirit = save.player.stats.maxSpirit;
-    if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
-    save.updatedAt = Date.now();
-    tx.set(userRefs[i], save);
-  });
-  for (const p of battle.participants) tx.delete(db.collection('partyBattleLocks').doc(p));
 }
 
 /**
@@ -179,7 +209,7 @@ export const voteContinueEndlessBattle = onCall<VoteContinueEndlessBattleRequest
     if (battle.status !== 'awaitingContinueVote') return { status: battle.status };
 
     if (!wantsToContinue) {
-      await endRun(tx, db, battle);
+      await restoreParticipantsAndClearLocks(tx, db, battle.participants);
       tx.update(battleRef, { status: 'withdrawn', updatedAt: Date.now() });
       return { status: 'withdrawn' as const };
     }
@@ -194,18 +224,14 @@ export const voteContinueEndlessBattle = onCall<VoteContinueEndlessBattleRequest
     }
 
     const nextWave = battle.wave + 1;
-    let enemies;
-    try {
-      enemies = rollWaveEnemies(battle.locationId, nextWave, battle.partyAverageLevel);
-    } catch {
-      throw new HttpsError('internal', 'Could not roll the next wave.');
-    }
+    const enemies = rollWaveEnemies(nextWave, battle.partyAverageLevel);
     const now = Date.now();
     tx.update(battleRef, {
       wave: nextWave,
       enemies,
       status: 'active',
-      pendingActions: Object.fromEntries(battle.participants.map((p) => [p, null])),
+      turnOrder: alive,
+      currentTurnIndex: 0,
       turnDeadlineAt: now + TURN_TIMEOUT_MS,
       continueVotes: {},
       updatedAt: now,

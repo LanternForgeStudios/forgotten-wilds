@@ -1,5 +1,12 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { resolvePartyRound, type PartyPlayerInput, type PartyRoundInput } from './partyCombatEngine';
+import {
+  resolvePartyPlayerTurn,
+  resolvePartyEnemyPhase,
+  resolvePvpTurn,
+  type PartyPlayerInput,
+  type PartyEnemyPhasePlayerState,
+  type PvpDefenderInput,
+} from './partyCombatEngine';
 import type { RoundEnemyInput } from './combatEngine';
 import type { Stats, ActiveAilment } from '../shared-types';
 
@@ -35,120 +42,130 @@ function mothling(overrides: Partial<RoundEnemyInput> = {}): RoundEnemyInput {
   return { enemyId: 'mothling', level: 1, hp: 28, ...overrides };
 }
 
-describe('resolvePartyRound', () => {
+describe('resolvePartyPlayerTurn', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('lets multiple players damage the same enemy in one round', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.5); // avoids every miss/ailment-chance check
-    const input: PartyRoundInput = {
-      players: [
-        player('p1', { stats: stats({ speed: 999 }) }),
-        player('p2', { stats: stats({ speed: 998 }) }),
-      ],
-      enemies: [mothling({ hp: 1000 })], // survives the round so its own turn still fires
-    };
-    const result = resolvePartyRound(input);
-    const hitsOnEnemy = result.hits.filter((h) => h.targetIndex === 0 && !h.missed);
-    expect(hitsOnEnemy.map((h) => h.uid).sort()).toEqual(['p1', 'p2']);
+  it('damages the targeted enemy and returns the updated board', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5); // avoids miss/ailment chances
+    const result = resolvePartyPlayerTurn(player('p1'), [mothling({ hp: 1000 })]);
     expect(result.enemyHp[0]).toBeLessThan(1000);
-    expect(result.phase).toBe('continue');
+    expect(result.hits).toHaveLength(1);
+    expect(result.hits[0].uid).toBe('p1');
   });
 
-  it('halves damage taken by a defending player', () => {
+  it("a second player's turn sees the first player's damage already applied - can't hit a dead enemy twice", () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    const attacking = resolvePartyRound({
-      players: [player('solo', { action: { type: 'attack' }, stats: stats({ speed: 1 }) })],
-      enemies: [mothling({ hp: 1000 })],
-    });
-    const defending = resolvePartyRound({
-      players: [player('solo', { action: { type: 'defend' }, stats: stats({ speed: 1 }) })],
-      enemies: [mothling({ hp: 1000 })],
-    });
+    const first = resolvePartyPlayerTurn(player('p1', { stats: stats({ attack: 999 }) }), [mothling({ hp: 20 })]);
+    expect(first.enemyHp[0]).toBe(0); // one-shot with attack: 999
+    expect(first.hits[0].defeated).toBe(true);
+
+    // p2's turn receives the already-updated board (enemyHp: [0]), not the original hp: 20 -
+    // exactly the bug this sequential design fixes (a second player's attack landing on an enemy
+    // the first player's hit had already defeated).
+    const second = resolvePartyPlayerTurn(player('p2'), [{ enemyId: 'mothling', level: 1, hp: first.enemyHp[0] }]);
+    expect(second.hits).toHaveLength(0); // no alive enemy to target - resolveTargetIndex returns undefined
+  });
+
+  it('sets defending true only for a Defend (or flee) action, not attack/skill/item', () => {
+    expect(resolvePartyPlayerTurn(player('p1', { action: { type: 'defend' } }), [mothling()]).defending).toBe(true);
+    expect(resolvePartyPlayerTurn(player('p1', { action: { type: 'flee' } }), [mothling()]).defending).toBe(true);
+    expect(resolvePartyPlayerTurn(player('p1', { action: { type: 'attack' } }), [mothling()]).defending).toBe(false);
+  });
+
+  it('a stunned player skips their action entirely but still takes ailment tick damage', () => {
+    const stunnedAndPoisoned: ActiveAilment[] = [{ ailmentId: 'stun' }, { ailmentId: 'poison' }];
+    const result = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'attack' }, ailments: stunnedAndPoisoned, stats: stats({ hp: 60, maxHp: 60 }) }),
+      [mothling({ hp: 1000 })],
+    );
+    expect(result.hits).toHaveLength(0); // never got to attack
+    expect(result.enemyHp[0]).toBe(1000); // untouched
+    expect(result.hp).toBeLessThan(60); // poison still ticked
+  });
+});
+
+describe('resolvePartyEnemyPhase', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  function playerState(uid: string, overrides: Partial<PartyEnemyPhasePlayerState> = {}): PartyEnemyPhasePlayerState {
+    return { uid, hp: 999, maxHp: 999, defense: 5, ailments: [], defending: false, ...overrides };
+  }
+
+  it('halves damage against a defending player', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const attacking = resolvePartyEnemyPhase([playerState('solo', { defending: false })], [mothling()]);
+    const defending = resolvePartyEnemyPhase([playerState('solo', { defending: true })], [mothling()]);
     const attackingHit = attacking.enemyHits.find((h) => !h.missed)!;
     const defendingHit = defending.enemyHits.find((h) => !h.missed)!;
-    expect(defendingHit.wasDefended).toBe(true);
-    expect(attackingHit.wasDefended).toBe(false);
     expect(defendingHit.damage).toBe(Math.round(attackingHit.damage / 2));
   });
 
-  it('never lets a downed player act or be targeted', () => {
+  it('never targets a downed player', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    const input: PartyRoundInput = {
-      players: [
-        player('downed', { stats: stats({ hp: 0, speed: 999 }) }),
-        player('standing', { stats: stats({ speed: 998 }) }),
-      ],
-      enemies: [mothling({ hp: 1000 })],
-    };
-    const result = resolvePartyRound(input);
-    expect(result.hits.some((h) => h.uid === 'downed')).toBe(false);
+    const result = resolvePartyEnemyPhase(
+      [playerState('downed', { hp: 0 }), playerState('standing')],
+      [mothling({ hp: 1000 })],
+    );
     expect(result.enemyHits.every((h) => h.targetUid === 'standing')).toBe(true);
-    const downedResult = result.players.find((p) => p.uid === 'downed')!;
-    expect(downedResult.hp).toBe(0);
   });
 
-  it('reports victory once every enemy is defeated, and partyDefeated once every player is down', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    const victory = resolvePartyRound({
-      players: [player('p1', { stats: stats({ speed: 999, attack: 999 }) })],
-      enemies: [mothling({ hp: 1 })],
-    });
-    expect(victory.phase).toBe('victory');
-
-    const defeat = resolvePartyRound({
-      players: [player('p1', { stats: stats({ hp: 1, speed: 1 }) })],
-      enemies: [mothling({ hp: 1000, level: 50 })],
-    });
-    expect(defeat.phase).toBe('partyDefeated');
-    expect(defeat.players[0].hp).toBe(0);
-  });
-
-  it('distributes enemy attacks across every alive player over many rounds, not just one', () => {
+  it('distributes attacks across every alive player over many calls', () => {
     const targeted = new Set<string>();
     for (let i = 0; i < 40; i++) {
-      const result = resolvePartyRound({
-        players: [
-          player('p1', { action: { type: 'defend' }, stats: stats({ speed: 1 }) }),
-          player('p2', { action: { type: 'defend' }, stats: stats({ speed: 1 }) }),
-        ],
-        enemies: [mothling({ hp: 1000 })],
-      });
+      const result = resolvePartyEnemyPhase([playerState('p1'), playerState('p2')], [mothling({ hp: 1000 })]);
       for (const hit of result.enemyHits) targeted.add(hit.targetUid);
     }
     expect(targeted.has('p1')).toBe(true);
     expect(targeted.has('p2')).toBe(true);
   });
 
-  it('only inflicts an ailment on the player the attack actually landed on', () => {
-    // mothling-dustwing (weight 1 of 4) inflicts Blind at a 0.3 chance - run enough rounds that a
-    // real inflict is overwhelmingly likely, then confirm it never lands on the untargeted player.
-    for (let i = 0; i < 60; i++) {
-      const result = resolvePartyRound({
-        players: [
-          player('p1', { action: { type: 'defend' }, stats: stats({ speed: 1 }) }),
-          player('p2', { action: { type: 'defend' }, stats: stats({ speed: 1 }) }),
-        ],
-        enemies: [mothling({ hp: 1000 })],
-      });
-      for (const hit of result.enemyHits) {
-        const untargeted = hit.targetUid === 'p1' ? 'p2' : 'p1';
-        const untargetedAilments = result.players.find((p) => p.uid === untargeted)!.ailments;
-        expect(untargetedAilments.some((a: ActiveAilment) => a.ailmentId === 'blind')).toBe(false);
-      }
-    }
+  it('a dead enemy in the roster never gets a turn', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const result = resolvePartyEnemyPhase([playerState('p1')], [mothling({ hp: 0 }), mothling({ hp: 1000 })]);
+    expect(result.enemyHits.every((h) => h.attackerIndex === 1)).toBe(true);
+  });
+});
+
+describe('resolvePvpTurn', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  function opponent(overrides: Partial<PvpDefenderInput> = {}): PvpDefenderInput {
+    return { hp: 60, maxHp: 60, defense: 5, ...overrides };
+  }
+
+  it('damages the opponent directly, not an enemy board', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const result = resolvePvpTurn(player('p1'), opponent({ hp: 1000, maxHp: 1000 }));
+    expect(result.defenderHp).toBeLessThan(1000);
   });
 
-  it('applies a targeted skill only against the shared enemy roster, not other players', () => {
+  it('defeats the opponent when damage brings their hp to 0', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    const result = resolvePartyRound({
-      players: [
-        player('p1', { action: { type: 'skill', skillId: 'keepers-strike', targetIndex: 1 }, stats: stats({ speed: 999 }) }),
-      ],
-      enemies: [mothling({ hp: 1000 }), mothling({ hp: 1000 })],
-    });
-    const hit = result.hits.find((h) => h.uid === 'p1' && !h.missed)!;
-    expect(hit.targetIndex).toBe(1);
-    expect(result.enemyHp[0]).toBe(1000); // untouched - only index 1 was targeted
-    expect(result.enemyHp[1]).toBeLessThan(1000);
+    const result = resolvePvpTurn(player('p1', { stats: stats({ attack: 999 }) }), opponent({ hp: 20 }));
+    expect(result.defenderHp).toBe(0);
+    expect(result.log.some((l) => l.includes('defeated'))).toBe(true);
+  });
+
+  it('a Defend action never touches the opponent and sets defending true', () => {
+    const result = resolvePvpTurn(player('p1', { action: { type: 'defend' } }), opponent());
+    expect(result.defenderHp).toBe(opponent().hp);
+    expect(result.defending).toBe(true);
+    expect(result.forfeited).toBe(false);
+  });
+
+  it('a flee action forfeits the match without damaging anyone', () => {
+    const result = resolvePvpTurn(player('p1', { action: { type: 'flee' } }), opponent());
+    expect(result.forfeited).toBe(true);
+    expect(result.defenderHp).toBe(opponent().hp);
+  });
+
+  it('a stunned player skips their action entirely but still takes ailment tick damage', () => {
+    const stunnedAndPoisoned: ActiveAilment[] = [{ ailmentId: 'stun' }, { ailmentId: 'poison' }];
+    const result = resolvePvpTurn(
+      player('p1', { action: { type: 'attack' }, ailments: stunnedAndPoisoned, stats: stats({ hp: 60, maxHp: 60 }) }),
+      opponent({ hp: 1000, maxHp: 1000 }),
+    );
+    expect(result.defenderHp).toBe(1000); // never got to attack
+    expect(result.hp).toBeLessThan(60); // poison still ticked
   });
 });

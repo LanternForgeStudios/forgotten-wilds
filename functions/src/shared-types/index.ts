@@ -380,6 +380,10 @@ export interface PartyBattleParticipantStats {
   defense: number;
   speed: number;
   ailments: ActiveAilment[];
+  /** Whether this participant chose Defend (or flee, treated the same) on their turn this round -
+   *  read by the enemy phase (partyCombatEngine.ts's resolvePartyEnemyPhase) to halve incoming
+   *  damage, then cleared back to false once the enemy phase runs. */
+  defending: boolean;
 }
 
 export interface PartyBattleEnemyState {
@@ -389,11 +393,13 @@ export interface PartyBattleEnemyState {
   maxHp: number;
 }
 
-/** The last round's resolution, persisted onto the doc (not just returned from whichever client's
- *  submitPartyBattleAction call happened to trigger it) - unlike solo combat's resolveCombatAction,
- *  every participant needs to see what just happened via their own onSnapshot listener, not only
- *  the one caller who got the function response. Overwritten each round, not accumulated. */
-export interface PartyBattleRoundResult {
+/** Whichever single player-turn or enemy-phase just resolved, persisted onto the doc (not just
+ *  returned from whichever client's submitPartyBattleAction call happened to trigger it) - unlike
+ *  solo combat's resolveCombatAction, every participant needs to see what just happened via their
+ *  own onSnapshot listener, not only the one caller who got the function response. Overwritten
+ *  every turn (not just every round), so the party sees each player's action land one at a time
+ *  rather than a whole round's worth of text appearing at once. */
+export interface PartyBattleTurnResult {
   round: number;
   log: string[];
   resolvedAt: number;
@@ -406,36 +412,55 @@ export interface PartyBattleWaveRewards {
 }
 
 /** partyBattles/{battleId} - auto-id, `participants` is the trades-style array
- *  firestore.rules/the client's live query filter on. `pendingActions[uid]` is null until that
- *  participant submits for the current round; a round resolves (via submitPartyBattleAction, see
- *  its own doc comment for the client-triggered timeout model) once every participant has
- *  submitted or `turnDeadlineAt` has passed, whichever comes first. */
+ *  firestore.rules/the client's live query filter on. Resolution is sequential, one player at a
+ *  time - `turnOrder` (recomputed from currently-alive participants at the start of each round)
+ *  plus `currentTurnIndex` say whose turn it is; `turnOrder[currentTurnIndex]` is the only
+ *  participant submitPartyBattleAction will currently accept an action from (see its own doc
+ *  comment). Once every player in `turnOrder` has gone, the enemy phase resolves and a new round
+ *  begins - see partyCombatEngine.ts's own top comment for why this is sequential rather than
+ *  collect-everyone-then-resolve-at-once. */
 export interface PartyBattleSession {
   id: string;
   clanId: string | null;
   mode: PartyBattleMode;
   participants: string[];
-  /** Where the party was standing when the run started - fixed for the run's lifetime, used to
-   *  reroll each new wave's enemies from the same encounter table (see endlessBattleEngine.ts). */
+  /** Where the party was standing when the run started - fixed for the run's lifetime. Endless
+   *  Battle's own wave enemies aren't drawn from this location's encounter table (see
+   *  endlessBattleEngine.ts) - this is purely a record of where the party gathered. */
   locationId: string;
   /** The party's average real level at battle start, frozen for the whole run - each wave's
    *  difficulty escalates from this fixed baseline (see endlessBattleEngine.ts's
    *  effectiveLevelForWave), not from real characters' levels changing mid-run as rewards land. */
   partyAverageLevel: number;
+  /** A registry.ts battle-background asset id, rolled once at battle start and fixed for the run -
+   *  same "looks like a normal encounter" background solo combat shows, picked at random from
+   *  every overworld location's battleBackgroundAssetId (see endlessBattle.ts). */
+  battleBackgroundAssetId: string;
   wave: number;
   enemies: PartyBattleEnemyState[];
   round: number;
   status: PartyBattleStatus;
+  /** Whose turn it is this round, alive participants only, recomputed at the start of every round
+   *  (a player who goes down mid-round is simply skipped for the rest of it, not removed from
+   *  future rounds if somehow revived - not currently possible mid-battle, but the recompute-per-
+   *  round design leaves room for it). */
+  turnOrder: string[];
+  /** Index into `turnOrder` - `turnOrder[currentTurnIndex]` is the active player. */
+  currentTurnIndex: number;
   turnDeadlineAt: number;
-  pendingActions: Record<string, CombatAction | null>;
   participantStats: Record<string, PartyBattleParticipantStats>;
-  lastRoundResult: PartyBattleRoundResult | null;
+  lastTurnResult: PartyBattleTurnResult | null;
   /** Independent per-player rewards from the wave just won - see endlessBattle.ts. null until the
    *  first wave is cleared; endless-mode only (PvP grants rewards once, at the very end). */
   lastWaveRewards: Record<string, PartyBattleWaveRewards> | null;
   /** Endless-mode only, meaningful only while status === 'awaitingContinueVote' - see
    *  endlessBattle.ts's voteContinueEndlessBattle. Reset to {} every time a new vote opens. */
   continueVotes: Record<string, boolean>;
+  /** PvP-only - which participant won, once status is 'victory'/'defeated'. Endless Battle's
+   *  status is shared party-wide (everyone wins or loses together), so this stays null for that
+   *  mode; PvP's win/loss is per-uid, which the shared PartyBattleStatus field alone can't express -
+   *  see pvpBattle.ts. */
+  winnerUid: string | null;
   startedAt: number;
   updatedAt: number;
 }
@@ -446,4 +471,30 @@ export interface PartyBattleSession {
  *  second one. Deleted the moment their battle reaches any terminal status. */
 export interface PartyBattleLockDoc {
   battleId: string;
+}
+
+export type PvpChallengeStatus = 'pending' | 'accepted' | 'declined';
+
+/** pvpChallenges/{fromUid}_{toUid} - deterministic id, same pattern as FriendRequest (a player
+ *  could plausibly hold more than one pending challenge, but a duplicate challenge to the same
+ *  target should just overwrite rather than pile up). Kept (not deleted) after resolution, same
+ *  "history stays, status changes" precedent as friendRequests/clanInvites. */
+export interface PvpChallengeDoc {
+  id: string;
+  fromUid: string;
+  fromDisplayName: string;
+  toUid: string;
+  toDisplayName: string;
+  status: PvpChallengeStatus;
+  createdAt: number;
+}
+
+/** pvpQueue/{uid} - one doc per account, only exists while queued. joinPvpQueue matches greedily
+ *  against whichever other queued player is closest in level (see pvpBattle.ts) rather than a
+ *  fully general matchmaking service - "basic matchmaking" per the design doc's own reduced
+ *  ambition for casual PvP. */
+export interface PvpQueueEntry {
+  uid: string;
+  level: number;
+  joinedAt: number;
 }

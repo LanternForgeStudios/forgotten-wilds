@@ -4,7 +4,6 @@
 // functions/src/functions/partyBattle.ts / endlessBattle.ts.
 
 import type { ActiveAilment } from './ailment';
-import type { CombatAction } from './combat';
 
 export type PartyBattleMode = 'endless' | 'pvp';
 export type PartyBattleStatus = 'active' | 'awaitingContinueVote' | 'victory' | 'defeated' | 'withdrawn';
@@ -20,6 +19,7 @@ export interface PartyBattleParticipantStats {
   defense: number;
   speed: number;
   ailments: ActiveAilment[];
+  defending: boolean;
 }
 
 export interface PartyBattleEnemyState {
@@ -29,7 +29,7 @@ export interface PartyBattleEnemyState {
   maxHp: number;
 }
 
-export interface PartyBattleRoundResult {
+export interface PartyBattleTurnResult {
   round: number;
   log: string[];
   resolvedAt: number;
@@ -48,16 +48,24 @@ export interface PartyBattleSession {
   participants: string[];
   locationId: string;
   partyAverageLevel: number;
+  /** A registry.ts battle-background asset id, rolled once at battle start and fixed for the run. */
+  battleBackgroundAssetId: string;
   wave: number;
   enemies: PartyBattleEnemyState[];
   round: number;
   status: PartyBattleStatus;
+  /** Whose turn it is this round, alive participants only - turnOrder[currentTurnIndex] is the
+   *  only participant the server currently accepts a submitted action from. */
+  turnOrder: string[];
+  currentTurnIndex: number;
   turnDeadlineAt: number;
-  pendingActions: Record<string, CombatAction | null>;
   participantStats: Record<string, PartyBattleParticipantStats>;
-  lastRoundResult: PartyBattleRoundResult | null;
+  lastTurnResult: PartyBattleTurnResult | null;
   lastWaveRewards: Record<string, PartyBattleWaveRewards> | null;
   continueVotes: Record<string, boolean>;
+  /** PvP-only - which participant won, once status is 'victory'/'defeated'. Always null for
+   *  Endless Battle (a shared party-wide outcome, not per-uid). */
+  winnerUid: string | null;
   startedAt: number;
   updatedAt: number;
 }

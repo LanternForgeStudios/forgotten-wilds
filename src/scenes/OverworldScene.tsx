@@ -150,7 +150,7 @@ export function OverworldScene() {
 
   useHeartbeat(uid, displayName, locationId, position, skin);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const { startDash, stopDash, dashRampKey } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
+  const { startDash, stopDash } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
 
   function attemptInteract() {
     if (suspended || !map) return;
@@ -331,7 +331,6 @@ export function OverworldScene() {
           viewportSize={viewportSize}
           playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
           playerMovementState={movementState}
-          dashRampTrigger={dashRampKey}
         />
       </div>
       {isMobile ? (
