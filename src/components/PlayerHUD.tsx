@@ -7,11 +7,14 @@ import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { subscribeToIncomingFriendRequests, subscribeToAllDirectMessages } from '@/firebase/socialService';
 import { subscribeToMyTrades } from '@/firebase/tradeService';
+import { callSendFriendRequest, callClaimDailyChest, type DailyChestRewards } from '@/firebase/functionsClient';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
-import { XP_THRESHOLDS, LOCATIONS } from '@/data';
+import { XP_THRESHOLDS, LOCATIONS, CHEST_CLAIM_INTERVAL_MS, ELITE_CHEST_LEVEL_THRESHOLD } from '@/data';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { PRESENCE_STALE_AFTER_MS } from '@/utils/presence';
+import { itemDisplayName } from '@/utils/itemName';
+import { resyncSave } from '@/state/hydrate';
 import { playSound } from '@/audio/audioService';
 import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc } from '@/types';
 import styles from './PlayerHUD.module.css';
@@ -30,6 +33,34 @@ function xpProgress(xp: number, level: number) {
     span: nextThreshold - currentThreshold,
     remaining: nextThreshold - xp,
   };
+}
+
+/** Button label for a presence-popover row's friend-request state - undefined means "not yet
+ *  attempted this session" (the normal, common case). */
+function friendRequestLabel(status: string | undefined): string {
+  switch (status) {
+    case 'sending':
+      return '...';
+    case 'sent':
+      return 'Sent';
+    case 'accepted':
+      return 'Friends!';
+    case 'already-pending':
+      return 'Pending';
+    case 'error':
+      return 'Retry?';
+    default:
+      return 'Add';
+  }
+}
+
+/** "7h 24m" - always shows both units (even "0h 5m") since a bare "5m" reads ambiguously as
+ *  possibly-seconds at a glance, and this only ever needs minute precision. */
+function formatCountdown(ms: number): string {
+  const totalMinutes = Math.max(0, Math.ceil(ms / 60_000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}h ${minutes}m`;
 }
 
 interface PlayerHUDProps {
@@ -51,6 +82,16 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   const [statsOpen, setStatsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
+  // Per-uid result of a friend request sent from the presence popover below - keyed by target uid
+  // so each row tracks its own outcome independently (sending/sent/accepted/already-pending/error),
+  // same shape as UserProfile.tsx's own friend-search flow.
+  const [friendRequestStatus, setFriendRequestStatus] = useState<Record<string, string>>({});
+  const [chestOpen, setChestOpen] = useState(false);
+  const [chestClaiming, setChestClaiming] = useState(false);
+  const [chestError, setChestError] = useState<string | null>(null);
+  const [chestResult, setChestResult] = useState<{ tier: 'standard' | 'elite'; rewards: DailyChestRewards } | null>(
+    null,
+  );
   const [allMessages, setAllMessages] = useState<DirectMessage[]>([]);
   const [myTrades, setMyTrades] = useState<TradeDoc[]>([]);
   // Ticks the HUD every quarter-second purely so the Stamina bar visibly climbs back up in real
@@ -95,6 +136,32 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
     prevHasNewSocialRef.current = hasNewSocial;
   }, [hasNewSocial]);
 
+  async function sendFriendRequestTo(toUid: string) {
+    setFriendRequestStatus((prev) => ({ ...prev, [toUid]: 'sending' }));
+    try {
+      const { status } = await callSendFriendRequest(toUid);
+      setFriendRequestStatus((prev) => ({ ...prev, [toUid]: status }));
+    } catch {
+      setFriendRequestStatus((prev) => ({ ...prev, [toUid]: 'error' }));
+    }
+  }
+
+  async function claimChest() {
+    if (chestClaiming) return;
+    setChestClaiming(true);
+    setChestError(null);
+    try {
+      const { tier, rewards } = await callClaimDailyChest();
+      if (uid) await resyncSave(uid);
+      setChestResult({ tier, rewards });
+      void playSound('sfx.chest-open');
+    } catch (err) {
+      setChestError(err instanceof Error ? err.message : 'Could not claim the chest.');
+    } finally {
+      setChestClaiming(false);
+    }
+  }
+
   if (!player) return null;
 
   const hpPct = Math.max(0, Math.min(100, (player.stats.hp / player.stats.maxHp) * 100));
@@ -117,6 +184,15 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
     : [];
   const locationName = locationId ? LOCATIONS.find((l) => l.id === locationId)?.name : undefined;
 
+  // Display-only prediction from the already-synced save (same "no round-trip needed just to
+  // show a countdown" approach as predictedStamina above) - the actual claim is always
+  // re-validated server-side in claimDailyChest.ts, so this can never grant early even if the
+  // client's clock is off.
+  const chestTier: 'standard' | 'elite' = player.level >= ELITE_CHEST_LEVEL_THRESHOLD ? 'elite' : 'standard';
+  const msSinceLastClaim = now - player.lastChestClaimedAt;
+  const chestReady = msSinceLastClaim >= CHEST_CLAIM_INTERVAL_MS;
+  const msUntilChest = CHEST_CLAIM_INTERVAL_MS - msSinceLastClaim;
+
   return (
     <div className={styles.bar} style={{ height: barHeight }}>
       {/* display:contents at normal widths (see .topRow) - name/location/gold/presence lay out as
@@ -135,6 +211,53 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
 
         <span className={styles.gold}>{player.gold}g</span>
 
+        <div className={styles.chestWrap}>
+          <button
+            className={`${styles.chestButton} ${chestReady ? styles.chestReady : ''}`}
+            onClick={() => setChestOpen((open) => !open)}
+            title="Daily Chest"
+          >
+            {chestReady ? 'Chest ready!' : formatCountdown(msUntilChest)}
+          </button>
+          {chestOpen && (
+            <div className={styles.chestPopover} onMouseLeave={() => setChestOpen(false)}>
+              {chestResult ? (
+                <>
+                  <p className={styles.chestResultTitle}>
+                    {chestResult.tier === 'elite' ? 'Elite' : 'Standard'} Chest opened!
+                  </p>
+                  <ul className={styles.chestResultList}>
+                    <li>{chestResult.rewards.gold}g</li>
+                    {chestResult.rewards.premiumCurrency > 0 && (
+                      <li>{chestResult.rewards.premiumCurrency} premium currency</li>
+                    )}
+                    {chestResult.rewards.itemIds.map((id, i) => (
+                      <li key={`${id}-${i}`}>{itemDisplayName(id)}</li>
+                    ))}
+                  </ul>
+                  <button className={styles.chestCloseButton} onClick={() => setChestResult(null)}>
+                    Close
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className={styles.chestPopoverTitle}>
+                    {chestTier === 'elite' ? 'Elite' : 'Standard'} Chest
+                  </p>
+                  {chestReady ? (
+                    <button className={styles.chestClaimButton} disabled={chestClaiming} onClick={() => void claimChest()}>
+                      {chestClaiming ? 'Opening...' : 'Claim'}
+                    </button>
+                  ) : (
+                    <p className={styles.chestCountdown}>Next chest in {formatCountdown(msUntilChest)}</p>
+                  )}
+                  {chestError && <p className={styles.chestError}>{chestError}</p>}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
         {locationId && (
           <div className={styles.presenceWrap}>
             <button className={styles.presenceButton} onClick={() => setPresenceOpen((open) => !open)}>
@@ -150,6 +273,18 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
                       {p.displayName}
                       {p.uid === uid ? ' (you)' : ''}
                     </span>
+                    {p.uid !== uid && (
+                      <button
+                        className={styles.addFriendButton}
+                        disabled={['sending', 'sent', 'accepted', 'already-pending'].includes(
+                          friendRequestStatus[p.uid],
+                        )}
+                        onClick={() => void sendFriendRequestTo(p.uid)}
+                        title="Send a friend request"
+                      >
+                        {friendRequestLabel(friendRequestStatus[p.uid])}
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

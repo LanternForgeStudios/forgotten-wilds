@@ -173,6 +173,104 @@
   flex-shrink: 0;
 }
 
+.chestWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.chestButton {
+  background: transparent;
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text-dim);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chestButton:hover {
+  color: var(--fw-text);
+  border-color: var(--fw-accent);
+}
+
+.chestReady {
+  color: var(--fw-accent);
+  border-color: var(--fw-accent);
+}
+
+.chestPopover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  width: 200px;
+  background: var(--fw-panel);
+  border: 1px solid var(--fw-panel-border);
+  border-radius: 6px;
+  padding: 10px;
+  z-index: 11;
+  text-align: center;
+}
+
+.chestPopoverTitle,
+.chestResultTitle {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.chestCountdown {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.chestClaimButton {
+  width: 100%;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid var(--fw-accent);
+  background: var(--fw-accent-dim);
+  color: var(--fw-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.chestClaimButton:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.chestResultList {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 11px;
+  text-align: left;
+}
+
+.chestResultList li {
+  padding: 2px 0;
+}
+
+.chestCloseButton {
+  width: 100%;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--fw-panel-border);
+  background: transparent;
+  color: var(--fw-text-dim);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.chestError {
+  margin: 6px 0 0;
+  font-size: 10px;
+  color: var(--fw-danger);
+}
+
 .presenceWrap {
   position: relative;
   flex-shrink: 0;
@@ -240,6 +338,27 @@
   font-size: 10px;
   font-weight: bold;
   flex-shrink: 0;
+}
+
+.addFriendButton {
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--fw-panel-border);
+  background: transparent;
+  color: var(--fw-text-dim);
+  cursor: pointer;
+}
+
+.addFriendButton:hover:not(:disabled) {
+  color: var(--fw-text);
+  border-color: var(--fw-accent);
+}
+
+.addFriendButton:disabled {
+  cursor: default;
+  opacity: 0.7;
 }
 
 @media (max-width: 480px) {

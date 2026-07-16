@@ -1,4 +1,4 @@
-import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
+import { explorerRankForLevel, levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
 import type { PlayerSave } from '../shared-types';
 
 /** Fully restores HP/Spirit (and Lantern Oil, if a lantern is equipped) - shared by a level-up
@@ -24,6 +24,10 @@ export function restoreFullVitals(save: PlayerSave): void {
  *  quest-reward xp alone never triggered a level-up before). */
 export function applyLevelUp(save: PlayerSave): void {
   const newLevel = levelForXp(save.player.xp);
+  // Unconditional, not just on an actual level-up this call - self-heals any save whose
+  // explorerRank predates this field being level-driven (same spirit as grantItem's
+  // itemsDiscovered self-heal), since every xp-granting call site already routes through here.
+  save.player.explorerRank = explorerRankForLevel(newLevel);
   if (newLevel <= save.player.level) return;
 
   const levelsGained = newLevel - save.player.level;

@@ -32,7 +32,19 @@ export interface Stats {
 }
 
 export type SpiritRank = 'Unawakened' | 'Attuned' | 'Resonant' | 'Warden';
-export type ExplorerRank = 'Newcomer' | 'Wayfarer' | 'Pathfinder' | 'Keeper';
+/** Awarded automatically from player level, in 10-level chunks across the level-100 cap - see
+ *  explorerRankForLevel in data/leveling.ts for the exact level boundaries. */
+export type ExplorerRank =
+  | 'Newcomer'
+  | 'Wayfarer'
+  | 'Pathfinder'
+  | 'Trailblazer'
+  | 'Ridgewalker'
+  | 'Keeper'
+  | 'Wayshaper'
+  | 'Deepwalker'
+  | 'Lantern Sage'
+  | 'Legend of Mytherra';
 
 export type PlayerEquipment = Partial<Record<EquipmentSlot, string | null>>;
 
@@ -63,6 +75,11 @@ export interface Player {
    *  at character creation, changeable any time via setPlayerSkin.ts. Only two options today; the
    *  shape is a plain string union (not an enum) so a future third option is a one-line type edit. */
   skin: 'male' | 'female';
+  /** Server clock reading the last time a Daily Chest was claimed - 0 for a fresh character
+   *  (newCharacter.ts) and as a read-time fallback for any save that predates this field (see
+   *  claimDailyChest.ts), which naturally means "eligible immediately" against
+   *  data/dailyChest.ts's CHEST_CLAIM_INTERVAL_MS with no separate first-claim special case. */
+  lastChestClaimedAt: number;
 }
 
 export interface InventoryItem {

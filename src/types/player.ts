@@ -30,6 +30,10 @@ export interface Player {
   knownSkillIds: string[];
   /** Which player sprite variant to render (see registry.ts's sprite.player.male/female). */
   skin: 'male' | 'female';
+  /** Server clock reading the last time a Daily Chest was claimed - 0 for a fresh character,
+   *  which naturally means "eligible immediately" (see data/dailyChest.ts's
+   *  CHEST_CLAIM_INTERVAL_MS) without a separate first-claim special case. */
+  lastChestClaimedAt: number;
 }
 
 export interface PlayerSave {

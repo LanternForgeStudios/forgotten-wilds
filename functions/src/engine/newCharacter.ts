@@ -34,6 +34,7 @@ export function buildFreshPlayer(uid: string, name: string, now: number, skin: '
     staminaUpdatedAt: now,
     knownSkillIds: ['keepers-strike'],
     skin,
+    lastChestClaimedAt: 0,
   };
 }
 

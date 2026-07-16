@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyLevelUp } from './levelingEngine';
-import { levelForXp } from '../data/leveling';
+import { explorerRankForLevel, levelForXp } from '../data/leveling';
 import type { PlayerSave } from '../shared-types';
 
 function saveAtLevel(level: number, xp: number): PlayerSave {
@@ -105,6 +105,36 @@ describe('applyLevelUp', () => {
     expect(save.player.stats.attack).toBe(106);
     expect(save.player.stats.defense).toBe(54);
     expect(save.player.stats.speed).toBe(55);
+  });
+});
+
+describe('applyLevelUp: explorerRank', () => {
+  it('promotes explorerRank when a level-up crosses a rank boundary', () => {
+    // xpForLevel(11) = 10*11*12 - 20 = 1300 - level 11 is the Wayfarer boundary.
+    const save = saveAtLevel(1, 1300);
+    applyLevelUp(save);
+    expect(save.player.level).toBe(11);
+    expect(save.player.explorerRank).toBe('Wayfarer');
+  });
+
+  it('self-heals explorerRank even when no level-up happens this call - covers saves from before this field was level-driven', () => {
+    // xpForLevel(25) = 10*25*26 - 20 = 6480 - already at level 25, no threshold to cross.
+    const save = saveAtLevel(25, 6480);
+    save.player.explorerRank = 'Newcomer'; // stale, as if predating this feature
+    applyLevelUp(save);
+    expect(save.player.level).toBe(25);
+    expect(save.player.explorerRank).toBe('Pathfinder');
+  });
+});
+
+describe('explorerRankForLevel', () => {
+  it('resolves every tier boundary correctly', () => {
+    expect(explorerRankForLevel(1)).toBe('Newcomer');
+    expect(explorerRankForLevel(10)).toBe('Newcomer');
+    expect(explorerRankForLevel(11)).toBe('Wayfarer');
+    expect(explorerRankForLevel(100)).toBe('Legend of Mytherra');
+    expect(explorerRankForLevel(91)).toBe('Legend of Mytherra');
+    expect(explorerRankForLevel(90)).toBe('Lantern Sage');
   });
 });
 

@@ -24,7 +24,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useSceneStore } from '@/state/useSceneStore';
-import { callTalkToNpc, callInteractWithShrine } from '@/firebase/functionsClient';
+import { callTalkToNpc, callInteractWithShrine, callSendFriendRequest } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS } from '@/data';
@@ -132,6 +132,33 @@ export function TownScene() {
           })
           .catch((err) => console.error('talkToNpc failed', err));
       }
+      return;
+    }
+    // Other players aren't map objects (they're live presence docs, positioned by their own
+    // x/y - see otherPlayerEntities above), so this is a separate check rather than folding into
+    // the npcObject search above.
+    const now = Date.now();
+    const otherPlayer = presences.find(
+      (p) =>
+        p.uid !== uid &&
+        p.locationId === locationId &&
+        now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS &&
+        p.x === target.x &&
+        p.y === target.y,
+    );
+    if (otherPlayer) {
+      const name = otherPlayer.displayName;
+      run(() => callSendFriendRequest(otherPlayer.uid), 'Sending friend request...')
+        ?.then((res) => {
+          setMessage(
+            res.status === 'sent'
+              ? `Friend request sent to ${name}.`
+              : res.status === 'accepted'
+                ? `You and ${name} are now friends!`
+                : `You already have a pending request with ${name}.`,
+          );
+        })
+        .catch((err) => setMessage(err instanceof Error ? err.message : `Could not reach ${name}.`));
       return;
     }
     const shrineObject = map.objects.find(

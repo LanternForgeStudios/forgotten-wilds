@@ -39,4 +39,16 @@ export const EQUIPMENT_SLOTS: EquipmentSlot[] = [
 
 export type SpiritRank = 'Unawakened' | 'Attuned' | 'Resonant' | 'Warden';
 
-export type ExplorerRank = 'Newcomer' | 'Wayfarer' | 'Pathfinder' | 'Keeper';
+/** Awarded automatically from player level, in 10-level chunks across the level-100 cap - see
+ *  explorerRankForLevel in data/leveling.ts for the exact level boundaries. */
+export type ExplorerRank =
+  | 'Newcomer'
+  | 'Wayfarer'
+  | 'Pathfinder'
+  | 'Trailblazer'
+  | 'Ridgewalker'
+  | 'Keeper'
+  | 'Wayshaper'
+  | 'Deepwalker'
+  | 'Lantern Sage'
+  | 'Legend of Mytherra';

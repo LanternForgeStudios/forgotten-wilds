@@ -1,5 +1,7 @@
 // Display copy only — functions/src/data/leveling.ts is authoritative for level-up resolution.
 
+import type { ExplorerRank } from '@/types';
+
 export const MAX_LEVEL = 100;
 
 // xpForLevel(L) = 10*L*(L+1) - 20 for L>=2 - the exact closed form of what used to be a hand-typed
@@ -31,3 +33,23 @@ export const STAT_GROWTH_PER_LEVEL = {
   defense: 1,
   speed: 1,
 };
+
+// 10 tiers of 10 levels each across the level-100 cap - reuses the 4 pre-existing ExplorerRank
+// names (Newcomer/Wayfarer/Pathfinder/Keeper) in their natural early-game order and extends
+// upward. Kept in sync by hand with functions/src/data/leveling.ts.
+const EXPLORER_RANK_THRESHOLDS: { minLevel: number; rank: ExplorerRank }[] = [
+  { minLevel: 91, rank: 'Legend of Mytherra' },
+  { minLevel: 81, rank: 'Lantern Sage' },
+  { minLevel: 71, rank: 'Deepwalker' },
+  { minLevel: 61, rank: 'Wayshaper' },
+  { minLevel: 51, rank: 'Keeper' },
+  { minLevel: 41, rank: 'Ridgewalker' },
+  { minLevel: 31, rank: 'Trailblazer' },
+  { minLevel: 21, rank: 'Pathfinder' },
+  { minLevel: 11, rank: 'Wayfarer' },
+  { minLevel: 1, rank: 'Newcomer' },
+];
+
+export function explorerRankForLevel(level: number): ExplorerRank {
+  return EXPLORER_RANK_THRESHOLDS.find((t) => level >= t.minLevel)!.rank;
+}

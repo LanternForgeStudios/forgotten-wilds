@@ -10,3 +10,4 @@ export * from './locations';
 export * from './lore';
 export * from './leveling';
 export * from './recipes';
+export * from './dailyChest';

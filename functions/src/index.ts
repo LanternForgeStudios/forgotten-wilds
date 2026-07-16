@@ -16,6 +16,7 @@ export { useItem } from './functions/useItem';
 export { interactWithShrine } from './functions/interactWithShrine';
 export { dash } from './functions/dash';
 export { openChest } from './functions/openChest';
+export { claimDailyChest } from './functions/claimDailyChest';
 export { sellItem } from './functions/sellItem';
 export { craftItem } from './functions/craftItem';
 export { setPlayerSkin } from './functions/setPlayerSkin';

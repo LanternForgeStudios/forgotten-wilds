@@ -226,6 +226,25 @@ export async function callOpenChest(
   return result.data;
 }
 
+export interface DailyChestRewards {
+  gold: number;
+  premiumCurrency: number;
+  itemIds: string[];
+}
+
+export async function callClaimDailyChest(): Promise<{
+  tier: 'standard' | 'elite';
+  rewards: DailyChestRewards;
+  lastChestClaimedAt: number;
+}> {
+  const fn = httpsCallable<
+    void,
+    { tier: 'standard' | 'elite'; rewards: DailyChestRewards; lastChestClaimedAt: number }
+  >(functions, 'claimDailyChest');
+  const result = await fn();
+  return result.data;
+}
+
 export async function callCraftItem(recipeId: string): Promise<{ inventory: { itemId: string; quantity: number }[] }> {
   const fn = httpsCallable<{ recipeId: string }, { inventory: { itemId: string; quantity: number }[] }>(
     functions,
