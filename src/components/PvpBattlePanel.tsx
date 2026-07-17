@@ -50,7 +50,11 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   // the active player's turn to resolve (with Defend substituted) once the 20s deadline passes.
   // Fires once immediately on mount (not just on the first 3s interval tick), so reconnecting/
   // reloading into a match whose deadline already passed a while ago resolves right away instead
-  // of waiting up to 3 more seconds.
+  // of waiting up to 3 more seconds. Also fires on tab-visibility regain - a backgrounded browser
+  // tab throttles setInterval (Chrome can drop to roughly once a minute after a tab's been hidden
+  // a while), so alt-tabbing away and back would otherwise sit on a stale readout well past the
+  // real deadline until the throttled interval happens to tick; visibilitychange fires immediately
+  // regardless of throttling.
   const lastPollRef = useRef(0);
   useEffect(() => {
     if (!battle || battle.status !== 'active') return;
@@ -61,7 +65,14 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
     };
     poll();
     const id = setInterval(poll, 3000);
-    return () => clearInterval(id);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') poll();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [battle, battleId]);
 
   // The match's end (win or lose) restores both real saves and grants rewards server-side -
@@ -158,19 +169,23 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             <p className={styles.countdown}>
               {isMyTurn ? `${secondsLeft}s to act` : `Waiting for ${opponentName} to act...`}
             </p>
-            {isMyTurn && (
-              <div className={styles.actionRow}>
-                <button className={styles.smallButton} disabled={busy} onClick={() => submit({ type: 'attack' })}>
-                  Attack
-                </button>
-                <button className={styles.smallButton} disabled={busy} onClick={() => submit({ type: 'defend' })}>
-                  Defend
-                </button>
-                <button className={styles.dangerButton} disabled={busy} onClick={() => submit({ type: 'flee' })}>
-                  Forfeit
-                </button>
-              </div>
-            )}
+            <div className={styles.actionRow}>
+              {isMyTurn && (
+                <>
+                  <button className={styles.smallButton} disabled={busy} onClick={() => submit({ type: 'attack' })}>
+                    Attack
+                  </button>
+                  <button className={styles.smallButton} disabled={busy} onClick={() => submit({ type: 'defend' })}>
+                    Defend
+                  </button>
+                </>
+              )}
+              {/* Forfeiting works regardless of whose turn it is - see submitPartyBattleAction's
+                  own doc comment on why flee bypasses the turn-order gate entirely. */}
+              <button className={styles.dangerButton} disabled={busy} onClick={() => submit({ type: 'flee' })}>
+                Forfeit
+              </button>
+            </div>
           </>
         )}
 

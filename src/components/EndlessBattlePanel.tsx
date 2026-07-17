@@ -56,7 +56,12 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   // it's not this player's turn yet and they're just waiting on the active player or the 20s
   // per-turn deadline. Fires once immediately on mount (not just on the first 3s interval tick),
   // so reconnecting/reloading into a battle whose deadline already passed a while ago (nobody was
-  // around to poll it) resolves right away instead of waiting up to 3 more seconds.
+  // around to poll it) resolves right away instead of waiting up to 3 more seconds. Also fires on
+  // tab-visibility regain - a backgrounded browser tab throttles setInterval (Chrome can drop to
+  // roughly once a minute after a tab's been hidden a while), so a player who alt-tabs away and
+  // back would otherwise sit on a stale "waiting" readout well past the real 20s deadline until
+  // the throttled interval happens to tick again; visibilitychange fires immediately regardless
+  // of throttling, so switching back to this tab always forces an up-to-date check right away.
   const lastPollRef = useRef(0);
   useEffect(() => {
     if (!battle || battle.status !== 'active') return;
@@ -67,7 +72,14 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
     };
     poll();
     const id = setInterval(poll, 3000);
-    return () => clearInterval(id);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') poll();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [battle, battleId]);
 
   // Rewards/restores land on real saves server-side - resync whenever the battle transitions to
@@ -195,27 +207,39 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
             <p className={styles.countdown}>
               {isMyTurn ? `${secondsLeft}s to act` : `Waiting for ${names[activeUid] ?? '...'} to act...`}
             </p>
-            {isMyTurn && (
-              <div className={styles.actionRow}>
-                <button
-                  className={styles.smallButton}
-                  disabled={busy || aliveEnemies.length === 0}
-                  onClick={() => submit({ type: 'attack', targetIndex: selectedTarget })}
-                >
-                  Attack
-                </button>
-                <button className={styles.smallButton} disabled={busy} onClick={() => submit({ type: 'defend' })}>
-                  Defend
-                </button>
-                <button className={styles.dangerButton} disabled={busy} onClick={() => submit({ type: 'flee' })}>
-                  Leave Battle
-                </button>
-              </div>
-            )}
+            <div className={styles.actionRow}>
+              {isMyTurn && (
+                <>
+                  <button
+                    className={styles.smallButton}
+                    disabled={busy || aliveEnemies.length === 0}
+                    onClick={() => submit({ type: 'attack', targetIndex: selectedTarget })}
+                  >
+                    Attack
+                  </button>
+                  <button className={styles.smallButton} disabled={busy} onClick={() => submit({ type: 'defend' })}>
+                    Defend
+                  </button>
+                </>
+              )}
+              {/* Leaving works regardless of whose turn it is - see submitPartyBattleAction's own
+                  doc comment on why flee bypasses the turn-order gate entirely. A waiting player
+                  stuck on an unresponsive partner needs a way out too, not just the active one. */}
+              <button className={styles.dangerButton} disabled={busy} onClick={() => submit({ type: 'flee' })}>
+                Leave Battle
+              </button>
+            </div>
           </>
         )}
 
-        {battle.status === 'active' && me && me.hp <= 0 && <p className={styles.empty}>You are down - waiting for the party.</p>}
+        {battle.status === 'active' && me && me.hp <= 0 && (
+          <>
+            <p className={styles.empty}>You are down - waiting for the party.</p>
+            <button className={styles.dangerButton} disabled={busy} onClick={() => submit({ type: 'flee' })}>
+              Leave Battle
+            </button>
+          </>
+        )}
 
         {battle.status === 'awaitingContinueVote' && (
           <>
