@@ -55,7 +55,10 @@ export const setDisplayName = onCall<SetDisplayNameRequest>(async (request) => {
     save.player.name = name;
     save.updatedAt = Date.now();
     tx.set(userRef, save);
-    tx.set(directoryRef, { uid, displayName: name, displayNameLower: nameLower });
+    // merge: true - a plain tx.set here would silently overwrite this doc's highestEndlessWave
+    // (added later than displayName/displayNameLower) back to nothing, since Firestore's set()
+    // without merge replaces the whole document rather than patching just these fields.
+    tx.set(directoryRef, { uid, displayName: name, displayNameLower: nameLower }, { merge: true });
 
     return { displayName: name };
   });

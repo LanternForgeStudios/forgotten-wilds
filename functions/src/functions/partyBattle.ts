@@ -21,6 +21,7 @@ import type {
   PartyBattleWaveRewards,
   PlayerSave,
   Stats,
+  UserDirectoryDoc,
 } from '../shared-types';
 
 /** A save already read (and possibly item-deducted) earlier in the same transaction, for whichever
@@ -303,6 +304,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         return { resolved: true, status: 'victory' as const, winnerUid: opponentUid };
       }
       const bumpClanWave = await prepareClanHighestWaveUpdate(tx, db, battle.clanId, battle.wave);
+      const bumpSoloWave = await prepareSoloHighestWaveUpdate(tx, db, battle.clanId, battle.participants, battle.wave);
       await restoreParticipantsAndClearLocks(tx, db, battle.participants);
       tx.update(battleRef, {
         status: 'withdrawn',
@@ -310,6 +312,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         updatedAt: now,
       });
       bumpClanWave?.();
+      bumpSoloWave?.();
       return { resolved: true, status: 'withdrawn' as const };
     }
 
@@ -454,6 +457,8 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     if (partyDefeated) {
       const bumpClanWave =
         battle.mode === 'endless' ? await prepareClanHighestWaveUpdate(tx, db, battle.clanId, battle.wave) : null;
+      const bumpSoloWave =
+        battle.mode === 'endless' ? await prepareSoloHighestWaveUpdate(tx, db, battle.clanId, battle.participants, battle.wave) : null;
       if (battle.mode === 'endless') {
         await restoreParticipantsAndClearLocks(tx, db, battle.participants, activePreFetch);
       }
@@ -465,6 +470,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         updatedAt: now,
       });
       bumpClanWave?.();
+      bumpSoloWave?.();
       return { resolved: true, status: 'defeated' as const };
     }
 
@@ -720,6 +726,32 @@ export async function prepareClanHighestWaveUpdate(
   const clan = clanSnap.data() as ClanDoc;
   if (wave <= clan.highestEndlessWave) return null;
   return () => tx.update(clanRef, { highestEndlessWave: wave, updatedAt: Date.now() });
+}
+
+/** The solo-battle mirror of prepareClanHighestWaveUpdate above - same read-now/write-later
+ *  split, same reasoning, just reading/writing userDirectory/{uid} instead of clans/{clanId}.
+ *  Only ever applies to a clanless ("solo") Endless Battle run - returns null immediately if
+ *  `clanId` is set, so calling both this and prepareClanHighestWaveUpdate unconditionally at the
+ *  same call site is safe (exactly one of the two can ever actually do anything for a given
+ *  battle). `participants` is always a single uid for a solo run (startEndlessBattle enforces
+ *  this), but takes the whole array rather than a bare uid so callers don't need their own
+ *  clanId-implies-solo-implies-participants[0] logic duplicated at each call site. */
+export async function prepareSoloHighestWaveUpdate(
+  tx: Transaction,
+  db: Firestore,
+  clanId: string | null,
+  participants: string[],
+  wave: number,
+): Promise<(() => void) | null> {
+  if (clanId) return null;
+  const uid = participants[0];
+  if (!uid) return null;
+  const dirRef = db.collection('userDirectory').doc(uid);
+  const dirSnap = await tx.get(dirRef);
+  if (!dirSnap.exists) return null;
+  const dir = dirSnap.data() as UserDirectoryDoc;
+  if (wave <= (dir.highestEndlessWave ?? 0)) return null;
+  return () => tx.update(dirRef, { highestEndlessWave: wave });
 }
 
 /** Restores every participant's real save to full HP/Spirit/Oil - "after the run ends... every

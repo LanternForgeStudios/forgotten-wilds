@@ -39,7 +39,9 @@ import {
   callTransferClanLeadership,
   callDisbandClan,
   callGetClanLeaderboard,
+  callGetSoloEndlessLeaderboard,
   callStartEndlessBattle,
+  callStartSoloEndlessBattle,
   callSetDisplayName,
   callChallengeToPvp,
   callRespondToPvpChallenge,
@@ -61,6 +63,7 @@ import type {
   ClanInvite,
   ClanLeaderboardEntry,
   DirectMessage,
+  SoloEndlessLeaderboardEntry,
   FriendRequest,
   OnlinePresence,
   PvpChallengeDoc,
@@ -141,8 +144,12 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const [clanInviteQuery, setClanInviteQuery] = useState('');
   const [clanInviteResults, setClanInviteResults] = useState<{ uid: string; displayName: string }[]>([]);
   const [showClanLeaderboard, setShowClanLeaderboard] = useState(false);
+  const [leaderboardCategory, setLeaderboardCategory] = useState<'clan' | 'solo'>('clan');
   const [clanLeaderboard, setClanLeaderboard] = useState<ClanLeaderboardEntry[] | null>(null);
+  const [soloLeaderboard, setSoloLeaderboard] = useState<SoloEndlessLeaderboardEntry[] | null>(null);
   const [clanLeaderboardError, setClanLeaderboardError] = useState<string | null>(null);
+  const [soloBattleBusy, setSoloBattleBusy] = useState(false);
+  const [soloBattleError, setSoloBattleError] = useState<string | null>(null);
 
   // --- PvP (Phase D) state - challenges/matchmaking, shown from the Friends tab ---
   const [incomingPvpChallenges, setIncomingPvpChallenges] = useState<PvpChallengeDoc[]>([]);
@@ -584,8 +591,9 @@ export function UserProfile({ onClose }: UserProfileProps) {
     setShowClanLeaderboard(true);
     setClanLeaderboardError(null);
     try {
-      const { entries } = await callGetClanLeaderboard();
-      setClanLeaderboard(entries);
+      const [clanResult, soloResult] = await Promise.all([callGetClanLeaderboard(), callGetSoloEndlessLeaderboard()]);
+      setClanLeaderboard(clanResult.entries);
+      setSoloLeaderboard(soloResult.entries);
     } catch (err) {
       setClanLeaderboardError(err instanceof Error ? err.message : 'Could not load the leaderboard.');
     }
@@ -620,6 +628,23 @@ export function UserProfile({ onClose }: UserProfileProps) {
       );
     } finally {
       setClanBusy(false);
+    }
+  }
+
+  // Available to any signed-in player regardless of clan status - a real solo run, not a 1-person
+  // clan run (see startEndlessBattle's own `solo` doc comment on why those are separate
+  // categories). Uses its own busy/error state rather than clanBusy/clanError since this button is
+  // rendered outside the `clan &&` section.
+  async function startSoloEndlessBattle() {
+    if (soloBattleBusy || !uid) return;
+    setSoloBattleBusy(true);
+    setSoloBattleError(null);
+    try {
+      await callStartSoloEndlessBattle();
+    } catch (err) {
+      setSoloBattleError(err instanceof Error ? err.message : 'Could not start a solo battle - make sure you are in a Town.');
+    } finally {
+      setSoloBattleBusy(false);
     }
   }
 
@@ -1057,27 +1082,78 @@ export function UserProfile({ onClose }: UserProfileProps) {
 
         {tab === 'clan' && (
           <div className={styles.section}>
-            <button className={styles.smallButton} onClick={toggleClanLeaderboard}>
-              {showClanLeaderboard ? 'Back' : 'View Leaderboard'}
-            </button>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button className={styles.smallButton} onClick={toggleClanLeaderboard}>
+                {showClanLeaderboard ? 'Back' : 'View Leaderboard'}
+              </button>
+              {!showClanLeaderboard && (
+                <button className={styles.smallButton} disabled={soloBattleBusy} onClick={startSoloEndlessBattle}>
+                  Start Solo Endless Battle
+                </button>
+              )}
+            </div>
+            {!showClanLeaderboard && soloBattleError && <p className={styles.error}>{soloBattleError}</p>}
+            {!showClanLeaderboard && (
+              <p className={styles.empty} style={{ marginTop: 6 }}>
+                Fights alone, from a Town (like Ash Hallow) - counts toward the Solo leaderboard, not your clan's.
+              </p>
+            )}
 
             {showClanLeaderboard ? (
               <>
+                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                  <button
+                    className={styles.smallButton}
+                    disabled={leaderboardCategory === 'clan'}
+                    onClick={() => setLeaderboardCategory('clan')}
+                  >
+                    Clan Ranks
+                  </button>
+                  <button
+                    className={styles.smallButton}
+                    disabled={leaderboardCategory === 'solo'}
+                    onClick={() => setLeaderboardCategory('solo')}
+                  >
+                    Solo Ranks
+                  </button>
+                </div>
                 <h3 className={styles.sectionTitle}>Highest Wave Reached</h3>
                 {clanLeaderboardError && <p className={styles.error}>{clanLeaderboardError}</p>}
-                {!clanLeaderboardError && !clanLeaderboard && <p className={styles.empty}>Loading...</p>}
-                {clanLeaderboard?.length === 0 && <p className={styles.empty}>No clans have entered an Endless Battle yet.</p>}
-                {clanLeaderboard && clanLeaderboard.length > 0 && (
-                  <div className={styles.list}>
-                    {clanLeaderboard.map((entry, i) => (
-                      <div key={entry.id} className={styles.row} style={entry.id === clanId ? { fontWeight: 'bold' } : undefined}>
-                        <span className={styles.rowName}>
-                          #{i + 1} {entry.name} [{entry.tag}] {entry.id === clanId ? '(you)' : ''}
-                        </span>
-                        <span>Wave {entry.highestEndlessWave}</span>
+                {leaderboardCategory === 'clan' && (
+                  <>
+                    {!clanLeaderboardError && !clanLeaderboard && <p className={styles.empty}>Loading...</p>}
+                    {clanLeaderboard?.length === 0 && <p className={styles.empty}>No clans have entered an Endless Battle yet.</p>}
+                    {clanLeaderboard && clanLeaderboard.length > 0 && (
+                      <div className={styles.list}>
+                        {clanLeaderboard.map((entry, i) => (
+                          <div key={entry.id} className={styles.row} style={entry.id === clanId ? { fontWeight: 'bold' } : undefined}>
+                            <span className={styles.rowName}>
+                              #{i + 1} {entry.name} [{entry.tag}] {entry.id === clanId ? '(you)' : ''}
+                            </span>
+                            <span>Wave {entry.highestEndlessWave}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
+                )}
+                {leaderboardCategory === 'solo' && (
+                  <>
+                    {!clanLeaderboardError && !soloLeaderboard && <p className={styles.empty}>Loading...</p>}
+                    {soloLeaderboard?.length === 0 && <p className={styles.empty}>No one has entered a solo Endless Battle yet.</p>}
+                    {soloLeaderboard && soloLeaderboard.length > 0 && (
+                      <div className={styles.list}>
+                        {soloLeaderboard.map((entry, i) => (
+                          <div key={entry.uid} className={styles.row} style={entry.uid === uid ? { fontWeight: 'bold' } : undefined}>
+                            <span className={styles.rowName}>
+                              #{i + 1} {entry.displayName} {entry.uid === uid ? '(you)' : ''}
+                            </span>
+                            <span>Wave {entry.highestEndlessWave}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             ) : (

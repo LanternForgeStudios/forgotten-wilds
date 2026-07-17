@@ -7,6 +7,7 @@ import type {
   PartyBattleParticipantStats,
   PartyBattleStatus,
   PlayerSave,
+  SoloEndlessLeaderboardEntry,
   TradeStatus,
 } from '@/types';
 import { functions } from './firebaseConfig';
@@ -448,6 +449,20 @@ export async function callGetClanLeaderboard(): Promise<{ entries: ClanLeaderboa
 export async function callStartEndlessBattle(participantUids: string[]): Promise<{ battleId: string }> {
   const fn = httpsCallable<{ participantUids: string[] }, { battleId: string }>(functions, 'startEndlessBattle');
   const result = await fn({ participantUids });
+  return result.data;
+}
+
+/** The Solo Endless Battle entry point - see startEndlessBattle's own `solo` doc comment. Always
+ *  exactly the caller, no clan involved, counts toward the solo leaderboard instead of a clan's. */
+export async function callStartSoloEndlessBattle(): Promise<{ battleId: string }> {
+  const fn = httpsCallable<{ solo: true }, { battleId: string }>(functions, 'startEndlessBattle');
+  const result = await fn({ solo: true });
+  return result.data;
+}
+
+export async function callGetSoloEndlessLeaderboard(): Promise<{ entries: SoloEndlessLeaderboardEntry[] }> {
+  const fn = httpsCallable<void, { entries: SoloEndlessLeaderboardEntry[] }>(functions, 'getSoloEndlessLeaderboard');
+  const result = await fn();
   return result.data;
 }
 

@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { buildFreshPlayer, buildFreshSaveContent } from '../engine/newCharacter';
-import type { PlayerSave } from '../shared-types';
+import type { PlayerSave, UserDirectoryDoc } from '../shared-types';
 
 interface CreateCharacterRequest {
   name: string;
@@ -61,11 +61,14 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
     tx.set(userRef, save);
     // Public, minimal directory entry so other players can find this account by name to send a
     // friend request - deliberately excludes email/anything sensitive (see searchUsers.ts).
+    // highestEndlessWave starts at 0, bumped later by prepareSoloHighestWaveUpdate the first time
+    // this account completes a solo Endless Battle run (see UserDirectoryDoc's own doc comment).
     tx.set(directoryRef, {
       uid,
       displayName: name,
       displayNameLower: name.toLowerCase(),
-    });
+      highestEndlessWave: 0,
+    } satisfies UserDirectoryDoc);
   });
 
   return save;

@@ -6,6 +6,7 @@ import {
   fullyRestoredParticipantStats,
   rollBattleBackgroundAssetId,
   prepareClanHighestWaveUpdate,
+  prepareSoloHighestWaveUpdate,
   TURN_TIMEOUT_MS,
 } from './partyBattle';
 import { MAX_CLAN_SIZE } from '../shared-types';
@@ -16,6 +17,7 @@ import type {
   PartyBattleParticipantStats,
   PartyBattleSession,
   PlayerSave,
+  UserDirectoryDoc,
 } from '../shared-types';
 
 /** Endless Battle can only be started from a Town - the only place clan members can actually see
@@ -32,6 +34,13 @@ const TERMINAL_STATUSES = new Set<PartyBattleSession['status']>(['victory', 'def
 
 interface StartEndlessBattleRequest {
   participantUids: string[];
+  /** True for the Solo Endless Battle entry point (available to any player, clanned or not) -
+   *  forces a party of exactly the caller, skips every clan-membership check entirely, and the
+   *  battle doc gets `clanId: null` so its eventual result counts toward the *solo* leaderboard
+   *  (userDirectory/{uid}.highestEndlessWave, prepareSoloHighestWaveUpdate) instead of a clan's. A
+   *  clanned player choosing this still gets a real solo run, not a 1-person clan run - the two are
+   *  deliberately separate categories, not a fallback for "happens to have no clan". */
+  solo?: boolean;
 }
 
 /**
@@ -76,13 +85,15 @@ async function resolveStaleLocks(
  * still fight solo - Endless Battle doesn't require company), restores every one of them to full
  * HP/Spirit/Oil (their real save is updated immediately, per the design doc), and rolls Wave 1.
  * Any clan member can start a run (not leader-only - forming a party is a group activity, unlike
- * clan administration).
+ * clan administration). `solo: true` is a distinct entry point (see StartEndlessBattleRequest's
+ * own doc comment) - always exactly one participant (the caller), no clan involved at all.
  */
 export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
-  const participantUids = Array.from(new Set(request.data?.participantUids ?? []));
-  if (!participantUids.includes(uid)) participantUids.push(uid);
+  const solo = request.data?.solo === true;
+  const participantUids = solo ? [uid] : Array.from(new Set(request.data?.participantUids ?? []));
+  if (!solo && !participantUids.includes(uid)) participantUids.push(uid);
   // A solo clan member (or a clan where only one member happens to be around) can still fight -
   // Endless Battle just runs with a party of one, the same as any other party size structurally.
   if (participantUids.length > MAX_CLAN_SIZE) {
@@ -93,22 +104,27 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
   const membershipRef = db.collection('clanMemberships').doc(uid);
 
   return db.runTransaction(async (tx) => {
-    const membershipSnap = await tx.get(membershipRef);
-    const clanId = (membershipSnap.data() as ClanMembershipDoc | undefined)?.clanId;
-    if (!clanId) throw new HttpsError('failed-precondition', 'You are not in a clan.');
+    let clanId: string | null = null;
+    if (!solo) {
+      const membershipSnap = await tx.get(membershipRef);
+      clanId = (membershipSnap.data() as ClanMembershipDoc | undefined)?.clanId ?? null;
+      if (!clanId) throw new HttpsError('failed-precondition', 'You are not in a clan.');
+    }
 
-    const clanRef = db.collection('clans').doc(clanId);
+    const clanRef = clanId ? db.collection('clans').doc(clanId) : null;
     const lockRefs = participantUids.map((p) => db.collection('partyBattleLocks').doc(p));
     const userRefs = participantUids.map((p) => db.collection('users').doc(p));
     const [clanSnap, lockSnaps, userSnaps] = await Promise.all([
-      tx.get(clanRef),
+      clanRef ? tx.get(clanRef) : Promise.resolve(null),
       Promise.all(lockRefs.map((ref) => tx.get(ref))),
       Promise.all(userRefs.map((ref) => tx.get(ref))),
     ]);
-    if (!clanSnap.exists) throw new HttpsError('not-found', 'That clan no longer exists.');
-    const clan = clanSnap.data() as ClanDoc;
-    if (!participantUids.every((p) => clan.memberUids.includes(p))) {
-      throw new HttpsError('failed-precondition', 'Every player must be a member of your clan.');
+    if (clanRef) {
+      if (!clanSnap!.exists) throw new HttpsError('not-found', 'That clan no longer exists.');
+      const clan = clanSnap!.data() as ClanDoc;
+      if (!participantUids.every((p) => clan.memberUids.includes(p))) {
+        throw new HttpsError('failed-precondition', 'Every player must be a member of your clan.');
+      }
     }
     if (userSnaps.some((snap) => !snap.exists)) {
       throw new HttpsError('failed-precondition', 'A character could not be found.');
@@ -217,9 +233,11 @@ export const voteContinueEndlessBattle = onCall<VoteContinueEndlessBattleRequest
 
     if (!wantsToContinue) {
       const bumpClanWave = await prepareClanHighestWaveUpdate(tx, db, battle.clanId, battle.wave);
+      const bumpSoloWave = await prepareSoloHighestWaveUpdate(tx, db, battle.clanId, battle.participants, battle.wave);
       await restoreParticipantsAndClearLocks(tx, db, battle.participants);
       tx.update(battleRef, { status: 'withdrawn', updatedAt: Date.now() });
       bumpClanWave?.();
+      bumpSoloWave?.();
       return { status: 'withdrawn' as const };
     }
 
@@ -247,4 +265,34 @@ export const voteContinueEndlessBattle = onCall<VoteContinueEndlessBattleRequest
     });
     return { status: 'active' as const, wave: nextWave };
   });
+});
+
+const SOLO_LEADERBOARD_SIZE = 20;
+
+export interface SoloEndlessLeaderboardEntry {
+  uid: string;
+  displayName: string;
+  highestEndlessWave: number;
+}
+
+/** Read-only, all-time ranking of individual players by highest *solo* Endless Battle wave
+ *  reached - the userDirectory/{uid} mirror of getClanLeaderboard (clan.ts). userDirectory is
+ *  already public/signed-in-readable (see its own firestore.rules block), so unlike
+ *  getClanLeaderboard this doesn't strictly need an Admin-SDK bypass for read access - kept as its
+ *  own callable anyway (rather than a client-side query) so a future field addition here doesn't
+ *  require a firestore.indexes.json change on the client's behalf, and to match this project's
+ *  existing "every cross-account read goes through a Cloud Function" convention. */
+export const getSoloEndlessLeaderboard = onCall(async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
+
+  const db = getFirestore();
+  const snap = await db.collection('userDirectory').orderBy('highestEndlessWave', 'desc').limit(SOLO_LEADERBOARD_SIZE).get();
+
+  const entries: SoloEndlessLeaderboardEntry[] = snap.docs.map((d) => {
+    const dir = d.data() as UserDirectoryDoc;
+    return { uid: dir.uid, displayName: dir.displayName, highestEndlessWave: dir.highestEndlessWave };
+  });
+
+  return { entries };
 });

@@ -316,9 +316,11 @@ export interface WorldChatCleanupMeta {
 export const MAX_CLAN_SIZE = 6;
 
 /** clans/{clanId} - one doc per clan, auto-id. `memberUids` always includes `leaderUid` (checked
- *  by every clan.ts mutation, not enforced by the doc shape itself). `level`/`xp`/
- *  `highestEndlessWave` are placeholders written by the future Endless Battle phase - clan.ts's
- *  functions only ever initialize them to 0, never advance them. */
+ *  by every clan.ts mutation, not enforced by the doc shape itself). `level`/`xp` are still
+ *  placeholders (clan.ts's functions only ever initialize them to 0, never advance them) - but
+ *  `highestEndlessWave` is real: initialized to 0 by createClan, then bumped by
+ *  prepareClanHighestWaveUpdate (partyBattle.ts) whenever a clan Endless Battle run ends with a
+ *  new record wave, and surfaced read-only via getClanLeaderboard (clan.ts). */
 export interface ClanDoc {
   id: string;
   name: string;
@@ -330,6 +332,21 @@ export interface ClanDoc {
   highestEndlessWave: number;
   createdAt: number;
   updatedAt: number;
+}
+
+/** userDirectory/{uid} - one public, minimal doc per account (deliberately excludes email/
+ *  anything sensitive - see createCharacter.ts's own comment). Originally search/friend-lookup
+ *  only (`displayName`/`displayNameLower`); `highestEndlessWave` was added for the *solo* Endless
+ *  Battle leaderboard (getSoloEndlessLeaderboard, endlessBattle.ts) - bumped by
+ *  prepareSoloHighestWaveUpdate (partyBattle.ts) whenever a clanless ("solo") Endless Battle run
+ *  ends with a new record wave, mirroring ClanDoc's own highestEndlessWave for clan runs. Every
+ *  writer of this doc (createCharacter.ts, setDisplayName.ts) must be careful not to silently drop
+ *  this field - see setDisplayName.ts's own comment on why it uses a merge write. */
+export interface UserDirectoryDoc {
+  uid: string;
+  displayName: string;
+  displayNameLower: string;
+  highestEndlessWave: number;
 }
 
 /** clanMemberships/{uid} - one doc per account, mirrors friendships/{uid}'s "one doc per account"

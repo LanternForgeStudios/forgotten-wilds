@@ -45,3 +45,13 @@ export interface ClanLeaderboardEntry {
   level: number;
   highestEndlessWave: number;
 }
+
+/** One row of getSoloEndlessLeaderboard's response (functions/src/functions/endlessBattle.ts) -
+ *  not clan-related at all (ranks individual players by their own solo Endless Battle record,
+ *  userDirectory/{uid}.highestEndlessWave) - kept here alongside ClanLeaderboardEntry since the
+ *  two are always shown together in the same leaderboard UI (UserProfile.tsx's Clan tab). */
+export interface SoloEndlessLeaderboardEntry {
+  uid: string;
+  displayName: string;
+  highestEndlessWave: number;
+}

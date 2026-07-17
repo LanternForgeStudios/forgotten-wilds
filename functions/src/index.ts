@@ -39,6 +39,6 @@ export {
   getClanLeaderboard,
 } from './functions/clan';
 export { submitPartyBattleAction, useItemInPartyBattle } from './functions/partyBattle';
-export { startEndlessBattle, voteContinueEndlessBattle } from './functions/endlessBattle';
+export { startEndlessBattle, voteContinueEndlessBattle, getSoloEndlessLeaderboard } from './functions/endlessBattle';
 export { challengeToPvp, respondToPvpChallenge, joinPvpQueue, leavePvpQueue } from './functions/pvpBattle';
 export { setDisplayName } from './functions/setDisplayName';
