@@ -82,6 +82,28 @@ describe('resolvePartyPlayerTurn', () => {
     expect(result.enemyHp[0]).toBe(1000); // untouched
     expect(result.hp).toBeLessThan(60); // poison still ticked
   });
+
+  it('an offensive lanternAbility damages the enemy and deducts oil', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const result = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'lanternAbility', abilityId: 'lantern-flame' }, stats: stats({ lanternOil: 20 }) }),
+      [mothling({ hp: 1000 })],
+    );
+    expect(result.enemyHp[0]).toBeLessThan(1000);
+    expect(result.hits).toHaveLength(1);
+    expect(result.lanternOil).toBe(12); // 20 - lantern-flame's 8 oil cost
+  });
+
+  it('a healing lanternAbility restores hp and never touches the enemy board', () => {
+    const result = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'lanternAbility', abilityId: 'steadfast-ember' }, stats: stats({ hp: 20, maxHp: 60, lanternOil: 20 }) }),
+      [mothling({ hp: 1000 })],
+    );
+    expect(result.hp).toBe(45); // 20 + steadfast-ember's 25 healHp
+    expect(result.enemyHp[0]).toBe(1000);
+    expect(result.hits).toHaveLength(0);
+    expect(result.lanternOil).toBe(10); // 20 - steadfast-ember's 10 oil cost
+  });
 });
 
 describe('resolvePartyEnemyPhase', () => {
@@ -168,6 +190,28 @@ describe('resolvePvpTurn', () => {
     expect(result.forfeited).toBe(true);
     expect(result.defenderHp).toBe(opponent().hp);
     expect(result.hit).toBeNull();
+  });
+
+  it('an offensive lanternAbility damages the opponent and deducts oil', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const result = resolvePvpTurn(
+      player('p1', { action: { type: 'lanternAbility', abilityId: 'lantern-flame' }, stats: stats({ lanternOil: 20 }) }),
+      opponent({ hp: 1000, maxHp: 1000 }),
+    );
+    expect(result.defenderHp).toBeLessThan(1000);
+    expect(result.hit).not.toBeNull();
+    expect(result.lanternOil).toBe(12); // 20 - lantern-flame's 8 oil cost
+  });
+
+  it('a healing lanternAbility restores hp and never touches the opponent', () => {
+    const result = resolvePvpTurn(
+      player('p1', { action: { type: 'lanternAbility', abilityId: 'steadfast-ember' }, stats: stats({ hp: 20, maxHp: 60, lanternOil: 20 }) }),
+      opponent(),
+    );
+    expect(result.hp).toBe(45); // 20 + steadfast-ember's 25 healHp
+    expect(result.defenderHp).toBe(opponent().hp);
+    expect(result.hit).toBeNull();
+    expect(result.lanternOil).toBe(10); // 20 - steadfast-ember's 10 oil cost
   });
 
   it('a stunned player skips their action entirely but still takes ailment tick damage', () => {

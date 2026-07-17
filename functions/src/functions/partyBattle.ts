@@ -1,11 +1,15 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type DocumentReference, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { resolvePartyPlayerTurn, resolvePartyEnemyPhase, resolvePvpTurn } from '../engine/partyCombatEngine';
-import { computeRewards } from '../engine/combatEngine';
+import { computeRewards, aggregateItemCounts, hasSufficientQuantity } from '../engine/combatEngine';
 import { rollChestRewards } from '../engine/dailyChestEngine';
 import { isMilestoneWave, milestoneChestTier } from '../engine/endlessBattleEngine';
-import { grantItem } from '../engine/inventoryEngine';
+import { grantItem, itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
+import { SKILLS } from '../data/skills';
+import { ITEMS } from '../data/items';
+import { EQUIPMENT } from '../data/equipment';
+import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import type {
   CombatAction,
   CombatActionType,
@@ -14,7 +18,78 @@ import type {
   PartyBattleStatus,
   PartyBattleWaveRewards,
   PlayerSave,
+  Stats,
 } from '../shared-types';
+
+/** A save already read (and possibly item-deducted) earlier in the same transaction, for whichever
+ *  one uid a restore/reward helper below shouldn't re-`tx.get` - Firestore transactions require
+ *  every read to happen before any write, so once a turn's item deduction has been applied
+ *  in-memory to the active player's save, nothing later in the same transaction can independently
+ *  re-fetch that same doc (see submitPartyBattleAction's own call sites for why this matters). */
+interface PreFetchedSave {
+  uid: string;
+  save: PlayerSave;
+}
+
+async function getSaveForUid(tx: Transaction, db: Firestore, uid: string, preFetched?: PreFetchedSave): Promise<PlayerSave | null> {
+  if (preFetched?.uid === uid) return preFetched.save;
+  const snap = await tx.get(db.collection('users').doc(uid));
+  return snap.exists ? (snap.data() as PlayerSave) : null;
+}
+
+/** Validates a submitted action's skill/lanternAbility/item ownership and sufficiency against the
+ *  acting player's real save - mirrors resolveCombatAction.ts's own checks (~lines 73-131)
+ *  practically verbatim, just sourced from PartyBattleParticipantStats (spirit/oil/ailments -
+ *  already the battle's own live numbers, not the real save's, since those are intentionally not
+ *  kept in sync mid-battle) plus the real save's inventory/knownSkillIds/equipment for ownership.
+ *  Throws on any violation; callers run this before ever calling the engine, same as solo does. */
+function validatePartyBattleAction(action: CombatAction, stats: PartyBattleParticipantStats, save: PlayerSave): void {
+  if (action.type === 'skill') {
+    const skillId = action.skillId ?? 'keepers-strike';
+    const skill = SKILLS[skillId];
+    if (!skill) throw new HttpsError('invalid-argument', 'Unknown Specialty Attack.');
+    // SKILLS also holds every enemy's own signature move in the same flat dictionary - without
+    // this check, a crafted client call could request any of those by id.
+    if (!stats.knownSkillIds.includes(skillId)) {
+      throw new HttpsError('failed-precondition', 'You have not learned that Specialty Attack.');
+    }
+    if (stats.spirit < skill.spiritCost) {
+      throw new HttpsError('failed-precondition', 'Not enough Spirit for that.');
+    }
+  }
+  if (action.type === 'lanternAbility') {
+    const lanternDef = stats.lanternId ? EQUIPMENT[stats.lanternId] : undefined;
+    const abilityId = action.abilityId;
+    const ability = abilityId ? LANTERN_ABILITIES[abilityId] : undefined;
+    if (!ability || !lanternDef?.lanternAbilityIds?.includes(abilityId!)) {
+      throw new HttpsError('failed-precondition', 'Your equipped lantern cannot do that.');
+    }
+    if (stats.lanternOil < ability.oilCost) {
+      throw new HttpsError('failed-precondition', 'Not enough Lantern Oil for that.');
+    }
+  }
+  const itemIds = action.itemIds ?? [];
+  if (itemIds.length > 0) {
+    const playerStats: Stats = { ...stats, stamina: 0, maxStamina: 0 };
+    for (const [itemId] of aggregateItemCounts(itemIds)) {
+      const def = ITEMS[itemId];
+      if (!def?.usableInCombat) throw new HttpsError('failed-precondition', 'You cannot use that item right now.');
+      const effect = def.effect;
+      if (!effect || !itemWouldHaveEffect(effect, playerStats, stats.ailments)) {
+        throw new HttpsError('failed-precondition', 'That would have no effect right now.');
+      }
+    }
+    if (!hasSufficientQuantity(itemIds, save.inventory)) {
+      throw new HttpsError('failed-precondition', 'You do not have enough of that item.');
+    }
+  }
+}
+
+function deductConsumedItems(save: PlayerSave, itemConsumedIds: string[]): void {
+  for (const [itemId, count] of aggregateItemCounts(itemConsumedIds)) {
+    removeItem(save, itemId, count);
+  }
+}
 
 /** partyBattles/{battleId}'s one participantStats entry for a save that's already been (or is
  *  about to be) restored to full - shared by startEndlessBattle and startPvpBattle so the two
@@ -173,8 +248,20 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     const resolvedAction: CombatAction = action ?? { type: 'defend' };
     const activeStats = battle.participantStats[activeUid];
 
+    // A live read of the acting player's real save - everything else about a turn is fully
+    // described by the battle doc's own participantStats snapshot, but items are a shared
+    // resource that could be spent elsewhere between turns, so (like solo combat's
+    // resolveCombatAction.ts) this is read fresh every turn rather than snapshotted once at
+    // battle start. Must happen before any tx.update/tx.set below (Firestore transactions
+    // require every read before any write).
+    const activeUserRef = db.collection('users').doc(activeUid);
+    const activeUserSnap = await tx.get(activeUserRef);
+    if (!activeUserSnap.exists) throw new HttpsError('failed-precondition', 'Character not found.');
+    const activeSave = activeUserSnap.data() as PlayerSave;
+    validatePartyBattleAction(resolvedAction, activeStats, activeSave);
+
     if (battle.mode === 'pvp') {
-      return resolvePvpBattleTurn(tx, db, battleRef, battle, activeUid, activeStats, resolvedAction, now);
+      return resolvePvpBattleTurn(tx, db, battleRef, battle, activeUid, activeStats, activeUserRef, activeSave, resolvedAction, now);
     }
 
     const turnResult = resolvePartyPlayerTurn(
@@ -184,14 +271,16 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         // Party battles don't track Stamina (no Dash mid-fight) - 0/0 is the same "not applicable"
         // convention STARTING_STATS uses before Stamina is unlocked.
         stats: { ...activeStats, stamina: 0, maxStamina: 0 },
-        // Real inventory-backed item usage is Phase C/D's job (see the original design note) -
-        // the engine already accepts itemIds and simulates their effect, just not yet wired to a
-        // real per-participant inventory here.
-        inventory: [],
+        inventory: activeSave.inventory,
         ailments: activeStats.ailments,
       },
       battle.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
     );
+    // Applied in-memory now, written to Firestore at whichever exit branch below actually ends up
+    // writing activeUserRef (a plain tx.set here, or threaded into grantWaveRewards/
+    // restoreParticipantsAndClearLocks as a PreFetchedSave if this turn also ends the run).
+    deductConsumedItems(activeSave, turnResult.itemConsumedIds);
+    const activePreFetch: PreFetchedSave = { uid: activeUid, save: activeSave };
 
     const nextParticipantStats: Record<string, PartyBattleParticipantStats> = { ...battle.participantStats };
     nextParticipantStats[activeUid] = {
@@ -207,6 +296,10 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     const roundComplete = nextTurnIndex >= battle.turnOrder.length;
 
     if (!roundComplete) {
+      if (turnResult.itemConsumedIds.length > 0) {
+        activeSave.updatedAt = now;
+        tx.set(activeUserRef, activeSave);
+      }
       tx.update(battleRef, {
         participantStats: nextParticipantStats,
         enemies: nextEnemies,
@@ -227,7 +320,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       let lastWaveRewards = battle.lastWaveRewards;
       if (isEndless) {
         const aliveUids = battle.participants.filter((p) => nextParticipantStats[p].hp > 0);
-        lastWaveRewards = await grantWaveRewards(tx, db, aliveUids, battle.wave, battle.enemies);
+        lastWaveRewards = await grantWaveRewards(tx, db, aliveUids, battle.wave, battle.enemies, activePreFetch);
       }
       tx.update(battleRef, {
         participantStats: nextParticipantStats,
@@ -272,7 +365,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
 
     if (partyDefeated) {
       if (battle.mode === 'endless') {
-        await restoreParticipantsAndClearLocks(tx, db, battle.participants);
+        await restoreParticipantsAndClearLocks(tx, db, battle.participants, activePreFetch);
       }
       tx.update(battleRef, {
         participantStats: nextParticipantStats,
@@ -282,6 +375,11 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         updatedAt: now,
       });
       return { resolved: true, status: 'defeated' as const };
+    }
+
+    if (turnResult.itemConsumedIds.length > 0) {
+      activeSave.updatedAt = now;
+      tx.set(activeUserRef, activeSave);
     }
 
     // New round: recompute turn order from currently-alive participants (see PartyBattleSession's
@@ -313,6 +411,8 @@ async function resolvePvpBattleTurn(
   battle: PartyBattleSession,
   activeUid: string,
   activeStats: PartyBattleParticipantStats,
+  activeUserRef: DocumentReference,
+  activeSave: PlayerSave,
   resolvedAction: CombatAction,
   now: number,
 ) {
@@ -324,11 +424,15 @@ async function resolvePvpBattleTurn(
       uid: activeUid,
       action: resolvedAction,
       stats: { ...activeStats, stamina: 0, maxStamina: 0 },
-      inventory: [],
+      inventory: activeSave.inventory,
       ailments: activeStats.ailments,
     },
     { hp: opponentStats.hp, maxHp: opponentStats.maxHp, defense: opponentStats.defense },
   );
+  // Applied in-memory now, written out at whichever exit branch below actually writes
+  // activeUserRef - see submitPartyBattleAction's own matching comment.
+  deductConsumedItems(activeSave, turnResult.itemConsumedIds);
+  const activePreFetch: PreFetchedSave = { uid: activeUid, save: activeSave };
 
   const nextParticipantStats: Record<string, PartyBattleParticipantStats> = {
     ...battle.participantStats,
@@ -350,8 +454,12 @@ async function resolvePvpBattleTurn(
     // Restore-to-full and reward-grant both write the same two user docs, so they're combined
     // into one function/one tx.set per user rather than called separately - two independent
     // writes to the same doc in one transaction would each read the same pre-transaction
-    // snapshot and the later tx.set would silently clobber the earlier one's changes.
-    await restoreAndRewardPvpParticipants(tx, db, winnerUid, loserUid, battle.partyAverageLevel);
+    // snapshot and the later tx.set would silently clobber the earlier one's changes. Passing
+    // activePreFetch means the active player's already-item-deducted save is reused here instead
+    // of being independently re-read (which would violate Firestore's "every read before any
+    // write" transaction rule, since deductConsumedItems' write hasn't landed yet at this point -
+    // it's only ever actually written inside this same call).
+    await restoreAndRewardPvpParticipants(tx, db, winnerUid, loserUid, battle.partyAverageLevel, activePreFetch);
     for (const p of battle.participants) tx.delete(db.collection('partyBattleLocks').doc(p));
     tx.update(battleRef, {
       participantStats: nextParticipantStats,
@@ -361,6 +469,11 @@ async function resolvePvpBattleTurn(
       updatedAt: now,
     });
     return { resolved: true, status: 'victory' as const, winnerUid };
+  }
+
+  if (turnResult.itemConsumedIds.length > 0) {
+    activeSave.updatedAt = now;
+    tx.set(activeUserRef, activeSave);
   }
 
   const nextTurnIndex = (battle.currentTurnIndex + 1) % battle.turnOrder.length;
@@ -397,14 +510,16 @@ async function restoreAndRewardPvpParticipants(
   winnerUid: string,
   loserUid: string,
   level: number,
+  preFetched?: PreFetchedSave,
 ): Promise<void> {
   const winnerXp = PVP_WINNER_BASE_XP + level * PVP_WINNER_XP_PER_LEVEL;
   const winnerGold = PVP_WINNER_BASE_GOLD + level * PVP_WINNER_GOLD_PER_LEVEL;
   const loserXp = Math.round(winnerXp * PVP_LOSER_XP_FRACTION);
 
-  const winnerRef = db.collection('users').doc(winnerUid);
-  const loserRef = db.collection('users').doc(loserUid);
-  const [winnerSnap, loserSnap] = await Promise.all([tx.get(winnerRef), tx.get(loserRef)]);
+  const [winnerSave, loserSave] = await Promise.all([
+    getSaveForUid(tx, db, winnerUid, preFetched),
+    getSaveForUid(tx, db, loserUid, preFetched),
+  ]);
   const now = Date.now();
 
   function restore(save: PlayerSave): void {
@@ -413,22 +528,20 @@ async function restoreAndRewardPvpParticipants(
     if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
   }
 
-  if (winnerSnap.exists) {
-    const save = winnerSnap.data() as PlayerSave;
-    restore(save);
-    save.player.xp += winnerXp;
-    save.player.gold += winnerGold;
-    applyLevelUp(save);
-    save.updatedAt = now;
-    tx.set(winnerRef, save);
+  if (winnerSave) {
+    restore(winnerSave);
+    winnerSave.player.xp += winnerXp;
+    winnerSave.player.gold += winnerGold;
+    applyLevelUp(winnerSave);
+    winnerSave.updatedAt = now;
+    tx.set(db.collection('users').doc(winnerUid), winnerSave);
   }
-  if (loserSnap.exists) {
-    const save = loserSnap.data() as PlayerSave;
-    restore(save);
-    save.player.xp += loserXp;
-    applyLevelUp(save);
-    save.updatedAt = now;
-    tx.set(loserRef, save);
+  if (loserSave) {
+    restore(loserSave);
+    loserSave.player.xp += loserXp;
+    applyLevelUp(loserSave);
+    loserSave.updatedAt = now;
+    tx.set(db.collection('users').doc(loserUid), loserSave);
   }
 }
 
@@ -443,17 +556,16 @@ async function grantWaveRewards(
   aliveUids: string[],
   wave: number,
   waveEnemies: { enemyId: string }[],
+  preFetched?: PreFetchedSave,
 ): Promise<Record<string, PartyBattleWaveRewards>> {
-  const userRefs = aliveUids.map((uid) => db.collection('users').doc(uid));
-  const snaps = await Promise.all(userRefs.map((ref) => tx.get(ref)));
+  const saves = await Promise.all(aliveUids.map((uid) => getSaveForUid(tx, db, uid, preFetched)));
   const defeated = waveEnemies.map((e) => ({ enemyId: e.enemyId }));
   const chestTier = isMilestoneWave(wave) ? milestoneChestTier(wave) : null;
 
   const summary: Record<string, PartyBattleWaveRewards> = {};
-  snaps.forEach((snap, i) => {
+  saves.forEach((save, i) => {
     const uid = aliveUids[i];
-    if (!snap.exists) return;
-    const save = snap.data() as PlayerSave;
+    if (!save) return;
 
     const reward = computeRewards(defeated, save.player.xp, save.player.level);
     let totalXp = reward.xp;
@@ -479,7 +591,7 @@ async function grantWaveRewards(
 
     applyLevelUp(save);
     save.updatedAt = Date.now();
-    tx.set(userRefs[i], save);
+    tx.set(db.collection('users').doc(uid), save);
     summary[uid] = { xp: totalXp, gold: totalGold, itemIds: grantedItemIds };
   });
 
@@ -491,17 +603,20 @@ async function grantWaveRewards(
  *  and a voluntary exit, see voteContinueEndlessBattle). Downed participants are included, not
  *  just currently-alive ones - the whole party gets the same clean slate regardless of who was
  *  still standing when the run ended. */
-export async function restoreParticipantsAndClearLocks(tx: Transaction, db: Firestore, uids: string[]): Promise<void> {
-  const userRefs = uids.map((uid) => db.collection('users').doc(uid));
-  const snaps = await Promise.all(userRefs.map((ref) => tx.get(ref)));
-  snaps.forEach((snap, i) => {
-    if (!snap.exists) return;
-    const save = snap.data() as PlayerSave;
+export async function restoreParticipantsAndClearLocks(
+  tx: Transaction,
+  db: Firestore,
+  uids: string[],
+  preFetched?: PreFetchedSave,
+): Promise<void> {
+  const saves = await Promise.all(uids.map((uid) => getSaveForUid(tx, db, uid, preFetched)));
+  saves.forEach((save, i) => {
+    if (!save) return;
     save.player.stats.hp = save.player.stats.maxHp;
     save.player.stats.spirit = save.player.stats.maxSpirit;
     if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
     save.updatedAt = Date.now();
-    tx.set(userRefs[i], save);
+    tx.set(db.collection('users').doc(uids[i]), save);
   });
   // Frees each participant to start (or be invited into) another battle - matches
   // endlessBattle.ts's own restoreParticipantsAndClearLocks on a voluntary exit.

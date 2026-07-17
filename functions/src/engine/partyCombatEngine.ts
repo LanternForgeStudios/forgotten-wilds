@@ -20,6 +20,7 @@ import { ENEMIES, type EnemyDefinition } from '../data/enemies';
 import { SKILLS, type DamageType } from '../data/skills';
 import { ITEMS } from '../data/items';
 import { AILMENTS } from '../data/ailments';
+import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { scaledEnemyStats, type RoundEnemyInput } from './combatEngine';
 import {
   ailmentAttackMultiplier,
@@ -95,7 +96,11 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
   const inflictedThisTurn = new Set<string>();
   const itemConsumedIds: string[] = [];
   const hits: PartyCombatHitResult[] = [];
-  const defending = player.action.type === 'defend' || player.action.type === 'flee';
+  const isDefensiveLanternAbility =
+    player.action.type === 'lanternAbility' &&
+    !!player.action.abilityId &&
+    LANTERN_ABILITIES[player.action.abilityId]?.category === 'defensive';
+  const defending = player.action.type === 'defend' || player.action.type === 'flee' || isDefensiveLanternAbility;
 
   function damageEnemy(i: number, dmg: number, verb: string): boolean {
     const before = enemyHp[i];
@@ -191,12 +196,30 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
         // roster fight.
         log.push(`${player.uid} has nowhere to flee to and braces instead.`);
         break;
-      case 'lanternAbility':
-        // Lantern abilities are deferred to whichever of Phase C/D first needs them in practice -
-        // no current spec calls for them, and resolving one requires per-player lantern-equip
-        // state this input doesn't carry yet.
-        log.push(`${player.uid}'s lantern flickers, but its ability isn't usable in a party fight yet.`);
+      case 'lanternAbility': {
+        // Ownership/oil-sufficiency is validated by the caller (submitPartyBattleAction) before
+        // this ever gets called - abilityId resolving to nothing here would mean that check was
+        // skipped, not a real in-game case, so this is just a defensive no-op rather than a log
+        // line a player could ever actually see.
+        const ability = player.action.abilityId ? LANTERN_ABILITIES[player.action.abilityId] : undefined;
+        if (!ability) break;
+        lanternOil = Math.max(0, lanternOil - ability.oilCost);
+        if (ability.category === 'offensive') {
+          resolveOffensiveHits(
+            ability.power ?? 0,
+            `${ability.name} sears`,
+            (i) => (ability.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1) * weaknessMultiplier(enemyDefs[i], 'lantern'),
+            'lantern',
+          );
+        } else if (ability.category === 'healing') {
+          const healed = Math.min(player.stats.maxHp - hp, ability.healHp ?? 0);
+          hp = Math.min(player.stats.maxHp, hp + (ability.healHp ?? 0));
+          log.push(`${ability.name} draws on the lantern's warmth, restoring ${healed} HP.`);
+        } else {
+          log.push(`${ability.name} wraps ${player.uid} in the lantern's glow, ready to blunt the next blow.`);
+        }
         break;
+      }
     }
   }
 
@@ -259,7 +282,11 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
   let ailments = player.ailments.map((a) => ({ ...a }));
   const inflictedThisTurn = new Set<string>();
   const itemConsumedIds: string[] = [];
-  const defending = player.action.type === 'defend';
+  const isDefensiveLanternAbility =
+    player.action.type === 'lanternAbility' &&
+    !!player.action.abilityId &&
+    LANTERN_ABILITIES[player.action.abilityId]?.category === 'defensive';
+  const defending = player.action.type === 'defend' || isDefensiveLanternAbility;
   let forfeited = false;
   let defenderHp = defender.hp;
   let hit: PvpHitResult | null = null;
@@ -337,9 +364,26 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
         forfeited = true;
         log.push('You forfeit the match.');
         break;
-      case 'lanternAbility':
-        log.push("Your lantern flickers, but its ability isn't usable in PvP yet.");
+      case 'lanternAbility': {
+        // Ownership/oil-sufficiency is validated by the caller (submitPartyBattleAction) before
+        // this ever gets called - see resolvePartyPlayerTurn's matching comment.
+        const ability = player.action.abilityId ? LANTERN_ABILITIES[player.action.abilityId] : undefined;
+        if (!ability) break;
+        lanternOil = Math.max(0, lanternOil - ability.oilCost);
+        if (ability.category === 'offensive') {
+          // No family-effectiveness/weakness bonus here, unlike resolvePartyPlayerTurn's version -
+          // those are enemy-def concepts (family, weaknessDamageType) that don't exist for a
+          // player opponent.
+          resolveOffensiveHit(ability.power ?? 0, `${ability.name} sears`, 'lantern');
+        } else if (ability.category === 'healing') {
+          const healed = Math.min(player.stats.maxHp - hp, ability.healHp ?? 0);
+          hp = Math.min(player.stats.maxHp, hp + (ability.healHp ?? 0));
+          log.push(`${ability.name} draws on the lantern's warmth, restoring ${healed} HP.`);
+        } else {
+          log.push(`${ability.name} wraps you in the lantern's glow, ready to blunt the next blow.`);
+        }
         break;
+      }
     }
   }
 
