@@ -8,6 +8,7 @@ import { isMilestoneWave, milestoneChestTier } from '../engine/endlessBattleEngi
 import { grantItem, itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
 import { SKILLS } from '../data/skills';
+import { AILMENTS } from '../data/ailments';
 import { ITEMS } from '../data/items';
 import { EQUIPMENT } from '../data/equipment';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
@@ -48,6 +49,15 @@ async function getSaveForUid(tx: Transaction, db: Firestore, uid: string, preFet
  *  Throws on any violation; callers run this before ever calling the engine, same as solo does. */
 function validatePartyBattleAction(action: CombatAction, stats: PartyBattleParticipantStats, save: PlayerSave): void {
   if (action.type === 'skill') {
+    // Data-driven rather than hardcoding "if silence" - mirrors resolveCombatAction.ts's own
+    // check verbatim, just sourced from the battle's live participantStats.ailments instead of a
+    // combat session's playerAilments. This was missing entirely here - a silenced player could
+    // still submit a real 'skill' action in Endless Battle/PvP and have it resolve normally, unlike
+    // solo combat which rejects it outright.
+    const silencer = stats.ailments.find((a) => AILMENTS[a.ailmentId]?.effect.blocksSkill);
+    if (silencer) {
+      throw new HttpsError('failed-precondition', `You are ${AILMENTS[silencer.ailmentId].name} and cannot use Specialty Attacks.`);
+    }
     const skillId = action.skillId ?? 'keepers-strike';
     const skill = SKILLS[skillId];
     if (!skill) throw new HttpsError('invalid-argument', 'Unknown Specialty Attack.');
@@ -61,6 +71,10 @@ function validatePartyBattleAction(action: CombatAction, stats: PartyBattleParti
     }
   }
   if (action.type === 'lanternAbility') {
+    const disabler = stats.ailments.find((a) => AILMENTS[a.ailmentId]?.effect.disablesLanternAbility);
+    if (disabler) {
+      throw new HttpsError('failed-precondition', `You are ${AILMENTS[disabler.ailmentId].name} and cannot use the Lantern specialty.`);
+    }
     const lanternDef = stats.lanternId ? EQUIPMENT[stats.lanternId] : undefined;
     const abilityId = action.abilityId;
     const ability = abilityId ? LANTERN_ABILITIES[abilityId] : undefined;

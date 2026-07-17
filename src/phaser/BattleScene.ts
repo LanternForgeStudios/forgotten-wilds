@@ -136,18 +136,27 @@ export class BattleScene extends Phaser.Scene {
     const spacing = viewportW / (enemies.length + 1);
     enemies.forEach((enemy, i) => {
       const x = spacing * (i + 1);
-      this.createEnemySlot(enemy, x, y, scale, alpha);
+      this.createEnemySlot(enemy, x, y, scale, alpha, spacing);
     });
   }
 
-  private createEnemySlot(enemy: BattleEnemyVisual, x: number, y: number, scale: number, alpha: number): void {
+  private createEnemySlot(enemy: BattleEnemyVisual, x: number, y: number, scale: number, alpha: number, spacing: number): void {
     const def = getAssetDefinition(enemy.spriteAssetId);
     // Close-up battle-stage sizing convention (not the exploration-tile-grid-scaled sizes from the
     // 3/4-view scale spec's literal numbers, which govern walking sprites/field-encounter icons
     // instead - a full-screen battle close-up needs its own, larger scale). Halved from the
     // original 256/192/128 - at full size, a multi-enemy formation's sprites overlapped each other.
+    // Further capped to a fraction of this slot's own allocated spacing (viewportW / enemy count)
+    // rather than staying a fixed pixel target - on a narrow mobile canvas, a fixed 64/96/128px
+    // sprite ate up proportionally more of the (already narrow) per-slot width than on desktop, so
+    // a multi-enemy formation still overlapped there even after the desktop-tuned halving.
     const baseSize = enemy.isBoss ? 128 : enemy.tier === 'elite' ? 96 : 64;
-    const spriteScale = (baseSize / (def.dimensions?.width ?? baseSize)) * scale;
+    // 0.7, not a looser fraction like 0.85 - on a wide desktop canvas spacing is already generous
+    // enough that this cap rarely engages at all (desktop scaling is untouched), but on a narrow
+    // mobile canvas even a 3-regular-enemy row left barely any gap between sprites at a looser
+    // factor, which is exactly the "still too large on mobile" report this exists to fix.
+    const cappedSize = Math.min(baseSize, spacing * 0.7);
+    const spriteScale = (cappedSize / (def.dimensions?.width ?? cappedSize)) * scale;
 
     const sprite = this.add
       .sprite(x, y, enemy.spriteAssetId)
@@ -157,7 +166,7 @@ export class BattleScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onTargetEnemy?.(enemy.index));
 
-    const hpTrackWidth = Math.min(160, baseSize * 1.25) * scale;
+    const hpTrackWidth = Math.min(160, cappedSize * 1.25) * scale;
     // HP bar sits directly under the sprite's own rendered bounds, matching CSS's ".enemyBar" which
     // was likewise anchored to each enemy's own sprite rather than a shared/fixed position.
     const barY = sprite.y + sprite.displayHeight / 2 + 14 * scale;

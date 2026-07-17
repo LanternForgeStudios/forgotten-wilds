@@ -230,6 +230,12 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   // comment) - shown so the countdown doesn't read as "pick an action" when nothing they click
   // would matter.
   const isStunned = (me?.ailments ?? []).some((a) => AILMENTS[a.ailmentId]?.effect.skipsTurn);
+  // Mirrors solo combat's own isSilenced/isLanternDisabled (CombatScene.tsx) - disables just the
+  // affected button rather than the whole action row, matching the server's own per-action
+  // validatePartyBattleAction checks (which reject a silenced 'skill'/disabled 'lanternAbility'
+  // submission outright) so the button doesn't invite a click the server would just reject.
+  const isSilenced = (me?.ailments ?? []).some((a) => AILMENTS[a.ailmentId]?.effect.blocksSkill);
+  const isLanternDisabled = (me?.ailments ?? []).some((a) => AILMENTS[a.ailmentId]?.effect.disablesLanternAbility);
   // Same "reduced visibility" blur-the-stage / color-wash-the-screen treatment as solo combat's
   // own isBlinded/activeTintColors (CombatScene.tsx) - see AILMENT_TINT_COLORS' own doc comment
   // for why Blind gets a blur instead of a tint color. Gated on the battle still being active -
@@ -516,13 +522,19 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                   {knownSkills.length <= 1 ? (
                     <button
                       className={styles.smallButton}
-                      disabled={busy || me.spirit < (knownSkills[0]?.spiritCost ?? 0)}
+                      disabled={busy || isSilenced || me.spirit < (knownSkills[0]?.spiritCost ?? 0)}
+                      title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
                       onClick={() => submitSkill(knownSkills[0]?.id ?? 'keepers-strike')}
                     >
                       {knownSkills[0]?.name ?? "Keeper's Strike"} ({knownSkills[0]?.spiritCost ?? 0} SP)
                     </button>
                   ) : (
-                    <button className={styles.smallButton} disabled={busy} onClick={() => setShowSkillMenu(true)}>
+                    <button
+                      className={styles.smallButton}
+                      disabled={busy || isSilenced}
+                      title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
+                      onClick={() => setShowSkillMenu(true)}
+                    >
                       Select Spirit Ability
                     </button>
                   )}
@@ -530,7 +542,8 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                     <button
                       key={ability.id}
                       className={styles.smallButton}
-                      disabled={busy || me.lanternOil < ability.oilCost}
+                      disabled={busy || isLanternDisabled || me.lanternOil < ability.oilCost}
+                      title={isLanternDisabled ? 'Frozen - the Lantern specialty is blocked.' : undefined}
                       onClick={() => submitLanternAbility(ability.id)}
                     >
                       {ability.name} ({ability.oilCost} Oil)

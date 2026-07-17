@@ -225,6 +225,9 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   // comment on why the server auto-forces it through on the next poll instead of waiting out the
   // deadline. Shown so the countdown doesn't read as "pick an action" when nothing matters.
   const isStunned = (me.ailments ?? []).some((a) => AILMENTS[a.ailmentId]?.effect.skipsTurn);
+  // See EndlessBattlePanel.tsx's identical comment on isSilenced/isLanternDisabled.
+  const isSilenced = (me.ailments ?? []).some((a) => AILMENTS[a.ailmentId]?.effect.blocksSkill);
+  const isLanternDisabled = (me.ailments ?? []).some((a) => AILMENTS[a.ailmentId]?.effect.disablesLanternAbility);
   // Gated on the match still being active - see EndlessBattlePanel.tsx's identical comment on why
   // (participantStats.ailments isn't cleared by the end-of-match restore).
   const myAilments = battle.status === 'active' ? (me.ailments ?? []) : [];
@@ -421,13 +424,19 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
                   {knownSkills.length <= 1 ? (
                     <button
                       className={styles.smallButton}
-                      disabled={busy || me.spirit < (knownSkills[0]?.spiritCost ?? 0)}
+                      disabled={busy || isSilenced || me.spirit < (knownSkills[0]?.spiritCost ?? 0)}
+                      title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
                       onClick={() => submitSkill(knownSkills[0]?.id ?? 'keepers-strike')}
                     >
                       {knownSkills[0]?.name ?? "Keeper's Strike"} ({knownSkills[0]?.spiritCost ?? 0} SP)
                     </button>
                   ) : (
-                    <button className={styles.smallButton} disabled={busy} onClick={() => setShowSkillMenu(true)}>
+                    <button
+                      className={styles.smallButton}
+                      disabled={busy || isSilenced}
+                      title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
+                      onClick={() => setShowSkillMenu(true)}
+                    >
                       Select Spirit Ability
                     </button>
                   )}
@@ -435,7 +444,8 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
                     <button
                       key={ability.id}
                       className={styles.smallButton}
-                      disabled={busy || me.lanternOil < ability.oilCost}
+                      disabled={busy || isLanternDisabled || me.lanternOil < ability.oilCost}
+                      title={isLanternDisabled ? 'Frozen - the Lantern specialty is blocked.' : undefined}
                       onClick={() => submit({ type: 'lanternAbility', abilityId: ability.id })}
                     >
                       {ability.name} ({ability.oilCost} Oil)
