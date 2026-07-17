@@ -144,8 +144,9 @@ export class BattleScene extends Phaser.Scene {
     const def = getAssetDefinition(enemy.spriteAssetId);
     // Close-up battle-stage sizing convention (not the exploration-tile-grid-scaled sizes from the
     // 3/4-view scale spec's literal numbers, which govern walking sprites/field-encounter icons
-    // instead - a full-screen battle close-up needs its own, larger scale).
-    const baseSize = enemy.isBoss ? 256 : enemy.tier === 'elite' ? 192 : 128;
+    // instead - a full-screen battle close-up needs its own, larger scale). Halved from the
+    // original 256/192/128 - at full size, a multi-enemy formation's sprites overlapped each other.
+    const baseSize = enemy.isBoss ? 128 : enemy.tier === 'elite' ? 96 : 64;
     const spriteScale = (baseSize / (def.dimensions?.width ?? baseSize)) * scale;
 
     const sprite = this.add
