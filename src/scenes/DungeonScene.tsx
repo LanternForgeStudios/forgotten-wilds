@@ -244,7 +244,11 @@ export function DungeonScene() {
           playerMovementState={movementState}
         />
       </div>
-      {isMobile ? (
+      {/* Hidden entirely while a battle panel is open (mobile controls included) - see
+          useBattleOverlayStore's own doc comment; the near-full-screen battle panel leaves no room
+          for these and mobile's touch controls would otherwise sit uselessly (and confusingly)
+          underneath it. */}
+      {battleOverlayOpen ? null : isMobile ? (
         <>
           <DirectionPad attemptMove={attemptMove} />
           <MobileHud
@@ -256,13 +260,13 @@ export function DungeonScene() {
             onMap={toggleMap}
           />
         </>
-      ) : !battleOverlayOpen ? (
+      ) : (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: hold Shift</>}
           &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Map: M
         </p>
-      ) : null}
+      )}
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}

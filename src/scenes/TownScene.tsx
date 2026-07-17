@@ -307,7 +307,11 @@ export function TownScene() {
           playerMovementState={movementState}
         />
       </div>
-      {isMobile ? (
+      {/* Hidden entirely while a battle panel is open (mobile controls included) - see
+          useBattleOverlayStore's own doc comment; the near-full-screen battle panel leaves no room
+          for these and mobile's touch controls would otherwise sit uselessly (and confusingly)
+          underneath it. */}
+      {battleOverlayOpen ? null : isMobile ? (
         <>
           <DirectionPad attemptMove={attemptMove} />
           <MobileHud
@@ -320,13 +324,13 @@ export function TownScene() {
             onMap={toggleMap}
           />
         </>
-      ) : !battleOverlayOpen ? (
+      ) : (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Talk: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: hold Shift</>}
           &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Chat: C &nbsp;·&nbsp; Map: M
         </p>
-      ) : null}
+      )}
       {activeNpc && (
         <DialogueBox
           lines={resolveNpcDialogue(activeNpc, questProgress)}
