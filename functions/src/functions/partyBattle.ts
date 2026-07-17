@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type DocumentReference, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { resolvePartyPlayerTurn, resolvePartyEnemyPhase, resolvePvpTurn } from '../engine/partyCombatEngine';
+import { isStunned } from '../engine/combatMath';
 import { computeRewards, aggregateItemCounts, hasSufficientQuantity } from '../engine/combatEngine';
 import { rollChestRewards } from '../engine/dailyChestEngine';
 import { isMilestoneWave, milestoneChestTier } from '../engine/endlessBattleEngine';
@@ -91,6 +92,72 @@ function deductConsumedItems(save: PlayerSave, itemConsumedIds: string[]): void 
   }
 }
 
+interface UseItemInPartyBattleRequest {
+  battleId: string;
+  itemId: string;
+}
+
+/** Consuming a healing/spirit/ailment-cure item mid-battle without spending a turn - the party
+ *  battle equivalent of useItem.ts, called from the Items menu's "Done" button so a Spirit Draught
+ *  or Lantern Oil used here unlocks a Skill/Lantern Ability button on the very next screen, same as
+ *  solo combat. Can't just reuse useItem.ts as-is: that function only ever touches users/{uid}
+ *  because solo combat reads live save stats each turn, but a party battle's hp/spirit/oil/ailments
+ *  live on partyBattles/{battleId}.participantStats[uid] instead (a separate in-fight snapshot,
+ *  decoupled from the real save for the whole run) - useItem.ts alone would silently desync the
+ *  battle from the real save. Deliberately not turn-gated (any participant, any time, matching
+ *  solo's "costs no turn" behavior) - only requires the battle still be active and the caller
+ *  still be alive in it. */
+export const useItemInPartyBattle = onCall<UseItemInPartyBattleRequest>(async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
+  const battleId = request.data?.battleId;
+  const itemId = request.data?.itemId;
+  const def = itemId ? ITEMS[itemId] : undefined;
+  const effect = def?.effect;
+  if (!battleId || !effect) throw new HttpsError('invalid-argument', 'That item cannot be used this way.');
+
+  const db = getFirestore();
+  const battleRef = db.collection('partyBattles').doc(battleId);
+  const userRef = db.collection('users').doc(uid);
+
+  return db.runTransaction(async (tx) => {
+    const [battleSnap, userSnap] = await Promise.all([tx.get(battleRef), tx.get(userRef)]);
+    if (!battleSnap.exists) throw new HttpsError('not-found', 'That battle no longer exists.');
+    if (!userSnap.exists) throw new HttpsError('failed-precondition', 'No character found.');
+    const battle = battleSnap.data() as PartyBattleSession;
+    const save = userSnap.data() as PlayerSave;
+    if (!battle.participants.includes(uid)) throw new HttpsError('permission-denied', 'You are not part of this battle.');
+    if (battle.status !== 'active') throw new HttpsError('failed-precondition', 'This battle has already ended.');
+
+    const stats = { ...battle.participantStats[uid] };
+    if (stats.hp <= 0) throw new HttpsError('failed-precondition', 'You are down and cannot use items.');
+
+    const entry = save.inventory.find((i) => i.itemId === itemId);
+    if (!entry || entry.quantity < 1) throw new HttpsError('failed-precondition', 'You do not have that item.');
+    if (!itemWouldHaveEffect(effect, { ...stats, stamina: 0, maxStamina: 0 }, stats.ailments)) {
+      throw new HttpsError('failed-precondition', 'That would have no effect right now.');
+    }
+
+    if (effect.healHpPercent) stats.hp = Math.min(stats.maxHp, stats.hp + Math.round(stats.maxHp * effect.healHpPercent));
+    if (effect.healSpiritPercent) {
+      stats.spirit = Math.min(stats.maxSpirit, stats.spirit + Math.round(stats.maxSpirit * effect.healSpiritPercent));
+    }
+    if (effect.restoreOilPercent) {
+      stats.lanternOil = Math.min(stats.maxLanternOil, stats.lanternOil + Math.round(stats.maxLanternOil * effect.restoreOilPercent));
+    }
+    if (effect.cureAilmentId) {
+      stats.ailments = stats.ailments.filter((a) => a.ailmentId !== effect.cureAilmentId);
+    }
+
+    removeItem(save, itemId);
+    save.updatedAt = Date.now();
+    tx.set(userRef, save);
+    tx.update(battleRef, { [`participantStats.${uid}`]: stats, updatedAt: Date.now() });
+
+    return { stats, inventory: save.inventory };
+  });
+});
+
 /** partyBattles/{battleId}'s one participantStats entry for a save that's already been (or is
  *  about to be) restored to full - shared by startEndlessBattle and startPvpBattle so the two
  *  don't duplicate this shape twice. Reads only the save's max-value fields, so it's correct
@@ -114,6 +181,7 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
     knownSkillIds: save.player.knownSkillIds,
     lanternId: save.player.equipment.lantern ?? null,
     skin: save.player.skin,
+    name: save.player.name,
   };
 }
 
@@ -185,7 +253,14 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const battleId = request.data?.battleId;
   if (!battleId) throw new HttpsError('invalid-argument', 'No battle specified.');
-  const action = request.data?.action !== undefined ? validateAction(request.data.action) : undefined;
+  // A "poll only" call (the client-triggered timeout model's periodic check-in) omits `action`
+  // entirely client-side, but the Firebase callable-function wire format serializes an omitted/
+  // undefined property to `null`, not to an absent key - `!== undefined` alone let a poll's
+  // action arrive here as `null` and fall through to validateAction(null), which threw "Invalid
+  // action." on *every single poll call*, forever. That silently broke the entire timeout/
+  // auto-Defend mechanism (confirmed by hand: a battle left at 0s to act never resolved) since
+  // this throw happened before any turn/deadline logic even ran. `!= null` (loose) catches both.
+  const action = request.data?.action != null ? validateAction(request.data.action) : undefined;
 
   const db = getFirestore();
   const battleRef = db.collection('partyBattles').doc(battleId);
@@ -212,6 +287,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     // instead of a landed knockout hit).
     if (action?.type === 'flee') {
       const now = Date.now();
+      const fleeingName = battle.participantStats[uid]?.name ?? uid;
       if (battle.mode === 'pvp') {
         const opponentUid = battle.participants.find((p) => p !== uid)!;
         await restoreAndRewardPvpParticipants(tx, db, opponentUid, uid, battle.partyAverageLevel);
@@ -219,7 +295,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         tx.update(battleRef, {
           status: 'victory',
           winnerUid: opponentUid,
-          lastTurnResult: { round: battle.round, log: [`${uid} forfeits the match.`], resolvedAt: now },
+          lastTurnResult: { round: battle.round, log: [`${fleeingName} forfeits the match.`], resolvedAt: now },
           updatedAt: now,
         });
         return { resolved: true, status: 'victory' as const, winnerUid: opponentUid };
@@ -227,26 +303,32 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       await restoreParticipantsAndClearLocks(tx, db, battle.participants);
       tx.update(battleRef, {
         status: 'withdrawn',
-        lastTurnResult: { round: battle.round, log: [`${uid} flees - the party withdraws from the battle.`], resolvedAt: now },
+        lastTurnResult: { round: battle.round, log: [`${fleeingName} flees - the party withdraws from the battle.`], resolvedAt: now },
         updatedAt: now,
       });
       return { resolved: true, status: 'withdrawn' as const };
     }
 
     const activeUid = battle.turnOrder[battle.currentTurnIndex];
+    const activeStats = battle.participantStats[activeUid];
     const now = Date.now();
     const deadlinePassed = now >= battle.turnDeadlineAt;
+    // A stunned active player's turn is a guaranteed no-op regardless of what they submit (see
+    // partyCombatEngine.ts's own resolvePartyPlayerTurn/resolvePvpTurn doc comments) - waiting out
+    // the full 20s deadline (or requiring them to click something) before resolving it just stalls
+    // every other participant for no reason. Any poll (including the one this panel fires
+    // immediately on mount/every 3s) can force it through right away instead.
+    const activeIsStunned = isStunned(activeStats.ailments);
 
     if (action && uid !== activeUid) {
       throw new HttpsError('failed-precondition', "It isn't your turn yet.");
     }
-    if (!action && !deadlinePassed) {
+    if (!action && !deadlinePassed && !activeIsStunned) {
       // A poll with nothing to submit and no timeout yet - just report whose turn it is.
       return { resolved: false, status: 'active' as const, activeUid };
     }
 
     const resolvedAction: CombatAction = action ?? { type: 'defend' };
-    const activeStats = battle.participantStats[activeUid];
 
     // A live read of the acting player's real save - everything else about a turn is fully
     // described by the battle doc's own participantStats snapshot, but items are a shared
@@ -267,6 +349,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     const turnResult = resolvePartyPlayerTurn(
       {
         uid: activeUid,
+        name: activeStats.name,
         action: resolvedAction,
         // Party battles don't track Stamina (no Dash mid-fight) - 0/0 is the same "not applicable"
         // convention STARTING_STATS uses before Stamina is unlocked.
@@ -339,6 +422,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       .filter((p) => nextParticipantStats[p].hp > 0)
       .map((p) => ({
         uid: p,
+        name: nextParticipantStats[p].name,
         hp: nextParticipantStats[p].hp,
         maxHp: nextParticipantStats[p].maxHp,
         defense: nextParticipantStats[p].defense,
@@ -422,6 +506,7 @@ async function resolvePvpBattleTurn(
   const turnResult = resolvePvpTurn(
     {
       uid: activeUid,
+      name: activeStats.name,
       action: resolvedAction,
       stats: { ...activeStats, stamina: 0, maxStamina: 0 },
       inventory: activeSave.inventory,

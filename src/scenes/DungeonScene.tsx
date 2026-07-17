@@ -22,6 +22,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
+import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { isTypingTarget } from '@/utils/keyboard';
 import { itemDisplayName } from '@/utils/itemName';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
@@ -55,6 +56,7 @@ export function DungeonScene() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const isMobile = useIsMobile();
+  const battleOverlayOpen = useBattleOverlayStore((s) => s.isOpen);
   const hudBarHeight = useHudBarHeight();
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const skin = usePlayerStore((s) => s.player?.skin ?? 'male');
@@ -254,13 +256,13 @@ export function DungeonScene() {
             onMap={toggleMap}
           />
         </>
-      ) : (
+      ) : !battleOverlayOpen ? (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: hold Shift</>}
           &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Map: M
         </p>
-      )}
+      ) : null}
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}

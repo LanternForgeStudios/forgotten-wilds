@@ -1,5 +1,13 @@
 import { httpsCallable } from 'firebase/functions';
-import type { ActiveAilment, CombatAction, EnemyTier, PartyBattleStatus, PlayerSave, TradeStatus } from '@/types';
+import type {
+  ActiveAilment,
+  CombatAction,
+  EnemyTier,
+  PartyBattleParticipantStats,
+  PartyBattleStatus,
+  PlayerSave,
+  TradeStatus,
+} from '@/types';
 import { functions } from './firebaseConfig';
 
 export async function callCreateCharacter(name: string, skin: 'male' | 'female' = 'male'): Promise<PlayerSave> {
@@ -457,6 +465,22 @@ export async function callSubmitPartyBattleAction(
     'submitPartyBattleAction',
   );
   const result = await fn({ battleId, action });
+  return result.data;
+}
+
+/** Consumes an item mid-battle without spending a turn - the party-battle equivalent of
+ *  callUseItem, applying the effect to both the real save and the battle's own in-fight
+ *  participantStats snapshot. See useItemInPartyBattle's own doc comment for why party battle
+ *  can't just reuse callUseItem as-is. */
+export async function callUseItemInPartyBattle(
+  battleId: string,
+  itemId: string,
+): Promise<{ stats: PartyBattleParticipantStats; inventory: { itemId: string; quantity: number }[] }> {
+  const fn = httpsCallable<
+    { battleId: string; itemId: string },
+    { stats: PartyBattleParticipantStats; inventory: { itemId: string; quantity: number }[] }
+  >(functions, 'useItemInPartyBattle');
+  const result = await fn({ battleId, itemId });
   return result.data;
 }
 

@@ -36,6 +36,9 @@ import type { ActiveAilment, CombatAction, Stats } from '../shared-types';
 
 export interface PartyPlayerInput {
   uid: string;
+  /** Character display name - used only in log-line text (e.g. "Alys braces, ready to absorb the
+   *  next blow."), never for game-logic identity (uid still owns that everywhere else). */
+  name: string;
   action: CombatAction;
   stats: Stats;
   inventory: { itemId: string; quantity: number }[];
@@ -171,7 +174,7 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
   }
 
   if (isStunned(ailments)) {
-    log.push(`${player.uid} is stunned and cannot act!`);
+    log.push(`${player.name} is stunned and cannot act!`);
   } else {
     consumeItems();
     switch (player.action.type) {
@@ -187,14 +190,14 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
       case 'item':
         break; // fully handled by consumeItems() above
       case 'defend':
-        log.push(`${player.uid} braces, ready to absorb the next blow.`);
+        log.push(`${player.name} braces, ready to absorb the next blow.`);
         break;
       case 'flee':
         // Individual flee has no defined meaning in a party fight yet (Endless Battle uses a group
         // continue/withdraw vote instead; PvP forfeit is Phase D's own concern) - treated as
         // Defend for now rather than inventing solo-flee semantics that don't fit a shared-enemy-
         // roster fight.
-        log.push(`${player.uid} has nowhere to flee to and braces instead.`);
+        log.push(`${player.name} has nowhere to flee to and braces instead.`);
         break;
       case 'lanternAbility': {
         // Ownership/oil-sufficiency is validated by the caller (submitPartyBattleAction) before
@@ -216,7 +219,7 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
           hp = Math.min(player.stats.maxHp, hp + (ability.healHp ?? 0));
           log.push(`${ability.name} draws on the lantern's warmth, restoring ${healed} HP.`);
         } else {
-          log.push(`${ability.name} wraps ${player.uid} in the lantern's glow, ready to blunt the next blow.`);
+          log.push(`${ability.name} wraps ${player.name} in the lantern's glow, ready to blunt the next blow.`);
         }
         break;
       }
@@ -404,6 +407,8 @@ export interface PartyEnemyHitResult {
 
 export interface PartyEnemyPhasePlayerState {
   uid: string;
+  /** Character display name - used only in log-line text, same as PartyPlayerInput.name. */
+  name: string;
   hp: number;
   maxHp: number;
   defense: number;
@@ -486,7 +491,7 @@ export function resolvePartyEnemyPhase(
     }
     if (target.defending) dmg = Math.round(dmg / 2);
     hpByUid.set(targetUid, Math.max(0, hpByUid.get(targetUid)! - dmg));
-    const attackLogLine = `${def.name} uses ${move.skillId.replace(/-/g, ' ')} on ${targetUid} for ${dmg} damage${
+    const attackLogLine = `${def.name} uses ${move.skillId.replace(/-/g, ' ')} on ${target.name} for ${dmg} damage${
       target.defending ? ' (halved - defended)' : ''
     }.`;
     enemyHits.push({ attackerIndex: i, targetUid, damage: dmg, missed: false, wasDefended: target.defending, logLine: attackLogLine });

@@ -1,16 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Panel } from './common/Panel';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
+import { PhaserBattleCanvas } from './combat/PhaserBattleCanvas';
 import { useAuthStore } from '@/state/useAuthStore';
+import { useInventoryStore } from '@/state/useInventoryStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
 import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
 import { resolveDisplayNames } from '@/firebase/socialService';
-import { callSubmitPartyBattleAction, callVoteContinueEndlessBattle } from '@/firebase/functionsClient';
+import {
+  callSubmitPartyBattleAction,
+  callUseItemInPartyBattle,
+  callVoteContinueEndlessBattle,
+} from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { getAssetUrl } from '@/assets/assetManager';
-import { ENEMIES } from '@/data';
+import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
+import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
+import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemDisplayName } from '@/utils/itemName';
+import { itemWouldHaveEffect } from '@/utils/itemEffect';
 import type { PartyBattleSession } from '@/types';
 import styles from './EndlessBattlePanel.module.css';
 
@@ -19,19 +28,40 @@ interface EndlessBattlePanelProps {
   onClose: () => void;
 }
 
-/** A Panel/list/button-chrome UI for Endless Battle, not a Phaser battle scene - solo combat's
- *  animated canvas (BattleScene.ts/CombatScene.tsx) represents a lot of accumulated polish that a
- *  brand-new multiplayer mode can't match in one pass. It borrows the one piece of that
- *  presentation that matters most for the "looks like a normal encounter" ask cheaply - a full-
- *  screen battle background image behind the panel, driven by the same battleBackgroundAssetId the
- *  server rolls once per run - plus a clear "whose turn is it" indicator matching the new
- *  sequential per-player turn order. A production-quality animated battle scene for this mode
- *  remains a reasonable larger follow-up. */
+/** Endless Battle's real-sprite/full-action-menu presentation, matching solo quest combat's own
+ *  (`CombatScene.tsx`) as closely as this mode's shared-turn-order structure allows - reuses
+ *  `PhaserBattleCanvas`/`BattleScene.ts` as-is (no fork) for the enemy formation and hit
+ *  animations, and the same Attack/Skill/Lantern Ability/Item/Defend action set. Party HP/turn
+ *  status for 2-6 players stays plain React/CSS below the canvas (BattleScene draws no non-enemy
+ *  UI) rather than solo's single-player HUD. Ailment FX bursts and the item-queue-multiple-per-
+ *  turn UX are intentionally not ported - a real but smaller scope than solo's own canvas, per the
+ *  Multiplayer Battle System plan's Phase F. */
 export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProps) {
   const uid = useAuthStore((s) => s.user?.uid);
+  const inventory = useInventoryStore((s) => s.items);
   const [battle, setBattle] = useState<PartyBattleSession | null>(null);
   const [selectedTarget, setSelectedTarget] = useState(0);
+  const [targetMode, setTargetMode] = useState<'single' | 'all'>('single');
+  const [showSkillMenu, setShowSkillMenu] = useState(false);
+  const [showItemMenu, setShowItemMenu] = useState(false);
+  // Up to 3 item ids queued in the item menu, applied IMMEDIATELY (via callUseItemInPartyBattle)
+  // when the menu is closed - matches solo combat's own tray/finishItemMenu exactly (CombatScene.tsx):
+  // items never consume a turn, so using a Spirit Draught unlocks a Skill button on the very next
+  // screen instead of waiting for the primary action they'd otherwise ride along with.
+  const [tray, setTray] = useState<string[]>([]);
+  const [usingItems, setUsingItems] = useState(false);
+  // Items already applied this turn via a *previous* trip through the item menu - finishItemMenu
+  // clears `tray` back to [] the instant it uses a batch, so tray.length alone can't cap "3 items
+  // per turn": without this, reopening Items after clicking Done resets canQueueMore and lets the
+  // player use another 3, repeatedly, all before ever taking their turn's real action. Reset only
+  // when the player actually commits their turn's real action (see submit()).
+  const [itemsUsedThisTurn, setItemsUsedThisTurn] = useState(0);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   const [busy, setBusy] = useState(false);
+  // Synchronous guard alongside `busy` (React state) - a fast double-click can fire two submit()
+  // calls in the same tick before a state update re-renders the disabled buttons, both reading the
+  // same stale busy=false. A ref is readable/settable synchronously, closing that race.
+  const submittingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
@@ -93,6 +123,85 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
     prevStatusRef.current = battle.status;
   }, [battle, uid]);
 
+  // Structured per-turn hit data (Phase F1) drives the canvas's hit/defeat animations - a shared
+  // spectacle everyone watching sees the same way, regardless of whose turn it was or who an
+  // enemy's counter-attack actually targeted (party HP itself is the plain list below, not
+  // per-player sprites in the canvas). Cleared after a fixed playback window so a later turn with
+  // no hits (e.g. a pure Defend) doesn't leave a stale animation queued.
+  const [activeOutgoingHits, setActiveOutgoingHits] = useState<
+    ({ targetIndex: number; damage: number; missed: boolean; defeated: boolean } & { key: number })[]
+  >([]);
+  const [activeIncomingHits, setActiveIncomingHits] = useState<
+    ({ attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean; logLine: string } & { key: number })[]
+  >([]);
+  // True for the full duration of a round's hit playback (matches CombatScene.tsx's own
+  // playbackActive) - gates the action buttons below so a fast-cycling battle (e.g. a solo Endless
+  // Battle run, where the same player's turn can come right back around the instant the enemy
+  // phase resolves in the same transaction) can't let the player attack again before they've even
+  // seen the previous round's hits/enemy counter-attacks finish playing. Set unconditionally on
+  // every new resolvedAt (even a hitless Defend round), same as solo's own fixed minimum pause.
+  const [playbackActive, setPlaybackActive] = useState(false);
+  useEffect(() => {
+    const resolvedAt = battle?.lastTurnResult?.resolvedAt;
+    if (!battle?.lastTurnResult || !resolvedAt) return;
+    const hits = battle.lastTurnResult.hits ?? [];
+    const enemyHits = battle.lastTurnResult.enemyHits ?? [];
+    setActiveOutgoingHits(hits.map((h) => ({ ...h, key: resolvedAt })));
+    setActiveIncomingHits(enemyHits.map((h) => ({ ...h, key: resolvedAt })));
+    setPlaybackActive(true);
+    const id = setTimeout(() => {
+      setActiveOutgoingHits([]);
+      setActiveIncomingHits([]);
+      setPlaybackActive(false);
+    }, 1400);
+    return () => clearTimeout(id);
+  }, [battle?.lastTurnResult?.resolvedAt]);
+
+  // Drives PhaserBattleCanvas's FX-pack ailment bursts (poison/burn/freeze) for the *viewer's own*
+  // ailments - mirrors CombatScene.tsx's ailmentFxEvent/ailmentTakesHoldEvent exactly (same
+  // key-changes-every-round convention, same before/after diff for "newly inflicted this round").
+  // This was hardcoded to {ailmentIds:[], key:0} through Stage F3 - a real but explicitly scoped-out
+  // gap per the Multiplayer Battle System plan, now wired up to match solo combat.
+  const prevAilmentIdsRef = useRef<Set<string>>(new Set());
+  const [ailmentFxEvent, setAilmentFxEvent] = useState<{ ailmentIds: string[]; key: number }>({ ailmentIds: [], key: 0 });
+  const [ailmentTakesHoldEvent, setAilmentTakesHoldEvent] = useState<{ ailmentIds: string[]; key: number }>({
+    ailmentIds: [],
+    key: 0,
+  });
+  useEffect(() => {
+    const resolvedAt = battle?.lastTurnResult?.resolvedAt;
+    if (!battle || !uid || !resolvedAt) return;
+    const currentIds = (battle.participantStats[uid]?.ailments ?? []).map((a) => a.ailmentId);
+    const newlyInflicted = currentIds.filter((id) => !prevAilmentIdsRef.current.has(id));
+    prevAilmentIdsRef.current = new Set(currentIds);
+    setAilmentFxEvent({ ailmentIds: currentIds, key: resolvedAt });
+    if (newlyInflicted.length > 0) setAilmentTakesHoldEvent({ ailmentIds: newlyInflicted, key: resolvedAt });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [battle?.lastTurnResult?.resolvedAt]);
+
+  // Memoized so a re-render caused by unrelated state (menu toggles, error text, etc.) doesn't
+  // hand PhaserBattleCanvas a brand-new array reference every time - see CombatScene.tsx's own
+  // identical reasoning for battleEnemies.
+  const battleEnemies = useMemo(
+    () =>
+      (battle?.enemies ?? []).map((e, i) => {
+        const def = ENEMIES.find((d) => d.id === e.enemyId);
+        return {
+          index: i,
+          spriteAssetId: def?.battleSpriteAssetId ?? '',
+          name: def?.name ?? e.enemyId,
+          tierLabel: def ? ENEMY_TIER_LABELS[def.tier] : '',
+          tierColor: def ? ENEMY_TIER_COLORS[def.tier] : '#a8a8a0',
+          tier: def?.tier ?? ('regular' as const),
+          level: e.level,
+          hp: e.hp,
+          maxHp: e.maxHp,
+          isBoss: def?.isBoss ?? false,
+        };
+      }),
+    [battle?.enemies],
+  );
+
   if (!battle || !uid) {
     return (
       <div className={styles.overlay} onClick={onClose}>
@@ -109,18 +218,106 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   const isMyTurn = activeUid === uid;
   const aliveEnemies = battle.enemies.filter((e) => e.hp > 0);
   const secondsLeft = Math.max(0, Math.ceil((battle.turnDeadlineAt - now) / 1000));
+  const canAct = battle.status === 'active' && isMyTurn && me && me.hp > 0 && !playbackActive;
+  // A stunned active player's turn always resolves as a no-op (server auto-forces it through on
+  // the next poll rather than waiting out the deadline - see submitPartyBattleAction's own
+  // comment) - shown so the countdown doesn't read as "pick an action" when nothing they click
+  // would matter.
+  const isStunned = (me?.ailments ?? []).some((a) => AILMENTS[a.ailmentId]?.effect.skipsTurn);
+  // Same "reduced visibility" blur-the-stage / color-wash-the-screen treatment as solo combat's
+  // own isBlinded/activeTintColors (CombatScene.tsx) - see AILMENT_TINT_COLORS' own doc comment
+  // for why Blind gets a blur instead of a tint color. Gated on the battle still being active -
+  // participantStats.ailments isn't cleared by the end-of-battle restore (that only ever touches
+  // the real save's hp/spirit/oil), so without this a leftover ailment from the moment of defeat/
+  // withdrawal would keep tinting/blurring the outcome screen after the fight is already over.
+  const myAilments = battle.status === 'active' ? (me?.ailments ?? []) : [];
+  const isBlinded = myAilments.some((a) => AILMENTS[a.ailmentId]?.effect.physicalAccuracyMultiplier);
+  const activeTintColors = myAilments.map((a) => AILMENT_TINT_COLORS[a.ailmentId]).filter((c): c is string => !!c);
+
+  const knownSkillIds = me?.knownSkillIds ?? ['keepers-strike'];
+  const knownSkills = knownSkillIds.map((id) => SKILLS.find((s) => s.id === id)).filter((s): s is NonNullable<typeof s> => !!s);
+  const lanternDef = me?.lanternId ? EQUIPMENT.find((e) => e.id === me.lanternId) : undefined;
+  const lanternAbilities = (lanternDef?.lanternAbilityIds ?? [])
+    .map((id) => LANTERN_ABILITIES.find((a) => a.id === id))
+    .filter((a): a is NonNullable<typeof a> => !!a);
+  const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');
 
   async function submit(action: Parameters<typeof callSubmitPartyBattleAction>[1]) {
-    if (busy) return;
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setBusy(true);
     setError(null);
+    setItemsUsedThisTurn(0);
     try {
       await callSubmitPartyBattleAction(battleId, action);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit that action.');
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
+  }
+
+  function submitAttack() {
+    void submit({ type: 'attack', targetIndex: selectedTarget, targetAll: targetMode === 'all' });
+  }
+  function submitSkill(skillId: string) {
+    setShowSkillMenu(false);
+    void submit({ type: 'skill', skillId, targetIndex: selectedTarget, targetAll: targetMode === 'all' });
+  }
+  function submitLanternAbility(abilityId: string) {
+    void submit({ type: 'lanternAbility', abilityId, targetIndex: selectedTarget, targetAll: targetMode === 'all' });
+  }
+  function submitDefend() {
+    void submit({ type: 'defend' });
+  }
+
+  const queuedCountFor = (itemId: string) => tray.filter((id) => id === itemId).length;
+  const canQueueMore = itemsUsedThisTurn + tray.length < 3;
+  function queueItem(itemId: string) {
+    const owned = combatItems.find((i) => i.itemId === itemId)?.quantity ?? 0;
+    if (!canQueueMore || queuedCountFor(itemId) >= owned) return;
+    setTray((prev) => [...prev, itemId]);
+  }
+  function dequeueItem(itemId: string) {
+    setTray((prev) => {
+      const i = prev.lastIndexOf(itemId);
+      if (i === -1) return prev;
+      return [...prev.slice(0, i), ...prev.slice(i + 1)];
+    });
+  }
+
+  // "Done" on the item menu - queued items are used immediately (via callUseItemInPartyBattle,
+  // which only ever touches the real save + this battle's own participantStats snapshot, never
+  // turnOrder/currentTurnIndex/deadline - so it costs no turn). Mirrors CombatScene.tsx's own
+  // finishItemMenu almost verbatim.
+  async function finishItemMenu() {
+    if (tray.length === 0) {
+      setShowItemMenu(false);
+      return;
+    }
+    const queued = tray;
+    setUsingItems(true);
+    let usedCount = 0;
+    let failed = false;
+    for (const itemId of queued) {
+      try {
+        await callUseItemInPartyBattle(battleId, itemId);
+        usedCount += 1;
+      } catch {
+        // A later item can still be valid even if an earlier one in this batch turned out to be a
+        // no-op (e.g. it would have had no effect because an earlier item already maxed that
+        // stat) - keep going rather than aborting the whole batch. A failed call never actually
+        // consumes the item server-side, so it shouldn't cost one of the player's 3 real uses.
+        failed = true;
+      }
+    }
+    setItemsUsedThisTurn((n) => n + usedCount);
+    setTray([]);
+    setUsingItems(false);
+    if (uid) await resyncSave(uid);
+    if (failed) setError("Some of those items wouldn't have done anything - skipped.");
+    setShowItemMenu(false);
   }
 
   async function vote(wantsToContinue: boolean) {
@@ -137,33 +334,70 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   }
 
   return (
-    <div
-      className={styles.overlay}
-      style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.7)), url(${getAssetUrl(battle.battleBackgroundAssetId)})` }}
-    >
+    <div className={styles.overlay}>
+      {activeTintColors.length > 0 && (
+        <div className={styles.ailmentTintLayer}>
+          {activeTintColors.map((color) => (
+            <div key={color} className={styles.ailmentTint} style={{ background: color }} />
+          ))}
+        </div>
+      )}
       <Panel className={styles.panel}>
         {canDismiss && <OverlayCloseButton onClick={onClose} />}
         <h2 className={styles.title}>Endless Battle - Wave {battle.wave}</h2>
 
-        <h3 className={styles.sectionTitle}>Enemies</h3>
-        <div className={styles.list}>
-          {battle.enemies.map((e, i) => (
-            <div key={i} className={styles.row} style={{ opacity: e.hp <= 0 ? 0.4 : 1 }}>
-              <button
-                className={i === selectedTarget ? styles.targetSelected : styles.targetButton}
-                disabled={e.hp <= 0 || !isMyTurn}
-                onClick={() => setSelectedTarget(i)}
-              >
-                {ENEMIES.find((def) => def.id === e.enemyId)?.name ?? e.enemyId} (Lv.{e.level})
-              </button>
-              <div className={styles.barTrack}>
-                <div className={styles.barFillEnemy} style={{ width: `${(e.hp / e.maxHp) * 100}%` }} />
-                <span className={styles.barValue}>
-                  {e.hp}/{e.maxHp}
-                </span>
-              </div>
+        <div className={isBlinded ? `${styles.battleCanvasWrap} ${styles.battleCanvasBlurred}` : styles.battleCanvasWrap}>
+          {/* key={battle.wave} forces a fresh PhaserBattleCanvas/BattleScene mount every wave -
+              loadEncounter only ever runs once per BattleScene instance's life (see that
+              component's own doc comment), and this panel's canvas otherwise survives the whole
+              run across every wave. Without this, wave 2+'s genuinely different enemy roster (more
+              enemies, different sprites) never gets a real loadEncounter call, only syncEnemies
+              (hp-only updates against wave 1's now-stale sprite slots) - confirmed by hand as the
+              cause of a black arena from wave 2 onward. */}
+          <PhaserBattleCanvas
+            key={battle.wave}
+            backgroundAssetId={battle.battleBackgroundAssetId}
+            enemies={battleEnemies}
+            outgoingHits={activeOutgoingHits}
+            incomingHits={activeIncomingHits}
+            playerMaxHp={me?.maxHp ?? 1}
+            fastRounds={false}
+            targetIndex={selectedTarget}
+            targetMode={targetMode}
+            canPickTarget={canAct && aliveEnemies.length > 1}
+            onTargetEnemy={(index) => {
+              setTargetMode('single');
+              setSelectedTarget(index);
+            }}
+            combatEnded={battle.status !== 'active'}
+            ailmentFxEvent={ailmentFxEvent}
+            ailmentTakesHoldEvent={ailmentTakesHoldEvent}
+          />
+          {/* The canvas itself goes blank once combatEnded (BattleScene.clear()) - without this,
+              that read as a bare black rectangle instead of a moment worth celebrating. Earnings
+              get their own bigger, colored line so they jump out rather than blending into the
+              same-size countdown text below. */}
+          {battle.status === 'awaitingContinueVote' && (
+            <div className={styles.canvasMessage}>
+              <p className={styles.canvasMessageTitle}>Wave {battle.wave} cleared!</p>
+              {battle.lastWaveRewards?.[uid] && (
+                <p className={styles.canvasEarnings}>
+                  +{battle.lastWaveRewards[uid].xp} XP &nbsp;·&nbsp; +{battle.lastWaveRewards[uid].gold}g
+                  {battle.lastWaveRewards[uid].itemIds.length > 0 &&
+                    ` · ${battle.lastWaveRewards[uid].itemIds.map(itemDisplayName).join(', ')}`}
+                </p>
+              )}
+              <p className={styles.canvasMessageHint}>Act below to continue to the next wave, or withdraw.</p>
             </div>
-          ))}
+          )}
+          {(battle.status === 'defeated' || battle.status === 'withdrawn') && (
+            <div className={styles.canvasMessage}>
+              <p className={styles.canvasMessageTitle}>
+                {battle.status === 'defeated' ? 'The party was defeated.' : 'The party withdrew.'}
+              </p>
+              <p className={styles.canvasMessageHint}>Reached Wave {battle.wave}. Everyone has been restored to full health.</p>
+            </div>
+          )}
         </div>
 
         <h3 className={styles.sectionTitle}>Party</h3>
@@ -175,18 +409,51 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
             const isTheirTurn = isActive && p === activeUid;
             return (
               <div key={p} className={styles.row} style={{ opacity: stats.hp <= 0 ? 0.4 : 1 }}>
-                <span className={styles.rowName}>{displayName}</span>
-                {isActive && (
-                  <span className={isTheirTurn ? styles.playerActing : styles.playerReady}>
-                    {isTheirTurn ? "Acting..." : 'Waiting'}
-                  </span>
-                )}
+                <div className={styles.rowHeader}>
+                  <span className={styles.rowName}>{displayName}</span>
+                  {isActive && (
+                    <span className={isTheirTurn ? styles.playerActing : styles.playerReady}>
+                      {isTheirTurn ? "Acting..." : 'Waiting'}
+                    </span>
+                  )}
+                </div>
                 <div className={styles.barTrack}>
                   <div className={styles.barFillHp} style={{ width: `${(stats.hp / stats.maxHp) * 100}%` }} />
                   <span className={styles.barValue}>
                     {stats.hp}/{stats.maxHp}
                   </span>
                 </div>
+                <div className={styles.statBars}>
+                  <div className={styles.barTrackSmall}>
+                    <div className={styles.barFillSpirit} style={{ width: `${(stats.spirit / stats.maxSpirit) * 100}%` }} />
+                    <span className={styles.barValueSmall}>
+                      {stats.spirit}/{stats.maxSpirit} SP
+                    </span>
+                  </div>
+                  <div className={styles.barTrackSmall}>
+                    <div
+                      className={styles.barFillOil}
+                      style={{ width: `${stats.maxLanternOil > 0 ? (stats.lanternOil / stats.maxLanternOil) * 100 : 0}%` }}
+                    />
+                    <span className={styles.barValueSmall}>
+                      {stats.lanternOil}/{stats.maxLanternOil} Oil
+                    </span>
+                  </div>
+                </div>
+                {battle.status === 'active' && stats.ailments.length > 0 && (
+                  <div className={styles.ailmentBadgeRow}>
+                    {stats.ailments.map((a) => {
+                      const def = AILMENTS[a.ailmentId];
+                      return (
+                        <span key={a.ailmentId} className={styles.ailmentBadge} title={def?.description ?? a.ailmentId}>
+                          {def?.iconAssetId && <img src={getAssetUrl(def.iconAssetId)} alt="" className={styles.ailmentIcon} />}
+                          {def?.name ?? a.ailmentId}
+                          {a.turnsRemaining !== undefined ? ` (${a.turnsRemaining})` : ''}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -205,19 +472,56 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
         {battle.status === 'active' && me && me.hp > 0 && (
           <>
             <p className={styles.countdown}>
-              {isMyTurn ? `${secondsLeft}s to act` : `Waiting for ${names[activeUid] ?? '...'} to act...`}
+              {isMyTurn
+                ? isStunned
+                  ? 'You are stunned and cannot act - your turn will resolve automatically.'
+                  : playbackActive
+                    ? 'Resolving...'
+                    : `${secondsLeft}s to act`
+                : `Waiting for ${names[activeUid] ?? '...'} to act...`}
             </p>
             <div className={styles.actionRow}>
-              {isMyTurn && (
+              {isMyTurn && !isStunned && !playbackActive && (
                 <>
-                  <button
-                    className={styles.smallButton}
-                    disabled={busy || aliveEnemies.length === 0}
-                    onClick={() => submit({ type: 'attack', targetIndex: selectedTarget })}
-                  >
+                  {aliveEnemies.length > 1 && (
+                    <button
+                      className={styles.smallButton}
+                      disabled={busy}
+                      onClick={() => setTargetMode((m) => (m === 'all' ? 'single' : 'all'))}
+                    >
+                      Target: {targetMode === 'all' ? 'All Foes' : 'Single'}
+                    </button>
+                  )}
+                  <button className={styles.smallButton} disabled={busy || aliveEnemies.length === 0} onClick={submitAttack}>
                     Attack
                   </button>
-                  <button className={styles.smallButton} disabled={busy} onClick={() => submit({ type: 'defend' })}>
+                  {knownSkills.length <= 1 ? (
+                    <button
+                      className={styles.smallButton}
+                      disabled={busy || me.spirit < (knownSkills[0]?.spiritCost ?? 0)}
+                      onClick={() => submitSkill(knownSkills[0]?.id ?? 'keepers-strike')}
+                    >
+                      {knownSkills[0]?.name ?? "Keeper's Strike"} ({knownSkills[0]?.spiritCost ?? 0} SP)
+                    </button>
+                  ) : (
+                    <button className={styles.smallButton} disabled={busy} onClick={() => setShowSkillMenu(true)}>
+                      Select Spirit Ability
+                    </button>
+                  )}
+                  {lanternAbilities.map((ability) => (
+                    <button
+                      key={ability.id}
+                      className={styles.smallButton}
+                      disabled={busy || me.lanternOil < ability.oilCost}
+                      onClick={() => submitLanternAbility(ability.id)}
+                    >
+                      {ability.name} ({ability.oilCost} Oil)
+                    </button>
+                  ))}
+                  <button className={styles.smallButton} disabled={busy} onClick={() => setShowItemMenu(true)}>
+                    Items{tray.length > 0 ? ` (${tray.length}/3)` : ''}
+                  </button>
+                  <button className={styles.smallButton} disabled={busy} onClick={submitDefend}>
                     Defend
                   </button>
                 </>
@@ -225,7 +529,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
               {/* Leaving works regardless of whose turn it is - see submitPartyBattleAction's own
                   doc comment on why flee bypasses the turn-order gate entirely. A waiting player
                   stuck on an unresponsive partner needs a way out too, not just the active one. */}
-              <button className={styles.dangerButton} disabled={busy} onClick={() => submit({ type: 'flee' })}>
+              <button className={styles.dangerButton} disabled={busy} onClick={() => setConfirmLeave(true)}>
                 Leave Battle
               </button>
             </div>
@@ -235,7 +539,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
         {battle.status === 'active' && me && me.hp <= 0 && (
           <>
             <p className={styles.empty}>You are down - waiting for the party.</p>
-            <button className={styles.dangerButton} disabled={busy} onClick={() => submit({ type: 'flee' })}>
+            <button className={styles.dangerButton} disabled={busy} onClick={() => setConfirmLeave(true)}>
               Leave Battle
             </button>
           </>
@@ -243,14 +547,6 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
 
         {battle.status === 'awaitingContinueVote' && (
           <>
-            <p className={styles.countdown}>Wave {battle.wave} cleared!</p>
-            {battle.lastWaveRewards?.[uid] && (
-              <p className={styles.rewardLine}>
-                +{battle.lastWaveRewards[uid].xp} XP, +{battle.lastWaveRewards[uid].gold}g
-                {battle.lastWaveRewards[uid].itemIds.length > 0 &&
-                  `, ${battle.lastWaveRewards[uid].itemIds.map(itemDisplayName).join(', ')}`}
-              </p>
-            )}
             {battle.continueVotes[uid] ? (
               <p className={styles.empty}>Waiting for the rest of the party to vote...</p>
             ) : (
@@ -267,17 +563,110 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
         )}
 
         {(battle.status === 'defeated' || battle.status === 'withdrawn') && (
-          <>
-            <p className={styles.countdown}>
-              {battle.status === 'defeated' ? 'The party was defeated.' : 'The party withdrew.'} Reached Wave {battle.wave}.
-              Everyone has been restored to full health.
-            </p>
-            <button className={styles.smallButton} onClick={onClose}>
-              Close
-            </button>
-          </>
+          <button className={styles.smallButton} onClick={onClose}>
+            Close
+          </button>
         )}
       </Panel>
+
+      {showSkillMenu && (
+        <div className={styles.overlay} onClick={() => setShowSkillMenu(false)}>
+          <Panel style={{ width: 'min(360px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <OverlayCloseButton onClick={() => setShowSkillMenu(false)} />
+            <h3 className={styles.sectionTitle}>Select Spirit Ability</h3>
+            <div className={styles.list}>
+              {knownSkills.map((skill) => (
+                <button
+                  key={skill.id}
+                  className={styles.smallButton}
+                  disabled={me.spirit < skill.spiritCost}
+                  onClick={() => submitSkill(skill.id)}
+                >
+                  {skill.name} ({skill.spiritCost} SP)
+                </button>
+              ))}
+            </div>
+          </Panel>
+        </div>
+      )}
+
+      {showItemMenu && (
+        <div className={styles.overlay} onClick={() => !usingItems && setShowItemMenu(false)}>
+          <Panel style={{ width: 'min(360px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <OverlayCloseButton onClick={() => setShowItemMenu(false)} />
+            <h3 className={styles.sectionTitle}>Use Items</h3>
+            {/* Queuing here doesn't submit anything by itself - "Done" below applies each queued
+                item immediately (costs no turn), matching solo combat's own item menu exactly. Only
+                items that would currently do something are offered, and a ready ailment cure is
+                highlighted, same as CombatScene.tsx's wouldHelp/itemRowCureReady. */}
+            <div className={styles.list}>
+              {combatItems.length === 0 && <p className={styles.empty}>No usable items.</p>}
+              {combatItems.map((i) => {
+                const def = ITEMS.find((d) => d.id === i.itemId);
+                const cureAilmentId = def?.effect?.cureAilmentId;
+                const wouldHelp = me
+                  ? itemWouldHaveEffect(def?.effect, { ...me, stamina: 0, maxStamina: 0 }, me.ailments.map((a) => a.ailmentId))
+                  : false;
+                const queued = queuedCountFor(i.itemId);
+                const canAdd = wouldHelp && canQueueMore && queued < i.quantity;
+                return (
+                  <div
+                    key={i.itemId}
+                    className={cureAilmentId && wouldHelp ? `${styles.rowHeader} ${styles.itemRowCureReady}` : styles.rowHeader}
+                  >
+                    <span className={styles.rowName}>
+                      {itemDisplayName(i.itemId)} x{i.quantity}
+                      {queued > 0 ? ` (queued ${queued})` : ''}
+                      {!wouldHelp && (cureAilmentId ? ' (not needed)' : ' (full)')}
+                    </span>
+                    <button
+                      className={styles.smallButton}
+                      disabled={usingItems || !canAdd}
+                      title={wouldHelp ? undefined : cureAilmentId ? 'You do not have that ailment.' : 'Already at maximum.'}
+                      onClick={() => queueItem(i.itemId)}
+                    >
+                      Add
+                    </button>
+                    <button className={styles.smallButton} disabled={usingItems || queued === 0} onClick={() => dequeueItem(i.itemId)}>
+                      Remove
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            <div className={styles.actionRow}>
+              <button className={styles.smallButton} disabled={usingItems} onClick={() => void finishItemMenu()}>
+                {usingItems ? 'Using items...' : 'Done'}
+              </button>
+            </div>
+          </Panel>
+        </div>
+      )}
+
+      {confirmLeave && (
+        <div className={styles.overlay} onClick={() => setConfirmLeave(false)}>
+          <Panel style={{ width: 'min(360px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <OverlayCloseButton onClick={() => setConfirmLeave(false)} />
+            <h3 className={styles.sectionTitle}>Leave Battle?</h3>
+            <p className={styles.empty}>You'll forfeit this run and lose any rewards from waves not yet claimed.</p>
+            <div className={styles.actionRow}>
+              <button
+                className={styles.dangerButton}
+                disabled={busy}
+                onClick={() => {
+                  setConfirmLeave(false);
+                  void submit({ type: 'flee' });
+                }}
+              >
+                Leave Battle
+              </button>
+              <button className={styles.smallButton} onClick={() => setConfirmLeave(false)}>
+                Cancel
+              </button>
+            </div>
+          </Panel>
+        </div>
+      )}
     </div>
   );
 }

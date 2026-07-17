@@ -23,6 +23,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
+import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import {
   callOpenChest,
   callVisitLandmark,
@@ -97,6 +98,7 @@ export function OverworldScene() {
   const [journalOpen, setJournalOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const isMobile = useIsMobile();
+  const battleOverlayOpen = useBattleOverlayStore((s) => s.isOpen);
   const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
@@ -345,13 +347,13 @@ export function OverworldScene() {
             onMap={toggleMap}
           />
         </>
-      ) : (
+      ) : !battleOverlayOpen ? (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Interact: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: hold Shift</>}
           &nbsp;·&nbsp; Avoid or approach enemies to fight &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Map: M
         </p>
-      )}
+      ) : null}
       {activeNpc && (
         <DialogueBox
           lines={resolveNpcDialogue(activeNpc, questProgress)}

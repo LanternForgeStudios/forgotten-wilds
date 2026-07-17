@@ -9,17 +9,114 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
+/* Close to full-viewport, matching solo combat's own scale (CombatScene.module.css's .stage caps
+   at 1400px too) - this used to be a small centered dialog, which made the battle canvas beneath
+   it tiny and cramped by comparison. flex column + the canvas wrap's flex:1 below lets the arena
+   claim whatever vertical space the Party list/log/actions don't need, instead of a fixed height. */
 .panel {
-  width: min(560px, 94vw);
-  max-height: 85vh;
+  width: min(1400px, 97vw);
+  height: 94vh;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Gives PhaserBattleCanvas's own ResizeObserver a concrete, nonzero size to measure - same
+   reasoning as CombatScene.module.css's identical .battleCanvasWrap rule (this mode reuses the
+   same canvas/Scene, just inside a modal Panel instead of a full-viewport stage). flex: 1 lets it
+   fill whatever space .panel's other children (title/party/log/actions) don't need. */
+.battleCanvasWrap {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 320px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--fw-bg-deep);
+  transition: filter 0.3s ease;
+}
+
+/* Blind's "reduced visibility" theme - matches CombatScene.module.css's own .stageBlurred. */
+.battleCanvasBlurred {
+  filter: blur(3px);
+}
+
+/* Reinforces the ailment badge with a low-opacity full-screen color wash while it's active -
+   matches CombatScene.module.css's own .ailmentTintLayer/.ailmentTint (see AILMENT_TINT_COLORS'
+   own doc comment). pointer-events: none so it never blocks clicking the action buttons. */
+.ailmentTintLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+}
+
+.ailmentTint {
+  position: absolute;
+  inset: 0;
+  animation: ailmentTintFadeIn 0.6s ease-out 0.5s backwards;
+}
+
+@keyframes ailmentTintFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .title {
   margin: 0 0 12px;
   color: var(--fw-accent);
+}
+
+/* Overlaid on .battleCanvasWrap once combatEnded clears the arena (wave cleared / defeated /
+   withdrawn) - without this, that moment read as a bare black rectangle instead of a payoff. */
+.canvasMessage {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 24px;
+  background: rgba(20, 15, 10, 0.55);
+}
+
+.canvasMessageTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--fw-accent);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* Earnings get their own larger, bright line so they jump out rather than reading like ordinary
+   body text next to the title. */
+.canvasEarnings {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #6fd67a;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.canvasMessageHint {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.85;
+  color: var(--fw-text);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
 .sectionTitle {
@@ -38,14 +135,79 @@
 
 .row {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 0;
+}
+
+.rowHeader {
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 0;
+}
+
+/* A cure item whose ailment is currently active, in the item menu - matches
+   CombatScene.module.css's own .itemRowCureReady so it stands out from the rest of the list. */
+.itemRowCureReady {
+  background: rgba(224, 169, 74, 0.18);
+  outline: 1px solid var(--fw-accent);
+  border-radius: 4px;
+  padding: 2px 4px;
 }
 
 .rowName {
   flex: 1;
   font-size: 13px;
+}
+
+/* HP gets the full-width bar (.barTrack, below); Spirit/Oil sit side by side beneath it at half
+   width each - a compact version of PlayerHUD's own three-bar readout, scoped to whichever
+   participant row it's in rather than only the viewer's own top-of-screen HUD. */
+.statBars {
+  display: flex;
+  gap: 6px;
+}
+
+.barTrackSmall {
+  position: relative;
+  flex: 1;
+  height: 13px;
+  border-radius: 4px;
+  background: var(--fw-bg-deep);
+  overflow: hidden;
+}
+
+.barValueSmall {
+  position: relative;
+  display: block;
+  text-align: center;
+  font-size: 9px;
+  line-height: 13px;
+  color: var(--fw-text);
+}
+
+.ailmentBadgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ailmentBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid var(--fw-danger, #b34b3c);
+  color: var(--fw-text);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.ailmentIcon {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
 }
 
 .playerReady {
@@ -59,24 +221,6 @@
   font-size: 11px;
   opacity: 0.6;
   font-style: italic;
-}
-
-.targetButton,
-.targetSelected {
-  flex-shrink: 0;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--fw-panel-border);
-  background: transparent;
-  color: var(--fw-text-dim);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.targetSelected {
-  border-color: var(--fw-accent);
-  color: var(--fw-accent);
 }
 
 .barTrack {
@@ -95,10 +239,17 @@
   transition: width 0.3s ease;
 }
 
-.barFillEnemy {
+.barFillSpirit {
   position: absolute;
   inset: 0;
-  background: var(--fw-danger);
+  background: var(--fw-spirit, #4a90d9);
+  transition: width 0.3s ease;
+}
+
+.barFillOil {
+  position: absolute;
+  inset: 0;
+  background: #d97b2e;
   transition: width 0.3s ease;
 }
 
@@ -140,6 +291,7 @@
 
 .actionRow {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 

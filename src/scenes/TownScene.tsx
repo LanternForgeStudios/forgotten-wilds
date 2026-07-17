@@ -32,6 +32,7 @@ import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
+import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { playMusic, playSound } from '@/audio/audioService';
 import styles from './TownScene.module.css';
 
@@ -80,6 +81,7 @@ export function TownScene() {
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const isMobile = useIsMobile();
+  const battleOverlayOpen = useBattleOverlayStore((s) => s.isOpen);
   const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
@@ -318,13 +320,13 @@ export function TownScene() {
             onMap={toggleMap}
           />
         </>
-      ) : (
+      ) : !battleOverlayOpen ? (
         <p className={styles.hint}>
           Move: arrow keys / WASD &nbsp;·&nbsp; Talk: Enter / Space
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: hold Shift</>}
           &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Chat: C &nbsp;·&nbsp; Map: M
         </p>
-      )}
+      ) : null}
       {activeNpc && (
         <DialogueBox
           lines={resolveNpcDialogue(activeNpc, questProgress)}

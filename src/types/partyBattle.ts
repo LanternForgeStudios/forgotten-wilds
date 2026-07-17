@@ -25,6 +25,9 @@ export interface PartyBattleParticipantStats {
   knownSkillIds: string[];
   lanternId: string | null;
   skin: 'male' | 'female';
+  /** Snapshotted the same way - see shared-types/index.ts's matching comment. Used for battle log
+   *  lines only (e.g. "Alys braces, ready to absorb the next blow."). */
+  name: string;
 }
 
 export interface PartyBattleEnemyState {

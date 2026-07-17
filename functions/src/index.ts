@@ -37,7 +37,7 @@ export {
   transferClanLeadership,
   disbandClan,
 } from './functions/clan';
-export { submitPartyBattleAction } from './functions/partyBattle';
+export { submitPartyBattleAction, useItemInPartyBattle } from './functions/partyBattle';
 export { startEndlessBattle, voteContinueEndlessBattle } from './functions/endlessBattle';
 export { challengeToPvp, respondToPvpChallenge, joinPvpQueue, leavePvpQueue } from './functions/pvpBattle';
 export { setDisplayName } from './functions/setDisplayName';

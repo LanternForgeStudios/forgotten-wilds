@@ -113,7 +113,17 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
 
       if (!gameRef.current) {
         createGame(width, height);
-      } else {
+      } else if (hasLoadedEncounterRef.current) {
+        // Resizing mid-boot (before loadEncounter has laid anything out) raced with Phaser's own
+        // async scene init and left the canvas rendering nothing at all - confirmed by hand: a
+        // cold-cache first mount (slow texture fetch, wide window for this observer's guaranteed
+        // "report current size" callback to land before `create()` finished) reliably went black,
+        // while a warm-cache remount (fast enough to dodge the race) didn't. ResizeObserver always
+        // fires at least once right after observe() even when nothing has visually changed, so
+        // gating on hasLoadedEncounterRef defers that report until there's actually a laid-out
+        // scene worth resizing - background/formation are still only computed once at loadEncounter
+        // time (BattleScene.setViewport's own doc comment), so a real resize during that window
+        // would've been a no-op for the enemy layout anyway.
         sceneRef.current?.setViewport({ width, height });
       }
     });

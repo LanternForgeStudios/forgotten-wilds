@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
+import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { useNow } from '@/hooks/useNow';
 import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
@@ -121,11 +122,25 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
       subscribeToFriendship(uid, setFriendUids),
       // Every participant in an Endless Battle or PvP fight gets shown it automatically via this
       // global subscription, not just whoever clicked "Start"/accepted the challenge - see
-      // subscribeToMyActivePartyBattle's own doc comment.
-      subscribeToMyActivePartyBattle(uid, setActiveBattleId),
+      // subscribeToMyActivePartyBattle's own doc comment. Only ever used to *discover* a fresh
+      // battle to auto-show, though - once a panel is open, only its own onClose (the player
+      // explicitly acknowledging a victory/defeat/withdrawn outcome) should ever close it. Wiring
+      // this subscription's `null` result straight into setActiveBattleId would otherwise yank the
+      // panel away the instant the battle's status flips to terminal, before the player ever saw
+      // the outcome screen - confirmed by hand, not theoretical.
+      subscribeToMyActivePartyBattle(uid, (battleId) => {
+        if (battleId) setActiveBattleId(battleId);
+      }),
     ];
     return () => unsubs.forEach((u) => u());
   }, [uid]);
+
+  // Mirrors activeBattleId into the shared store so Town/Overworld/Dungeon can hide their fixed
+  // keyboard-shortcut hint while it's showing - it otherwise sits visible underneath the
+  // near-full-screen battle panel.
+  useEffect(() => {
+    useBattleOverlayStore.getState().setOpen(!!activeBattleId);
+  }, [activeBattleId]);
 
   const hasNewSocial =
     incomingRequests.some((r) => r.createdAt > lastReviewedSocialAt) ||

@@ -399,6 +399,10 @@ export interface PartyBattleParticipantStats {
   knownSkillIds: string[];
   lanternId: string | null;
   skin: 'male' | 'female';
+  /** Snapshotted the same way as knownSkillIds/lanternId/skin above - character display name
+   *  doesn't change mid-battle either. Used only for log-line text (partyCombatEngine.ts), never
+   *  for game-logic identity (uid still owns that everywhere else). */
+  name: string;
 }
 
 export interface PartyBattleEnemyState {

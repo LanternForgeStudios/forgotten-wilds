@@ -22,6 +22,7 @@ import { useSceneStore } from '@/state/useSceneStore';
 import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS } from '@/data';
 import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
+import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemWouldHaveEffect } from '@/utils/itemEffect';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
@@ -30,18 +31,6 @@ import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
 import { getAssetUrl } from '@/assets/assetManager';
 import { playMusic, playSound } from '@/audio/audioService';
 import styles from './CombatScene.module.css';
-
-// Reinforces the ailment badge with a low-opacity full-screen color wash while it's active - each
-// stacks additively (rare, but a Burn+Poison round should read as visibly "worse" than either
-// alone, not one silently overwriting the other). Blind gets a blur filter on the stage instead of
-// a tint (per its own "reduced visibility" theme) rather than a color, since a color wash doesn't
-// read as "hard to see." Stun has no tint - the existing stunnedBanner text already covers it.
-const AILMENT_TINT_COLORS: Record<string, string> = {
-  poison: 'rgba(76, 175, 80, 0.22)',
-  burn: 'rgba(211, 47, 47, 0.22)',
-  freeze: 'rgba(41, 121, 255, 0.22)',
-  silence: 'rgba(156, 39, 176, 0.22)',
-};
 
 const RESTORE_STAT_LABEL: Record<'hp' | 'spirit' | 'lanternOil', string> = {
   hp: 'HP',
