@@ -3,6 +3,12 @@
 // import would resolve locally but 404 in the deployed bundle. Keep shapes in sync by hand — these
 // are small, low-churn interfaces (save-document shape), not the fast-moving gameplay content data.
 
+// Type-only, erased at compile time - both files live inside functions/ (the same deployed
+// bundle), unlike the src/ boundary the comment above guards against, so this doesn't risk the
+// same "resolves locally but 404s once deployed" problem. Used only by PartyBattleTurnResult's
+// hits/enemyHits/pvpHit fields below.
+import type { PartyCombatHitResult, PartyEnemyHitResult, PvpHitResult } from '../engine/partyCombatEngine';
+
 export type EquipmentSlot =
   | 'weapon'
   | 'armor'
@@ -384,6 +390,15 @@ export interface PartyBattleParticipantStats {
    *  read by the enemy phase (partyCombatEngine.ts's resolvePartyEnemyPhase) to halve incoming
    *  damage, then cleared back to false once the enemy phase runs. */
   defending: boolean;
+  /** Snapshotted once at battle start (fullyRestoredParticipantStats, partyBattle.ts) from the
+   *  real save - can't change mid-battle (no re-learning a skill or re-equipping a lantern while
+   *  locked in a fight), so there's no need for a live per-turn read the way item ownership needs
+   *  (see submitPartyBattleAction's own inventory read). Used both to validate a submitted
+   *  skillId/abilityId actually belongs to this participant (Phase F's action-menu enforcement)
+   *  and to know which sprite to render them as in PvP (skin). */
+  knownSkillIds: string[];
+  lanternId: string | null;
+  skin: 'male' | 'female';
 }
 
 export interface PartyBattleEnemyState {
@@ -403,6 +418,15 @@ export interface PartyBattleTurnResult {
   round: number;
   log: string[];
   resolvedAt: number;
+  /** Structured hit data for the client's battle canvas to animate (Phase F of the Multiplayer
+   *  Battle System plan) - optional so a battle doc written before this field existed doesn't fail
+   *  client typing; absence just means "nothing to animate," same as an empty array would. Endless
+   *  Battle only: `hits` is the acting player's own offensive swing this turn; `enemyHits` is only
+   *  present on the turn that also ran the enemy phase (every other turn, no enemy acted yet). */
+  hits?: PartyCombatHitResult[];
+  enemyHits?: PartyEnemyHitResult[];
+  /** PvP only - null on a Defend/item/forfeit/stunned turn (nothing was thrown at the opponent). */
+  pvpHit?: PvpHitResult | null;
 }
 
 export interface PartyBattleWaveRewards {

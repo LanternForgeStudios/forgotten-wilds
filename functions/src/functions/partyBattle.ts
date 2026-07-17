@@ -21,6 +21,9 @@ import type {
  *  don't duplicate this shape twice. Reads only the save's max-value fields, so it's correct
  *  whether called before or after the save's own hp/spirit/oil are actually written back to max. */
 export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattleParticipantStats {
+  // Backfill for a save written before knownSkillIds existed - same one-line pattern
+  // resolveCombatAction.ts already uses for the exact same reason (see that file's own comment).
+  if (!save.player.knownSkillIds) save.player.knownSkillIds = ['keepers-strike'];
   return {
     hp: save.player.stats.maxHp,
     maxHp: save.player.stats.maxHp,
@@ -33,6 +36,9 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
     speed: save.player.stats.speed,
     ailments: [],
     defending: false,
+    knownSkillIds: save.player.knownSkillIds,
+    lanternId: save.player.equipment.lantern ?? null,
+    skin: save.player.skin,
   };
 }
 
@@ -206,7 +212,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         enemies: nextEnemies,
         currentTurnIndex: nextTurnIndex,
         turnDeadlineAt: now + TURN_TIMEOUT_MS,
-        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now },
+        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, hits: turnResult.hits },
         updatedAt: now,
       });
       return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };
@@ -227,7 +233,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         participantStats: nextParticipantStats,
         enemies: nextEnemies,
         status,
-        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now },
+        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, hits: turnResult.hits },
         lastWaveRewards,
         continueVotes: status === 'awaitingContinueVote' ? {} : battle.continueVotes,
         updatedAt: now,
@@ -272,7 +278,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         participantStats: nextParticipantStats,
         enemies: nextEnemies,
         status: 'defeated',
-        lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now },
+        lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyPhase.enemyHits },
         updatedAt: now,
       });
       return { resolved: true, status: 'defeated' as const };
@@ -288,7 +294,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       turnOrder: newTurnOrder,
       currentTurnIndex: 0,
       turnDeadlineAt: now + TURN_TIMEOUT_MS,
-      lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now },
+      lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyPhase.enemyHits },
       updatedAt: now,
     });
     return { resolved: true, status: 'active' as const, phase: 'enemyPhase' as const };
@@ -351,7 +357,7 @@ async function resolvePvpBattleTurn(
       participantStats: nextParticipantStats,
       status: 'victory',
       winnerUid,
-      lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now },
+      lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, pvpHit: turnResult.hit },
       updatedAt: now,
     });
     return { resolved: true, status: 'victory' as const, winnerUid };
@@ -363,7 +369,7 @@ async function resolvePvpBattleTurn(
     currentTurnIndex: nextTurnIndex,
     round: nextTurnIndex === 0 ? battle.round + 1 : battle.round,
     turnDeadlineAt: now + TURN_TIMEOUT_MS,
-    lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now },
+    lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, pvpHit: turnResult.hit },
     updatedAt: now,
   });
   return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };

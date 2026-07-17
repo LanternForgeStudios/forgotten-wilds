@@ -20,6 +20,11 @@ export interface PartyBattleParticipantStats {
   speed: number;
   ailments: ActiveAilment[];
   defending: boolean;
+  /** Snapshotted once at battle start - see shared-types/index.ts's matching comment for why this
+   *  doesn't need a live per-turn read the way item ownership does. */
+  knownSkillIds: string[];
+  lanternId: string | null;
+  skin: 'male' | 'female';
 }
 
 export interface PartyBattleEnemyState {
@@ -29,10 +34,41 @@ export interface PartyBattleEnemyState {
   maxHp: number;
 }
 
+export interface PartyCombatHitResult {
+  uid: string;
+  targetIndex: number;
+  damage: number;
+  missed: boolean;
+  defeated: boolean;
+}
+
+export interface PartyEnemyHitResult {
+  attackerIndex: number;
+  targetUid: string;
+  damage: number;
+  missed: boolean;
+  wasDefended: boolean;
+  logLine: string;
+}
+
+/** PvP only ever has one possible target - singular where the party engine's own hit result
+ *  carries a targetIndex. */
+export interface PvpHitResult {
+  damage: number;
+  missed: boolean;
+  defeated: boolean;
+}
+
 export interface PartyBattleTurnResult {
   round: number;
   log: string[];
   resolvedAt: number;
+  /** Endless only: `hits` is the acting player's own offensive swing this turn; `enemyHits` is
+   *  only present on the turn that also ran the enemy phase. */
+  hits?: PartyCombatHitResult[];
+  enemyHits?: PartyEnemyHitResult[];
+  /** PvP only - null on a Defend/item/forfeit/stunned turn. */
+  pvpHit?: PvpHitResult | null;
 }
 
 export interface PartyBattleWaveRewards {

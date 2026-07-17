@@ -146,17 +146,28 @@ describe('resolvePvpTurn', () => {
     expect(result.log.some((l) => l.includes('defeated'))).toBe(true);
   });
 
-  it('a Defend action never touches the opponent and sets defending true', () => {
+  it('a landed attack populates a structured hit, and a defeated opponent flags it', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const result = resolvePvpTurn(player('p1', { stats: stats({ attack: 999 }) }), opponent({ hp: 20 }));
+    expect(result.hit).not.toBeNull();
+    expect(result.hit?.missed).toBe(false);
+    expect(result.hit?.defeated).toBe(true);
+    expect(result.hit?.damage).toBeGreaterThan(0);
+  });
+
+  it('a Defend action never touches the opponent, sets defending true, and leaves hit null', () => {
     const result = resolvePvpTurn(player('p1', { action: { type: 'defend' } }), opponent());
     expect(result.defenderHp).toBe(opponent().hp);
     expect(result.defending).toBe(true);
     expect(result.forfeited).toBe(false);
+    expect(result.hit).toBeNull();
   });
 
-  it('a flee action forfeits the match without damaging anyone', () => {
+  it('a flee action forfeits the match without damaging anyone, and leaves hit null', () => {
     const result = resolvePvpTurn(player('p1', { action: { type: 'flee' } }), opponent());
     expect(result.forfeited).toBe(true);
     expect(result.defenderHp).toBe(opponent().hp);
+    expect(result.hit).toBeNull();
   });
 
   it('a stunned player skips their action entirely but still takes ailment tick damage', () => {

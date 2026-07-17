@@ -212,6 +212,15 @@ export interface PvpDefenderInput {
   defense: number;
 }
 
+/** PvP only ever has one possible target, so this is singular where the party engine's
+ *  PartyCombatHitResult carries a targetIndex - the client's hit-animation wiring (Phase F of the
+ *  Multiplayer Battle System plan) always plays this against the sole opponent slot. */
+export interface PvpHitResult {
+  damage: number;
+  missed: boolean;
+  defeated: boolean;
+}
+
 export interface PvpTurnResult {
   log: string[];
   hp: number;
@@ -223,6 +232,9 @@ export interface PvpTurnResult {
   /** The opponent's hp after this turn's attack - unchanged from `defender.hp` on a Defend/item/
    *  forfeit turn, since only an offensive action ever touches the opponent. */
   defenderHp: number;
+  /** Structured record of the offensive swing this turn, if any - null on Defend/item/forfeit/
+   *  stunned turns (nothing was thrown at the opponent to animate). */
+  hit: PvpHitResult | null;
   /** True only for a 'flee' action - PvP is 1-on-1, so unlike a party fight against shared enemies
    *  (where individual flee has no defined meaning - see resolvePartyPlayerTurn's 'flee' case),
    *  forfeiting here has a real, immediate effect: the match ends in the opponent's favor. */
@@ -250,11 +262,14 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
   const defending = player.action.type === 'defend';
   let forfeited = false;
   let defenderHp = defender.hp;
+  let hit: PvpHitResult | null = null;
 
   function damageDefender(dmg: number, verb: string): void {
     defenderHp = Math.max(0, defenderHp - dmg);
+    const defeated = defenderHp <= 0;
     log.push(`${verb} your opponent for ${dmg} damage.`);
-    if (defenderHp <= 0) log.push('Your opponent is defeated!');
+    if (defeated) log.push('Your opponent is defeated!');
+    hit = { damage: dmg, missed: false, defeated };
   }
 
   function resolveOffensiveHit(power: number, verb: string, damageType: DamageType) {
@@ -262,6 +277,7 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
     const blindChance = damageType === 'physical' ? blindMissChance(ailments) : 0;
     if (blindChance > 0 && Math.random() < blindChance) {
       log.push('Your attack goes wide - miss!');
+      hit = { damage: 0, missed: true, defeated: false };
       return;
     }
     const dmg = Math.round(computeDamage(power, player.stats.attack * attackMultiplier, defender.defense));
@@ -330,7 +346,7 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
   hp = applyAilmentTickDamage(hp, player.stats.maxHp, ailments, log);
   ailments = expireAilments(ailments, inflictedThisTurn);
 
-  return { log, hp, spirit, lanternOil, ailments, itemConsumedIds, defending, defenderHp, forfeited };
+  return { log, hp, spirit, lanternOil, ailments, itemConsumedIds, defending, defenderHp, hit, forfeited };
 }
 
 export interface PartyEnemyHitResult {
