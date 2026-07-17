@@ -17,6 +17,19 @@ export const INTRO_CUTSCENE = {
   ],
 };
 
+/** Shown once per fresh sign-in for a RETURNING character (one who already has a save) - see
+ *  App.tsx's bootstrap effect, which only ever runs this path once per auth transition (a cold
+ *  page load or a fresh sign-in), never on later in-session map transitions back into Ash Hallow
+ *  (those go through useLocationExploration.ts instead, which never touches this cutscene). */
+export const WELCOME_BACK_CUTSCENE = {
+  backgroundAssetId: FALLBACK_CUTSCENE_BACKGROUND,
+  lines: [
+    "The lantern catches, low and steady, and Ash Hallow's rooftops rise into view once more.",
+    'A few familiar faces glance up as you pass - a nod here, a raised hand there.',
+    "Welcome back, Keeper. The mountain remembers you, even when you're away.",
+  ],
+};
+
 /** Shown when the player clicks Continue off a defeat overlay, before returning to Ash Hallow -
  *  see CombatScene.tsx's returnToExploration(). */
 export const DEFEAT_CUTSCENE = {

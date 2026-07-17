@@ -11,6 +11,8 @@ import { DungeonScene } from '@/scenes/DungeonScene';
 import { CombatScene } from '@/scenes/CombatScene';
 import { ToastHost } from '@/components/ToastHost';
 import { Cutscene } from '@/components/cutscene/Cutscene';
+import { useCutsceneStore } from '@/state/useCutsceneStore';
+import { WELCOME_BACK_CUTSCENE } from '@/data/cutscenes';
 import { LOCATIONS } from '@/data';
 
 /** On a completely fresh page load (not an in-session scene transition - see the "signedIn"
@@ -47,7 +49,18 @@ function App() {
         .then((save) => {
           if (save) {
             hydrateAllStores(save);
-            goTo('town', { locationId: freshLoadStartLocationId(save.player.currentLocationId) });
+            const locationId = freshLoadStartLocationId(save.player.currentLocationId);
+            // A returning character's fresh sign-in (this effect only ever runs once per auth
+            // transition - see checkedForUid above) gets a "welcome back" beat before landing in
+            // town, same "don't navigate until the cutscene is dismissed" convention
+            // CharacterCreationScene's own intro cutscene uses. Later in-session transitions back
+            // into Ash Hallow (walking in from the Overworld, etc.) go through
+            // useLocationExploration.ts instead, which never touches this cutscene - only a
+            // genuinely fresh page load/sign-in reaches this branch at all.
+            useCutsceneStore.getState().play({
+              ...WELCOME_BACK_CUTSCENE,
+              onComplete: () => goTo('town', { locationId }),
+            });
           } else {
             goTo('characterCreation');
           }
