@@ -35,7 +35,13 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   const [error, setError] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
-  useOverlayClose(onClose);
+  // While a fight is actively in progress, Escape/click-outside must NOT silently dismiss this
+  // panel - closing it stops the poll below (its interval is torn down on unmount), which is
+  // exactly what orphans a battle server-side forever (nobody left to ever notice the deadline
+  // passed). Only dismissable between waves / at a real terminal state; a no-op callback keeps
+  // this hook call unconditional (rules of hooks) without actually closing anything mid-fight.
+  const canDismiss = battle?.status !== 'active';
+  useOverlayClose(canDismiss ? onClose : () => {});
 
   useEffect(() => subscribeToPartyBattle(battleId, setBattle), [battleId]);
 
@@ -48,15 +54,19 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
 
   // Any client can nudge a turn/timeout check even without a new action - covers the case where
   // it's not this player's turn yet and they're just waiting on the active player or the 20s
-  // per-turn deadline.
+  // per-turn deadline. Fires once immediately on mount (not just on the first 3s interval tick),
+  // so reconnecting/reloading into a battle whose deadline already passed a while ago (nobody was
+  // around to poll it) resolves right away instead of waiting up to 3 more seconds.
   const lastPollRef = useRef(0);
   useEffect(() => {
     if (!battle || battle.status !== 'active') return;
-    const id = setInterval(() => {
+    const poll = () => {
       if (Date.now() - lastPollRef.current < 2500) return;
       lastPollRef.current = Date.now();
       void callSubmitPartyBattleAction(battleId).catch(() => {});
-    }, 3000);
+    };
+    poll();
+    const id = setInterval(poll, 3000);
     return () => clearInterval(id);
   }, [battle, battleId]);
 
@@ -120,7 +130,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
       style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.7)), url(${getAssetUrl(battle.battleBackgroundAssetId)})` }}
     >
       <Panel className={styles.panel}>
-        <OverlayCloseButton onClick={onClose} />
+        {canDismiss && <OverlayCloseButton onClick={onClose} />}
         <h2 className={styles.title}>Endless Battle - Wave {battle.wave}</h2>
 
         <h3 className={styles.sectionTitle}>Enemies</h3>
@@ -196,6 +206,9 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                 </button>
                 <button className={styles.smallButton} disabled={busy} onClick={() => submit({ type: 'defend' })}>
                   Defend
+                </button>
+                <button className={styles.dangerButton} disabled={busy} onClick={() => submit({ type: 'flee' })}>
+                  Leave Battle
                 </button>
               </div>
             )}

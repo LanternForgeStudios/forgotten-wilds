@@ -29,7 +29,13 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
-  useOverlayClose(onClose);
+  // While the duel is actively in progress, Escape/click-outside must NOT silently dismiss this
+  // panel - closing it stops the poll below (its interval is torn down on unmount), which is
+  // exactly what orphans a match server-side forever (nobody left to notice the deadline passed
+  // or to see the Forfeit button). Only dismissable once the match has actually ended; a no-op
+  // callback keeps this hook call unconditional (rules of hooks) without closing anything mid-duel.
+  const canDismiss = battle?.status !== 'active';
+  useOverlayClose(canDismiss ? onClose : () => {});
 
   useEffect(() => subscribeToPartyBattle(battleId, setBattle), [battleId]);
 
@@ -42,14 +48,19 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
 
   // Same client-triggered timeout model as Endless Battle - any client's periodic poll can force
   // the active player's turn to resolve (with Defend substituted) once the 20s deadline passes.
+  // Fires once immediately on mount (not just on the first 3s interval tick), so reconnecting/
+  // reloading into a match whose deadline already passed a while ago resolves right away instead
+  // of waiting up to 3 more seconds.
   const lastPollRef = useRef(0);
   useEffect(() => {
     if (!battle || battle.status !== 'active') return;
-    const id = setInterval(() => {
+    const poll = () => {
       if (Date.now() - lastPollRef.current < 2500) return;
       lastPollRef.current = Date.now();
       void callSubmitPartyBattleAction(battleId).catch(() => {});
-    }, 3000);
+    };
+    poll();
+    const id = setInterval(poll, 3000);
     return () => clearInterval(id);
   }, [battle, battleId]);
 
@@ -103,7 +114,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
       style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.7)), url(${getAssetUrl(battle.battleBackgroundAssetId)})` }}
     >
       <Panel className={styles.panel}>
-        <OverlayCloseButton onClick={onClose} />
+        {canDismiss && <OverlayCloseButton onClick={onClose} />}
         <h2 className={styles.title}>PvP Duel</h2>
 
         <h3 className={styles.sectionTitle}>Opponent</h3>

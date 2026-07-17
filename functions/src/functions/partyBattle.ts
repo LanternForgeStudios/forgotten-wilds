@@ -139,6 +139,24 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       return resolvePvpBattleTurn(tx, db, battleRef, battle, activeUid, activeStats, resolvedAction, now);
     }
 
+    // A real (player-submitted, not timeout-substituted) flee during an active Endless Battle ends
+    // the whole run immediately - "flee" has no per-player meaning against a shared enemy board
+    // (see partyCombatEngine.ts's own 'flee' case, which treats it as Defend for anyone who somehow
+    // still reaches the engine with it), so instead of silently no-opping, give the active player a
+    // real way to leave right now rather than only being able to hide the panel (which orphans the
+    // battle server-side with nobody left polling it - see this file's own history). Mirrors
+    // voteContinueEndlessBattle's decline-to-continue path: restore everyone, clear locks, mark
+    // withdrawn.
+    if (action && resolvedAction.type === 'flee') {
+      await restoreParticipantsAndClearLocks(tx, db, battle.participants);
+      tx.update(battleRef, {
+        status: 'withdrawn',
+        lastTurnResult: { round: battle.round, log: [`${activeUid} flees - the party withdraws from the battle.`], resolvedAt: now },
+        updatedAt: now,
+      });
+      return { resolved: true, status: 'withdrawn' as const };
+    }
+
     const turnResult = resolvePartyPlayerTurn(
       {
         uid: activeUid,
