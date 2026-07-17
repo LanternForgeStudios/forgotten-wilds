@@ -320,6 +320,9 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             outgoingHits={activeOutgoingHits}
             incomingHits={activeIncomingHits}
             playerMaxHp={me.maxHp}
+            // PvP is strictly 1-on-1 (a single pvpHit per turn, never multiple simultaneous
+            // attackers) so fastRounds' inter-enemy stagger has nothing to collapse here - unlike
+            // Endless Battle, there's no toggle to expose for a setting with no visible effect.
             fastRounds={false}
             targetIndex={0}
             targetMode="single"
@@ -332,6 +335,11 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
           {battle.status === 'victory' && (
             <div className={styles.canvasMessage}>
               <p className={styles.canvasMessageTitle}>{iWon ? `You defeated ${opponentName}!` : `You were defeated by ${opponentName}.`}</p>
+              {uid && battle.pvpRewards?.[uid] && (
+                <p className={styles.canvasEarnings}>
+                  +{battle.pvpRewards[uid].xp} XP{battle.pvpRewards[uid].gold > 0 && ` · +${battle.pvpRewards[uid].gold}g`}
+                </p>
+              )}
               <p className={styles.canvasMessageHint}>Both of you have been restored to full health.</p>
             </div>
           )}

@@ -75,6 +75,7 @@ async function startPvpBattleInTransaction(
     lastWaveRewards: null,
     continueVotes: {},
     winnerUid: null,
+    pvpRewards: null,
     startedAt: now,
     updatedAt: now,
   };

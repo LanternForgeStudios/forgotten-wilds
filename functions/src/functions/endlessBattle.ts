@@ -168,6 +168,7 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
       lastWaveRewards: null,
       continueVotes: {},
       winnerUid: null,
+      pvpRewards: null,
       startedAt: now,
       updatedAt: now,
     };

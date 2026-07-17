@@ -57,6 +57,12 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   // when the player actually commits their turn's real action (see submit()).
   const [itemsUsedThisTurn, setItemsUsedThisTurn] = useState(0);
   const [confirmLeave, setConfirmLeave] = useState(false);
+  // Per-viewer, client-only preference (never sent to the server or synced to other
+  // participants) - collapses the stagger between multiple enemies' attacks in *this player's own*
+  // canvas so a round plays out all at once instead of one attacker at a time. Matches solo
+  // combat's own fastRounds (CombatScene.tsx) exactly: purely a local animation-pacing choice, so
+  // one player toggling it has zero effect on what anyone else in the same battle sees.
+  const [fastRounds, setFastRounds] = useState(false);
   const [busy, setBusy] = useState(false);
   // Synchronous guard alongside `busy` (React state) - a fast double-click can fire two submit()
   // calls in the same tick before a state update re-renders the disabled buttons, both reading the
@@ -361,7 +367,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
             outgoingHits={activeOutgoingHits}
             incomingHits={activeIncomingHits}
             playerMaxHp={me?.maxHp ?? 1}
-            fastRounds={false}
+            fastRounds={fastRounds}
             targetIndex={selectedTarget}
             targetMode={targetMode}
             canPickTarget={canAct && aliveEnemies.length > 1}
@@ -468,6 +474,18 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
         )}
 
         {error && <p className={styles.error}>{error}</p>}
+
+        {battle.status === 'active' && (
+          <button
+            type="button"
+            className={styles.smallButton}
+            disabled={playbackActive}
+            onClick={() => setFastRounds((f) => !f)}
+            title="When multiple enemies attack in the same round, let their attacks land together instead of staggered one at a time. Only affects your own view - not synced to other players."
+          >
+            Fast Rounds: {fastRounds ? 'On' : 'Off'}
+          </button>
+        )}
 
         {battle.status === 'active' && me && me.hp > 0 && (
           <>

@@ -290,11 +290,12 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       const fleeingName = battle.participantStats[uid]?.name ?? uid;
       if (battle.mode === 'pvp') {
         const opponentUid = battle.participants.find((p) => p !== uid)!;
-        await restoreAndRewardPvpParticipants(tx, db, opponentUid, uid, battle.partyAverageLevel);
+        const pvpRewards = await restoreAndRewardPvpParticipants(tx, db, opponentUid, uid, battle.partyAverageLevel);
         for (const p of battle.participants) tx.delete(db.collection('partyBattleLocks').doc(p));
         tx.update(battleRef, {
           status: 'victory',
           winnerUid: opponentUid,
+          pvpRewards,
           lastTurnResult: { round: battle.round, log: [`${fleeingName} forfeits the match.`], resolvedAt: now },
           updatedAt: now,
         });
@@ -544,12 +545,13 @@ async function resolvePvpBattleTurn(
     // of being independently re-read (which would violate Firestore's "every read before any
     // write" transaction rule, since deductConsumedItems' write hasn't landed yet at this point -
     // it's only ever actually written inside this same call).
-    await restoreAndRewardPvpParticipants(tx, db, winnerUid, loserUid, battle.partyAverageLevel, activePreFetch);
+    const pvpRewards = await restoreAndRewardPvpParticipants(tx, db, winnerUid, loserUid, battle.partyAverageLevel, activePreFetch);
     for (const p of battle.participants) tx.delete(db.collection('partyBattleLocks').doc(p));
     tx.update(battleRef, {
       participantStats: nextParticipantStats,
       status: 'victory',
       winnerUid,
+      pvpRewards,
       lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, pvpHit: turnResult.hit },
       updatedAt: now,
     });
@@ -588,7 +590,9 @@ const PVP_LOSER_XP_FRACTION = 0.25;
 /** Restores both real saves to full HP/Spirit/Oil ("full restore before and after" per the design
  *  doc) and grants the winner/loser their end-of-match rewards, in one read-modify-write per user
  *  doc - see this function's one call site for why restore and reward can't be two separate writes
- *  within the same transaction. */
+ *  within the same transaction. Returns what was actually granted (per uid) so callers can persist
+ *  it onto the battle doc as `pvpRewards` - otherwise a real reward is applied silently to the
+ *  save with nothing in the response for the client's victory screen to show. */
 async function restoreAndRewardPvpParticipants(
   tx: Transaction,
   db: Firestore,
@@ -596,7 +600,7 @@ async function restoreAndRewardPvpParticipants(
   loserUid: string,
   level: number,
   preFetched?: PreFetchedSave,
-): Promise<void> {
+): Promise<Record<string, { xp: number; gold: number }>> {
   const winnerXp = PVP_WINNER_BASE_XP + level * PVP_WINNER_XP_PER_LEVEL;
   const winnerGold = PVP_WINNER_BASE_GOLD + level * PVP_WINNER_GOLD_PER_LEVEL;
   const loserXp = Math.round(winnerXp * PVP_LOSER_XP_FRACTION);
@@ -628,6 +632,11 @@ async function restoreAndRewardPvpParticipants(
     loserSave.updatedAt = now;
     tx.set(db.collection('users').doc(loserUid), loserSave);
   }
+
+  return {
+    [winnerUid]: { xp: winnerXp, gold: winnerGold },
+    [loserUid]: { xp: loserXp, gold: 0 },
+  };
 }
 
 /** Grants independent xp/gold/loot to every alive participant for the wave just won, plus a bonus

@@ -489,6 +489,11 @@ export interface PartyBattleSession {
    *  mode; PvP's win/loss is per-uid, which the shared PartyBattleStatus field alone can't express -
    *  see pvpBattle.ts. */
   winnerUid: string | null;
+  /** PvP-only - what each participant was actually granted once the match ended (winner gets
+   *  xp+gold, loser gets a reduced xp-only consolation - see restoreAndRewardPvpParticipants in
+   *  partyBattle.ts). null until the match ends; stays null for Endless Battle (see lastWaveRewards
+   *  instead). */
+  pvpRewards: Record<string, { xp: number; gold: number }> | null;
   startedAt: number;
   updatedAt: number;
 }
