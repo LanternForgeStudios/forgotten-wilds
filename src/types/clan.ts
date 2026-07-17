@@ -34,3 +34,14 @@ export interface ClanInvite {
   status: ClanInviteStatus;
   createdAt: number;
 }
+
+/** One row of getClanLeaderboard's response (functions/src/functions/clan.ts) - a stripped-down
+ *  ClanDoc (no memberUids/leaderUid/xp) since this is returned for every clan on the board, not
+ *  just ones the caller is a member of. */
+export interface ClanLeaderboardEntry {
+  id: string;
+  name: string;
+  tag: string;
+  level: number;
+  highestEndlessWave: number;
+}

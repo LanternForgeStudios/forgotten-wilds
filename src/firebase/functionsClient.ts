@@ -1,6 +1,7 @@
 import { httpsCallable } from 'firebase/functions';
 import type {
   ActiveAilment,
+  ClanLeaderboardEntry,
   CombatAction,
   EnemyTier,
   PartyBattleParticipantStats,
@@ -434,6 +435,12 @@ export async function callTransferClanLeadership(toUid: string): Promise<{ newLe
 
 export async function callDisbandClan(): Promise<{ disbanded: true }> {
   const fn = httpsCallable<void, { disbanded: true }>(functions, 'disbandClan');
+  const result = await fn();
+  return result.data;
+}
+
+export async function callGetClanLeaderboard(): Promise<{ entries: ClanLeaderboardEntry[] }> {
+  const fn = httpsCallable<void, { entries: ClanLeaderboardEntry[] }>(functions, 'getClanLeaderboard');
   const result = await fn();
   return result.data;
 }

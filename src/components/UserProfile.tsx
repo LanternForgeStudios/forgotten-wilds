@@ -38,6 +38,7 @@ import {
   callRemoveFromClan,
   callTransferClanLeadership,
   callDisbandClan,
+  callGetClanLeaderboard,
   callStartEndlessBattle,
   callSetDisplayName,
   callChallengeToPvp,
@@ -58,6 +59,7 @@ import { MAX_CLAN_SIZE } from '@/types';
 import type {
   ClanDoc,
   ClanInvite,
+  ClanLeaderboardEntry,
   DirectMessage,
   FriendRequest,
   OnlinePresence,
@@ -138,6 +140,9 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const [newClanTag, setNewClanTag] = useState('');
   const [clanInviteQuery, setClanInviteQuery] = useState('');
   const [clanInviteResults, setClanInviteResults] = useState<{ uid: string; displayName: string }[]>([]);
+  const [showClanLeaderboard, setShowClanLeaderboard] = useState(false);
+  const [clanLeaderboard, setClanLeaderboard] = useState<ClanLeaderboardEntry[] | null>(null);
+  const [clanLeaderboardError, setClanLeaderboardError] = useState<string | null>(null);
 
   // --- PvP (Phase D) state - challenges/matchmaking, shown from the Friends tab ---
   const [incomingPvpChallenges, setIncomingPvpChallenges] = useState<PvpChallengeDoc[]>([]);
@@ -564,6 +569,25 @@ export function UserProfile({ onClose }: UserProfileProps) {
       setClanError(err instanceof Error ? err.message : 'Could not disband the clan.');
     } finally {
       setClanBusy(false);
+    }
+  }
+
+  // Not membership-gated - any signed-in player can view the board (see getClanLeaderboard's own
+  // doc comment on why this needs a Cloud Function rather than a direct client query). Loads once
+  // per "open" click rather than subscribing live - an all-time leaderboard doesn't need to be
+  // real-time, and re-fetching on demand avoids holding open a listener across every clan's doc.
+  async function toggleClanLeaderboard() {
+    if (showClanLeaderboard) {
+      setShowClanLeaderboard(false);
+      return;
+    }
+    setShowClanLeaderboard(true);
+    setClanLeaderboardError(null);
+    try {
+      const { entries } = await callGetClanLeaderboard();
+      setClanLeaderboard(entries);
+    } catch (err) {
+      setClanLeaderboardError(err instanceof Error ? err.message : 'Could not load the leaderboard.');
     }
   }
 
@@ -1033,9 +1057,34 @@ export function UserProfile({ onClose }: UserProfileProps) {
 
         {tab === 'clan' && (
           <div className={styles.section}>
-            {clanError && <p className={styles.error}>{clanError}</p>}
+            <button className={styles.smallButton} onClick={toggleClanLeaderboard}>
+              {showClanLeaderboard ? 'Back' : 'View Leaderboard'}
+            </button>
 
-            {incomingClanInvites.length > 0 && (
+            {showClanLeaderboard ? (
+              <>
+                <h3 className={styles.sectionTitle}>Highest Wave Reached</h3>
+                {clanLeaderboardError && <p className={styles.error}>{clanLeaderboardError}</p>}
+                {!clanLeaderboardError && !clanLeaderboard && <p className={styles.empty}>Loading...</p>}
+                {clanLeaderboard?.length === 0 && <p className={styles.empty}>No clans have entered an Endless Battle yet.</p>}
+                {clanLeaderboard && clanLeaderboard.length > 0 && (
+                  <div className={styles.list}>
+                    {clanLeaderboard.map((entry, i) => (
+                      <div key={entry.id} className={styles.row} style={entry.id === clanId ? { fontWeight: 'bold' } : undefined}>
+                        <span className={styles.rowName}>
+                          #{i + 1} {entry.name} [{entry.tag}] {entry.id === clanId ? '(you)' : ''}
+                        </span>
+                        <span>Wave {entry.highestEndlessWave}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {clanError && <p className={styles.error}>{clanError}</p>}
+
+                {incomingClanInvites.length > 0 && (
               <>
                 <h3 className={styles.sectionTitle}>Clan Invites</h3>
                 <div className={styles.list}>
@@ -1165,10 +1214,12 @@ export function UserProfile({ onClose }: UserProfileProps) {
               </>
             )}
 
-            {!clanId && incomingClanInvites.length === 0 && (
-              <p className={styles.empty} style={{ marginTop: 12 }}>
-                Not in a clan yet - create one above, or wait for an invite.
-              </p>
+                {!clanId && incomingClanInvites.length === 0 && (
+                  <p className={styles.empty} style={{ marginTop: 12 }}>
+                    Not in a clan yet - create one above, or wait for an invite.
+                  </p>
+                )}
+              </>
             )}
           </div>
         )}

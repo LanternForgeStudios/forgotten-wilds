@@ -320,3 +320,35 @@ export const disbandClan = onCall(async (request) => {
     return { disbanded: true };
   });
 });
+
+const LEADERBOARD_SIZE = 20;
+
+export interface ClanLeaderboardEntry {
+  id: string;
+  name: string;
+  tag: string;
+  level: number;
+  highestEndlessWave: number;
+}
+
+/** Read-only, all-time (not weekly) ranking by highest Endless Battle wave reached - see
+ *  prepareClanHighestWaveUpdate (partyBattle.ts) for where that field actually gets written.
+ *  firestore.rules only lets a clan's own members read its doc, so a plain client-side query
+ *  across every clan isn't possible - this bypasses that the same way searchUsers.ts bypasses
+ *  userDirectory's own per-doc rules, via an Admin-SDK query any signed-in caller can invoke.
+ *  Deliberately strips each doc down to display fields only (no memberUids/leaderUid/xp) rather
+ *  than returning full ClanDocs for clans the caller isn't a member of. */
+export const getClanLeaderboard = onCall(async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
+
+  const db = getFirestore();
+  const snap = await db.collection('clans').orderBy('highestEndlessWave', 'desc').limit(LEADERBOARD_SIZE).get();
+
+  const entries: ClanLeaderboardEntry[] = snap.docs.map((d) => {
+    const clan = d.data() as ClanDoc;
+    return { id: clan.id, name: clan.name, tag: clan.tag, level: clan.level, highestEndlessWave: clan.highestEndlessWave };
+  });
+
+  return { entries };
+});

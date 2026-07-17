@@ -12,6 +12,7 @@ import { ITEMS } from '../data/items';
 import { EQUIPMENT } from '../data/equipment';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import type {
+  ClanDoc,
   CombatAction,
   CombatActionType,
   PartyBattleParticipantStats,
@@ -301,12 +302,14 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         });
         return { resolved: true, status: 'victory' as const, winnerUid: opponentUid };
       }
+      const bumpClanWave = await prepareClanHighestWaveUpdate(tx, db, battle.clanId, battle.wave);
       await restoreParticipantsAndClearLocks(tx, db, battle.participants);
       tx.update(battleRef, {
         status: 'withdrawn',
         lastTurnResult: { round: battle.round, log: [`${fleeingName} flees - the party withdraws from the battle.`], resolvedAt: now },
         updatedAt: now,
       });
+      bumpClanWave?.();
       return { resolved: true, status: 'withdrawn' as const };
     }
 
@@ -449,6 +452,8 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     const partyDefeated = battle.participants.every((p) => nextParticipantStats[p].hp <= 0);
 
     if (partyDefeated) {
+      const bumpClanWave =
+        battle.mode === 'endless' ? await prepareClanHighestWaveUpdate(tx, db, battle.clanId, battle.wave) : null;
       if (battle.mode === 'endless') {
         await restoreParticipantsAndClearLocks(tx, db, battle.participants, activePreFetch);
       }
@@ -459,6 +464,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyPhase.enemyHits },
         updatedAt: now,
       });
+      bumpClanWave?.();
       return { resolved: true, status: 'defeated' as const };
     }
 
@@ -690,6 +696,30 @@ async function grantWaveRewards(
   });
 
   return summary;
+}
+
+/** Reads clans/{clanId} (if this battle has one) and, if `wave` is a new high for that clan,
+ *  returns a closure that bumps highestEndlessWave when called - deliberately split into a
+ *  read-now/write-later pair rather than writing directly, since Firestore transactions require
+ *  every read to happen before any write, and this needs to be called from several different
+ *  places an Endless Battle run can end (voluntary withdraw, party wipe), each already partway
+ *  through building up its own batch of writes by the time this fires. Returns null (a no-op) for
+ *  PvP, a clan-less battle, an already-deleted clan, or a wave that isn't actually a new record -
+ *  `clans/{clanId}.highestEndlessWave` was otherwise dead: initialized to 0 by createClan and never
+ *  written by any real gameplay. */
+export async function prepareClanHighestWaveUpdate(
+  tx: Transaction,
+  db: Firestore,
+  clanId: string | null,
+  wave: number,
+): Promise<(() => void) | null> {
+  if (!clanId) return null;
+  const clanRef = db.collection('clans').doc(clanId);
+  const clanSnap = await tx.get(clanRef);
+  if (!clanSnap.exists) return null;
+  const clan = clanSnap.data() as ClanDoc;
+  if (wave <= clan.highestEndlessWave) return null;
+  return () => tx.update(clanRef, { highestEndlessWave: wave, updatedAt: Date.now() });
 }
 
 /** Restores every participant's real save to full HP/Spirit/Oil - "after the run ends... every

@@ -1,7 +1,13 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type DocumentReference, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { rollWaveEnemies } from '../engine/endlessBattleEngine';
-import { restoreParticipantsAndClearLocks, fullyRestoredParticipantStats, rollBattleBackgroundAssetId, TURN_TIMEOUT_MS } from './partyBattle';
+import {
+  restoreParticipantsAndClearLocks,
+  fullyRestoredParticipantStats,
+  rollBattleBackgroundAssetId,
+  prepareClanHighestWaveUpdate,
+  TURN_TIMEOUT_MS,
+} from './partyBattle';
 import { MAX_CLAN_SIZE } from '../shared-types';
 import type {
   ClanDoc,
@@ -210,8 +216,10 @@ export const voteContinueEndlessBattle = onCall<VoteContinueEndlessBattleRequest
     if (battle.status !== 'awaitingContinueVote') return { status: battle.status };
 
     if (!wantsToContinue) {
+      const bumpClanWave = await prepareClanHighestWaveUpdate(tx, db, battle.clanId, battle.wave);
       await restoreParticipantsAndClearLocks(tx, db, battle.participants);
       tx.update(battleRef, { status: 'withdrawn', updatedAt: Date.now() });
+      bumpClanWave?.();
       return { status: 'withdrawn' as const };
     }
 
