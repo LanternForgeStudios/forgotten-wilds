@@ -1873,7 +1873,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 72, height: 72 },
     status: 'placeholder',
     notes:
-      'Generated SVG placeholder. Final art should be a painted building facade sized to its footprint. Dimensions bumped 48x48 -> 72x72 (docs/Asset-Production-Checklist.md\'s "1.5x-proportional to the new 72x96 player/NPC size") - this is metadata only, purely descriptive for object-type sprites (Phaser renders at the loaded texture\'s own native pixel size, not this field), so it doesn\'t change how the current placeholder SVG looks.',
+      'Generated SVG placeholder. Final art should be a painted building facade sized to its footprint. Dimensions bumped 48x48 -> 72x72 (docs/Asset-Production-Checklist.md\'s "1.5x-proportional to the new 72x96 player/NPC size") - the placeholder SVG itself was regenerated at this size too (its width/height attrs, not the internal viewBox/artwork), so it now actually renders at 72x72 in-game, not just documented as the target.',
   },
   {
     id: 'structure.shop',
@@ -1973,7 +1973,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 48, height: 48 },
     status: 'placeholder',
     notes:
-      'Generated SVG placeholder. Dimensions bumped 32x32 -> 48x48 per docs/Asset-Production-Checklist.md\'s current target spec - metadata only, doesn\'t change how the current placeholder SVG renders (see structure.house\'s note).',
+      'Generated SVG placeholder. Dimensions bumped 32x32 -> 48x48 per docs/Asset-Production-Checklist.md\'s current target spec - the placeholder SVG was regenerated at this size too (see structure.house\'s note), so it now actually renders at 48x48.',
   },
   {
     id: 'structure.chest-open',
