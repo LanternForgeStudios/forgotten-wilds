@@ -414,7 +414,7 @@
       "name": "velmora-environments",
       "image": "../../../public/assets/tilesets/VelmoraRealms-Environments_Free-16.png",
       "imagewidth": 160,
-      "imageheight": 104,
+      "imageheight": 96,
       "tilewidth": 16,
       "tileheight": 16,
       "margin": 0,

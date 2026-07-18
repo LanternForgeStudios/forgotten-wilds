@@ -426,19 +426,20 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'tileset',
     intendedUse: 'VelmoraRealms-branded pack: environment tiles - source art for tileset.velmora-environments-16, the version actually used by 16x16-grid maps',
     filePath: 'tilesets/VelmoraRealms-Environments_Free.png',
-    dimensions: { width: 320, height: 208 },
+    dimensions: { width: 320, height: 192 },
     status: 'placeholder',
-    notes: 'provenance unconfirmed, verify license before shipping as final.',
+    notes:
+      'provenance unconfirmed, verify license before shipping as final. Originally 320x208 with a dead 16px bottom strip that wasn\'t a multiple of the 32px tile height (Tiled\'s own declared columns=10/tilecount=60 already only used the top 6 full rows, ignoring it, but Phaser logged an "Image tile area not tile size multiple" warning on every load) - cropped to 320x192 to match what was actually being used, no tile content lost.',
   },
   {
     id: 'tileset.velmora-environments-16',
     category: 'tileset',
     intendedUse: "VelmoraRealms-Environments_Free.png pre-scaled to a 16x16 tile grid (from its native 32x32) - used by every Ash Hallow building interior map instead of the runtime ExplorationScene.ts pre-scaling fallback (see that file's own doc comment) so mismatched-grid maps get a real asset, not a canvas resize on first load",
     filePath: 'tilesets/VelmoraRealms-Environments_Free-16.png',
-    dimensions: { width: 160, height: 104 },
+    dimensions: { width: 160, height: 96 },
     status: 'placeholder',
     notes:
-      'Generated via scripts/genScaledTilesets.mjs (nearest-neighbor downscale of tileset.velmora-environments, same provenance/license caveat as that source). Source image has a 16x208 partial/unused row (208 isn\'t a multiple of the 32px tile height) - this scaled copy inherits the same 8px leftover strip proportionally, harmless since Tiled\'s own declared columns/tilecount already ignores it.',
+      'Generated via scripts/genScaledTilesets.mjs (nearest-neighbor downscale of tileset.velmora-environments, same provenance/license caveat as that source).',
   },
   {
     id: 'enemy.velmora-slime-animation',
