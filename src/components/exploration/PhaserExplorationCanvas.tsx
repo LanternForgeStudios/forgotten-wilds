@@ -62,6 +62,15 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
   const gameRef = useRef<Phaser.Game | null>(null);
   const sceneRef = useRef<ExplorationScene | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
+  // True from mount until the *currently requested* map has actually finished building its tile
+  // layers (texture loads included) - covers the gap ExplorationScene's own async loadMap leaves
+  // invisible to React. Without this, a slow load (cold cache, a flaky connection) showed a bare
+  // dark canvas with only the player sprite floating on it until the floor tiles popped in, which
+  // read as broken rather than "still loading." mapLoadGenerationRef guards against a stale
+  // resolution clearing this after a newer loadMap call has already superseded it (same pattern as
+  // ExplorationScene's own internal mapGeneration).
+  const [mapLoading, setMapLoading] = useState(true);
+  const mapLoadGenerationRef = useRef(0);
 
   // Created once and persists across every prop change - React StrictMode's dev-only
   // mount->cleanup->mount double-invoke is harmless as long as cleanup actually destroys the game
@@ -101,7 +110,11 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
 
   useEffect(() => {
     if (!sceneReady) return;
-    void sceneRef.current?.loadMap(map, tileSize);
+    const generation = ++mapLoadGenerationRef.current;
+    setMapLoading(true);
+    void sceneRef.current?.loadMap(map, tileSize).then(() => {
+      if (mapLoadGenerationRef.current === generation) setMapLoading(false);
+    });
   }, [sceneReady, map, tileSize]);
 
   useEffect(() => {
@@ -125,5 +138,34 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
     sceneRef.current?.setViewport({ width: viewportWidthPx, height: viewportHeightPx });
   }, [sceneReady, viewportWidthPx, viewportHeightPx]);
 
-  return <div ref={containerRef} style={{ width: viewportWidthPx, height: viewportHeightPx, overflow: 'hidden' }} />;
+  const loading = !sceneReady || mapLoading;
+
+  return (
+    <div style={{ position: 'relative', width: viewportWidthPx, height: viewportHeightPx, overflow: 'hidden' }}>
+      <div ref={containerRef} style={{ width: viewportWidthPx, height: viewportHeightPx }} />
+      {/* Covers the canvas until the requested map's tiles have actually finished building -
+       *  otherwise a slow load shows a bare dark canvas with only the player sprite floating on
+       *  it, which reads as broken rather than "still loading". Same background color as the
+       *  Phaser canvas itself so there's no color pop when it fades out. pointerEvents 'none' once
+       *  faded so it doesn't eat clicks/taps meant for the (now-ready) canvas underneath. */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#120e0b',
+          color: '#ece1cf',
+          fontSize: 14,
+          letterSpacing: 1,
+          opacity: loading ? 1 : 0,
+          transition: 'opacity 250ms ease-out',
+          pointerEvents: loading ? 'auto' : 'none',
+        }}
+      >
+        Loading...
+      </div>
+    </div>
+  );
 }
