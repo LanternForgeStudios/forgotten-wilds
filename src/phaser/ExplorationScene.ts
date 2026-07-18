@@ -46,6 +46,13 @@ const DASH_DUST_COLOR = 0xb8a888;
  *  see spawnDashDust's textures.exists guard for the (rare) fallback path. */
 const DASH_DUST_FX_ASSET_ID = 'fx.smoke-puff';
 
+/** Texture-cache key for a tileset's map-grid-scaled copy - see loadMap's tileset pre-scaling
+ *  step. Namespaced by target size (not just the source asset id) so the same tileset loaded for
+ *  two different maps with different grid sizes wouldn't collide on one cached texture. */
+function scaledTilesetKey(assetId: string, tileWidth: number, tileHeight: number): string {
+  return `${assetId}__scaled-${tileWidth}x${tileHeight}`;
+}
+
 interface EntityVisual {
   sprite: Phaser.GameObjects.Sprite;
   /** The spriteAssetId this sprite was last textured with - lets upsertEntity detect a change
@@ -138,6 +145,38 @@ export class ExplorationScene extends Phaser.Scene {
     // abort rather than build tile layers for a location we've already left.
     if (generation !== this.mapGeneration) return;
 
+    // A tileset's own tile size can differ from the map's grid (e.g. a 32px prop sheet on a 16px-
+    // grid map) - this project's tilesets are all configured in Tiled with "Tile Render Size: Map
+    // Grid Size" + "Fill Mode: Preserve Aspect Ratio" (confirmed by hand against a real map,
+    // whisper-falls.json), meaning Tiled draws every tile scaled DOWN to fit its own single grid
+    // cell, never overflowing into neighbors. An earlier version of this code assumed the opposite
+    // (tiles drawn at native size, overflowing bottom-left-anchored per Tiled's usual convention
+    // for *unscaled* oversized tiles) - that was the wrong mental model for this project's actual
+    // tileset config and only partially matched real Tiled output. Phaser's Tileset/Tile classes
+    // have no "slice at native size, draw at a different size" mode of their own (the renderer
+    // draws each tile at exactly `tileset.tileWidth/tileHeight`, the same value used to slice
+    // frames from the source image), so the fix happens one level up: pre-scale the whole source
+    // texture down to the map's grid size *before* handing it to addTilesetImage, so slicing and
+    // drawing both naturally happen at the already-correct size - no per-tile position/scale hacks
+    // needed. Every current tileset and map grid here is square, so a uniform whole-image resize is
+    // exactly equivalent to Tiled's "preserve aspect ratio" fill mode (no letterboxing needed since
+    // the aspect ratio never actually differs) - this doesn't handle a hypothetical non-square
+    // mismatch, since nothing in this project has one yet.
+    for (const t of map.tilesets) {
+      if (t.tileWidth === map.tileWidth && t.tileHeight === map.tileHeight) continue;
+      const scaledKey = scaledTilesetKey(t.assetId, map.tileWidth, map.tileHeight);
+      if (this.textures.exists(scaledKey)) continue;
+      const source = this.textures.get(t.assetId).getSourceImage() as HTMLImageElement | HTMLCanvasElement;
+      const scale = Math.min(map.tileWidth / t.tileWidth, map.tileHeight / t.tileHeight);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(source.width * scale);
+      canvas.height = Math.round(source.height * scale);
+      const ctx = canvas.getContext('2d')!;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+      this.textures.addCanvas(scaledKey, canvas);
+    }
+
     const ground = map.layers.find((l) => l.name === 'ground');
     const decorationLayers = map.layers
       .filter((l) => /^decorations-\d+$/.test(l.name))
@@ -165,47 +204,21 @@ export class ExplorationScene extends Phaser.Scene {
     // not the raw 1-based Tiled firstgid - passing the raw value left `tiles[0]` (and every other
     // index in tileset 0's range) unpopulated, throwing inside Phaser's PutTileAt on the very first
     // tile and aborting the whole layer build silently (the map rendered as a blank room).
-    // Each tileset's OWN tileWidth/tileHeight (t.tileWidth/t.tileHeight) is used here, not the map's
-    // - a tileset can have a different native tile size than the map's grid (e.g. a 32px prop sheet
-    // on this 16px-grid map), same as Tiled itself always does. Passing the map's size for every
-    // tileset instead cropped the wrong sub-region of any tileset whose native size differed from
-    // it - exactly why the game's tiles looked different/wrong compared to opening the same file in
-    // the real Tiled editor, which always reads each tileset's own declared size correctly.
-    const tilesets = map.tilesets.map((t) => tilemap.addTilesetImage(t.assetId, t.assetId, t.tileWidth, t.tileHeight, 0, 0, t.firstgid - 1)!);
-
-    // Tiled anchors every orthogonal tile at its grid cell's BOTTOM-left corner, not top-left -
-    // invisible when a tileset's own tile size matches the map's grid (the common case), but for a
-    // tileset whose native size is bigger (the intentional "32px prop sheet on a 16px-grid map"
-    // pattern the comment above already covers for image-slicing) Tiled lets the extra height grow
-    // *upward* from the cell. Phaser's own tile renderer always draws top-left anchored with no such
-    // compensation (confirmed by reading TilemapLayerCanvasRenderer.js/WebGLRenderer.js - both draw
-    // the tileset's native tileWidth/tileHeight straight from tile.pixelX/pixelY, which Phaser
-    // computes from the *map's* grid size, not the tileset's), so a tileset taller than the map's
-    // own tileHeight rendered exactly (tilesetTileHeight - map.tileHeight) pixels lower than its
-    // authored position in Tiled - confirmed by hand against a real map (whisper-falls.json mixes a
-    // 16px map grid with 32px/64px tilesets; the 64px water tiles were rendering a full 48px/3 map-
-    // tiles lower in-game than in Tiled, exactly matching this formula). Nudging pixelY up by that
-    // same amount after placement reproduces Tiled's bottom-anchor without needing to touch
-    // tile.bottom/right - those already describe the cell's own bottom/right edge, which Tiled's
-    // bottom-anchor convention keeps fixed in place (only the top edge moves for a taller tile).
-    function tilesetForGid(gid: number) {
-      let match = map.tilesets[0];
-      for (const t of map.tilesets) {
-        if (t.firstgid <= gid) match = t;
-        else break;
-      }
-      return match;
-    }
+    // A mismatched tileset now draws from its pre-scaled texture (built above) at the map's own
+    // tile size - already scaled correctly, so no per-tile position/size adjustment is needed below.
+    const tilesets = map.tilesets.map((t) => {
+      const mismatched = t.tileWidth !== map.tileWidth || t.tileHeight !== map.tileHeight;
+      const key = mismatched ? scaledTilesetKey(t.assetId, map.tileWidth, map.tileHeight) : t.assetId;
+      const tileWidth = mismatched ? map.tileWidth : t.tileWidth;
+      const tileHeight = mismatched ? map.tileHeight : t.tileHeight;
+      return tilemap.addTilesetImage(t.assetId, key, tileWidth, tileHeight, 0, 0, t.firstgid - 1)!;
+    });
 
     orderedLayers.forEach((layer, index) => {
       const phaserLayer = tilemap.createBlankLayer(layer.name, tilesets, 0, 0, map.width, map.height)!;
       layer.data.forEach((gid, i) => {
         if (gid <= 0) return;
-        const tile = phaserLayer.putTileAt(gid - 1, i % map.width, Math.floor(i / map.width));
-        const tilesetTileHeight = tilesetForGid(gid).tileHeight;
-        if (tile && tilesetTileHeight !== map.tileHeight) {
-          tile.pixelY -= tilesetTileHeight - map.tileHeight;
-        }
+        phaserLayer.putTileAt(gid - 1, i % map.width, Math.floor(i / map.width));
       });
       phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(this.viewportScale);
       const overhangMatch = /^overhang(?:-(\d+))?$/.exec(layer.name);
