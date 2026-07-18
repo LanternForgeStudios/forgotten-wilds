@@ -20,7 +20,8 @@ filenames below — just drop files into the matching subfolder and leave any no
   a text label) and is what needs replacing.
 - **Format**: PNG with transparency where the shape isn't a full rectangle (portraits, icons,
   battle/enemy sprites, character sprites). Battle backgrounds are full-bleed, no transparency
-  needed.
+  needed. Audio: WAV or MP3, whichever you have - music tracks should loop seamlessly (no dead air
+  or a hard cut at the loop point), sfx should be short one-shots.
 
 ## Priority order (highest visual impact first)
 
@@ -34,6 +35,9 @@ Battle backgrounds are already done (see above) — the biggest remaining "place
 4. **Structures & tilesets** — optional/lower priority. Most tilesets are already real (if
    unconfirmed-license) uploaded packs, several not yet wired into any map; see "Lower priority"
    below for what's actually worth spending time on here.
+5. **Audio** (7 music tracks + 20 sfx) — every track is currently a generated placeholder tone
+   loop; drop in whenever you have real audio, no particular urgency relative to the visual list
+   above.
 
 ## Shot list
 
@@ -127,6 +131,21 @@ visually distinct too (not required).
 **Currency (4)**: `icon.currency.gold` (32×32), `.spirit-essence` (32×32),
 `.festival-tokens`/`.premium-currency` (32×32, both unused placeholders reserved for future
 systems — low priority).
+
+### `art-staging/audio/music/` and `art-staging/audio/sfx/` — WAV/MP3
+
+All 7 music tracks and 20 sfx are currently procedurally-generated placeholder tone loops
+(`scripts/genPlaceholderAudio.mjs`), not real audio - every one of them is fair game to replace.
+Filename doesn't need to match exactly; just drop into the right subfolder (`music/` vs `sfx/`)
+and note which id it's for if it isn't obvious.
+
+**Music (7, `music/`)**: `music.title`, `music.town`, `music.overworld`, `music.dungeon`,
+`music.combat`, `music.combat-boss`, `music.defeat`.
+
+**SFX (20, `sfx/`)**: `sfx.ui-close`, `sfx.ui-error`, `sfx.purchase`, `sfx.sell`, `sfx.rest`,
+`sfx.equip`, `sfx.item-use`, `sfx.craft-success`, `sfx.chest-open`, `sfx.shrine`, `sfx.npc-talk`,
+`sfx.transition`, `sfx.combat-hit`, `sfx.enemy-defeated`, `sfx.victory`, `sfx.level-up`,
+`sfx.defeat`, `sfx.quest-started`, `sfx.quest-progress`, `sfx.quest-completed`, `sfx.social-ping`.
 
 ### Lower priority / optional
 
