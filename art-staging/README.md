@@ -20,8 +20,11 @@ filenames below — just drop files into the matching subfolder and leave any no
   a text label) and is what needs replacing.
 - **Format**: PNG with transparency where the shape isn't a full rectangle (portraits, icons,
   battle/enemy sprites, character sprites). Battle backgrounds are full-bleed, no transparency
-  needed. Audio: WAV or MP3, whichever you have - music tracks should loop seamlessly (no dead air
-  or a hard cut at the loop point), sfx should be short one-shots.
+  needed. Audio: MP3 or OGG preferred for music (much smaller than WAV for a 60-120s loop; WAV is
+  fine too if that's what you have), any of WAV/MP3/OGG fine for sfx at that length - music tracks
+  should loop seamlessly (no dead air or a hard cut at the loop point), sfx should be short
+  one-shots. See `docs/Asset-Production-Checklist.md`'s Audio section for the full per-track/
+  per-cue spec and generation prompts.
 
 ## Priority order (highest visual impact first)
 

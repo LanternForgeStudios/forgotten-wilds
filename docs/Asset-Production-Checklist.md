@@ -132,26 +132,89 @@ label.
 **Door**: **48×96 PNG**, transparent background - a standalone wooden door (not currently placed on
 any map, but stubbed for future building-entrance use). Rustic plank door, iron hinges.
 
-## Icons (54 - inventory/equipment/currency)
+## Icons (52 - inventory/equipment/currency)
 
-**64×64 tier (50 items)**: consumables, ailment-cure items, the 6 battlefield ailment status icons,
-all named equipment (21 pieces across 7 rarity families - Walking Staff, Keeper Coat, Traveler
-Boots, Work Gloves, Mountain Charm, Mountain Spirits totems, and 2 unique lanterns), and the two
-Iron Mountains Side Quest key items (`icon.item.frostbound-treatise`, `icon.item.ember-codex` -
-docs/Mytherra-SQ_breakdown.md).
-**Spec**: 64×64 PNG, transparent background, single centered object, simple flat lighting (these are
-small UI icons, not illustrations - avoid busy detail that won't read at 64px).
+**Spec (all tiers)**: PNG, transparent background, single centered object, simple flat-shaded
+lighting - these are small UI icons, not illustrations, so avoid busy detail that won't read at
+64px (or 32px for currency). Every prompt below already opens with "Simple flat-shaded fantasy
+game icon of..." so it's ready to use as-is - no template filling-in needed.
 
-Generation prompt template: "Simple flat-shaded fantasy game icon of a [item], centered, transparent
-background, warm muted color palette, readable at small size." Fill in `[item]` per id - e.g.
-"a glass vial of glowing green healing poultice," "a small lit brass lantern," "a pair of worn
-leather traveler's boots," "a carved wolf-totem charm," "a weathered leather-bound manuscript rimed
-with frost" (frostbound-treatise), "a scorched, ember-warm leather codex" (ember-codex).
+### Items (22 - 64×64: consumables, materials, key items)
 
-**32×32 tier (4 currency icons)**: `icon.currency.gold`, `spirit-essence`, `festival-tokens`,
-`premium-currency`. Same flat-icon spec, smaller. Generation prompt: "Simple flat fantasy currency
-icon - [a gold coin / a glowing spirit-essence orb / a festival token / a premium gem], centered,
-transparent background."
+| Item | Size | Generation prompt |
+|---|---|---|
+| Healing Poultice *(shared by all 4 tiers)* | 64×64 | Simple flat-shaded fantasy game icon of a small clay jar of green herbal healing poultice, cloth tied over the top, centered, transparent background. |
+| Spirit Draught *(shared by all 4 tiers)* | 64×64 | Simple flat-shaded fantasy game icon of a corked glass bottle of glowing pale starlight-blue liquid, centered, transparent background. |
+| Lantern Oil *(shared by all 4 tiers)* | 64×64 | Simple flat-shaded fantasy game icon of a small tin oil flask with a narrow spout, amber lantern oil visible inside, centered, transparent background. |
+| Antidote | 64×64 | Simple flat-shaded fantasy game icon of a small dark apothecary vial with a faint sickly-green tint and a cork stopper, centered, transparent background. |
+| Burn Salve | 64×64 | Simple flat-shaded fantasy game icon of a small round tin of pale cooling herbal salve, lid slightly ajar, centered, transparent background. |
+| Thaw Crystal | 64×64 | Simple flat-shaded fantasy game icon of a warm-glowing orange-red crystal shard with a faint heat shimmer, centered, transparent background. |
+| Eye Drops | 64×64 | Simple flat-shaded fantasy game icon of a tiny glass dropper bottle with a clear pale-blue tint, centered, transparent background. |
+| Echo Herb | 64×64 | Simple flat-shaded fantasy game icon of a small bundle of dried silver-green leaves tied with twine, centered, transparent background. |
+| Moth Dust | 64×64 | Simple flat-shaded fantasy game icon of a small pinch of glittering silver-white dust with a faint sparkle, centered, transparent background. |
+| Rusted Token | 64×64 | Simple flat-shaded fantasy game icon of a worn, rust-orange mine-shift coin stamped with a faded number, centered, transparent background. |
+| Ember Shard | 64×64 | Simple flat-shaded fantasy game icon of a small jagged coal-black shard with a faintly glowing ember-orange core, centered, transparent background. |
+| Wolf Fang | 64×64 | Simple flat-shaded fantasy game icon of a single curved, sharp ivory-white wolf fang, centered, transparent background. |
+| Silver Droplet | 64×64 | Simple flat-shaded fantasy game icon of a single perfectly round silver-blue water droplet with a faint glimmer, centered, transparent background. |
+| Withered Bramble | 64×64 | Simple flat-shaded fantasy game icon of a twisted knot of dark thorned bramble, faintly frost-touched, centered, transparent background. |
+| Stone Fragment *(key item - Guardian Sigil piece)* | 64×64 | Simple flat-shaded fantasy game icon of a pale stone shard etched with a faint glowing sigil, centered, transparent background. |
+| Water Fragment *(key item - Guardian Sigil piece)* | 64×64 | Simple flat-shaded fantasy game icon of a curved bead of ever-flowing blue water etched with a faint glowing sigil, centered, transparent background. |
+| Wind Fragment *(key item - Guardian Sigil piece)* | 64×64 | Simple flat-shaded fantasy game icon of a wisp of pale-white captured wind swirling inside a small glass shape, faint glowing sigil, centered, transparent background. |
+| The Miner's Lost Lantern *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a battered, dented brass lantern relic with dark soot-stained glass, centered, transparent background. |
+| Warden's Ember Heart *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a molten-orange coal-and-ember heart-shaped core with a faint smoke wisp, centered, transparent background. |
+| Guardian Memory Fragment I *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a translucent pale-green shard holding a faint ghostly glowing memory-image, centered, transparent background. |
+| Frostbound Treatise *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of an old leather-bound manuscript rimed with frost, tied shut with cord, centered, transparent background. |
+| Ember Codex *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a scorched, ember-warm leather-bound codex with singed edges, centered, transparent background. |
+
+Note: the tiered potion upgrades (Greater/Superior/Pristine Healing Poultice, Greater/Superior/
+Pristine Spirit Draught, Thin/Superior/Pristine Lantern Oil) all reuse their base item's icon
+above rather than getting a unique one each - only make separate art for those if you want each
+tier to look visually distinct too (not required).
+
+### Ailment status icons (6 - 64×64, combat ailment strip badges)
+
+| Ailment | Size | Generation prompt |
+|---|---|---|
+| Poison | 64×64 | Simple flat-shaded fantasy game icon badge of a sickly-green skull-and-droplet symbol, centered, transparent background. |
+| Burn | 64×64 | Simple flat-shaded fantasy game icon badge of a small orange-red flame symbol, centered, transparent background. |
+| Freeze | 64×64 | Simple flat-shaded fantasy game icon badge of a pale-blue snowflake/ice-shard symbol, centered, transparent background. |
+| Stun | 64×64 | Simple flat-shaded fantasy game icon badge of small yellow spinning stars/dizzy-swirl symbol, centered, transparent background. |
+| Blind | 64×64 | Simple flat-shaded fantasy game icon badge of a grey crossed-out eye symbol, centered, transparent background. |
+| Silence | 64×64 | Simple flat-shaded fantasy game icon badge of a muted purple crossed-out sound-wave symbol, centered, transparent background. |
+
+### Equipment (20 - 64×64, across 7 rarity families + 2 unique lanterns)
+
+| Equipment | Size | Generation prompt |
+|---|---|---|
+| Weathered Walking Staff *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain wooden traveling staff worn smooth with age, centered, transparent background. |
+| Ironwood Walking Staff *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a heavier dark-wood staff cut from a single length of ironwood, centered, transparent background. |
+| Spiritwood Walking Staff *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a pale, faintly glowing living-wood staff with root-like grain, centered, transparent background. |
+| Worn Keeper Coat *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a patched, hand-me-down long coat in the Lantern Keeper cut, centered, transparent background. |
+| Reinforced Keeper Coat *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a sturdier Keeper coat lined with visible boiled-leather seams, centered, transparent background. |
+| Veteran Keeper Coat *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a battle-worn but well-kept Keeper coat with a subtle insignia, centered, transparent background. |
+| Traveler Boots *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain sturdy pair of leather traveling boots, centered, transparent background. |
+| Trail Boots *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a broken-in pair of ridge-trail boots with reinforced soles, centered, transparent background. |
+| Ranger Boots *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a light, sure-footed pair of scout's boots, centered, transparent background. |
+| Work Gloves *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain pair of leather work gloves, centered, transparent background. |
+| Leather Gauntlets *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a thicker pair of mine-crew leather gauntlets, centered, transparent background. |
+| Keeper's Gauntlets *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of reinforced gauntlets bearing a small Lantern Keeper mark, centered, transparent background. |
+| River Stone Charm *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a smooth grey river stone on a simple cord, centered, transparent background. |
+| Mountain Knot *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a cord tied in an intricate mountain-traveler knot pattern, centered, transparent background. |
+| Ghost Miner's Coin *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a pale, cold mine-shift coin with a faint ghostly glow, centered, transparent background. |
+| Lantern of the First Promise *(legendary - standard Keeper lantern)* | 64×64 | Simple flat-shaded fantasy game icon of a warm, steady brass lantern with a small flame inside, centered, transparent background. |
+| Lantern of Enduring Embers *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a weathered relic lantern with an unnervingly steady ember-orange flame, centered, transparent background. |
+| Stone Wolf Totem *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a small wolf figure carved from grey mountain stone, centered, transparent background. |
+| Mountain Guardian Totem *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a stone totem carved in the likeness of a great bear guardian, centered, transparent background. |
+| Traveler's Cloak *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain folded wool traveling cloak, centered, transparent background. |
+
+### Currency (4 - 32×32)
+
+| Currency | Size | Generation prompt |
+|---|---|---|
+| Gold | 32×32 | Simple flat-shaded fantasy game icon of a single gold coin, centered, transparent background. |
+| Spirit Essence | 32×32 | Simple flat-shaded fantasy game icon of a small glowing pale-blue spirit-essence orb, centered, transparent background. |
+| Festival Tokens *(unused, reserved for future systems - low priority)* | 32×32 | Simple flat-shaded fantasy game icon of a small carved wooden festival token, centered, transparent background. |
+| Premium Currency *(unused, reserved for future systems - low priority)* | 32×32 | Simple flat-shaded fantasy game icon of a small faceted gemstone, centered, transparent background. |
 
 ## UI (2 - low priority, already serviceable)
 
