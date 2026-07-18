@@ -108,29 +108,40 @@ rather than assuming they need to grow to match the buildings/NPCs above.
 
 ## Buildings, shrine, chest, door (1.5x-proportional to the new player size)
 
-**Building facades** (10: house/shop/inn/blacksmith/apothecary/armory/archive/mine-office/town-hall,
-plus the generic shrine marker): **72×72 PNG**, transparent background, a painted building-entrance
-facade (door + surrounding wall texture) sized to its footprint - matches the rustic mountain-town
-look of Ash Hallow (weathered wood, stone foundations, lantern-lit windows).
+**Spec**: PNG, transparent background, painterly rustic mountain-town style matching Ash Hallow
+(weathered wood, stone foundations, lantern-lit windows) - see per-row size and a fully-written
+generation prompt below, no template filling-in needed.
 
-Generation prompt (shared, vary the door/sign per building): "Small rustic mountain-town building
-facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn
-Appalachian fantasy town." Add per-building flavor: General Store (goods crates by the door),
-Inn (a hanging sign, warm glow), Blacksmith (an anvil visible, chimney smoke), Apothecary (dried
-herbs hanging in the window), Armory (a shield/weapon emblem on the door), Archive (an old stone
-facade with a carved sigil), Mine Office (a lantern-post and mining-cart rail nearby), Town Hall
-(slightly grander, a small bell tower or flag).
+### Building facades & shrine (10 - 72×72)
 
-**Shrine marker**: 72×72, same conventions - a small weathered stone shrine, moss-covered, with a
-faint spiritual glow (matches "a small stone shrine, half-forgotten" from its in-game flavor text).
+A painted building-entrance facade (door + surrounding wall texture) sized to its footprint, one
+per building, plus the shrine landmark marker using the same size/conventions.
 
-**Chest**: **48×48 PNG**, transparent background, two states needed - `structure.chest` (closed,
-wooden treasure chest, iron banding) and `structure.chest-open` (same chest, lid open, empty dark
-interior) - these are now genuinely separate sprites, not the same image reused with a different
-label.
+| Structure | Size | Generation prompt |
+|---|---|---|
+| House *(Elias Rowan's home)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - a modest personal home, a single potted herb by the doorstep. |
+| Shop *(Mara Ash's General Store)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - goods crates stacked by the door. |
+| Inn *(Ash Hallow Inn)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - a hanging inn sign, warm inviting glow from the windows. |
+| Blacksmith *(the Ash Hallow Forge)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - a visible anvil out front, a chimney with a wisp of smoke. |
+| Apothecary *(Willow's Apothecary)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - bundles of dried herbs hanging in the window. |
+| Armory *(the Ash Hallow Armory)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - a shield-and-weapon emblem carved into the door. |
+| Archive *(the Ash Hallow Archive)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - an old stone facade with a carved sigil above the door, deep-set narrow window. |
+| Mine Office *(the Ash Hallow Mine Office)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - a lantern-post out front and a mining-cart rail running past. |
+| Town Hall *(Ash Hallow Town Hall)* | 72×72 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - slightly grander scale than the other buildings, a small bell tower or flag above the door. |
+| Shrine *(landmark marker, e.g. Spirit Grove)* | 72×72 | Small weathered stone shrine, moss-covered, half-forgotten, faint spiritual glow, autumn Appalachian fantasy mountain setting - matches "a small stone shrine, half-forgotten" from its in-game flavor text. |
 
-**Door**: **48×96 PNG**, transparent background - a standalone wooden door (not currently placed on
-any map, but stubbed for future building-entrance use). Rustic plank door, iron hinges.
+### Chest (2 - 48×48, two distinct states)
+
+| Structure | Size | Generation prompt |
+|---|---|---|
+| Chest (closed) | 48×48 | Small wooden treasure chest, closed, iron banding and a metal clasp, weathered wood, transparent background, rustic Appalachian fantasy style. |
+| Chest (open) | 48×48 | Small wooden treasure chest, lid open, empty dark interior, iron banding, weathered wood, transparent background, rustic Appalachian fantasy style - same chest body/palette as the closed version, not a different label on the same image. |
+
+### Door (1 - 48×96)
+
+| Structure | Size | Generation prompt |
+|---|---|---|
+| Door *(standalone, not yet placed on any map - stubbed for future use)* | 48×96 | Standalone rustic wooden plank door with iron hinges, weathered, transparent background, matches the Ash Hallow building-facade style above. |
 
 ## Icons (52 - inventory/equipment/currency)
 
