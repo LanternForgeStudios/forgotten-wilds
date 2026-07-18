@@ -134,6 +134,9 @@ export function playDefeatEffect(
     quantity: 12,
     emitting: false,
   });
+  // See playFxBurst's identical comment - an emitter with no explicit depth renders behind the
+  // enemy sprite it's supposed to be bursting on top of.
+  emitter.setDepth(15);
   emitter.explode(12);
   scene.time.delayedCall(500, () => emitter.destroy());
 
@@ -164,6 +167,12 @@ export function playFxBurst(scene: Phaser.Scene, x: number, y: number, textureKe
     rotate: { min: -180, max: 180 },
     emitting: false,
   });
+  // A particle emitter with no explicit depth defaults below BattleScene's enemy sprites (depth
+  // 10) and their HP-bar/name chrome (11-12), so every burst this drives - ailment ticks/takes-
+  // hold, and the landed-hit blood/holy-light/magic-spark FX - rendered *behind* the enemy it was
+  // supposed to be bursting on top of. 15 clears all of that while staying under playFloatingText's
+  // 2000 (damage numbers must always stay readable on top of everything, FX included).
+  emitter.setDepth(15);
   emitter.explode(quantity);
   scene.time.delayedCall(1300, () => emitter.destroy());
 }
