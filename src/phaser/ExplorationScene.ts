@@ -142,18 +142,31 @@ export class ExplorationScene extends Phaser.Scene {
     // independently of whether the tile layers themselves get rebuilt).
     this.viewportScale = tileSize / map.tileWidth;
     if (this.currentMapKey === map.locationId) return;
-    this.currentMapKey = map.locationId;
     this.mapJustChanged = true;
     this.mapGeneration++;
     const generation = this.mapGeneration;
 
-    for (const layer of this.mapLayers) layer.destroy();
-    this.mapLayers = [];
-
-    await Promise.all(map.tilesets.map((t) => loadSceneTexture(this, t.assetId)));
+    try {
+      await Promise.all(map.tilesets.map((t) => loadSceneTexture(this, t.assetId)));
+    } catch (err) {
+      // A texture genuinely failed to load even after loadSceneTexture's own internal retry (a
+      // real, if rare, transient network/CDN failure - confirmed live against Graveyard_Set.png
+      // returning a bare 503) - deliberately does NOT set currentMapKey, so the *next* loadMap
+      // call for this same location doesn't hit the "already loaded" early-return above and skip
+      // retrying for real (e.g. leaving and re-entering the location). Also deliberately leaves
+      // whatever tile layers are already on screen alone rather than tearing them down first -
+      // showing the previous location's floor a moment longer beats a blank/broken scene for one
+      // that can't actually be built right now.
+      console.error(`ExplorationScene.loadMap: failed to load tileset textures for "${map.locationId}"`, err);
+      throw err;
+    }
     // A newer loadMap call (a second, rapid location transition) has since superseded this one -
     // abort rather than build tile layers for a location we've already left.
     if (generation !== this.mapGeneration) return;
+
+    this.currentMapKey = map.locationId;
+    for (const layer of this.mapLayers) layer.destroy();
+    this.mapLayers = [];
 
     // A tileset's own tile size can differ from the map's grid (e.g. a 32px prop sheet on a 16px-
     // grid map) - this project's tilesets are all configured in Tiled with "Tile Render Size: Map

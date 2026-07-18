@@ -70,6 +70,11 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
   // resolution clearing this after a newer loadMap call has already superseded it (same pattern as
   // ExplorationScene's own internal mapGeneration).
   const [mapLoading, setMapLoading] = useState(true);
+  // Set when loadMap's own promise rejects (a texture that genuinely failed to load, even after
+  // its internal retry - see textureLoader.ts/ExplorationScene.ts's own comments) rather than
+  // hanging on the loading overlay forever, which would otherwise look identical to "still
+  // loading" with no way to tell the player anything actually went wrong.
+  const [mapLoadError, setMapLoadError] = useState(false);
   const mapLoadGenerationRef = useRef(0);
 
   // Created once and persists across every prop change - React StrictMode's dev-only
@@ -112,9 +117,18 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
     if (!sceneReady) return;
     const generation = ++mapLoadGenerationRef.current;
     setMapLoading(true);
-    void sceneRef.current?.loadMap(map, tileSize).then(() => {
-      if (mapLoadGenerationRef.current === generation) setMapLoading(false);
-    });
+    setMapLoadError(false);
+    void sceneRef.current?.loadMap(map, tileSize).then(
+      () => {
+        if (mapLoadGenerationRef.current === generation) setMapLoading(false);
+      },
+      () => {
+        if (mapLoadGenerationRef.current === generation) {
+          setMapLoading(false);
+          setMapLoadError(true);
+        }
+      },
+    );
   }, [sceneReady, map, tileSize]);
 
   useEffect(() => {
@@ -139,6 +153,11 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
   }, [sceneReady, viewportWidthPx, viewportHeightPx]);
 
   const loading = !sceneReady || mapLoading;
+  // Stays visible (no fade) on a real failure, rather than fading away into whatever was left on
+  // screen (the previous location's tiles, or a blank canvas on a first-ever load) with no
+  // indication anything went wrong - see ExplorationScene.loadMap's own comment on why the old
+  // tiles are deliberately left in place rather than torn down for a map that couldn't be built.
+  const showOverlay = loading || mapLoadError;
 
   return (
     <div style={{ position: 'relative', width: viewportWidthPx, height: viewportHeightPx, overflow: 'hidden' }}>
@@ -153,18 +172,29 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
           position: 'absolute',
           inset: 0,
           display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: '#120e0b',
-          color: '#ece1cf',
+          color: mapLoadError ? '#e0a94a' : '#ece1cf',
           fontSize: 14,
           letterSpacing: 1,
-          opacity: loading ? 1 : 0,
+          textAlign: 'center',
+          padding: 16,
+          opacity: showOverlay ? 1 : 0,
           transition: 'opacity 250ms ease-out',
-          pointerEvents: loading ? 'auto' : 'none',
+          pointerEvents: showOverlay ? 'auto' : 'none',
         }}
       >
-        Loading...
+        {mapLoadError ? (
+          <>
+            <div>Couldn&apos;t load this area - probably a brief connection hiccup.</div>
+            <div>Try leaving and re-entering, or refreshing the page.</div>
+          </>
+        ) : (
+          'Loading...'
+        )}
       </div>
     </div>
   );
