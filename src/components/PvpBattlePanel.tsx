@@ -10,6 +10,7 @@ import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
 import { resolveDisplayNames } from '@/firebase/socialService';
 import { callSubmitPartyBattleAction, callUseItemInPartyBattle } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { getCurrentMusicId, playMusic, playSound } from '@/audio/audioService';
 import { getAssetUrl } from '@/assets/assetManager';
 import { AILMENTS, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
@@ -18,6 +19,12 @@ import { itemWouldHaveEffect } from '@/utils/itemEffect';
 import type { PartyBattleSession } from '@/types';
 // Reuses Endless Battle's stylesheet - same Panel/list/bar chrome, no PvP-specific classes needed.
 import styles from './EndlessBattlePanel.module.css';
+
+// PvP has no enemy board (the opponent is a single player, not an EndlessBattle-style enemy
+// roster) - PhaserBattleCanvas's enemyAilmentTakesHoldEvent prop is simply always this empty
+// sentinel here. A module-level constant, not an inline object literal, so it's a stable
+// reference across renders (this component's own effects don't need to re-fire from it).
+const NO_ENEMY_AILMENT_TAKES_HOLD_EVENT = { entries: [], key: 0 };
 
 interface PvpBattlePanelProps {
   battleId: string;
@@ -97,15 +104,42 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   }, [battle, battleId]);
 
   // The match's end (win or lose) restores both real saves and grants rewards server-side -
-  // resync once that lands.
+  // resync once that lands. Same transition also drives the win/loss sound cue - status is a
+  // single shared 'victory' for both participants, so which sound plays is decided per-viewer via
+  // winnerUid (see this component's own iWon below), mirroring CombatScene.tsx's sfx.victory/
+  // sfx.defeat + music.defeat.
   const prevStatusRef = useRef<string | null>(null);
   useEffect(() => {
     if (!battle || !uid) return;
     if (prevStatusRef.current !== battle.status && battle.status === 'victory') {
       void resyncSave(uid);
+      if (battle.winnerUid === uid) {
+        void playSound('sfx.victory');
+      } else {
+        void playSound('sfx.defeat');
+        void playMusic('music.defeat');
+      }
     }
     prevStatusRef.current = battle.status;
   }, [battle, uid]);
+
+  // Switches to combat music once real battle data first arrives, and restores whatever was
+  // playing before on unmount - see EndlessBattlePanel.tsx's identical wiring/reasoning (this
+  // panel is likewise an overlay, not a scene transition). No boss variant here - a PvP opponent
+  // is another player, not an enemy tier.
+  const previousMusicIdRef = useRef<string | null>(null);
+  const combatMusicStartedRef = useRef(false);
+  useEffect(() => {
+    if (!battle || combatMusicStartedRef.current) return;
+    combatMusicStartedRef.current = true;
+    previousMusicIdRef.current = getCurrentMusicId();
+    void playMusic('music.combat');
+  }, [battle]);
+  useEffect(() => {
+    return () => {
+      if (previousMusicIdRef.current) void playMusic(previousMusicIdRef.current);
+    };
+  }, []);
 
   // Structured hit data (Phase F1) drives the canvas's hit animation - but unlike Endless Battle's
   // shared enemy board, PvP's single `pvpHit` doesn't say *who* it was dealt to, since turns
@@ -134,6 +168,10 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
       setActiveIncomingHits([]);
       return;
     }
+    // Mirrors CombatScene.tsx's own sfx.combat-hit/sfx.enemy-defeated triggers - defeating a human
+    // opponent reuses the same "defeated" sting rather than a separate PvP-only asset.
+    if (!pvpHit.missed) void playSound('sfx.combat-hit');
+    if (pvpHit.defeated) void playSound('sfx.enemy-defeated');
     if (lastActorUid === uid) {
       setActiveOutgoingHits([{ targetIndex: 0, ...pvpHit, key: resolvedAt }]);
       setActiveIncomingHits([]);
@@ -338,6 +376,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             combatEnded={battle.status !== 'active'}
             ailmentFxEvent={ailmentFxEvent}
             ailmentTakesHoldEvent={ailmentTakesHoldEvent}
+            enemyAilmentTakesHoldEvent={NO_ENEMY_AILMENT_TAKES_HOLD_EVENT}
           />
           {battle.status === 'victory' && (
             <div className={styles.canvasMessage}>

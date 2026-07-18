@@ -106,6 +106,14 @@ export function stopMusic(): void {
   musicSound?.stop();
 }
 
+/** The track currently playing (or loading) - lets an overlay that temporarily takes over music
+ *  (Endless Battle/PvP's battle panels, which sit on top of Town/Overworld/Dungeon rather than
+ *  replacing it via a scene transition, so nothing else naturally resumes the prior track once the
+ *  overlay closes) snapshot it on open and restore it on close. */
+export function getCurrentMusicId(): string | null {
+  return currentMusicId;
+}
+
 // Keeps the currently-playing track reactive to the Settings tab without requiring every caller
 // to re-invoke playMusic - toggling music off pauses in place (resume() picks back up from the
 // same position, not a restart), and the volume slider applies live mid-track.

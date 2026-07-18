@@ -14,6 +14,7 @@ import {
   callVoteContinueEndlessBattle,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { getCurrentMusicId, playMusic, playSound } from '@/audio/audioService';
 import { getAssetUrl } from '@/assets/assetManager';
 import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
@@ -31,11 +32,12 @@ interface EndlessBattlePanelProps {
 /** Endless Battle's real-sprite/full-action-menu presentation, matching solo quest combat's own
  *  (`CombatScene.tsx`) as closely as this mode's shared-turn-order structure allows - reuses
  *  `PhaserBattleCanvas`/`BattleScene.ts` as-is (no fork) for the enemy formation and hit
- *  animations, and the same Attack/Skill/Lantern Ability/Item/Defend action set. Party HP/turn
- *  status for 2-6 players stays plain React/CSS below the canvas (BattleScene draws no non-enemy
- *  UI) rather than solo's single-player HUD. Ailment FX bursts and the item-queue-multiple-per-
- *  turn UX are intentionally not ported - a real but smaller scope than solo's own canvas, per the
- *  Multiplayer Battle System plan's Phase F. */
+ *  animations, and the same Attack/Skill/Lantern Ability/Item/Defend action set, including ailment
+ *  FX bursts and sound/music. Party HP/turn status for 2-6 players stays plain React/CSS below the
+ *  canvas (BattleScene draws no non-enemy UI) rather than solo's single-player HUD. This panel is
+ *  an overlay on top of whichever exploration scene is mounted (not a scene transition like solo
+ *  combat), so it owns snapshotting/restoring the prior music track itself rather than relying on
+ *  a scene remount to do it - see the music effects below. */
 export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProps) {
   const uid = useAuthStore((s) => s.user?.uid);
   const inventory = useInventoryStore((s) => s.items);
@@ -119,15 +121,41 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   }, [battle, battleId]);
 
   // Rewards/restores land on real saves server-side - resync whenever the battle transitions to
-  // a state that implies a real-save write just happened (wave cleared, run ended).
+  // a state that implies a real-save write just happened (wave cleared, run ended). Same
+  // transition check also drives the wave-cleared/party-defeated sound cues (mirrors
+  // CombatScene.tsx's own sfx.victory/sfx.defeat + music.defeat on those same two outcomes).
   const prevStatusRef = useRef<string | null>(null);
   useEffect(() => {
     if (!battle || !uid) return;
-    if (prevStatusRef.current !== battle.status && ['awaitingContinueVote', 'defeated', 'withdrawn'].includes(battle.status)) {
+    const justChanged = prevStatusRef.current !== battle.status;
+    if (justChanged && ['awaitingContinueVote', 'defeated', 'withdrawn'].includes(battle.status)) {
       void resyncSave(uid);
+    }
+    if (justChanged && battle.status === 'awaitingContinueVote') void playSound('sfx.victory');
+    if (justChanged && battle.status === 'defeated') {
+      void playSound('sfx.defeat');
+      void playMusic('music.defeat');
     }
     prevStatusRef.current = battle.status;
   }, [battle, uid]);
+
+  // Switches to combat music once real battle data first arrives (an overlay, not a scene
+  // transition - see this component's own doc comment for why it must do this itself), and
+  // restores whatever was playing before on unmount (panel close, Leave Battle, or the run simply
+  // ending) rather than leaving combat/defeat music stuck playing under Town/Overworld/Dungeon.
+  const previousMusicIdRef = useRef<string | null>(null);
+  const combatMusicStartedRef = useRef(false);
+  useEffect(() => {
+    if (!battle || combatMusicStartedRef.current) return;
+    combatMusicStartedRef.current = true;
+    previousMusicIdRef.current = getCurrentMusicId();
+    void playMusic(battle.enemies.some((e) => ENEMIES.find((d) => d.id === e.enemyId)?.isBoss) ? 'music.combat-boss' : 'music.combat');
+  }, [battle]);
+  useEffect(() => {
+    return () => {
+      if (previousMusicIdRef.current) void playMusic(previousMusicIdRef.current);
+    };
+  }, []);
 
   // Structured per-turn hit data (Phase F1) drives the canvas's hit/defeat animations - a shared
   // spectacle everyone watching sees the same way, regardless of whose turn it was or who an
@@ -152,6 +180,9 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
     if (!battle?.lastTurnResult || !resolvedAt) return;
     const hits = battle.lastTurnResult.hits ?? [];
     const enemyHits = battle.lastTurnResult.enemyHits ?? [];
+    // Mirrors CombatScene.tsx's own sfx.combat-hit/sfx.enemy-defeated triggers exactly.
+    if (hits.some((h) => !h.missed) || enemyHits.length > 0) void playSound('sfx.combat-hit');
+    if (hits.some((h) => h.defeated)) void playSound('sfx.enemy-defeated');
     setActiveOutgoingHits(hits.map((h) => ({ ...h, key: resolvedAt })));
     setActiveIncomingHits(enemyHits.map((h) => ({ ...h, key: resolvedAt })));
     setPlaybackActive(true);
@@ -182,6 +213,31 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
     prevAilmentIdsRef.current = new Set(currentIds);
     setAilmentFxEvent({ ailmentIds: currentIds, key: resolvedAt });
     if (newlyInflicted.length > 0) setAilmentTakesHoldEvent({ ailmentIds: newlyInflicted, key: resolvedAt });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [battle?.lastTurnResult?.resolvedAt]);
+
+  // Enemy-side equivalent of the above - see PhaserBattleCanvas's enemyAilmentTakesHoldEvent doc
+  // comment. Tracked per-enemy-index (a Map, not a single Set) since each enemy's ailments are
+  // independent - same before/after-per-index diff CombatScene.tsx does against its own closure
+  // state, just via a ref here since this panel gets updates through onSnapshot, not a call
+  // response.
+  const prevEnemyAilmentIdsRef = useRef<Map<number, Set<string>>>(new Map());
+  const [enemyAilmentTakesHoldEvent, setEnemyAilmentTakesHoldEvent] = useState<{
+    entries: { enemyIndex: number; ailmentIds: string[] }[];
+    key: number;
+  }>({ entries: [], key: 0 });
+  useEffect(() => {
+    const resolvedAt = battle?.lastTurnResult?.resolvedAt;
+    if (!battle || !resolvedAt) return;
+    const entries = battle.enemies
+      .map((e, i) => {
+        const currentIds = (e.ailments ?? []).map((a) => a.ailmentId);
+        const prevIds = prevEnemyAilmentIdsRef.current.get(i) ?? new Set<string>();
+        prevEnemyAilmentIdsRef.current.set(i, new Set(currentIds));
+        return { enemyIndex: i, ailmentIds: currentIds.filter((id) => !prevIds.has(id)) };
+      })
+      .filter((e) => e.ailmentIds.length > 0);
+    if (entries.length > 0) setEnemyAilmentTakesHoldEvent({ entries, key: resolvedAt });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [battle?.lastTurnResult?.resolvedAt]);
 
@@ -385,6 +441,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
             combatEnded={battle.status !== 'active'}
             ailmentFxEvent={ailmentFxEvent}
             ailmentTakesHoldEvent={ailmentTakesHoldEvent}
+            enemyAilmentTakesHoldEvent={enemyAilmentTakesHoldEvent}
           />
           {/* The canvas itself goes blank once combatEnded (BattleScene.clear()) - without this,
               that read as a bare black rectangle instead of a moment worth celebrating. Earnings

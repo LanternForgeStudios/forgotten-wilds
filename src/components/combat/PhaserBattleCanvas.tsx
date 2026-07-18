@@ -34,6 +34,11 @@ interface PhaserBattleCanvasProps {
    *  "this just took hold" moment instead of the quieter per-round reapplication burst. Same
    *  key-changes-every-round shape as ailmentFxEvent, for the same reason. */
   ailmentTakesHoldEvent: { ailmentIds: string[]; key: number };
+  /** The enemy-side equivalent of ailmentTakesHoldEvent - one entry per enemy that had a new
+   *  ailment land on it this round (e.g. Ember Burst's Burn succeeding against a vulnerable
+   *  enemy), each bursting that ailment's FX directly on that enemy's own sprite instead of the
+   *  whole-arena scatter the player's own ailments use. Same key-changes-every-round convention. */
+  enemyAilmentTakesHoldEvent: { entries: { enemyIndex: number; ailmentIds: string[] }[]; key: number };
 }
 
 /** Phaser-backed battle stage - background, enemy formation, HP bars, hit/defeat effects. Same
@@ -60,6 +65,7 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
     combatEnded,
     ailmentFxEvent,
     ailmentTakesHoldEvent,
+    enemyAilmentTakesHoldEvent,
   } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -195,6 +201,14 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
     sceneRef.current?.playAilmentTakesHold(ailmentTakesHoldEvent.ailmentIds).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneReady, ailmentTakesHoldEvent.key]);
+
+  useEffect(() => {
+    if (!sceneReady || enemyAilmentTakesHoldEvent.key === 0) return;
+    for (const entry of enemyAilmentTakesHoldEvent.entries) {
+      sceneRef.current?.playEnemyAilmentTakesHold(entry.enemyIndex, entry.ailmentIds).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneReady, enemyAilmentTakesHoldEvent.key]);
 
   // position:absolute + inset:0 against .battleCanvasWrap's own position:relative, not
   // width/height:100% - a flex item sized only by flex-grow/min-height (no explicit `height`) is

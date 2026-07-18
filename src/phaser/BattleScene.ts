@@ -404,6 +404,38 @@ export class BattleScene extends Phaser.Scene {
     }
   }
 
+  /** The enemy-side equivalent of playAilmentTakesHold above - a player's Skill/weapon successfully
+   *  inflicting an ailment on a specific enemy (e.g. Ember Burst landing Burn) bursts that ailment's
+   *  FX asset directly on/around *that enemy's own sprite* a few times, rather than scattered
+   *  across the whole arena the way the player's own ailments are - there's no single "arena"
+   *  position that reads as "this specific enemy" the way anchoring on its sprite does. Called once,
+   *  the round an ailment is newly inflicted on this enemy (see CombatScene.tsx's/
+   *  EndlessBattlePanel.tsx's before/after enemy-ailments diff), never for one already ticking. A
+   *  no-op if the enemy has already been removed (defeated the same round the ailment landed, or a
+   *  slot from a stale index). */
+  async playEnemyAilmentTakesHold(enemyIndex: number, ailmentIds: string[]): Promise<void> {
+    const slot = this.enemySlots.get(enemyIndex);
+    if (!slot) return;
+    const BURST_COUNT = 5;
+    const BURST_STAGGER_MS = 130;
+    for (const ailmentId of ailmentIds) {
+      const assetId = AILMENT_FX_ASSET[ailmentId];
+      if (!assetId) continue;
+      await loadSceneTexture(this, assetId);
+      for (let i = 0; i < BURST_COUNT; i++) {
+        this.time.delayedCall(i * BURST_STAGGER_MS, () => {
+          // Small random jitter around the sprite (not always dead-center) so five quick bursts
+          // in the same spot don't just look like one blob - scaled to that enemy's own displayed
+          // size so it still reads as "on top of the enemy image" per the ask, for a boss-size
+          // sprite as much as a regular one.
+          const jitterX = (Math.random() - 0.5) * slot.sprite.displayWidth * 0.6;
+          const jitterY = (Math.random() - 0.5) * slot.sprite.displayHeight * 0.6;
+          playFxBurst(this, slot.sprite.x + jitterX, slot.sprite.y + jitterY, assetId, 10);
+        });
+      }
+    }
+  }
+
   /** Stops every tween/emitter, destroys all visuals. Called on phase transition to
    *  victory/defeat/fled/error, and implicitly on unmount via Game.destroy(). */
   clear(): void {

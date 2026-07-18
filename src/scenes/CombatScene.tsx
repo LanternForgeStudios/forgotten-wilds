@@ -72,6 +72,14 @@ export function CombatScene() {
     ailmentIds: [],
     key: 0,
   });
+  // Enemy-side equivalent of ailmentTakesHoldEvent above - one entry per enemy that had a new
+  // ailment land on it this round (e.g. a Skill/weapon's inflictsAilmentId succeeding against a
+  // vulnerable enemy), driving BattleScene's per-enemy-sprite FX burst instead of the whole-arena
+  // scatter the player's own ailments use.
+  const [enemyAilmentTakesHoldEvent, setEnemyAilmentTakesHoldEvent] = useState<{
+    entries: { enemyIndex: number; ailmentIds: string[] }[];
+    key: number;
+  }>({ entries: [], key: 0 });
   const [selectedAilmentId, setSelectedAilmentId] = useState<string | null>(null);
   const [showSkillMenu, setShowSkillMenu] = useState(false);
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
@@ -243,6 +251,15 @@ export function CombatScene() {
         .filter((a) => !playerAilments.some((old) => old.ailmentId === a.ailmentId))
         .map((a) => a.ailmentId);
       setPlayerAilments(res.playerAilments);
+      // Same before/after diff, per enemy - drives BattleScene's per-enemy-sprite FX burst (see
+      // enemyAilmentTakesHoldEvent's own doc comment) rather than the whole-arena scatter above.
+      const newlyInflictedEnemyAilments = res.enemies
+        .map((updated) => {
+          const before = enemies.find((e) => e.index === updated.index);
+          const beforeIds = new Set((before?.ailments ?? []).map((a) => a.ailmentId));
+          return { enemyIndex: updated.index, ailmentIds: updated.ailments.filter((a) => !beforeIds.has(a.ailmentId)).map((a) => a.ailmentId) };
+        })
+        .filter((e) => e.ailmentIds.length > 0);
       // On a defeat, the server's playerHp/playerSpirit here are already the post-respawn values
       // (Ash Hallow's soft-respawn restore, applied in the same transaction as the defeat itself -
       // see resolveCombatAction.ts) - patching them in immediately would show the HUD's HP/Spirit
@@ -284,6 +301,9 @@ export function CombatScene() {
       setAilmentFxEvent({ ailmentIds: res.playerAilments.map((a) => a.ailmentId), key: batch });
       if (newlyInflictedAilmentIds.length > 0) {
         setAilmentTakesHoldEvent({ ailmentIds: newlyInflictedAilmentIds, key: batch });
+      }
+      if (newlyInflictedEnemyAilments.length > 0) {
+        setEnemyAilmentTakesHoldEvent({ entries: newlyInflictedEnemyAilments, key: batch });
       }
       // The last incoming hit doesn't even START playing until lastAttackStartMs, and then needs
       // its own ~1.4s (playFloatingText's tween duration) to actually finish - a fixed 1500ms here
@@ -589,6 +609,7 @@ export function CombatScene() {
               combatEnded={combatEnded}
               ailmentFxEvent={ailmentFxEvent}
               ailmentTakesHoldEvent={ailmentTakesHoldEvent}
+              enemyAilmentTakesHoldEvent={enemyAilmentTakesHoldEvent}
             />
             {canPickTarget && (
               <p className={styles.targetHint}>
