@@ -778,11 +778,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.elias-rowan',
     category: 'character',
-    intendedUse: 'Overworld sprite for elias-rowan (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for elias-rowan (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/elias-rowan.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 (docs/Asset-Production-Checklist.md's NPC spec, matching sprite.player.male/female's size) - the SVG itself was resized too, not just this metadata.",
   },
   {
     id: 'portrait.mara-ash',
@@ -796,11 +796,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.mara-ash',
     category: 'character',
-    intendedUse: 'Overworld sprite for mara-ash (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for mara-ash (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/mara-ash.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.finn-rowan',
@@ -814,11 +814,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.finn-rowan',
     category: 'character',
-    intendedUse: 'Overworld sprite for finn-rowan (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for finn-rowan (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/finn-rowan.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.silas-flint',
@@ -832,11 +832,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.silas-flint',
     category: 'character',
-    intendedUse: 'Overworld sprite for silas-flint (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for silas-flint (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/silas-flint.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.juniper-reed',
@@ -850,11 +850,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.juniper-reed',
     category: 'character',
-    intendedUse: 'Overworld sprite for juniper-reed (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for juniper-reed (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/juniper-reed.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.nell-ashby',
@@ -868,11 +868,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.nell-ashby',
     category: 'character',
-    intendedUse: 'Overworld sprite for nell-ashby (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for nell-ashby (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/nell-ashby.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.aldren-stone',
@@ -886,11 +886,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.aldren-stone',
     category: 'character',
-    intendedUse: 'Overworld sprite for aldren-stone (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for aldren-stone (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/aldren-stone.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.tessa-ironhand',
@@ -904,11 +904,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.tessa-ironhand',
     category: 'character',
-    intendedUse: 'Overworld sprite for tessa-ironhand (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for tessa-ironhand (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/tessa-ironhand.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.willow-briar',
@@ -922,11 +922,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.willow-briar',
     category: 'character',
-    intendedUse: 'Overworld sprite for willow-briar (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for willow-briar (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/willow-briar.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.historian-miriam',
@@ -940,11 +940,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.historian-miriam',
     category: 'character',
-    intendedUse: 'Overworld sprite for historian-miriam (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for historian-miriam (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/historian-miriam.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.mayor-eleanor-ashcroft',
@@ -958,11 +958,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.mayor-eleanor-ashcroft',
     category: 'character',
-    intendedUse: 'Overworld sprite for mayor-eleanor-ashcroft (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for mayor-eleanor-ashcroft (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/mayor-eleanor-ashcroft.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.hunter-garrick',
@@ -976,11 +976,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.hunter-garrick',
     category: 'character',
-    intendedUse: 'Overworld sprite for hunter-garrick (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for hunter-garrick (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/hunter-garrick.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.spirit-child',
@@ -994,11 +994,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.spirit-child',
     category: 'character',
-    intendedUse: 'Overworld sprite for spirit-child (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for spirit-child (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/spirit-child.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'portrait.ranger-caleb',
@@ -1012,11 +1012,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.ranger-caleb',
     category: 'character',
-    intendedUse: 'Overworld sprite for ranger-caleb (single-frame placeholder; final art should be a 32x32 4-direction idle+walk sheet)',
+    intendedUse: 'Overworld sprite for ranger-caleb (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
     filePath: 'sprites/characters/ranger-caleb.svg',
-    dimensions: { width: 32, height: 32 },
+    dimensions: { width: 72, height: 96 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
   },
   {
     id: 'sprite.player',
@@ -2079,11 +2079,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.large',
     category: 'character',
-    intendedUse: 'Generic "Large NPC" overworld sprite, matching the 3/4-view scale spec\'s "Large NPC: 64x80" - not yet referenced by any location (every current NPC uses the flat 32x32 sprite.npc.* convention)',
+    intendedUse: 'Generic "Large NPC" overworld sprite for anyone who should read as more imposing than a regular human, proportionally bigger than the regular 72x96 sprite.npc.* convention - not yet referenced by any location',
     filePath: 'sprites/characters/npc-large.svg',
-    dimensions: { width: 64, height: 80 },
+    dimensions: { width: 96, height: 120 },
     status: 'placeholder',
-    notes: 'Generated SVG placeholder, stub-registered for future map-building use per the 3/4-view scale spec. Final art should be a 64x80 4-direction idle+walk sheet, same convention as sprite.player.',
+    notes:
+      "Generated SVG placeholder, stub-registered for future map-building use. Dimensions bumped 64x80 -> 96x120 (docs/Asset-Production-Checklist.md's current target spec, proportional to the regular NPCs' own 32x32 -> 72x96 bump - see sprite.npc.elias-rowan's note) - the SVG itself was resized too. Final art should be a 96x120 4-direction idle+walk sheet, same convention as sprite.player.",
   },
 
   // Music - looping background beds, one per scene/encounter identity. Procedurally generated
