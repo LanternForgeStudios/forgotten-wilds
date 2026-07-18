@@ -84,6 +84,10 @@ interface EnemySlot {
   targetRing?: Phaser.GameObjects.Rectangle;
   hpTrackWidth: number;
   maxHp: number;
+  /** Last ailmentIds passed to updateAilments for this slot - lets syncEnemies (called once every
+   *  round for every enemy) skip the setTint/setText work entirely when nothing actually changed,
+   *  rather than redoing it unconditionally each round. */
+  lastAilmentKey?: string;
 }
 
 /** The battle-stage rendering Phaser Scene - background, enemy formation, HP bars, hit/defeat
@@ -235,6 +239,9 @@ export class BattleScene extends Phaser.Scene {
   private updateAilments(index: number, ailmentIds: string[]): void {
     const slot = this.enemySlots.get(index);
     if (!slot) return;
+    const key = ailmentIds.join(',');
+    if (slot.lastAilmentKey === key) return;
+    slot.lastAilmentKey = key;
     const tintedId = ailmentIds.find((id) => AILMENT_TINT_HEX[id] !== undefined);
     if (tintedId) slot.sprite.setTint(AILMENT_TINT_HEX[tintedId]);
     else slot.sprite.clearTint();
@@ -298,6 +305,12 @@ export class BattleScene extends Phaser.Scene {
   playOutgoingHits(
     hits: { targetIndex: number; damage: number; missed: boolean; defeated: boolean; damageType: DamageType; ailmentInflicted?: string }[],
   ): void {
+    // Loads each unique damageType's FX texture once per round (via one batched Promise.all)
+    // rather than once per hit that needs it - a multi-hit target-all round previously reloaded
+    // (or re-queued, for an already-loaded texture) the same texture up to once per hit.
+    const neededAssetIds = [...new Set(hits.filter((h) => !h.missed && !h.ailmentInflicted).map((h) => HIT_FX_ASSET[h.damageType]))];
+    const texturesLoaded = Promise.all(neededAssetIds.map((assetId) => loadSceneTexture(this, assetId)));
+
     for (const hit of hits) {
       const slot = this.enemySlots.get(hit.targetIndex);
       if (!slot) continue;
@@ -309,9 +322,7 @@ export class BattleScene extends Phaser.Scene {
       playFloatingText(this, slot.sprite.x, slot.sprite.y - slot.sprite.displayHeight / 2 - 20, `-${hit.damage}`, COLOR_DAMAGE);
       if (!hit.ailmentInflicted) {
         const assetId = HIT_FX_ASSET[hit.damageType];
-        loadSceneTexture(this, assetId)
-          .then(() => playFxBurst(this, slot.sprite.x, slot.sprite.y, assetId, 10))
-          .catch(() => {});
+        texturesLoaded.then(() => playFxBurst(this, slot.sprite.x, slot.sprite.y, assetId, 10)).catch(() => {});
       }
       if (hit.defeated) {
         this.time.delayedCall(120, () => this.playDefeat(hit.targetIndex));
@@ -406,12 +417,9 @@ export class BattleScene extends Phaser.Scene {
    *  that bigger moment). */
   async playAilmentEffects(ailmentIds: string[]): Promise<void> {
     const PER_ROUND_BURST_COUNT = 4;
-    for (const ailmentId of ailmentIds) {
-      const assetId = AILMENT_FX_ASSET[ailmentId];
-      if (!assetId) continue;
-      await loadSceneTexture(this, assetId);
-      this.burstAilmentFxAcrossArena(assetId, PER_ROUND_BURST_COUNT);
-    }
+    const assetIds = ailmentIds.map((id) => AILMENT_FX_ASSET[id]).filter((id): id is string => !!id);
+    await Promise.all(assetIds.map((assetId) => loadSceneTexture(this, assetId)));
+    for (const assetId of assetIds) this.burstAilmentFxAcrossArena(assetId, PER_ROUND_BURST_COUNT);
   }
 
   /** The even bigger, one-time "this ailment just landed" moment - more bursts than a regular
@@ -421,12 +429,9 @@ export class BattleScene extends Phaser.Scene {
    *  already active and is just continuing to tick. */
   async playAilmentTakesHold(ailmentIds: string[]): Promise<void> {
     const TAKES_HOLD_BURST_COUNT = 8;
-    for (const ailmentId of ailmentIds) {
-      const assetId = AILMENT_FX_ASSET[ailmentId];
-      if (!assetId) continue;
-      await loadSceneTexture(this, assetId);
-      this.burstAilmentFxAcrossArena(assetId, TAKES_HOLD_BURST_COUNT);
-    }
+    const assetIds = ailmentIds.map((id) => AILMENT_FX_ASSET[id]).filter((id): id is string => !!id);
+    await Promise.all(assetIds.map((assetId) => loadSceneTexture(this, assetId)));
+    for (const assetId of assetIds) this.burstAilmentFxAcrossArena(assetId, TAKES_HOLD_BURST_COUNT);
   }
 
   /** The enemy-side equivalent of playAilmentTakesHold above - a player's Skill/weapon successfully
@@ -443,10 +448,9 @@ export class BattleScene extends Phaser.Scene {
     if (!slot) return;
     const BURST_COUNT = 5;
     const BURST_STAGGER_MS = 130;
-    for (const ailmentId of ailmentIds) {
-      const assetId = AILMENT_FX_ASSET[ailmentId];
-      if (!assetId) continue;
-      await loadSceneTexture(this, assetId);
+    const assetIds = ailmentIds.map((id) => AILMENT_FX_ASSET[id]).filter((id): id is string => !!id);
+    await Promise.all(assetIds.map((assetId) => loadSceneTexture(this, assetId)));
+    for (const assetId of assetIds) {
       for (let i = 0; i < BURST_COUNT; i++) {
         this.time.delayedCall(i * BURST_STAGGER_MS, () => {
           // Small random jitter around the sprite (not always dead-center) so five quick bursts

@@ -6,11 +6,13 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
+import { useCombatMusic } from '@/hooks/useCombatMusic';
+import { useAilmentFxEvents } from '@/hooks/useAilmentFxEvents';
 import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
 import { resolveDisplayNames } from '@/firebase/socialService';
 import { callSubmitPartyBattleAction, callUseItemInPartyBattle, type CombatHitResult, type EnemyHitResult } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
-import { getCurrentMusicId, playMusic, playSound } from '@/audio/audioService';
+import { playMusic, playSound } from '@/audio/audioService';
 import { getAssetUrl } from '@/assets/assetManager';
 import { AILMENTS, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
@@ -117,23 +119,9 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
     prevStatusRef.current = battle.status;
   }, [battle, uid]);
 
-  // Switches to combat music once real battle data first arrives, and restores whatever was
-  // playing before on unmount - see EndlessBattlePanel.tsx's identical wiring/reasoning (this
-  // panel is likewise an overlay, not a scene transition). No boss variant here - a PvP opponent
-  // is another player, not an enemy tier.
-  const previousMusicIdRef = useRef<string | null>(null);
-  const combatMusicStartedRef = useRef(false);
-  useEffect(() => {
-    if (!battle || combatMusicStartedRef.current) return;
-    combatMusicStartedRef.current = true;
-    previousMusicIdRef.current = getCurrentMusicId();
-    void playMusic('music.combat');
-  }, [battle]);
-  useEffect(() => {
-    return () => {
-      if (previousMusicIdRef.current) void playMusic(previousMusicIdRef.current);
-    };
-  }, []);
+  // See useCombatMusic's own doc comment. No boss variant here - a PvP opponent is another player,
+  // not an enemy tier.
+  useCombatMusic(!!battle, 'music.combat');
 
   // Structured hit data (Phase F1) drives the canvas's hit animation - but unlike Endless Battle's
   // shared enemy board, PvP's single `pvpHit` doesn't say *who* it was dealt to, since turns
@@ -204,23 +192,11 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   }, [battle?.lastTurnResult?.resolvedAt]);
 
   // Drives PhaserBattleCanvas's FX-pack ailment bursts for the viewer's own ailments - see
-  // EndlessBattlePanel.tsx's identical wiring for the full reasoning (mirrors CombatScene.tsx).
-  const prevAilmentIdsRef = useRef<Set<string>>(new Set());
-  const [ailmentFxEvent, setAilmentFxEvent] = useState<{ ailmentIds: string[]; key: number }>({ ailmentIds: [], key: 0 });
-  const [ailmentTakesHoldEvent, setAilmentTakesHoldEvent] = useState<{ ailmentIds: string[]; key: number }>({
-    ailmentIds: [],
-    key: 0,
-  });
-  useEffect(() => {
-    const resolvedAt = battle?.lastTurnResult?.resolvedAt;
-    if (!battle || !uid || !resolvedAt) return;
-    const currentIds = (battle.participantStats[uid]?.ailments ?? []).map((a) => a.ailmentId);
-    const newlyInflicted = currentIds.filter((id) => !prevAilmentIdsRef.current.has(id));
-    prevAilmentIdsRef.current = new Set(currentIds);
-    setAilmentFxEvent({ ailmentIds: currentIds, key: resolvedAt });
-    if (newlyInflicted.length > 0) setAilmentTakesHoldEvent({ ailmentIds: newlyInflicted, key: resolvedAt });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [battle?.lastTurnResult?.resolvedAt]);
+  // useAilmentFxEvents's own doc comment.
+  const { ailmentFxEvent, ailmentTakesHoldEvent } = useAilmentFxEvents(
+    uid ? (battle?.participantStats[uid]?.ailments ?? []).map((a) => a.ailmentId) : [],
+    battle?.lastTurnResult?.resolvedAt,
+  );
 
   // Enemy-side equivalent of the above, for the opponent's sprite - PvP's opponent renders as a
   // single-element enemy slot (index 0, see opponentVisuals below), so a Skill/weapon landing an

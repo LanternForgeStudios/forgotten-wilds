@@ -24,8 +24,10 @@ import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { scaledEnemyStats, type RoundEnemyInput } from './combatEngine';
 import {
   ailmentAttackMultiplier,
+  applyAilmentEntry,
   applyAilmentResistance,
   applyAilmentTickDamage,
+  applyAilmentTickDamageToTarget,
   blindMissChance,
   computeDamage,
   expireAilments,
@@ -111,16 +113,9 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
 
   function inflictAilmentOnEnemy(i: number, ailmentId: string): boolean {
     if (!enemyDefs[i].vulnerableAilments.includes(ailmentId)) return false;
-    const def = AILMENTS[ailmentId];
-    if (!def) return false;
-    const list = enemyAilments[i];
-    const existingIndex = list.findIndex((a) => a.ailmentId === ailmentId);
-    const entry: ActiveAilment =
-      def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
-    if (existingIndex >= 0) list[existingIndex] = entry;
-    else list.push(entry);
+    if (!applyAilmentEntry(enemyAilments[i], ailmentId)) return false;
     inflictedThisTurnByEnemy[i].add(ailmentId);
-    log.push(`${enemyDefs[i].name} is afflicted with ${def.name}!`);
+    log.push(`${enemyDefs[i].name} is afflicted with ${AILMENTS[ailmentId].name}!`);
     return true;
   }
 
@@ -375,15 +370,9 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
   const inflictedThisTurnByDefender = new Set<string>();
 
   function inflictAilmentOnDefender(ailmentId: string): boolean {
-    const def = AILMENTS[ailmentId];
-    if (!def) return false;
-    const existingIndex = defenderAilments.findIndex((a) => a.ailmentId === ailmentId);
-    const entry: ActiveAilment =
-      def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
-    if (existingIndex >= 0) defenderAilments[existingIndex] = entry;
-    else defenderAilments.push(entry);
+    if (!applyAilmentEntry(defenderAilments, ailmentId)) return false;
     inflictedThisTurnByDefender.add(ailmentId);
-    log.push(`Your opponent is afflicted with ${def.name}!`);
+    log.push(`Your opponent is afflicted with ${AILMENTS[ailmentId].name}!`);
     return true;
   }
 
@@ -675,15 +664,14 @@ export function resolvePartyEnemyPhase(
       }
     }
 
-    for (const active of enemyAilmentsByIndex[i]) {
-      if (enemyHp[i] <= 0) break;
-      const tickDef = AILMENTS[active.ailmentId];
-      if (!tickDef?.effect.damagePercentPerTurn) continue;
-      const tickDmg = Math.max(1, Math.round(stats.maxHp * tickDef.effect.damagePercentPerTurn));
-      enemyHp[i] = Math.max(0, enemyHp[i] - tickDmg);
-      log.push(`${tickDef.name} deals ${tickDmg} damage to ${def.name}.`);
-      if (enemyHp[i] <= 0) log.push(`${def.name} is defeated!`);
-    }
+    enemyHp[i] = applyAilmentTickDamageToTarget(
+      enemyHp[i],
+      stats.maxHp,
+      enemyAilmentsByIndex[i],
+      log,
+      def.name,
+      () => log.push(`${def.name} is defeated!`),
+    );
   });
 
   return {

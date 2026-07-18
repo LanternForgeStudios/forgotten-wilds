@@ -6,6 +6,8 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
+import { useCombatMusic } from '@/hooks/useCombatMusic';
+import { useAilmentFxEvents } from '@/hooks/useAilmentFxEvents';
 import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
 import { resolveDisplayNames } from '@/firebase/socialService';
 import {
@@ -14,7 +16,7 @@ import {
   callVoteContinueEndlessBattle,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
-import { getCurrentMusicId, playMusic, playSound } from '@/audio/audioService';
+import { playMusic, playSound } from '@/audio/audioService';
 import { getAssetUrl } from '@/assets/assetManager';
 import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
@@ -139,23 +141,11 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
     prevStatusRef.current = battle.status;
   }, [battle, uid]);
 
-  // Switches to combat music once real battle data first arrives (an overlay, not a scene
-  // transition - see this component's own doc comment for why it must do this itself), and
-  // restores whatever was playing before on unmount (panel close, Leave Battle, or the run simply
-  // ending) rather than leaving combat/defeat music stuck playing under Town/Overworld/Dungeon.
-  const previousMusicIdRef = useRef<string | null>(null);
-  const combatMusicStartedRef = useRef(false);
-  useEffect(() => {
-    if (!battle || combatMusicStartedRef.current) return;
-    combatMusicStartedRef.current = true;
-    previousMusicIdRef.current = getCurrentMusicId();
-    void playMusic(battle.enemies.some((e) => ENEMIES.find((d) => d.id === e.enemyId)?.isBoss) ? 'music.combat-boss' : 'music.combat');
-  }, [battle]);
-  useEffect(() => {
-    return () => {
-      if (previousMusicIdRef.current) void playMusic(previousMusicIdRef.current);
-    };
-  }, []);
+  // See useCombatMusic's own doc comment for why this panel must snapshot/restore music itself.
+  useCombatMusic(
+    !!battle,
+    battle?.enemies.some((e) => ENEMIES.find((d) => d.id === e.enemyId)?.isBoss) ? 'music.combat-boss' : 'music.combat',
+  );
 
   // Structured per-turn hit data (Phase F1) drives the canvas's hit/defeat animations - a shared
   // spectacle everyone watching sees the same way, regardless of whose turn it was or who an
@@ -191,26 +181,13 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   }, [battle?.lastTurnResult?.resolvedAt]);
 
   // Drives PhaserBattleCanvas's FX-pack ailment bursts (poison/burn/freeze) for the *viewer's own*
-  // ailments - mirrors CombatScene.tsx's ailmentFxEvent/ailmentTakesHoldEvent exactly (same
-  // key-changes-every-round convention, same before/after diff for "newly inflicted this round").
-  // This was hardcoded to {ailmentIds:[], key:0} through Stage F3 - a real but explicitly scoped-out
-  // gap per the Multiplayer Battle System plan, now wired up to match solo combat.
-  const prevAilmentIdsRef = useRef<Set<string>>(new Set());
-  const [ailmentFxEvent, setAilmentFxEvent] = useState<{ ailmentIds: string[]; key: number }>({ ailmentIds: [], key: 0 });
-  const [ailmentTakesHoldEvent, setAilmentTakesHoldEvent] = useState<{ ailmentIds: string[]; key: number }>({
-    ailmentIds: [],
-    key: 0,
-  });
-  useEffect(() => {
-    const resolvedAt = battle?.lastTurnResult?.resolvedAt;
-    if (!battle || !uid || !resolvedAt) return;
-    const currentIds = (battle.participantStats[uid]?.ailments ?? []).map((a) => a.ailmentId);
-    const newlyInflicted = currentIds.filter((id) => !prevAilmentIdsRef.current.has(id));
-    prevAilmentIdsRef.current = new Set(currentIds);
-    setAilmentFxEvent({ ailmentIds: currentIds, key: resolvedAt });
-    if (newlyInflicted.length > 0) setAilmentTakesHoldEvent({ ailmentIds: newlyInflicted, key: resolvedAt });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [battle?.lastTurnResult?.resolvedAt]);
+  // ailments - see useAilmentFxEvents's own doc comment. This was hardcoded to
+  // {ailmentIds:[], key:0} through Stage F3 - a real but explicitly scoped-out gap per the
+  // Multiplayer Battle System plan, now wired up to match solo combat.
+  const { ailmentFxEvent, ailmentTakesHoldEvent } = useAilmentFxEvents(
+    uid ? (battle?.participantStats[uid]?.ailments ?? []).map((a) => a.ailmentId) : [],
+    battle?.lastTurnResult?.resolvedAt,
+  );
 
   // Enemy-side equivalent of the above - see PhaserBattleCanvas's enemyAilmentTakesHoldEvent doc
   // comment. Tracked per-enemy-index (a Map, not a single Set) since each enemy's ailments are

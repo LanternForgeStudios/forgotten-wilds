@@ -75,6 +75,52 @@ export function applyAilmentTickDamage(hp: number, maxHp: number, ailments: Acti
   return next;
 }
 
+/** Applies (inserts, or refreshes if already present) one ailment entry, mutating `ailments` in
+ *  place - the shared core of "this attack just afflicted its target" for a non-player target (an
+ *  enemy in either engine, or a PvP defender), which unlike inflictAilment above already mutates
+ *  its ailment array in place everywhere else in both engines rather than copying, so this matches
+ *  that convention instead of introducing a copy-vs-mutate split within the same engine. Callers
+ *  own the vulnerability gate (enemies only - see EnemyDefinition.vulnerableAilments; a PvP
+ *  defender has none, just equipped-item resistance) and the log-line phrasing, since both differ
+ *  by target ("X is afflicted..." for an enemy vs. "Your opponent is afflicted..." for a PvP
+ *  defender). Returns false only when `ailmentId` isn't a real ailment. */
+export function applyAilmentEntry(ailments: ActiveAilment[], ailmentId: string): boolean {
+  const def = AILMENTS[ailmentId];
+  if (!def) return false;
+  const existingIndex = ailments.findIndex((a) => a.ailmentId === ailmentId);
+  const entry: ActiveAilment =
+    def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
+  if (existingIndex >= 0) ailments[existingIndex] = entry;
+  else ailments.push(entry);
+  return true;
+}
+
+/** Poison/Burn/Freeze's per-turn damage against a non-player combatant (an enemy, in either
+ *  engine) - same math as applyAilmentTickDamage above, generalized with a `targetLabel` for the
+ *  3rd-person log line and an `onDefeated` callback for the enemies' extra "is defeated!" line
+ *  (the player-side helper above always logs "you" and never needs a defeat line - a player
+ *  reaching 0 hp is handled by each engine's own end-of-round logic, not logged here). */
+export function applyAilmentTickDamageToTarget(
+  hp: number,
+  maxHp: number,
+  ailments: ActiveAilment[],
+  log: string[],
+  targetLabel: string,
+  onDefeated?: () => void,
+): number {
+  let next = hp;
+  for (const active of ailments) {
+    if (next <= 0) break;
+    const def = AILMENTS[active.ailmentId];
+    if (!def?.effect.damagePercentPerTurn) continue;
+    const dmg = Math.max(1, Math.round(maxHp * def.effect.damagePercentPerTurn));
+    next = Math.max(0, next - dmg);
+    log.push(`${def.name} deals ${dmg} damage to ${targetLabel}.`);
+    if (next <= 0) onDefeated?.();
+  }
+  return next;
+}
+
 /** Burn's attackMultiplier is the only ailment effect that touches outgoing damage today -
  *  multiple stacked ailments with an attackMultiplier would compound multiplicatively. */
 export function ailmentAttackMultiplier(ailments: ActiveAilment[]): number {

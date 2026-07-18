@@ -4,7 +4,15 @@ import { ITEMS } from '../data/items';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { AILMENTS } from '../data/ailments';
 import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
-import { applyAilmentResistance, blindMissChance, computeDamage, pickEnemyMove, weightedPick } from './combatMath';
+import {
+  applyAilmentEntry,
+  applyAilmentResistance,
+  applyAilmentTickDamageToTarget,
+  blindMissChance,
+  computeDamage,
+  pickEnemyMove,
+  weightedPick,
+} from './combatMath';
 import type { AilmentResistance, CombatAction, Stats, ActiveAilment } from '../shared-types';
 
 export function rollEnemyForLocation(locationId: string): EnemyDefinition {
@@ -351,16 +359,9 @@ export function resolveRound(input: RoundInput): RoundResult {
 
   function inflictAilmentOnEnemy(i: number, ailmentId: string): boolean {
     if (!enemyDefs[i].vulnerableAilments.includes(ailmentId)) return false;
-    const def = AILMENTS[ailmentId];
-    if (!def) return false;
-    const list = enemyAilments[i];
-    const existingIndex = list.findIndex((a) => a.ailmentId === ailmentId);
-    const entry: ActiveAilment =
-      def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
-    if (existingIndex >= 0) list[existingIndex] = entry;
-    else list.push(entry);
+    if (!applyAilmentEntry(enemyAilments[i], ailmentId)) return false;
     inflictedThisRoundByEnemy[i].add(ailmentId);
-    log.push(`${enemyDefs[i].name} is afflicted with ${def.name}!`);
+    log.push(`${enemyDefs[i].name} is afflicted with ${AILMENTS[ailmentId].name}!`);
     return true;
   }
 
@@ -370,15 +371,14 @@ export function resolveRound(input: RoundInput): RoundResult {
    *  contract. */
   function applyEnemyAilmentTickDamage(i: number) {
     if (!isAlive(i)) return;
-    for (const active of enemyAilments[i]) {
-      if (enemyHp[i] <= 0) break;
-      const def = AILMENTS[active.ailmentId];
-      if (!def?.effect.damagePercentPerTurn) continue;
-      const dmg = Math.max(1, Math.round(enemyStats[i].maxHp * def.effect.damagePercentPerTurn));
-      enemyHp[i] = Math.max(0, enemyHp[i] - dmg);
-      log.push(`${def.name} deals ${dmg} damage to ${enemyDefs[i].name}.`);
-      if (enemyHp[i] <= 0) log.push(`${enemyDefs[i].name} is defeated!`);
-    }
+    enemyHp[i] = applyAilmentTickDamageToTarget(
+      enemyHp[i],
+      enemyStats[i].maxHp,
+      enemyAilments[i],
+      log,
+      enemyDefs[i].name,
+      () => log.push(`${enemyDefs[i].name} is defeated!`),
+    );
   }
 
   // The player's own ailment state (enemyAilments above is the parallel per-enemy version) -
