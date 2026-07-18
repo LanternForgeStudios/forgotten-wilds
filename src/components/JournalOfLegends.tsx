@@ -708,6 +708,15 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 </p>
 
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
+                  <strong>Vulnerable To</strong>
+                </p>
+                <p className={questStyles.objective}>
+                  {enemy.vulnerableAilments && enemy.vulnerableAilments.length > 0
+                    ? enemy.vulnerableAilments.map((id) => AILMENTS[id]?.name ?? id).join(', ')
+                    : 'None known'}
+                </p>
+
+                <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Drops</strong>
                 </p>
                 {drops.length === 0 && <p className={questStyles.objective}>None known.</p>}
