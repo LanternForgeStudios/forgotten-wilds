@@ -53,6 +53,16 @@ function scaledTilesetKey(assetId: string, tileWidth: number, tileHeight: number
   return `${assetId}__scaled-${tileWidth}x${tileHeight}`;
 }
 
+/** Module-level (not per-Scene) cache of already-scaled tileset canvases, keyed by
+ *  scaledTilesetKey - PhaserExplorationCanvas.tsx creates a brand-new Phaser.Game (and therefore a
+ *  brand-new, empty Scene.textures manager) on every Town/Overworld/Dungeon transition, so a
+ *  per-Scene cache alone made the actual pixel-scaling work (a synchronous canvas drawImage call)
+ *  redo itself on every single map load instead of once - the map-loading slowdown this was meant
+ *  to fix. This survives across Game instances for the life of the page, so the expensive resize
+ *  only ever happens once per (tileset, target size) pair; only the cheap re-registration into a
+ *  new Game's texture manager repeats. */
+const scaledTilesetCanvasCache = new Map<string, HTMLCanvasElement>();
+
 interface EntityVisual {
   sprite: Phaser.GameObjects.Sprite;
   /** The spriteAssetId this sprite was last textured with - lets upsertEntity detect a change
@@ -166,6 +176,11 @@ export class ExplorationScene extends Phaser.Scene {
       if (t.tileWidth === map.tileWidth && t.tileHeight === map.tileHeight) continue;
       const scaledKey = scaledTilesetKey(t.assetId, map.tileWidth, map.tileHeight);
       if (this.textures.exists(scaledKey)) continue;
+      const cached = scaledTilesetCanvasCache.get(scaledKey);
+      if (cached) {
+        this.textures.addCanvas(scaledKey, cached);
+        continue;
+      }
       const source = this.textures.get(t.assetId).getSourceImage() as HTMLImageElement | HTMLCanvasElement;
       const scale = Math.min(map.tileWidth / t.tileWidth, map.tileHeight / t.tileHeight);
       const canvas = document.createElement('canvas');
@@ -174,6 +189,7 @@ export class ExplorationScene extends Phaser.Scene {
       const ctx = canvas.getContext('2d')!;
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+      scaledTilesetCanvasCache.set(scaledKey, canvas);
       this.textures.addCanvas(scaledKey, canvas);
     }
 
