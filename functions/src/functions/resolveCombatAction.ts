@@ -67,6 +67,14 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     // matching pattern in inventoryEngine.ts. Persisted below via the unconditional tx.set(userRef,
     // save), so this only ever needs to run once per player.
     if (!save.player.knownSkillIds) save.player.knownSkillIds = ['keepers-strike'];
+    // Backfill for a save written before the equipment system existed - matches buildFreshPlayer's
+    // own defaults (newCharacter.ts). Every action type now reads save.player.equipment
+    // unconditionally below (computeAilmentResistances/resolveWeaponAttackAilment), where before
+    // this stub feature only 'lanternAbility' ever touched it - an account missing this field
+    // entirely crashed with a bare INTERNAL error on every action, not just lanternAbility.
+    if (!save.player.equipment) {
+      save.player.equipment = { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
+    }
 
     // Data-driven rather than hardcoding "if silence"/"if freeze" - any current or future ailment
     // whose effect sets blocksSkill/disablesLanternAbility gates the matching action, keyed off

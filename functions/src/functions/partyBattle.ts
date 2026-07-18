@@ -183,6 +183,12 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
   // Backfill for a save written before knownSkillIds existed - same one-line pattern
   // resolveCombatAction.ts already uses for the exact same reason (see that file's own comment).
   if (!save.player.knownSkillIds) save.player.knownSkillIds = ['keepers-strike'];
+  // Backfill for a save written before the equipment system existed - see
+  // resolveCombatAction.ts's identical comment for why this now needs to be unconditional (every
+  // Endless Battle/PvP start reads save.player.equipment below, not just a lanternAbility action).
+  if (!save.player.equipment) {
+    save.player.equipment = { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
+  }
   return {
     hp: save.player.stats.maxHp,
     maxHp: save.player.stats.maxHp,
