@@ -173,11 +173,39 @@ export class ExplorationScene extends Phaser.Scene {
     // the real Tiled editor, which always reads each tileset's own declared size correctly.
     const tilesets = map.tilesets.map((t) => tilemap.addTilesetImage(t.assetId, t.assetId, t.tileWidth, t.tileHeight, 0, 0, t.firstgid - 1)!);
 
+    // Tiled anchors every orthogonal tile at its grid cell's BOTTOM-left corner, not top-left -
+    // invisible when a tileset's own tile size matches the map's grid (the common case), but for a
+    // tileset whose native size is bigger (the intentional "32px prop sheet on a 16px-grid map"
+    // pattern the comment above already covers for image-slicing) Tiled lets the extra height grow
+    // *upward* from the cell. Phaser's own tile renderer always draws top-left anchored with no such
+    // compensation (confirmed by reading TilemapLayerCanvasRenderer.js/WebGLRenderer.js - both draw
+    // the tileset's native tileWidth/tileHeight straight from tile.pixelX/pixelY, which Phaser
+    // computes from the *map's* grid size, not the tileset's), so a tileset taller than the map's
+    // own tileHeight rendered exactly (tilesetTileHeight - map.tileHeight) pixels lower than its
+    // authored position in Tiled - confirmed by hand against a real map (whisper-falls.json mixes a
+    // 16px map grid with 32px/64px tilesets; the 64px water tiles were rendering a full 48px/3 map-
+    // tiles lower in-game than in Tiled, exactly matching this formula). Nudging pixelY up by that
+    // same amount after placement reproduces Tiled's bottom-anchor without needing to touch
+    // tile.bottom/right - those already describe the cell's own bottom/right edge, which Tiled's
+    // bottom-anchor convention keeps fixed in place (only the top edge moves for a taller tile).
+    function tilesetForGid(gid: number) {
+      let match = map.tilesets[0];
+      for (const t of map.tilesets) {
+        if (t.firstgid <= gid) match = t;
+        else break;
+      }
+      return match;
+    }
+
     orderedLayers.forEach((layer, index) => {
       const phaserLayer = tilemap.createBlankLayer(layer.name, tilesets, 0, 0, map.width, map.height)!;
       layer.data.forEach((gid, i) => {
         if (gid <= 0) return;
-        phaserLayer.putTileAt(gid - 1, i % map.width, Math.floor(i / map.width));
+        const tile = phaserLayer.putTileAt(gid - 1, i % map.width, Math.floor(i / map.width));
+        const tilesetTileHeight = tilesetForGid(gid).tileHeight;
+        if (tile && tilesetTileHeight !== map.tileHeight) {
+          tile.pixelY -= tilesetTileHeight - map.tileHeight;
+        }
       });
       phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(this.viewportScale);
       const overhangMatch = /^overhang(?:-(\d+))?$/.exec(layer.name);
