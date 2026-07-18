@@ -56,6 +56,10 @@ export interface PartyCombatHitResult {
   damage: number;
   missed: boolean;
   defeated: boolean;
+  /** See combatEngine.ts's CombatHitResult.damageType - same generic-impact-FX purpose. */
+  damageType: DamageType;
+  /** See combatEngine.ts's CombatHitResult.ailmentInflicted. */
+  ailmentInflicted?: string;
 }
 
 const TARGET_ALL_MISS_CHANCE = 0.15;
@@ -105,10 +109,10 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
   const enemyAilments: ActiveAilment[][] = enemies.map((e) => e.ailments.map((a) => ({ ...a })));
   const inflictedThisTurnByEnemy: Set<string>[] = enemies.map(() => new Set());
 
-  function inflictAilmentOnEnemy(i: number, ailmentId: string) {
-    if (!enemyDefs[i].vulnerableAilments.includes(ailmentId)) return;
+  function inflictAilmentOnEnemy(i: number, ailmentId: string): boolean {
+    if (!enemyDefs[i].vulnerableAilments.includes(ailmentId)) return false;
     const def = AILMENTS[ailmentId];
-    if (!def) return;
+    if (!def) return false;
     const list = enemyAilments[i];
     const existingIndex = list.findIndex((a) => a.ailmentId === ailmentId);
     const entry: ActiveAilment =
@@ -117,6 +121,7 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
     else list.push(entry);
     inflictedThisTurnByEnemy[i].add(ailmentId);
     log.push(`${enemyDefs[i].name} is afflicted with ${def.name}!`);
+    return true;
   }
 
   let hp = player.stats.hp;
@@ -166,15 +171,16 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
       const missedBlind = blindChance > 0 && Math.random() < blindChance;
       if (missedTargetAll || missedBlind) {
         log.push(`Your attack on ${enemyDefs[i].name} goes wide - miss!`);
-        hits.push({ uid: player.uid, targetIndex: i, damage: 0, missed: true, defeated: false });
+        hits.push({ uid: player.uid, targetIndex: i, damage: 0, missed: true, defeated: false, damageType });
         continue;
       }
       let dmg = Math.round(computeDamage(power, player.stats.attack * attackMultiplier, enemyStats[i].defense) * bonusMultiplier(i));
       if (useAll) dmg = Math.max(1, Math.round(dmg * TARGET_ALL_DAMAGE_FACTOR));
       const defeated = damageEnemy(i, dmg, verb);
-      hits.push({ uid: player.uid, targetIndex: i, damage: dmg, missed: false, defeated });
-      if (ailment && !defeated && Math.random() < ailment.chance) {
-        inflictAilmentOnEnemy(i, ailment.id);
+      const hit: PartyCombatHitResult = { uid: player.uid, targetIndex: i, damage: dmg, missed: false, defeated, damageType };
+      hits.push(hit);
+      if (ailment && !defeated && Math.random() < ailment.chance && inflictAilmentOnEnemy(i, ailment.id)) {
+        hit.ailmentInflicted = ailment.id;
       }
     }
   }
@@ -302,6 +308,10 @@ export interface PvpHitResult {
   damage: number;
   missed: boolean;
   defeated: boolean;
+  /** See combatEngine.ts's CombatHitResult.damageType - same generic-impact-FX purpose. */
+  damageType: DamageType;
+  /** See combatEngine.ts's CombatHitResult.ailmentInflicted. */
+  ailmentInflicted?: string;
 }
 
 export interface PvpTurnResult {
@@ -364,9 +374,9 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
   let defenderAilments = defender.ailments.map((a) => ({ ...a }));
   const inflictedThisTurnByDefender = new Set<string>();
 
-  function inflictAilmentOnDefender(ailmentId: string) {
+  function inflictAilmentOnDefender(ailmentId: string): boolean {
     const def = AILMENTS[ailmentId];
-    if (!def) return;
+    if (!def) return false;
     const existingIndex = defenderAilments.findIndex((a) => a.ailmentId === ailmentId);
     const entry: ActiveAilment =
       def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
@@ -374,14 +384,15 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
     else defenderAilments.push(entry);
     inflictedThisTurnByDefender.add(ailmentId);
     log.push(`Your opponent is afflicted with ${def.name}!`);
+    return true;
   }
 
-  function damageDefender(dmg: number, verb: string): void {
+  function damageDefender(dmg: number, verb: string, damageType: DamageType): void {
     defenderHp = Math.max(0, defenderHp - dmg);
     const defeated = defenderHp <= 0;
     log.push(`${verb} your opponent for ${dmg} damage.`);
     if (defeated) log.push('Your opponent is defeated!');
-    hit = { damage: dmg, missed: false, defeated };
+    hit = { damage: dmg, missed: false, defeated, damageType };
   }
 
   // Mirrors resolveOffensiveHits'/resolveOffensiveHit's shared "ailment" param elsewhere - rolled
@@ -392,13 +403,18 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
     const blindChance = damageType === 'physical' ? blindMissChance(ailments) : 0;
     if (blindChance > 0 && Math.random() < blindChance) {
       log.push('Your attack goes wide - miss!');
-      hit = { damage: 0, missed: true, defeated: false };
+      hit = { damage: 0, missed: true, defeated: false, damageType };
       return;
     }
     const dmg = Math.round(computeDamage(power, player.stats.attack * attackMultiplier, defender.defense));
-    damageDefender(dmg, verb);
-    if (ailment && !hit?.defeated && Math.random() < applyAilmentResistance(ailment.chance, ailment.id, defender.ailmentResistances)) {
-      inflictAilmentOnDefender(ailment.id);
+    damageDefender(dmg, verb, damageType);
+    if (
+      ailment &&
+      !hit?.defeated &&
+      Math.random() < applyAilmentResistance(ailment.chance, ailment.id, defender.ailmentResistances) &&
+      inflictAilmentOnDefender(ailment.id)
+    ) {
+      if (hit) hit.ailmentInflicted = ailment.id;
     }
   }
 
@@ -497,6 +513,10 @@ export interface PartyEnemyHitResult {
   missed: boolean;
   wasDefended: boolean;
   logLine: string;
+  /** See combatEngine.ts's EnemyHitResult.damageType - same generic-impact-FX purpose. */
+  damageType: DamageType;
+  /** See combatEngine.ts's EnemyHitResult.ailmentInflicted. */
+  ailmentInflicted?: string;
 }
 
 export interface PartyEnemyPhasePlayerState {
@@ -601,11 +621,11 @@ export function resolvePartyEnemyPhase(
 
         if (blindChance > 0 && Math.random() < blindChance) {
           const missLogLine = `${def.name}'s attack goes wide - miss! (Blind)`;
-          enemyHits.push({ attackerIndex: i, targetUid, damage: 0, missed: true, wasDefended: false, logLine: missLogLine });
+          enemyHits.push({ attackerIndex: i, targetUid, damage: 0, missed: true, wasDefended: false, logLine: missLogLine, damageType: 'physical' });
           log.push(missLogLine);
         } else if (Math.random() < ENEMY_MISS_CHANCE) {
           const missLogLine = `${def.name}'s attack goes wide - miss!`;
-          enemyHits.push({ attackerIndex: i, targetUid, damage: 0, missed: true, wasDefended: false, logLine: missLogLine });
+          enemyHits.push({ attackerIndex: i, targetUid, damage: 0, missed: true, wasDefended: false, logLine: missLogLine, damageType: 'physical' });
           log.push(missLogLine);
         } else {
           const hpFraction = enemyHp[i] / stats.maxHp;
@@ -622,7 +642,16 @@ export function resolvePartyEnemyPhase(
           const attackLogLine = `${def.name} uses ${move.skillId.replace(/-/g, ' ')} on ${target.name} for ${dmg} damage${
             target.defending ? ' (halved - defended)' : ''
           }.`;
-          enemyHits.push({ attackerIndex: i, targetUid, damage: dmg, missed: false, wasDefended: target.defending, logLine: attackLogLine });
+          const enemyHit: PartyEnemyHitResult = {
+            attackerIndex: i,
+            targetUid,
+            damage: dmg,
+            missed: false,
+            wasDefended: target.defending,
+            logLine: attackLogLine,
+            damageType: skill.damageType,
+          };
+          enemyHits.push(enemyHit);
           log.push(attackLogLine);
 
           // target's own equipped-item resistance (see equipmentEngine.ts's
@@ -635,6 +664,7 @@ export function resolvePartyEnemyPhase(
             const ailments = ailmentsByUid.get(targetUid)!;
             ailmentsByUid.set(targetUid, inflictAilment(ailments, skill.inflictsAilmentId, log));
             inflictedThisPhaseByUid.get(targetUid)!.add(skill.inflictsAilmentId);
+            enemyHit.ailmentInflicted = skill.inflictsAilmentId;
           }
         }
       }

@@ -21,7 +21,7 @@ import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemDisplayName } from '@/utils/itemName';
 import { itemWouldHaveEffect } from '@/utils/itemEffect';
-import type { PartyBattleSession } from '@/types';
+import type { PartyBattleSession, PartyCombatHitResult, PartyEnemyHitResult } from '@/types';
 import styles from './EndlessBattlePanel.module.css';
 
 interface EndlessBattlePanelProps {
@@ -162,12 +162,8 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   // enemy's counter-attack actually targeted (party HP itself is the plain list below, not
   // per-player sprites in the canvas). Cleared after a fixed playback window so a later turn with
   // no hits (e.g. a pure Defend) doesn't leave a stale animation queued.
-  const [activeOutgoingHits, setActiveOutgoingHits] = useState<
-    ({ targetIndex: number; damage: number; missed: boolean; defeated: boolean } & { key: number })[]
-  >([]);
-  const [activeIncomingHits, setActiveIncomingHits] = useState<
-    ({ attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean; logLine: string } & { key: number })[]
-  >([]);
+  const [activeOutgoingHits, setActiveOutgoingHits] = useState<(PartyCombatHitResult & { key: number })[]>([]);
+  const [activeIncomingHits, setActiveIncomingHits] = useState<(PartyEnemyHitResult & { key: number })[]>([]);
   // True for the full duration of a round's hit playback (matches CombatScene.tsx's own
   // playbackActive) - gates the action buttons below so a fast-cycling battle (e.g. a solo Endless
   // Battle run, where the same player's turn can come right back around the instant the enemy

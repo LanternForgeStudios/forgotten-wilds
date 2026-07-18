@@ -192,6 +192,16 @@ export interface CombatHitResult {
   damage: number;
   missed: boolean;
   defeated: boolean;
+  /** The action's damage type (attack: 'physical', skill: whatever the Skill entry says,
+   *  lanternAbility: 'lantern') - drives which generic impact FX BattleScene.playOutgoingHits
+   *  bursts on the target (blood/holy-light/magic-spark). Meaningless when `missed` is true (no
+   *  move was ever picked to report one for). */
+  damageType: DamageType;
+  /** Set only when this specific hit's ailment-infliction roll actually succeeded - lets the
+   *  client show that ailment's own colored FX (see BattleScene.playEnemyAilmentTakesHold)
+   *  instead of the generic damageType impact effect above, so a landed Burn doesn't get buried
+   *  under a redundant magic-spark burst on top of it. */
+  ailmentInflicted?: string;
 }
 
 export interface EnemyHitResult {
@@ -209,6 +219,12 @@ export interface EnemyHitResult {
    *  (BattleScene.playIncomingHits) instead of dumping every round's log lines at once, which
    *  read as disconnected from a multi-enemy fight's one-attacker-at-a-time presentation. */
   logLine: string;
+  /** See CombatHitResult.damageType - same generic-impact-FX purpose, just for an enemy's own
+   *  move hitting the player. Meaningless when `missed` is true. */
+  damageType: DamageType;
+  /** See CombatHitResult.ailmentInflicted - set only when this attacker's move actually landed
+   *  its ailment roll against the player this hit. */
+  ailmentInflicted?: string;
 }
 
 export interface RoundResult {
@@ -333,10 +349,10 @@ export function resolveRound(input: RoundInput): RoundResult {
   const enemyAilments: ActiveAilment[][] = input.enemies.map((e) => e.ailments.map((a) => ({ ...a })));
   const inflictedThisRoundByEnemy: Set<string>[] = input.enemies.map(() => new Set());
 
-  function inflictAilmentOnEnemy(i: number, ailmentId: string) {
-    if (!enemyDefs[i].vulnerableAilments.includes(ailmentId)) return;
+  function inflictAilmentOnEnemy(i: number, ailmentId: string): boolean {
+    if (!enemyDefs[i].vulnerableAilments.includes(ailmentId)) return false;
     const def = AILMENTS[ailmentId];
-    if (!def) return;
+    if (!def) return false;
     const list = enemyAilments[i];
     const existingIndex = list.findIndex((a) => a.ailmentId === ailmentId);
     const entry: ActiveAilment =
@@ -345,6 +361,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     else list.push(entry);
     inflictedThisRoundByEnemy[i].add(ailmentId);
     log.push(`${enemyDefs[i].name} is afflicted with ${def.name}!`);
+    return true;
   }
 
   /** Mirrors applyAilmentTickDamage below, for one enemy - called once per enemy per round, right
@@ -435,7 +452,7 @@ export function resolveRound(input: RoundInput): RoundResult {
 
     if (Math.random() < ENEMY_MISS_CHANCE) {
       const missLogLine = `${def.name}'s attack goes wide - miss!`;
-      enemyHits.push({ attackerIndex: i, damage: 0, missed: true, wasDefended: false, logLine: missLogLine });
+      enemyHits.push({ attackerIndex: i, damage: 0, missed: true, wasDefended: false, logLine: missLogLine, damageType: 'physical' });
       log.push(missLogLine);
       return;
     }
@@ -464,7 +481,15 @@ export function resolveRound(input: RoundInput): RoundResult {
     const attackLogLine = `${def.name} uses ${move.skillId.replace(/-/g, ' ')} for ${dmg} damage${
       playerDefending ? ' (halved - you defended)' : ''
     }.`;
-    enemyHits.push({ attackerIndex: i, damage: dmg, missed: false, wasDefended: playerDefending, logLine: attackLogLine });
+    const enemyHit: EnemyHitResult = {
+      attackerIndex: i,
+      damage: dmg,
+      missed: false,
+      wasDefended: playerDefending,
+      logLine: attackLogLine,
+      damageType: skill.damageType,
+    };
+    enemyHits.push(enemyHit);
     log.push(attackLogLine);
 
     // Only rolled once the attack itself has already landed (see Skill.inflictAilmentChance's doc
@@ -476,6 +501,7 @@ export function resolveRound(input: RoundInput): RoundResult {
       Math.random() < applyAilmentResistance(skill.inflictAilmentChance ?? 0, skill.inflictsAilmentId, input.ailmentResistances)
     ) {
       inflictAilment(skill.inflictsAilmentId);
+      enemyHit.ailmentInflicted = skill.inflictsAilmentId;
     }
   }
 
@@ -525,7 +551,7 @@ export function resolveRound(input: RoundInput): RoundResult {
       const missedBlind = blindApplies && Math.random() < blindMissChance;
       if (missedTargetAll || missedBlind) {
         log.push(`Your attack on ${enemyDefs[i].name} goes wide - miss!${missedBlind ? ' (Blind)' : ''}`);
-        hits.push({ targetIndex: i, damage: 0, missed: true, defeated: false });
+        hits.push({ targetIndex: i, damage: 0, missed: true, defeated: false, damageType });
         continue;
       }
       let dmg = Math.round(
@@ -533,9 +559,10 @@ export function resolveRound(input: RoundInput): RoundResult {
       );
       if (useAll) dmg = Math.max(1, Math.round(dmg * TARGET_ALL_DAMAGE_FACTOR));
       const defeated = damageEnemy(i, dmg, verb);
-      hits.push({ targetIndex: i, damage: dmg, missed: false, defeated });
-      if (ailment && !defeated && Math.random() < ailment.chance) {
-        inflictAilmentOnEnemy(i, ailment.id);
+      const hit: CombatHitResult = { targetIndex: i, damage: dmg, missed: false, defeated, damageType };
+      hits.push(hit);
+      if (ailment && !defeated && Math.random() < ailment.chance && inflictAilmentOnEnemy(i, ailment.id)) {
+        hit.ailmentInflicted = ailment.id;
       }
     }
   }

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { getAssetDefinition } from '@/assets/assetManager';
 import { AILMENT_TINT_HEX } from '@/utils/ailmentTint';
+import type { DamageType } from '@/types';
 import { splitFormation } from './battleFormation';
 import { loadSceneTexture } from './textureLoader';
 import {
@@ -29,6 +30,18 @@ const AILMENT_FX_ASSET: Record<string, string> = {
   poison: 'fx.poison-cloud',
   burn: 'fx.ember',
   freeze: 'fx.ice-shard',
+};
+// Generic "something landed" impact FX, keyed by the attack's damage type - bursts on the target's
+// own sprite for every landed (non-missed) outgoing hit (player -> enemy in solo/Endless Battle,
+// or the acting player -> their opponent in PvP), across all three battle scenes alike, the same
+// way AILMENT_FX_ASSET already does for a specifically-colored ailment burst. Skipped whenever a
+// hit's own ailmentInflicted is set instead (see playOutgoingHits) - a landed Burn already gets
+// its own distinctly-colored, bigger burst (playEnemyAilmentTakesHold), so this would just be
+// visual clutter layered on top of that same hit.
+const HIT_FX_ASSET: Record<DamageType, string> = {
+  physical: 'fx.blood-splatter',
+  lantern: 'fx.holy-light',
+  spirit: 'fx.magic-spark',
 };
 // Anchors the enemy sprite's own center - the HP bar/name/tier-text stack renders *below* that
 // (see createEnemySlot: barY = sprite bottom edge + ~14px, then name/tier further down still),
@@ -277,8 +290,14 @@ export class BattleScene extends Phaser.Scene {
   }
 
   /** Player's outgoing hits this round. Tint-flash + recoil-punch tween + floating "-N"/"MISS"
-   *  text per hit. A defeated:true hit chains into playDefeat once the impact tween settles. */
-  playOutgoingHits(hits: { targetIndex: number; damage: number; missed: boolean; defeated: boolean }[]): void {
+   *  text per hit. A defeated:true hit chains into playDefeat once the impact tween settles. Also
+   *  bursts a generic impact FX (blood/holy-light/magic-spark, keyed by damageType - see
+   *  HIT_FX_ASSET) on the target's own sprite for every landed hit, skipped when ailmentInflicted
+   *  is set (that hit already gets its own bigger, ailment-colored burst instead - see
+   *  playEnemyAilmentTakesHold). */
+  playOutgoingHits(
+    hits: { targetIndex: number; damage: number; missed: boolean; defeated: boolean; damageType: DamageType; ailmentInflicted?: string }[],
+  ): void {
     for (const hit of hits) {
       const slot = this.enemySlots.get(hit.targetIndex);
       if (!slot) continue;
@@ -288,6 +307,12 @@ export class BattleScene extends Phaser.Scene {
       }
       playOutgoingHitOnSprite(this, slot.sprite);
       playFloatingText(this, slot.sprite.x, slot.sprite.y - slot.sprite.displayHeight / 2 - 20, `-${hit.damage}`, COLOR_DAMAGE);
+      if (!hit.ailmentInflicted) {
+        const assetId = HIT_FX_ASSET[hit.damageType];
+        loadSceneTexture(this, assetId)
+          .then(() => playFxBurst(this, slot.sprite.x, slot.sprite.y, assetId, 10))
+          .catch(() => {});
+      }
       if (hit.defeated) {
         this.time.delayedCall(120, () => this.playDefeat(hit.targetIndex));
       }

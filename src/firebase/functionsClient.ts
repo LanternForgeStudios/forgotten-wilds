@@ -3,6 +3,7 @@ import type {
   ActiveAilment,
   ClanLeaderboardEntry,
   CombatAction,
+  DamageType,
   EnemyTier,
   PartyBattleParticipantStats,
   PartyBattleStatus,
@@ -117,6 +118,12 @@ export interface CombatHitResult {
   damage: number;
   missed: boolean;
   defeated: boolean;
+  /** Drives which generic impact FX (blood/holy-light/magic-spark) BattleScene.playOutgoingHits
+   *  bursts on the target - meaningless when missed. */
+  damageType: DamageType;
+  /** Set only when this hit's ailment roll actually succeeded - shows that ailment's own colored
+   *  FX instead of the generic damageType effect. */
+  ailmentInflicted?: string;
 }
 
 export interface EnemyHitResult {
@@ -130,6 +137,10 @@ export interface EnemyHitResult {
    *  staggered animation (see BattleScene.playIncomingHits) rather than dumping every round's log
    *  lines at once. */
   logLine: string;
+  /** See CombatHitResult.damageType. */
+  damageType: DamageType;
+  /** See CombatHitResult.ailmentInflicted. */
+  ailmentInflicted?: string;
 }
 
 export interface ResolveCombatActionResponse {
@@ -220,14 +231,9 @@ export async function callInteractWithShrine(
   return result.data;
 }
 
-export async function callDash(
-  options: { isDashStart?: boolean } = {},
-): Promise<{ stamina: number; maxStamina: number; staminaUpdatedAt: number }> {
-  const fn = httpsCallable<{ isDashStart?: boolean }, { stamina: number; maxStamina: number; staminaUpdatedAt: number }>(
-    functions,
-    'dash',
-  );
-  const result = await fn(options);
+export async function callDash(): Promise<{ stamina: number; maxStamina: number; staminaUpdatedAt: number }> {
+  const fn = httpsCallable<Record<string, never>, { stamina: number; maxStamina: number; staminaUpdatedAt: number }>(functions, 'dash');
+  const result = await fn({});
   return result.data;
 }
 

@@ -4,6 +4,7 @@
 // functions/src/functions/partyBattle.ts / endlessBattle.ts.
 
 import type { ActiveAilment, AilmentResistance } from './ailment';
+import type { DamageType } from './skill';
 
 export type PartyBattleMode = 'endless' | 'pvp';
 export type PartyBattleStatus = 'active' | 'awaitingContinueVote' | 'victory' | 'defeated' | 'withdrawn';
@@ -50,6 +51,12 @@ export interface PartyCombatHitResult {
   damage: number;
   missed: boolean;
   defeated: boolean;
+  /** Drives which generic impact FX (blood/holy-light/magic-spark) bursts on the target -
+   *  meaningless when missed. */
+  damageType: DamageType;
+  /** Set only when this hit's ailment roll actually succeeded - shows that ailment's own colored
+   *  FX instead of the generic damageType effect. */
+  ailmentInflicted?: string;
 }
 
 export interface PartyEnemyHitResult {
@@ -59,6 +66,10 @@ export interface PartyEnemyHitResult {
   missed: boolean;
   wasDefended: boolean;
   logLine: string;
+  /** See PartyCombatHitResult.damageType. */
+  damageType: DamageType;
+  /** See PartyCombatHitResult.ailmentInflicted. */
+  ailmentInflicted?: string;
 }
 
 /** PvP only ever has one possible target - singular where the party engine's own hit result
@@ -67,6 +78,10 @@ export interface PvpHitResult {
   damage: number;
   missed: boolean;
   defeated: boolean;
+  /** See PartyCombatHitResult.damageType. */
+  damageType: DamageType;
+  /** See PartyCombatHitResult.ailmentInflicted. */
+  ailmentInflicted?: string;
 }
 
 export interface PartyBattleTurnResult {

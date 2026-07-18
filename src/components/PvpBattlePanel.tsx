@@ -8,7 +8,7 @@ import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
 import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
 import { resolveDisplayNames } from '@/firebase/socialService';
-import { callSubmitPartyBattleAction, callUseItemInPartyBattle } from '@/firebase/functionsClient';
+import { callSubmitPartyBattleAction, callUseItemInPartyBattle, type CombatHitResult, type EnemyHitResult } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { getCurrentMusicId, playMusic, playSound } from '@/audio/audioService';
 import { getAssetUrl } from '@/assets/assetManager';
@@ -143,12 +143,8 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   // a match-ending one (currentTurnIndex deliberately left pointing at the player who just won/
   // forfeited) - both cases correctly resolve to "whoever was active in the previous snapshot".
   const prevActiveUidRef = useRef<string | null>(null);
-  const [activeOutgoingHits, setActiveOutgoingHits] = useState<
-    ({ targetIndex: number; damage: number; missed: boolean; defeated: boolean } & { key: number })[]
-  >([]);
-  const [activeIncomingHits, setActiveIncomingHits] = useState<
-    ({ attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean; logLine: string } & { key: number })[]
-  >([]);
+  const [activeOutgoingHits, setActiveOutgoingHits] = useState<(CombatHitResult & { key: number })[]>([]);
+  const [activeIncomingHits, setActiveIncomingHits] = useState<(EnemyHitResult & { key: number })[]>([]);
   useEffect(() => {
     if (!battle) return;
     const currentActiveUid = battle.turnOrder[battle.currentTurnIndex];
@@ -170,7 +166,18 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
       setActiveOutgoingHits([{ targetIndex: 0, ...pvpHit, key: resolvedAt }]);
       setActiveIncomingHits([]);
     } else {
-      setActiveIncomingHits([{ attackerIndex: 0, damage: pvpHit.damage, missed: pvpHit.missed, wasDefended: false, logLine: '', key: resolvedAt }]);
+      setActiveIncomingHits([
+        {
+          attackerIndex: 0,
+          damage: pvpHit.damage,
+          missed: pvpHit.missed,
+          wasDefended: false,
+          logLine: '',
+          damageType: pvpHit.damageType,
+          ailmentInflicted: pvpHit.ailmentInflicted,
+          key: resolvedAt,
+        },
+      ]);
       setActiveOutgoingHits([]);
     }
     const id = setTimeout(() => {
