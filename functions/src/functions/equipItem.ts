@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { EQUIPMENT, type EquipmentSlot } from '../data/equipment';
-import { adjustStatsForBonuses, setLanternOilCapacity } from '../engine/equipmentEngine';
+import { adjustStatsForBonuses, backfillPlayerEquipment, setLanternOilCapacity } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
 
 const VALID_SLOTS = new Set<EquipmentSlot>([
@@ -33,6 +33,7 @@ export const equipItem = onCall<EquipItemRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+    backfillPlayerEquipment(save);
 
     const owned = save.inventory.some((i) => i.itemId === itemId && i.quantity > 0);
     if (!owned) throw new HttpsError('failed-precondition', 'You do not own that item.');
@@ -77,6 +78,7 @@ export const unequipItem = onCall<UnequipItemRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+    backfillPlayerEquipment(save);
 
     const currentItemId = save.player.equipment[slot];
     if (currentItemId) {

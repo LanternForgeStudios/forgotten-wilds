@@ -7,7 +7,7 @@ import { rollChestRewards } from '../engine/dailyChestEngine';
 import { isMilestoneWave, milestoneChestTier } from '../engine/endlessBattleEngine';
 import { grantItem, itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
-import { computeAilmentResistances, resolveWeaponAttackAilment } from '../engine/equipmentEngine';
+import { backfillPlayerEquipment, computeAilmentResistances, resolveWeaponAttackAilment } from '../engine/equipmentEngine';
 import { SKILLS } from '../data/skills';
 import { AILMENTS } from '../data/ailments';
 import { ITEMS } from '../data/items';
@@ -37,9 +37,15 @@ interface PreFetchedSave {
 }
 
 async function getSaveForUid(tx: Transaction, db: Firestore, uid: string, preFetched?: PreFetchedSave): Promise<PlayerSave | null> {
-  if (preFetched?.uid === uid) return preFetched.save;
+  if (preFetched?.uid === uid) {
+    backfillPlayerEquipment(preFetched.save);
+    return preFetched.save;
+  }
   const snap = await tx.get(db.collection('users').doc(uid));
-  return snap.exists ? (snap.data() as PlayerSave) : null;
+  if (!snap.exists) return null;
+  const save = snap.data() as PlayerSave;
+  backfillPlayerEquipment(save);
+  return save;
 }
 
 /** Validates a submitted action's skill/lanternAbility/item ownership and sufficiency against the
@@ -183,12 +189,7 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
   // Backfill for a save written before knownSkillIds existed - same one-line pattern
   // resolveCombatAction.ts already uses for the exact same reason (see that file's own comment).
   if (!save.player.knownSkillIds) save.player.knownSkillIds = ['keepers-strike'];
-  // Backfill for a save written before the equipment system existed - see
-  // resolveCombatAction.ts's identical comment for why this now needs to be unconditional (every
-  // Endless Battle/PvP start reads save.player.equipment below, not just a lanternAbility action).
-  if (!save.player.equipment) {
-    save.player.equipment = { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
-  }
+  backfillPlayerEquipment(save);
   return {
     hp: save.player.stats.maxHp,
     maxHp: save.player.stats.maxHp,

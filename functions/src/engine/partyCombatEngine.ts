@@ -591,6 +591,11 @@ export function resolvePartyEnemyPhase(
   // damage against itself (Poison/Burn/Freeze) - matching combatEngine.ts's solo-fight parity.
   const enemyHp = enemies.map((e) => e.hp);
   const enemyAilmentsByIndex: ActiveAilment[][] = enemies.map((e) => e.ailments.map((a) => ({ ...a })));
+  // Always stays empty in this function - nothing inflicts a *new* ailment on an enemy during the
+  // enemy phase itself (that only happens on a player's own turn, see resolveOffensiveHits).
+  // Threaded into expireAilments below anyway, for the same reason inflictedThisPhaseByUid is:
+  // matching that helper's signature so a freshly-inflicted ailment (from the player phase just
+  // before this one) isn't accidentally ticked down to 0 turns before it ever takes effect.
   const inflictedThisPhaseByEnemy: Set<string>[] = enemies.map(() => new Set());
 
   function pickTargetUid(): string | undefined {

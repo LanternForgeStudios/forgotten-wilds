@@ -1,5 +1,20 @@
 import { EQUIPMENT, type StatBonuses } from '../data/equipment';
-import type { AilmentResistance, PlayerEquipment, Stats } from '../shared-types';
+import type { AilmentResistance, PlayerEquipment, PlayerSave, Stats } from '../shared-types';
+
+/** Backfill for a save written before the equipment system existed - player.equipment is entirely
+ *  absent from the Firestore doc for these, not just empty, so any unguarded `save.player.
+ *  equipment.X` read throws a bare INTERNAL error. Matches buildFreshPlayer's own defaults
+ *  (newCharacter.ts). Every Cloud Function that reads a PlayerSave's equipment must call this
+ *  first, on that save, before touching it - centralized here (rather than each call site
+ *  duplicating the same object literal) specifically so a new call site can't reintroduce this
+ *  crash by forgetting to copy it; a prior version of this fix shipped as four separate inline
+ *  copies and still missed six other real call sites (equipItem/unequipItem/sellItem/trade.ts,
+ *  and partyBattle.ts's restoreParticipantsAndClearLocks/restoreAndRewardPvpParticipants). */
+export function backfillPlayerEquipment(save: PlayerSave): void {
+  if (!save.player.equipment) {
+    save.player.equipment = { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
+  }
+}
 
 /** Mutates stats in place, applying (sign=1) or removing (sign=-1) an item's bonuses, clamping current
  *  hp/spirit so they never exceed the resulting max after the change. */

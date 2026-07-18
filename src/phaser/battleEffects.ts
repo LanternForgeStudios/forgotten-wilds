@@ -9,6 +9,14 @@ export const COLOR_MISS = 0xb8a888; // --fw-text-dim
 export const COLOR_DEFENDED = 0x7a94a8; // a cooler/dimmer blue-grey, for a successfully-defended hit
 export const COLOR_WHITE = 0xffffff;
 
+/** Depth for every particle emitter this file drives (defeat burst, ailment/hit FX bursts) - a
+ *  Phaser particle emitter with no explicit depth defaults below BattleScene's enemy sprites
+ *  (depth 10) and their HP-bar/name chrome (11-12), so it would render *behind* the thing it's
+ *  supposed to be bursting on top of. Stays under playFloatingText's 2000 (damage numbers must
+ *  always stay readable on top of everything, FX included). One shared constant so
+ *  playFxBurst/playDefeatEffect can't drift apart on this. */
+export const FX_EMITTER_DEPTH = 15;
+
 /** Delay between each attacking enemy's turn in a multi-enemy round's incoming-hit playback (both
  *  the visual animation in BattleScene.playIncomingHits and the matching log-line reveal in
  *  CombatScene.tsx use this same value, kept in one place so they can't drift apart) - long enough
@@ -134,9 +142,7 @@ export function playDefeatEffect(
     quantity: 12,
     emitting: false,
   });
-  // See playFxBurst's identical comment - an emitter with no explicit depth renders behind the
-  // enemy sprite it's supposed to be bursting on top of.
-  emitter.setDepth(15);
+  emitter.setDepth(FX_EMITTER_DEPTH);
   emitter.explode(12);
   scene.time.delayedCall(500, () => emitter.destroy());
 
@@ -167,12 +173,7 @@ export function playFxBurst(scene: Phaser.Scene, x: number, y: number, textureKe
     rotate: { min: -180, max: 180 },
     emitting: false,
   });
-  // A particle emitter with no explicit depth defaults below BattleScene's enemy sprites (depth
-  // 10) and their HP-bar/name chrome (11-12), so every burst this drives - ailment ticks/takes-
-  // hold, and the landed-hit blood/holy-light/magic-spark FX - rendered *behind* the enemy it was
-  // supposed to be bursting on top of. 15 clears all of that while staying under playFloatingText's
-  // 2000 (damage numbers must always stay readable on top of everything, FX included).
-  emitter.setDepth(15);
+  emitter.setDepth(FX_EMITTER_DEPTH);
   emitter.explode(quantity);
   scene.time.delayedCall(1300, () => emitter.destroy());
 }

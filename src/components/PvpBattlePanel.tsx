@@ -159,9 +159,11 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
       return;
     }
     // Mirrors CombatScene.tsx's own sfx.combat-hit/sfx.enemy-defeated triggers - defeating a human
-    // opponent reuses the same "defeated" sting rather than a separate PvP-only asset.
+    // opponent reuses the same "defeated" sting rather than a separate PvP-only asset. Gated to
+    // the winner only - the loser already gets their own sfx.defeat/music.defeat from the
+    // status-transition effect below, and would otherwise hear both stings at once.
     if (!pvpHit.missed) void playSound('sfx.combat-hit');
-    if (pvpHit.defeated) void playSound('sfx.enemy-defeated');
+    if (pvpHit.defeated && lastActorUid === uid) void playSound('sfx.enemy-defeated');
     if (lastActorUid === uid) {
       setActiveOutgoingHits([{ targetIndex: 0, ...pvpHit, key: resolvedAt }]);
       setActiveIncomingHits([]);

@@ -183,6 +183,11 @@ export function useGridMovement({
   // throttle still gates the actual move rate, so over-calling it is harmless) removes that dead
   // pause entirely, same fix already applied to Dash via useDashKeybind's held-Shift tracking.
   const heldFacingRef = useRef<Facing | null>(null);
+  // Tracks whichever direction key is *physically* held down right now, independent of who
+  // currently owns movement (this loop vs. useDash.ts's own loop while Shift is also held) - lets
+  // Shift's keyup handler below re-arm normal held-movement for a direction that was never
+  // released, instead of leaving it frozen. See handleKeyUp's 'Shift' case.
+  const physicallyHeldFacingRef = useRef<Facing | null>(null);
   const attemptMoveRef = useRef(attemptMove);
   attemptMoveRef.current = attemptMove;
 
@@ -219,10 +224,14 @@ export function useGridMovement({
         if (heldFacingRef.current) stopHolding();
         return;
       }
+      const facing = KEY_TO_FACING[e.key];
+      // Tracked before the Shift check below so a direction pressed (or already held) while Shift
+      // is down is still remembered - otherwise releasing Shift later has no record of it to
+      // resume.
+      if (facing) physicallyHeldFacingRef.current = facing;
       // Shift+direction is Dash, handled by a separate hook (useDashKeybind) - don't also take a
       // normal single-tile step on the same keypress.
       if (e.shiftKey) return;
-      const facing = KEY_TO_FACING[e.key];
       if (!facing) return;
       e.preventDefault();
       // The OS's own auto-repeat re-fires keydown for the still-held key - ignore those (the
@@ -232,8 +241,18 @@ export function useGridMovement({
     }
 
     function handleKeyUp(e: KeyboardEvent) {
+      // Releasing Shift while a direction is still physically held must hand movement back to
+      // this loop - useDash.ts's own loop (which owned movement while Shift was down) stops on
+      // this same keyup, and without this nothing else re-arms the normal loop, leaving the
+      // player frozen despite still holding a direction key.
+      if (e.key === 'Shift') {
+        if (physicallyHeldFacingRef.current) startHolding(physicallyHeldFacingRef.current);
+        return;
+      }
       const facing = KEY_TO_FACING[e.key];
-      if (!facing || heldFacingRef.current !== facing) return;
+      if (!facing) return;
+      if (physicallyHeldFacingRef.current === facing) physicallyHeldFacingRef.current = null;
+      if (heldFacingRef.current !== facing) return;
       stopHolding();
     }
 
@@ -241,6 +260,7 @@ export function useGridMovement({
     // - without this the interval would keep calling attemptMove indefinitely.
     function handleBlur() {
       stopHolding();
+      physicallyHeldFacingRef.current = null;
     }
 
     window.addEventListener('keydown', handleKeyDown);

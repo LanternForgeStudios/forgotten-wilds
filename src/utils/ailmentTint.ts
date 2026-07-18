@@ -12,13 +12,16 @@ export const AILMENT_TINT_COLORS: Record<string, string> = {
   silence: 'rgba(156, 39, 176, 0.22)',
 };
 
+function rgbaToHex(rgba: string): number {
+  const [r, g, b] = rgba.replace(/[^\d,.]/g, '').split(',').map(Number);
+  return (r << 16) | (g << 8) | b;
+}
+
 // Same hues as AILMENT_TINT_COLORS above, as opaque 0xRRGGBB ints - Phaser's Sprite.setTint wants
 // a numeric tint, not a CSS rgba string, so this is the enemy-sprite-facing companion to the
 // screen-wash colors rather than a second, independently-tuned palette (BattleScene.ts uses this
-// for the enemy-ailment tint added alongside the badge text under each afflicted enemy).
-export const AILMENT_TINT_HEX: Record<string, number> = {
-  poison: 0x4caf50,
-  burn: 0xd32f2f,
-  freeze: 0x2979ff,
-  silence: 0x9c27b0,
-};
+// for the enemy-ailment tint added alongside the badge text under each afflicted enemy). Derived
+// from AILMENT_TINT_COLORS rather than hand-copied, so the two palettes can't drift apart.
+export const AILMENT_TINT_HEX: Record<string, number> = Object.fromEntries(
+  Object.entries(AILMENT_TINT_COLORS).map(([ailmentId, rgba]) => [ailmentId, rgbaToHex(rgba)]),
+);

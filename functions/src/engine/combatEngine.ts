@@ -4,7 +4,7 @@ import { ITEMS } from '../data/items';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { AILMENTS } from '../data/ailments';
 import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
-import { applyAilmentResistance, computeDamage, pickEnemyMove, weightedPick } from './combatMath';
+import { applyAilmentResistance, blindMissChance, computeDamage, pickEnemyMove, weightedPick } from './combatMath';
 import type { AilmentResistance, CombatAction, Stats, ActiveAilment } from '../shared-types';
 
 export function rollEnemyForLocation(locationId: string): EnemyDefinition {
@@ -427,9 +427,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     (mult, a) => mult * (AILMENTS[a.ailmentId]?.effect.attackMultiplier ?? 1),
     1,
   );
-  const blindMissChance = ailments.some((a) => a.ailmentId === 'blind')
-    ? 1 - (AILMENTS.blind.effect.physicalAccuracyMultiplier ?? 1)
-    : 0;
+  const playerBlindMissChance = blindMissChance(ailments);
 
   function damageEnemy(i: number, dmg: number, verb: string): boolean {
     const before = enemyHp[i];
@@ -447,6 +445,14 @@ export function resolveRound(input: RoundInput): RoundResult {
 
     if (enemyAilments[i].some((a) => a.ailmentId === 'stun')) {
       log.push(`${def.name} is stunned and cannot move!`);
+      return;
+    }
+
+    const enemyBlindChance = blindMissChance(enemyAilments[i]);
+    if (enemyBlindChance > 0 && Math.random() < enemyBlindChance) {
+      const missLogLine = `${def.name}'s attack goes wide - miss! (Blind)`;
+      enemyHits.push({ attackerIndex: i, damage: 0, missed: true, wasDefended: false, logLine: missLogLine, damageType: 'physical' });
+      log.push(missLogLine);
       return;
     }
 
@@ -544,11 +550,11 @@ export function resolveRound(input: RoundInput): RoundResult {
     const alive = aliveIndices();
     const useAll = !!action.targetAll && alive.length > 1;
     const targets = useAll ? alive : [resolveTargetIndex()].filter((i): i is number => i !== undefined);
-    const blindApplies = damageType === 'physical' && blindMissChance > 0;
+    const blindApplies = damageType === 'physical' && playerBlindMissChance > 0;
 
     for (const i of targets) {
       const missedTargetAll = useAll && Math.random() < TARGET_ALL_MISS_CHANCE;
-      const missedBlind = blindApplies && Math.random() < blindMissChance;
+      const missedBlind = blindApplies && Math.random() < playerBlindMissChance;
       if (missedTargetAll || missedBlind) {
         log.push(`Your attack on ${enemyDefs[i].name} goes wide - miss!${missedBlind ? ' (Blind)' : ''}`);
         hits.push({ targetIndex: i, damage: 0, missed: true, defeated: false, damageType });

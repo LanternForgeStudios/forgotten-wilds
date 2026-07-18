@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { sellPriceFor } from '../engine/pricingEngine';
 import { isItemEquipped, removeItem } from '../engine/inventoryEngine';
+import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface SellItemRequest {
@@ -33,6 +34,7 @@ export const sellItem = onCall<SellItemRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+    backfillPlayerEquipment(save);
 
     const entry = save.inventory.find((i) => i.itemId === itemId);
     if (!entry || entry.quantity < 1) {

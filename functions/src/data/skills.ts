@@ -103,10 +103,14 @@ export const SKILLS: Record<string, Skill> = {
   },
 
   // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Forgotten Treatises).
-  // Themed around Freeze/Burn via name/description, the effectiveAgainstFamilies bonus below, and
-  // (now that enemies can be afflicted) an ailment matching that theme - both land only on a
-  // vulnerable target (coalSpirits/waterSpirits/briarSpirits are all vulnerable to their
-  // respective ailment here, see enemies.ts's vulnerableAilments).
+  // Themed around Freeze/Burn via name/description and (now that enemies can be afflicted) an
+  // ailment matching that theme, which only lands on a vulnerable target (coalSpirits/
+  // waterSpirits/briarSpirits are all vulnerable to their respective ailment here, see
+  // enemies.ts's vulnerableAilments). Note: effectiveAgainstFamilies below is set but NOT
+  // currently read for a 'skill' action by either combat engine (only a 'lanternAbility' reads
+  // it, see combatEngine.ts/partyCombatEngine.ts's effectiveAgainstFamilies handling) - these two
+  // Skills' weakness bonus is inert today. Leaving that gap alone here since wiring it up would
+  // be a real damage-balance change, not a doc-comment fix.
   'frost-lance': {
     id: 'frost-lance',
     kind: 'spiritArt',

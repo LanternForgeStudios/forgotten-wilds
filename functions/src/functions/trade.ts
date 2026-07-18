@@ -8,6 +8,7 @@ import {
   validateTradeOfferItems,
   type TradeItemRequest,
 } from '../engine/tradeEngine';
+import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { ActiveTradeLockDoc, FriendshipDoc, PlayerSave, TradeDoc, TradeOfferSide } from '../shared-types';
 
 /** Deterministic key for the one-active-trade-per-pair lock, independent of who's the initiator
@@ -79,6 +80,7 @@ export const proposeTrade = onCall<ProposeTradeRequest>(async (request) => {
     }
 
     const save = userSnap.data() as PlayerSave;
+    backfillPlayerEquipment(save);
     const validation = validateTradeOfferItems(items, save.inventory, save.player.equipment);
     if (!validation.ok) throw new HttpsError('failed-precondition', validation.message ?? 'Invalid offer.');
     if (gold > save.player.gold) throw new HttpsError('failed-precondition', 'Not enough gold.');
@@ -169,6 +171,7 @@ export const respondToTradeOffer = onCall<RespondToTradeOfferRequest>(async (req
     const recipientSnap = await tx.get(recipientRef);
     if (!recipientSnap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const recipientSave = recipientSnap.data() as PlayerSave;
+    backfillPlayerEquipment(recipientSave);
 
     const offer = counterOffer as TradeOfferSide;
     const validation = validateTradeOfferItems(offer.items, recipientSave.inventory, recipientSave.player.equipment);
