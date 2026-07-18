@@ -13,10 +13,6 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 // comfortably above the throttle floor rather than padded for network latency - the closer to it,
 // the smoother a held dash feels.
 const DASH_STEP_MS = 120;
-// Matches the server's own hard floor (functions/src/functions/dash.ts) - not itself what prevents
-// spamming (the server enforces that regardless of what the client sends), just avoids firing a
-// network call the client already knows would be rejected.
-const DASH_COOLDOWN_MS = 3000;
 
 function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -30,14 +26,15 @@ interface UseDashOptions {
 /** Dash: hold to run in the given direction (or the player's current facing, e.g. the mobile Dash
  *  button) until Stamina runs out, the held direction changes to something new, or movement is
  *  blocked by collision - replacing the old fixed "5 tiles for a flat upfront cost" model. Movement
- *  starts on the very first held frame - no ramp-up beat. Stamina is debited per tile via the
- *  server-authoritative dash Cloud Function (functions/src/functions/dash.ts), fired
- *  fire-and-forget alongside each tile's movement rather than gating it - see the loop's own
- *  comment for why. Call `startDash` on press (optionally with an explicit facing) and `stopDash`
- *  on release - see useDashKeybind.ts (keyboard: Shift held) and MobileHud.tsx (touch:
- *  press-and-hold). */
+ *  starts on the very first held frame - no ramp-up beat, and no cooldown between holds either (a
+ *  player with Stamina to spend can release and immediately hold again) - Stamina itself is the
+ *  only throttle, per the design decision that a flat extra cooldown on top of it was an
+ *  unnecessary second gate. Stamina is debited per tile via the server-authoritative dash Cloud
+ *  Function (functions/src/functions/dash.ts), fired fire-and-forget alongside each tile's
+ *  movement rather than gating it - see the loop's own comment for why. Call `startDash` on press
+ *  (optionally with an explicit facing) and `stopDash` on release - see useDashKeybind.ts
+ *  (keyboard: Shift held) and MobileHud.tsx (touch: press-and-hold). */
 export function useDash({ attemptMove, positionRef }: UseDashOptions) {
-  const lastDashEndedAtRef = useRef(0);
   const dashingRef = useRef(false);
   // The currently-held direction - null means "not dashing" and is also the hold-loop's own stop
   // signal. A direction key pressed while already dashing just updates this (see startDash's
@@ -66,8 +63,6 @@ export function useDash({ attemptMove, positionRef }: UseDashOptions) {
         if (requestedFacing) facingRef.current = requestedFacing;
         return;
       }
-      const now = Date.now();
-      if (now - lastDashEndedAtRef.current < DASH_COOLDOWN_MS) return;
 
       const facing = requestedFacing ?? positionRef.current.facing;
       facingRef.current = facing;
@@ -81,21 +76,19 @@ export function useDash({ attemptMove, positionRef }: UseDashOptions) {
       // (a rejected call's tile has already visually happened by the time the rejection arrives -
       // at most one tile's worth) for genuinely smooth, continuous movement. staminaExhausted is
       // set the instant any call rejects, stopping the loop before the *next* tile fires.
-      let isDashStart = true;
       let staminaExhausted = false;
       try {
         while (facingRef.current !== null && !staminaExhausted) {
           const before = positionRef.current;
           attemptMoveRef.current(facingRef.current, { isDash: true });
-          callDash({ isDashStart })
+          callDash()
             .then((result) => {
               patchStats({ stamina: result.stamina, maxStamina: result.maxStamina });
               patchPlayer({ staminaUpdatedAt: result.staminaUpdatedAt });
             })
             .catch(() => {
-              staminaExhausted = true; // out of Stamina (or, rarely, still on cooldown)
+              staminaExhausted = true; // out of Stamina
             });
-          isDashStart = false;
           await wait(DASH_STEP_MS);
           const after = positionRef.current;
           if (after.x === before.x && after.y === before.y) break; // blocked - stop the dash here
@@ -103,7 +96,6 @@ export function useDash({ attemptMove, positionRef }: UseDashOptions) {
       } finally {
         dashingRef.current = false;
         facingRef.current = null;
-        lastDashEndedAtRef.current = Date.now();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

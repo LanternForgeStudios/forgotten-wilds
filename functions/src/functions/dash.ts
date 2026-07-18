@@ -2,16 +2,6 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import type { PlayerSave } from '../shared-types';
 
-interface DashRequest {
-  /** True for the first tile of a fresh hold (gates the cooldown check below); false for every
-   *  continuation tile of an already-in-progress hold, called roughly every DASH_STEP_MS
-   *  (src/hooks/useDash.ts) for as long as the player keeps Dash held - those must skip the
-   *  cooldown gate entirely, or the hold would get cut off after its very first tile the moment
-   *  staminaUpdatedAt (below) gets touched. Defaults to true so an old/mismatched client still
-   *  gets the (more conservative) cooldown-gated behavior instead of silently bypassing it. */
-  isDashStart?: boolean;
-}
-
 /** How much Stamina one dashed tile costs, and how long a full empty-to-max refill takes - both
  *  fixed server constants rather than data-file content since there's only one kind of dash right
  *  now. Regen is expressed as "seconds to fill the whole bar" rather than a flat per-second amount
@@ -22,20 +12,12 @@ interface DashRequest {
  *  so an uninterrupted full-Stamina hold still covers roughly the same ~5 tiles it always did. */
 const DASH_COST_PER_TILE = 3;
 const FULL_REGEN_SECONDS = 20;
-/** Hard floor between the *end* of one dash hold and the *start* of the next, enforced server-side
- *  against staminaUpdatedAt (which every tile-debit call - including the last one of a hold -
- *  updates, so it's a close-enough proxy for "when the hold ended," within one DASH_STEP_MS).
- *  Without this, a client with enough banked Stamina could fire fresh dash holds back to back with
- *  no gap at all and cross an entire map's encounter zones for free. Only checked when
- *  isDashStart is true - never applies mid-hold, or every hold would cut itself off after one tile. */
-const DASH_COOLDOWN_MS = 3000;
 
-export const dash = onCall<DashRequest>(async (request) => {
+export const dash = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');
   }
-  const isDashStart = request.data?.isDashStart !== false;
 
   const db = getFirestore();
   const userRef = db.collection('users').doc(uid);
@@ -50,9 +32,6 @@ export const dash = onCall<DashRequest>(async (request) => {
     }
 
     const now = Date.now();
-    if (isDashStart && now - save.player.staminaUpdatedAt < DASH_COOLDOWN_MS) {
-      throw new HttpsError('failed-precondition', 'Dash is still recovering.');
-    }
 
     // Lazy regen: there's no scheduled job ticking every player's Stamina, so each Dash call
     // first reconciles however much time has passed since the last update (a few tenths of a
