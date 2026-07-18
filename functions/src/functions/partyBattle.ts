@@ -433,7 +433,11 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         participantStats: nextParticipantStats,
         enemies: nextEnemies,
         status,
-        lastTurnResult: { round: battle.round, log: logLines, resolvedAt: now, hits: turnResult.hits, enemyHits },
+        // Firestore's Admin SDK rejects an explicit `undefined` field value outright (same class of
+        // bug as ActiveAilment.turnsRemaining's own doc comment) - a victory declared right after
+        // the active player's own attack (before the enemy phase ever runs) calls this with no
+        // enemyHits arg at all, which must default to [] here rather than writing `undefined`.
+        lastTurnResult: { round: battle.round, log: logLines, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyHits ?? [] },
         lastWaveRewards,
         continueVotes: status === 'awaitingContinueVote' ? {} : battle.continueVotes,
         updatedAt: now,
