@@ -160,20 +160,40 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'tileset.graveyard-set',
     category: 'tileset',
-    intendedUse: 'Graveyard-themed tile/prop set - not yet wired into any map',
+    intendedUse: 'Graveyard-themed tile/prop set - source art for tileset.graveyard-set-16, the version actually used by 16x16-grid maps',
     filePath: 'tilesets/Graveyard_Set.png',
     dimensions: { width: 432, height: 480 },
     status: 'placeholder',
     notes: 'provenance unconfirmed, verify license before shipping as final.',
   },
   {
+    id: 'tileset.graveyard-set-16',
+    category: 'tileset',
+    intendedUse: "Graveyard_Set.png pre-scaled to a 16x16 tile grid (from its native 48x48) - used by black-briar-forest.json instead of the runtime ExplorationScene.ts pre-scaling fallback (see that file's own doc comment) so mismatched-grid maps get a real asset, not a canvas resize on first load",
+    filePath: 'tilesets/Graveyard_Set-16.png',
+    dimensions: { width: 144, height: 160 },
+    status: 'placeholder',
+    notes:
+      'Generated via scripts/genScaledTilesets.mjs (nearest-neighbor downscale of tileset.graveyard-set, same provenance/license caveat as that source).',
+  },
+  {
     id: 'tileset.ground-tiles',
     category: 'tileset',
-    intendedUse: 'Generic ground tile sheet - not yet wired into any map',
+    intendedUse: 'Generic ground tile sheet - source art for tileset.ground-tiles-16, the version actually used by 16x16-grid maps',
     filePath: 'tilesets/ground-tiles.png',
     dimensions: { width: 416, height: 384 },
     status: 'placeholder',
     notes: 'provenance unconfirmed, verify license before shipping as final.',
+  },
+  {
+    id: 'tileset.ground-tiles-16',
+    category: 'tileset',
+    intendedUse: "ground-tiles.png pre-scaled to a 16x16 tile grid (from its native 32x32) - used by ash-hallow.json/black-briar-forest.json/ironwood-trail.json/raven-ridge.json/whisper-falls.json instead of the runtime ExplorationScene.ts pre-scaling fallback (see that file's own doc comment) so mismatched-grid maps get a real asset, not a canvas resize on first load",
+    filePath: 'tilesets/ground-tiles-16.png',
+    dimensions: { width: 208, height: 192 },
+    status: 'placeholder',
+    notes:
+      'Generated via scripts/genScaledTilesets.mjs (nearest-neighbor downscale of tileset.ground-tiles, same provenance/license caveat as that source).',
   },
   {
     id: 'tileset.outdoor-decor',
@@ -268,11 +288,21 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'tileset.trees-signs-rocks-bridge',
     category: 'tileset',
-    intendedUse: 'Mixed outdoor prop sheet: trees, signs, rocks, bridge pieces - likely source for the \'Default Tree\' asset needed by the 3/4-view scale spec - not yet wired into any map',
+    intendedUse: 'Mixed outdoor prop sheet: trees, signs, rocks, bridge pieces - likely source for the \'Default Tree\' asset needed by the 3/4-view scale spec; also source art for tileset.trees-signs-rocks-bridge-16, the version actually used by 16x16-grid maps',
     filePath: 'tilesets/trees-signs-rocks-bridge.png',
     dimensions: { width: 512, height: 864 },
     status: 'placeholder',
     notes: 'provenance unconfirmed, verify license before shipping as final.',
+  },
+  {
+    id: 'tileset.trees-signs-rocks-bridge-16',
+    category: 'tileset',
+    intendedUse: "trees-signs-rocks-bridge.png pre-scaled to a 16x16 tile grid (from its native 32x32) - used by ash-hallow.json/black-briar-forest.json/ironwood-trail.json/raven-ridge.json/whisper-falls.json instead of the runtime ExplorationScene.ts pre-scaling fallback (see that file's own doc comment) so mismatched-grid maps get a real asset, not a canvas resize on first load",
+    filePath: 'tilesets/trees-signs-rocks-bridge-16.png',
+    dimensions: { width: 256, height: 432 },
+    status: 'placeholder',
+    notes:
+      'Generated via scripts/genScaledTilesets.mjs (nearest-neighbor downscale of tileset.trees-signs-rocks-bridge, same provenance/license caveat as that source).',
   },
   {
     id: 'tileset.tx-plant-shadow',
@@ -394,11 +424,21 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'tileset.velmora-environments',
     category: 'tileset',
-    intendedUse: 'VelmoraRealms-branded pack: environment tiles - not yet wired into any map',
+    intendedUse: 'VelmoraRealms-branded pack: environment tiles - source art for tileset.velmora-environments-16, the version actually used by 16x16-grid maps',
     filePath: 'tilesets/VelmoraRealms-Environments_Free.png',
     dimensions: { width: 320, height: 208 },
     status: 'placeholder',
     notes: 'provenance unconfirmed, verify license before shipping as final.',
+  },
+  {
+    id: 'tileset.velmora-environments-16',
+    category: 'tileset',
+    intendedUse: "VelmoraRealms-Environments_Free.png pre-scaled to a 16x16 tile grid (from its native 32x32) - used by every Ash Hallow building interior map instead of the runtime ExplorationScene.ts pre-scaling fallback (see that file's own doc comment) so mismatched-grid maps get a real asset, not a canvas resize on first load",
+    filePath: 'tilesets/VelmoraRealms-Environments_Free-16.png',
+    dimensions: { width: 160, height: 104 },
+    status: 'placeholder',
+    notes:
+      'Generated via scripts/genScaledTilesets.mjs (nearest-neighbor downscale of tileset.velmora-environments, same provenance/license caveat as that source). Source image has a 16x208 partial/unused row (208 isn\'t a multiple of the 32px tile height) - this scaled copy inherits the same 8px leftover strip proportionally, harmless since Tiled\'s own declared columns/tilecount already ignores it.',
   },
   {
     id: 'enemy.velmora-slime-animation',
@@ -466,11 +506,21 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'tileset.water-animation-demo',
     category: 'tileset',
-    intendedUse: 'Animated water tile demo sheet - not yet wired into any map',
+    intendedUse: 'Animated water tile demo sheet - source art for tileset.water-animation-demo-16, the version actually used by 16x16-grid maps',
     filePath: 'tilesets/water_animation_demo.png',
     dimensions: { width: 192, height: 128 },
     status: 'placeholder',
     notes: 'provenance unconfirmed, verify license before shipping as final.',
+  },
+  {
+    id: 'tileset.water-animation-demo-16',
+    category: 'tileset',
+    intendedUse: "water_animation_demo.png pre-scaled to a 16x16 tile grid (from its native 64x64) - used by whisper-falls.json instead of the runtime ExplorationScene.ts pre-scaling fallback (see that file's own doc comment) so mismatched-grid maps get a real asset, not a canvas resize on first load",
+    filePath: 'tilesets/water_animation_demo-16.png',
+    dimensions: { width: 48, height: 32 },
+    status: 'placeholder',
+    notes:
+      'Generated via scripts/genScaledTilesets.mjs (nearest-neighbor downscale of tileset.water-animation-demo, same provenance/license caveat as that source).',
   },
   {
     id: 'tileset.water-middle',

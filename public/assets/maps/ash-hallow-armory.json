@@ -412,11 +412,11 @@
     {
       "firstgid": 133,
       "name": "velmora-environments",
-      "image": "../../../public/assets/tilesets/VelmoraRealms-Environments_Free.png",
-      "imagewidth": 320,
-      "imageheight": 208,
-      "tilewidth": 32,
-      "tileheight": 32,
+      "image": "../../../public/assets/tilesets/VelmoraRealms-Environments_Free-16.png",
+      "imagewidth": 160,
+      "imageheight": 104,
+      "tilewidth": 16,
+      "tileheight": 16,
       "margin": 0,
       "spacing": 0,
       "columns": 10,
@@ -425,7 +425,7 @@
         {
           "name": "tilesetAssetId",
           "type": "string",
-          "value": "tileset.velmora-environments"
+          "value": "tileset.velmora-environments-16"
         }
       ]
     }

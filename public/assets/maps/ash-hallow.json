@@ -2066,11 +2066,11 @@
     {
       "firstgid": 1,
       "name": "ground-tiles",
-      "image": "../../../public/assets/tilesets/ground-tiles.png",
-      "imagewidth": 416,
-      "imageheight": 384,
-      "tilewidth": 32,
-      "tileheight": 32,
+      "image": "../../../public/assets/tilesets/ground-tiles-16.png",
+      "imagewidth": 208,
+      "imageheight": 192,
+      "tilewidth": 16,
+      "tileheight": 16,
       "margin": 0,
       "spacing": 0,
       "columns": 13,
@@ -2079,7 +2079,7 @@
         {
           "name": "tilesetAssetId",
           "type": "string",
-          "value": "tileset.ground-tiles"
+          "value": "tileset.ground-tiles-16"
         }
       ],
       "tiles": [
@@ -2108,11 +2108,11 @@
     {
       "firstgid": 157,
       "name": "trees-props",
-      "image": "../../../public/assets/tilesets/trees-signs-rocks-bridge.png",
-      "imagewidth": 512,
-      "imageheight": 864,
-      "tilewidth": 32,
-      "tileheight": 32,
+      "image": "../../../public/assets/tilesets/trees-signs-rocks-bridge-16.png",
+      "imagewidth": 256,
+      "imageheight": 432,
+      "tilewidth": 16,
+      "tileheight": 16,
       "margin": 0,
       "spacing": 0,
       "columns": 16,
@@ -2121,7 +2121,7 @@
         {
           "name": "tilesetAssetId",
           "type": "string",
-          "value": "tileset.trees-signs-rocks-bridge"
+          "value": "tileset.trees-signs-rocks-bridge-16"
         }
       ]
     }
