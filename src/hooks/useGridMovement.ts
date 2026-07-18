@@ -74,6 +74,13 @@ interface UseGridMovementOptions {
    *  that shouldn't trigger mid-dash (encounter checks; see useLocationExploration). */
   onStep?: (pos: GridPosition, isDash?: boolean) => void;
   stepIntervalMs?: number;
+  /** The throttle floor for a step taken with `isDash: true` - separate from (and faster than)
+   *  stepIntervalMs, matching Dash's own faster glide (ExplorationScene.ts's DASH_GLIDE_MS) and
+   *  loop cadence (useDash.ts's DASH_STEP_MS). Previously Dash silently fell back to the plain
+   *  walking throttle here (this option didn't actually exist despite useDash.ts's own comment
+   *  assuming it did) - real dash steps landed slower than the glide animation tuned for them,
+   *  leaving a visible gap between each glide instead of one continuous run. */
+  dashStepIntervalMs?: number;
   /** Tiles currently occupied by something that moves independently of the static map data (e.g.
    *  a wandering npc) - blocks the player from walking onto them, same as a static npc/interactable
    *  object would. Read via a ref so passing a new array each render doesn't re-create attemptMove. */
@@ -86,6 +93,7 @@ export function useGridMovement({
   suspended,
   onStep,
   stepIntervalMs = 220,
+  dashStepIntervalMs = 100,
   dynamicBlockers,
 }: UseGridMovementOptions) {
   const [resolvedStart, setResolvedStart] = useState(start);
@@ -136,9 +144,10 @@ export function useGridMovement({
       const now = Date.now();
       const current = positionRef.current;
       const delta = FACING_TO_DELTA[facing];
+      const throttleMs = options?.isDash ? dashStepIntervalMs : stepIntervalMs;
 
       // Always allow turning to face a new direction even if the move itself is throttled/blocked.
-      if (now - lastMoveRef.current < stepIntervalMs) {
+      if (now - lastMoveRef.current < throttleMs) {
         if (current.facing !== facing) setPosition({ ...current, facing });
         return;
       }
@@ -157,11 +166,11 @@ export function useGridMovement({
       setPosition(next);
       setMovementState(options?.isDash ? 'running' : 'walking');
       clearTimeout(movementIdleTimeoutRef.current);
-      movementIdleTimeoutRef.current = setTimeout(() => setMovementState('idle'), stepIntervalMs + 40);
+      movementIdleTimeoutRef.current = setTimeout(() => setMovementState('idle'), throttleMs + 40);
       onStepRef.current?.(next, options?.isDash);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [map, suspended, stepIntervalMs],
+    [map, suspended, stepIntervalMs, dashStepIntervalMs],
   );
 
   useEffect(() => () => clearTimeout(movementIdleTimeoutRef.current), []);
@@ -199,6 +208,17 @@ export function useGridMovement({
 
     function handleKeyDown(e: KeyboardEvent) {
       if (isTypingTarget(e)) return;
+      // Pressing Shift while already holding a direction (a very natural way to start dashing)
+      // must stop this hold, not just decline to start a new one - useDashKeybind's own Shift
+      // keydown handler starts a *second*, independent hold-loop via useDash.ts, and without this
+      // the two would keep calling attemptMove concurrently for the rest of the hold. Whichever
+      // loop's interval happens to win a given throttle window decides that step's movementState
+      // ('walking' vs 'running'), so an in-progress Dash would randomly get a slower glide
+      // duration and no dust FX on the steps the normal loop won - the stutter this fixes.
+      if (e.key === 'Shift') {
+        if (heldFacingRef.current) stopHolding();
+        return;
+      }
       // Shift+direction is Dash, handled by a separate hook (useDashKeybind) - don't also take a
       // normal single-tile step on the same keypress.
       if (e.shiftKey) return;
