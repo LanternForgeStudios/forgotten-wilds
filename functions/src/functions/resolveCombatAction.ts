@@ -11,6 +11,7 @@ import {
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
 import { grantItem, itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
+import { computeAilmentResistances, resolveWeaponAttackAilment } from '../engine/equipmentEngine';
 import { ENEMIES } from '../data/enemies';
 import { ITEMS } from '../data/items';
 import { SKILLS } from '../data/skills';
@@ -136,6 +137,8 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       inventory: save.inventory,
       enemies: session.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp, ailments: e.ailments ?? [] })),
       playerAilments,
+      attackAilment: resolveWeaponAttackAilment(save.player.equipment.weapon),
+      ailmentResistances: computeAilmentResistances(save.player.equipment),
     });
 
     save.player.stats.hp = result.playerHp;

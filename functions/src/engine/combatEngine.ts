@@ -4,8 +4,8 @@ import { ITEMS } from '../data/items';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { AILMENTS } from '../data/ailments';
 import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
-import { computeDamage, pickEnemyMove, weightedPick } from './combatMath';
-import type { CombatAction, Stats, ActiveAilment } from '../shared-types';
+import { applyAilmentResistance, computeDamage, pickEnemyMove, weightedPick } from './combatMath';
+import type { AilmentResistance, CombatAction, Stats, ActiveAilment } from '../shared-types';
 
 export function rollEnemyForLocation(locationId: string): EnemyDefinition {
   const table = ENCOUNTER_TABLES[locationId];
@@ -174,6 +174,15 @@ export interface RoundInput {
   /** Ailments the player is entering this round with - see shared-types' ActiveAilment. Whatever
    *  this round inflicts/cures/expires is reflected in RoundResult.playerAilments, not here. */
   playerAilments: ActiveAilment[];
+  /** The equipped weapon's attack-ailment roll, already resolved by the caller (see
+   *  equipmentEngine.ts's resolveWeaponAttackAilment) - undefined whenever no weapon is equipped
+   *  or it doesn't set one. Only ever rolled for the plain 'attack' action (Skill/lanternAbility
+   *  ailments come from their own data instead). Stubbed: always undefined today. */
+  attackAilment?: { id: string; chance: number };
+  /** The player's flattened equipped-item ailment resistance (see equipmentEngine.ts's
+   *  computeAilmentResistances) - reduces the chance of an enemy's own move afflicting the player.
+   *  Stubbed: always [] today. */
+  ailmentResistances: AilmentResistance[];
 }
 
 export type RoundOutcomePhase = 'continue' | 'victory' | 'defeat' | 'fled';
@@ -459,8 +468,13 @@ export function resolveRound(input: RoundInput): RoundResult {
     log.push(attackLogLine);
 
     // Only rolled once the attack itself has already landed (see Skill.inflictAilmentChance's doc
-    // comment) - a missed attack (the branch above, which returns early) never reaches here.
-    if (skill.inflictsAilmentId && Math.random() < (skill.inflictAilmentChance ?? 0)) {
+    // comment) - a missed attack (the branch above, which returns early) never reaches here. The
+    // player's equipped-item resistance (see equipmentEngine.ts's computeAilmentResistances)
+    // reduces the effective chance - a no-op today since no authored item sets it yet.
+    if (
+      skill.inflictsAilmentId &&
+      Math.random() < applyAilmentResistance(skill.inflictAilmentChance ?? 0, skill.inflictsAilmentId, input.ailmentResistances)
+    ) {
       inflictAilment(skill.inflictsAilmentId);
     }
   }
@@ -581,7 +595,7 @@ export function resolveRound(input: RoundInput): RoundResult {
   function playerTurn() {
     switch (action.type) {
       case 'attack':
-        resolveOffensiveHits(SKILLS.attack.power, 'You strike', (i) => weaknessMultiplier(i, 'physical'), 'physical');
+        resolveOffensiveHits(SKILLS.attack.power, 'You strike', (i) => weaknessMultiplier(i, 'physical'), 'physical', input.attackAilment);
         break;
       case 'skill': {
         const skill = SKILLS[action.skillId ?? 'keepers-strike'];

@@ -130,13 +130,32 @@ describe('resolvePartyPlayerTurn', () => {
     );
     expect(result.enemyAilments[0]).toEqual([]);
   });
+
+  it("a weapon's attackAilment rolls on a plain Attack, gated by the target's vulnerability", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
+    const coalSpirit = ENEMIES['coal-spirit'];
+    const result = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'attack' }, attackAilment: { id: 'freeze', chance: 1 } }),
+      [{ enemyId: coalSpirit.id, level: 1, hp: 1000, ailments: [] }],
+    );
+    expect(result.enemyAilments[0]).toStrictEqual([{ ailmentId: 'freeze' }]);
+  });
+
+  it("a weapon's attackAilment is a no-op against an enemy not listed in its vulnerableAilments", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
+    const result = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'attack' }, attackAilment: { id: 'burn', chance: 1 } }),
+      [mothling()],
+    );
+    expect(result.enemyAilments[0]).toEqual([]);
+  });
 });
 
 describe('resolvePartyEnemyPhase', () => {
   afterEach(() => vi.restoreAllMocks());
 
   function playerState(uid: string, overrides: Partial<PartyEnemyPhasePlayerState> = {}): PartyEnemyPhasePlayerState {
-    return { uid, hp: 999, maxHp: 999, defense: 5, ailments: [], defending: false, ...overrides };
+    return { uid, hp: 999, maxHp: 999, defense: 5, ailments: [], defending: false, ailmentResistances: [], ...overrides };
   }
 
   it('halves damage against a defending player', () => {
@@ -203,6 +222,24 @@ describe('resolvePartyEnemyPhase', () => {
     const baselineHit = baseline.enemyHits.find((h) => !h.missed)!;
     const burnedHit = burned.enemyHits.find((h) => !h.missed)!;
     expect(burnedHit.damage).toBeLessThan(baselineHit.damage);
+  });
+
+  it("a player's equipped-item ailment resistance can fully block an enemy's move from landing its ailment", () => {
+    // Sequence: pickTargetUid (only 1 alive player, doesn't matter), no miss, weightedPick picks
+    // miner-pickaxe-swing (same math as combatEngine.test.ts's identical restless-miner fixture),
+    // damage variance, then the ailment roll that would otherwise succeed unresisted (0.1 < 0.2).
+    vi.spyOn(Math, 'random')
+      .mockReturnValueOnce(0.5)
+      .mockReturnValueOnce(0.5)
+      .mockReturnValueOnce(0.9)
+      .mockReturnValueOnce(0.5)
+      .mockReturnValueOnce(0.1);
+    const restlessMiner = ENEMIES['restless-miner'];
+    const result = resolvePartyEnemyPhase(
+      [playerState('p1', { ailmentResistances: [{ ailmentId: 'stun', reductionPercent: 1 }] })],
+      [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp, ailments: [] }],
+    );
+    expect(result.players.find((p) => p.uid === 'p1')!.ailments).toEqual([]);
   });
 });
 

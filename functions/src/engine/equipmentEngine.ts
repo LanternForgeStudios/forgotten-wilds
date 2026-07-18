@@ -1,5 +1,5 @@
-import type { StatBonuses } from '../data/equipment';
-import type { Stats } from '../shared-types';
+import { EQUIPMENT, type StatBonuses } from '../data/equipment';
+import type { AilmentResistance, PlayerEquipment, Stats } from '../shared-types';
 
 /** Mutates stats in place, applying (sign=1) or removing (sign=-1) an item's bonuses, clamping current
  *  hp/spirit so they never exceed the resulting max after the change. */
@@ -12,6 +12,28 @@ export function adjustStatsForBonuses(stats: Stats, bonuses: StatBonuses, sign: 
 
   stats.hp = Math.min(stats.hp, stats.maxHp);
   stats.spirit = Math.min(stats.spirit, stats.maxSpirit);
+}
+
+/** Resolves the equipped weapon's attackAilment (see EquipmentDefinition) into the plain
+ *  {id,chance} shape resolveOffensiveHits/resolveOffensiveHit already expect for a Skill's own
+ *  inflictsAilmentId - callers (resolveCombatAction.ts, partyBattle.ts) resolve this once from the
+ *  save/snapshot and pass the plain value into the engine, rather than the engine importing
+ *  EQUIPMENT itself, so combatEngine.ts/partyCombatEngine.ts stay decoupled from equipment data
+ *  the same way they already are from it today. Undefined whenever no weapon is equipped or the
+ *  equipped one doesn't set attackAilment - always undefined right now, since no authored weapon
+ *  does yet. */
+export function resolveWeaponAttackAilment(weaponId: string | null | undefined): { id: string; chance: number } | undefined {
+  const attackAilment = weaponId ? EQUIPMENT[weaponId]?.attackAilment : undefined;
+  return attackAilment ? { id: attackAilment.ailmentId, chance: attackAilment.chance } : undefined;
+}
+
+/** Flattens every equipped item's ailmentResistance entries (see EquipmentDefinition) into one
+ *  list, ready for combatMath.ts's applyAilmentResistance. Always [] today since no authored item
+ *  sets ailmentResistance yet. */
+export function computeAilmentResistances(equipment: PlayerEquipment): AilmentResistance[] {
+  return Object.values(equipment)
+    .filter((id): id is string => !!id)
+    .flatMap((id) => EQUIPMENT[id]?.ailmentResistance ?? []);
 }
 
 /** Unlike the generic stat bonuses above (which stack additively across several equipped slots),

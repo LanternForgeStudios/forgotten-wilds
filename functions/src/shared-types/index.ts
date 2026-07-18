@@ -190,6 +190,14 @@ export interface ActiveAilment {
   turnsRemaining?: number;
 }
 
+/** One equipped item's reduction toward a specific ailment (see
+ *  EquipmentDefinition.ailmentResistance) - a flattened list of these, gathered from every
+ *  equipped item, is what combatMath.ts's applyAilmentResistance reduces a chance by. */
+export interface AilmentResistance {
+  ailmentId: string;
+  reductionPercent: number;
+}
+
 export interface CombatSession {
   sessionId: string;
   uid: string;
@@ -424,6 +432,13 @@ export interface PartyBattleParticipantStats {
    *  doesn't change mid-battle either. Used only for log-line text (partyCombatEngine.ts), never
    *  for game-logic identity (uid still owns that everywhere else). */
   name: string;
+  /** Snapshotted the same way as knownSkillIds/lanternId/skin above (equipment can't change
+   *  mid-battle) - the equipped weapon's attack-ailment roll, already resolved (see
+   *  equipmentEngine.ts's resolveWeaponAttackAilment). Stubbed: always null today. */
+  attackAilment: { id: string; chance: number } | null;
+  /** Snapshotted the same way - this participant's flattened equipped-item ailment resistance
+   *  (see equipmentEngine.ts's computeAilmentResistances). Stubbed: always [] today. */
+  ailmentResistances: AilmentResistance[];
 }
 
 export interface PartyBattleEnemyState {

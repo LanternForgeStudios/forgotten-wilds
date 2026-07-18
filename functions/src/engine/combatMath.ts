@@ -7,7 +7,7 @@
 
 import { AILMENTS } from '../data/ailments';
 import type { EnemyDefinition, EnemyMove } from '../data/enemies';
-import type { ActiveAilment } from '../shared-types';
+import type { ActiveAilment, AilmentResistance } from '../shared-types';
 
 /** Picks one item from `items`, proportional to `weightOf(item)`. Callers are expected to only
  *  ever pass a non-empty `items` array. */
@@ -99,6 +99,18 @@ export function expireAilments(ailments: ActiveAilment[], inflictedThisRound: Se
 
 export function isStunned(ailments: ActiveAilment[]): boolean {
   return ailments.some((a) => a.ailmentId === 'stun');
+}
+
+/** Reduces an ailment-infliction chance by the target's equipped resistance to that specific
+ *  ailment id (see EquipmentDefinition.ailmentResistance) - every equipped item with a matching
+ *  entry sums, clamped to [0, 1] so stacking several can't push the effective chance negative or
+ *  leave it unreduced. Always a no-op today (returns `chance` unchanged) since no authored item
+ *  sets ailmentResistance yet - this is the stub's one live piece of math, waiting on content. */
+export function applyAilmentResistance(chance: number, ailmentId: string, resistances: AilmentResistance[]): number {
+  const totalReduction = resistances
+    .filter((r) => r.ailmentId === ailmentId)
+    .reduce((sum, r) => sum + r.reductionPercent, 0);
+  return chance * (1 - Math.min(1, Math.max(0, totalReduction)));
 }
 
 /** Initiative = speed + a d6 roll, re-rolled every round - keeps speed the dominant factor while

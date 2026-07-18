@@ -58,6 +58,13 @@ export interface EquipmentItem {
    *  (src/data/lanternAbilities.ts) it grants while equipped. */
   oilCapacity?: number;
   lanternAbilityIds?: string[];
+  /** Weapon-slot only: a chance to inflict this ailment on a plain 'attack'. See
+   *  functions/src/data/equipment.ts's matching field for the full explanation - display copy
+   *  only, combat math is server-authoritative. */
+  attackAilment?: { ailmentId: string; chance: number };
+  /** Any slot: reduces the wielder's chance of being afflicted by a matching ailment while
+   *  equipped. Display copy only, see functions/src/data/equipment.ts. */
+  ailmentResistance?: { ailmentId: string; reductionPercent: number }[];
 }
 
 export interface InventoryItem {

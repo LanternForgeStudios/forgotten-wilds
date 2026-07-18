@@ -1,5 +1,7 @@
 // Authoritative — the client's src/data/equipment.ts is a display copy only.
 
+import type { AilmentResistance } from '../shared-types';
+
 export type EquipmentSlot = 'weapon' | 'armor' | 'boots' | 'gloves' | 'charm' | 'lantern' | 'spiritTotem';
 // Ascending order: Common < Uncommon < Rare < Mythic < Legendary. Per the canonical equipment
 // design (docs/Mytherra-Equipment_breakdown.md) - Legendary is a named, story-tied artifact that
@@ -32,6 +34,17 @@ export interface EquipmentDefinition {
    *  one; non-lantern equipment leaves both fields undefined. */
   oilCapacity?: number;
   lanternAbilityIds?: string[];
+  /** Weapon-slot only: a chance to inflict this ailment when this weapon lands a plain 'attack'
+   *  (not Skill/lanternAbility, which have their own inflictsAilmentId path via Skill/
+   *  LanternAbility) - mirrors Skill.inflictsAilmentId/inflictAilmentChance's shape and is gated
+   *  the same way (the target's EnemyDefinition.vulnerableAilments, never on a defeating hit).
+   *  Stubbed for future weapon content - no authored weapon sets this yet. */
+  attackAilment?: { ailmentId: string; chance: number };
+  /** Any slot: reduces the wielder's own chance of being afflicted by a matching ailment while
+   *  equipped. Entries from every equipped item with a matching ailmentId sum (see
+   *  combatMath.ts's applyAilmentResistance for the clamp). Stubbed for future item content - no
+   *  authored item sets this yet. */
+  ailmentResistance?: AilmentResistance[];
 }
 
 // Iron Mountains canonical equipment families (docs/Mytherra-Equipment_breakdown.md). Common

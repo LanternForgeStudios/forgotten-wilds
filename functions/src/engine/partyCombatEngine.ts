@@ -24,6 +24,7 @@ import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { scaledEnemyStats, type RoundEnemyInput } from './combatEngine';
 import {
   ailmentAttackMultiplier,
+  applyAilmentResistance,
   applyAilmentTickDamage,
   blindMissChance,
   computeDamage,
@@ -32,7 +33,7 @@ import {
   isStunned,
   pickEnemyMove,
 } from './combatMath';
-import type { ActiveAilment, CombatAction, Stats } from '../shared-types';
+import type { AilmentResistance, ActiveAilment, CombatAction, Stats } from '../shared-types';
 
 export interface PartyPlayerInput {
   uid: string;
@@ -43,6 +44,10 @@ export interface PartyPlayerInput {
   stats: Stats;
   inventory: { itemId: string; quantity: number }[];
   ailments: ActiveAilment[];
+  /** The equipped weapon's attack-ailment roll, already resolved by the caller (see
+   *  equipmentEngine.ts's resolveWeaponAttackAilment) - mirrors RoundInput.attackAilment's solo
+   *  equivalent. Stubbed: always undefined today. */
+  attackAilment?: { id: string; chance: number };
 }
 
 export interface PartyCombatHitResult {
@@ -210,7 +215,13 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
     consumeItems();
     switch (player.action.type) {
       case 'attack':
-        resolveOffensiveHits(SKILLS.attack.power, 'You strike', (i) => weaknessMultiplier(enemyDefs[i], 'physical'), 'physical');
+        resolveOffensiveHits(
+          SKILLS.attack.power,
+          'You strike',
+          (i) => weaknessMultiplier(enemyDefs[i], 'physical'),
+          'physical',
+          player.attackAilment,
+        );
         break;
       case 'skill': {
         const skill = SKILLS[player.action.skillId ?? 'keepers-strike'] ?? SKILLS['keepers-strike'];
@@ -452,6 +463,10 @@ export interface PartyEnemyPhasePlayerState {
   defense: number;
   ailments: ActiveAilment[];
   defending: boolean;
+  /** This player's flattened equipped-item ailment resistance (see equipmentEngine.ts's
+   *  computeAilmentResistances) - reduces the chance of an enemy's own move afflicting them.
+   *  Stubbed: always [] today. */
+  ailmentResistances: AilmentResistance[];
 }
 
 export interface PartyEnemyPhasePlayerResult {
@@ -565,7 +580,13 @@ export function resolvePartyEnemyPhase(
           enemyHits.push({ attackerIndex: i, targetUid, damage: dmg, missed: false, wasDefended: target.defending, logLine: attackLogLine });
           log.push(attackLogLine);
 
-          if (skill.inflictsAilmentId && Math.random() < (skill.inflictAilmentChance ?? 0)) {
+          // target's own equipped-item resistance (see equipmentEngine.ts's
+          // computeAilmentResistances) reduces the effective chance - a no-op today since no
+          // authored item sets it yet.
+          if (
+            skill.inflictsAilmentId &&
+            Math.random() < applyAilmentResistance(skill.inflictAilmentChance ?? 0, skill.inflictsAilmentId, target.ailmentResistances)
+          ) {
             const ailments = ailmentsByUid.get(targetUid)!;
             ailmentsByUid.set(targetUid, inflictAilment(ailments, skill.inflictsAilmentId, log));
             inflictedThisPhaseByUid.get(targetUid)!.add(skill.inflictsAilmentId);

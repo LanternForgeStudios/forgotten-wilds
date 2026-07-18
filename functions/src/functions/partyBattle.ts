@@ -7,6 +7,7 @@ import { rollChestRewards } from '../engine/dailyChestEngine';
 import { isMilestoneWave, milestoneChestTier } from '../engine/endlessBattleEngine';
 import { grantItem, itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
+import { computeAilmentResistances, resolveWeaponAttackAilment } from '../engine/equipmentEngine';
 import { SKILLS } from '../data/skills';
 import { AILMENTS } from '../data/ailments';
 import { ITEMS } from '../data/items';
@@ -198,6 +199,8 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
     lanternId: save.player.equipment.lantern ?? null,
     skin: save.player.skin,
     name: save.player.name,
+    attackAilment: resolveWeaponAttackAilment(save.player.equipment.weapon) ?? null,
+    ailmentResistances: computeAilmentResistances(save.player.equipment),
   };
 }
 
@@ -377,6 +380,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         stats: { ...activeStats, stamina: 0, maxStamina: 0 },
         inventory: activeSave.inventory,
         ailments: activeStats.ailments,
+        attackAilment: activeStats.attackAilment ?? undefined,
       },
       battle.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp, ailments: e.ailments ?? [] })),
     );
@@ -462,6 +466,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         defense: nextParticipantStats[p].defense,
         ailments: nextParticipantStats[p].ailments,
         defending: nextParticipantStats[p].defending,
+        ailmentResistances: nextParticipantStats[p].ailmentResistances ?? [],
       }));
     const enemyPhase = resolvePartyEnemyPhase(
       alivePlayersForEnemyPhase,

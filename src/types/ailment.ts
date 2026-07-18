@@ -30,3 +30,9 @@ export interface ActiveAilment {
    *  ailment (see AilmentDefinition.autoExpireAfterTurns server-side). */
   turnsRemaining?: number;
 }
+
+/** Mirrors the server's AilmentResistance (shared-types/index.ts) - display copy only. */
+export interface AilmentResistance {
+  ailmentId: string;
+  reductionPercent: number;
+}

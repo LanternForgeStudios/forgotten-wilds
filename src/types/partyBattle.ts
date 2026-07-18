@@ -3,7 +3,7 @@
 // read these via onSnapshot; every write goes through a Cloud Function in
 // functions/src/functions/partyBattle.ts / endlessBattle.ts.
 
-import type { ActiveAilment } from './ailment';
+import type { ActiveAilment, AilmentResistance } from './ailment';
 
 export type PartyBattleMode = 'endless' | 'pvp';
 export type PartyBattleStatus = 'active' | 'awaitingContinueVote' | 'victory' | 'defeated' | 'withdrawn';
@@ -28,6 +28,12 @@ export interface PartyBattleParticipantStats {
   /** Snapshotted the same way - see shared-types/index.ts's matching comment. Used for battle log
    *  lines only (e.g. "Alys braces, ready to absorb the next blow."). */
   name: string;
+  /** Snapshotted the same way - see shared-types/index.ts's matching comment. Stubbed: always
+   *  null today. */
+  attackAilment: { id: string; chance: number } | null;
+  /** Snapshotted the same way - see shared-types/index.ts's matching comment. Stubbed: always []
+   *  today. */
+  ailmentResistances: AilmentResistance[];
 }
 
 export interface PartyBattleEnemyState {
