@@ -191,7 +191,17 @@ export class ExplorationScene extends Phaser.Scene {
   private async ensurePlayerAnimations(spriteAssetId: string): Promise<void> {
     if (this.playerTextureKey === spriteAssetId) return;
     await loadSceneTexture(this, spriteAssetId);
-    createCharacterAnimations(this.anims, spriteAssetId, PLAYER_ANIMATION_LAYOUT);
+    // Only a real spritesheet (frameSize set - today just the sprite.player fallback) has rows to
+    // build a walk/run animation from. The male/female skins (Player.skin) are still a single
+    // static frame with no frameSize - creating frame-numbered animations against those found zero
+    // real frames every time (Phaser logs one warning per missing frame, then the broken Animation
+    // object throws when setPlayer's walking/running branch below tries to play it), on every
+    // single scene-level map transition since PhaserExplorationCanvas mounts a fresh
+    // ExplorationScene per Town/Overworld/Dungeon switch. Matches setEntities' own `if
+    // (def.frameSize)` guard for NPCs - this is that same guard, just missing here until now.
+    if (getAssetDefinition(spriteAssetId).frameSize) {
+      createCharacterAnimations(this.anims, spriteAssetId, PLAYER_ANIMATION_LAYOUT);
+    }
     this.playerTextureKey = spriteAssetId;
   }
 
@@ -252,15 +262,21 @@ export class ExplorationScene extends Phaser.Scene {
       this.tweens.add({ targets: sprite, x: targetX, y: targetY, duration, ease: 'Linear' });
     }
 
-    if (movementState === 'walking' || movementState === 'running') {
-      const key = animationKey(spriteAssetId, movementState, pos.facing);
-      if (sprite.anims.currentAnim?.key !== key) sprite.play(key);
-    } else {
-      // Idle has no dedicated row on the sheet - `frameRow` is already resolveDisplayRow's
-      // fallback-to-frame-0-of-the-walking-row answer, computed by the caller (same as the old
-      // TileGrid's `playerFrameRow` prop) rather than re-derived here.
-      sprite.anims.stop();
-      sprite.setFrame(frameRow * PLAYER_ANIMATION_LAYOUT.frameCount);
+    // A static single-frame skin (male/female - see Player.skin) has no rows/frames to animate or
+    // select at all - only a real spritesheet (frameSize set, today just the sprite.player
+    // fallback) has any frame beyond its one default. Matches setEntities' own `if
+    // (def.frameSize)` guard for NPCs below.
+    if (getAssetDefinition(spriteAssetId).frameSize) {
+      if (movementState === 'walking' || movementState === 'running') {
+        const key = animationKey(spriteAssetId, movementState, pos.facing);
+        if (sprite.anims.currentAnim?.key !== key) sprite.play(key);
+      } else {
+        // Idle has no dedicated row on the sheet - `frameRow` is already resolveDisplayRow's
+        // fallback-to-frame-0-of-the-walking-row answer, computed by the caller (same as the old
+        // TileGrid's `playerFrameRow` prop) rather than re-derived here.
+        sprite.anims.stop();
+        sprite.setFrame(frameRow * PLAYER_ANIMATION_LAYOUT.frameCount);
+      }
     }
   }
 
