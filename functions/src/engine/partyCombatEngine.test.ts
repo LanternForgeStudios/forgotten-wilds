@@ -247,7 +247,7 @@ describe('resolvePvpTurn', () => {
   afterEach(() => vi.restoreAllMocks());
 
   function opponent(overrides: Partial<PvpDefenderInput> = {}): PvpDefenderInput {
-    return { hp: 60, maxHp: 60, defense: 5, ...overrides };
+    return { hp: 60, maxHp: 60, defense: 5, ailments: [], ailmentResistances: [], ...overrides };
   }
 
   it('damages the opponent directly, not an enemy board', () => {
@@ -317,5 +317,43 @@ describe('resolvePvpTurn', () => {
     );
     expect(result.defenderHp).toBe(1000); // never got to attack
     expect(result.hp).toBeLessThan(60); // poison still ticked
+  });
+
+  it("a Skill's ailment roll lands on the opponent (frost-lance -> Freeze) - PvP has no vulnerability gate", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.3 inflict chance
+    const result = resolvePvpTurn(
+      player('p1', { action: { type: 'skill', skillId: 'frost-lance' }, stats: stats({ spirit: 30 }) }),
+      opponent({ hp: 1000, maxHp: 1000 }),
+    );
+    expect(result.defenderAilments).toStrictEqual([{ ailmentId: 'freeze' }]);
+    expect(result.log.some((l) => l.includes('opponent is afflicted with Freeze'))).toBe(true);
+  });
+
+  it("a weapon's attackAilment rolls on a plain Attack against the opponent", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
+    const result = resolvePvpTurn(
+      player('p1', { action: { type: 'attack' }, attackAilment: { id: 'burn', chance: 1 } }),
+      opponent({ hp: 1000, maxHp: 1000 }),
+    );
+    expect(result.defenderAilments).toStrictEqual([{ ailmentId: 'burn' }]);
+  });
+
+  it("the opponent's equipped-item ailment resistance can fully block a landed ailment roll", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // would succeed unresisted
+    const result = resolvePvpTurn(
+      player('p1', { action: { type: 'skill', skillId: 'frost-lance' }, stats: stats({ spirit: 30 }) }),
+      opponent({ hp: 1000, maxHp: 1000, ailmentResistances: [{ ailmentId: 'freeze', reductionPercent: 1 }] }),
+    );
+    expect(result.defenderAilments).toEqual([]);
+  });
+
+  it('a defeating hit never rolls its ailment chance against the opponent', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
+    const result = resolvePvpTurn(
+      player('p1', { action: { type: 'skill', skillId: 'frost-lance' }, stats: stats({ spirit: 30, attack: 999 }) }),
+      opponent({ hp: 1 }),
+    );
+    expect(result.defenderHp).toBe(0);
+    expect(result.defenderAilments).toEqual([]);
   });
 });

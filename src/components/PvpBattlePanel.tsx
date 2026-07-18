@@ -20,12 +20,6 @@ import type { PartyBattleSession } from '@/types';
 // Reuses Endless Battle's stylesheet - same Panel/list/bar chrome, no PvP-specific classes needed.
 import styles from './EndlessBattlePanel.module.css';
 
-// PvP has no enemy board (the opponent is a single player, not an EndlessBattle-style enemy
-// roster) - PhaserBattleCanvas's enemyAilmentTakesHoldEvent prop is simply always this empty
-// sentinel here. A module-level constant, not an inline object literal, so it's a stable
-// reference across renders (this component's own effects don't need to re-fire from it).
-const NO_ENEMY_AILMENT_TAKES_HOLD_EVENT = { entries: [], key: 0 };
-
 interface PvpBattlePanelProps {
   battleId: string;
   onClose: () => void;
@@ -219,6 +213,28 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [battle?.lastTurnResult?.resolvedAt]);
 
+  // Enemy-side equivalent of the above, for the opponent's sprite - PvP's opponent renders as a
+  // single-element enemy slot (index 0, see opponentVisuals below), so a Skill/weapon landing an
+  // ailment on them bursts that ailment's FX on their sprite the same way EndlessBattlePanel.tsx
+  // does for a real enemy. See BattleScene.playEnemyAilmentTakesHold's own doc comment.
+  const prevOpponentAilmentIdsRef = useRef<Set<string>>(new Set());
+  const [enemyAilmentTakesHoldEvent, setEnemyAilmentTakesHoldEvent] = useState<{
+    entries: { enemyIndex: number; ailmentIds: string[] }[];
+    key: number;
+  }>({ entries: [], key: 0 });
+  useEffect(() => {
+    const resolvedAt = battle?.lastTurnResult?.resolvedAt;
+    const opponent = battle?.participants.find((p) => p !== uid);
+    if (!battle || !opponent || !resolvedAt) return;
+    const currentIds = (battle.participantStats[opponent]?.ailments ?? []).map((a) => a.ailmentId);
+    const newlyInflicted = currentIds.filter((id) => !prevOpponentAilmentIdsRef.current.has(id));
+    prevOpponentAilmentIdsRef.current = new Set(currentIds);
+    if (newlyInflicted.length > 0) {
+      setEnemyAilmentTakesHoldEvent({ entries: [{ enemyIndex: 0, ailmentIds: newlyInflicted }], key: resolvedAt });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [battle?.lastTurnResult?.resolvedAt]);
+
   const opponentUid = battle?.participants.find((p) => p !== uid);
   const opponentName = opponentUid ? (names[opponentUid] ?? '...') : '...';
   const opponentVisuals = useMemo(() => {
@@ -376,7 +392,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             combatEnded={battle.status !== 'active'}
             ailmentFxEvent={ailmentFxEvent}
             ailmentTakesHoldEvent={ailmentTakesHoldEvent}
-            enemyAilmentTakesHoldEvent={NO_ENEMY_AILMENT_TAKES_HOLD_EVENT}
+            enemyAilmentTakesHoldEvent={enemyAilmentTakesHoldEvent}
           />
           {battle.status === 'victory' && (
             <div className={styles.canvasMessage}>

@@ -570,8 +570,15 @@ async function resolvePvpBattleTurn(
       stats: { ...activeStats, stamina: 0, maxStamina: 0 },
       inventory: activeSave.inventory,
       ailments: activeStats.ailments,
+      attackAilment: activeStats.attackAilment ?? undefined,
     },
-    { hp: opponentStats.hp, maxHp: opponentStats.maxHp, defense: opponentStats.defense },
+    {
+      hp: opponentStats.hp,
+      maxHp: opponentStats.maxHp,
+      defense: opponentStats.defense,
+      ailments: opponentStats.ailments,
+      ailmentResistances: opponentStats.ailmentResistances ?? [],
+    },
   );
   // Applied in-memory now, written out at whichever exit branch below actually writes
   // activeUserRef - see submitPartyBattleAction's own matching comment.
@@ -588,7 +595,7 @@ async function resolvePvpBattleTurn(
       ailments: turnResult.ailments,
       defending: turnResult.defending,
     },
-    [opponentUid]: { ...opponentStats, hp: turnResult.defenderHp },
+    [opponentUid]: { ...opponentStats, hp: turnResult.defenderHp, ailments: turnResult.defenderAilments },
   };
 
   const matchOver = turnResult.forfeited || turnResult.defenderHp <= 0;

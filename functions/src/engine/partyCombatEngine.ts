@@ -285,6 +285,14 @@ export interface PvpDefenderInput {
   hp: number;
   maxHp: number;
   defense: number;
+  /** The opponent's ailments entering this turn - a landed Skill/weapon ailment roll (see
+   *  resolveOffensiveHit's ailment param) is applied on top of these, same overwrite-on-reinflict
+   *  semantics as everywhere else. */
+  ailments: ActiveAilment[];
+  /** The opponent's flattened equipped-item ailment resistance (see equipmentEngine.ts's
+   *  computeAilmentResistances) - reduces the chance of a landed hit's ailment roll succeeding
+   *  against them. Stubbed: always [] today. */
+  ailmentResistances: AilmentResistance[];
 }
 
 /** PvP only ever has one possible target, so this is singular where the party engine's
@@ -307,6 +315,13 @@ export interface PvpTurnResult {
   /** The opponent's hp after this turn's attack - unchanged from `defender.hp` on a Defend/item/
    *  forfeit turn, since only an offensive action ever touches the opponent. */
   defenderHp: number;
+  /** The opponent's ailments after this turn's attack (and their own tick/expiry - PvP has no
+   *  separate "enemy phase" the way Endless Battle does, so a Skill/weapon landing an ailment and
+   *  that opponent's own ailments ticking both happen relative to whichever player's turn this is
+   *  - the tick itself is applied when it becomes *their* turn, via their own `ailments` input,
+   *  same as any other participant). Unchanged from `defender.ailments` on a turn that never lands
+   *  a new one. */
+  defenderAilments: ActiveAilment[];
   /** Structured record of the offensive swing this turn, if any - null on Defend/item/forfeit/
    *  stunned turns (nothing was thrown at the opponent to animate). */
   hit: PvpHitResult | null;
@@ -342,6 +357,24 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
   let forfeited = false;
   let defenderHp = defender.hp;
   let hit: PvpHitResult | null = null;
+  // The opponent's ailment tracking - mirrors combatEngine.ts's/resolvePartyPlayerTurn's own
+  // per-enemy inflictAilmentOnEnemy, just 3rd-person ("your opponent") and ungated by any
+  // vulnerability allowlist (a human opponent has no EnemyDefinition.vulnerableAilments - only
+  // their own equipped resistance can reduce the chance, see resolveOffensiveHit below).
+  let defenderAilments = defender.ailments.map((a) => ({ ...a }));
+  const inflictedThisTurnByDefender = new Set<string>();
+
+  function inflictAilmentOnDefender(ailmentId: string) {
+    const def = AILMENTS[ailmentId];
+    if (!def) return;
+    const existingIndex = defenderAilments.findIndex((a) => a.ailmentId === ailmentId);
+    const entry: ActiveAilment =
+      def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
+    if (existingIndex >= 0) defenderAilments[existingIndex] = entry;
+    else defenderAilments.push(entry);
+    inflictedThisTurnByDefender.add(ailmentId);
+    log.push(`Your opponent is afflicted with ${def.name}!`);
+  }
 
   function damageDefender(dmg: number, verb: string): void {
     defenderHp = Math.max(0, defenderHp - dmg);
@@ -351,7 +384,10 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
     hit = { damage: dmg, missed: false, defeated };
   }
 
-  function resolveOffensiveHit(power: number, verb: string, damageType: DamageType) {
+  // Mirrors resolveOffensiveHits'/resolveOffensiveHit's shared "ailment" param elsewhere - rolled
+  // once per landed (non-missed), non-defeating hit, chance reduced by the opponent's own
+  // equipped resistance (a no-op today, since no item sets ailmentResistance yet).
+  function resolveOffensiveHit(power: number, verb: string, damageType: DamageType, ailment?: { id: string; chance: number }) {
     const attackMultiplier = ailmentAttackMultiplier(ailments);
     const blindChance = damageType === 'physical' ? blindMissChance(ailments) : 0;
     if (blindChance > 0 && Math.random() < blindChance) {
@@ -361,6 +397,9 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
     }
     const dmg = Math.round(computeDamage(power, player.stats.attack * attackMultiplier, defender.defense));
     damageDefender(dmg, verb);
+    if (ailment && !hit?.defeated && Math.random() < applyAilmentResistance(ailment.chance, ailment.id, defender.ailmentResistances)) {
+      inflictAilmentOnDefender(ailment.id);
+    }
   }
 
   function consumeItems() {
@@ -399,12 +438,17 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
     consumeItems();
     switch (player.action.type) {
       case 'attack':
-        resolveOffensiveHit(SKILLS.attack.power, 'You strike', 'physical');
+        resolveOffensiveHit(SKILLS.attack.power, 'You strike', 'physical', player.attackAilment);
         break;
       case 'skill': {
         const skill = SKILLS[player.action.skillId ?? 'keepers-strike'] ?? SKILLS['keepers-strike'];
         spirit = Math.max(0, spirit - skill.spiritCost);
-        resolveOffensiveHit(skill.power, "Keeper's Strike hits", skill.damageType);
+        resolveOffensiveHit(
+          skill.power,
+          "Keeper's Strike hits",
+          skill.damageType,
+          skill.inflictsAilmentId ? { id: skill.inflictsAilmentId, chance: skill.inflictAilmentChance ?? 0 } : undefined,
+        );
         break;
       }
       case 'item':
@@ -441,8 +485,9 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
 
   hp = applyAilmentTickDamage(hp, player.stats.maxHp, ailments, log);
   ailments = expireAilments(ailments, inflictedThisTurn);
+  defenderAilments = expireAilments(defenderAilments, inflictedThisTurnByDefender);
 
-  return { log, hp, spirit, lanternOil, ailments, itemConsumedIds, defending, defenderHp, hit, forfeited };
+  return { log, hp, spirit, lanternOil, ailments, itemConsumedIds, defending, defenderHp, defenderAilments, hit, forfeited };
 }
 
 export interface PartyEnemyHitResult {
