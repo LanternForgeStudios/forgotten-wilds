@@ -39,6 +39,7 @@ export interface EncounterEnemy {
   hp: number;
   maxHp: number;
   isBoss: boolean;
+  ailments: ActiveAilment[];
 }
 
 export interface StartEncounterResponse {
@@ -140,7 +141,7 @@ export interface ResolveCombatActionResponse {
   playerMaxSpirit: number;
   playerLanternOil: number;
   playerMaxLanternOil: number;
-  enemies: { index: number; hp: number; maxHp: number }[];
+  enemies: { index: number; hp: number; maxHp: number; ailments: ActiveAilment[] }[];
   rewards: {
     xp: number;
     gold: number;

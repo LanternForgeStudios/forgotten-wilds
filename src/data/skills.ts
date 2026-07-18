@@ -103,6 +103,7 @@ export const SKILLS: Skill[] = [
     power: 20,
     spiritCost: 12,
     effectiveAgainstFamilies: ['coalSpirits'],
+    inflictsAilmentId: 'freeze',
   },
   {
     id: 'ember-burst',
@@ -113,5 +114,6 @@ export const SKILLS: Skill[] = [
     power: 20,
     spiritCost: 12,
     effectiveAgainstFamilies: ['waterSpirits', 'briarSpirits'],
+    inflictsAilmentId: 'burn',
   },
 ];

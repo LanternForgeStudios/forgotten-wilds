@@ -38,10 +38,13 @@ export function pickEnemyMove(enemy: EnemyDefinition, hpFraction: number): Enemy
   return weightedPick(available, (m) => m.weight);
 }
 
-/** Ailments only ever apply to a player (see shared-types' ActiveAilment doc comment) - operates
- *  on one combatant's ailment array at a time, so the party engine can call it once per player per
- *  round the same way the solo engine calls it once for its one player. Copies rather than
- *  mutates in place, matching the solo engine's own contract. */
+/** Player-side ailment infliction ("You are afflicted..." - 2nd person) - operates on one
+ *  combatant's ailment array at a time, so the party engine can call it once per player per round
+ *  the same way the solo engine calls it once for its one player. Enemies can be afflicted too now
+ *  (see EnemyDefinition.vulnerableAilments), but go through each engine's own inflictAilmentOnEnemy
+ *  instead of this function, since that needs a vulnerability check and 3rd-person log phrasing
+ *  this shared helper doesn't have. Copies rather than mutates in place, matching the solo engine's
+ *  own contract. */
 export function inflictAilment(ailments: ActiveAilment[], ailmentId: string, log: string[]): ActiveAilment[] {
   const def = AILMENTS[ailmentId];
   if (!def) return ailments;

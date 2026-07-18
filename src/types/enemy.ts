@@ -40,9 +40,14 @@ export interface Enemy {
    *  1.5x damage from - combatEngine.ts's resolveOffensiveHits applies the bonus server-side; this
    *  client copy is display-only, for the Journal's Echoes/Bosses detail card. */
   weaknessDamageType: 'physical' | 'spirit' | 'lantern';
-  /** Display-only, for the Journal's Echoes/Bosses detail card - not read by any combat math yet.
-   *  Ailment ids (see data/ailments.ts), not display names - JournalOfLegends.tsx resolves each id
-   *  to its AILMENTS name at render time. Derived by hand from this enemy's moves' own
-   *  inflictsAilmentId in functions/src/data/skills.ts - keep in sync if a move's ailment changes. */
+  /** Display-only, for the Journal's Echoes/Bosses detail card. Ailment ids (see data/ailments.ts),
+   *  not display names - JournalOfLegends.tsx resolves each id to its AILMENTS name at render time.
+   *  Derived by hand from this enemy's moves' own inflictsAilmentId in
+   *  functions/src/data/skills.ts - keep in sync if a move's ailment changes. */
   ailmentsInflicted?: string[];
+  /** Display-only mirror of the authoritative functions/src/data/enemies.ts field of the same name
+   *  (which is what combat math actually reads server-side to decide whether a player's
+   *  Skill/Lantern Ability can inflict a given ailment on this enemy) - shown on the Journal's
+   *  Echoes/Bosses detail card as this enemy's known weaknesses. Keep in sync by hand. */
+  vulnerableAilments?: string[];
 }

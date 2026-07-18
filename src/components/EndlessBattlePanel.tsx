@@ -203,6 +203,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
           hp: e.hp,
           maxHp: e.maxHp,
           isBoss: def?.isBoss ?? false,
+          ailmentIds: (e.ailments ?? []).map((a) => a.ailmentId),
         };
       }),
     [battle?.enemies],

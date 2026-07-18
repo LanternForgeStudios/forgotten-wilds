@@ -65,6 +65,8 @@ export interface PartyPlayerTurnResult {
   /** The enemy board after this player's turn - feed this into the next player's
    *  resolvePartyPlayerTurn call (or into resolvePartyEnemyPhase, if this was the last player). */
   enemyHp: number[];
+  /** Same as enemyHp - per-enemy ailments after this player's turn, same order/indices. */
+  enemyAilments: ActiveAilment[][];
   hits: PartyCombatHitResult[];
   hp: number;
   spirit: number;
@@ -91,6 +93,26 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
   const enemyStats = enemies.map((e, i) => scaledEnemyStats(enemyDefs[i], e.level));
   const isEnemyAlive = (i: number) => enemyHp[i] > 0;
   const aliveEnemyIndices = () => enemyHp.map((_, i) => i).filter(isEnemyAlive);
+
+  // Per-enemy mirror of the player's own ailment tracking below - see combatEngine.ts's identical
+  // inflictAilmentOnEnemy for the full reasoning (vulnerability-gated, never the ailment an enemy
+  // inflicts on itself).
+  const enemyAilments: ActiveAilment[][] = enemies.map((e) => e.ailments.map((a) => ({ ...a })));
+  const inflictedThisTurnByEnemy: Set<string>[] = enemies.map(() => new Set());
+
+  function inflictAilmentOnEnemy(i: number, ailmentId: string) {
+    if (!enemyDefs[i].vulnerableAilments.includes(ailmentId)) return;
+    const def = AILMENTS[ailmentId];
+    if (!def) return;
+    const list = enemyAilments[i];
+    const existingIndex = list.findIndex((a) => a.ailmentId === ailmentId);
+    const entry: ActiveAilment =
+      def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
+    if (existingIndex >= 0) list[existingIndex] = entry;
+    else list.push(entry);
+    inflictedThisTurnByEnemy[i].add(ailmentId);
+    log.push(`${enemyDefs[i].name} is afflicted with ${def.name}!`);
+  }
 
   let hp = player.stats.hp;
   let spirit = player.stats.spirit;
@@ -121,7 +143,13 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
     return alive[0];
   }
 
-  function resolveOffensiveHits(power: number, verb: string, bonusMultiplier: (i: number) => number, damageType: DamageType) {
+  function resolveOffensiveHits(
+    power: number,
+    verb: string,
+    bonusMultiplier: (i: number) => number,
+    damageType: DamageType,
+    ailment?: { id: string; chance: number },
+  ) {
     const attackMultiplier = ailmentAttackMultiplier(ailments);
     const blindChance = damageType === 'physical' ? blindMissChance(ailments) : 0;
     const alive = aliveEnemyIndices();
@@ -140,6 +168,9 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
       if (useAll) dmg = Math.max(1, Math.round(dmg * TARGET_ALL_DAMAGE_FACTOR));
       const defeated = damageEnemy(i, dmg, verb);
       hits.push({ uid: player.uid, targetIndex: i, damage: dmg, missed: false, defeated });
+      if (ailment && !defeated && Math.random() < ailment.chance) {
+        inflictAilmentOnEnemy(i, ailment.id);
+      }
     }
   }
 
@@ -184,7 +215,13 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
       case 'skill': {
         const skill = SKILLS[player.action.skillId ?? 'keepers-strike'] ?? SKILLS['keepers-strike'];
         spirit = Math.max(0, spirit - skill.spiritCost);
-        resolveOffensiveHits(skill.power, "Keeper's Strike hits", (i) => weaknessMultiplier(enemyDefs[i], skill.damageType), skill.damageType);
+        resolveOffensiveHits(
+          skill.power,
+          "Keeper's Strike hits",
+          (i) => weaknessMultiplier(enemyDefs[i], skill.damageType),
+          skill.damageType,
+          skill.inflictsAilmentId ? { id: skill.inflictsAilmentId, chance: skill.inflictAilmentChance ?? 0 } : undefined,
+        );
         break;
       }
       case 'item':
@@ -228,8 +265,9 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
 
   hp = applyAilmentTickDamage(hp, player.stats.maxHp, ailments, log);
   ailments = expireAilments(ailments, inflictedThisTurn);
+  const remainingEnemyAilments = enemyAilments.map((list, i) => expireAilments(list, inflictedThisTurnByEnemy[i]));
 
-  return { log, enemyHp, hits, hp, spirit, lanternOil, ailments, itemConsumedIds, defending };
+  return { log, enemyHp, enemyAilments: remainingEnemyAilments, hits, hp, spirit, lanternOil, ailments, itemConsumedIds, defending };
 }
 
 export interface PvpDefenderInput {
@@ -426,6 +464,13 @@ export interface PartyEnemyPhaseResult {
   log: string[];
   players: PartyEnemyPhasePlayerResult[];
   enemyHits: PartyEnemyHitResult[];
+  /** Same as PartyPlayerTurnResult.enemyAilments - per-enemy ailments after this phase's own tick
+   *  damage/expiry, same order/indices as the `enemies` input. */
+  enemyAilments: ActiveAilment[][];
+  /** Enemy hp after this phase's own ailment tick damage (Poison/Burn/Freeze can now defeat an
+   *  enemy purely from ticking, independent of any player attack that round) - unchanged from the
+   *  `enemies` input for an enemy with no damage-dealing ailment active. Same order/indices. */
+  enemyHp: number[];
 }
 
 const ENEMY_MISS_CHANCE = 0.1;
@@ -460,47 +505,83 @@ export function resolvePartyEnemyPhase(
   const ailmentsByUid = new Map(players.map((p) => [p.uid, p.ailments.map((a) => ({ ...a }))]));
   const inflictedThisPhaseByUid = new Map(players.map((p) => [p.uid, new Set<string>()]));
 
+  // Per-enemy mirror of the above - an enemy's own ailments can now reduce its outgoing damage
+  // (Burn), miss its own physical attack (Blind), skip its turn entirely (Stun), force it down to
+  // its plain 'attack' move (Silence, same as it does to a player's Skill action), and tick real
+  // damage against itself (Poison/Burn/Freeze) - matching combatEngine.ts's solo-fight parity.
+  const enemyHp = enemies.map((e) => e.hp);
+  const enemyAilmentsByIndex: ActiveAilment[][] = enemies.map((e) => e.ailments.map((a) => ({ ...a })));
+  const inflictedThisPhaseByEnemy: Set<string>[] = enemies.map(() => new Set());
+
   function pickTargetUid(): string | undefined {
     const alive = players.filter((p) => (hpByUid.get(p.uid) ?? 0) > 0);
     if (alive.length === 0) return undefined;
     return alive[Math.floor(Math.random() * alive.length)].uid;
   }
 
-  enemies.forEach((enemy, i) => {
-    if (enemy.hp <= 0) return;
-    const targetUid = pickTargetUid();
-    if (!targetUid) return;
+  enemies.forEach((_enemy, i) => {
+    if (enemyHp[i] <= 0) return;
     const def = enemyDefs[i];
     const stats = enemyStats[i];
-    const target = players.find((p) => p.uid === targetUid)!;
 
-    if (Math.random() < ENEMY_MISS_CHANCE) {
-      const missLogLine = `${def.name}'s attack goes wide - miss!`;
-      enemyHits.push({ attackerIndex: i, targetUid, damage: 0, missed: true, wasDefended: false, logLine: missLogLine });
-      log.push(missLogLine);
-      return;
+    if (enemyAilmentsByIndex[i].some((a) => a.ailmentId === 'stun')) {
+      log.push(`${def.name} is stunned and cannot move!`);
+    } else {
+      const targetUid = pickTargetUid();
+      if (targetUid) {
+        const target = players.find((p) => p.uid === targetUid)!;
+        const isSilenced = enemyAilmentsByIndex[i].some((a) => AILMENTS[a.ailmentId]?.effect.blocksSkill);
+        const attackMultiplier = enemyAilmentsByIndex[i].reduce(
+          (mult, a) => mult * (AILMENTS[a.ailmentId]?.effect.attackMultiplier ?? 1),
+          1,
+        );
+        const blindChance = enemyAilmentsByIndex[i].some((a) => a.ailmentId === 'blind')
+          ? 1 - (AILMENTS.blind.effect.physicalAccuracyMultiplier ?? 1)
+          : 0;
+
+        if (blindChance > 0 && Math.random() < blindChance) {
+          const missLogLine = `${def.name}'s attack goes wide - miss! (Blind)`;
+          enemyHits.push({ attackerIndex: i, targetUid, damage: 0, missed: true, wasDefended: false, logLine: missLogLine });
+          log.push(missLogLine);
+        } else if (Math.random() < ENEMY_MISS_CHANCE) {
+          const missLogLine = `${def.name}'s attack goes wide - miss!`;
+          enemyHits.push({ attackerIndex: i, targetUid, damage: 0, missed: true, wasDefended: false, logLine: missLogLine });
+          log.push(missLogLine);
+        } else {
+          const hpFraction = enemyHp[i] / stats.maxHp;
+          const moveSource = isSilenced ? { ...def, moves: def.moves.filter((m) => m.skillId === 'attack') } : def;
+          const move = pickEnemyMove(moveSource.moves.length > 0 ? moveSource : def, hpFraction);
+          const skill = SKILLS[move.skillId] ?? SKILLS.attack;
+          let dmg = computeDamage(skill.power, stats.attack * attackMultiplier, target.defense);
+          if (def.tier !== 'boss') {
+            const crowdFactor = CROWD_DAMAGE_FACTOR[Math.min(6, aliveNonBossEnemyCount)] ?? 1;
+            dmg = Math.max(1, Math.round(dmg * crowdFactor));
+          }
+          if (target.defending) dmg = Math.round(dmg / 2);
+          hpByUid.set(targetUid, Math.max(0, hpByUid.get(targetUid)! - dmg));
+          const attackLogLine = `${def.name} uses ${move.skillId.replace(/-/g, ' ')} on ${target.name} for ${dmg} damage${
+            target.defending ? ' (halved - defended)' : ''
+          }.`;
+          enemyHits.push({ attackerIndex: i, targetUid, damage: dmg, missed: false, wasDefended: target.defending, logLine: attackLogLine });
+          log.push(attackLogLine);
+
+          if (skill.inflictsAilmentId && Math.random() < (skill.inflictAilmentChance ?? 0)) {
+            const ailments = ailmentsByUid.get(targetUid)!;
+            ailmentsByUid.set(targetUid, inflictAilment(ailments, skill.inflictsAilmentId, log));
+            inflictedThisPhaseByUid.get(targetUid)!.add(skill.inflictsAilmentId);
+          }
+        }
+      }
     }
 
-    const hpFraction = enemy.hp / stats.maxHp;
-    const move = pickEnemyMove(def, hpFraction);
-    const skill = SKILLS[move.skillId] ?? SKILLS.attack;
-    let dmg = computeDamage(skill.power, stats.attack, target.defense);
-    if (def.tier !== 'boss') {
-      const crowdFactor = CROWD_DAMAGE_FACTOR[Math.min(6, aliveNonBossEnemyCount)] ?? 1;
-      dmg = Math.max(1, Math.round(dmg * crowdFactor));
-    }
-    if (target.defending) dmg = Math.round(dmg / 2);
-    hpByUid.set(targetUid, Math.max(0, hpByUid.get(targetUid)! - dmg));
-    const attackLogLine = `${def.name} uses ${move.skillId.replace(/-/g, ' ')} on ${target.name} for ${dmg} damage${
-      target.defending ? ' (halved - defended)' : ''
-    }.`;
-    enemyHits.push({ attackerIndex: i, targetUid, damage: dmg, missed: false, wasDefended: target.defending, logLine: attackLogLine });
-    log.push(attackLogLine);
-
-    if (skill.inflictsAilmentId && Math.random() < (skill.inflictAilmentChance ?? 0)) {
-      const ailments = ailmentsByUid.get(targetUid)!;
-      ailmentsByUid.set(targetUid, inflictAilment(ailments, skill.inflictsAilmentId, log));
-      inflictedThisPhaseByUid.get(targetUid)!.add(skill.inflictsAilmentId);
+    for (const active of enemyAilmentsByIndex[i]) {
+      if (enemyHp[i] <= 0) break;
+      const tickDef = AILMENTS[active.ailmentId];
+      if (!tickDef?.effect.damagePercentPerTurn) continue;
+      const tickDmg = Math.max(1, Math.round(stats.maxHp * tickDef.effect.damagePercentPerTurn));
+      enemyHp[i] = Math.max(0, enemyHp[i] - tickDmg);
+      log.push(`${tickDef.name} deals ${tickDmg} damage to ${def.name}.`);
+      if (enemyHp[i] <= 0) log.push(`${def.name} is defeated!`);
     }
   });
 
@@ -512,5 +593,7 @@ export function resolvePartyEnemyPhase(
       ailments: expireAilments(ailmentsByUid.get(p.uid)!, inflictedThisPhaseByUid.get(p.uid)!),
     })),
     enemyHits,
+    enemyAilments: enemyAilmentsByIndex.map((list, i) => expireAilments(list, inflictedThisPhaseByEnemy[i])),
+    enemyHp,
   };
 }

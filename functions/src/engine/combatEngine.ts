@@ -158,6 +158,10 @@ export interface RoundEnemyInput {
   /** 1-50 for every enemy, including bosses - see rollEnemyLevel. */
   level: number;
   hp: number;
+  /** Ailments this enemy is entering the round with - see EnemyDefinition.vulnerableAilments for
+   *  which ailments a player can actually inflict on it. Whatever this round inflicts/cures/expires
+   *  is reflected in RoundResult.enemyAilments, not here. */
+  ailments: ActiveAilment[];
 }
 
 export interface RoundInput {
@@ -222,6 +226,9 @@ export interface RoundResult {
    *  have all been applied - the caller (resolveCombatAction.ts) persists this verbatim onto
    *  CombatSession.playerAilments. */
   playerAilments: ActiveAilment[];
+  /** Same as playerAilments, per enemy (same order/indices as enemyHp) - persisted onto
+   *  CombatSession.enemies[i].ailments. */
+  enemyAilments: ActiveAilment[][];
 }
 
 /** Groups a (possibly duplicate-laden) list of item ids into counts per id, capped at 3 total uses
@@ -309,10 +316,50 @@ export function resolveRound(input: RoundInput): RoundResult {
   const aliveIndices = () => enemyHp.map((_, i) => i).filter(isAlive);
   const aliveNonBossCount = () => aliveIndices().filter((i) => enemyDefs[i].tier !== 'boss').length;
 
-  // Ailments only ever apply to the player (see shared-types' ActiveAilment doc comment) - copied
-  // rather than mutated in place so a caller that reuses `input` after calling resolveRound never
-  // sees a half-mutated array. `inflictedThisRound` tracks ids inflicted during this same round so
-  // the end-of-round expiry step (below) doesn't immediately decrement a fresh Stun to 0 before it
+  // Per-enemy mirror of the player ailment tracking just below - a player's Skill can now inflict
+  // an ailment on an enemy the same way an enemy's own move inflicts one on the player, gated by
+  // that enemy's own EnemyDefinition.vulnerableAilments allowlist (never the ailment it inflicts
+  // itself - see that field's own doc comment). Copied rather than mutated in place, same reasoning
+  // as the player's `ailments` below.
+  const enemyAilments: ActiveAilment[][] = input.enemies.map((e) => e.ailments.map((a) => ({ ...a })));
+  const inflictedThisRoundByEnemy: Set<string>[] = input.enemies.map(() => new Set());
+
+  function inflictAilmentOnEnemy(i: number, ailmentId: string) {
+    if (!enemyDefs[i].vulnerableAilments.includes(ailmentId)) return;
+    const def = AILMENTS[ailmentId];
+    if (!def) return;
+    const list = enemyAilments[i];
+    const existingIndex = list.findIndex((a) => a.ailmentId === ailmentId);
+    const entry: ActiveAilment =
+      def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
+    if (existingIndex >= 0) list[existingIndex] = entry;
+    else list.push(entry);
+    inflictedThisRoundByEnemy[i].add(ailmentId);
+    log.push(`${enemyDefs[i].name} is afflicted with ${def.name}!`);
+  }
+
+  /** Mirrors applyAilmentTickDamage below, for one enemy - called once per enemy per round, right
+   *  at the point that enemy's own turn would occur (whether it actually attacked or was skipped
+   *  by Stun), matching AilmentEffect's "dealt at the end of the afflicted character's own turn"
+   *  contract. */
+  function applyEnemyAilmentTickDamage(i: number) {
+    if (!isAlive(i)) return;
+    for (const active of enemyAilments[i]) {
+      if (enemyHp[i] <= 0) break;
+      const def = AILMENTS[active.ailmentId];
+      if (!def?.effect.damagePercentPerTurn) continue;
+      const dmg = Math.max(1, Math.round(enemyStats[i].maxHp * def.effect.damagePercentPerTurn));
+      enemyHp[i] = Math.max(0, enemyHp[i] - dmg);
+      log.push(`${def.name} deals ${dmg} damage to ${enemyDefs[i].name}.`);
+      if (enemyHp[i] <= 0) log.push(`${enemyDefs[i].name} is defeated!`);
+    }
+  }
+
+  // The player's own ailment state (enemyAilments above is the parallel per-enemy version) -
+  // copied rather than mutated in place so a caller that reuses `input` after calling resolveRound
+  // never sees a half-mutated array. `inflictedThisRound` tracks ids inflicted during this same
+  // round so the end-of-round expiry step (below) doesn't immediately decrement a fresh Stun to 0
+  // before it
   // ever gets the chance to actually skip a turn.
   const ailments: ActiveAilment[] = input.playerAilments.map((a) => ({ ...a }));
   const inflictedThisRound = new Set<string>();
@@ -372,6 +419,11 @@ export function resolveRound(input: RoundInput): RoundResult {
     const def = enemyDefs[i];
     const stats = enemyStats[i];
 
+    if (enemyAilments[i].some((a) => a.ailmentId === 'stun')) {
+      log.push(`${def.name} is stunned and cannot move!`);
+      return;
+    }
+
     if (Math.random() < ENEMY_MISS_CHANCE) {
       const missLogLine = `${def.name}'s attack goes wide - miss!`;
       enemyHits.push({ attackerIndex: i, damage: 0, missed: true, wasDefended: false, logLine: missLogLine });
@@ -380,9 +432,19 @@ export function resolveRound(input: RoundInput): RoundResult {
     }
 
     const hpFraction = enemyHp[i] / stats.maxHp;
-    const move = pickEnemyMove(def, hpFraction);
+    // Silence blocks this enemy's own signature move the same way it blocks the player's Skill
+    // action - forced down to its plain 'attack' entry instead. Falls back to the unfiltered
+    // moveset (never actually empty - 'attack' is in every enemy's moves) if somehow nothing
+    // survives the filter.
+    const isSilenced = enemyAilments[i].some((a) => AILMENTS[a.ailmentId]?.effect.blocksSkill);
+    const moveSource = isSilenced ? { ...def, moves: def.moves.filter((m) => m.skillId === 'attack') } : def;
+    const move = pickEnemyMove(moveSource.moves.length > 0 ? moveSource : def, hpFraction);
     const skill = SKILLS[move.skillId] ?? SKILLS.attack;
-    let dmg = computeDamage(skill.power, stats.attack, input.playerStats.defense);
+    const attackMultiplier = enemyAilments[i].reduce(
+      (mult, a) => mult * (AILMENTS[a.ailmentId]?.effect.attackMultiplier ?? 1),
+      1,
+    );
+    let dmg = computeDamage(skill.power, stats.attack * attackMultiplier, input.playerStats.defense);
     if (def.tier !== 'boss') {
       const crowdFactor = CROWD_DAMAGE_FACTOR[Math.min(6, aliveNonBossCount())] ?? 1;
       dmg = Math.max(1, Math.round(dmg * crowdFactor));
@@ -433,6 +495,11 @@ export function resolveRound(input: RoundInput): RoundResult {
     verb: string,
     bonusMultiplier: (enemyIdx: number) => number = () => 1,
     damageType: DamageType = 'physical',
+    // Mirrors Skill.inflictsAilmentId/inflictAilmentChance - only a couple of quest-taught Skills
+    // set this today (frost-lance/ember-burst), same as only an enemy's own signature move sets it
+    // on the enemy->player side. Rolled once per landed (non-missed) hit, same "only after the
+    // attack itself already connected" rule enemyAttack's own ailment roll follows.
+    ailment?: { id: string; chance: number },
   ) {
     const alive = aliveIndices();
     const useAll = !!action.targetAll && alive.length > 1;
@@ -453,6 +520,9 @@ export function resolveRound(input: RoundInput): RoundResult {
       if (useAll) dmg = Math.max(1, Math.round(dmg * TARGET_ALL_DAMAGE_FACTOR));
       const defeated = damageEnemy(i, dmg, verb);
       hits.push({ targetIndex: i, damage: dmg, missed: false, defeated });
+      if (ailment && !defeated && Math.random() < ailment.chance) {
+        inflictAilmentOnEnemy(i, ailment.id);
+      }
     }
   }
 
@@ -521,6 +591,7 @@ export function resolveRound(input: RoundInput): RoundResult {
           "Keeper's Strike hits",
           (i) => weaknessMultiplier(i, skill.damageType),
           skill.damageType,
+          skill.inflictsAilmentId ? { id: skill.inflictsAilmentId, chance: skill.inflictAilmentChance ?? 0 } : undefined,
         );
         break;
       }
@@ -564,7 +635,10 @@ export function resolveRound(input: RoundInput): RoundResult {
     const sorted = [...indices].sort((a, b) => enemyStats[b].speed - enemyStats[a].speed);
     for (const i of sorted) {
       if (playerHp <= 0) break;
-      if (isAlive(i)) enemyAttack(i);
+      if (isAlive(i)) {
+        enemyAttack(i);
+        applyEnemyAilmentTickDamage(i);
+      }
     }
   }
 
@@ -604,11 +678,15 @@ export function resolveRound(input: RoundInput): RoundResult {
           enemyHits,
           damageTakenByPlayer,
           playerAilments: ailments,
+          enemyAilments,
         };
       }
       log.push('You try to flee, but there is no opening! Every foe still standing gets a free hit.');
       applyAilmentTickDamage();
-      for (const i of alive) enemyAttack(i);
+      for (const i of alive) {
+        enemyAttack(i);
+        applyEnemyAilmentTickDamage(i);
+      }
     } else {
       // Initiative = speed + a d6 roll, re-rolled every round - keeps speed the dominant factor
       // (a big enough lead still reliably goes first) while giving turn order genuine round-to-
@@ -630,7 +708,10 @@ export function resolveRound(input: RoundInput): RoundResult {
         if (turn.kind === 'player') {
           playerTurn();
           applyAilmentTickDamage();
-        } else if (isAlive(turn.index)) enemyAttack(turn.index);
+        } else if (isAlive(turn.index)) {
+          enemyAttack(turn.index);
+          applyEnemyAilmentTickDamage(turn.index);
+        }
       }
     }
   }
@@ -643,6 +724,17 @@ export function resolveRound(input: RoundInput): RoundResult {
       a.turnsRemaining === undefined || inflictedThisRound.has(a.ailmentId) ? a : { ...a, turnsRemaining: a.turnsRemaining - 1 },
     )
     .filter((a) => a.turnsRemaining === undefined || a.turnsRemaining > 0);
+
+  // Same expiry rule, per enemy.
+  const remainingEnemyAilments = enemyAilments.map((list, i) =>
+    list
+      .map((a) =>
+        a.turnsRemaining === undefined || inflictedThisRoundByEnemy[i].has(a.ailmentId)
+          ? a
+          : { ...a, turnsRemaining: a.turnsRemaining - 1 },
+      )
+      .filter((a) => a.turnsRemaining === undefined || a.turnsRemaining > 0),
+  );
 
   const allDefeated = enemyHp.every((hp) => hp <= 0);
   let phase: RoundOutcomePhase = 'continue';
@@ -661,6 +753,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     enemyHits,
     damageTakenByPlayer,
     playerAilments: remainingAilments,
+    enemyAilments: remainingEnemyAilments,
   };
 }
 

@@ -13,12 +13,13 @@ export interface Skill {
   power: number;
   spiritCost: number;
   effectiveAgainstFamilies?: string[];
-  /** Ailment id (see data/ailments.ts) this move has a chance to inflict on the player when an
-   *  enemy uses it - only meaningful on an enemy's own signature move, never the player's own
-   *  attack/skill/lanternAbility (nothing currently inflicts an ailment on an enemy). */
+  /** Ailment id (see data/ailments.ts) this move has a chance to inflict on its target - an
+   *  enemy's signature move targets the player (always applies); a player skill targets the
+   *  enemy and is gated by that enemy's EnemyDefinition.vulnerableAilments (see enemies.ts's doc
+   *  comment on that field - a non-vulnerable enemy just no-ops the roll). */
   inflictsAilmentId?: string;
-  /** Rolled independently of the attack's own hit/miss - a missed attack never rolls this at all
-   *  (see enemyAttack in combatEngine.ts), so this is the chance *given* the hit already landed. */
+  /** Rolled independently of the attack's own hit/miss - a missed or defeating hit never rolls
+   *  this at all, so this is the chance *given* the hit landed and didn't finish the target. */
   inflictAilmentChance?: number;
 }
 
@@ -102,9 +103,10 @@ export const SKILLS: Record<string, Skill> = {
   },
 
   // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Forgotten Treatises).
-  // Themed around Freeze/Burn via name/description and the effectiveAgainstFamilies bonus below,
-  // but this game's ailment system is player-only (see this file's inflictsAilmentId doc comment) -
-  // pure spirit damage, no ailment inflicted on the enemy.
+  // Themed around Freeze/Burn via name/description, the effectiveAgainstFamilies bonus below, and
+  // (now that enemies can be afflicted) an ailment matching that theme - both land only on a
+  // vulnerable target (coalSpirits/waterSpirits/briarSpirits are all vulnerable to their
+  // respective ailment here, see enemies.ts's vulnerableAilments).
   'frost-lance': {
     id: 'frost-lance',
     kind: 'spiritArt',
@@ -112,6 +114,8 @@ export const SKILLS: Record<string, Skill> = {
     power: 20,
     spiritCost: 12,
     effectiveAgainstFamilies: ['coalSpirits'],
+    inflictsAilmentId: 'freeze',
+    inflictAilmentChance: 0.3,
   },
   'ember-burst': {
     id: 'ember-burst',
@@ -120,5 +124,7 @@ export const SKILLS: Record<string, Skill> = {
     power: 20,
     spiritCost: 12,
     effectiveAgainstFamilies: ['waterSpirits', 'briarSpirits'],
+    inflictsAilmentId: 'burn',
+    inflictAilmentChance: 0.3,
   },
 };

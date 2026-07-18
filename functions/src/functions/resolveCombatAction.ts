@@ -134,7 +134,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       action,
       playerStats: save.player.stats,
       inventory: save.inventory,
-      enemies: session.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
+      enemies: session.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp, ailments: e.ailments ?? [] })),
       playerAilments,
     });
 
@@ -220,7 +220,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
-    const updatedEnemies = session.enemies.map((e, i) => ({ ...e, hp: result.enemyHp[i] }));
+    const updatedEnemies = session.enemies.map((e, i) => ({ ...e, hp: result.enemyHp[i], ailments: result.enemyAilments[i] }));
     if (result.phase === 'continue') {
       tx.update(sessionRef, { enemies: updatedEnemies, round: session.round + 1, playerAilments: result.playerAilments });
     } else {
@@ -238,7 +238,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       playerMaxSpirit: save.player.stats.maxSpirit,
       playerLanternOil: save.player.stats.lanternOil,
       playerMaxLanternOil: save.player.stats.maxLanternOil,
-      enemies: updatedEnemies.map((e, index) => ({ index, hp: e.hp, maxHp: e.maxHp })),
+      enemies: updatedEnemies.map((e, index) => ({ index, hp: e.hp, maxHp: e.maxHp, ailments: e.ailments })),
       damageTakenByPlayer: result.damageTakenByPlayer,
       hits: result.hits,
       enemyHits: result.enemyHits,

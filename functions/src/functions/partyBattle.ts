@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type DocumentReference, type Firestore, type Transaction } from 'firebase-admin/firestore';
-import { resolvePartyPlayerTurn, resolvePartyEnemyPhase, resolvePvpTurn } from '../engine/partyCombatEngine';
+import { resolvePartyPlayerTurn, resolvePartyEnemyPhase, resolvePvpTurn, type PartyEnemyHitResult } from '../engine/partyCombatEngine';
 import { isStunned } from '../engine/combatMath';
 import { computeRewards, aggregateItemCounts, hasSufficientQuantity } from '../engine/combatEngine';
 import { rollChestRewards } from '../engine/dailyChestEngine';
@@ -378,7 +378,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         inventory: activeSave.inventory,
         ailments: activeStats.ailments,
       },
-      battle.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
+      battle.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp, ailments: e.ailments ?? [] })),
     );
     // Applied in-memory now, written to Firestore at whichever exit branch below actually ends up
     // writing activeUserRef (a plain tx.set here, or threaded into grantWaveRewards/
@@ -395,7 +395,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       ailments: turnResult.ailments,
       defending: turnResult.defending,
     };
-    const nextEnemies = battle.enemies.map((e, i) => ({ ...e, hp: turnResult.enemyHp[i] }));
+    const nextEnemies = battle.enemies.map((e, i) => ({ ...e, hp: turnResult.enemyHp[i], ailments: turnResult.enemyAilments[i] }));
     const nextTurnIndex = battle.currentTurnIndex + 1;
     const roundComplete = nextTurnIndex >= battle.turnOrder.length;
 
@@ -415,10 +415,13 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };
     }
 
-    // Every alive participant this round has now gone - check for victory before running the
-    // enemy phase (no point letting an already-cleared board "attack back" after the last blow).
-    const enemiesDefeated = nextEnemies.every((e) => e.hp <= 0);
-    if (enemiesDefeated) {
+    // Declares victory once every enemy is at 0 hp - factored out since that can now happen at
+    // either of two points in a round: right after the active player's own attack (the original,
+    // "no point letting an already-cleared board attack back" case, checked immediately below), or
+    // - now that ailments can tick real damage against enemies - during the enemy phase itself, if
+    // Poison/Burn/Freeze alone finishes off whatever the player's attack didn't (checked further
+    // down, after the enemy phase runs).
+    async function declareVictory(logLines: string[], enemyHits?: PartyEnemyHitResult[]) {
       const isEndless = battle.mode === 'endless';
       const status: PartyBattleStatus = isEndless ? 'awaitingContinueVote' : 'victory';
       let lastWaveRewards = battle.lastWaveRewards;
@@ -430,12 +433,18 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         participantStats: nextParticipantStats,
         enemies: nextEnemies,
         status,
-        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, hits: turnResult.hits },
+        lastTurnResult: { round: battle.round, log: logLines, resolvedAt: now, hits: turnResult.hits, enemyHits },
         lastWaveRewards,
         continueVotes: status === 'awaitingContinueVote' ? {} : battle.continueVotes,
         updatedAt: now,
       });
       return { resolved: true, status, phase: 'victory' as const };
+    }
+
+    // Every alive participant this round has now gone - check for victory before running the
+    // enemy phase (no point letting an already-cleared board "attack back" after the last blow).
+    if (nextEnemies.every((e) => e.hp <= 0)) {
+      return declareVictory(turnResult.log);
     }
 
     // Enemy phase: every currently-alive participant takes a hit, once, now that everyone's gone.
@@ -452,10 +461,16 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       }));
     const enemyPhase = resolvePartyEnemyPhase(
       alivePlayersForEnemyPhase,
-      nextEnemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp })),
+      nextEnemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp, ailments: e.ailments })),
     );
     for (const p of enemyPhase.players) {
       nextParticipantStats[p.uid] = { ...nextParticipantStats[p.uid], hp: p.hp, ailments: p.ailments, defending: false };
+    }
+    // Ailment tick damage during the enemy phase can now defeat/afflict an enemy independent of
+    // any player attack that round (see resolvePartyEnemyPhase's own enemyHp/enemyAilments doc
+    // comments) - apply both back onto the board before it's persisted below.
+    for (let i = 0; i < nextEnemies.length; i++) {
+      nextEnemies[i] = { ...nextEnemies[i], hp: enemyPhase.enemyHp[i], ailments: enemyPhase.enemyAilments[i] };
     }
     // Anyone excluded above (already down before the enemy phase ran) also clears defending, same
     // as everyone else once a round fully resolves.
@@ -466,6 +481,14 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     }
 
     const combinedLog = [...turnResult.log, ...enemyPhase.log];
+
+    // Same precedence solo combat's own resolveRound uses (allDefeated checked before playerHp<=0)
+    // - an ailment tick killing the last enemy the same phase the party also gets wiped out is a
+    // genuine edge case, but "the enemies died too" reads as the more meaningful outcome.
+    if (nextEnemies.every((e) => e.hp <= 0)) {
+      return declareVictory(combinedLog, enemyPhase.enemyHits);
+    }
+
     const partyDefeated = battle.participants.every((p) => nextParticipantStats[p].hp <= 0);
 
     if (partyDefeated) {

@@ -55,7 +55,7 @@ export function rollWaveEnemies(wave: number, partyAverageLevel: number): PartyB
   return roster.map((enemy) => {
     const level = rollEnemyLevel(effectiveLevel);
     const stats = scaledEnemyStats(enemy, level);
-    return { enemyId: enemy.id, level, hp: stats.maxHp, maxHp: stats.maxHp };
+    return { enemyId: enemy.id, level, hp: stats.maxHp, maxHp: stats.maxHp, ailments: [] };
   });
 }
 

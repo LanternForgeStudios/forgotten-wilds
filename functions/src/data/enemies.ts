@@ -38,6 +38,15 @@ export interface EnemyDefinition {
    *  challenged. Data-driven per-boss rather than a separate hardcoded id-to-quest map, so a new
    *  boss's prerequisite lives right alongside its other authored content. */
   prerequisiteQuestId?: string;
+  /** Which ailments (data/ailments.ts ids) a player's Skill/Lantern Ability can actually inflict on
+   *  this enemy - an authored allowlist, not "everything except what it inflicts itself" (see
+   *  combatMath.ts's enemyIsVulnerableTo). Every family gets a curated 2-3 ailment subset rather
+   *  than all 5 remaining ones, for real pick-the-right-ailment strategy rather than "anything but
+   *  its own signature works." Deliberately never includes the ailment this enemy's own moves
+   *  inflict (immune to what it deals out) - checked by enemies.test.ts so a future authoring
+   *  mistake here fails a test instead of shipping quietly. First-pass thematic assignment, not
+   *  playtested - expect these to need real balance tuning. */
+  vulnerableAilments: string[];
 }
 
 export const ENEMIES: Record<string, EnemyDefinition> = {
@@ -48,6 +57,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'regular',
     isBoss: false,
     weaknessDamageType: 'lantern',
+    vulnerableAilments: ['freeze', 'poison', 'stun'],
     stats: { maxHp: 28, attack: 7, defense: 3, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 3 },
@@ -69,6 +79,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'elite',
     isBoss: false,
     weaknessDamageType: 'lantern',
+    vulnerableAilments: ['freeze', 'poison', 'stun'],
     stats: { maxHp: 42, attack: 10, defense: 5, speed: 11 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -89,6 +100,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'regular',
     isBoss: false,
     weaknessDamageType: 'physical',
+    vulnerableAilments: ['poison', 'burn', 'silence'],
     stats: { maxHp: 34, attack: 9, defense: 6, speed: 6 },
     moves: [
       { skillId: 'attack', weight: 3 },
@@ -105,6 +117,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'elite',
     isBoss: false,
     weaknessDamageType: 'physical',
+    vulnerableAilments: ['poison', 'burn', 'silence'],
     stats: { maxHp: 50, attack: 12, defense: 8, speed: 7 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -121,6 +134,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'regular',
     isBoss: false,
     weaknessDamageType: 'spirit',
+    vulnerableAilments: ['freeze', 'stun', 'silence'],
     stats: { maxHp: 30, attack: 8, defense: 4, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -142,6 +156,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'elite',
     isBoss: false,
     weaknessDamageType: 'spirit',
+    vulnerableAilments: ['freeze', 'stun', 'silence'],
     stats: { maxHp: 46, attack: 11, defense: 6, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -162,6 +177,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'regular',
     isBoss: false,
     weaknessDamageType: 'physical',
+    vulnerableAilments: ['stun', 'poison', 'blind'],
     stats: { maxHp: 30, attack: 8, defense: 4, speed: 10 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -182,6 +198,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'elite',
     isBoss: false,
     weaknessDamageType: 'physical',
+    vulnerableAilments: ['stun', 'poison', 'blind'],
     stats: { maxHp: 44, attack: 11, defense: 6, speed: 12 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -201,6 +218,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'regular',
     isBoss: false,
     weaknessDamageType: 'lantern',
+    vulnerableAilments: ['burn', 'poison', 'blind'],
     stats: { maxHp: 29, attack: 7, defense: 4, speed: 9 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -222,6 +240,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'elite',
     isBoss: false,
     weaknessDamageType: 'lantern',
+    vulnerableAilments: ['burn', 'poison', 'blind'],
     stats: { maxHp: 45, attack: 10, defense: 6, speed: 11 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -242,6 +261,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'regular',
     isBoss: false,
     weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'silence'],
     stats: { maxHp: 32, attack: 9, defense: 5, speed: 7 },
     moves: [
       { skillId: 'attack', weight: 2 },
@@ -262,6 +282,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'elite',
     isBoss: false,
     weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'silence'],
     stats: { maxHp: 48, attack: 12, defense: 7, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 1 },
@@ -282,6 +303,9 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     isBoss: true,
     weaknessDamageType: 'lantern',
     prerequisiteQuestId: 'the-shrine-below',
+    // A boss stays resistant to more of the ailment kit than a regular/elite of its own family
+    // would - only 2 vulnerabilities instead of 3, reflecting its tougher, more resilient nature.
+    vulnerableAilments: ['freeze', 'stun'],
     stats: { maxHp: 140, attack: 13, defense: 8, speed: 8 },
     moves: [
       { skillId: 'attack', weight: 2 },

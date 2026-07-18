@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { getAssetDefinition } from '@/assets/assetManager';
+import { AILMENT_TINT_HEX } from '@/utils/ailmentTint';
 import { splitFormation } from './battleFormation';
 import { loadSceneTexture } from './textureLoader';
 import {
@@ -54,6 +55,10 @@ export interface BattleEnemyVisual {
   hp: number;
   maxHp: number;
   isBoss: boolean;
+  /** Ailment ids (see data/ailments.ts) currently active on this enemy - see
+   *  createEnemySlot/updateAilments for how this drives the sprite tint + badge text. Empty for an
+   *  unafflicted enemy. */
+  ailmentIds: string[];
 }
 
 interface EnemySlot {
@@ -62,6 +67,7 @@ interface EnemySlot {
   hpTrackFill: Phaser.GameObjects.Rectangle;
   nameText: Phaser.GameObjects.Text;
   tierText: Phaser.GameObjects.Text;
+  ailmentText: Phaser.GameObjects.Text;
   targetRing?: Phaser.GameObjects.Rectangle;
   hpTrackWidth: number;
   maxHp: number;
@@ -188,6 +194,11 @@ export class BattleScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setDepth(11)
       .setShadow(0, 1, 'rgba(0,0,0,0.9)', 3);
+    const ailmentText = this.add
+      .text(x, barY + 38 * scale, '', { fontSize: `${10 * scale}px`, color: '#ffcf6b', fontStyle: 'bold' })
+      .setOrigin(0.5, 0)
+      .setDepth(11)
+      .setShadow(0, 1, 'rgba(0,0,0,0.9)', 3);
 
     this.enemySlots.set(enemy.index, {
       sprite,
@@ -195,10 +206,26 @@ export class BattleScene extends Phaser.Scene {
       hpTrackFill,
       nameText,
       tierText,
+      ailmentText,
       hpTrackWidth,
       maxHp: enemy.maxHp,
     });
     this.updateHpBar(enemy.index, enemy.hp);
+    this.updateAilments(enemy.index, enemy.ailmentIds);
+  }
+
+  /** Tints the enemy's sprite to the first active ailment with a real color (see AILMENT_TINT_HEX -
+   *  Stun/Blind have no tint, matching the screen-wash convention those two already skip for the
+   *  player) and lists every active ailment's name in the badge text beneath its tier label. A
+   *  pragmatic first pass, not a full multi-ailment blend - good enough to read "something is
+   *  wrong with this enemy" at a glance, which is the goal. */
+  private updateAilments(index: number, ailmentIds: string[]): void {
+    const slot = this.enemySlots.get(index);
+    if (!slot) return;
+    const tintedId = ailmentIds.find((id) => AILMENT_TINT_HEX[id] !== undefined);
+    if (tintedId) slot.sprite.setTint(AILMENT_TINT_HEX[tintedId]);
+    else slot.sprite.clearTint();
+    slot.ailmentText.setText(ailmentIds.map((id) => id.charAt(0).toUpperCase() + id.slice(1)).join(', '));
   }
 
   private updateHpBar(index: number, hp: number): void {
@@ -213,11 +240,14 @@ export class BattleScene extends Phaser.Scene {
     });
   }
 
-  /** HP-only sync for an already-loaded roster: tweens each changed enemy's HP-bar fill. Does not
-   *  remove dead enemies - playDefeat (chained from playOutgoingHits) owns that. */
+  /** Sync for an already-loaded roster: tweens each changed enemy's HP-bar fill and refreshes its
+   *  ailment tint/badge text. Does not remove dead enemies - playDefeat (chained from
+   *  playOutgoingHits) owns that. */
   syncEnemies(enemies: BattleEnemyVisual[]): void {
     for (const enemy of enemies) {
-      if (this.enemySlots.has(enemy.index)) this.updateHpBar(enemy.index, enemy.hp);
+      if (!this.enemySlots.has(enemy.index)) continue;
+      this.updateHpBar(enemy.index, enemy.hp);
+      this.updateAilments(enemy.index, enemy.ailmentIds);
     }
   }
 
@@ -320,6 +350,7 @@ export class BattleScene extends Phaser.Scene {
         slot.hpTrackFill.destroy();
         slot.nameText.destroy();
         slot.tierText.destroy();
+        slot.ailmentText.destroy();
         slot.targetRing?.destroy();
       },
       useFxSmoke ? DEFEAT_FX_FRAMES : undefined,
@@ -389,6 +420,7 @@ export class BattleScene extends Phaser.Scene {
       slot.hpTrackFill.destroy();
       slot.nameText.destroy();
       slot.tierText.destroy();
+      slot.ailmentText.destroy();
       slot.targetRing?.destroy();
     }
     this.enemySlots.clear();

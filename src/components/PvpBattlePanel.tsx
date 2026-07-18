@@ -198,6 +198,10 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
         hp: opponent.hp,
         maxHp: opponent.maxHp,
         isBoss: false,
+        // Gated on 'active' the same way myAilments is below - participantStats.ailments isn't
+        // cleared by the end-of-match restore, so an ended duel would otherwise still show a
+        // stale tint/badge on the opponent's sprite.
+        ailmentIds: battle.status === 'active' ? (opponent.ailments ?? []).map((a) => a.ailmentId) : [],
       },
     ];
     // opponentName intentionally omitted - resolving it a moment after mount shouldn't force

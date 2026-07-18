@@ -233,7 +233,7 @@ export function CombatScene() {
       });
       setEnemies((prev) => prev.map((e) => {
         const updated = res.enemies.find((u) => u.index === e.index);
-        return updated ? { ...e, hp: updated.hp } : e;
+        return updated ? { ...e, hp: updated.hp, ailments: updated.ailments } : e;
       }));
       // Diffed against `playerAilments` (the pre-this-round state, captured by closure before the
       // await above) rather than after setPlayerAilments below - an ailment already active last
@@ -475,6 +475,7 @@ export function CombatScene() {
         hp: e.hp,
         maxHp: e.maxHp,
         isBoss: e.isBoss,
+        ailmentIds: e.ailments.map((a) => a.ailmentId),
       })),
     [enemies],
   );

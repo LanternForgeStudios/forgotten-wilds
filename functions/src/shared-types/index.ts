@@ -171,14 +171,18 @@ export interface CombatEnemyState {
   level: number;
   hp: number;
   maxHp: number;
+  /** Ailments currently afflicting this specific enemy - a player's Skill/Lantern Ability can
+   *  inflict one the same way an enemy's own move inflicts one on the player (see
+   *  EnemyDefinition.vulnerableAilments, functions/src/data/enemies.ts, for which ailments a given
+   *  enemy can actually be afflicted with). Defaults to [] at encounter start. */
+  ailments: ActiveAilment[];
 }
 
-/** One ailment currently afflicting the player mid-battle - see functions/src/data/ailments.ts
- *  for what each ailmentId actually does. Ailments only ever apply to the player in this system
- *  (enemies inflict them, nothing currently inflicts them on enemies) and live only on
- *  CombatSession, never PlayerSave - "all active ailments are automatically removed when combat
- *  ends" falls out for free from that, since nothing ever reads or writes this once the session
- *  is resolved. */
+/** One ailment currently afflicting a combatant (player or enemy) mid-battle - see
+ *  functions/src/data/ailments.ts for what each ailmentId actually does. Lives only on
+ *  CombatSession/PartyBattleSession, never PlayerSave - "all active ailments are automatically
+ *  removed when combat ends" falls out for free from that, since nothing ever reads or writes
+ *  this once the session/battle is resolved. */
 export interface ActiveAilment {
   ailmentId: string;
   /** Turns remaining before this auto-expires (see AilmentDefinition.autoExpireAfterTurns) -
@@ -427,6 +431,9 @@ export interface PartyBattleEnemyState {
   level: number;
   hp: number;
   maxHp: number;
+  /** Same as CombatEnemyState.ailments (solo) - see that field's own doc comment. Defaults to []
+   *  when a wave's enemies are first rolled. */
+  ailments: ActiveAilment[];
 }
 
 /** Whichever single player-turn or enemy-phase just resolved, persisted onto the doc (not just

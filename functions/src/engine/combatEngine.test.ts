@@ -170,7 +170,7 @@ describe('resolveRound', () => {
   const mothling = ENEMIES.mothling;
 
   function soloEnemies(hp = mothling.stats.maxHp, level = 1) {
-    return [{ enemyId: mothling.id, level, hp }];
+    return [{ enemyId: mothling.id, level, hp, ailments: [] }];
   }
 
   it('deals damage on attack and reduces enemy hp', () => {
@@ -192,8 +192,8 @@ describe('resolveRound', () => {
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
       ],
     });
     expect(result.enemyHp[0]).toBe(mothling.stats.maxHp);
@@ -207,8 +207,8 @@ describe('resolveRound', () => {
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: mothling.id, level: 1, hp: 0 },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: 0, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
       ],
     });
     expect(result.enemyHp[1]).toBeLessThan(mothling.stats.maxHp);
@@ -221,9 +221,9 @@ describe('resolveRound', () => {
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
       ],
     });
     // Each of the 3 enemies attacks (not just the targeted one) - CROWD_DAMAGE_FACTOR
@@ -241,8 +241,8 @@ describe('resolveRound', () => {
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: mothling.id, level: 1, hp: 0 },
-        { enemyId: mothling.id, level: 1, hp: 1 },
+        { enemyId: mothling.id, level: 1, hp: 0, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: 1, ailments: [] },
       ],
     });
     expect(almostDone.phase).toBe('victory');
@@ -254,8 +254,8 @@ describe('resolveRound', () => {
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
       ],
     });
     expect(notYet.phase).toBe('continue');
@@ -340,8 +340,8 @@ describe('resolveRound', () => {
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp, ailments: [] },
       ],
     });
     const attacking = resolveRound({
@@ -350,8 +350,8 @@ describe('resolveRound', () => {
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp, ailments: [] },
       ],
     });
     vi.restoreAllMocks();
@@ -366,8 +366,8 @@ describe('resolveRound', () => {
     const restlessMiner = ENEMIES['restless-miner'];
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const enemies = [
-      { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp },
-      { enemyId: restlessMiner.id, level: 20, hp: restlessMiner.stats.maxHp },
+      { enemyId: mothling.id, level: 20, hp: mothling.stats.maxHp, ailments: [] },
+      { enemyId: restlessMiner.id, level: 20, hp: restlessMiner.stats.maxHp, ailments: [] },
     ];
     const defending = resolveRound({
       action: { type: 'defend' },
@@ -406,7 +406,7 @@ describe('resolveRound', () => {
       playerStats: stats({ speed: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: coalSpirit.id, level: 1, hp: coalSpirit.stats.maxHp }],
+      enemies: [{ enemyId: coalSpirit.id, level: 1, hp: coalSpirit.stats.maxHp, ailments: [] }],
     });
     expect(result.playerLanternOil).toBeLessThan(20);
     expect(result.enemyHp[0]).toBeLessThan(coalSpirit.stats.maxHp);
@@ -521,7 +521,7 @@ describe('resolveRound', () => {
       playerStats: stats({ hp: 1, maxHp: 60, speed: -999, defense: 0 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] }],
     });
     vi.restoreAllMocks();
     expect(result.phase).toBe('defeat');
@@ -583,9 +583,9 @@ describe('resolveRound', () => {
   describe('target-all', () => {
     function threeMothlings() {
       return [
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
       ];
     }
 
@@ -717,7 +717,7 @@ describe('resolveRound', () => {
           playerStats,
           inventory: [],
           playerAilments: [],
-          enemies: [{ enemyId: mothling.id, level: enemyLevel, hp: 999999 }], // isolate from enemy maxHp too
+          enemies: [{ enemyId: mothling.id, level: enemyLevel, hp: 999999, ailments: [] }], // isolate from enemy maxHp too
         });
         vi.restoreAllMocks();
 
@@ -777,9 +777,9 @@ describe('resolveRound', () => {
       const enemyLevel = Math.max(1, Math.round(playerLevel / 2));
       const enemyHp = scaledEnemyStats(mothling, enemyLevel).maxHp;
       let enemies = [
-        { enemyId: mothling.id, level: enemyLevel, hp: enemyHp },
-        { enemyId: mothling.id, level: enemyLevel, hp: enemyHp },
-        { enemyId: mothling.id, level: enemyLevel, hp: enemyHp },
+        { enemyId: mothling.id, level: enemyLevel, hp: enemyHp, ailments: [] },
+        { enemyId: mothling.id, level: enemyLevel, hp: enemyHp, ailments: [] },
+        { enemyId: mothling.id, level: enemyLevel, hp: enemyHp, ailments: [] },
       ];
 
       let phase: string = 'continue';
@@ -831,7 +831,7 @@ describe('resolveRound - elemental weakness bonus', () => {
       playerStats: stats({ speed: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp, ailments: [] }],
     });
     restlessMiner.weaknessDamageType = 'spirit';
     const notWeak = resolveRound({
@@ -839,7 +839,7 @@ describe('resolveRound - elemental weakness bonus', () => {
       playerStats: stats({ speed: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp, ailments: [] }],
     });
     vi.restoreAllMocks();
     const weakDamage = restlessMiner.stats.maxHp - weak.enemyHp[0];
@@ -855,7 +855,7 @@ describe('resolveRound - elemental weakness bonus', () => {
       playerStats: stats({ speed: 999, spirit: 30, maxSpirit: 30 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp, ailments: [] }],
     });
     restlessMiner.weaknessDamageType = 'physical';
     const notWeak = resolveRound({
@@ -863,7 +863,7 @@ describe('resolveRound - elemental weakness bonus', () => {
       playerStats: stats({ speed: 999, spirit: 30, maxSpirit: 30 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp, ailments: [] }],
     });
     vi.restoreAllMocks();
     const weakDamage = restlessMiner.stats.maxHp - weak.enemyHp[0];
@@ -884,7 +884,7 @@ describe('resolveRound - elemental weakness bonus', () => {
       playerStats: stats({ speed: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: restlessMiner.id, level, hp: maxHp }],
+      enemies: [{ enemyId: restlessMiner.id, level, hp: maxHp, ailments: [] }],
     });
     restlessMiner.weaknessDamageType = 'physical';
     const notWeak = resolveRound({
@@ -892,7 +892,7 @@ describe('resolveRound - elemental weakness bonus', () => {
       playerStats: stats({ speed: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: restlessMiner.id, level, hp: maxHp }],
+      enemies: [{ enemyId: restlessMiner.id, level, hp: maxHp, ailments: [] }],
     });
     vi.restoreAllMocks();
     const weakDamage = maxHp - weak.enemyHp[0];
@@ -917,7 +917,7 @@ describe('resolveRound - initiative roll', () => {
         playerStats: stats({ speed: 7, attack: 999, hp: 999, maxHp: 999 }), // guaranteed one-shot kill
         inventory: [],
         playerAilments: [],
-        enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+        enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] }],
       });
       if (result.enemyHits.length > 0) enemyActedAtLeastOnce = true;
       else playerWonInitiativeAtLeastOnce = true;
@@ -946,9 +946,9 @@ describe('resolveRound - defeated-enemy-cannot-attack regression test', () => {
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
       ],
     });
     vi.restoreAllMocks();
@@ -1092,9 +1092,9 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
 
   function threeMothlings() {
     return [
-      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+      { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
     ];
   }
 
@@ -1175,14 +1175,14 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
       playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] }],
     });
     const attacking = resolveRound({
       action: { type: 'attack' },
       playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] }],
     });
     expect(defending.enemyHits[0].damage).toBeLessThan(attacking.enemyHits[0].damage);
   });
@@ -1195,7 +1195,7 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
       playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] }],
     });
     expect(missed.enemyHits[0].missed).toBe(true);
     expect(missed.enemyHits[0].damage).toBe(0);
@@ -1213,7 +1213,7 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
       playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp }],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] }],
     });
     expect(hit.enemyHits[0].missed).toBe(false);
     expect(hit.enemyHits[0].damage).toBeGreaterThan(0);
@@ -1228,7 +1228,7 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
       playerStats: stats({ speed: -999, hp: 9999, maxHp: 9999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: boss.id, level: 1, hp: boss.stats.maxHp }],
+      enemies: [{ enemyId: boss.id, level: 1, hp: boss.stats.maxHp, ailments: [] }],
     });
     const bossWithAdds = resolveRound({
       action: { type: 'defend' },
@@ -1236,9 +1236,9 @@ describe('resolveRound - enemyHits (structured per-attacker enemy damage on the 
       inventory: [],
       playerAilments: [],
       enemies: [
-        { enemyId: boss.id, level: 1, hp: boss.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
-        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp },
+        { enemyId: boss.id, level: 1, hp: boss.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
+        { enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] },
       ],
     });
     // Roster order is [boss, mothling, mothling] in both cases relevant to attackerIndex 0.
@@ -1293,7 +1293,7 @@ describe('resolveRound - ailments', () => {
   const mothling = ENEMIES.mothling;
 
   function soloEnemies(hp = mothling.stats.maxHp, level = 1) {
-    return [{ enemyId: mothling.id, level, hp }];
+    return [{ enemyId: mothling.id, level, hp, ailments: [] }];
   }
 
   afterEach(() => {
@@ -1410,7 +1410,7 @@ describe('resolveRound - ailments', () => {
       playerStats: stats({ speed: 999 }),
       inventory: [],
       playerAilments: [],
-      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp }],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp, ailments: [] }],
     });
     expect(result.playerAilments).toEqual([{ ailmentId: 'stun', turnsRemaining: 1 }]);
     expect(result.log.some((l) => l.includes('afflicted with Stun'))).toBe(true);
@@ -1476,5 +1476,106 @@ describe('resolveRound - ailments', () => {
     });
     expect(result.itemConsumedIds).toEqual(['antidote']);
     expect(result.playerAilments).toEqual([{ ailmentId: 'burn' }]);
+  });
+});
+
+describe('resolveRound - enemy ailments', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("a Skill's ailment roll lands on an enemy vulnerable to it (frost-lance -> Freeze on a coal-spirit)", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.3 inflict chance
+    const coalSpirit = ENEMIES['coal-spirit'];
+    // Padded well above coalSpirit's real maxHp (30) - frost-lance's spirit damage plus its 1.5x
+    // weakness bonus against this family would otherwise one-shot it, and a defeated enemy never
+    // rolls the ailment-infliction chance (see resolveOffensiveHits' `!defeated` gate) - this test
+    // is about the vulnerability gate, not the defeat gate.
+    const result = resolveRound({
+      action: { type: 'skill', skillId: 'frost-lance' },
+      playerStats: stats({ speed: 999, spirit: 30 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: coalSpirit.id, level: 1, hp: 1000, ailments: [] }],
+    });
+    expect(result.enemyAilments[0]).toStrictEqual([{ ailmentId: 'freeze' }]);
+    expect(result.log.some((l) => l.includes('afflicted with Freeze'))).toBe(true);
+  });
+
+  it("a Skill's ailment roll is a no-op against an enemy not listed in its vulnerableAilments (ember-burst's Burn on a mothling)", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // would land if this enemy were vulnerable
+    const mothling = ENEMIES.mothling;
+    expect(mothling.vulnerableAilments).not.toContain('burn');
+    const result = resolveRound({
+      action: { type: 'skill', skillId: 'ember-burst' },
+      playerStats: stats({ speed: 999, spirit: 30 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] }],
+    });
+    expect(result.enemyAilments[0]).toEqual([]);
+  });
+
+  it('an enemy already afflicted with a damage-over-time ailment takes tick damage at the end of its own turn', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5); // no enemy miss (ENEMY_MISS_CHANCE is 0.1)
+    const coalSpirit = ENEMIES['coal-spirit'];
+    const result = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: coalSpirit.id, level: 1, hp: coalSpirit.stats.maxHp, ailments: [{ ailmentId: 'poison' }] }],
+    });
+    const expectedTick = Math.round(coalSpirit.stats.maxHp * AILMENTS.poison.effect.damagePercentPerTurn!);
+    // The enemy's own attack damages the player, never itself - its hp only moves via the tick.
+    expect(result.enemyHp[0]).toBe(coalSpirit.stats.maxHp - expectedTick);
+    expect(result.log.some((l) => l.includes('Poison deals'))).toBe(true);
+  });
+
+  it("a stunned enemy skips its own attack entirely, but the player's own attack still lands", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const mothling = ENEMIES.mothling;
+    const result = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [{ ailmentId: 'stun', turnsRemaining: 1 }] }],
+    });
+    expect(result.hits).toHaveLength(1); // player's own attack still landed
+    expect(result.enemyHits).toEqual([]); // the stunned enemy never got to attack
+    expect(result.log.some((l) => l.includes('is stunned and cannot move'))).toBe(true);
+  });
+
+  it('Silence forces an afflicted enemy down to its plain attack, blocking its signature ailment-inflicting move', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const restlessMiner = ENEMIES['restless-miner'];
+    const result = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: restlessMiner.id, level: 1, hp: restlessMiner.stats.maxHp, ailments: [{ ailmentId: 'silence' }] }],
+    });
+    expect(result.log.some((l) => l.includes('uses attack for'))).toBe(true);
+    expect(result.playerAilments).toEqual([]); // never got to roll miner-pickaxe-swing's Stun chance
+  });
+
+  it("Burn reduces an afflicted enemy's outgoing damage via attackMultiplier", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const mothling = ENEMIES.mothling;
+    const baseline = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [] }],
+    });
+    const burned = resolveRound({
+      action: { type: 'defend' },
+      playerStats: stats({ speed: 999 }),
+      inventory: [],
+      playerAilments: [],
+      enemies: [{ enemyId: mothling.id, level: 1, hp: mothling.stats.maxHp, ailments: [{ ailmentId: 'burn' }] }],
+    });
+    expect(burned.enemyHits[0].damage).toBeLessThan(baseline.enemyHits[0].damage);
   });
 });

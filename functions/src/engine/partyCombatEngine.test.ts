@@ -8,6 +8,8 @@ import {
   type PvpDefenderInput,
 } from './partyCombatEngine';
 import type { RoundEnemyInput } from './combatEngine';
+import { ENEMIES } from '../data/enemies';
+import { AILMENTS } from '../data/ailments';
 import type { Stats, ActiveAilment } from '../shared-types';
 
 function stats(overrides: Partial<Stats> = {}): Stats {
@@ -39,7 +41,7 @@ function player(uid: string, overrides: Partial<PartyPlayerInput> = {}): PartyPl
 }
 
 function mothling(overrides: Partial<RoundEnemyInput> = {}): RoundEnemyInput {
-  return { enemyId: 'mothling', level: 1, hp: 28, ...overrides };
+  return { enemyId: 'mothling', level: 1, hp: 28, ailments: [], ...overrides };
 }
 
 describe('resolvePartyPlayerTurn', () => {
@@ -62,7 +64,7 @@ describe('resolvePartyPlayerTurn', () => {
     // p2's turn receives the already-updated board (enemyHp: [0]), not the original hp: 20 -
     // exactly the bug this sequential design fixes (a second player's attack landing on an enemy
     // the first player's hit had already defeated).
-    const second = resolvePartyPlayerTurn(player('p2'), [{ enemyId: 'mothling', level: 1, hp: first.enemyHp[0] }]);
+    const second = resolvePartyPlayerTurn(player('p2'), [{ enemyId: 'mothling', level: 1, hp: first.enemyHp[0], ailments: [] }]);
     expect(second.hits).toHaveLength(0); // no alive enemy to target - resolveTargetIndex returns undefined
   });
 
@@ -103,6 +105,30 @@ describe('resolvePartyPlayerTurn', () => {
     expect(result.enemyHp[0]).toBe(1000);
     expect(result.hits).toHaveLength(0);
     expect(result.lanternOil).toBe(10); // 20 - steadfast-ember's 10 oil cost
+  });
+
+  it("a Skill's ailment roll lands on an enemy vulnerable to it (frost-lance -> Freeze on a coal-spirit)", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.3 inflict chance
+    const coalSpirit = ENEMIES['coal-spirit'];
+    // Padded well above coalSpirit's real maxHp (30) - see combatEngine.test.ts's identical fixture
+    // comment: frost-lance's weakness bonus against this family would otherwise one-shot it, and a
+    // defeated enemy never rolls the ailment-infliction chance.
+    const result = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'skill', skillId: 'frost-lance' }, stats: stats({ spirit: 30 }) }),
+      [{ enemyId: coalSpirit.id, level: 1, hp: 1000, ailments: [] }],
+    );
+    expect(result.enemyAilments[0]).toStrictEqual([{ ailmentId: 'freeze' }]);
+    expect(result.log.some((l) => l.includes('afflicted with Freeze'))).toBe(true);
+  });
+
+  it("a Skill's ailment roll is a no-op against an enemy not listed in its vulnerableAilments (ember-burst's Burn on a mothling)", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // would land if this enemy were vulnerable
+    expect(ENEMIES.mothling.vulnerableAilments).not.toContain('burn');
+    const result = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'skill', skillId: 'ember-burst' }, stats: stats({ spirit: 30 }) }),
+      [mothling()],
+    );
+    expect(result.enemyAilments[0]).toEqual([]);
   });
 });
 
@@ -145,6 +171,38 @@ describe('resolvePartyEnemyPhase', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const result = resolvePartyEnemyPhase([playerState('p1')], [mothling({ hp: 0 }), mothling({ hp: 1000 })]);
     expect(result.enemyHits.every((h) => h.attackerIndex === 1)).toBe(true);
+  });
+
+  it('a stunned enemy skips its attack during the enemy phase entirely', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const result = resolvePartyEnemyPhase(
+      [playerState('p1')],
+      [mothling({ ailments: [{ ailmentId: 'stun', turnsRemaining: 1 }] })],
+    );
+    expect(result.enemyHits).toEqual([]);
+    expect(result.log.some((l) => l.includes('stunned and cannot move'))).toBe(true);
+  });
+
+  it('an enemy with an active damage-over-time ailment takes tick damage during the enemy phase (able to defeat it)', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5); // no miss - the enemy also attacks this phase
+    const coalSpirit = ENEMIES['coal-spirit'];
+    const result = resolvePartyEnemyPhase(
+      [playerState('p1')],
+      [{ enemyId: coalSpirit.id, level: 1, hp: coalSpirit.stats.maxHp, ailments: [{ ailmentId: 'poison' }] }],
+    );
+    const expectedTick = Math.round(coalSpirit.stats.maxHp * AILMENTS.poison.effect.damagePercentPerTurn!);
+    // The enemy's own attack damages the player, never itself - its hp only moves via the tick.
+    expect(result.enemyHp[0]).toBe(coalSpirit.stats.maxHp - expectedTick);
+    expect(result.log.some((l) => l.includes('Poison deals'))).toBe(true);
+  });
+
+  it("Burn reduces an afflicted enemy's outgoing damage during the enemy phase", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const baseline = resolvePartyEnemyPhase([playerState('p1')], [mothling({ hp: 1000 })]);
+    const burned = resolvePartyEnemyPhase([playerState('p1')], [mothling({ hp: 1000, ailments: [{ ailmentId: 'burn' }] })]);
+    const baselineHit = baseline.enemyHits.find((h) => !h.missed)!;
+    const burnedHit = burned.enemyHits.find((h) => !h.missed)!;
+    expect(burnedHit.damage).toBeLessThan(baselineHit.damage);
   });
 });
 
