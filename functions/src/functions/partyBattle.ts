@@ -204,7 +204,12 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
     defending: false,
     knownSkillIds: save.player.knownSkillIds,
     lanternId: save.player.equipment.lantern ?? null,
-    skin: save.player.skin,
+    // Backfill for a save written before the skin picker existed - same fallback
+    // resetPlayerProgress.ts already uses for the identical reason. Missing here meant this whole
+    // object (embedded in participantStats, written via tx.set) carried an explicit `undefined`
+    // skin field - Firestore's Admin SDK rejects that outright, so any account predating the skin
+    // picker got a bare INTERNAL error starting *any* party battle (Endless or PvP), not just once.
+    skin: save.player.skin ?? 'male',
     name: save.player.name,
     attackAilment: resolveWeaponAttackAilment(save.player.equipment.weapon) ?? null,
     ailmentResistances: computeAilmentResistances(save.player.equipment),
