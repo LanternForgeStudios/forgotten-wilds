@@ -35,6 +35,7 @@ export interface PartyBattleEnemyState {
   level: number;
   hp: number;
   maxHp: number;
+  ailments: ActiveAilment[];
 }
 
 export interface PartyCombatHitResult {
