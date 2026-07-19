@@ -216,7 +216,6 @@ export function CombatScene() {
     setItemsUsedThisTurn(0);
     try {
       const needsTarget = type === 'attack' || type === 'skill' || type === 'lanternAbility';
-      const usedItems = tray.length > 0;
       const res = await callResolveCombatAction(sessionId, {
         type,
         abilityId: options?.abilityId,
@@ -316,38 +315,40 @@ export function CombatScene() {
         setPlaybackActive(false);
       }, playbackMs);
 
-      // An item's inventory count only lives in Firestore, not in the combat response above, so
-      // it must be resynced here too - otherwise the displayed quantity never decrements mid-fight
-      // even though the server correctly consumed it, and using it again eventually fails once the
-      // real (server-side) stock hits zero while the stale client count still shows some left.
-      // Skipped on the round that ends in defeat - a full resync would pull in the same
-      // already-respawned hp/spirit patchStats just avoided above (see returnToExploration()).
-      if (usedItems && uid && res.phase !== 'defeat') {
-        await resyncSave(uid);
-      }
-
+      // Resolves the round's outcome immediately - the player should see their action's result
+      // right away rather than wait on the background resync below. This function used to run
+      // resyncSave *before* setPhase (gating on whether an item was used this round to avoid
+      // double-resyncing), which meant a slow/stuck resync - a flaky mobile connection, a Cloud
+      // Functions cold start - left the whole scene looking frozen on the previous phase, only
+      // ever resolving once something unrelated happened to trigger its own resync (reported live
+      // as "the fight doesn't know it's over," more often on mobile, and clicking into Profile
+      // sometimes appearing to "unstick" it - both consistent with this exact race, not a
+      // coincidence). combatEnded's phase check reads res.phase directly here, decoupled from
+      // that entirely.
       if (res.phase === 'continue') {
         setPhase('playerTurn');
-        return;
+      } else {
+        if (res.phase === 'victory') {
+          setRewards(res.rewards);
+          void playSound('sfx.victory');
+          if (res.rewards?.leveledUp) void playSound('sfx.level-up');
+        } else if (res.phase === 'defeat') {
+          void playSound('sfx.defeat');
+          void playMusic('music.defeat');
+        }
+        setPhase(res.phase);
       }
 
-      if (res.phase === 'victory') {
-        setRewards(res.rewards);
-        void playSound('sfx.victory');
-        if (res.rewards?.leveledUp) void playSound('sfx.level-up');
-      } else if (res.phase === 'defeat') {
-        void playSound('sfx.defeat');
-        void playMusic('music.defeat');
+      // An item's inventory count (and any quest/journal progress from this round) only lives in
+      // Firestore, not in the combat response above - refreshed here so it isn't stale the next
+      // time the player opens a menu that reads it. Deliberately fire-and-forget (never awaited) -
+      // see the comment above for why this must not be able to block the phase transition. Skipped
+      // on defeat - a resync here would pull in the same already-respawned hp/spirit patchStats
+      // just avoided above; that resync happens later instead, once the player clicks Continue
+      // (see returnToExploration()).
+      if (uid && res.phase !== 'defeat') {
+        void resyncSave(uid);
       }
-
-      // Skipped if the usedItems resync above already ran this same round (only reachable here for
-      // victory/fled, since 'continue' already returned) - that resync is a full save refetch, so
-      // it already covers everything this one would; without this guard, a victory/fled round that
-      // also used items paid for the same resync twice in a row.
-      if (uid && res.phase !== 'defeat' && !usedItems) {
-        await resyncSave(uid);
-      }
-      setPhase(res.phase);
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Something went wrong resolving that action.');
       setPhase('error');
