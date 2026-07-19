@@ -8,6 +8,7 @@ import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
 import { useCombatMusic } from '@/hooks/useCombatMusic';
 import { useAilmentFxEvents } from '@/hooks/useAilmentFxEvents';
+import { usePartyBattlePoll } from '@/hooks/usePartyBattlePoll';
 import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
 import { resolveDisplayNames } from '@/firebase/socialService';
 import { callSubmitPartyBattleAction, callUseItemInPartyBattle, type CombatHitResult, type EnemyHitResult } from '@/firebase/functionsClient';
@@ -70,34 +71,8 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
     resolveDisplayNames(unresolved).then((resolved) => setNames((prev) => ({ ...prev, ...resolved })));
   }, [battle, names]);
 
-  // Same client-triggered timeout model as Endless Battle - any client's periodic poll can force
-  // the active player's turn to resolve (with Defend substituted) once the 20s deadline passes.
-  // Fires once immediately on mount (not just on the first 3s interval tick), so reconnecting/
-  // reloading into a match whose deadline already passed a while ago resolves right away instead
-  // of waiting up to 3 more seconds. Also fires on tab-visibility regain - a backgrounded browser
-  // tab throttles setInterval (Chrome can drop to roughly once a minute after a tab's been hidden
-  // a while), so alt-tabbing away and back would otherwise sit on a stale readout well past the
-  // real deadline until the throttled interval happens to tick; visibilitychange fires immediately
-  // regardless of throttling.
-  const lastPollRef = useRef(0);
-  useEffect(() => {
-    if (!battle || battle.status !== 'active') return;
-    const poll = () => {
-      if (Date.now() - lastPollRef.current < 2500) return;
-      lastPollRef.current = Date.now();
-      void callSubmitPartyBattleAction(battleId).catch(() => {});
-    };
-    poll();
-    const id = setInterval(poll, 3000);
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') poll();
-    };
-    document.addEventListener('visibilitychange', onVisible);
-    return () => {
-      clearInterval(id);
-      document.removeEventListener('visibilitychange', onVisible);
-    };
-  }, [battle, battleId]);
+  // See usePartyBattlePoll's own doc comment for what this covers and why.
+  usePartyBattlePoll(battle, battleId);
 
   // The match's end (win or lose) restores both real saves and grants rewards server-side -
   // resync once that lands. Same transition also drives the win/loss sound cue - status is a
@@ -454,7 +429,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
               {isMyTurn
                 ? isStunned
                   ? 'You are stunned and cannot act - your turn will resolve automatically.'
-                  : playbackActive
+                  : busy || playbackActive
                     ? 'Resolving...'
                     : `${secondsLeft}s to act`
                 : `Waiting for ${opponentName} to act...`}

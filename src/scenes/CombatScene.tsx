@@ -712,6 +712,12 @@ export function CombatScene() {
             </>
           ) : (
             <>
+              {/* Covers both the network round-trip (phase 'resolving', before any response has
+               *  arrived) and the staggered hit-playback after it (playbackActive) - without this,
+               *  a slow response left the action buttons disabled with no visible reason, reading
+               *  as frozen rather than "still working on it" (worse on a slow/mobile connection,
+               *  where that gap can stretch to several seconds). */}
+              {(phase === 'resolving' || playbackActive) && <p className={styles.stunnedBanner}>Resolving...</p>}
               {isStunned && canAct && (
                 <p className={styles.stunnedBanner}>You are stunned and cannot act this turn!</p>
               )}
