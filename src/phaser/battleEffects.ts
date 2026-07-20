@@ -94,18 +94,43 @@ export function playFloatingText(
   });
 }
 
-/** A short "lunge" tween on the attacking enemy's own sprite - identifies WHICH enemy just hit the
- *  player, the concrete payoff of the new per-attacker enemyHits data (previously only an
- *  aggregate "you took N damage" toast existed). */
+/** A forward-step-and-shake tween on the attacking enemy's own sprite - identifies WHICH enemy
+ *  just hit the player, the concrete payoff of the per-attacker enemyHits data (previously only
+ *  an aggregate "you took N damage" toast existed). "Forward" is toward the viewer/player - down
+ *  the arena, since the front/back row formation (BattleScene.layoutRow) places enemies further
+ *  from the camera the higher up the arena they sit - followed by a quick horizontal shake (the
+ *  windup/impact beat) before stepping back to its formation position. */
 export function playIncomingLunge(scene: Phaser.Scene, sprite: Phaser.GameObjects.Sprite): void {
-  const originScale = sprite.scaleX;
+  const originX = sprite.x;
+  const originY = sprite.y;
+  const forwardY = originY + sprite.displayHeight * 0.16;
+  const shakeAmplitude = Math.max(4, sprite.displayWidth * 0.05);
+  const SHAKE_REPEATS = 3;
+
   scene.tweens.add({
     targets: sprite,
-    scaleX: originScale * 1.1,
-    scaleY: originScale * 1.1,
-    duration: 200,
-    ease: 'Sine.easeInOut',
-    yoyo: true,
+    y: forwardY,
+    duration: 150,
+    ease: 'Quad.easeOut',
+    onComplete: () => {
+      scene.tweens.add({
+        targets: sprite,
+        x: originX - shakeAmplitude,
+        duration: 55,
+        ease: 'Sine.easeInOut',
+        yoyo: true,
+        repeat: SHAKE_REPEATS,
+        onComplete: () => {
+          scene.tweens.add({
+            targets: sprite,
+            x: originX,
+            y: originY,
+            duration: 180,
+            ease: 'Sine.easeIn',
+          });
+        },
+      });
+    },
   });
 }
 
@@ -121,12 +146,14 @@ export function playIncomingCameraImpact(scene: Phaser.Scene, damage: number, pl
   }
 }
 
-/** Fade+scale-down tween paired with a one-shot particle burst - the defeat sequence, replacing
- *  the old "stays rendered until a 1500ms timeout expires" trick. `onComplete` is where the caller
- *  should actually destroy the enemy's sprite/HP-bar/text - this function only animates.
- *  `frames` is set when `particleTextureKey` is a real animated FX-pack sheet (e.g. the smoke-puff
- *  burst) rather than the generated 4x4 dot texture - Phaser needs explicit frame indices to cycle
- *  through a spritesheet's frames instead of always rendering frame 0. */
+/** Flash-white-a-few-times, then fade+scale-down+particle-burst - the defeat sequence, replacing
+ *  the old "stays rendered until a 1500ms timeout expires" trick. The flash reuses the same
+ *  setTintFill white-flash convention playOutgoingHitOnSprite already uses for a landed hit, so a
+ *  defeat reads as a distinct, more emphatic beat rather than just the fade alone. `onComplete` is
+ *  where the caller should actually destroy the enemy's sprite/HP-bar/text - this function only
+ *  animates. `frames` is set when `particleTextureKey` is a real animated FX-pack sheet (e.g. the
+ *  smoke-puff burst) rather than the generated 4x4 dot texture - Phaser needs explicit frame
+ *  indices to cycle through a spritesheet's frames instead of always rendering frame 0. */
 export function playDefeatEffect(
   scene: Phaser.Scene,
   sprite: Phaser.GameObjects.Sprite,
@@ -134,27 +161,49 @@ export function playDefeatEffect(
   onComplete: () => void,
   frames?: number[],
 ): void {
-  const emitter = scene.add.particles(sprite.x, sprite.y, particleTextureKey, {
-    ...(frames ? { frame: frames } : { tint: [0x888888, 0xa8762c] }),
-    speed: { min: 60, max: 140 },
-    lifespan: 400,
-    scale: { start: 1, end: 0 },
-    quantity: 12,
-    emitting: false,
-  });
-  emitter.setDepth(FX_EMITTER_DEPTH);
-  emitter.explode(12);
-  scene.time.delayedCall(500, () => emitter.destroy());
+  const FLASH_COUNT = 3;
+  const FLASH_ON_MS = 90;
+  const FLASH_OFF_MS = 90;
 
-  scene.tweens.add({
-    targets: sprite,
-    alpha: 0,
-    scaleX: sprite.scaleX * 0.5,
-    scaleY: sprite.scaleY * 0.5,
-    duration: 500,
-    ease: 'Cubic.easeIn',
-    onComplete,
-  });
+  const fadeOut = () => {
+    const emitter = scene.add.particles(sprite.x, sprite.y, particleTextureKey, {
+      ...(frames ? { frame: frames } : { tint: [0x888888, 0xa8762c] }),
+      speed: { min: 60, max: 140 },
+      lifespan: 400,
+      scale: { start: 1, end: 0 },
+      quantity: 12,
+      emitting: false,
+    });
+    emitter.setDepth(FX_EMITTER_DEPTH);
+    emitter.explode(12);
+    scene.time.delayedCall(500, () => emitter.destroy());
+
+    scene.tweens.add({
+      targets: sprite,
+      alpha: 0,
+      scaleX: sprite.scaleX * 0.5,
+      scaleY: sprite.scaleY * 0.5,
+      duration: 500,
+      ease: 'Cubic.easeIn',
+      onComplete,
+    });
+  };
+
+  let flashesLeft = FLASH_COUNT;
+  const flash = () => {
+    if (flashesLeft <= 0) {
+      sprite.clearTint();
+      fadeOut();
+      return;
+    }
+    flashesLeft--;
+    sprite.setTint(COLOR_WHITE).setTintMode(Phaser.TintModes.FILL);
+    scene.time.delayedCall(FLASH_ON_MS, () => {
+      sprite.clearTint();
+      scene.time.delayedCall(FLASH_OFF_MS, flash);
+    });
+  };
+  flash();
 }
 
 /** One-shot animated particle burst from a 4-frame FX-pack sheet (16x16 frames, indices 0-3 - see
