@@ -1,10 +1,12 @@
 # Asset Production Checklist
 
-Every entry below is `status: 'placeholder'` in `src/assets/registry.ts` (or, for audio, a newly
-added placeholder category - see "Audio"). Each section describes a *pattern* once rather than
-repeating an identical spec per id - look up the exact id list in the registry when you're ready to
-swap a specific file in. Swapping a placeholder for final art is always a one-line edit to that
-file (`filePath`, `dimensions`, and `status: 'final'`) - no code changes needed anywhere else.
+Every entry below started as `status: 'placeholder'` in `src/assets/registry.ts` (or, for audio, a
+newly added placeholder category - see "Audio"); each section now notes which ones have since been
+swapped for real art (see each section's own status line/column). Each section describes a
+*pattern* once rather than repeating an identical spec per id - look up the exact id list in the
+registry when you're ready to swap a specific file in. Swapping a placeholder for final art is
+always a one-line edit to that file (`filePath`, `dimensions`, and `status: 'final'`) - no code
+changes needed anywhere else.
 
 Every entry also includes a short **generation prompt** - a description written to be handed
 directly to an AI image/audio generator, not just a spec. They lean on this game's own established
@@ -34,29 +36,32 @@ zoom - unaffected by anything above.
 
 ---
 
-## Portraits (14 - dialogue box headshots)
+## Portraits (14 - dialogue box headshots) - all 14 done
 
 **Spec**: 512×512 PNG, painted background (not transparent - fills the dialogue portrait frame),
 head-and-shoulders framing, 3/4 or front-facing.
 
-| Character | Role | Generation prompt |
-|---|---|---|
-| Elias Rowan | Lantern Keeper Mentor | Weathered older man, greying beard, worn leather Keeper's coat, holding a lit lantern close to his chest, stern but kind eyes, mountain-town mentor. |
-| Finn Rowan | Elias's Nephew | Younger man in his twenties, relaxed posture, lighter/more casual clothing than his uncle, half-smile, holds a lantern oil flask loosely. |
-| Mara Ash | General Store Owner | Middle-aged woman, warm practical expression, apron over simple clothes, sleeves rolled up, standing in front of shelves of goods. |
-| Silas Flint | Mine Office Foreman | Stocky older man, soot-smudged face, hard hat or miner's cap, thick beard, tired but determined eyes. |
-| Juniper Reed | Innkeeper | Cheerful middle-aged woman, apron, warm smile, hair tied back, holding a mug or cloth. |
-| Nell Ashby | Folklore Collector | Bookish young woman, spectacles, satchel of notes, curious/intense expression, ink-stained fingers. |
-| Aldren Stone | Blacksmith | Broad-shouldered man, forge-scarred forearms, leather apron, soot and sparks nearby, confident stance. |
-| Tessa Ironhand | Armorer | Sturdy woman, practical braided hair, inspecting a piece of armor, calloused hands, focused expression. |
-| Willow Briar | Apothecary | Slender woman surrounded by dried herbs and small bottles, calm knowing expression, earth-toned clothing. |
-| Historian Miriam | Town Historian | Elderly woman, spectacles, surrounded by old books/scrolls, thoughtful and patient expression. |
-| Hunter Garrick | Tracker | Rugged outdoorsman, fur-lined cloak, bow or knife at hip, alert eyes, weathered from the trail. |
-| Spirit Child | Voice of the Grove | Ethereal pale child-like spirit, faint glow, forest-green and silver tones, slightly translucent, ancient sad eyes. |
-| Ranger Caleb | Ridge Scout | Lean scout in mountain gear, cloak, watchful expression, sharp-eyed, cliffside backdrop hint. |
-| Mayor Eleanor Ashcroft | Mayor of Ash Hallow | Dignified older woman, formal but weathered town-official attire, a small mayoral pin/sash, composed authoritative expression. |
+| Character | Role | Generation prompt | Status |
+|---|---|---|---|
+| Elias Rowan | Lantern Keeper Mentor | Weathered older man, greying beard, worn leather Keeper's coat, holding a lit lantern close to his chest, stern but kind eyes, mountain-town mentor. | Done |
+| Finn Rowan | Elias's Nephew | Younger man in his twenties, relaxed posture, lighter/more casual clothing than his uncle, half-smile, holds a lantern oil flask loosely. | Done |
+| Mara Ash | General Store Owner | Middle-aged woman, warm practical expression, apron over simple clothes, sleeves rolled up, standing in front of shelves of goods. | Done |
+| Silas Flint | Mine Office Foreman | Stocky older man, soot-smudged face, hard hat or miner's cap, thick beard, tired but determined eyes. | Done |
+| Juniper Reed | Innkeeper | Cheerful middle-aged woman, apron, warm smile, hair tied back, holding a mug or cloth. | Done |
+| Nell Ashby | Folklore Collector | Bookish young woman, spectacles, satchel of notes, curious/intense expression, ink-stained fingers. | Done |
+| Aldren Stone | Blacksmith | Broad-shouldered man, forge-scarred forearms, leather apron, soot and sparks nearby, confident stance. | Done |
+| Tessa Ironhand | Armorer | Sturdy woman, practical braided hair, inspecting a piece of armor, calloused hands, focused expression. | Done |
+| Willow Briar | Apothecary | Slender woman surrounded by dried herbs and small bottles, calm knowing expression, earth-toned clothing. | Done |
+| Historian Miriam | Town Historian | Elderly woman, spectacles, surrounded by old books/scrolls, thoughtful and patient expression. | Done |
+| Hunter Garrick | Tracker | Rugged outdoorsman, fur-lined cloak, bow or knife at hip, alert eyes, weathered from the trail. | Done |
+| Spirit Child | Voice of the Grove | Ethereal pale child-like spirit, faint glow, forest-green and silver tones, slightly translucent, ancient sad eyes. | Done |
+| Ranger Caleb | Ridge Scout | Lean scout in mountain gear, cloak, watchful expression, sharp-eyed, cliffside backdrop hint. | Done |
+| Mayor Eleanor Ashcroft | Mayor of Ash Hallow | Dignified older woman, formal but weathered town-official attire, a small mayoral pin/sash, composed authoritative expression. | Done |
 
-## NPC overworld sprites (14, 1:1 with portraits above)
+Originals archived at `public/assets/portraits/original/`; resize/optimize pipeline is
+`scripts/resize_portraits.py`.
+
+## NPC overworld sprites (14, 1:1 with portraits above) - 3 of 14 done
 
 **Spec**: **72×96 PNG, transparent background - the same size as the player character**, full-body,
 standing idle pose, 3/4-view (not top-down). Single frame for now (per your staged plan - swap this
@@ -67,6 +72,13 @@ MSQ is built out.
 Generation prompt: reuse the matching portrait's prompt above, but as a **full-body figure**, same
 outfit/props, standing pose, transparent background, sized/cropped to read clearly at 72×96 (avoid
 overly fine detail that would disappear at that resolution).
+
+**Done**: Elias Rowan, Finn Rowan, Mara Ash. Originals archived at
+`public/assets/sprites/characters/original/`; resize/optimize pipeline is
+`scripts/resize_npc_sprites.py`.
+
+**Remaining (11)**: Silas Flint, Juniper Reed, Nell Ashby, Aldren Stone, Tessa Ironhand, Willow
+Briar, Historian Miriam, Hunter Garrick, Spirit Child, Ranger Caleb, Mayor Eleanor Ashcroft.
 
 `sprite.npc.large` (the one deliberately-bigger NPC tier, for anyone who should read as more
 imposing than a regular human) becomes **96×120** proportionally - not used by any location yet.
