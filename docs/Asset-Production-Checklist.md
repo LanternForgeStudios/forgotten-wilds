@@ -61,7 +61,7 @@ head-and-shoulders framing, 3/4 or front-facing.
 Originals archived at `public/assets/portraits/original/`; resize/optimize pipeline is
 `scripts/resize_portraits.py`.
 
-## NPC overworld sprites (14, 1:1 with portraits above) - 3 of 14 done
+## NPC overworld sprites (14, 1:1 with portraits above) - 11 of 14 done
 
 **Spec**: **72×96 PNG, transparent background - the same size as the player character**, full-body,
 standing idle pose, 3/4-view (not top-down). Single frame for now (per your staged plan - swap this
@@ -73,9 +73,12 @@ Generation prompt: reuse the matching portrait's prompt above, but as a **full-b
 outfit/props, standing pose, transparent background, sized/cropped to read clearly at 72×96 (avoid
 overly fine detail that would disappear at that resolution).
 
-**Done**: Elias Rowan, Finn Rowan, Mara Ash. Originals archived at
+**Done**: Elias Rowan, Finn Rowan, Mara Ash, Aldren Stone, Historian Miriam, Hunter Garrick,
+Juniper Reed, Nell Ashby, Silas Flint, Tessa Ironhand, Willow Briar. Originals archived at
 `public/assets/sprites/characters/original/`; resize/optimize pipeline is
 `scripts/resize_npc_sprites.py`.
+
+**Remaining (3)**: Spirit Child, Ranger Caleb, Mayor Eleanor Ashcroft.
 
 **Remaining (11)**: Silas Flint, Juniper Reed, Nell Ashby, Aldren Stone, Tessa Ironhand, Willow
 Briar, Historian Miriam, Hunter Garrick, Spirit Child, Ranger Caleb, Mayor Eleanor Ashcroft.
