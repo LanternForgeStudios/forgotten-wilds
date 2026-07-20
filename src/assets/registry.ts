@@ -1009,11 +1009,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.mayor-eleanor-ashcroft',
     category: 'character',
-    intendedUse: 'Overworld sprite for mayor-eleanor-ashcroft (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
-    filePath: 'sprites/characters/mayor-eleanor-ashcroft.svg',
+    intendedUse: 'Overworld sprite for mayor-eleanor-ashcroft (single-frame; a future 4-direction idle+walk sheet would still match the player)',
+    filePath: 'sprites/characters/mayor-eleanor-ashcroft.png',
     dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
+    status: 'final',
+    notes: 'Generated sprite art (art-staging/characters/npc-mayor-eleanor-ashcroft.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-mayor-eleanor-ashcroft.png.',
   },
   {
     id: 'portrait.hunter-garrick',
@@ -1045,11 +1045,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.spirit-child',
     category: 'character',
-    intendedUse: 'Overworld sprite for spirit-child (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
-    filePath: 'sprites/characters/spirit-child.svg',
+    intendedUse: 'Overworld sprite for spirit-child (single-frame; a future 4-direction idle+walk sheet would still match the player)',
+    filePath: 'sprites/characters/spirit-child.png',
     dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
+    status: 'final',
+    notes: 'Generated sprite art (art-staging/characters/npc-spirit-child.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-spirit-child.png.',
   },
   {
     id: 'portrait.ranger-caleb',
@@ -1063,11 +1063,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.ranger-caleb',
     category: 'character',
-    intendedUse: 'Overworld sprite for ranger-caleb (single-frame placeholder; final art should be a 72x96 4-direction idle+walk sheet, matching the player)',
-    filePath: 'sprites/characters/ranger-caleb.svg',
+    intendedUse: 'Overworld sprite for ranger-caleb (single-frame; a future 4-direction idle+walk sheet would still match the player)',
+    filePath: 'sprites/characters/ranger-caleb.png',
     dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: "Generated SVG placeholder, regenerated 32x32 -> 72x96 - see sprite.npc.elias-rowan's note for why.",
+    status: 'final',
+    notes: 'Generated sprite art (art-staging/characters/npc-ranger-caleb.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-ranger-caleb.png.',
   },
   {
     id: 'sprite.player',
