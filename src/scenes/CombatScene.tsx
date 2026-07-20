@@ -263,12 +263,15 @@ export function CombatScene() {
       // (Ash Hallow's soft-respawn restore, applied in the same transaction as the defeat itself -
       // see resolveCombatAction.ts) - patching them in immediately would show the HUD's HP/Spirit
       // bars already healed while the defeat overlay is still saying "you were overwhelmed,"
-      // which reads as a contradiction. Leave the store showing whatever HP/Spirit the fight
-      // itself last displayed, and only apply the real (respawned) numbers once the player
-      // actually clicks Continue - see returnToExploration().
+      // which reads as a contradiction. Leave spirit showing whatever the fight itself last
+      // displayed, and only apply the real (respawned) numbers once the player actually clicks
+      // Continue - see returnToExploration(). HP is the exception: `phase === 'defeat'` only ever
+      // fires when the round's playerHp dropped to <=0 (see combatEngine.ts), so clamping the HUD
+      // to 0 here is always accurate, unlike leaving it at the previous round's last-displayed
+      // value - which is what showed a stale *positive* HP number next to the defeat message.
       if (res.phase === 'defeat') {
         pendingDefeatResyncRef.current = true;
-        patchStats({ lanternOil: res.playerLanternOil });
+        patchStats({ hp: 0, lanternOil: res.playerLanternOil });
       } else {
         patchStats({ hp: res.playerHp, spirit: res.playerSpirit, lanternOil: res.playerLanternOil });
       }
