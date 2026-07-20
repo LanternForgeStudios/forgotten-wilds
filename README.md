@@ -143,5 +143,8 @@ sign-in inputs, Character Creation's name field) — see `src/utils/browserLockd
 - Vitest covers the pure combat/quest/equipment engine functions (`functions/src/engine/*.test.ts`)
   but not the Cloud Functions themselves (Firestore transactions) or any client code yet.
 - The player has a real 4-direction walk/run sprite sheet (still a placeholder piece of art per
-  `public/CREDITS.md`, but animated in-game). NPCs are still single-frame placeholders — swap via
-  `src/assets/registry.ts`, no code changes needed for either.
+  `public/CREDITS.md`, but animated in-game). Most NPCs are still single-frame placeholders — a
+  few (Elias Rowan, Finn Rowan, Mara Ash) now have real single-frame art, the rest swap the same
+  way — via `src/assets/registry.ts`, no code changes needed for either. All 14 dialogue portraits
+  now have real art too (`public/assets/portraits/`, originals archived alongside under
+  `original/`).
