@@ -259,59 +259,72 @@ whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, an
 
 ---
 
-## Audio
+## Audio - all 7 music + 21 sfx mapped to real files
 
-Every id below was just added to `src/assets/registry.ts` with a **procedurally generated
-placeholder** (simple synthesized tones - see `scripts/genPlaceholderAudio.mjs`, the audio
-equivalent of the SVG placeholder convention used for visual assets). They're already wired into
-real gameplay moments (see each entry's `intendedUse` in the registry for exactly where), so
-dropping in final files is the only step left - no new code required, same one-line registry swap
-as any visual asset.
+Every id below now has a real file wired in (`status: 'final'` in `src/assets/registry.ts`),
+picked from the audio library staged into `public/assets/audio/library/` (see "Source file"
+columns below). **These picks were made by filename/category and duration alone - not personally
+auditioned** (no audio playback available while doing this pass), so treat this as a strong
+starting point to confirm by ear, not a final call. Swap any of them by pointing that id's
+`filePath` at a different file already sitting in the library (or a new one) - same one-line
+registry edit either way, no code changes.
 
-### Music (7 - looping background beds)
+The full staged library - everything that was NOT picked, too - is preserved at
+`public/assets/audio/library/music/{OGG,WAV}/` and `public/assets/audio/library/sfx/<category>/`
+for browsing more options or remapping later. The `Musical Effects` sfx category in particular is
+a full 10-instrument-family chime pack (8_bit, brass, grand_piano, harpsichord, music_box,
+sitar, steel_drums, synth_bass, vibraphone, xylophone × the same ~11 cue types each) - most picks
+below use `grand_piano` as the default "chime" voice for its warm, non-electronic character, with
+a few other families used deliberately for distinct-sounding cues (see each row's reasoning).
+**Note on sfx filenames**: several came from a generic multi-genre sound pack (Card and Board,
+Match Three, Retro, etc. - not touched here) where the filename describes what the sound was
+*originally recorded for*, not necessarily this game's use - the picks below stuck to categories
+whose names describe the actual sound (Musical Effects, Weapons, Environment, UI, Items, Other).
 
-**Spec**: mp3 or ogg (much smaller than this placeholder pass's wav files), ~60-120s loop that
-returns cleanly to its start (a DAW/generator with seamless-loop export is worth using). Style
-baseline: warm, folk-adjacent Appalachian-mountain fantasy instrumentation (acoustic guitar,
+### Music (7 - looping background beds) - all 7 mapped
+
+**Spec**: mp3 or ogg (much smaller than wav), ~60-120s loop that returns cleanly to its start.
+Style baseline: warm, folk-adjacent Appalachian-mountain fantasy instrumentation (acoustic guitar,
 fiddle, low strings, occasional soft percussion) - understated, not bombastic, this is a quiet game
-about lantern-keepers and small-town life more than grand heroics.
+about lantern-keepers and small-town life more than grand heroics. All from the same CC-BY 4.0 pack
+(FarBeyond Studio - Freebies Vol. 1).
 
-| Track | Generation prompt |
-|---|---|
-| `music.title` | Hopeful, mysterious mountain-folk main theme, slow build, acoustic guitar and fiddle, a sense of quiet adventure beginning. |
-| `music.town` | Warm, cozy small-town theme, gentle acoustic guitar, relaxed tempo, evokes lantern-lit evenings in a mountain village. |
-| `music.overworld` | Adventurous but understated exploration theme, walking tempo, acoustic strings, open-air mountain-trail feeling. |
-| `music.dungeon` | Tense, echoing mine-tunnel theme, sparse low drones, distant metallic percussion, claustrophobic but not horror-styled. |
-| `music.combat` | Energetic but restrained battle theme, driving rhythm, string ostinato, urgency without bombast. |
-| `music.combat-boss` | Heavier, more dramatic boss theme - lower register, percussive weight, higher stakes than the regular combat theme. |
-| `music.defeat` | Quiet, melancholy recovery theme - soft strings, slow tempo, comforting rather than punishing. |
+| Track | Generation prompt (original spec) | Mapped source file | Notes |
+|---|---|---|---|
+| `music.title` | Hopeful, mysterious mountain-folk main theme, slow build. | `Mystic Forest.ogg` | 60s, in-spec. Confident pick. |
+| `music.town` | Warm, cozy small-town theme, gentle acoustic guitar, relaxed tempo. | `Enchanted Woods.ogg` | 85s, in-spec. Confident pick. |
+| `music.overworld` | Adventurous but understated exploration theme, walking tempo. | `Tiefsee.ogg` | 155s (longest track - good for a bed heard continuously). Title means "deep sea" in German, doesn't literally match a mountain trail - **weakest thematic fit, picked mainly for its length; listen through first.** |
+| `music.dungeon` | Tense, echoing mine-tunnel theme, claustrophobic not horror. | `Winter Ruins.ogg` | 63s, in-spec. "Ruins" fits well. Confident pick. |
+| `music.combat` | Energetic but restrained battle theme. | `Suspense.wav` | 48s, a bit short. **No ogg was staged for this track - shipped as wav (8.1MB); ask for an ogg export if this stays the pick.** |
+| `music.combat-boss` | Heavier, more dramatic boss theme. | `Fight The Devil.ogg` | 41s, short for a long fight but a strong thematic match. |
+| `music.defeat` | Quiet, melancholy recovery theme, comforting not punishing. | `Sneaky.wav` | Only 19s - well short of the 60-120s spec, and "sneaky" doesn't obviously read as melancholy. Picked because the post-defeat screen is brief enough that a short loop matters less here. **Weakest pick overall - no ogg staged either (6.5MB wav); revisit both the track and the format.** |
 
-### Sound effects (20 - short one-shots)
+### Sound effects (21 - short one-shots) - all 21 mapped
 
 **Spec**: mp3, ogg, or wav all fine at this length (~0.15-1s each). Style baseline: soft, tactile,
 non-electronic (wood, cloth, metal, water, breath) - matches the game's grounded folk-fantasy tone
 rather than a synth-heavy arcade feel.
 
-| Cue | Fires when | Generation prompt |
-|---|---|---|
-| `sfx.ui-close` | Any overlay/modal closes | Soft, short UI dismiss click - a gentle downward pitch, unobtrusive. |
-| `sfx.ui-error` | A rejected action (can't afford, missing materials, etc.) | Low, brief "denied" buzz - clear but not harsh or alarming. |
-| `sfx.purchase` | Successful shop purchase | Satisfying coin-purse jingle, bright and quick. |
-| `sfx.sell` | Successful shop sale | A distinct "gold received" chime, slightly different pitch/character from purchase. |
-| `sfx.rest` | Successful Inn rest | Gentle, warm ascending chime - restful, comforting. |
-| `sfx.equip` | Equip/unequip an item | Soft metallic/leather click - armor or gear settling into place. |
-| `sfx.item-use` | Using a consumable | Soft pop/fizz - a potion or poultice being used. |
-| `sfx.craft-success` | Successful crafting | Bright ascending 3-note flourish - a small triumphant "made it" cue. |
-| `sfx.chest-open` | Opening a new chest | Wooden creak followed by a soft treasure chime. |
-| `sfx.shrine` | Interacting with a shrine | Soft resonant bell/chime swell - mystical, reverent. |
-| `sfx.npc-talk` | Opening NPC dialogue | Gentle notification blip - inviting, conversational. |
-| `sfx.transition` | Crossing a location transition | Soft whoosh - a brief sense of movement/passage. |
-| `sfx.combat-hit` | A combat round lands a hit | Sharp, grounded impact thud - weapon or fist contact. |
-| `sfx.enemy-defeated` | An enemy is defeated | A short descending "dissipating" burst - a spirit/creature fading out. |
-| `sfx.victory` | Winning a battle | Bright ascending fanfare arpeggio - a short victory flourish. |
-| `sfx.level-up` | Leveling up after victory | A distinct, more triumphant ascending chime than the victory cue. |
-| `sfx.defeat` | Losing a battle | A soft descending minor cue - somber, not harsh. |
-| `sfx.quest-started` | A quest becomes active | A single soft notification tone - the lightest of the three quest-chime tiers. |
-| `sfx.quest-progress` | A quest's objective advances | A two-note rising blip - the middle quest-chime tier. |
-| `sfx.quest-completed` | A quest is fully completed | A fuller, more resolved 3-note chime - the most celebratory quest-chime tier. |
-| `sfx.social-ping` | A friend request/message/trade update arrives | A gentle notification ping, distinct from the quest chimes. |
+| Cue | Fires when | Generation prompt (original spec) | Mapped source file | Reasoning |
+|---|---|---|---|---|
+| `sfx.ui-close` | Any overlay/modal closes | Soft, short UI dismiss click. | `UI/click_double_off.wav` | Neutral close click, not a "reject" sound. |
+| `sfx.ui-error` | A rejected action | Low, brief "denied" buzz. | `Musical Effects/grand_piano_negative_quick.wav` | Warm instrument stinger instead of the pack's synth/sci-fi error buzzes - fits the folk tone better. |
+| `sfx.purchase` | Successful shop purchase | Coin-purse jingle, bright and quick. | `Items/coin_jingle_small.wav` | Literal match. |
+| `sfx.sell` | Successful shop sale | Distinct "gold received" chime. | `Items/coin_collect.wav` | Different character from purchase's jingle, per spec. |
+| `sfx.rest` | Successful Inn rest | Gentle, warm ascending chime. | `Musical Effects/grand_piano_inn.wav` | Literally named "inn." |
+| `sfx.equip` | Equip/unequip an item | Soft metallic/leather click. | `Weapons/weapon_equip_short.wav` | Direct match. |
+| `sfx.item-use` | Using a consumable | Soft pop/fizz. | `UI/pop_2.wav` | One of 4 near-identical takes staged (`pop_1`-`4`) - easy to swap. |
+| `sfx.craft-success` | Successful crafting | Bright ascending 3-note flourish. | `Musical Effects/grand_piano_chime_positive.wav` | Same chime family as the other economy cues. |
+| `sfx.chest-open` | Opening a new chest | Wooden creak + soft treasure chime. | `Environment/creaky_door_short.wav` | Took the literal "creak" half rather than another chime, so chests don't sound like every other reward cue. |
+| `sfx.shrine` | Interacting with a shrine | Soft resonant bell/chime swell. | `Musical Effects/vibraphone_mystery.wav` | Vibraphone (not the piano default) for its bell-like resonance. |
+| `sfx.npc-talk` | Opening NPC dialogue | Gentle notification blip. | `Musical Effects/xylophone_chime_quick.wav` | Bright, distinct from the other chime families used elsewhere. |
+| `sfx.transition` | Crossing a location transition | Soft whoosh. | `Other/whoosh_1.wav` | Literal match; `whoosh_2.wav` is an untried alternate. |
+| `sfx.combat-hit` | A combat round lands a hit | Sharp, grounded impact thud. | `Weapons/harsh_thud.wav` | Generic enough for any weapon type. |
+| `sfx.enemy-defeated` | An enemy is defeated | Short descending "dissipating" burst. | `Other/ghost_long.wav` | A literal "ghost" cue fits this world's spirit-guardian theme better than the pack's retro power-down stingers. |
+| `sfx.victory` | Winning a battle | Bright ascending fanfare arpeggio. | `Musical Effects/grand_piano_level_complete.wav` | "Level complete" maps directly onto winning. |
+| `sfx.level-up` | Leveling up after victory | More triumphant than the victory cue. | `Musical Effects/grand_piano_positive_long.wav` | Bigger/longer than victory's chime, per spec. |
+| `sfx.defeat` | Losing a battle | Soft descending minor cue. | `Musical Effects/grand_piano_defeated.wav` | Literally named "defeated." |
+| `sfx.quest-started` | A quest becomes active | Lightest of the 3 quest-chime tiers. | `Musical Effects/music_box_chime_quick.wav` | Music box is the dedicated family for all 3 quest tiers - kept distinct from the economy (piano) and npc-talk (xylophone) families. |
+| `sfx.quest-progress` | A quest's objective advances | Middle quest-chime tier. | `Musical Effects/music_box_chime_positive.wav` | Fuller than quest-started, same family. |
+| `sfx.quest-completed` | A quest is fully completed | Most celebratory quest-chime tier. | `Musical Effects/music_box_level_complete.wav` | Fullest/most resolved of the 3, same family. |
+| `sfx.social-ping` | Friend/message/trade update arrives | Notification ping, distinct from quest chimes. | `Musical Effects/harpsichord_chime_quick.wav` | Its own family so it's never mistaken for a quest/economy/dialogue chime. |
