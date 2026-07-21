@@ -76,9 +76,6 @@ overly fine detail that would disappear at that resolution).
 Originals archived at `public/assets/sprites/characters/original/`; resize/optimize pipeline is
 `scripts/resize_npc_sprites.py`.
 
-**Remaining (11)**: Silas Flint, Juniper Reed, Nell Ashby, Aldren Stone, Tessa Ironhand, Willow
-Briar, Historian Miriam, Hunter Garrick, Spirit Child, Ranger Caleb, Mayor Eleanor Ashcroft.
-
 `sprite.npc.large` (the one deliberately-bigger NPC tier, for anyone who should read as more
 imposing than a regular human) becomes **96×120** proportionally - not used by any location yet.
 
