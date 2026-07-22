@@ -9,6 +9,7 @@ import { useNow } from '@/hooks/useNow';
 import { useCombatMusic } from '@/hooks/useCombatMusic';
 import { useAilmentFxEvents } from '@/hooks/useAilmentFxEvents';
 import { usePartyBattlePoll } from '@/hooks/usePartyBattlePoll';
+import { usePartyBattleAction } from '@/hooks/usePartyBattleAction';
 import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
 import { resolveDisplayNames } from '@/firebase/socialService';
 import { callSubmitPartyBattleAction, callUseItemInPartyBattle, callVoteContinueEndlessBattle } from '@/firebase/functionsClient';
@@ -64,12 +65,6 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   // combat's own fastRounds (CombatScene.tsx) exactly: purely a local animation-pacing choice, so
   // one player toggling it has zero effect on what anyone else in the same battle sees.
   const [fastRounds, setFastRounds] = useState(false);
-  const [busy, setBusy] = useState(false);
-  // Synchronous guard alongside `busy` (React state) - a fast double-click can fire two submit()
-  // calls in the same tick before a state update re-renders the disabled buttons, both reading the
-  // same stale busy=false. A ref is readable/settable synchronously, closing that race.
-  const submittingRef = useRef(false);
-  const [error, setError] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
   // While a fight is actively in progress, Escape/click-outside must NOT silently dismiss this
@@ -91,6 +86,8 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
 
   // See usePartyBattlePoll's own doc comment for what this covers and why.
   usePartyBattlePoll(battle, battleId);
+  // See usePartyBattleAction's own doc comment for what this covers and why.
+  const { busy, error, setError, run } = usePartyBattleAction(battle);
 
   // Rewards/restores land on real saves server-side - resync whenever the battle transitions to
   // a state that implies a real-save write just happened (wave cleared, run ended). Same
@@ -255,19 +252,8 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');
 
   async function submit(action: Parameters<typeof callSubmitPartyBattleAction>[1]) {
-    if (submittingRef.current) return;
-    submittingRef.current = true;
-    setBusy(true);
-    setError(null);
     setItemsUsedThisTurn(0);
-    try {
-      await callSubmitPartyBattleAction(battleId, action);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not submit that action.');
-    } finally {
-      submittingRef.current = false;
-      setBusy(false);
-    }
+    await run(() => callSubmitPartyBattleAction(battleId, action), 'Could not submit that action.');
   }
 
   function submitAttack() {
@@ -333,16 +319,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   }
 
   async function vote(wantsToContinue: boolean) {
-    if (busy) return;
-    setBusy(true);
-    setError(null);
-    try {
-      await callVoteContinueEndlessBattle(battleId, wantsToContinue);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not cast that vote.');
-    } finally {
-      setBusy(false);
-    }
+    await run(() => callVoteContinueEndlessBattle(battleId, wantsToContinue), 'Could not cast that vote.');
   }
 
   return (

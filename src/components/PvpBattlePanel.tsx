@@ -9,6 +9,7 @@ import { useNow } from '@/hooks/useNow';
 import { useCombatMusic } from '@/hooks/useCombatMusic';
 import { useAilmentFxEvents } from '@/hooks/useAilmentFxEvents';
 import { usePartyBattlePoll } from '@/hooks/usePartyBattlePoll';
+import { usePartyBattleAction } from '@/hooks/usePartyBattleAction';
 import { subscribeToPartyBattle } from '@/firebase/partyBattleService';
 import { resolveDisplayNames } from '@/firebase/socialService';
 import { callSubmitPartyBattleAction, callUseItemInPartyBattle, type CombatHitResult, type EnemyHitResult } from '@/firebase/functionsClient';
@@ -47,11 +48,6 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   const [usingItems, setUsingItems] = useState(false);
   const [itemsUsedThisTurn, setItemsUsedThisTurn] = useState(0);
   const [confirmForfeit, setConfirmForfeit] = useState(false);
-  const [busy, setBusy] = useState(false);
-  // Synchronous guard alongside `busy` (React state) - closes the same double-click race
-  // EndlessBattlePanel.tsx guards against (see its own comment on submittingRef).
-  const submittingRef = useRef(false);
-  const [error, setError] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
   // While the duel is actively in progress, Escape/click-outside must NOT silently dismiss this
@@ -73,6 +69,8 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
 
   // See usePartyBattlePoll's own doc comment for what this covers and why.
   usePartyBattlePoll(battle, battleId);
+  // See usePartyBattleAction's own doc comment for what this covers and why.
+  const { busy, error, setError, run } = usePartyBattleAction(battle);
 
   // The match's end (win or lose) restores both real saves and grants rewards server-side -
   // resync once that lands. Same transition also drives the win/loss sound cue - status is a
@@ -261,19 +259,8 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');
 
   async function submit(action: Parameters<typeof callSubmitPartyBattleAction>[1]) {
-    if (submittingRef.current) return;
-    submittingRef.current = true;
-    setBusy(true);
-    setError(null);
     setItemsUsedThisTurn(0);
-    try {
-      await callSubmitPartyBattleAction(battleId, action);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not submit that action.');
-    } finally {
-      submittingRef.current = false;
-      setBusy(false);
-    }
+    await run(() => callSubmitPartyBattleAction(battleId, action), 'Could not submit that action.');
   }
 
   function submitSkill(skillId: string) {
