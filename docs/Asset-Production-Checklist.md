@@ -79,18 +79,56 @@ Originals archived at `public/assets/sprites/characters/original/`; resize/optim
 `sprite.npc.large` (the one deliberately-bigger NPC tier, for anyone who should read as more
 imposing than a regular human) becomes **96×120** proportionally - not used by any location yet.
 
-## Player sprite (in progress - you're doing this one yourself)
+### NPC idle animations (new capability - 1 of 14 done)
 
-Already at 72×96 (single frame). The later target, once you're ready for animation, is a 4-direction
-idle+walk sheet at 72×96 per frame, same row order as the existing `sprite.player` fallback sheet
-(walk-down, walk-left, walk-up, walk-right, run-down, run-left, run-up, run-right - 8 rows × 4
-columns). No rush on this one.
+Stationary NPCs can now have a real ambient idle loop instead of a single static frame -
+`IDLE_ANIMATION_LAYOUT` in `src/animation/characterAnimations.ts` (a single row × 4 frames of
+72×96), rendered by `ExplorationScene.ts`'s `upsertEntity`. **Not every NPC needs one** - an NPC
+with no idle sheet just keeps showing its plain static frame exactly as before (the code checks
+`anims.exists(...)` before ever trying to play one, so there's no risk of a broken animation call
+for an NPC that doesn't have this). NPCs always render facing south/down today, so only a
+south-facing idle loop is needed - no other directions.
 
-## Enemies (12 regular + 1 boss - battle sprites)
+**Done**: Elias Rowan - built from a pixellab.ai animation export (south-facing frames only), same
+crop-then-upscale-to-72×96 treatment as the player sheets. Build/re-run pipeline:
+`scripts/build_npc_idle_sheet.py`. Note pixellab's own export folder was named "Breathing_Idle" -
+the game only ever calls this concept **idle** (`IDLE_ANIMATION_LAYOUT`/`MovementState`), so name
+future idle-animation folders/exports however's convenient on the pixellab side; the script maps
+whatever folder name to the game's "idle" concept. Original archived at
+`public/assets/sprites/characters/original/elias-rowan/`.
+
+**Remaining (13)**: every other NPC still shows a single static frame - add an idle loop for any of
+them the same way, whenever art for it exists.
+
+## Player sprite - both skins done (4-direction walk animation)
+
+Both `sprite.player.male` and `sprite.player.female` are now real 8-row × 4-column sheets (72×96
+per frame, same row order the old `sprite.player` fallback sheet used: walk-down/left/up/right,
+run-down/left/up/right), built from a pixellab.ai export
+(`art-staging/characters/{male-player,female-player}/animations/Walking/{south,west,north,east}/
+frame_00{0-3}.png`). pixellab only exported a Walking cycle, not a separate Running one, so the
+sheet's running rows duplicate the walking rows 1:1 - Dash moves faster but reuses the same
+animation rather than a distinct run cycle. Build/re-run pipeline: `scripts/build_player_sheet.py`
+(crops each skin's own fixed, hand-measured region before upscaling to 72×96 - see the script's own
+comments for the exact numbers). Originals archived under
+`public/assets/sprites/characters/original/{male-player,female-player}/`.
+
+pixellab's export also included 8-directional "rotations" (NE/E/SE/S/SW/W/NW) for both skins - not
+used, since this game's movement only supports 4 cardinal facings today.
+
+## Enemies (12 regular + 1 boss - battle sprites) - 1 of 13 done
 
 **Spec, regular tier (12)**: 128×128 PNG, transparent background, front-facing "battle stance" pose
-(this is what's shown in the combat screen, not an overworld sprite). **Boss tier (1)**: 256×256,
-same conventions, more detailed/imposing.
+(this is what's shown in the combat screen, not an overworld sprite - it's also reused directly as
+the roaming overworld/field-encounter icon for that same enemy, see `useFieldEncounters.ts`).
+**Boss tier (1)**: 256×256, same conventions, more detailed/imposing.
+
+**Done**: Mothling - built from a pixellab.ai rotation export (only the south/front-facing pose is
+used; enemies get no walk/idle animation today, just the one static battle image), cropped to just
+the creature before upscaling to 128×128 (skipping the crop would have rendered it far smaller than
+intended, since `BattleScene.ts` sizes enemies off the full image width). Build script:
+`scripts/build_enemy_sprite.py`. Original archived at
+`public/assets/sprites/enemies/original/mothling-south.png`.
 
 Note: these are **not** scaled by the player-proportion rule above - they serve double duty (an
 in-battle portrait, using its own separate scaling formula, *and* the overworld "something's
