@@ -355,7 +355,7 @@ rather than a synth-heavy arcade feel.
 | `sfx.npc-talk` | Opening NPC dialogue | Gentle notification blip. | `Musical Effects/xylophone_chime_quick.wav` | Bright, distinct from the other chime families used elsewhere. |
 | `sfx.transition` | Crossing a location transition | Soft whoosh. | `Other/whoosh_1.wav` | Literal match; `whoosh_2.wav` is an untried alternate. |
 | `sfx.combat-hit` | A combat round lands a hit | Sharp, grounded impact thud. | `Weapons/harsh_thud.wav` | Generic enough for any weapon type. |
-| `sfx.enemy-defeated` | An enemy is defeated | Short descending "dissipating" burst. | `Other/ghost_long.wav` | A literal "ghost" cue fits this world's spirit-guardian theme better than the pack's retro power-down stingers. |
+| `sfx.enemy-defeated` | An enemy is defeated | Short descending "dissipating" burst. | `Retro/lose.wav` | Manually swapped in by the user, replacing the earlier `Other/ghost_long.wav` pick. |
 | `sfx.victory` | Winning a battle | Bright ascending fanfare arpeggio. | `Musical Effects/grand_piano_level_complete.wav` | "Level complete" maps directly onto winning. |
 | `sfx.level-up` | Leveling up after victory | More triumphant than the victory cue. | `Musical Effects/grand_piano_positive_long.wav` | Bigger/longer than victory's chime, per spec. |
 | `sfx.defeat` | Losing a battle | Soft descending minor cue. | `Musical Effects/grand_piano_defeated.wav` | Literally named "defeated." |

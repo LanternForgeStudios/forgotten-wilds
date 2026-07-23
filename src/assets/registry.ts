@@ -2336,7 +2336,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     filePath: 'audio/sfx/enemy-defeated.wav',
     dimensions: null,
     status: 'final',
-    notes: 'Source: art-staging library copy at public/assets/audio/library/sfx/Other/ghost_long.wav - a literal "ghost" cue reads as a spirit/creature dissipating, fitting this world\'s spirit-guardian theme better than the pack\'s Retro power-down stingers. Not personally auditioned (filenames/categories only) - please confirm by ear.',
+    notes: 'Manually swapped in by the user from the staged library at public/assets/audio/library/sfx/Retro/lose.wav, replacing the earlier ghost_long.wav pick.',
   },
   {
     id: 'sfx.victory',
