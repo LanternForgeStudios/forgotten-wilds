@@ -5,7 +5,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { signOutUser } from '@/firebase/auth';
-import { getAssetUrl } from '@/assets/assetManager';
+import { getAssetUrl, getAssetDefinition } from '@/assets/assetManager';
 import {
   subscribeToFriendship,
   subscribeToBlockList,
@@ -1324,11 +1324,38 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     cursor: busy ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  <img
-                    src={getAssetUrl(option.assetId)}
-                    alt={option.label}
-                    style={{ width: 72, height: 96, imageRendering: 'pixelated' }}
-                  />
+                  {(() => {
+                    const def = getAssetDefinition(option.assetId);
+                    // A skin's own registry entry may be a plain single image (no frameSize) or a
+                    // full walk/run sheet - a bare <img> would otherwise render the *entire* sheet
+                    // squashed into this preview box instead of one frame. When there's a
+                    // frameSize, crop to just row 0/col 0 (south-facing, walking-down frame 0 - a
+                    // neutral standing pose) via a background-image sized to the full sheet and
+                    // positioned to show only that one frame.
+                    if (!def.frameSize) {
+                      return (
+                        <img
+                          src={getAssetUrl(option.assetId)}
+                          alt={option.label}
+                          style={{ width: 72, height: 96, imageRendering: 'pixelated' }}
+                        />
+                      );
+                    }
+                    return (
+                      <div
+                        role="img"
+                        aria-label={option.label}
+                        style={{
+                          width: def.frameSize.width,
+                          height: def.frameSize.height,
+                          backgroundImage: `url(${getAssetUrl(option.assetId)})`,
+                          backgroundPosition: '0 0',
+                          backgroundSize: `${def.dimensions?.width ?? def.frameSize.width}px ${def.dimensions?.height ?? def.frameSize.height}px`,
+                          imageRendering: 'pixelated',
+                        }}
+                      />
+                    );
+                  })()}
                   <span style={{ fontSize: 12 }}>{option.label}</span>
                   {player.skin === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
                 </button>
