@@ -2,7 +2,7 @@ import type { CharacterAnimationLayout, MovementState } from '@/animation/charac
 import type { Facing } from '@/hooks/useGridMovement';
 
 const FACINGS: Facing[] = ['down', 'left', 'up', 'right'];
-const ANIMATED_STATES: MovementState[] = ['walking', 'running'];
+const ANIMATED_STATES: MovementState[] = ['idle', 'walking', 'running'];
 
 /** Namespaced by textureKey since Phaser's AnimationManager keys are global per-game, not
  *  per-texture - without this, two different character sheets both having a "walking-down" row
@@ -14,9 +14,10 @@ export function animationKey(textureKey: string, state: MovementState, facing: F
 /** Registers one Phaser animation per (state, facing) row a layout actually defines - direct
  *  translation of CharacterAnimationLayout (src/animation/characterAnimations.ts, untouched) into
  *  scene.anims.create() calls. Safe to call more than once for the same textureKey (e.g. several
- *  entities sharing one sheet) - already-registered keys are skipped. Idle has no dedicated row on
- *  any sheet today (see resolveAnimationRow) and is intentionally not created here - callers should
- *  stop the sprite's animation and set an explicit frame via resolveDisplayRow instead. */
+ *  entities sharing one sheet) - already-registered keys are skipped. A layout with no row for a
+ *  given state (e.g. the player's own layout has no idle row, or a plain NPC sheet has no idle
+ *  animation at all) simply gets no animation created for it - callers should check
+ *  `anims.exists(...)` before playing and fall back to a static frame via resolveDisplayRow. */
 export function createCharacterAnimations(
   anims: Phaser.Animations.AnimationManager,
   textureKey: string,

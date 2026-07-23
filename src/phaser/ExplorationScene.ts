@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { TileLayer, TileMap } from '@/types';
 import type { GridPosition } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
-import { PLAYER_ANIMATION_LAYOUT } from '@/animation/characterAnimations';
+import { PLAYER_ANIMATION_LAYOUT, animationLayoutForSprite } from '@/animation/characterAnimations';
 import { getAssetDefinition } from '@/assets/assetManager';
 import { createCharacterAnimations, animationKey } from './animationDefs';
 import { ensureParticleTexture } from './battleEffects';
@@ -339,7 +339,14 @@ export class ExplorationScene extends Phaser.Scene {
     if (getAssetDefinition(spriteAssetId).frameSize) {
       if (movementState === 'walking' || movementState === 'running') {
         const key = animationKey(spriteAssetId, movementState, pos.facing);
-        if (sprite.anims.currentAnim?.key !== key) sprite.play(key);
+        // `currentAnim` reflects the *last* animation loaded into this sprite, not whether it's
+        // still actually playing - the idle branch below calls `anims.stop()` without clearing it,
+        // so re-pressing the same direction right after stopping saw a matching currentAnim.key
+        // and skipped play() entirely, leaving the sprite frozen on its last frame while still
+        // gliding to the next tile (reported live as "the animation only works on direction
+        // change" - a same-direction stop-then-go never restarted it). `isPlaying` is the actual
+        // signal for whether anything is animating right now.
+        if (!sprite.anims.isPlaying || sprite.anims.currentAnim?.key !== key) sprite.play(key);
       } else {
         // Idle has no dedicated row on the sheet - `frameRow` is already resolveDisplayRow's
         // fallback-to-frame-0-of-the-walking-row answer, computed by the caller (same as the old
@@ -405,6 +412,12 @@ export class ExplorationScene extends Phaser.Scene {
       const sprite = this.add.sprite(0, 0, entity.spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
       visual = { sprite, spriteAssetId: entity.spriteAssetId };
       this.entityVisuals.set(entity.id, visual);
+      // Mirrors ensurePlayerAnimations - a static single-frame sprite (no frameSize) has no rows to
+      // register at all. Safe to call unconditionally for every frameSize'd entity sharing this
+      // sheet (createCharacterAnimations already skips already-registered keys).
+      if (getAssetDefinition(entity.spriteAssetId).frameSize) {
+        createCharacterAnimations(this.anims, entity.spriteAssetId, animationLayoutForSprite(entity.spriteAssetId));
+      }
     } else if (visual.spriteAssetId !== entity.spriteAssetId) {
       // Same entity id (e.g. another player's presence doc), different sprite - most notably
       // another player switching skins via Profile mid-session. Load (if not already cached) and
@@ -413,6 +426,9 @@ export class ExplorationScene extends Phaser.Scene {
       if (generation !== this.entityGeneration) return;
       visual.sprite.setTexture(entity.spriteAssetId);
       visual.spriteAssetId = entity.spriteAssetId;
+      if (getAssetDefinition(entity.spriteAssetId).frameSize) {
+        createCharacterAnimations(this.anims, entity.spriteAssetId, animationLayoutForSprite(entity.spriteAssetId));
+      }
     }
 
     const def = getAssetDefinition(entity.spriteAssetId);
@@ -422,14 +438,29 @@ export class ExplorationScene extends Phaser.Scene {
     if (def.frameSize) {
       const row = entity.frameRow ?? 0;
       const column = entity.frameColumn ?? 0;
+      const layout = animationLayoutForSprite(entity.spriteAssetId);
       if (entity.movementState === 'walking' || entity.movementState === 'running') {
         // Not exercised by any entity yet (only the player has a frameSize sheet today), but
-        // wired the same way as setPlayer for when an NPC/enemy gets one.
+        // wired the same way as setPlayer for when an NPC/enemy gets one. Same isPlaying check as
+        // setPlayer's own fix - see that call site's comment for why currentAnim alone isn't
+        // enough.
         const key = animationKey(entity.spriteAssetId, entity.movementState, 'down');
-        if (this.anims.exists(key) && visual.sprite.anims.currentAnim?.key !== key) visual.sprite.play(key);
+        if (this.anims.exists(key) && (!visual.sprite.anims.isPlaying || visual.sprite.anims.currentAnim?.key !== key)) {
+          visual.sprite.play(key);
+        }
       } else {
-        visual.sprite.anims.stop();
-        visual.sprite.setFrame(row * PLAYER_ANIMATION_LAYOUT.frameCount + column);
+        // Not every NPC/enemy has an idle animation of its own (most don't) - only play one if
+        // createCharacterAnimations actually registered it for this sheet; otherwise fall back to
+        // the plain static frame exactly as before.
+        const idleKey = animationKey(entity.spriteAssetId, 'idle', 'down');
+        if (this.anims.exists(idleKey)) {
+          if (!visual.sprite.anims.isPlaying || visual.sprite.anims.currentAnim?.key !== idleKey) {
+            visual.sprite.play(idleKey);
+          }
+        } else {
+          visual.sprite.anims.stop();
+          visual.sprite.setFrame(row * layout.frameCount + column);
+        }
       }
     }
 
