@@ -1089,7 +1089,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "pixellab MCP-generated (create_character + animate_character's breathing-idle and walking-4-frames templates, 136x136 source frames, south/west/north/east directions), one shared crop box across every direction+idle frame, upscaled to 72x96. Build script: scripts/build_npc_walk_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-ranger-caleb.png; this batch's own originals at public/assets/sprites/characters/original/ranger-caleb/).",
+      "pixellab MCP-generated (create_character + animate_character's breathing-idle and walking-4-frames templates, 136x136 source frames, south/west/north/east directions), one shared crop box across every direction+idle frame, upscaled to 72x96. Regenerated once already - the first MCP generation didn't specify race in the prompt and came back white; Ranger Caleb is Black, corrected via an explicit \"Black man, dark brown skin\" prompt (see docs/pixellab-asset-ids.md). Build script: scripts/build_npc_walk_sheet.py. Original static art archived at public/assets/sprites/characters/original/npc-ranger-caleb.png; the superseded first MCP attempt at public/assets/sprites/characters/original/ranger-caleb-v1-no-race-specified/; this regeneration's own originals at public/assets/sprites/characters/original/ranger-caleb/.",
   },
   {
     id: 'sprite.player',

@@ -55,7 +55,7 @@ head-and-shoulders framing, 3/4 or front-facing.
 | Historian Miriam | Town Historian | Elderly woman, spectacles, surrounded by old books/scrolls, thoughtful and patient expression. | Done |
 | Hunter Garrick | Tracker | Rugged outdoorsman, fur-lined cloak, bow or knife at hip, alert eyes, weathered from the trail. | Done |
 | Spirit Child | Voice of the Grove | Ethereal pale child-like spirit, faint glow, forest-green and silver tones, slightly translucent, ancient sad eyes. | Done |
-| Ranger Caleb | Ridge Scout | Lean scout in mountain gear, cloak, watchful expression, sharp-eyed, cliffside backdrop hint. | Done |
+| Ranger Caleb | Ridge Scout | Lean Black man, dark brown skin, mountain gear, cloak, watchful expression, sharp-eyed, cliffside backdrop hint. | Done |
 | Mayor Eleanor Ashcroft | Mayor of Ash Hallow | Dignified older woman, formal but weathered town-official attire, a small mayoral pin/sash, composed authoritative expression. | Done |
 
 Originals archived at `public/assets/portraits/original/`; resize/optimize pipeline is

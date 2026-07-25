@@ -30,7 +30,7 @@ manual-workflow phase) but are the same account and just as targetable for a fut
 | `sprite.player.male` | Male player skin | `97fdbc5d-841b-483e-9fa8-0f287dc630a8` | website (pre-MCP) |
 | `sprite.player.female` | Female player skin | `ec7ecd8c-2ec8-4fb7-a16c-62924606dcc5` | website (pre-MCP) |
 
-| `sprite.npc.ranger-caleb` | Ranger Caleb | `78831885-de76-447f-a776-79d2fc54fe7f` | MCP |
+| `sprite.npc.ranger-caleb` | Ranger Caleb | `00229b8e-3874-4aed-a190-533ce692e267` (regenerated - original `78831885...` was generated without race specified in the prompt and came back white; Ranger Caleb is Black) | MCP |
 | `sprite.npc.historian-miriam` | Historian Miriam | `808a6c9f-b361-4cf1-8ade-a1b7db0c05b6` (first attempt `e36323eb...` failed - server load) | MCP |
 | `sprite.npc.mayor-eleanor-ashcroft` | Mayor Eleanor Ashcroft | `821b4aef-10e6-4cbc-8f83-5f974861bd54` (first attempt `931c7421...` failed - server load) | MCP |
 
@@ -59,10 +59,20 @@ manual-workflow phase) but are the same account and just as targetable for a fut
 | `55c837d3-1f95-41f0-ae49-5c9ab4bedf7c` | Failed duplicate Silas Flint attempt (96x128) - superseded by `2e105e5b...` above |
 | `8425810e-dc38-4594-8617-895e5b7c2e23` | Failed duplicate player-skin attempt (48x64) - superseded by the male/female entries above |
 
-## Objects (icons/equipment/items) - none yet
+## Objects (icons/equipment/items)
 
-Will list `create_map_object`/`create_object_state` ids here once icon generation starts (see the
-Asset-Production-Checklist.md "Icons" section - generate at 128×128, resize to final in-game size).
+`create_map_object` outputs (currency/ailment/item icons) are NOT tracked here - they're
+single-shot static images with no further-editable identity on pixellab's side, so there's nothing
+meaningful to look back up (unlike a `create_character`/`create_1_direction_object` "object",
+which persists and can be re-animated/state-varied later). See each icon's own registry.ts note
+for its generation settings instead.
+
+`create_1_direction_object`/`create_8_direction_object` outputs (real animated/stateful objects):
+
+| Registry id | Name | pixellab object_id | Notes |
+|---|---|---|---|
+| `structure.chest` | Chest (closed) | `c369b6ce-e9c7-4fcf-9912-8273dae52025` | Has a pulsing-glow animation (group `a32ecdb0-1f2c-42ae-8785-b5fb7a45c9ba`) - see `animate_object`. Source review batch (4 candidates) was `85bfcb60-38e1-4b55-83df-62a6c59cd294`. |
+| `structure.chest-open` | Chest (open) | `1825b0b9-bc88-4772-86cb-d02ad42a68a6` | A `create_object_state` variant of the closed chest above - same body/palette, lid open, no glow. |
 Equipment icons are planned to eventually become directional walk/run sheets layered on the player
 sprite (visible equipment) - when that starts, the player base sprite will need regenerating as an
 "underwear" base body first, and equipment objects generated from *that* base's actual frames

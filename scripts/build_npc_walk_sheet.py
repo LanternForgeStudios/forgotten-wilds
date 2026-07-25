@@ -45,7 +45,10 @@ WALKING_NPCS = {
         "out_name": "spirit-child-walk.png",
     },
     "ranger-caleb": {
-        "crop_box": (23, 6, 113, 127),  # union bbox (42,14)-(94,119) on a 136x136 canvas
+        # Regenerated to correct his race - the first attempt was generated without race specified
+        # in the prompt and came back white; Ranger Caleb is Black. Superseded art archived at
+        # original/ranger-caleb-v1-no-race-specified/, not deleted.
+        "crop_box": (24, 11, 112, 128),  # union bbox (42,19)-(94,120) on a 136x136 canvas
         "out_name": "ranger-caleb-walk.png",
     },
 }
