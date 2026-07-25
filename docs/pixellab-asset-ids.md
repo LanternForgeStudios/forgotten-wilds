@@ -29,10 +29,11 @@ manual-workflow phase) but are the same account and just as targetable for a fut
 | `sprite.npc.willow-briar` | Willow Briar | `f75d44e5-e42d-4d49-9a9a-43c6bb8f627a` | MCP |
 | `sprite.player.male` | Male player skin | `97fdbc5d-841b-483e-9fa8-0f287dc630a8` | website (pre-MCP) |
 | `sprite.player.female` | Female player skin | `ec7ecd8c-2ec8-4fb7-a16c-62924606dcc5` | website (pre-MCP) |
-
 | `sprite.npc.ranger-caleb` | Ranger Caleb | `00229b8e-3874-4aed-a190-533ce692e267` (regenerated - original `78831885...` was generated without race specified in the prompt and came back white; Ranger Caleb is Black) | MCP |
 | `sprite.npc.historian-miriam` | Historian Miriam | `808a6c9f-b361-4cf1-8ade-a1b7db0c05b6` (first attempt `e36323eb...` failed - server load) | MCP |
 | `sprite.npc.mayor-eleanor-ashcroft` | Mayor Eleanor Ashcroft | `821b4aef-10e6-4cbc-8f83-5f974861bd54` (first attempt `931c7421...` failed - server load) | MCP |
+| `sprite.player.base.male` *(planned - underwear-only base body for equipment layering)* | Player Base Male | `aa9fbbe8-b51a-43a2-b5ae-f48bb820c4ae` | MCP |
+| `sprite.player.base.female` *(planned - underwear-only base body for equipment layering)* | Player Base Female | `7d3be856-2493-49f0-8e62-92c9663522eb` | MCP |
 
 ## Characters (enemies)
 

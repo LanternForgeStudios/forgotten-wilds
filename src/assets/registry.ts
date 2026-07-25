@@ -2088,22 +2088,24 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'structure.chest',
     category: 'structure',
-    intendedUse: 'Marker for an unopened treasure chest interactable in overworld/dungeon locations',
-    filePath: 'sprites/structures/chest.svg',
-    dimensions: { width: 48, height: 48 },
-    status: 'placeholder',
+    intendedUse:
+      "Marker for an unopened treasure chest interactable in overworld/dungeon locations - a pulsing glow animation (single row x 9 frames of 48x48) so it's visible/discoverable on the map, using the same generic idle-animation mechanism every enemy/wandering-NPC sheet already uses (animationLayoutForSprite's fallback branch) - no new game code needed, upsertEntity already plays any frameSize'd sprite's single row automatically.",
+    filePath: 'sprites/structures/chest-closed-glow.png',
+    dimensions: { width: 432, height: 48 },
+    frameSize: { width: 48, height: 48 },
+    status: 'final',
     notes:
-      'Generated SVG placeholder. Dimensions bumped 32x32 -> 48x48 per docs/Asset-Production-Checklist.md\'s current target spec - the placeholder SVG was regenerated at this size too (see structure.house\'s note), so it now actually renders at 48x48.',
+      'pixellab MCP-generated: create_1_direction_object (128x128, top-down view, 4 candidates reviewed, picked the one with the most visible glowing seams) + animate_object (v3 mode, "gently pulsing warm golden magical glow" description, 9 frames). Each frame cropped to its own square content bbox and resized to 48x48 with LANCZOS. Build script: scripts/build_chest.py. 128x128 originals archived at public/assets/sprites/structures/original/chest-closed/.',
   },
   {
     id: 'structure.chest-open',
     category: 'structure',
     intendedUse: 'Marker for an already-opened/emptied treasure chest - distinct art from structure.chest, not just a different label',
-    filePath: 'sprites/structures/chest-open.svg',
+    filePath: 'sprites/structures/chest-open.png',
     dimensions: { width: 48, height: 48 },
-    status: 'placeholder',
+    status: 'final',
     notes:
-      "Generated SVG placeholder - same chest body/palette as structure.chest, lid open and interior empty, no gem/clasp. Dimensions bumped 32x32 -> 48x48 - see structure.chest's note for why.",
+      "pixellab MCP-generated via create_object_state on the SAME closed-chest object (edit: \"open the lid fully, empty dark interior, no glow\") rather than an independent generation, so the two states share the same body/palette per the checklist doc's explicit requirement. Cropped to its square content bbox and resized to 48x48 with LANCZOS. Build script: scripts/build_chest.py. 128x128 original archived at public/assets/sprites/structures/original/chest-open.png.",
   },
   {
     id: 'structure.door',

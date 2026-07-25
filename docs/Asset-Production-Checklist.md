@@ -217,7 +217,21 @@ per building, plus the shrine landmark marker using the same size/conventions.
 | Town Hall *(Ash Hallow Town Hall)* | 144×144 | Small rustic mountain-town building facade with a wooden door, weathered plank and stone construction, warm lantern-lit window, autumn Appalachian fantasy town - slightly grander scale than the other buildings, a small bell tower or flag above the door. |
 | Shrine *(landmark marker, e.g. Spirit Grove)* | 144×144 | Small weathered stone shrine, moss-covered, half-forgotten, faint spiritual glow, autumn Appalachian fantasy mountain setting - matches "a small stone shrine, half-forgotten" from its in-game flavor text. |
 
-### Chest (2 - 48×48, two distinct states)
+### Chest (2 - 48×48, two distinct states) - both done
+
+Built via the pixellab MCP's character-style "object" pipeline (`create_1_direction_object` +
+`animate_object` + `create_object_state`) rather than `create_map_object` (used for every icon
+above) - only `create_1_direction_object`/`create_8_direction_object` outputs are real, persistent
+"objects" that `animate_object` can act on; `create_map_object` outputs are single-shot static
+images with no animation capability. Closed: `create_1_direction_object` at 128×128 (a cheap
+4-candidate review batch - picked the one with the most visible glowing seams), then
+`animate_object` (v3 mode, "gently pulsing warm golden magical glow" description, 9 frames) so the
+chest is visibly glowing/discoverable on the map - the same generic single-row idle-animation
+mechanism every enemy/wandering-NPC sheet already uses, so **no new game code was needed**, just a
+registry entry with `frameSize` set. Open: a `create_object_state` variant of the *same* closed-
+chest object (not an independent generation) so both states share the same body/palette. Build
+script: `scripts/build_chest.py`. 128×128 originals archived at
+`public/assets/sprites/structures/original/{chest-closed,chest-open}`.
 
 | Structure | Size | Generation prompt |
 |---|---|---|
