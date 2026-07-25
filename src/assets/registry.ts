@@ -924,11 +924,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.nell-ashby',
     category: 'character',
-    intendedUse: 'Overworld sprite for nell-ashby (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/nell-ashby.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse:
+      "Overworld sprite for nell-ashby - a wandering NPC (see wanderRadius on her ash-hallow.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/nell-ashby-walk.png',
+    dimensions: { width: 288, height: 480 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-nell-ashby.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-nell-ashby.png.',
+    notes:
+      "pixellab MCP-generated (create_character + animate_character's breathing-idle and walking-4-frames templates, 136x136 source frames, south/west/north/east directions), one shared crop box across every direction+idle frame (a single consistent crop still correctly frames every pose) upscaled to 72x96. Build script: scripts/build_npc_walk_sheet.py (new - a 5-row combined idle+walk sheet, distinct from the other NPCs' 1-row idle-only build_npc_idle_sheet.py). Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-nell-ashby.png; this batch's own originals at public/assets/sprites/characters/original/nell-ashby/).",
   },
   {
     id: 'portrait.aldren-stone',
@@ -942,11 +945,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.aldren-stone',
     category: 'character',
-    intendedUse: 'Overworld sprite for aldren-stone (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/aldren-stone.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse: 'Overworld sprite for aldren-stone - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape)',
+    filePath: 'sprites/characters/aldren-stone-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-aldren-stone.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-aldren-stone.png.',
+    notes: 'pixellab MCP-generated idle/breathing loop (136x136 source frames, south direction only) via create_character + animate_character, same crop-then-upscale-to-72x96 treatment as every other NPC idle sheet. Build script: scripts/build_npc_idle_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-aldren-stone.png; this batch\'s own originals at public/assets/sprites/characters/original/aldren-stone/).',
   },
   {
     id: 'portrait.tessa-ironhand',

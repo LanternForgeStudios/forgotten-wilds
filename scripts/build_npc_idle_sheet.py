@@ -63,6 +63,11 @@ NPCS = {
         "crop_box": (22, 1, 115, 124),  # union bbox (52,9)-(85,116) on a 136x136 canvas
         "out_name": "juniper-reed-idle.png",
     },
+    "aldren-stone": {
+        "anim_folder": "animating",
+        "crop_box": (24, 7, 112, 125),  # union bbox (50,15)-(86,117) on a 136x136 canvas
+        "out_name": "aldren-stone-idle.png",
+    },
 }
 
 SRC_ROOT = os.path.join("art-staging", "characters")
