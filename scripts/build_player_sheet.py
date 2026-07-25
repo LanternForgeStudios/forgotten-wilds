@@ -1,5 +1,5 @@
-"""Build a player skin's animated overworld sprite sheet from a pixellab.ai export
-(art-staging/characters/{skin}/animations/Walking/{south,west,north,east}/frame_00{0-3}.png).
+"""Build (or update) a player skin's animated overworld sprite sheet from a pixellab.ai export
+(art-staging/characters/{skin}/animations/{Walking,Running}/{south,west,north,east}/frame_00{0-3}.png).
 
 Every source frame for a given skin shares the same square canvas with the character consistently
 centered (verified by comparing each skin's own union content-bbox across all its staged frames/
@@ -9,12 +9,13 @@ auto-crop would risk. Each crop is a 60x80 box (aspect 0.75), scaling cleanly to
 per-frame size every other character sprite in the registry already uses, so the player doesn't
 suddenly render at a different scale than NPCs.
 
-Output is an 8-row x 4-column sheet (PLAYER_ANIMATION_LAYOUT's existing shape: rows 0-3 walking
-down/left/up/right, rows 4-7 running down/left/up/right) - pixellab only exported a Walking cycle,
-no separate Running one, so rows 4-7 duplicate rows 0-3. This means Dash reuses the walk cycle's
-frames (just plays faster) rather than a distinct run animation - a deliberate, low-risk choice:
-matching the existing 8-row shape needs zero changes to ExplorationScene.ts's animation code, which
-hardcodes that shape today rather than deriving it per-asset.
+Output is an 8-row x 4-column sheet (PLAYER_ANIMATION_LAYOUT's shape: rows 0-3 walking
+down/left/up/right, rows 4-7 running down/left/up/right). Three supported staging shapes:
+  - Walking only: fresh build, running rows duplicate the walking rows (no real run cycle yet).
+  - Walking + Running: fresh build, both halves real.
+  - Running only: an update to an *already-built* sheet (Walking was finalized in an earlier run
+    and cleared from staging) - loads the existing output file and overwrites just rows 4-7,
+    leaving the walking rows untouched.
 
 The entire staged folder (including the unused 8-directional "rotations") is archived as-is once
 processed, then removed from staging - nothing is lost, staging just stays limited to work still
@@ -35,51 +36,82 @@ FRAMES_PER_DIRECTION = 4
 # session notes for the measurements), and the output filename.
 SKINS = {
     "male-player": {
-        "crop_box": (32, 22, 92, 102),  # union bbox (40,31)-(83,94) on a 124x124 canvas
+        "crop_box": (32, 22, 92, 102),  # union bbox (40,31)-(83,94) on a 124x124 Walking canvas
         "out_name": "player-male-animated.png",
     },
     "female-player": {
-        "crop_box": (34, 24, 94, 104),  # union bbox (43,32)-(84,97) on a 128x128 canvas
+        "crop_box": (34, 24, 94, 104),  # union bbox (43,32)-(84,97) on a 128x128 Walking canvas
         "out_name": "player-female-animated.png",
     },
 }
 
 OUT_DIR = os.path.join("public", "assets", "sprites", "characters")
 
-for skin, cfg in SKINS.items():
-    staging_dir = os.path.join("art-staging", "characters", skin)
-    src_dir = os.path.join(staging_dir, "animations", "Walking")
-    if not os.path.isdir(src_dir):
-        print(f"skipping {skin}: no staged Walking animation found")
-        continue
-    crop_box = cfg["crop_box"]
 
-    frames_by_direction = {}
+def load_direction_frames(anim_dir, crop_box):
+    by_direction = {}
     for src_name, _facing in DIRECTIONS:
         frames = []
         for i in range(FRAMES_PER_DIRECTION):
-            src_path = os.path.join(src_dir, src_name, f"frame_{i:03d}.png")
+            src_path = os.path.join(anim_dir, src_name, f"frame_{i:03d}.png")
             im = Image.open(src_path).convert("RGBA")
             cropped = im.crop(crop_box)
-            resized = cropped.resize(FRAME_SIZE, Image.NEAREST)
-            frames.append(resized)
-        frames_by_direction[src_name] = frames
+            frames.append(cropped.resize(FRAME_SIZE, Image.NEAREST))
+        by_direction[src_name] = frames
+    return by_direction
 
-    sheet_w = FRAME_SIZE[0] * FRAMES_PER_DIRECTION
-    sheet_h = FRAME_SIZE[1] * 8  # 4 walking rows + 4 duplicated running rows
-    sheet = Image.new("RGBA", (sheet_w, sheet_h), (0, 0, 0, 0))
 
-    row_order = [name for name, _facing in DIRECTIONS] * 2
-    for row_index, src_name in enumerate(row_order):
+def paste_rows(sheet, frames_by_direction, start_row):
+    for row_offset, (src_name, _facing) in enumerate(DIRECTIONS):
         for col_index, frame in enumerate(frames_by_direction[src_name]):
-            sheet.paste(frame, (col_index * FRAME_SIZE[0], row_index * FRAME_SIZE[1]))
+            sheet.paste(frame, (col_index * FRAME_SIZE[0], (start_row + row_offset) * FRAME_SIZE[1]))
 
+
+for skin, cfg in SKINS.items():
+    staging_dir = os.path.join("art-staging", "characters", skin)
+    walking_dir = os.path.join(staging_dir, "animations", "Walking")
+    running_dir = os.path.join(staging_dir, "animations", "Running")
+    has_walking = os.path.isdir(walking_dir)
+    has_running = os.path.isdir(running_dir)
+    if not has_walking and not has_running:
+        print(f"skipping {skin}: no staged Walking or Running animation found")
+        continue
+
+    crop_box = cfg["crop_box"]
     out_path = os.path.join(OUT_DIR, cfg["out_name"])
+    sheet_w = FRAME_SIZE[0] * FRAMES_PER_DIRECTION
+    sheet_h = FRAME_SIZE[1] * 8
+
+    if has_walking:
+        sheet = Image.new("RGBA", (sheet_w, sheet_h), (0, 0, 0, 0))
+        walking_frames = load_direction_frames(walking_dir, crop_box)
+        paste_rows(sheet, walking_frames, start_row=0)
+        running_frames = load_direction_frames(running_dir, crop_box) if has_running else walking_frames
+        paste_rows(sheet, running_frames, start_row=4)
+        mode = "walking+running" if has_running else "walking only (running rows duplicated)"
+    else:
+        if not os.path.exists(out_path):
+            print(f"skipping {skin}: Running-only update but no existing sheet found at {out_path}")
+            continue
+        sheet = Image.open(out_path).convert("RGBA")
+        running_frames = load_direction_frames(running_dir, crop_box)
+        paste_rows(sheet, running_frames, start_row=4)
+        mode = "running-only update"
+
     sheet.save(out_path, format="PNG", optimize=True, compress_level=9)
-    print(f"{skin}: {sheet_w}x{sheet_h} -> {out_path} ({os.path.getsize(out_path) / 1024:.0f}KB)")
+    print(f"{skin} ({mode}): {sheet_w}x{sheet_h} -> {out_path} ({os.path.getsize(out_path) / 1024:.0f}KB)")
 
     archive_dir = os.path.join(OUT_DIR, "original", skin)
-    if not os.path.exists(archive_dir):
+    if os.path.exists(archive_dir):
+        # A later batch (e.g. this Running-only follow-up) landing after an earlier archive already
+        # exists - merge the new staged files in rather than skipping the whole archive step.
+        for root, _dirs, files in os.walk(staging_dir):
+            rel = os.path.relpath(root, staging_dir)
+            dest_root = os.path.join(archive_dir, rel) if rel != "." else archive_dir
+            os.makedirs(dest_root, exist_ok=True)
+            for f in files:
+                shutil.copy2(os.path.join(root, f), os.path.join(dest_root, f))
+    else:
         shutil.copytree(staging_dir, archive_dir)
     shutil.rmtree(staging_dir)
     print(f"  archived staged files to {archive_dir}, cleared {staging_dir}")
