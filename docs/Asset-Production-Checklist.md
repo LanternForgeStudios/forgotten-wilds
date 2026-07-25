@@ -174,7 +174,7 @@ rather than assuming they need to grow to match the buildings/NPCs above.
 (weathered wood, stone foundations, lantern-lit windows) - see per-row size and a fully-written
 generation prompt below, no template filling-in needed.
 
-### Building facades & shrine (10 - 72×72)
+### Building facades & shrine (10 - 72×72) - all 10 done
 
 A painted building-entrance facade (door + surrounding wall texture) sized to its footprint, one
 per building, plus the shrine landmark marker using the same size/conventions.
