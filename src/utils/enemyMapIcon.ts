@@ -3,9 +3,10 @@ import { getAssetDefinition } from '@/assets/assetManager';
 /** Enemy battle sprites are authored for the full-screen combat view (128x128 regular, 256x256
  *  boss) - too large for a small "something's nearby" map marker (a field-encounter icon, or a
  *  boss's fixed map-object marker). These are the target on-screen sizes for that map-marker
- *  context specifically; the combat screen's own rendering is untouched. */
-const REGULAR_ENEMY_MAP_ICON_SIZE = 64;
-const BOSS_MAP_ICON_SIZE = 128;
+ *  context specifically; the combat screen's own rendering is untouched. Bumped ~25% up from an
+ *  original 64/128 once real art was in and read as too small at that size. */
+const REGULAR_ENEMY_MAP_ICON_SIZE = 80;
+const BOSS_MAP_ICON_SIZE = 160;
 
 /** A GridEntity.displayScale multiplier that shrinks an enemy's existing battle sprite down to
  *  map-marker size, computed from the asset's own registered width rather than a hardcoded ratio -

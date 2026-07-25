@@ -169,13 +169,15 @@ export class BattleScene extends Phaser.Scene {
     const def = getAssetDefinition(enemy.spriteAssetId);
     // Close-up battle-stage sizing convention (not the exploration-tile-grid-scaled sizes from the
     // 3/4-view scale spec's literal numbers, which govern walking sprites/field-encounter icons
-    // instead - a full-screen battle close-up needs its own, larger scale). Halved from the
-    // original 256/192/128 - at full size, a multi-enemy formation's sprites overlapped each other.
-    // Further capped to a fraction of this slot's own allocated spacing (viewportW / enemy count)
-    // rather than staying a fixed pixel target - on a narrow mobile canvas, a fixed 64/96/128px
-    // sprite ate up proportionally more of the (already narrow) per-slot width than on desktop, so
-    // a multi-enemy formation still overlapped there even after the desktop-tuned halving.
-    const baseSize = enemy.isBoss ? 128 : enemy.tier === 'elite' ? 96 : 64;
+    // instead - a full-screen battle close-up needs its own, larger scale). Originally halved from
+    // 256/192/128 (full size overlapped a multi-enemy formation's sprites), then bumped ~25% back
+    // up from that halved 64/96/128 baseline once real art was in and reads as too small at the
+    // fully-halved size. Further capped to a fraction of this slot's own allocated spacing
+    // (viewportW / enemy count) rather than staying a fixed pixel target - on a narrow mobile
+    // canvas, a fixed-size sprite ate up proportionally more of the (already narrow) per-slot width
+    // than on desktop, so a multi-enemy formation still overlapped there even after the
+    // desktop-tuned halving.
+    const baseSize = enemy.isBoss ? 160 : enemy.tier === 'elite' ? 120 : 80;
     // 0.7, not a looser fraction like 0.85 - on a wide desktop canvas spacing is already generous
     // enough that this cap rarely engages at all (desktop scaling is untouched), but on a narrow
     // mobile canvas even a 3-regular-enemy row left barely any gap between sprites at a looser
