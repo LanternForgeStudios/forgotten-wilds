@@ -149,7 +149,13 @@ export class CutsceneScene extends Phaser.Scene {
         const def = getAssetDefinition(enemy.spriteAssetId);
         // An idle-animated enemy's `dimensions` is the whole multi-frame sheet, not one frame -
         // same class of bug as BattleScene.ts's own sprite scale (see that file's comment).
-        const targetScale = 96 / (def.frameSize?.width ?? def.dimensions?.width ?? 96);
+        // ARRIVAL_TARGET_SIZE sits between BattleScene's own regular/elite sizes (112/168) - this
+        // cutscene doesn't know an enemy's tier (showEnemyArrivals is only ever passed
+        // spriteAssetId, see CombatScene.tsx's cutscene-store population), so every arrival gets
+        // one flat size rather than a per-tier one. Bumped from an original flat 96, which read as
+        // too small once real art was in - same "still too small" report BattleScene's own size got.
+        const ARRIVAL_TARGET_SIZE = 140;
+        const targetScale = ARRIVAL_TARGET_SIZE / (def.frameSize?.width ?? def.dimensions?.width ?? ARRIVAL_TARGET_SIZE);
         const sprite = this.add
           .sprite(x, y, enemy.spriteAssetId)
           .setDepth(10)
