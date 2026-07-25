@@ -218,9 +218,21 @@ lighting - these are small UI icons, not illustrations, so avoid busy detail tha
 64px (or 32px for currency). Every prompt below already opens with "Simple flat-shaded fantasy
 game icon of..." so it's ready to use as-is - no template filling-in needed.
 
-### Items (22 - 64×64: consumables, materials, key items)
+**Generate at 128×128, not the in-game size** - every icon table below lists a "Final" size (64×64,
+or 32×32 for currency) that's what actually ends up in the registry/in-game, but the source
+generation prompt should target 128×128 regardless. The build/processing step downscales
+128×128 → the Final size for the live asset, and archives the full 128×128 original alongside it
+(same "keep the source, archive it, build the final from it" pattern every other asset category
+in this doc already follows - see e.g. the building-facade pipeline's `original/` folder). The
+point: if the in-game size ever needs to change again later (as already happened once with the
+building facades, 72×72 → 144×144), there's a real 128×128 source to re-resize from instead of
+needing to regenerate the art from scratch. None of these 52 are built yet (all still
+`status: 'placeholder'` in the registry) - this is the spec for whenever that work starts, pixellab
+MCP-generated or otherwise.
 
-| Item | Size | Generation prompt |
+### Items (22 - generate 128×128, final 64×64: consumables, materials, key items)
+
+| Item | Final Size | Generation prompt |
 |---|---|---|
 | Healing Poultice *(shared by all 4 tiers)* | 64×64 | Simple flat-shaded fantasy game icon of a small clay jar of green herbal healing poultice, cloth tied over the top, centered, transparent background. |
 | Spirit Draught *(shared by all 4 tiers)* | 64×64 | Simple flat-shaded fantasy game icon of a corked glass bottle of glowing pale starlight-blue liquid, centered, transparent background. |
@@ -250,9 +262,9 @@ Pristine Spirit Draught, Thin/Superior/Pristine Lantern Oil) all reuse their bas
 above rather than getting a unique one each - only make separate art for those if you want each
 tier to look visually distinct too (not required).
 
-### Ailment status icons (6 - 64×64, combat ailment strip badges)
+### Ailment status icons (6 - generate 128×128, final 64×64, combat ailment strip badges)
 
-| Ailment | Size | Generation prompt |
+| Ailment | Final Size | Generation prompt |
 |---|---|---|
 | Poison | 64×64 | Simple flat-shaded fantasy game icon badge of a sickly-green skull-and-droplet symbol, centered, transparent background. |
 | Burn | 64×64 | Simple flat-shaded fantasy game icon badge of a small orange-red flame symbol, centered, transparent background. |
@@ -261,9 +273,9 @@ tier to look visually distinct too (not required).
 | Blind | 64×64 | Simple flat-shaded fantasy game icon badge of a grey crossed-out eye symbol, centered, transparent background. |
 | Silence | 64×64 | Simple flat-shaded fantasy game icon badge of a muted purple crossed-out sound-wave symbol, centered, transparent background. |
 
-### Equipment (20 - 64×64, across 7 rarity families + 2 unique lanterns)
+### Equipment (20 - generate 128×128, final 64×64, across 7 rarity families + 2 unique lanterns)
 
-| Equipment | Size | Generation prompt |
+| Equipment | Final Size | Generation prompt |
 |---|---|---|
 | Weathered Walking Staff *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain wooden traveling staff worn smooth with age, centered, transparent background. |
 | Ironwood Walking Staff *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a heavier dark-wood staff cut from a single length of ironwood, centered, transparent background. |
@@ -286,9 +298,9 @@ tier to look visually distinct too (not required).
 | Mountain Guardian Totem *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a stone totem carved in the likeness of a great bear guardian, centered, transparent background. |
 | Traveler's Cloak *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain folded wool traveling cloak, centered, transparent background. |
 
-### Currency (4 - 32×32)
+### Currency (4 - generate 128×128, final 32×32)
 
-| Currency | Size | Generation prompt |
+| Currency | Final Size | Generation prompt |
 |---|---|---|
 | Gold | 32×32 | Simple flat-shaded fantasy game icon of a single gold coin, centered, transparent background. |
 | Spirit Essence | 32×32 | Simple flat-shaded fantasy game icon of a small glowing pale-blue spirit-essence orb, centered, transparent background. |

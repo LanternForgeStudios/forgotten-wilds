@@ -68,6 +68,16 @@ NPCS = {
         "crop_box": (24, 7, 112, 125),  # union bbox (50,15)-(86,117) on a 136x136 canvas
         "out_name": "aldren-stone-idle.png",
     },
+    "tessa-ironhand": {
+        "anim_folder": "animating",
+        "crop_box": (26, 9, 112, 125),  # union bbox (51,17)-(87,117) on a 136x136 canvas
+        "out_name": "tessa-ironhand-idle.png",
+    },
+    "willow-briar": {
+        "anim_folder": "animating",
+        "crop_box": (25, 9, 112, 124),  # union bbox (52,17)-(85,116) on a 136x136 canvas
+        "out_name": "willow-briar-idle.png",
+    },
 }
 
 SRC_ROOT = os.path.join("art-staging", "characters")

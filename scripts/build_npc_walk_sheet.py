@@ -36,6 +36,10 @@ WALKING_NPCS = {
         "crop_box": (22, 4, 114, 128),  # union bbox (41,12)-(95,120) on a 136x136 canvas
         "out_name": "nell-ashby-walk.png",
     },
+    "hunter-garrick": {
+        "crop_box": (21, 10, 109, 127),  # union bbox (36,18)-(94,119) on a 136x136 canvas
+        "out_name": "hunter-garrick-walk.png",
+    },
 }
 
 SRC_ROOT = os.path.join("art-staging", "characters")

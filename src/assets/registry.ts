@@ -964,11 +964,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.tessa-ironhand',
     category: 'character',
-    intendedUse: 'Overworld sprite for tessa-ironhand (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/tessa-ironhand.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse: 'Overworld sprite for tessa-ironhand - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape)',
+    filePath: 'sprites/characters/tessa-ironhand-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-tessa-ironhand.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-tessa-ironhand.png.',
+    notes: 'pixellab MCP-generated idle/breathing loop (136x136 source frames, south direction only) via create_character + animate_character, same crop-then-upscale-to-72x96 treatment as every other NPC idle sheet. Build script: scripts/build_npc_idle_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-tessa-ironhand.png; this batch\'s own originals at public/assets/sprites/characters/original/tessa-ironhand/).',
   },
   {
     id: 'portrait.willow-briar',
@@ -982,11 +983,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.willow-briar',
     category: 'character',
-    intendedUse: 'Overworld sprite for willow-briar (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/willow-briar.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse: 'Overworld sprite for willow-briar - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape)',
+    filePath: 'sprites/characters/willow-briar-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-willow-briar.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-willow-briar.png.',
+    notes: 'pixellab MCP-generated idle/breathing loop (136x136 source frames, south direction only) via create_character + animate_character, same crop-then-upscale-to-72x96 treatment as every other NPC idle sheet. Build script: scripts/build_npc_idle_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-willow-briar.png; this batch\'s own originals at public/assets/sprites/characters/original/willow-briar/).',
   },
   {
     id: 'portrait.historian-miriam',
@@ -1036,11 +1038,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.hunter-garrick',
     category: 'character',
-    intendedUse: 'Overworld sprite for hunter-garrick (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/hunter-garrick.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse:
+      "Overworld sprite for hunter-garrick - a wandering NPC (see wanderRadius on his ironwood-trail.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/hunter-garrick-walk.png',
+    dimensions: { width: 288, height: 480 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-hunter-garrick.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-hunter-garrick.png.',
+    notes:
+      "pixellab MCP-generated (create_character + animate_character's breathing-idle and walking-4-frames templates, 136x136 source frames, south/west/north/east directions), one shared crop box across every direction+idle frame, upscaled to 72x96. Build script: scripts/build_npc_walk_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-hunter-garrick.png; this batch's own originals at public/assets/sprites/characters/original/hunter-garrick/).",
   },
   {
     id: 'portrait.spirit-child',
