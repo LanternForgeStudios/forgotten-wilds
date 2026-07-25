@@ -28,14 +28,38 @@ const PLAYER_SKIN_ASSET_IDS = new Set(['sprite.player', 'sprite.player.male', 's
 const DEFAULT_IDLE_FRAME_SIZE = { width: 72, height: 96 };
 const DEFAULT_IDLE_FRAME_COUNT = 4;
 
+/** NPCs whose sprite sheet includes real walk-cycle rows on top of the usual idle row, for an NPC
+ *  that actually moves around (see `wanderRadius` in useWanderingNpcs.ts) rather than standing
+ *  still - every other NPC/enemy still gets the generic idle-only layout below. A small explicit
+ *  set (mirroring PLAYER_SKIN_ASSET_IDS's own pattern) rather than inferring this from the sheet's
+ *  dimensions, since a 5-row idle+walk sheet and a 5-frame idle-only sheet aren't distinguishable
+ *  from `dimensions` alone. */
+const NPC_WALK_ASSET_IDS = new Set(['sprite.npc.nell-ashby']);
+/** Row layout for NPC_WALK_ASSET_IDS sheets: row 0 idle (breathing), rows 1-4 walking by facing -
+ *  a fixed convention (not per-NPC configurable) since the build script that assembles these
+ *  sheets controls the row order and can just always produce it this way. frameDurationMs stays at
+ *  the same 240ms every other NPC's idle loop already uses (one shared value for the whole
+ *  layout - see CharacterAnimationLayout) rather than the player's snappier 120ms, giving a
+ *  town NPC's amble a slower, more ambient pace than the player's own brisk walk. */
+const NPC_WALK_ANIMATION_LAYOUT: CharacterAnimationLayout = {
+  frameSize: { width: 72, height: 96 },
+  rows: {
+    idle: { down: 0, left: 0, up: 0, right: 0 },
+    walking: { down: 1, left: 2, up: 3, right: 4 },
+  },
+  frameCount: 4,
+  frameDurationMs: 240,
+};
+
 /** Which layout applies to a given sprite sheet - the player's own skins (and its generic
- *  fallback) use PLAYER_ANIMATION_LAYOUT's walk/run shape; every other frameSize'd sprite (NPCs,
- *  enemies, and other players' presence entities sharing this same picker via upsertEntity/
- *  BattleScene's createEnemySlot) gets a single-row ambient idle loop (a breathing/fight-stance
- *  sway) instead. Every facing points at the same row: neither NPCs nor enemies ever render with
- *  a real facing today (both are always shown front/down-on), so only 'down' is ever actually
- *  requested in practice, but CharacterAnimationLayout's `rows` type requires all four once a
- *  state is present at all.
+ *  fallback) use PLAYER_ANIMATION_LAYOUT's walk/run shape; a `NPC_WALK_ASSET_IDS` NPC (one that
+ *  actually wanders, see useWanderingNpcs.ts) uses NPC_WALK_ANIMATION_LAYOUT's idle+4-direction-walk
+ *  shape; every other frameSize'd sprite (stationary NPCs, enemies, and other players' presence
+ *  entities sharing this same picker via upsertEntity/BattleScene's createEnemySlot) gets a
+ *  single-row ambient idle loop (a breathing/fight-stance sway) instead. For that stationary case,
+ *  every facing points at the same row - a stationary NPC/enemy never renders with a real facing
+ *  (always shown front/down-on), so only 'down' is ever actually requested in practice, but
+ *  CharacterAnimationLayout's `rows` type requires all four once a state is present at all.
  *
  *  Frame count is derived from the registry's own `dimensions.width / frameSize.width` (a
  *  single-row sheet) rather than a hardcoded constant - the first two idle sheets built
@@ -49,6 +73,7 @@ const DEFAULT_IDLE_FRAME_COUNT = 4;
  *  frame instead of assuming one was defined. */
 export function animationLayoutForSprite(spriteAssetId: string): CharacterAnimationLayout {
   if (PLAYER_SKIN_ASSET_IDS.has(spriteAssetId)) return PLAYER_ANIMATION_LAYOUT;
+  if (NPC_WALK_ASSET_IDS.has(spriteAssetId)) return NPC_WALK_ANIMATION_LAYOUT;
   const def = getAssetDefinition(spriteAssetId);
   const frameSize = def.frameSize ?? DEFAULT_IDLE_FRAME_SIZE;
   const frameCount =

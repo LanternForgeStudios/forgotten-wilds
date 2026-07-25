@@ -53,6 +53,16 @@ NPCS = {
         "crop_box": (71, 52, 179, 195),  # union bbox (91,62)-(159,185) on a 248x248 canvas
         "out_name": "silas-flint-idle.png",
     },
+    "juniper-reed": {
+        # First NPC generated via the pixellab MCP server directly (create_character +
+        # animate_character) instead of the manual pixellab.ai website + zip-export workflow - the
+        # MCP names its own animation-group folder "animating" rather than the website export's
+        # "Breathing_Idle", another instance of "pixellab's own folder naming varies, the script
+        # just maps whatever it is to the game's 'idle' concept" (see this file's own docstring).
+        "anim_folder": "animating",
+        "crop_box": (22, 1, 115, 124),  # union bbox (52,9)-(85,116) on a 136x136 canvas
+        "out_name": "juniper-reed-idle.png",
+    },
 }
 
 SRC_ROOT = os.path.join("art-staging", "characters")

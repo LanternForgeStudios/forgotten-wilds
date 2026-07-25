@@ -274,6 +274,10 @@ export function OverworldScene() {
           spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
           label: npc?.name,
           badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
+          // Only meaningful for a wandering NPC whose sheet actually has walk rows
+          // (NPC_WALK_ASSET_IDS) - see TownScene.tsx's identical wiring for the full explanation.
+          movementState: pos.isMoving ? 'walking' : undefined,
+          facing: pos.facing,
         };
       });
 

@@ -905,11 +905,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.juniper-reed',
     category: 'character',
-    intendedUse: 'Overworld sprite for juniper-reed (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/juniper-reed.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse: 'Overworld sprite for juniper-reed - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape)',
+    filePath: 'sprites/characters/juniper-reed-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-juniper-reed.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-juniper-reed.png.',
+    notes: 'First NPC generated via the pixellab MCP server directly (create_character + animate_character\'s breathing-idle template, 136x136 source frames, south direction only) instead of the manual pixellab.ai website workflow - downloaded as a zip via the MCP\'s download link, same crop-then-upscale-to-72x96 treatment as every other NPC idle sheet. Build script: scripts/build_npc_idle_sheet.py. Replaces the previous static single-frame art (that source is still archived at public/assets/sprites/characters/original/npc-juniper-reed.png; this batch\'s own originals are at public/assets/sprites/characters/original/juniper-reed/).',
   },
   {
     id: 'portrait.nell-ashby',

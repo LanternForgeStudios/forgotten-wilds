@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import type { TileMap } from '@/types';
-import type { GridPosition } from '@/hooks/useGridMovement';
+import type { Facing, GridPosition } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
 import { ExplorationScene } from '@/phaser/ExplorationScene';
 
@@ -12,12 +12,17 @@ export interface GridEntity {
   spriteAssetId: string;
   label?: string;
   /** Which row of the sprite sheet to show (a direction/state row) - only meaningful when the
-   *  asset's registry entry has a `frameSize` (e.g. the player sheet). No NPC/enemy asset has one
-   *  yet, so this is inert for them today. */
+   *  asset's registry entry has a `frameSize` and no dedicated idle/walking animation row exists
+   *  for the current movementState (the static-frame fallback branch in upsertEntity). */
   frameRow?: number;
   /** Static column to show when not animating (e.g. a resting pose) - defaults to 0. */
   frameColumn?: number;
   movementState?: MovementState;
+  /** Which direction to face while playing a walking/running animation - only meaningful together
+   *  with movementState 'walking'/'running' on a sheet that actually has directional walk rows
+   *  (see NPC_WALK_ASSET_IDS in characterAnimations.ts). Defaults to 'down' when omitted, matching
+   *  every entity's behavior before this field existed. */
+  facing?: Facing;
   /** Small overlay shown above the entity's label (e.g. "!" for an NPC with unheard dialogue). */
   badge?: string;
   /** Multiplier on top of ExplorationScene's normal viewport-relative scale (see

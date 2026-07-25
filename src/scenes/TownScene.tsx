@@ -243,6 +243,11 @@ export function TownScene() {
           spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
           label: npc?.name,
           badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
+          // Only meaningful for a wandering NPC whose sheet actually has walk rows
+          // (NPC_WALK_ASSET_IDS) - upsertEntity/animationLayoutForSprite fall back to idle/static
+          // for everyone else regardless of what's passed here.
+          movementState: pos.isMoving ? 'walking' : undefined,
+          facing: pos.facing,
         };
       });
 

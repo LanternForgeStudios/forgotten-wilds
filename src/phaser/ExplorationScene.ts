@@ -440,11 +440,11 @@ export class ExplorationScene extends Phaser.Scene {
       const column = entity.frameColumn ?? 0;
       const layout = animationLayoutForSprite(entity.spriteAssetId);
       if (entity.movementState === 'walking' || entity.movementState === 'running') {
-        // Not exercised by any entity yet (only the player has a frameSize sheet today), but
-        // wired the same way as setPlayer for when an NPC/enemy gets one. Same isPlaying check as
-        // setPlayer's own fix - see that call site's comment for why currentAnim alone isn't
-        // enough.
-        const key = animationKey(entity.spriteAssetId, entity.movementState, 'down');
+        // Mirrors setPlayer's own walking/running branch, including its facing param (a wandering
+        // NPC is the first non-player entity to actually exercise this - see NPC_WALK_ASSET_IDS in
+        // characterAnimations.ts). Same isPlaying check as setPlayer's own fix - see that call
+        // site's comment for why currentAnim alone isn't enough.
+        const key = animationKey(entity.spriteAssetId, entity.movementState, entity.facing ?? 'down');
         if (this.anims.exists(key) && (!visual.sprite.anims.isPlaying || visual.sprite.anims.currentAnim?.key !== key)) {
           visual.sprite.play(key);
         }
