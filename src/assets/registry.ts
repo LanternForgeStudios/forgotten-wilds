@@ -1929,17 +1929,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: "Overworld building-facade marker for Elias Rowan's house door in Ash Hallow",
     filePath: 'sprites/structures/house.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'Painted building facade, cropped/resized from a staged 1024x1024 render (art-staging/icons/elias-rowan-home.png, real alpha with a soft vignette fade - no croppable padding, used near full-canvas) via scripts/build_structure_icon.py (crop to content bbox, pad to square, LANCZOS resize to 72x72). Original archived to public/assets/sprites/structures/original/.',
+      'Painted building facade, cropped/resized from a staged 1024x1024 render (art-staging/icons/elias-rowan-home.png, real alpha with a soft vignette fade - no croppable padding, used near full-canvas) via scripts/build_structure_icon.py (crop to content bbox, pad to square, LANCZOS resize to 144x144). Authored at 144x144 (bumped from an original 72x72 once seen live on the map and read as too small) - renders at exactly 96x96 on mobile automatically via ExplorationScene.ts\'s viewport-scale ratio (2/3), no separate mobile asset needed. Original archived to public/assets/sprites/structures/original/.',
   },
   {
     id: 'structure.shop',
     category: 'structure',
     intendedUse: "Overworld building-facade marker for Mara Ash's general store door in Ash Hallow",
     filePath: 'sprites/structures/shop.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Painted building facade, cropped/resized from a staged 1254x1254 render (art-staging/icons/shop-mara-ash.png, baked-in near-white background removed via a gray+brightness heuristic) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
@@ -1949,7 +1949,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: 'Overworld building-facade marker for the Ash Hallow Inn door',
     filePath: 'sprites/structures/inn.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Painted building facade, cropped/resized from a staged 1254x1254 render (art-staging/icons/inn-ash-hallow.png, baked-in near-white background removed via a gray+brightness heuristic) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
@@ -1959,7 +1959,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: 'Overworld building-facade marker for the Ash Hallow Forge door',
     filePath: 'sprites/structures/blacksmith.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Painted building facade, cropped/resized from a staged 1254x1254 render (art-staging/icons/blacksmith-ash-hallow-forge.png, baked-in near-white background removed via a gray+brightness heuristic) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
@@ -1969,7 +1969,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: "Overworld building-facade marker for Willow's Apothecary door in Ash Hallow",
     filePath: 'sprites/structures/apothecary.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Painted building facade, cropped/resized from a staged 1254x1254 render (art-staging/icons/apothecary-willows.png, baked-in near-white background removed via a gray+brightness heuristic) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
@@ -1979,7 +1979,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: 'Overworld building-facade marker for the Ash Hallow Armory door',
     filePath: 'sprites/structures/armory.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Painted building facade, cropped/resized from a staged 1254x1254 render (art-staging/icons/armory-ash-hallow.png, baked-in near-white background removed via a gray+brightness heuristic) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
@@ -1989,7 +1989,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: 'Overworld building-facade marker for the Ash Hallow Archive door',
     filePath: 'sprites/structures/archive.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Painted building facade, cropped/resized from a staged 1024x1024 render (art-staging/icons/archive-ash-hallow.png, real alpha, no background removal needed) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
@@ -1999,7 +1999,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: 'Overworld building-facade marker for the Ash Hallow Mine Office door',
     filePath: 'sprites/structures/mine-office.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Painted building facade, cropped/resized from a staged 1254x1254 render (art-staging/icons/mine-office-ash-hallow.png, baked-in near-white background removed via a gray+brightness heuristic) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
@@ -2009,7 +2009,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: 'Overworld building-facade marker for Ash Hallow Town Hall door',
     filePath: 'sprites/structures/town-hall.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Painted building facade, cropped/resized from a staged 1024x1024 render (art-staging/icons/town-hall-ash-hallow.png, real alpha, no background removal needed) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
@@ -2019,7 +2019,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'structure',
     intendedUse: 'Marker for shrine/landmark interactables in overworld locations (e.g. Spirit Grove)',
     filePath: 'sprites/structures/shrine.png',
-    dimensions: { width: 72, height: 72 },
+    dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
       "Weathered stone shrine, cropped/resized from a staged 1024x1024 render (art-staging/icons/shrine.png, real alpha, no background removal needed) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",

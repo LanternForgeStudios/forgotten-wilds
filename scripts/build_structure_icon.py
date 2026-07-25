@@ -1,26 +1,32 @@
 """Build the 10 building-facade/shrine icons from staged painterly renders
-(art-staging/icons/*.png, ~1024-1254px square) into the 72x72 structure.* registry assets.
+(art-staging/icons/*.png, ~1024-1254px square) into the structure.* registry assets, authored at
+TARGET_SIZE (the desktop-reference pixel size - see ExplorationScene.ts's REFERENCE_VIEWPORT_SCALE
+doc comment for why mobile needs no separate asset: mobile's viewport scale is exactly 2/3 of
+desktop's, so a 144x144 desktop asset already renders at exactly 96x96 on mobile automatically).
 
 Two source styles are mixed in this staged batch: 4 files already have real PNG alpha
 (archive/elias-rowan-home/shrine/town-hall), the other 6 instead have a baked-in near-white/gray
 background from whatever export pipeline produced them - those get an alpha punched in first via
 a gray+bright per-pixel heuristic (not a fixed color match, since the near-white tone/gradient
 varied slightly per file). Every file is then: crop to its content bbox, padded to a square
-(centered, transparent fill) so the resize doesn't distort, then resized to 72x72.
+(centered, transparent fill) so the resize doesn't distort, then resized to TARGET_SIZE.
 
 LANCZOS (not NEAREST) is used for the resize deliberately - unlike this project's pixel-art
 character/enemy sprites, these are painterly high-res renders being downsampled, where a smooth
 filter avoids aliasing instead of preserving crisp pixel edges.
 
-The entire staged icons folder is archived as-is (per-file, since these aren't multi-file
-rotation/animation sets like the character scripts) before being removed from staging.
+Re-runnable against the archive: once art-staging/icons/ is cleared, the source falls back to the
+already-archived original in public/assets/sprites/structures/original/ (re-run this script with a
+new TARGET_SIZE any time the target dimensions change, as happened once already - 72x72 to 144x144
+after the buildings read as too small once seen live on the map). Archiving/removal only happens
+when the source actually came from staging, never when re-processing from the archive itself.
 """
 
 import os
 import shutil
 from PIL import Image
 
-# filename in art-staging/icons/ -> (registry slug, needs baked-in-background removal)
+# filename -> (registry slug, needs baked-in-background removal)
 STRUCTURES = {
     "apothecary-willows.png": ("apothecary", True),
     "archive-ash-hallow.png": ("archive", False),
@@ -34,7 +40,7 @@ STRUCTURES = {
     "town-hall-ash-hallow.png": ("town-hall", False),
 }
 
-TARGET_SIZE = (72, 72)
+TARGET_SIZE = (144, 144)
 SRC_DIR = os.path.join("art-staging", "icons")
 ORIGINALS_ROOT = os.path.join("public", "assets", "sprites", "structures", "original")
 OUT_DIR = os.path.join("public", "assets", "sprites", "structures")
@@ -74,9 +80,12 @@ os.makedirs(OUT_DIR, exist_ok=True)
 os.makedirs(ORIGINALS_ROOT, exist_ok=True)
 
 for fname, (slug, needs_bg_removal) in STRUCTURES.items():
-    src_path = os.path.join(SRC_DIR, fname)
+    staged_path = os.path.join(SRC_DIR, fname)
+    archive_path = os.path.join(ORIGINALS_ROOT, fname)
+    from_staging = os.path.exists(staged_path)
+    src_path = staged_path if from_staging else archive_path
     if not os.path.exists(src_path):
-        print(f"skipping {slug}: no staged {fname} found")
+        print(f"skipping {slug}: no staged or archived {fname} found")
         continue
 
     im = Image.open(src_path)
@@ -93,8 +102,8 @@ for fname, (slug, needs_bg_removal) in STRUCTURES.items():
     print(f"{slug}: {im.size} -> squared {squared.size} -> {TARGET_SIZE} -> {out_path} "
           f"({os.path.getsize(out_path) / 1024:.1f}KB)")
 
-    archive_path = os.path.join(ORIGINALS_ROOT, fname)
-    if not os.path.exists(archive_path):
-        shutil.copy2(src_path, archive_path)
-    os.remove(src_path)
-    print(f"  archived source to {archive_path}, removed from staging")
+    if from_staging:
+        if not os.path.exists(archive_path):
+            shutil.copy2(src_path, archive_path)
+        os.remove(src_path)
+        print(f"  archived source to {archive_path}, removed from staging")
