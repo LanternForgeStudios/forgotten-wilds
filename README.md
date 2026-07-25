@@ -142,9 +142,16 @@ sign-in inputs, Character Creation's name field) — see `src/utils/browserLockd
   Normal linear play is unaffected either way.
 - Vitest covers the pure combat/quest/equipment engine functions (`functions/src/engine/*.test.ts`)
   but not the Cloud Functions themselves (Firestore transactions) or any client code yet.
-- The player has a real 4-direction walk/run sprite sheet (still a placeholder piece of art per
-  `public/CREDITS.md`, but animated in-game). Most NPCs are still single-frame placeholders — a
-  few (Elias Rowan, Finn Rowan, Mara Ash) now have real single-frame art, the rest swap the same
-  way — via `src/assets/registry.ts`, no code changes needed for either. All 14 dialogue portraits
-  now have real art too (`public/assets/portraits/`, originals archived alongside under
-  `original/`).
+- The player has a real, pixellab.ai-generated 4-direction walk+run sprite sheet for both skins
+  (`sprite.player.male`/`.female`), and all 14 NPC overworld sprites and all 14 dialogue portraits
+  now have real art too (`src/assets/registry.ts`; originals archived under each asset folder's own
+  `original/`). A few NPCs (Elias Rowan, Finn Rowan) also have a real ambient idle animation
+  instead of a static frame - a new, opt-in-per-NPC capability
+  (`animationLayoutForSprite` in `src/animation/characterAnimations.ts`); an NPC with no idle sheet
+  just keeps showing its static frame. Enemies can use the same idle-animation mechanism for a
+  "fight stance" loop, shown both in battle and as their overworld field-encounter icon - 4 of 13
+  enemies (Mothling, Greater Mothling, Restless Miner, Foreman Wraith) have one; the rest are still
+  placeholder SVGs. See `docs/Asset-Production-Checklist.md` for exactly what's done vs. remaining
+  across every asset category, and the `scripts/build_*.py` pipelines used to process a new
+  pixellab.ai export (stage it under `art-staging/characters/` for players/NPCs or
+  `art-staging/enemies/` for enemies).
