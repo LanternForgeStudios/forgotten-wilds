@@ -79,7 +79,7 @@ Originals archived at `public/assets/sprites/characters/original/`; resize/optim
 `sprite.npc.large` (the one deliberately-bigger NPC tier, for anyone who should read as more
 imposing than a regular human) becomes **96×120** proportionally - not used by any location yet.
 
-### NPC idle animations (new capability - 2 of 14 done)
+### NPC idle animations (new capability - 4 of 14 done)
 
 Stationary NPCs can now have a real ambient idle loop instead of a single static frame -
 `animationLayoutForSprite` in `src/animation/characterAnimations.ts` (a single row, 72×96 per
@@ -92,16 +92,18 @@ south-facing idle loop is needed - no other directions. Frame count is derived f
 been 4 frames, but this isn't hardcoded (the enemy battle-idle sheets below turned out to be 8, and
 frame count "just working" either way is why).
 
-**Done**: Elias Rowan, Finn Rowan - both built from a pixellab.ai animation export (south-facing
-frames only), same crop-then-upscale-to-72×96 treatment as the player sheets. Build/re-run
-pipeline: `scripts/build_npc_idle_sheet.py`. Note pixellab's own export folder was named
-"Breathing_Idle" for both - the game only ever calls this concept **idle**
+**Done**: Elias Rowan, Finn Rowan, Mara Ash, Silas Flint - all four built from a pixellab.ai
+animation export (south-facing frames only), same crop-then-upscale-to-72×96 treatment as the
+player sheets. Mara Ash and Silas Flint replace their earlier single-frame static art (that source
+is still archived at `public/assets/sprites/characters/original/npc-{mara-ash,silas-flint}.png`).
+Build/re-run pipeline: `scripts/build_npc_idle_sheet.py`. Note pixellab's own export folder was
+named "Breathing_Idle" for all four - the game only ever calls this concept **idle**
 (`MovementState`/`animationLayoutForSprite`), so name future idle-animation folders/exports
 however's convenient on the pixellab side; the script maps whatever folder name to the game's
 "idle" concept. Originals archived at
-`public/assets/sprites/characters/original/{elias-rowan,finn-rowan}/`.
+`public/assets/sprites/characters/original/{elias-rowan,finn-rowan,mara-ash,silas-flint}/`.
 
-**Remaining (13)**: every other NPC still shows a single static frame - add an idle loop for any of
+**Remaining (11)**: every other NPC still shows a single static frame - add an idle loop for any of
 them the same way, whenever art for it exists.
 
 ## Player sprite - both skins done (4-direction walk + run animation)
@@ -121,7 +123,7 @@ already-built sheet). Originals archived under
 pixellab's export also included 8-directional "rotations" (NE/E/SE/S/SW/W/NW) for both skins - not
 used, since this game's movement only supports 4 cardinal facings today.
 
-## Enemies (12 regular + 1 boss - battle sprites) - 4 of 13 done
+## Enemies (12 regular + 1 boss - battle sprites) - all 13 done
 
 **Spec, regular tier (12)**: 128×128 PNG, transparent background, front-facing "battle stance" pose
 (this is what's shown in the combat screen, not an overworld sprite - it's also reused directly as
@@ -139,11 +141,15 @@ a new enemy's pixellab export under `art-staging/enemies/{slug}/` (the four done
 staged under `art-staging/characters/` before enemies got their own folder - the build script
 checks both locations). Build script: `scripts/build_enemy_idle_sheet.py`.
 
-**Done**: Mothling, Greater Mothling, Restless Miner, Foreman Wraith - all four built from a
-pixellab.ai `Fight_Stance_Idle` animation export (only the south/front-facing set is used, cropped
-to just the creature/figure per-enemy before upscaling to 128×128 - skipping the crop would have
-rendered them far smaller than intended, since `BattleScene.ts` sizes an animated sprite off its
-own frame size). Full pixellab exports (including the unused 8-directional rotations) archived at
+**Done**: all 13 - Mothling, Greater Mothling, Restless Miner, Foreman Wraith, Coal Spirit, Coal
+Wraith, Cliff Wolf, Ridge Hawk, Pool Wisp, Falls Siren, Briar Wraith, Cemetery Shade, The
+Coalbound Warden (boss, 256×256) - all built from a pixellab.ai idle animation export (only the
+south/front-facing set is used, cropped to just the creature/figure per-enemy before upscaling to
+128×128/256×256 - skipping the crop would have rendered them far smaller than intended, since
+`BattleScene.ts` sizes an animated sprite off its own frame size). Cliff Wolf's export used a plain
+`Idle` folder rather than `Fight_Stance_Idle` like every other enemy - the build script
+auto-detects the animation folder name rather than assuming it, since pixellab's own naming isn't
+consistent. Full pixellab exports (including the unused 8-directional rotations) archived at
 `public/assets/sprites/enemies/original/{slug}/`.
 
 Note: these are **not** scaled by the player-proportion rule above - they serve double duty (an

@@ -26,7 +26,10 @@ FRAME_SIZE = (72, 96)
 # hand against that NPC's own union content-bbox - see this script's session notes), and the
 # output filename. Frame count is however many frame_NNN.png files are actually staged (all NPC
 # idle loops so far happen to be 4, but this isn't assumed - see build_enemy_idle_sheet.py, whose
-# enemies came in at 8).
+# enemies came in at 8). "staged_folder" is optional - only needed when the staged directory name
+# doesn't match the slug (pixellab's default export name is the full generation prompt, e.g.
+# "Mara_Ash_NPC_General_Store_Owner_Middle-aged") - renaming to match the slug is the usual
+# convention but isn't required if a Windows permission lock on a freshly staged folder blocks it.
 NPCS = {
     "elias-rowan": {
         "anim_folder": "Breathing_Idle",
@@ -38,6 +41,18 @@ NPCS = {
         "crop_box": (32, 22, 92, 102),  # union bbox (48,31)-(74,93) on a 124x124 canvas
         "out_name": "finn-rowan-idle.png",
     },
+    "mara-ash": {
+        "staged_folder": "Mara_Ash_NPC_General_Store_Owner_Middle-aged",
+        "anim_folder": "Breathing_Idle",
+        "crop_box": (70, 50, 177, 192),  # union bbox (97,60)-(150,182) on a 248x248 canvas
+        "out_name": "mara-ash-idle.png",
+    },
+    "silas-flint": {
+        "staged_folder": "Silas_Flint_NPC_Mine_Office_Foreman_Stocky",
+        "anim_folder": "Breathing_Idle",
+        "crop_box": (71, 52, 179, 195),  # union bbox (91,62)-(159,185) on a 248x248 canvas
+        "out_name": "silas-flint-idle.png",
+    },
 }
 
 SRC_ROOT = os.path.join("art-staging", "characters")
@@ -45,7 +60,7 @@ OUT_DIR = os.path.join("public", "assets", "sprites", "characters")
 ORIGINALS_ROOT = os.path.join(OUT_DIR, "original")
 
 for slug, cfg in NPCS.items():
-    staging_dir = os.path.join(SRC_ROOT, slug)
+    staging_dir = os.path.join(SRC_ROOT, cfg.get("staged_folder", slug))
     src_dir = os.path.join(staging_dir, "animations", cfg["anim_folder"], "south")
     if not os.path.isdir(src_dir):
         print(f"skipping {slug}: no staged {cfg['anim_folder']}/south frames found")
