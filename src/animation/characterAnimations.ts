@@ -34,7 +34,12 @@ const DEFAULT_IDLE_FRAME_COUNT = 4;
  *  set (mirroring PLAYER_SKIN_ASSET_IDS's own pattern) rather than inferring this from the sheet's
  *  dimensions, since a 5-row idle+walk sheet and a 5-frame idle-only sheet aren't distinguishable
  *  from `dimensions` alone. */
-const NPC_WALK_ASSET_IDS = new Set(['sprite.npc.nell-ashby']);
+const NPC_WALK_ASSET_IDS = new Set([
+  'sprite.npc.nell-ashby',
+  'sprite.npc.hunter-garrick',
+  'sprite.npc.spirit-child',
+  'sprite.npc.ranger-caleb',
+]);
 /** Row layout for NPC_WALK_ASSET_IDS sheets: row 0 idle (breathing), rows 1-4 walking by facing -
  *  a fixed convention (not per-NPC configurable) since the build script that assembles these
  *  sheets controls the row order and can just always produce it this way. frameDurationMs stays at

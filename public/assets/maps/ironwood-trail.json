@@ -267,6 +267,11 @@
                          "name":"refId",
                          "type":"string",
                          "value":"hunter-garrick"
+                        },
+                        {
+                         "name":"wanderRadius",
+                         "type":"int",
+                         "value":2
                         }],
                  "rotation":0,
                  "type":"npc",
@@ -303,6 +308,11 @@
                          "name":"refId",
                          "type":"string",
                          "value":"spirit-child"
+                        },
+                        {
+                         "name":"wanderRadius",
+                         "type":"int",
+                         "value":2
                         }],
                  "rotation":0,
                  "type":"npc",
