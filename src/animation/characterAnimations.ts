@@ -1,4 +1,5 @@
 import type { Facing } from '@/hooks/useGridMovement';
+import { getAssetDefinition } from '@/assets/assetManager';
 
 export type MovementState = 'idle' | 'walking' | 'running';
 
@@ -23,34 +24,41 @@ export const PLAYER_ANIMATION_LAYOUT: CharacterAnimationLayout = {
   frameDurationMs: 120,
 };
 
-/** Single-row ambient idle loop (a breathing/sway cycle) for a stationary entity - NPCs today, and
- *  potentially overworld enemy field-icons later (see useFieldEncounters.ts). Distinct from
- *  PLAYER_ANIMATION_LAYOUT, which has no idle row of its own (the player is always either walking,
- *  running, or pinned to a fixed standing frame - see resolveDisplayRow). Every facing points at
- *  the same single row: NPCs always render facing 'down' today (see ExplorationScene.ts's
- *  upsertEntity, which hardcodes that), so only 'down' is ever actually requested in practice, but
- *  CharacterAnimationLayout's `rows` type requires all four facings once a state is present at
- *  all. Not every NPC/enemy sheet actually has an idle row of its own - callers must check
- *  `anims.exists(...)` before playing (see upsertEntity) and fall back to a static frame instead of
- *  assuming one was defined. */
-export const IDLE_ANIMATION_LAYOUT: CharacterAnimationLayout = {
-  frameSize: { width: 72, height: 96 },
-  rows: {
-    idle: { down: 0, left: 0, up: 0, right: 0 },
-  },
-  frameCount: 4,
-  frameDurationMs: 240,
-};
-
 const PLAYER_SKIN_ASSET_IDS = new Set(['sprite.player', 'sprite.player.male', 'sprite.player.female']);
+const DEFAULT_IDLE_FRAME_SIZE = { width: 72, height: 96 };
+const DEFAULT_IDLE_FRAME_COUNT = 4;
 
 /** Which layout applies to a given sprite sheet - the player's own skins (and its generic
  *  fallback) use PLAYER_ANIMATION_LAYOUT's walk/run shape; every other frameSize'd sprite (NPCs,
- *  and other players' presence entities sharing this same picker via upsertEntity) uses the
- *  idle-only shape instead. A per-asset lookup rather than a hardcoded constant, so ExplorationScene
- *  doesn't have to guess which shape a given entity's sheet actually has. */
+ *  enemies, and other players' presence entities sharing this same picker via upsertEntity/
+ *  BattleScene's createEnemySlot) gets a single-row ambient idle loop (a breathing/fight-stance
+ *  sway) instead. Every facing points at the same row: neither NPCs nor enemies ever render with
+ *  a real facing today (both are always shown front/down-on), so only 'down' is ever actually
+ *  requested in practice, but CharacterAnimationLayout's `rows` type requires all four once a
+ *  state is present at all.
+ *
+ *  Frame count is derived from the registry's own `dimensions.width / frameSize.width` (a
+ *  single-row sheet) rather than a hardcoded constant - the first two idle sheets built
+ *  (Elias Rowan, Finn Rowan) happened to both be 4 frames, but the enemy idle sheets that followed
+ *  (Mothling, Greater Mothling, Restless Miner) are 8 frames, and hardcoding 4 would have read
+ *  frames past the end of their texture. Falls back to a 4-frame default for a sprite with no
+ *  frameSize at all (shouldn't normally be asked for a layout, but keeps this total either way).
+ *
+ *  Not every NPC/enemy sheet actually has an idle row of its own - callers must check
+ *  `anims.exists(...)` before playing (see upsertEntity/createEnemySlot) and fall back to a static
+ *  frame instead of assuming one was defined. */
 export function animationLayoutForSprite(spriteAssetId: string): CharacterAnimationLayout {
-  return PLAYER_SKIN_ASSET_IDS.has(spriteAssetId) ? PLAYER_ANIMATION_LAYOUT : IDLE_ANIMATION_LAYOUT;
+  if (PLAYER_SKIN_ASSET_IDS.has(spriteAssetId)) return PLAYER_ANIMATION_LAYOUT;
+  const def = getAssetDefinition(spriteAssetId);
+  const frameSize = def.frameSize ?? DEFAULT_IDLE_FRAME_SIZE;
+  const frameCount =
+    def.dimensions && frameSize.width > 0 ? Math.max(1, Math.round(def.dimensions.width / frameSize.width)) : DEFAULT_IDLE_FRAME_COUNT;
+  return {
+    frameSize,
+    rows: { idle: { down: 0, left: 0, up: 0, right: 0 } },
+    frameCount,
+    frameDurationMs: 240,
+  };
 }
 
 /** Which sheet row to render for a given state/facing, or null when the sheet has no row for that

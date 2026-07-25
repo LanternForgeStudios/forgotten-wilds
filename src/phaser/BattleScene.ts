@@ -1,9 +1,11 @@
 import Phaser from 'phaser';
 import { getAssetDefinition } from '@/assets/assetManager';
 import { AILMENT_TINT_HEX } from '@/utils/ailmentTint';
+import { animationLayoutForSprite } from '@/animation/characterAnimations';
 import type { DamageType } from '@/types';
 import { splitFormation } from './battleFormation';
 import { loadSceneTexture } from './textureLoader';
+import { createCharacterAnimations, animationKey } from './animationDefs';
 import {
   COLOR_DAMAGE,
   COLOR_DEFENDED,
@@ -179,7 +181,11 @@ export class BattleScene extends Phaser.Scene {
     // mobile canvas even a 3-regular-enemy row left barely any gap between sprites at a looser
     // factor, which is exactly the "still too large on mobile" report this exists to fix.
     const cappedSize = Math.min(baseSize, spacing * 0.7);
-    const spriteScale = (cappedSize / (def.dimensions?.width ?? cappedSize)) * scale;
+    // A frameSize'd (animated) enemy's `dimensions` is the *whole sheet*, not one frame - scaling
+    // off that would render it roughly frameCount-times too small. Scale off frameSize instead so
+    // an idle-animated enemy renders at the same on-screen size a plain static sprite would.
+    const nativeWidth = def.frameSize?.width ?? def.dimensions?.width ?? cappedSize;
+    const spriteScale = (cappedSize / nativeWidth) * scale;
 
     const sprite = this.add
       .sprite(x, y, enemy.spriteAssetId)
@@ -188,6 +194,15 @@ export class BattleScene extends Phaser.Scene {
       .setDepth(10)
       .setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onTargetEnemy?.(enemy.index));
+
+    // Ambient idle/fight-stance sway, mirroring ExplorationScene.ts's upsertEntity - most enemies
+    // don't have one yet, in which case this is a no-op and the sprite just shows its single
+    // static frame exactly as before (Phaser defaults to frame 0 with no animation playing).
+    if (def.frameSize) {
+      createCharacterAnimations(this.anims, enemy.spriteAssetId, animationLayoutForSprite(enemy.spriteAssetId));
+      const idleKey = animationKey(enemy.spriteAssetId, 'idle', 'down');
+      if (this.anims.exists(idleKey)) sprite.play(idleKey);
+    }
 
     const hpTrackWidth = Math.min(160, cappedSize * 1.25) * scale;
     // HP bar sits directly under the sprite's own rendered bounds, matching CSS's ".enemyBar" which

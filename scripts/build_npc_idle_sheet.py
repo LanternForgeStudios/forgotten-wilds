@@ -21,16 +21,22 @@ import shutil
 from PIL import Image
 
 FRAME_SIZE = (72, 96)
-FRAME_COUNT = 4
 
 # Per-NPC: which pixellab animation folder holds the idle frames, the fixed crop box (measured by
 # hand against that NPC's own union content-bbox - see this script's session notes), and the
-# output filename.
+# output filename. Frame count is however many frame_NNN.png files are actually staged (all NPC
+# idle loops so far happen to be 4, but this isn't assumed - see build_enemy_idle_sheet.py, whose
+# enemies came in at 8).
 NPCS = {
     "elias-rowan": {
         "anim_folder": "Breathing_Idle",
         "crop_box": (32, 22, 92, 102),  # union bbox (45,29)-(79,92) on a 124x124 canvas
         "out_name": "elias-rowan-idle.png",
+    },
+    "finn-rowan": {
+        "anim_folder": "Breathing_Idle",
+        "crop_box": (32, 22, 92, 102),  # union bbox (48,31)-(74,93) on a 124x124 canvas
+        "out_name": "finn-rowan-idle.png",
     },
 }
 
@@ -45,15 +51,15 @@ for slug, cfg in NPCS.items():
         print(f"skipping {slug}: no staged {cfg['anim_folder']}/south frames found")
         continue
     crop_box = cfg["crop_box"]
+    frame_files = sorted(f for f in os.listdir(src_dir) if f.startswith("frame_") and f.endswith(".png"))
 
     frames = []
-    for i in range(FRAME_COUNT):
-        src_path = os.path.join(src_dir, f"frame_{i:03d}.png")
-        im = Image.open(src_path).convert("RGBA")
+    for fname in frame_files:
+        im = Image.open(os.path.join(src_dir, fname)).convert("RGBA")
         cropped = im.crop(crop_box)
         frames.append(cropped.resize(FRAME_SIZE, Image.NEAREST))
 
-    sheet = Image.new("RGBA", (FRAME_SIZE[0] * FRAME_COUNT, FRAME_SIZE[1]), (0, 0, 0, 0))
+    sheet = Image.new("RGBA", (FRAME_SIZE[0] * len(frames), FRAME_SIZE[1]), (0, 0, 0, 0))
     for i, frame in enumerate(frames):
         sheet.paste(frame, (i * FRAME_SIZE[0], 0))
 
