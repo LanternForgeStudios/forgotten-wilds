@@ -40,6 +40,14 @@ WALKING_NPCS = {
         "crop_box": (21, 10, 109, 127),  # union bbox (36,18)-(94,119) on a 136x136 canvas
         "out_name": "hunter-garrick-walk.png",
     },
+    "spirit-child": {
+        "crop_box": (23, 8, 113, 127),  # union bbox (41,16)-(95,119) on a 136x136 canvas
+        "out_name": "spirit-child-walk.png",
+    },
+    "ranger-caleb": {
+        "crop_box": (23, 6, 113, 127),  # union bbox (42,14)-(94,119) on a 136x136 canvas
+        "out_name": "ranger-caleb-walk.png",
+    },
 }
 
 SRC_ROOT = os.path.join("art-staging", "characters")

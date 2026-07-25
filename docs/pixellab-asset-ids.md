@@ -17,7 +17,7 @@ manual-workflow phase) but are the same account and just as targetable for a fut
 | Registry id | Name | pixellab character_id | Generated via |
 |---|---|---|---|
 | `sprite.npc.elias-rowan` | Elias Rowan | `9c51e8c3-e997-4525-a26c-7bb15a16266a` | website (pre-MCP) |
-| `sprite.npc.finn-rowan` | Finn Rowan | `19a7f47e-d106-4aa9-b1e6-aff646857fbd` | website (pre-MCP) |
+| `sprite.npc.finn-rowan` | Finn Rowan | `e8bd959b-4c16-473c-92a8-01474ffae07f` (regenerated via MCP - the original `19a7f47e...` didn't match the newer MCP-generated NPCs' consistent style; first regen attempt `a0458c7f...` failed - server load) | MCP |
 | `sprite.npc.mara-ash` | Mara Ash | `4e7b01ac-e5cb-4320-ba22-0878d62f8aee` | website (pre-MCP) |
 | `sprite.npc.silas-flint` | Silas Flint | `2e105e5b-ae0e-4f36-907c-2dc8346d74fd` | website (pre-MCP) |
 | `sprite.npc.juniper-reed` | Juniper Reed | `f64ce8c3-11de-494e-ac88-36dfdc532edd` | MCP |
@@ -30,8 +30,9 @@ manual-workflow phase) but are the same account and just as targetable for a fut
 | `sprite.player.male` | Male player skin | `97fdbc5d-841b-483e-9fa8-0f287dc630a8` | website (pre-MCP) |
 | `sprite.player.female` | Female player skin | `ec7ecd8c-2ec8-4fb7-a16c-62924606dcc5` | website (pre-MCP) |
 
-Not yet built (no static art or idle sheet exists to have generated a pixellab entry for): Historian
-Miriam, Mayor Eleanor Ashcroft, Ranger Caleb.
+| `sprite.npc.ranger-caleb` | Ranger Caleb | `78831885-de76-447f-a776-79d2fc54fe7f` | MCP |
+| `sprite.npc.historian-miriam` | Historian Miriam | `808a6c9f-b361-4cf1-8ade-a1b7db0c05b6` (first attempt `e36323eb...` failed - server load) | MCP |
+| `sprite.npc.mayor-eleanor-ashcroft` | Mayor Eleanor Ashcroft | `821b4aef-10e6-4cbc-8f83-5f974861bd54` (first attempt `931c7421...` failed - server load) | MCP |
 
 ## Characters (enemies)
 

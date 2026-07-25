@@ -79,32 +79,50 @@ Originals archived at `public/assets/sprites/characters/original/`; resize/optim
 `sprite.npc.large` (the one deliberately-bigger NPC tier, for anyone who should read as more
 imposing than a regular human) becomes **96×120** proportionally - not used by any location yet.
 
-### NPC idle animations (new capability - 4 of 14 done)
+### NPC idle animations (new capability - all 14 done)
 
 Stationary NPCs can now have a real ambient idle loop instead of a single static frame -
 `animationLayoutForSprite` in `src/animation/characterAnimations.ts` (a single row, 72×96 per
 frame), rendered by `ExplorationScene.ts`'s `upsertEntity`. **Not every NPC needs one** - an NPC
 with no idle sheet just keeps showing its plain static frame exactly as before (the code checks
 `anims.exists(...)` before ever trying to play one, so there's no risk of a broken animation call
-for an NPC that doesn't have this). NPCs always render facing south/down today, so only a
-south-facing idle loop is needed - no other directions. Frame count is derived from the sheet's own
-`dimensions.width / frameSize.width` rather than assumed - NPC idle loops staged so far have all
-been 4 frames, but this isn't hardcoded (the enemy battle-idle sheets below turned out to be 8, and
-frame count "just working" either way is why).
+for an NPC that doesn't have this). NPCs always render facing south/down today when stationary, so
+only a south-facing idle loop is needed for them - no other directions. Frame count is derived from
+the sheet's own `dimensions.width / frameSize.width` rather than assumed - NPC idle loops staged so
+far have all been 4 frames, but this isn't hardcoded (the enemy battle-idle sheets below turned out
+to be 8, and frame count "just working" either way is why).
 
-**Done**: Elias Rowan, Finn Rowan, Mara Ash, Silas Flint - all four built from a pixellab.ai
-animation export (south-facing frames only), same crop-then-upscale-to-72×96 treatment as the
-player sheets. Mara Ash and Silas Flint replace their earlier single-frame static art (that source
-is still archived at `public/assets/sprites/characters/original/npc-{mara-ash,silas-flint}.png`).
-Build/re-run pipeline: `scripts/build_npc_idle_sheet.py`. Note pixellab's own export folder was
-named "Breathing_Idle" for all four - the game only ever calls this concept **idle**
-(`MovementState`/`animationLayoutForSprite`), so name future idle-animation folders/exports
-however's convenient on the pixellab side; the script maps whatever folder name to the game's
-"idle" concept. Originals archived at
-`public/assets/sprites/characters/original/{elias-rowan,finn-rowan,mara-ash,silas-flint}/`.
+**Done, all 14**: Elias Rowan, Finn Rowan, Mara Ash, Silas Flint, Juniper Reed, Aldren Stone, Tessa
+Ironhand, Willow Briar, Historian Miriam, Mayor Eleanor Ashcroft (idle-only), plus Nell Ashby,
+Hunter Garrick, Spirit Child, Ranger Caleb (idle **and** walking - see below). The first four were
+built via the manual pixellab.ai website export workflow; everyone else was generated directly
+through the pixellab MCP server (`create_character` + `animate_character`) once that access was
+added mid-project - same visual pipeline either way (south-facing frames only for idle-only NPCs,
+cropped-then-upscaled-to-72×96). Finn Rowan was later regenerated via the MCP too, replacing his
+original website-workflow art, which didn't visually match the newer NPCs' consistent style (the
+superseded source is kept at `public/assets/sprites/characters/original/finn-rowan-website-v1/`,
+not deleted). Build/re-run pipeline: `scripts/build_npc_idle_sheet.py` (idle-only NPCs) /
+`scripts/build_npc_walk_sheet.py` (wandering NPCs, see below). Note pixellab's own export folder
+name for the idle animation varies ("Breathing_Idle" for the website workflow, "animating" - or
+"animating-<group-id>" when a character has two animation groups - for the MCP) - the game only
+ever calls this concept **idle** (`MovementState`/`animationLayoutForSprite`), so the scripts map
+whatever folder name/shape to that concept rather than assuming one. Every NPC's originals are
+archived at `public/assets/sprites/characters/original/{slug}/`.
 
-**Remaining (11)**: every other NPC still shows a single static frame - add an idle loop for any of
-them the same way, whenever art for it exists.
+**Wandering NPCs (new capability)**: Nell Ashby, Hunter Garrick, Spirit Child, and Ranger Caleb
+actually move around their map area (`wanderRadius` on their map object, driven by
+`useWanderingNpcs.ts`'s random-step timer - see `public/assets/maps/{ash-hallow,ironwood-trail,
+raven-ridge}.json`), and so need a real walk-cycle animation in addition to idle, not just idle
+alone. Sprite sheet shape: `NPC_WALK_ANIMATION_LAYOUT` in `characterAnimations.ts`, a fixed 5-row ×
+4-frame sheet (row 0 idle-down, rows 1-4 walking down/left/up/right), built by
+`scripts/build_npc_walk_sheet.py` - a single shared crop box per NPC across all 5 pose sets (a
+walking sideways silhouette differs from standing still facing down, so the box has to
+accommodate both). `GridEntity` gained a `facing` field and `upsertEntity` a corresponding fix
+(previously hardcoded to always face 'down' when playing a walking animation - dead code until a
+wandering NPC actually exercised it) so a wandering NPC's walk-cycle faces the direction it's
+actually moving. Spirit Child's first generation attempt used default proportions and read as a
+generic adult rather than a "child spirit" - regenerated with the `chibi` proportions preset and a
+description leaning harder into the glow/translucence, which fixed it.
 
 ## Player sprite - both skins done (4-direction walk + run animation)
 
@@ -298,7 +316,23 @@ tier to look visually distinct too (not required).
 | Mountain Guardian Totem *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a stone totem carved in the likeness of a great bear guardian, centered, transparent background. |
 | Traveler's Cloak *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain folded wool traveling cloak, centered, transparent background. |
 
-### Currency (4 - generate 128×128, final 32×32)
+### Currency (4 - generate 128×128, final 32×32) - all 4 done
+
+Built via the pixellab MCP's `create_map_object` (not `create_character`/`create_1_direction_object`
+- see the top-level icon spec note above for why: cheap, single-image, no rotation needed).
+Settings that worked well: `view="high top-down"`, `shading="basic shading"`,
+`outline="single color outline"` - `view="side"` (tried first, on Gold) produced an unrecognizable
+abstract shape, not a coin. Build script: `scripts/build_icon.py` (downscales 128×128 → final size
+with LANCZOS, archives the 128×128 original to `public/assets/icons/original/`).
+
+Two prompts needed real iteration beyond the table below to get a usable result - worth knowing
+for the remaining icon categories: **Gold** first came back as a literal Bitcoin-style coin (a "B"
+symbol) when the prompt just said "gold coin" - re-prompted as an explicit "medieval fantasy gold
+coin with a sun emblem, no letters or text" to avoid the association. **Spirit Essence** asked for
+a "glowing orb" and got a water-droplet shape twice in a row (which would have read as near-
+identical to the separate Silver Droplet item icon planned below) - only reprompting as an
+explicitly non-liquid "solid marble sphere...no water, no droplet, round like a ball bearing"
+finally produced an actual round ball.
 
 | Currency | Final Size | Generation prompt |
 |---|---|---|

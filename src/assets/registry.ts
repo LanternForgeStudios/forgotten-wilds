@@ -872,7 +872,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 288, height: 96 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'pixellab.ai-generated idle/breathing loop (art-staging/characters/finn-rowan/animations/Breathing_Idle/south/frame_00{0-3}.png, 124x124 each - only the south-facing set is used, since NPCs always render facing down), cropped to a fixed 60x80 box and upscaled to 72x96, same treatment as Elias Rowan\'s idle sheet. Replaces the previous static single-frame art (that source is still archived at public/assets/sprites/characters/original/npc-finn-rowan.png; this batch\'s own originals are at public/assets/sprites/characters/original/finn-rowan/). Build script: scripts/build_npc_idle_sheet.py. The pixellab export also included 8-directional idle "rotations" - not used, same reason as the other pixellab-sourced characters.',
+    notes: 'Regenerated via the pixellab MCP server (create_character + animate_character\'s breathing-idle template, 136x136 source frames, south direction only) - the original website-workflow version (described here as a "Weathered older man"-style generation) didn\'t match the visual consistency of the newer MCP-generated NPCs. Same crop-then-upscale-to-72x96 treatment as every other NPC idle sheet. Build script: scripts/build_npc_idle_sheet.py. The superseded original static art is still archived at public/assets/sprites/characters/original/npc-finn-rowan.png, and the superseded website-workflow idle-sheet source at public/assets/sprites/characters/original/finn-rowan-website-v1/; this regeneration\'s own originals are at public/assets/sprites/characters/original/finn-rowan/.',
   },
   {
     id: 'portrait.silas-flint',
@@ -1002,11 +1002,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.historian-miriam',
     category: 'character',
-    intendedUse: 'Overworld sprite for historian-miriam (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/historian-miriam.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse: 'Overworld sprite for historian-miriam - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape)',
+    filePath: 'sprites/characters/historian-miriam-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-historian-miriam.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-historian-miriam.png.',
+    notes: 'pixellab MCP-generated idle/breathing loop (136x136 source frames, south direction only) via create_character + animate_character, same crop-then-upscale-to-72x96 treatment as every other NPC idle sheet. Build script: scripts/build_npc_idle_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-historian-miriam.png; this batch\'s own originals at public/assets/sprites/characters/original/historian-miriam/).',
   },
   {
     id: 'portrait.mayor-eleanor-ashcroft',
@@ -1020,11 +1021,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.mayor-eleanor-ashcroft',
     category: 'character',
-    intendedUse: 'Overworld sprite for mayor-eleanor-ashcroft (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/mayor-eleanor-ashcroft.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse: 'Overworld sprite for mayor-eleanor-ashcroft - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape)',
+    filePath: 'sprites/characters/mayor-eleanor-ashcroft-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-mayor-eleanor-ashcroft.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-mayor-eleanor-ashcroft.png.',
+    notes: 'pixellab MCP-generated idle/breathing loop (136x136 source frames, south direction only) via create_character + animate_character, same crop-then-upscale-to-72x96 treatment as every other NPC idle sheet. Build script: scripts/build_npc_idle_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-mayor-eleanor-ashcroft.png; this batch\'s own originals at public/assets/sprites/characters/original/mayor-eleanor-ashcroft/).',
   },
   {
     id: 'portrait.hunter-garrick',
@@ -1059,11 +1061,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.spirit-child',
     category: 'character',
-    intendedUse: 'Overworld sprite for spirit-child (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/spirit-child.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse:
+      "Overworld sprite for spirit-child - a wandering NPC (see wanderRadius on her ironwood-trail.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/spirit-child-walk.png',
+    dimensions: { width: 288, height: 480 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-spirit-child.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-spirit-child.png.',
+    notes:
+      "pixellab MCP-generated (create_character with chibi proportions - a first attempt at default proportions read as a generic adult rather than a child-spirit and was discarded - plus animate_character's breathing-idle and walking-4-frames templates, 136x136 source frames, south/west/north/east directions), one shared crop box across every direction+idle frame, upscaled to 72x96. Build script: scripts/build_npc_walk_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-spirit-child.png; this batch's own originals at public/assets/sprites/characters/original/spirit-child/).",
   },
   {
     id: 'portrait.ranger-caleb',
@@ -1077,11 +1082,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.ranger-caleb',
     category: 'character',
-    intendedUse: 'Overworld sprite for ranger-caleb (single-frame; a future 4-direction idle+walk sheet would still match the player)',
-    filePath: 'sprites/characters/ranger-caleb.png',
-    dimensions: { width: 72, height: 96 },
+    intendedUse:
+      "Overworld sprite for ranger-caleb - a wandering NPC (see wanderRadius on his raven-ridge.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/ranger-caleb-walk.png',
+    dimensions: { width: 288, height: 480 },
+    frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated sprite art (art-staging/characters/npc-ranger-caleb.png, 1080x1440), downscaled to 72x96. Original preserved at public/assets/sprites/characters/original/npc-ranger-caleb.png.',
+    notes:
+      "pixellab MCP-generated (create_character + animate_character's breathing-idle and walking-4-frames templates, 136x136 source frames, south/west/north/east directions), one shared crop box across every direction+idle frame, upscaled to 72x96. Build script: scripts/build_npc_walk_sheet.py. Replaces the previous static single-frame art (archived at public/assets/sprites/characters/original/npc-ranger-caleb.png; this batch's own originals at public/assets/sprites/characters/original/ranger-caleb/).",
   },
   {
     id: 'sprite.player',
@@ -1679,37 +1687,41 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     id: 'icon.currency.gold',
     category: 'icon',
     intendedUse: 'Currency icon for gold',
-    filePath: 'icons/currency-gold.svg',
+    filePath: 'icons/currency-gold.png',
     dimensions: { width: 32, height: 32 },
-    status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 32x32 with LANCZOS. First attempt (view="side") produced an unrecognizable abstract shape - "high top-down" reads as a clean coin. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/currency-gold.png.',
   },
   {
     id: 'icon.currency.spirit-essence',
     category: 'icon',
     intendedUse: 'Currency icon for spirit-essence',
-    filePath: 'icons/currency-spirit-essence.svg',
+    filePath: 'icons/currency-spirit-essence.png',
     dimensions: { width: 32, height: 32 },
-    status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 32x32 with LANCZOS. First two attempts asking for a "glowing orb" both came back as a teardrop/water-droplet shape instead (risking visual confusion with the separate Silver Droplet item icon) - explicitly framing it as a "solid marble sphere...no water, no droplet" on the third attempt finally produced a round ball. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/currency-spirit-essence.png.',
   },
   {
     id: 'icon.currency.festival-tokens',
     category: 'icon',
     intendedUse: 'Currency icon for festival-tokens',
-    filePath: 'icons/currency-festival-tokens.svg',
+    filePath: 'icons/currency-festival-tokens.png',
     dimensions: { width: 32, height: 32 },
-    status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 32x32 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/currency-festival-tokens.png.',
   },
   {
     id: 'icon.currency.premium-currency',
     category: 'icon',
     intendedUse: 'Currency icon for premium-currency',
-    filePath: 'icons/currency-premium-currency.svg',
+    filePath: 'icons/currency-premium-currency.png',
     dimensions: { width: 32, height: 32 },
-    status: 'placeholder',
-    notes: 'Generated SVG placeholder.',
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 32x32 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/currency-premium-currency.png.',
   },
   {
     id: 'battle-bg.forest',

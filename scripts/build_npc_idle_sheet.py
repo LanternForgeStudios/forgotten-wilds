@@ -37,8 +37,12 @@ NPCS = {
         "out_name": "elias-rowan-idle.png",
     },
     "finn-rowan": {
-        "anim_folder": "Breathing_Idle",
-        "crop_box": (32, 22, 92, 102),  # union bbox (48,31)-(74,93) on a 124x124 canvas
+        # Regenerated via the pixellab MCP (create_character, not the manual pixellab.ai website
+        # workflow the rest of this file's entries used) - the original website-generated art
+        # didn't match the newer MCP-generated NPCs' consistent style. Original original/finn-rowan/
+        # archive preserved as original/finn-rowan-website-v1/ rather than overwritten.
+        "anim_folder": "animating",
+        "crop_box": (25, 8, 113, 126),  # union bbox (51,16)-(87,118) on a 136x136 canvas
         "out_name": "finn-rowan-idle.png",
     },
     "mara-ash": {
@@ -77,6 +81,16 @@ NPCS = {
         "anim_folder": "animating",
         "crop_box": (25, 9, 112, 124),  # union bbox (52,17)-(85,116) on a 136x136 canvas
         "out_name": "willow-briar-idle.png",
+    },
+    "mayor-eleanor-ashcroft": {
+        "anim_folder": "animating",
+        "crop_box": (24, 9, 112, 125),  # union bbox (51,17)-(85,117) on a 136x136 canvas
+        "out_name": "mayor-eleanor-ashcroft-idle.png",
+    },
+    "historian-miriam": {
+        "anim_folder": "animating",
+        "crop_box": (26, 8, 112, 123),  # union bbox (50,16)-(88,115) on a 136x136 canvas
+        "out_name": "historian-miriam-idle.png",
     },
 }
 
