@@ -14,6 +14,11 @@ const BOSS_MAP_ICON_SIZE = 128;
 export function enemyMapIconScale(spriteAssetId: string, isBoss: boolean): number {
   const targetSize = isBoss ? BOSS_MAP_ICON_SIZE : REGULAR_ENEMY_MAP_ICON_SIZE;
   if (!spriteAssetId) return 1;
-  const nativeWidth = getAssetDefinition(spriteAssetId).dimensions?.width ?? targetSize;
+  const def = getAssetDefinition(spriteAssetId);
+  // An idle-animated enemy's `dimensions` is the *whole multi-frame sheet*, not one frame - the
+  // same class of bug already fixed in BattleScene.ts's own scale calc (see that file's comment).
+  // Dividing by the full sheet width here made every animated enemy's map icon roughly
+  // frame-count-times too small (reported live as "way way way too small").
+  const nativeWidth = def.frameSize?.width ?? def.dimensions?.width ?? targetSize;
   return targetSize / nativeWidth;
 }

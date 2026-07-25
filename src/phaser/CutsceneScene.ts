@@ -147,7 +147,9 @@ export class CutsceneScene extends Phaser.Scene {
         this.time.delayedCall(400, () => emitter.destroy());
 
         const def = getAssetDefinition(enemy.spriteAssetId);
-        const targetScale = 96 / (def.dimensions?.width ?? 96);
+        // An idle-animated enemy's `dimensions` is the whole multi-frame sheet, not one frame -
+        // same class of bug as BattleScene.ts's own sprite scale (see that file's comment).
+        const targetScale = 96 / (def.frameSize?.width ?? def.dimensions?.width ?? 96);
         const sprite = this.add
           .sprite(x, y, enemy.spriteAssetId)
           .setDepth(10)
