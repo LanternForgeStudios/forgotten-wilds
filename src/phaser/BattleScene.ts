@@ -148,9 +148,16 @@ export class BattleScene extends Phaser.Scene {
 
     const { front, back } = splitFormation(enemies);
     this.layoutRow(front, width, height * FRONT_ROW_Y_FRACTION, 1, 1, false);
-    // Staggered horizontally only when front is populated too - a lone back-row enemy (a solo boss
-    // with no adds) still centers normally instead of being pushed off-center for no reason.
-    this.layoutRow(back, width, height * BACK_ROW_Y_FRACTION, BACK_ROW_SCALE, BACK_ROW_ALPHA, front.length > 0);
+    // Staggered horizontally only when front is populated AND the back row isn't a boss - a boss
+    // always stays dead-center in the back row (explicit requirement: "the boss should always be
+    // in the back row and in the middle"), never nudged off-center to avoid stacking under a front
+    // add. splitFormation only ever puts a boss in `back` alone (never mixed with non-boss
+    // entries), so a single boss there is already exactly centered by the row-spacing formula with
+    // no offset needed. A lone non-boss overflow enemy (a 4th-6th regular/elite in a big group,
+    // not a boss fight) still gets no stagger either, for the same "nothing to stagger against"
+    // reason a solo boss doesn't.
+    const backHasBoss = back.some((e) => e.isBoss);
+    this.layoutRow(back, width, height * BACK_ROW_Y_FRACTION, BACK_ROW_SCALE, BACK_ROW_ALPHA, front.length > 0 && !backHasBoss);
   }
 
   private renderBackground(assetId: string, viewportW: number, viewportH: number): void {

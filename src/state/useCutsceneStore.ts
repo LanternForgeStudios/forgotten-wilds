@@ -15,8 +15,9 @@ export interface CutsceneConfig {
    *  advance/skip still wins normally, this is just a ceiling. */
   autoAdvanceMs?: number;
   /** Enemies about to be faced, shown arriving via a portal/particle-burst flourish (see
-   *  CutsceneScene.showEnemyArrivals) - only the battle-entry cutscene sets this today. */
-  enemies?: { spriteAssetId: string }[];
+   *  CutsceneScene.showEnemyArrivals) - only the battle-entry cutscene sets this today. `isBoss`
+   *  lets showEnemyArrivals center the boss in the line and render it larger than its escort. */
+  enemies?: { spriteAssetId: string; isBoss: boolean }[];
   /** Alternate background entry animation for the one case that isn't a plain fade-in - the
    *  defeat cutscene's black -> white -> image "waking up" sequence (see
    *  CutsceneScene.playWakeUpSequence). Omitted means the default loadBackground fade-in. */

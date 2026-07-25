@@ -5,7 +5,7 @@ import { CutsceneScene } from '@/phaser/CutsceneScene';
 interface PhaserCutsceneCanvasProps {
   backgroundAssetId: string;
   dramatic?: boolean;
-  enemies?: { spriteAssetId: string }[];
+  enemies?: { spriteAssetId: string; isBoss: boolean }[];
   entryEffect?: 'wake-up';
 }
 

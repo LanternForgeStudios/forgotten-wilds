@@ -116,22 +116,38 @@ export class CutsceneScene extends Phaser.Scene {
     this.wakeWhiteRect = null;
   }
 
+  /** Reorders a boss-fight roster so the boss lands at (or just left-of, for an even total) the
+   *  middle index of the arrival line, instead of wherever rollBossEncounter happened to put it in
+   *  the array (adds first, boss last - see combatEngine.ts's own comment on that ordering, which
+   *  is about default-target selection, not display order). A no-op for a non-boss encounter. */
+  private static reorderWithBossInMiddle<T extends { isBoss: boolean }>(enemies: T[]): T[] {
+    const bossIndex = enemies.findIndex((e) => e.isBoss);
+    if (bossIndex === -1) return enemies;
+    const boss = enemies[bossIndex];
+    const rest = enemies.filter((_, i) => i !== bossIndex);
+    const middle = Math.floor(rest.length / 2);
+    return [...rest.slice(0, middle), boss, ...rest.slice(middle)];
+  }
+
   /** Battle-entry cutscene flourish: each enemy about to be faced pops into view via a localized
    *  particle burst followed by a scale/alpha "emerge" tween, staggered so a multi-enemy group
    *  reads as a sequence of individual portal-emergences. A single simple row (not the real
-   *  front/back battle formation) - this is a brief flourish, not positional parity with the fight. */
-  async showEnemyArrivals(enemies: { spriteAssetId: string }[]): Promise<void> {
+   *  front/back battle formation) - this is a brief flourish, not positional parity with the fight,
+   *  except for one deliberate parity: a boss is centered in the line and rendered larger than its
+   *  escort, the same "stand out" treatment BattleScene.ts's own boss sizing already gets. */
+  async showEnemyArrivals(enemies: { spriteAssetId: string; isBoss: boolean }[]): Promise<void> {
     if (enemies.length === 0) return;
     await Promise.all(enemies.map((e) => loadSceneTexture(this, e.spriteAssetId)));
 
     for (const sprite of this.arrivalSprites) sprite.destroy();
     this.arrivalSprites = [];
 
+    const ordered = CutsceneScene.reorderWithBossInMiddle(enemies);
     const { width, height } = this.scale;
     const y = height * 0.55;
-    const spacing = width / (enemies.length + 1);
+    const spacing = width / (ordered.length + 1);
 
-    enemies.forEach((enemy, i) => {
+    ordered.forEach((enemy, i) => {
       const x = spacing * (i + 1);
       this.time.delayedCall(i * ARRIVAL_STAGGER_MS, () => {
         const emitter = this.add.particles(x, y, PARTICLE_TEXTURE_KEY, {
@@ -150,12 +166,16 @@ export class CutsceneScene extends Phaser.Scene {
         // An idle-animated enemy's `dimensions` is the whole multi-frame sheet, not one frame -
         // same class of bug as BattleScene.ts's own sprite scale (see that file's comment).
         // ARRIVAL_TARGET_SIZE sits between BattleScene's own regular/elite sizes (112/168) - this
-        // cutscene doesn't know an enemy's tier (showEnemyArrivals is only ever passed
-        // spriteAssetId, see CombatScene.tsx's cutscene-store population), so every arrival gets
-        // one flat size rather than a per-tier one. Bumped from an original flat 96, which read as
-        // too small once real art was in - same "still too small" report BattleScene's own size got.
+        // cutscene doesn't know a regular enemy's exact tier (only isBoss), so every non-boss
+        // arrival gets one flat size rather than a per-tier one. Bumped from an original flat 96,
+        // which read as too small once real art was in - same "still too small" report
+        // BattleScene's own size got. BOSS_ARRIVAL_TARGET_SIZE mirrors BattleScene's own boss
+        // baseSize (224) so the boss reads as distinctly larger than its escort here too, not just
+        // in the battle screen that follows.
         const ARRIVAL_TARGET_SIZE = 140;
-        const targetScale = ARRIVAL_TARGET_SIZE / (def.frameSize?.width ?? def.dimensions?.width ?? ARRIVAL_TARGET_SIZE);
+        const BOSS_ARRIVAL_TARGET_SIZE = 224;
+        const targetSize = enemy.isBoss ? BOSS_ARRIVAL_TARGET_SIZE : ARRIVAL_TARGET_SIZE;
+        const targetScale = targetSize / (def.frameSize?.width ?? def.dimensions?.width ?? targetSize);
         const sprite = this.add
           .sprite(x, y, enemy.spriteAssetId)
           .setDepth(10)

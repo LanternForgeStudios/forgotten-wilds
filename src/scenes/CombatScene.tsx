@@ -181,7 +181,10 @@ export function CombatScene() {
         useCutsceneStore.getState().play({
           ...battleStartCutscene(res.enemies, location?.battleBackgroundAssetId ?? 'battle-bg.forest'),
           autoAdvanceMs: 5000,
-          enemies: res.enemies.map((e) => ({ spriteAssetId: ENEMIES.find((d) => d.id === e.enemyId)?.battleSpriteAssetId ?? '' })),
+          enemies: res.enemies.map((e) => {
+            const def = ENEMIES.find((d) => d.id === e.enemyId);
+            return { spriteAssetId: def?.battleSpriteAssetId ?? '', isBoss: def?.isBoss ?? false };
+          }),
           onComplete: () => setPhase('playerTurn'),
         });
       })
