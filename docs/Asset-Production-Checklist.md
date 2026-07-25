@@ -249,7 +249,15 @@ needing to regenerate the art from scratch. None of these 52 are built yet (all 
 `status: 'placeholder'` in the registry) - this is the spec for whenever that work starts, pixellab
 MCP-generated or otherwise.
 
-### Items (22 - generate 128×128, final 64×64: consumables, materials, key items)
+### Items (22 - generate 128×128, final 64×64: consumables, materials, key items) - all 22 done
+
+Same pixellab MCP `create_map_object` pipeline as Currency/Ailments above. Two needed a re-prompt:
+**Spirit Essence-style droplet-vs-sphere confusion did not repeat here** - Silver Droplet's own
+prompt asks for a droplet shape and correctly got one on the first try, unlike Currency's Spirit
+Essence (which needed to explicitly avoid a droplet). **Guardian Memory Fragment I** first came
+back as a cute rounded ghost/blob character rather than a "shard" - re-prompted with an explicit
+"angular crystal shard (faceted gem shape, not round)" fixed it. Everything else matched its
+prompt cleanly on the first attempt.
 
 | Item | Final Size | Generation prompt |
 |---|---|---|
