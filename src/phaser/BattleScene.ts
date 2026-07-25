@@ -56,6 +56,12 @@ const FRONT_ROW_Y_FRACTION = 0.52;
 const BACK_ROW_Y_FRACTION = 0.28;
 const BACK_ROW_SCALE = 0.8;
 const BACK_ROW_ALPHA = 0.92;
+// Enemy sprites read as too small once real (non-placeholder) art was in across the board - a
+// bigger bump on desktop than mobile since a touch canvas has proportionally less room per enemy
+// to begin with (createEnemySlot's own spacing*0.7 cap already guards against overflow on a
+// narrow/multi-enemy canvas either way, so this multiplier is a target, not a guarantee).
+const DESKTOP_SIZE_MULTIPLIER = 1.5;
+const MOBILE_SIZE_MULTIPLIER = 1.25;
 
 export interface BattleEnemyVisual {
   index: number;
@@ -104,11 +110,13 @@ export class BattleScene extends Phaser.Scene {
   private onReady?: () => void;
   private onTargetEnemy?: (index: number) => void;
   private encounterGeneration = 0;
+  private isMobile: boolean;
 
-  constructor(onReady?: () => void, onTargetEnemy?: (index: number) => void) {
+  constructor(onReady?: () => void, onTargetEnemy?: (index: number) => void, isMobile = false) {
     super({ key: 'BattleScene' });
     this.onReady = onReady;
     this.onTargetEnemy = onTargetEnemy;
+    this.isMobile = isMobile;
   }
 
   create() {
@@ -139,8 +147,10 @@ export class BattleScene extends Phaser.Scene {
     this.renderBackground(backgroundAssetId, width, height);
 
     const { front, back } = splitFormation(enemies);
-    this.layoutRow(front, width, height * FRONT_ROW_Y_FRACTION, 1, 1);
-    this.layoutRow(back, width, height * BACK_ROW_Y_FRACTION, BACK_ROW_SCALE, BACK_ROW_ALPHA);
+    this.layoutRow(front, width, height * FRONT_ROW_Y_FRACTION, 1, 1, false);
+    // Staggered horizontally only when front is populated too - a lone back-row enemy (a solo boss
+    // with no adds) still centers normally instead of being pushed off-center for no reason.
+    this.layoutRow(back, width, height * BACK_ROW_Y_FRACTION, BACK_ROW_SCALE, BACK_ROW_ALPHA, front.length > 0);
   }
 
   private renderBackground(assetId: string, viewportW: number, viewportH: number): void {
@@ -156,11 +166,16 @@ export class BattleScene extends Phaser.Scene {
       .setDepth(-1);
   }
 
-  private layoutRow(enemies: BattleEnemyVisual[], viewportW: number, y: number, scale: number, alpha: number): void {
+  private layoutRow(enemies: BattleEnemyVisual[], viewportW: number, y: number, scale: number, alpha: number, stagger: boolean): void {
     if (enemies.length === 0) return;
     const spacing = viewportW / (enemies.length + 1);
+    // Staggers the row half a slot-width to the right so it doesn't land in a straight column
+    // directly above/below the other row's sprites - front and back rows share the exact same
+    // spacing formula, so with equal (or coincidentally-overlapping) counts they'd otherwise sit
+    // at identical x positions, one straight on top of the other.
+    const xOffset = stagger ? spacing / 2 : 0;
     enemies.forEach((enemy, i) => {
-      const x = spacing * (i + 1);
+      const x = spacing * (i + 1) + xOffset;
       this.createEnemySlot(enemy, x, y, scale, alpha, spacing);
     });
   }
@@ -179,22 +194,34 @@ export class BattleScene extends Phaser.Scene {
     // target - on a narrow mobile canvas, a fixed-size sprite ate up proportionally more of the
     // (already narrow) per-slot width than on desktop, so a multi-enemy formation still overlapped
     // there even after the desktop-tuned halving.
-    const baseSize = enemy.isBoss ? 224 : enemy.tier === 'elite' ? 168 : 112;
+    const sizeMultiplier = this.isMobile ? MOBILE_SIZE_MULTIPLIER : DESKTOP_SIZE_MULTIPLIER;
+    const baseSize = (enemy.isBoss ? 224 : enemy.tier === 'elite' ? 168 : 112) * sizeMultiplier;
     // 0.7, not a looser fraction like 0.85 - on a wide desktop canvas spacing is already generous
     // enough that this cap rarely engages at all (desktop scaling is untouched), but on a narrow
     // mobile canvas even a 3-regular-enemy row left barely any gap between sprites at a looser
     // factor, which is exactly the "still too large on mobile" report this exists to fix.
     const cappedSize = Math.min(baseSize, spacing * 0.7);
+    // splitFormation always puts the boss in the "back" row (even when it's alone with zero adds -
+    // see that file's own comment), which normally means the BACK_ROW_SCALE/BACK_ROW_ALPHA
+    // depth-cue dampening (0.8x size, 92% alpha) applies - appropriate for genuine background-row
+    // filler in a 4-6 enemy group, but backwards for a boss: baseSize already doubles its footprint
+    // specifically so it reads as imposing, and stacking a further 0.8x shrink on top of that nearly
+    // cancels the size difference against a front-row elite add (224*0.8=179 vs 168), which is
+    // exactly the "boss doesn't look any bigger" report this fixes. The boss keeps its raised
+    // back-row Y position (still looms behind/above its escort) but always renders at full
+    // scale/opacity, never the row's dampened values.
+    const effectiveScale = enemy.isBoss ? 1 : scale;
+    const effectiveAlpha = enemy.isBoss ? 1 : alpha;
     // A frameSize'd (animated) enemy's `dimensions` is the *whole sheet*, not one frame - scaling
     // off that would render it roughly frameCount-times too small. Scale off frameSize instead so
     // an idle-animated enemy renders at the same on-screen size a plain static sprite would.
     const nativeWidth = def.frameSize?.width ?? def.dimensions?.width ?? cappedSize;
-    const spriteScale = (cappedSize / nativeWidth) * scale;
+    const spriteScale = (cappedSize / nativeWidth) * effectiveScale;
 
     const sprite = this.add
       .sprite(x, y, enemy.spriteAssetId)
       .setScale(spriteScale)
-      .setAlpha(alpha)
+      .setAlpha(effectiveAlpha)
       .setDepth(10)
       .setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onTargetEnemy?.(enemy.index));
@@ -208,30 +235,33 @@ export class BattleScene extends Phaser.Scene {
       if (this.anims.exists(idleKey)) sprite.play(idleKey);
     }
 
-    const hpTrackWidth = Math.min(160, cappedSize * 1.25) * scale;
+    const hpTrackWidth = Math.min(160, cappedSize * 1.25) * effectiveScale;
     // HP bar sits directly under the sprite's own rendered bounds, matching CSS's ".enemyBar" which
     // was likewise anchored to each enemy's own sprite rather than a shared/fixed position.
-    const barY = sprite.y + sprite.displayHeight / 2 + 14 * scale;
+    const barY = sprite.y + sprite.displayHeight / 2 + 14 * effectiveScale;
 
     const hpTrackBg = this.add
-      .rectangle(x, barY, hpTrackWidth, 8 * scale, 0x000000, 0.5)
+      .rectangle(x, barY, hpTrackWidth, 8 * effectiveScale, 0x000000, 0.5)
       .setStrokeStyle(1, 0x000000, 0.6)
       .setDepth(11);
-    const hpTrackFill = this.add.rectangle(x - hpTrackWidth / 2, barY, hpTrackWidth, 8 * scale, 0xb34b3c).setOrigin(0, 0.5).setDepth(12);
+    const hpTrackFill = this.add
+      .rectangle(x - hpTrackWidth / 2, barY, hpTrackWidth, 8 * effectiveScale, 0xb34b3c)
+      .setOrigin(0, 0.5)
+      .setDepth(12);
 
     const nameText = this.add
-      .text(x, barY + 10 * scale, enemy.name, { fontSize: `${12 * scale}px`, color: '#ece1cf' })
+      .text(x, barY + 10 * effectiveScale, enemy.name, { fontSize: `${12 * effectiveScale}px`, color: '#ece1cf' })
       .setOrigin(0.5, 0)
       .setDepth(11)
       .setShadow(0, 1, 'rgba(0,0,0,0.8)', 4);
     const tierLabel = `${enemy.tierLabel}${enemy.isBoss ? '' : ` · Lv.${enemy.level}`}`;
     const tierText = this.add
-      .text(x, barY + 24 * scale, tierLabel, { fontSize: `${10 * scale}px`, color: enemy.tierColor, fontStyle: 'bold' })
+      .text(x, barY + 24 * effectiveScale, tierLabel, { fontSize: `${10 * effectiveScale}px`, color: enemy.tierColor, fontStyle: 'bold' })
       .setOrigin(0.5, 0)
       .setDepth(11)
       .setShadow(0, 1, 'rgba(0,0,0,0.9)', 3);
     const ailmentText = this.add
-      .text(x, barY + 38 * scale, '', { fontSize: `${10 * scale}px`, color: '#ffcf6b', fontStyle: 'bold' })
+      .text(x, barY + 38 * effectiveScale, '', { fontSize: `${10 * effectiveScale}px`, color: '#ffcf6b', fontStyle: 'bold' })
       .setOrigin(0.5, 0)
       .setDepth(11)
       .setShadow(0, 1, 'rgba(0,0,0,0.9)', 3);

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { BattleScene, type BattleEnemyVisual } from '@/phaser/BattleScene';
 import type { CombatHitResult, EnemyHitResult } from '@/firebase/functionsClient';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 export type { BattleEnemyVisual };
 
@@ -75,6 +76,12 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
   const hasLoadedEncounterRef = useRef(false);
   const onTargetEnemyRef = useRef(onTargetEnemy);
   onTargetEnemyRef.current = onTargetEnemy;
+  const isMobile = useIsMobile();
+  // Read once at Game-creation time (see the mount effect's own exhaustive-deps opt-out below) -
+  // input mode essentially never flips mid-fight, and BattleScene's enemy sizing is only computed
+  // once per loadEncounter anyway, so there's nothing to react to after mount.
+  const isMobileRef = useRef(isMobile);
+  isMobileRef.current = isMobile;
 
   // Creates the Game exactly once, then a ResizeObserver keeps it sized to the container from then
   // on. The container's size is checked synchronously first (getBoundingClientRect) so the Game
@@ -91,6 +98,7 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
           if (!cancelled) setSceneReady(true);
         },
         (index) => onTargetEnemyRef.current(index),
+        isMobileRef.current,
       );
       const game = new Phaser.Game({
         type: Phaser.AUTO,
