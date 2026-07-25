@@ -20,6 +20,12 @@ ICONS = {
     "currency-spirit-essence": (32, 32),
     "currency-festival-tokens": (32, 32),
     "currency-premium-currency": (32, 32),
+    "ailment-poison": (64, 64),
+    "ailment-burn": (64, 64),
+    "ailment-freeze": (64, 64),
+    "ailment-stun": (64, 64),
+    "ailment-blind": (64, 64),
+    "ailment-silence": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")

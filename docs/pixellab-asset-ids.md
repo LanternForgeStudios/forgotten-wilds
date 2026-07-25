@@ -16,10 +16,10 @@ manual-workflow phase) but are the same account and just as targetable for a fut
 
 | Registry id | Name | pixellab character_id | Generated via |
 |---|---|---|---|
-| `sprite.npc.elias-rowan` | Elias Rowan | `9c51e8c3-e997-4525-a26c-7bb15a16266a` | website (pre-MCP) |
+| `sprite.npc.elias-rowan` | Elias Rowan | `f9dfff58-943e-4e7c-95b4-879b1c0154cc` (regenerated via MCP, same reason as Finn Rowan below; original `9c51e8c3...` was website pre-MCP) | MCP |
 | `sprite.npc.finn-rowan` | Finn Rowan | `e8bd959b-4c16-473c-92a8-01474ffae07f` (regenerated via MCP - the original `19a7f47e...` didn't match the newer MCP-generated NPCs' consistent style; first regen attempt `a0458c7f...` failed - server load) | MCP |
-| `sprite.npc.mara-ash` | Mara Ash | `4e7b01ac-e5cb-4320-ba22-0878d62f8aee` | website (pre-MCP) |
-| `sprite.npc.silas-flint` | Silas Flint | `2e105e5b-ae0e-4f36-907c-2dc8346d74fd` | website (pre-MCP) |
+| `sprite.npc.mara-ash` | Mara Ash | `934b31c4-319a-4fd1-b946-22fae72bd7b1` (regenerated via MCP, same reason as Finn Rowan; original `4e7b01ac...` was website pre-MCP) | MCP |
+| `sprite.npc.silas-flint` | Silas Flint | `6645aace-bba8-40e4-8f29-a4ad6dd1cd35` (regenerated via MCP, same reason as Finn Rowan; original `2e105e5b...` was website pre-MCP) | MCP |
 | `sprite.npc.juniper-reed` | Juniper Reed | `f64ce8c3-11de-494e-ac88-36dfdc532edd` | MCP |
 | `sprite.npc.nell-ashby` | Nell Ashby | `b5355df5-33f9-4889-8ac1-e8cf0b33f190` | MCP |
 | `sprite.npc.aldren-stone` | Aldren Stone | `9a684c31-804b-4bbf-a6a1-3a9a070e642e` | MCP |

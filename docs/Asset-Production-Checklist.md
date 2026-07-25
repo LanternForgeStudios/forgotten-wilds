@@ -95,16 +95,17 @@ to be 8, and frame count "just working" either way is why).
 **Done, all 14**: Elias Rowan, Finn Rowan, Mara Ash, Silas Flint, Juniper Reed, Aldren Stone, Tessa
 Ironhand, Willow Briar, Historian Miriam, Mayor Eleanor Ashcroft (idle-only), plus Nell Ashby,
 Hunter Garrick, Spirit Child, Ranger Caleb (idle **and** walking - see below). The first four were
-built via the manual pixellab.ai website export workflow; everyone else was generated directly
-through the pixellab MCP server (`create_character` + `animate_character`) once that access was
-added mid-project - same visual pipeline either way (south-facing frames only for idle-only NPCs,
-cropped-then-upscaled-to-72×96). Finn Rowan was later regenerated via the MCP too, replacing his
-original website-workflow art, which didn't visually match the newer NPCs' consistent style (the
-superseded source is kept at `public/assets/sprites/characters/original/finn-rowan-website-v1/`,
-not deleted). Build/re-run pipeline: `scripts/build_npc_idle_sheet.py` (idle-only NPCs) /
-`scripts/build_npc_walk_sheet.py` (wandering NPCs, see below). Note pixellab's own export folder
-name for the idle animation varies ("Breathing_Idle" for the website workflow, "animating" - or
-"animating-<group-id>" when a character has two animation groups - for the MCP) - the game only
+originally built via the manual pixellab.ai website export workflow, before pixellab MCP access
+was added mid-project - all four were later regenerated through the MCP server (`create_character`
++ `animate_character`) as well, since the website-workflow art didn't visually match the
+consistent style the MCP-generated NPCs share. Every superseded website-workflow source is kept,
+not deleted, at `public/assets/sprites/characters/original/{slug}-website-v1/`. Every NPC from
+here on is MCP-generated - same visual pipeline as the website workflow either way (south-facing
+frames only for idle-only NPCs, cropped-then-upscaled-to-72×96). Build/re-run pipeline:
+`scripts/build_npc_idle_sheet.py` (idle-only NPCs) / `scripts/build_npc_walk_sheet.py` (wandering
+NPCs, see below). Note pixellab's own export folder name for the idle animation varies
+("Breathing_Idle" for the website workflow, "animating" - or "animating-<group-id>" when a
+character has two animation groups - for the MCP) - the game only
 ever calls this concept **idle** (`MovementState`/`animationLayoutForSprite`), so the scripts map
 whatever folder name/shape to that concept rather than assuming one. Every NPC's originals are
 archived at `public/assets/sprites/characters/original/{slug}/`.
@@ -280,7 +281,16 @@ Pristine Spirit Draught, Thin/Superior/Pristine Lantern Oil) all reuse their bas
 above rather than getting a unique one each - only make separate art for those if you want each
 tier to look visually distinct too (not required).
 
-### Ailment status icons (6 - generate 128×128, final 64×64, combat ailment strip badges)
+### Ailment status icons (6 - generate 128×128, final 64×64, combat ailment strip badges) - all 6 done
+
+Same pixellab MCP `create_map_object` pipeline as Currency above. Two needed a re-prompt: **Blind**
+first came back as just a crossed-out grey circle with no eye at all (ambiguous with a generic
+"disabled" badge) - explicitly asking for a "clearly visible eye shape (eyelid and iris)" fixed it.
+**Silence** first came back as an active, uncrossed sound-wave/equalizer symbol - reading as the
+opposite of what was wanted - re-prompted with an explicit "bold diagonal red slash line crossing
+directly over it" fixed it. **Stun** came back as a single star rather than the requested "spinning
+stars" (plural) - accepted as-is, since a single star still reads clearly as a dazed/stun symbol on
+its own.
 
 | Ailment | Final Size | Generation prompt |
 |---|---|---|

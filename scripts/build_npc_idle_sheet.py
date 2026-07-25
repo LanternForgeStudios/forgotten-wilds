@@ -32,8 +32,10 @@ FRAME_SIZE = (72, 96)
 # convention but isn't required if a Windows permission lock on a freshly staged folder blocks it.
 NPCS = {
     "elias-rowan": {
-        "anim_folder": "Breathing_Idle",
-        "crop_box": (32, 22, 92, 102),  # union bbox (45,29)-(79,92) on a 124x124 canvas
+        # Regenerated via the pixellab MCP - same reason/pattern as finn-rowan below. Superseded
+        # website-workflow archive preserved as original/elias-rowan-website-v1/.
+        "anim_folder": "animating",
+        "crop_box": (24, 6, 113, 124),  # union bbox (48,14)-(89,116) on a 136x136 canvas
         "out_name": "elias-rowan-idle.png",
     },
     "finn-rowan": {
@@ -46,15 +48,17 @@ NPCS = {
         "out_name": "finn-rowan-idle.png",
     },
     "mara-ash": {
-        "staged_folder": "Mara_Ash_NPC_General_Store_Owner_Middle-aged",
-        "anim_folder": "Breathing_Idle",
-        "crop_box": (70, 50, 177, 192),  # union bbox (97,60)-(150,182) on a 248x248 canvas
+        # Regenerated via the pixellab MCP - same reason/pattern as finn-rowan above. Superseded
+        # website-workflow archive preserved as original/mara-ash-website-v1/.
+        "anim_folder": "animating",
+        "crop_box": (18, 0, 118, 133),  # union bbox (51,8)-(85,125) on a 136x136 canvas
         "out_name": "mara-ash-idle.png",
     },
     "silas-flint": {
-        "staged_folder": "Silas_Flint_NPC_Mine_Office_Foreman_Stocky",
-        "anim_folder": "Breathing_Idle",
-        "crop_box": (71, 52, 179, 195),  # union bbox (91,62)-(159,185) on a 248x248 canvas
+        # Regenerated via the pixellab MCP - same reason/pattern as finn-rowan above. Superseded
+        # website-workflow archive preserved as original/silas-flint-website-v1/.
+        "anim_folder": "animating",
+        "crop_box": (19, 0, 117, 130),  # union bbox (43,7)-(93,121) on a 136x136 canvas
         "out_name": "silas-flint-idle.png",
     },
     "juniper-reed": {
