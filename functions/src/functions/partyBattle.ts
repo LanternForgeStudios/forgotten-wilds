@@ -243,6 +243,14 @@ export function rollBattleBackgroundAssetId(): string {
 
 const VALID_ACTION_TYPES: CombatActionType[] = ['attack', 'skill', 'lanternAbility', 'item', 'defend', 'flee'];
 
+/** Spreadable `{ skillId?, abilityId? }` for a lastTurnResult write - never includes a key at all
+ *  when its value is undefined (Firestore's Admin SDK rejects an explicit `undefined` field value
+ *  outright, the same class of bug this file has already hit twice - see fullyRestoredParticipantStats'
+ *  and declareVictory's own comments on it). */
+function skillSfxFields(skillId: string | undefined, abilityId: string | undefined): { skillId?: string; abilityId?: string } {
+  return { ...(skillId ? { skillId } : {}), ...(abilityId ? { abilityId } : {}) };
+}
+
 function validateAction(raw: unknown): CombatAction {
   const type = (raw as { type?: unknown } | null)?.type;
   if (typeof type !== 'string' || !VALID_ACTION_TYPES.includes(type as CombatActionType)) {
@@ -365,6 +373,11 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
     }
 
     const resolvedAction: CombatAction = action ?? { type: 'defend' };
+    // Which Specialty Attack/Lantern Ability (if any) this turn's action used - see
+    // PartyBattleTurnResult.skillId/abilityId's own doc comments for why this needs to ride along
+    // in the write, not just be known locally by whoever happened to submit the action.
+    const usedSkillId = resolvedAction.type === 'skill' ? (resolvedAction.skillId ?? 'keepers-strike') : undefined;
+    const usedAbilityId = resolvedAction.type === 'lanternAbility' ? resolvedAction.abilityId : undefined;
 
     // A live read of the acting player's real save - everything else about a turn is fully
     // described by the battle doc's own participantStats snapshot, but items are a shared
@@ -425,7 +438,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         enemies: nextEnemies,
         currentTurnIndex: nextTurnIndex,
         turnDeadlineAt: now + TURN_TIMEOUT_MS,
-        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, hits: turnResult.hits },
+        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, hits: turnResult.hits, ...skillSfxFields(usedSkillId, usedAbilityId) },
         updatedAt: now,
       });
       return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };
@@ -453,7 +466,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         // bug as ActiveAilment.turnsRemaining's own doc comment) - a victory declared right after
         // the active player's own attack (before the enemy phase ever runs) calls this with no
         // enemyHits arg at all, which must default to [] here rather than writing `undefined`.
-        lastTurnResult: { round: battle.round, log: logLines, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyHits ?? [] },
+        lastTurnResult: { round: battle.round, log: logLines, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyHits ?? [], ...skillSfxFields(usedSkillId, usedAbilityId) },
         lastWaveRewards,
         continueVotes: status === 'awaitingContinueVote' ? {} : battle.continueVotes,
         updatedAt: now,
@@ -524,7 +537,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         participantStats: nextParticipantStats,
         enemies: nextEnemies,
         status: 'defeated',
-        lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyPhase.enemyHits },
+        lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyPhase.enemyHits, ...skillSfxFields(usedSkillId, usedAbilityId) },
         updatedAt: now,
       });
       bumpClanWave?.();
@@ -547,7 +560,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       turnOrder: newTurnOrder,
       currentTurnIndex: 0,
       turnDeadlineAt: now + TURN_TIMEOUT_MS,
-      lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyPhase.enemyHits },
+      lastTurnResult: { round: battle.round, log: combinedLog, resolvedAt: now, hits: turnResult.hits, enemyHits: enemyPhase.enemyHits, ...skillSfxFields(usedSkillId, usedAbilityId) },
       updatedAt: now,
     });
     return { resolved: true, status: 'active' as const, phase: 'enemyPhase' as const };
@@ -573,6 +586,8 @@ async function resolvePvpBattleTurn(
 ) {
   const opponentUid = battle.participants.find((p) => p !== activeUid)!;
   const opponentStats = battle.participantStats[opponentUid];
+  const usedSkillId = resolvedAction.type === 'skill' ? (resolvedAction.skillId ?? 'keepers-strike') : undefined;
+  const usedAbilityId = resolvedAction.type === 'lanternAbility' ? resolvedAction.abilityId : undefined;
 
   const turnResult = resolvePvpTurn(
     {
@@ -629,7 +644,7 @@ async function resolvePvpBattleTurn(
       status: 'victory',
       winnerUid,
       pvpRewards,
-      lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, pvpHit: turnResult.hit },
+      lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, pvpHit: turnResult.hit, ...skillSfxFields(usedSkillId, usedAbilityId) },
       updatedAt: now,
     });
     return { resolved: true, status: 'victory' as const, winnerUid };
@@ -646,7 +661,7 @@ async function resolvePvpBattleTurn(
     currentTurnIndex: nextTurnIndex,
     round: nextTurnIndex === 0 ? battle.round + 1 : battle.round,
     turnDeadlineAt: now + TURN_TIMEOUT_MS,
-    lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, pvpHit: turnResult.hit },
+    lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, pvpHit: turnResult.hit, ...skillSfxFields(usedSkillId, usedAbilityId) },
     updatedAt: now,
   });
   return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };

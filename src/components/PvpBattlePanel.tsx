@@ -122,8 +122,21 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
     // Mirrors CombatScene.tsx's own sfx.combat-hit/sfx.enemy-defeated triggers - defeating a human
     // opponent reuses the same "defeated" sting rather than a separate PvP-only asset. Gated to
     // the winner only - the loser already gets their own sfx.defeat/music.defeat from the
-    // status-transition effect below, and would otherwise hear both stings at once.
-    if (!pvpHit.missed) void playSound('sfx.combat-hit');
+    // status-transition effect below, and would otherwise hear both stings at once. A skill/lantern
+    // ability with its own dedicated cue (see EndlessBattlePanel.tsx's matching comment) plays that
+    // instead, sourced from the server's lastTurnResult.skillId/abilityId.
+    const hitLanded = !pvpHit.missed;
+    let dedicatedSoundId: string | undefined;
+    const { skillId, abilityId } = battle.lastTurnResult ?? {};
+    if (skillId) {
+      const skill = SKILLS.find((s) => s.id === skillId);
+      if (hitLanded && skill?.sfxAssetId) dedicatedSoundId = skill.sfxAssetId;
+    } else if (abilityId) {
+      const ability = LANTERN_ABILITIES.find((a) => a.id === abilityId);
+      if (ability?.sfxAssetId && (ability.category !== 'offensive' || hitLanded)) dedicatedSoundId = ability.sfxAssetId;
+    }
+    if (dedicatedSoundId) void playSound(dedicatedSoundId);
+    else if (hitLanded) void playSound('sfx.combat-hit');
     if (pvpHit.defeated && lastActorUid === uid) void playSound('sfx.enemy-defeated');
     if (lastActorUid === uid) {
       setActiveOutgoingHits([{ targetIndex: 0, ...pvpHit, key: resolvedAt }]);

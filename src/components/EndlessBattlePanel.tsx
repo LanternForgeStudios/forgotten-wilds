@@ -133,8 +133,24 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
     if (!battle?.lastTurnResult || !resolvedAt) return;
     const hits = battle.lastTurnResult.hits ?? [];
     const enemyHits = battle.lastTurnResult.enemyHits ?? [];
-    // Mirrors CombatScene.tsx's own sfx.combat-hit/sfx.enemy-defeated triggers exactly.
-    if (hits.some((h) => !h.missed) || enemyHits.length > 0) void playSound('sfx.combat-hit');
+    const hitLanded = hits.some((h) => !h.missed);
+    // Mirrors CombatScene.tsx's own sound-selection exactly, sourced from the server's
+    // lastTurnResult.skillId/abilityId (see that field's own doc comment) rather than local state -
+    // every viewer sees the same result here, not just whoever happened to submit the action.
+    let dedicatedSoundId: string | undefined;
+    const { skillId, abilityId } = battle.lastTurnResult;
+    if (skillId) {
+      const skill = SKILLS.find((s) => s.id === skillId);
+      if (hitLanded && skill?.sfxAssetId) dedicatedSoundId = skill.sfxAssetId;
+    } else if (abilityId) {
+      const ability = LANTERN_ABILITIES.find((a) => a.id === abilityId);
+      if (ability?.sfxAssetId && (ability.category !== 'offensive' || hitLanded)) dedicatedSoundId = ability.sfxAssetId;
+    }
+    if (dedicatedSoundId) {
+      void playSound(dedicatedSoundId);
+    } else if (hitLanded || enemyHits.length > 0) {
+      void playSound('sfx.combat-hit');
+    }
     if (hits.some((h) => h.defeated)) void playSound('sfx.enemy-defeated');
     setActiveOutgoingHits(hits.map((h) => ({ ...h, key: resolvedAt })));
     setActiveIncomingHits(enemyHits.map((h) => ({ ...h, key: resolvedAt })));

@@ -470,6 +470,14 @@ export interface PartyBattleTurnResult {
   enemyHits?: PartyEnemyHitResult[];
   /** PvP only - null on a Defend/item/forfeit/stunned turn (nothing was thrown at the opponent). */
   pvpHit?: PvpHitResult | null;
+  /** Which Specialty Attack the acting player used this turn, when their action was `type:
+   *  'skill'` (defaulting to 'keepers-strike', same as the action itself) - undefined for every
+   *  other action type. Lets any viewing client (not just the actor, who already knows what they
+   *  just submitted) look up Skill.sfxAssetId and play that skill's own hit cue instead of the
+   *  generic sfx.combat-hit, mirroring solo combat's CombatScene.tsx. */
+  skillId?: string;
+  /** Same idea as skillId, for `type: 'lanternAbility'` - look up LanternAbility.sfxAssetId. */
+  abilityId?: string;
 }
 
 export interface PartyBattleWaveRewards {

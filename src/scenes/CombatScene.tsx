@@ -296,7 +296,28 @@ export function CombatScene() {
 
       hitBatchRef.current += 1;
       const batch = hitBatchRef.current;
-      if (res.hits.some((h) => !h.missed) || res.enemyHits.length > 0) void playSound('sfx.combat-hit');
+      const playerHitLanded = res.hits.some((h) => !h.missed);
+      // A skill/lantern ability with its own dedicated cue (sfxAssetId) plays that instead of the
+      // generic hit sound - gated on an actual landed hit for an offensive action (skills are
+      // always offensive; a lantern ability can be healing/defensive instead, in which case there
+      // are no `hits` to check at all, so its own cue just plays whenever the action resolves).
+      // Falls back to the shared sfx.combat-hit for every other action type, a miss, or an
+      // action with no dedicated cue of its own (most of them).
+      let dedicatedSoundId: string | undefined;
+      if (type === 'skill') {
+        const skill = SKILLS.find((s) => s.id === (options?.skillId ?? 'keepers-strike'));
+        if (playerHitLanded && skill?.sfxAssetId) dedicatedSoundId = skill.sfxAssetId;
+      } else if (type === 'lanternAbility') {
+        const ability = LANTERN_ABILITIES.find((a) => a.id === options?.abilityId);
+        if (ability?.sfxAssetId && (ability.category !== 'offensive' || playerHitLanded)) {
+          dedicatedSoundId = ability.sfxAssetId;
+        }
+      }
+      if (dedicatedSoundId) {
+        void playSound(dedicatedSoundId);
+      } else if (playerHitLanded || res.enemyHits.length > 0) {
+        void playSound('sfx.combat-hit');
+      }
       if (res.hits.some((h) => h.defeated)) void playSound('sfx.enemy-defeated');
       setActiveOutgoingHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
       setActiveIncomingHits(res.enemyHits.map((h) => ({ ...h, key: batch * 1000 + h.attackerIndex })));

@@ -18,4 +18,10 @@ export interface Skill {
   /** Ailment id (see AILMENTS in data/ailments.ts) this move can inflict on the player - display
    *  only (e.g. the Journal's Echoes detail card), the actual chance/roll is server-only. */
   inflictsAilmentId?: string;
+  /** A registry.ts audio asset id (e.g. 'sfx.skill.ember-burst') to play instead of the generic
+   *  sfx.combat-hit when this skill lands a hit - purely a client-side presentation choice (like
+   *  everything else in this file), not gameplay data, so it has no server-side counterpart in
+   *  functions/src/data/skills.ts. Optional - most skills have no dedicated cue and just use the
+   *  generic hit sound (see CombatScene.tsx's own resolution of which sound to play). */
+  sfxAssetId?: string;
 }

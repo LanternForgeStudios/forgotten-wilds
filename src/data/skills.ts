@@ -10,6 +10,7 @@ export const SKILLS: Skill[] = [
     damageType: 'spirit',
     power: 18,
     spiritCost: 10,
+    sfxAssetId: 'sfx.skill.keepers-strike',
   },
   // Lantern Flame moved to src/data/lanternAbilities.ts — it belongs to whichever lantern is
   // equipped (fueled by Lantern Oil), not a generally-learned skill.
@@ -104,6 +105,7 @@ export const SKILLS: Skill[] = [
     spiritCost: 12,
     effectiveAgainstFamilies: ['coalSpirits'],
     inflictsAilmentId: 'freeze',
+    sfxAssetId: 'sfx.skill.frost-lance',
   },
   {
     id: 'ember-burst',
@@ -115,5 +117,6 @@ export const SKILLS: Skill[] = [
     spiritCost: 12,
     effectiveAgainstFamilies: ['waterSpirits', 'briarSpirits'],
     inflictsAilmentId: 'burn',
+    sfxAssetId: 'sfx.skill.ember-burst',
   },
 ];

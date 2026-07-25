@@ -94,6 +94,11 @@ export interface PartyBattleTurnResult {
   enemyHits?: PartyEnemyHitResult[];
   /** PvP only - null on a Defend/item/forfeit/stunned turn. */
   pvpHit?: PvpHitResult | null;
+  /** Which Specialty Attack the acting player used this turn (type: 'skill' only, defaults to
+   *  'keepers-strike') - look up Skill.sfxAssetId against this to play a per-skill hit cue. */
+  skillId?: string;
+  /** Same idea as skillId, for type: 'lanternAbility' - look up LanternAbility.sfxAssetId. */
+  abilityId?: string;
 }
 
 export interface PartyBattleWaveRewards {

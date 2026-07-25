@@ -8,6 +8,9 @@ export interface LanternAbility {
   category: LanternAbilityCategory;
   oilCost: number;
   description: string;
+  /** A registry.ts audio asset id, played instead of the generic sfx.combat-hit when this ability
+   *  resolves - same convention as Skill.sfxAssetId (see that type's own doc comment). */
+  sfxAssetId?: string;
 }
 
 export const LANTERN_ABILITIES: LanternAbility[] = [
@@ -17,6 +20,7 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
     category: 'offensive',
     oilCost: 8,
     description: "Sears a foe with the Keeper's Lantern's flame - especially fierce against Coal Spirits.",
+    sfxAssetId: 'sfx.lanternAbility.lantern-flame',
   },
   {
     id: 'steadfast-ember',
@@ -25,5 +29,6 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
     oilCost: 10,
     description:
       "The Miner's Lost Lantern burns with a warmth that outlasted its owner - draw on it to steady yourself and recover HP.",
+    sfxAssetId: 'sfx.lanternAbility.steadfast-ember',
   },
 ];
