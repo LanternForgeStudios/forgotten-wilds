@@ -63,10 +63,31 @@ below); the *existing* `sprite.player.male`/`.female` (fully-clothed) ids are st
 renders today and should NOT be swapped out until there's a rendering path plus at least
 placeholder-free layer art for the starter loadout.
 
-**Next up**: Phase 2 (rendering infrastructure - stack equipment-layer sprites on the base body,
-verified with a placeholder layer) is the next real step; the 4-appearance picker UI
-(CharacterCreationScene, UserProfile Skin tab) can also be built out now that real preview art
-exists for all 8 combinations, ahead of or alongside Phase 2.
+**4-appearance picker UI: done.** CharacterCreationScene and UserProfile's Skin tab both expose
+gender + appearance as two independent choices with live preview art (`SpritePreviewFrame`, a
+shared component that crops a sheet down to one frame instead of squashing the whole sheet into a
+tiny box - also reused by the Journal of Legends' Echoes/Bosses detail card, which had the same
+bug). `setPlayerSkin` now accepts and stores both fields.
+
+**Phase 2 (rendering infrastructure): done.** `ExplorationScene.setPlayer` accepts an
+`equipmentLayers: {slot, spriteAssetId}[]` param - each equipped slot with layer art gets its own
+child sprite kept in lockstep with the base sprite's position/scale/animation every call (each
+layer plays its own animation key against its own texture, but since every layer shares the same
+row/frameCount/frameRate as the base, playing them in the same tick keeps them visually frame-
+synced). Depth-ordered via `EQUIPMENT_LAYER_DEPTH_OFFSET` (boots < armor < gloves < weapon/
+lantern). `PhaserExplorationCanvas`/`TownScene`/`OverworldScene`/`DungeonScene` all thread a
+resolved layer list through via the new shared `resolveEquipmentLayers` util
+(`src/utils/equipmentLayers.ts`), which reads `player.equipment` + each equipped item's
+`layerSpriteAssetId[gender]` (new optional field on `EquipmentItem`). Verified end-to-end with a
+temporary placeholder layer (a real base-body sheet standing in for "armor") before removal -
+confirmed via live scene-graph inspection that position/scale/depth and all 4 walk directions'
+animation frames stay perfectly synced between the base sprite and its layer. Resolves to `[]` in
+practice today since no equipment item sets `layerSpriteAssetId` yet - **no visible change to the
+game** until Phase 3 ships real art. The base sprite itself is still `sprite.player.male/female`
+(not yet swapped to `sprite.player.base.*`) - that swap happens together with Phase 3/4's art, not
+before.
+
+**Next up**: Phase 3 (pilot loadout - walking-only, male-only, see that section above).
 
 ## The hard problem: frame-perfect alignment
 
@@ -158,9 +179,9 @@ scaled/animated identically to the base sprite:
 
 ## Phased delivery
 
-**Phase 1 (in progress)**: generate + build the two base bodies. No visual change yet - nothing
-switches over to them until there's a rendering path and at least placeholder-free art for the
-starter loadout (Phase 3/4).
+**Phase 1 (done)**: generate + build all 8 base bodies. No visual change yet - nothing switches
+over to them until there's a rendering path and at least placeholder-free art for the starter
+loadout (Phase 3/4).
 
 **Phase 2**: build the rendering infrastructure above with zero real layer art - verify a player
 renders identically to today (base body alone, no layers) and that the plumbing (equipment state →
@@ -169,9 +190,14 @@ resolved layer list → stacked sprites) works end-to-end with a single test pla
 
 **Phase 3 (pilot)**: pick ONE full loadout (e.g. the Prologue starter kit - `travelers-cloak`,
 `weathered-walking-staff`, `traveler-boots`, `work-gloves`, `keepers-lantern`) and take it all the
-way through: generate, align via the offset-tuning workflow above, verify in-game on both skins.
-This proves/refines the alignment workflow on a small, real slice before committing to all 19
-existing equipment items (soon more, once Mythic/Legendary tiers get built out per
+way through: generate, align via the offset-tuning workflow above, verify in-game. Deliberately
+narrowed twice (confirmed with the user) to keep the first pass through this workflow fast:
+**walking frames only** (16 cells - 4 directions × 4 frames - not the full 32; running frames get
+added once the workflow is proven) and **male base body only** (female equipment art is a genuinely
+separate generation+alignment pass given different proportions, not a resize - do it once the male
+pipeline is validated, not in parallel with figuring it out). This proves/refines the alignment
+workflow on the smallest real slice before committing to all 19 existing equipment items x 2
+genders x 2 animation states (soon more items too, once Mythic/Legendary tiers get built out per
 `functions/src/data/equipment.ts`'s own stubbed-for-later comment).
 
 **Phase 4**: roll out the remaining equipment families (walking-staff, keeper-coat,
@@ -180,12 +206,14 @@ item still needs its own flat `icon.equipment.*` UI icon too (deferred separatel
 `Asset-Production-Checklist.md`'s Equipment section) - the layer sprite and the icon are two
 different assets for the same item, generated independently.
 
-## Open questions for later phases (not blocking Phase 1)
+## Open questions for later phases
 
 - Exact z-order when a lantern is "held" vs. worn on a belt - depends on the actual generated pose,
   decide once real lantern layer art exists.
 - Whether running-animation equipment layers need their own distinct art or can reuse the walking
-  layer's frames scaled/retimed - likely needs its own art given the different limb positions,
-  same as the base body's own real (not duplicated) run cycle.
-- Female-skin equipment art is a full second set per item (proportions differ) - doubles Phase 4's
-  actual generation+alignment work, not just a resize.
+  layer's frames scaled/retimed - deferred until after Phase 3's walking-only pilot proves the
+  workflow; likely needs its own art given the different limb positions, same as the base body's
+  own real (not duplicated) run cycle.
+- Female equipment art (a genuinely separate generation+alignment pass, not a resize, given
+  different proportions) is deferred until after the male-only Phase 3 pilot validates the
+  workflow - see Phase 3's own note.

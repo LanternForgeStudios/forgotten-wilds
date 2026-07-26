@@ -1792,6 +1792,206 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ember-codex.png.',
   },
   {
+    id: 'icon.equipment.weathered-walking-staff',
+    category: 'icon',
+    intendedUse: 'Equipment icon for weathered-walking-staff',
+    filePath: 'icons/weathered-walking-staff.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-walking-staff.png.',
+  },
+  {
+    id: 'icon.equipment.ironwood-walking-staff',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ironwood-walking-staff',
+    filePath: 'icons/ironwood-walking-staff.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ironwood-walking-staff.png.',
+  },
+  {
+    id: 'icon.equipment.spiritwood-walking-staff',
+    category: 'icon',
+    intendedUse: 'Equipment icon for spiritwood-walking-staff',
+    filePath: 'icons/spiritwood-walking-staff.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/spiritwood-walking-staff.png.',
+  },
+  {
+    id: 'icon.equipment.worn-keeper-coat',
+    category: 'icon',
+    intendedUse: 'Equipment icon for worn-keeper-coat',
+    filePath: 'icons/worn-keeper-coat.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/worn-keeper-coat.png.',
+  },
+  {
+    id: 'icon.equipment.reinforced-keeper-coat',
+    category: 'icon',
+    intendedUse: 'Equipment icon for reinforced-keeper-coat',
+    filePath: 'icons/reinforced-keeper-coat.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/reinforced-keeper-coat.png.',
+  },
+  {
+    id: 'icon.equipment.veteran-keeper-coat',
+    category: 'icon',
+    intendedUse: 'Equipment icon for veteran-keeper-coat',
+    filePath: 'icons/veteran-keeper-coat.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/veteran-keeper-coat.png.',
+  },
+  {
+    id: 'icon.equipment.traveler-boots',
+    category: 'icon',
+    intendedUse: 'Equipment icon for traveler-boots',
+    filePath: 'icons/traveler-boots.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/traveler-boots.png.',
+  },
+  {
+    id: 'icon.equipment.trail-boots',
+    category: 'icon',
+    intendedUse: 'Equipment icon for trail-boots',
+    filePath: 'icons/trail-boots.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/trail-boots.png.',
+  },
+  {
+    id: 'icon.equipment.ranger-boots',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ranger-boots',
+    filePath: 'icons/ranger-boots.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ranger-boots.png.',
+  },
+  {
+    id: 'icon.equipment.work-gloves',
+    category: 'icon',
+    intendedUse: 'Equipment icon for work-gloves',
+    filePath: 'icons/work-gloves.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/work-gloves.png.',
+  },
+  {
+    id: 'icon.equipment.leather-gauntlets',
+    category: 'icon',
+    intendedUse: 'Equipment icon for leather-gauntlets',
+    filePath: 'icons/leather-gauntlets.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/leather-gauntlets.png.',
+  },
+  {
+    id: 'icon.equipment.keepers-gauntlets',
+    category: 'icon',
+    intendedUse: 'Equipment icon for keepers-gauntlets',
+    filePath: 'icons/keepers-gauntlets.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/keepers-gauntlets.png.',
+  },
+  {
+    id: 'icon.equipment.river-stone-charm',
+    category: 'icon',
+    intendedUse: 'Equipment icon for river-stone-charm',
+    filePath: 'icons/river-stone-charm.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/river-stone-charm.png.',
+  },
+  {
+    id: 'icon.equipment.mountain-knot',
+    category: 'icon',
+    intendedUse: 'Equipment icon for mountain-knot',
+    filePath: 'icons/mountain-knot.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/mountain-knot.png.',
+  },
+  {
+    id: 'icon.equipment.ghost-miners-coin',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ghost-miners-coin',
+    filePath: 'icons/ghost-miners-coin.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ghost-miners-coin.png.',
+  },
+  {
+    id: 'icon.equipment.keepers-lantern',
+    category: 'icon',
+    intendedUse: 'Equipment icon for keepers-lantern',
+    filePath: 'icons/keepers-lantern.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/keepers-lantern.png.',
+  },
+  {
+    id: 'icon.equipment.miners-lost-lantern-equipped',
+    category: 'icon',
+    intendedUse: 'Equipment icon for miners-lost-lantern-equipped',
+    filePath: 'icons/miners-lost-lantern-equipped.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/miners-lost-lantern-equipped.png.',
+  },
+  {
+    id: 'icon.equipment.stone-wolf-totem',
+    category: 'icon',
+    intendedUse: 'Equipment icon for stone-wolf-totem',
+    filePath: 'icons/stone-wolf-totem.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/stone-wolf-totem.png.',
+  },
+  {
+    id: 'icon.equipment.mountain-guardian-totem',
+    category: 'icon',
+    intendedUse: 'Equipment icon for mountain-guardian-totem',
+    filePath: 'icons/mountain-guardian-totem.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/mountain-guardian-totem.png.',
+  },
+  {
+    id: 'icon.equipment.travelers-cloak',
+    category: 'icon',
+    intendedUse: 'Equipment icon for travelers-cloak',
+    filePath: 'icons/travelers-cloak.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/travelers-cloak.png.',
+  },
+  {
     id: 'icon.currency.gold',
     category: 'icon',
     intendedUse: 'Currency icon for gold',

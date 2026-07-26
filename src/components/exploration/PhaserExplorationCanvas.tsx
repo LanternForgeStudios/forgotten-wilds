@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import type { TileMap } from '@/types';
+import type { EquipmentSlot, TileMap } from '@/types';
 import type { Facing, GridPosition } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
 import { ExplorationScene } from '@/phaser/ExplorationScene';
@@ -48,6 +48,10 @@ interface PhaserExplorationCanvasProps {
    *  `entities`, so it gets its own pair of animation props here. */
   playerFrameRow?: number;
   playerMovementState?: MovementState;
+  /** Equipped-item sprite layers stacked on top of the player (see
+   *  docs/Equipment-Layering-Plan.md) - resolved by the caller from player.equipment + each
+   *  equipped item's layerSpriteAssetId[gender]. Empty in practice until real layer art ships. */
+  equipmentLayers?: { slot: EquipmentSlot; spriteAssetId: string }[];
 }
 
 /** Phaser-backed replacement for the old DOM/CSS TileGrid - same prop shape, so every scene's JSX
@@ -62,6 +66,7 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
   const viewportSize = props.viewportSize;
   const playerFrameRow = props.playerFrameRow ?? 0;
   const playerMovementState = props.playerMovementState ?? 'idle';
+  const equipmentLayers = props.equipmentLayers ?? [];
 
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -138,8 +143,9 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
 
   useEffect(() => {
     if (!sceneReady) return;
-    void sceneRef.current?.setPlayer(player, playerSpriteAssetId, playerFrameRow, playerMovementState);
-  }, [sceneReady, player, playerSpriteAssetId, playerFrameRow, playerMovementState, tileSize]);
+    void sceneRef.current?.setPlayer(player, playerSpriteAssetId, playerFrameRow, playerMovementState, equipmentLayers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneReady, player, playerSpriteAssetId, playerFrameRow, playerMovementState, equipmentLayers, tileSize]);
 
   useEffect(() => {
     if (!sceneReady) return;

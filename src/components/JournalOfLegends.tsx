@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
+import { SpritePreviewFrame } from './common/SpritePreviewFrame';
 import { useJournalStore } from '@/state/useJournalStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useSceneStore } from '@/state/useSceneStore';
@@ -357,12 +358,14 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   .filter((f): f is Enemy['family'] => !!f && f !== 'boss'),
               ),
             );
-            const visible = journal.creaturesDiscovered.filter((id) => {
-              const enemy = ENEMIES.find((e) => e.id === id);
-              if (echoesFamilyFilter !== 'all' && enemy?.family !== echoesFamilyFilter) return false;
-              if (echoesTierFilter !== 'all' && enemy?.tier !== echoesTierFilter) return false;
-              return matchesEnemyQuery(enemy, query);
-            });
+            const visible = journal.creaturesDiscovered
+              .filter((id) => {
+                const enemy = ENEMIES.find((e) => e.id === id);
+                if (echoesFamilyFilter !== 'all' && enemy?.family !== echoesFamilyFilter) return false;
+                if (echoesTierFilter !== 'all' && enemy?.tier !== echoesTierFilter) return false;
+                return matchesEnemyQuery(enemy, query);
+              })
+              .sort((a, b) => (ENEMIES.find((e) => e.id === a)?.name ?? a).localeCompare(ENEMIES.find((e) => e.id === b)?.name ?? b));
             return (
               <div>
                 <input
@@ -441,12 +444,13 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             />
             {journal.locationsVisited
               .filter((id) => !LOCATIONS.find((l) => l.id === id)?.parentLocationId)
+              .sort((a, b) => (LOCATIONS.find((l) => l.id === a)?.name ?? a).localeCompare(LOCATIONS.find((l) => l.id === b)?.name ?? b))
               .map((id) => {
                 const loc = LOCATIONS.find((l) => l.id === id);
                 const canTravel = loc?.fastTravel && id !== currentLocationId && fastTravelUnlocked;
                 const allChildren = LOCATIONS.filter(
                   (l) => l.parentLocationId === id && journal.locationsVisited.includes(l.id),
-                );
+                ).sort((a, b) => a.name.localeCompare(b.name));
                 const parentMatches = matchesLocationQuery(loc);
                 const matchingChildren = allChildren.filter(matchesLocationQuery);
                 if (locationQuery && !parentMatches && matchingChildren.length === 0) return null;
@@ -516,11 +520,13 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   .filter((c): c is ItemCategory => !!c),
               ),
             );
-            const visible = journal.itemsDiscovered.filter((id) => {
-              const entry = resolveDiscoveredEntry(id);
-              if (itemsCategoryFilter !== 'all' && entry?.category !== itemsCategoryFilter) return false;
-              return matchesItemQuery(entry, query);
-            });
+            const visible = journal.itemsDiscovered
+              .filter((id) => {
+                const entry = resolveDiscoveredEntry(id);
+                if (itemsCategoryFilter !== 'all' && entry?.category !== itemsCategoryFilter) return false;
+                return matchesItemQuery(entry, query);
+              })
+              .sort((a, b) => (resolveDiscoveredEntry(a)?.name ?? a).localeCompare(resolveDiscoveredEntry(b)?.name ?? b));
             return (
               <div>
                 <input
@@ -586,7 +592,11 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
         {tab === 'lore' && (
           <div>
             {journal.loreUnlocked.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No lore unlocked yet.</p>}
-            {journal.loreUnlocked.map((id) => {
+            {[...journal.loreUnlocked]
+              .sort((a, b) =>
+                (LORE_ENTRIES.find((l) => l.id === a)?.title ?? a).localeCompare(LORE_ENTRIES.find((l) => l.id === b)?.title ?? b),
+              )
+              .map((id) => {
               const entry = LORE_ENTRIES.find((l) => l.id === id);
               if (!entry) return null;
               return (
@@ -605,7 +615,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
         {tab === 'bosses' &&
           (() => {
             const query = bossesSearch.trim().toLowerCase();
-            const visible = journal.bossesDefeated.filter((id) => matchesEnemyQuery(ENEMIES.find((e) => e.id === id), query));
+            const visible = journal.bossesDefeated
+              .filter((id) => matchesEnemyQuery(ENEMIES.find((e) => e.id === id), query))
+              .sort((a, b) => (ENEMIES.find((e) => e.id === a)?.name ?? a).localeCompare(ENEMIES.find((e) => e.id === b)?.name ?? b));
             return (
               <div>
                 <input
@@ -662,7 +674,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             >
               <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                 <div className={styles.detailHeader}>
-                  <img src={getAssetUrl(enemy.battleSpriteAssetId)} alt="" className={styles.detailIcon} style={{ width: 56, height: 56 }} />
+                  <SpritePreviewFrame assetId={enemy.battleSpriteAssetId} alt={enemy.name} size={{ width: 56, height: 56 }} />
                   <div>
                     <p className={styles.detailName} style={{ fontSize: 16 }}>
                       {enemy.name}

@@ -30,6 +30,7 @@ import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS } from '@/data';
 import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
+import { resolveEquipmentLayers } from '@/utils/equipmentLayers';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
@@ -77,6 +78,8 @@ export function TownScene() {
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
+  const equipment = usePlayerStore((s) => s.player?.equipment);
+  const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const questProgress = useQuestStore((s) => s.progress);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const openedChests = useWorldStateStore((s) => s.openedChests);
@@ -310,6 +313,7 @@ export function TownScene() {
           viewportSize={viewportSize}
           playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
           playerMovementState={movementState}
+          equipmentLayers={equipmentLayers}
         />
       </div>
       {/* Hidden entirely while a battle panel is open (mobile controls included) - see

@@ -65,6 +65,12 @@ export interface EquipmentItem {
   /** Any slot: reduces the wielder's chance of being afflicted by a matching ailment while
    *  equipped. Display copy only, see functions/src/data/equipment.ts. */
   ailmentResistance?: { ailmentId: string; reductionPercent: number }[];
+  /** Overworld sprite sheet rendered as a layer on top of the base player body when this item is
+   *  equipped (see docs/Equipment-Layering-Plan.md) - keyed by gender since layer art only depends
+   *  on body silhouette, not appearance. Omitted = nothing rendered for this item (every item
+   *  until Phase 3/4 ship real layer art). Purely a client-side display concern, same as
+   *  iconAssetId - no server-authoritative equivalent needed. */
+  layerSpriteAssetId?: { male: string; female: string };
 }
 
 export interface InventoryItem {

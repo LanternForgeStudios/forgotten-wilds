@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { TileLayer, TileMap } from '@/types';
+import type { TileLayer, TileMap, EquipmentSlot } from '@/types';
 import type { GridPosition } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
 import { PLAYER_ANIMATION_LAYOUT, animationLayoutForSprite } from '@/animation/characterAnimations';
@@ -26,6 +26,19 @@ const OVERHANG_DEPTH = 1000;
 /** Entities and the player sit between decoration layers and the overhang. Deliberately higher
  *  than any plausible decoration-layer count. */
 const ENTITY_DEPTH = 500;
+/** Stacking order for equipment layer sprites, as small fractional offsets from the base player
+ *  sprite's own ENTITY_DEPTH (see docs/Equipment-Layering-Plan.md) - boots under armor under
+ *  gloves under weapon/lantern. Tuned by eye once real layer art exists; weapon and lantern share
+ *  a tier for now since which one should render "on top" depends on the actual generated pose
+ *  (open question in the plan doc). A slot with no offset listed falls back to 0.5 (above every
+ *  named slot) rather than silently rendering under the base body. */
+const EQUIPMENT_LAYER_DEPTH_OFFSET: Partial<Record<EquipmentSlot, number>> = {
+  boots: 0.1,
+  armor: 0.2,
+  gloves: 0.3,
+  weapon: 0.4,
+  lantern: 0.4,
+};
 /** Same one-time generated 4x4 white-square texture ensureParticleTexture already sets up for
  *  BattleScene's defeat effect - reused here rather than duplicating the Graphics->texture
  *  boilerplate, tinted differently per call site. */
@@ -97,6 +110,11 @@ export class ExplorationScene extends Phaser.Scene {
    *  texture can change at runtime (e.g. a future equipment-appearance swap), but guarded now for
    *  consistency rather than waiting for that bug to actually happen. */
   private playerGeneration = 0;
+  /** One child sprite per equipped slot with layer art (see docs/Equipment-Layering-Plan.md) -
+   *  kept in lockstep with playerSprite's own position/scale/animation every setPlayer call.
+   *  Empty in practice until real layer art ships (Phase 3/4) - no equipped item sets a
+   *  layerSpriteAssetId yet, so equipmentLayers is always [] today. */
+  private equipmentLayerSprites = new Map<EquipmentSlot, { sprite: Phaser.GameObjects.Sprite; spriteAssetId: string }>();
 
   private entityVisuals = new Map<string, EntityVisual>();
   /** Incremented on every setEntities call - lets an in-flight upsertEntity (awaiting a texture
@@ -258,8 +276,13 @@ export class ExplorationScene extends Phaser.Scene {
     });
   }
 
-  private async ensurePlayerAnimations(spriteAssetId: string): Promise<void> {
-    if (this.playerTextureKey === spriteAssetId) return;
+  /** Loads the texture (if not already loaded) and registers PLAYER_ANIMATION_LAYOUT's walk/run
+   *  animations against it (if it's a real spritesheet - a frameSize-less static image has no rows
+   *  to animate). Side-effect-free w.r.t. playerTextureKey so it's safe to call for an equipment
+   *  layer's own spriteAssetId too, not just the base player sprite - every layer sheet shares the
+   *  base's exact row/frame layout (see docs/Equipment-Layering-Plan.md), so the same layout
+   *  applies uniformly. */
+  private async ensureAnimationsFor(spriteAssetId: string): Promise<void> {
     await loadSceneTexture(this, spriteAssetId);
     // Only a real spritesheet (frameSize set - today just the sprite.player fallback) has rows to
     // build a walk/run animation from. The male/female skins (Player.gender) are still a single
@@ -272,19 +295,36 @@ export class ExplorationScene extends Phaser.Scene {
     if (getAssetDefinition(spriteAssetId).frameSize) {
       createCharacterAnimations(this.anims, spriteAssetId, PLAYER_ANIMATION_LAYOUT);
     }
+  }
+
+  private async ensurePlayerAnimations(spriteAssetId: string): Promise<void> {
+    if (this.playerTextureKey === spriteAssetId) return;
+    await this.ensureAnimationsFor(spriteAssetId);
     this.playerTextureKey = spriteAssetId;
   }
 
   /** Positions/animates the player sprite - the player isn't part of `entities`, matching the old
-   *  TileGrid's own player-is-rendered-separately convention. */
-  async setPlayer(pos: GridPosition, spriteAssetId: string, frameRow: number, movementState: MovementState): Promise<void> {
+   *  TileGrid's own player-is-rendered-separately convention. `equipmentLayers` stacks one extra
+   *  sprite per equipped slot with layer art (see docs/Equipment-Layering-Plan.md), kept in
+   *  lockstep with the base sprite's own position/scale/animation every call - empty in practice
+   *  until real layer art exists. */
+  async setPlayer(
+    pos: GridPosition,
+    spriteAssetId: string,
+    frameRow: number,
+    movementState: MovementState,
+    equipmentLayers: { slot: EquipmentSlot; spriteAssetId: string }[] = [],
+  ): Promise<void> {
     this.playerGeneration++;
     const generation = this.playerGeneration;
     // Captured before ensurePlayerAnimations (which updates playerTextureKey itself) - true only
     // when an already-created sprite's skin actually changed mid-session (see UserProfile's Skin
     // tab); always false on the very first setPlayer call, since there's no sprite yet to retexture.
     const textureChanged = !!this.playerSprite && this.playerTextureKey !== spriteAssetId;
-    await this.ensurePlayerAnimations(spriteAssetId);
+    await Promise.all([
+      this.ensurePlayerAnimations(spriteAssetId),
+      ...equipmentLayers.map((layer) => this.ensureAnimationsFor(layer.spriteAssetId)),
+    ]);
     // A newer setPlayer call has since superseded this one - its own (more current) state has
     // already been applied, so don't let this stale continuation clobber it.
     if (generation !== this.playerGeneration) return;
@@ -353,6 +393,62 @@ export class ExplorationScene extends Phaser.Scene {
         // TileGrid's `playerFrameRow` prop) rather than re-derived here.
         sprite.anims.stop();
         sprite.setFrame(frameRow * PLAYER_ANIMATION_LAYOUT.frameCount);
+      }
+    }
+
+    // Equipment layers: one child sprite per equipped slot with layer art, kept in lockstep with
+    // the base sprite above (same position/scale/animation) - every layer sheet must share the
+    // base's exact 8-row x 4-frame x 72x96 layout for this to line up. Each layer plays its OWN
+    // animation key (computed against its own spriteAssetId, not the base's) since a Phaser
+    // Animation is tied to the texture it was created against - but since every layer shares the
+    // same row/frameCount/frameRate as the base, playing them all in the same tick keeps them
+    // visually frame-synced regardless of each one's distinct literal key string.
+    const seenSlots = new Set<EquipmentSlot>();
+    for (const layer of equipmentLayers) {
+      seenSlots.add(layer.slot);
+      let visual = this.equipmentLayerSprites.get(layer.slot);
+      if (!visual) {
+        const layerSprite = this.add
+          .sprite(sprite.x, sprite.y, layer.spriteAssetId)
+          .setOrigin(0.5, 1)
+          .setDepth(ENTITY_DEPTH + (EQUIPMENT_LAYER_DEPTH_OFFSET[layer.slot] ?? 0.5));
+        visual = { sprite: layerSprite, spriteAssetId: layer.spriteAssetId };
+        this.equipmentLayerSprites.set(layer.slot, visual);
+      } else if (visual.spriteAssetId !== layer.spriteAssetId) {
+        // Same retexture-must-stop-the-old-animation-first fix as upsertEntity's own retexture
+        // branch (see that method's comment) - a still-playing animation from the old asset would
+        // otherwise keep overwriting the sprite's frame back onto the just-replaced texture.
+        visual.sprite.anims.stop();
+        visual.sprite.setTexture(layer.spriteAssetId);
+        visual.spriteAssetId = layer.spriteAssetId;
+      }
+      const layerSprite = visual.sprite;
+      layerSprite.setScale(sprite.scaleX, sprite.scaleY);
+      if (snapInstantly) {
+        this.tweens.killTweensOf(layerSprite);
+        layerSprite.setPosition(targetX, targetY);
+      } else {
+        const duration = movementState === 'running' ? DASH_GLIDE_MS : GLIDE_MS;
+        this.tweens.add({ targets: layerSprite, x: targetX, y: targetY, duration, ease: 'Linear' });
+      }
+      if (getAssetDefinition(layer.spriteAssetId).frameSize) {
+        if (movementState === 'walking' || movementState === 'running') {
+          const layerKey = animationKey(layer.spriteAssetId, movementState, pos.facing);
+          if (!layerSprite.anims.isPlaying || layerSprite.anims.currentAnim?.key !== layerKey) {
+            layerSprite.play(layerKey);
+          }
+        } else {
+          layerSprite.anims.stop();
+          layerSprite.setFrame(frameRow * PLAYER_ANIMATION_LAYOUT.frameCount);
+        }
+      }
+    }
+    // A slot that had a layer sprite before but isn't in this call's list anymore (unequipped, or
+    // switched to an item with no layer art) gets its sprite torn down.
+    for (const [slot, visual] of this.equipmentLayerSprites) {
+      if (!seenSlots.has(slot)) {
+        visual.sprite.destroy();
+        this.equipmentLayerSprites.delete(slot);
       }
     }
   }

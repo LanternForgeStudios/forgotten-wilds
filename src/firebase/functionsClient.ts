@@ -28,9 +28,15 @@ export async function callCreateCharacter(
   return result.data;
 }
 
-export async function callSetPlayerSkin(gender: 'male' | 'female'): Promise<{ gender: 'male' | 'female' }> {
-  const fn = httpsCallable<{ gender: 'male' | 'female' }, { gender: 'male' | 'female' }>(functions, 'setPlayerSkin');
-  const result = await fn({ gender });
+export async function callSetPlayerSkin(
+  gender: 'male' | 'female',
+  appearance: Appearance,
+): Promise<{ gender: 'male' | 'female'; appearance: Appearance }> {
+  const fn = httpsCallable<
+    { gender: 'male' | 'female'; appearance: Appearance },
+    { gender: 'male' | 'female'; appearance: Appearance }
+  >(functions, 'setPlayerSkin');
+  const result = await fn({ gender, appearance });
   return result.data;
 }
 

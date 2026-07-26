@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Panel } from '@/components/common/Panel';
+import { SpritePreviewFrame } from '@/components/common/SpritePreviewFrame';
 import { getAssetUrl } from '@/assets/assetManager';
 import { callCreateCharacter } from '@/firebase/functionsClient';
 import { hydrateAllStores } from '@/state/hydrate';
@@ -9,11 +10,19 @@ import { INTRO_CUTSCENE } from '@/data/cutscenes';
 import { playMusic } from '@/audio/audioService';
 import styles from './TitleScene.module.css';
 
-// Gender-only picker for now - appearance (skin tone/hair) isn't user-facing yet, see
-// docs/Equipment-Layering-Plan.md; callCreateCharacter defaults appearance to 'white-dark'.
-const GENDER_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
-  { id: 'male', label: 'Male', assetId: 'sprite.player.male' },
-  { id: 'female', label: 'Female', assetId: 'sprite.player.female' },
+type Gender = 'male' | 'female';
+type Appearance = 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
+
+const GENDER_OPTIONS: { id: Gender; label: string }[] = [
+  { id: 'male', label: 'Male' },
+  { id: 'female', label: 'Female' },
+];
+
+const APPEARANCE_OPTIONS: { id: Appearance; label: string }[] = [
+  { id: 'white-dark', label: 'White, Dark Hair' },
+  { id: 'black-dark', label: 'Black, Dark Hair' },
+  { id: 'white-blonde', label: 'White, Blonde Hair' },
+  { id: 'asian-dark', label: 'Asian, Dark Hair' },
 ];
 
 export function CharacterCreationScene() {
@@ -24,7 +33,8 @@ export function CharacterCreationScene() {
   }, []);
 
   const [name, setName] = useState('');
-  const [gender, setGender] = useState<'male' | 'female'>('male');
+  const [gender, setGender] = useState<Gender>('male');
+  const [appearance, setAppearance] = useState<Appearance>('white-dark');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const goTo = useSceneStore((s) => s.goTo);
@@ -34,7 +44,7 @@ export function CharacterCreationScene() {
     setError(null);
     setBusy(true);
     try {
-      const save = await callCreateCharacter(name.trim(), gender);
+      const save = await callCreateCharacter(name.trim(), gender, appearance);
       hydrateAllStores(save);
       // A brand new character's own existence is the "first time" signal - no persisted flag
       // needed, this only ever runs once per account by construction. Town only loads once the
@@ -69,7 +79,7 @@ export function CharacterCreationScene() {
             className={styles.input}
             autoFocus
           />
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             {GENDER_OPTIONS.map((option) => (
               <button
                 key={option.id}
@@ -87,8 +97,31 @@ export function CharacterCreationScene() {
                   cursor: 'pointer',
                 }}
               >
-                <img src={getAssetUrl(option.assetId)} alt={option.label} style={{ width: 72, height: 96, imageRendering: 'pixelated' }} />
+                <SpritePreviewFrame assetId={`sprite.player.base.${option.id}.${appearance}`} alt={option.label} />
                 <span style={{ fontSize: 12, color: 'var(--fw-text)' }}>{option.label}</span>
+              </button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+            {APPEARANCE_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => setAppearance(option.id)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 4,
+                  background: appearance === option.id ? 'var(--fw-accent-dim)' : 'transparent',
+                  border: `1px solid ${appearance === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
+                  borderRadius: 6,
+                  padding: '6px 10px',
+                  cursor: 'pointer',
+                }}
+              >
+                <SpritePreviewFrame assetId={`sprite.player.base.${gender}.${option.id}`} alt={option.label} />
+                <span style={{ fontSize: 11, color: 'var(--fw-text)' }}>{option.label}</span>
               </button>
             ))}
           </div>

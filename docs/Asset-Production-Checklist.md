@@ -259,9 +259,8 @@ generation prompt should target 128×128 regardless. The build/processing step d
 in this doc already follows - see e.g. the building-facade pipeline's `original/` folder). The
 point: if the in-game size ever needs to change again later (as already happened once with the
 building facades, 72×72 → 144×144), there's a real 128×128 source to re-resize from instead of
-needing to regenerate the art from scratch. None of these 52 are built yet (all still
-`status: 'placeholder'` in the registry) - this is the spec for whenever that work starts, pixellab
-MCP-generated or otherwise.
+needing to regenerate the art from scratch. All 52 are now built (`status: 'final'` in the
+registry) - see each subsection below for generation notes.
 
 ### Items (22 - generate 128×128, final 64×64: consumables, materials, key items) - all 22 done
 
@@ -323,7 +322,12 @@ its own.
 | Blind | 64×64 | Simple flat-shaded fantasy game icon badge of a grey crossed-out eye symbol, centered, transparent background. |
 | Silence | 64×64 | Simple flat-shaded fantasy game icon badge of a muted purple crossed-out sound-wave symbol, centered, transparent background. |
 
-### Equipment (20 - generate 128×128, final 64×64, across 7 rarity families + 2 unique lanterns)
+### Equipment (20 - generate 128×128, final 64×64, across 7 rarity families + 2 unique lanterns) - all 20 done
+
+Same pixellab MCP `create_map_object` pipeline as the sections above. All 20 matched their prompts
+cleanly on the first attempt except **Ghost Miner's Coin**, which came back as a generic old
+coin/medallion (human-profile bust, stars) rather than anything distinctly "ghost"-themed or
+glowing - accepted as-is since it still reads clearly as an old coin/token, the core concept.
 
 | Equipment | Final Size | Generation prompt |
 |---|---|---|

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Panel } from './common/Panel';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
+import { SpritePreviewFrame } from './common/SpritePreviewFrame';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { signOutUser } from '@/firebase/auth';
-import { getAssetUrl, getAssetDefinition } from '@/assets/assetManager';
 import {
   subscribeToFriendship,
   subscribeToBlockList,
@@ -90,11 +90,19 @@ interface UserProfileProps {
 
 type ProfileTab = 'profile' | 'friends' | 'clan' | 'skin' | 'settings' | 'reset';
 
-// Gender-only picker for now - appearance (skin tone/hair) isn't user-facing yet, see
-// docs/Equipment-Layering-Plan.md.
-const GENDER_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
-  { id: 'male', label: 'Male', assetId: 'sprite.player.male' },
-  { id: 'female', label: 'Female', assetId: 'sprite.player.female' },
+type Gender = 'male' | 'female';
+type Appearance = 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
+
+const GENDER_OPTIONS: { id: Gender; label: string }[] = [
+  { id: 'male', label: 'Male' },
+  { id: 'female', label: 'Female' },
+];
+
+const APPEARANCE_OPTIONS: { id: Appearance; label: string }[] = [
+  { id: 'white-dark', label: 'White, Dark Hair' },
+  { id: 'black-dark', label: 'Black, Dark Hair' },
+  { id: 'white-blonde', label: 'White, Blonde Hair' },
+  { id: 'asian-dark', label: 'Asian, Dark Hair' },
 ];
 
 export function UserProfile({ onClose }: UserProfileProps) {
@@ -398,11 +406,11 @@ export function UserProfile({ onClose }: UserProfileProps) {
     }
   }
 
-  async function changeSkin(gender: 'male' | 'female') {
+  async function changeSkin(gender: Gender, appearance: Appearance) {
     if (busy) return;
     setBusy(true);
     try {
-      await callSetPlayerSkin(gender);
+      await callSetPlayerSkin(gender, appearance);
       if (uid) await resyncSave(uid);
     } finally {
       setBusy(false);
@@ -1305,15 +1313,15 @@ export function UserProfile({ onClose }: UserProfileProps) {
         {tab === 'skin' && player && (
           <div className={styles.section}>
             <p style={{ fontSize: 13, opacity: 0.85, marginTop: 0 }}>
-              Choose how your character appears to yourself and other players. More options may be added later.
+              Choose how your character appears to yourself and other players.
             </p>
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {GENDER_OPTIONS.map((option) => (
                 <button
                   key={option.id}
                   type="button"
                   disabled={busy}
-                  onClick={() => changeSkin(option.id)}
+                  onClick={() => changeSkin(option.id, player.appearance)}
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -1326,40 +1334,34 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     cursor: busy ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  {(() => {
-                    const def = getAssetDefinition(option.assetId);
-                    // A skin's own registry entry may be a plain single image (no frameSize) or a
-                    // full walk/run sheet - a bare <img> would otherwise render the *entire* sheet
-                    // squashed into this preview box instead of one frame. When there's a
-                    // frameSize, crop to just row 0/col 0 (south-facing, walking-down frame 0 - a
-                    // neutral standing pose) via a background-image sized to the full sheet and
-                    // positioned to show only that one frame.
-                    if (!def.frameSize) {
-                      return (
-                        <img
-                          src={getAssetUrl(option.assetId)}
-                          alt={option.label}
-                          style={{ width: 72, height: 96, imageRendering: 'pixelated' }}
-                        />
-                      );
-                    }
-                    return (
-                      <div
-                        role="img"
-                        aria-label={option.label}
-                        style={{
-                          width: def.frameSize.width,
-                          height: def.frameSize.height,
-                          backgroundImage: `url(${getAssetUrl(option.assetId)})`,
-                          backgroundPosition: '0 0',
-                          backgroundSize: `${def.dimensions?.width ?? def.frameSize.width}px ${def.dimensions?.height ?? def.frameSize.height}px`,
-                          imageRendering: 'pixelated',
-                        }}
-                      />
-                    );
-                  })()}
+                  <SpritePreviewFrame assetId={`sprite.player.base.${option.id}.${player.appearance}`} alt={option.label} />
                   <span style={{ fontSize: 12 }}>{option.label}</span>
                   {player.gender === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
+              {APPEARANCE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => changeSkin(player.gender, option.id)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 4,
+                    background: player.appearance === option.id ? 'var(--fw-accent-dim)' : 'transparent',
+                    border: `1px solid ${player.appearance === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
+                    borderRadius: 6,
+                    padding: '6px 10px',
+                    cursor: busy ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  <SpritePreviewFrame assetId={`sprite.player.base.${player.gender}.${option.id}`} alt={option.label} />
+                  <span style={{ fontSize: 11 }}>{option.label}</span>
+                  {player.appearance === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
                 </button>
               ))}
             </div>

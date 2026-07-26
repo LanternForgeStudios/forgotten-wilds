@@ -34,6 +34,7 @@ import {
 import { resyncSave } from '@/state/hydrate';
 import { LOCATIONS, NPCS } from '@/data';
 import { itemDisplayName } from '@/utils/itemName';
+import { resolveEquipmentLayers } from '@/utils/equipmentLayers';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
@@ -93,6 +94,8 @@ export function OverworldScene() {
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
+  const equipment = usePlayerStore((s) => s.player?.equipment);
+  const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
@@ -337,6 +340,7 @@ export function OverworldScene() {
           viewportSize={viewportSize}
           playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
           playerMovementState={movementState}
+          equipmentLayers={equipmentLayers}
         />
       </div>
       {/* Hidden entirely while a battle panel is open (mobile controls included) - see
