@@ -419,11 +419,21 @@ export class ExplorationScene extends Phaser.Scene {
         createCharacterAnimations(this.anims, entity.spriteAssetId, animationLayoutForSprite(entity.spriteAssetId));
       }
     } else if (visual.spriteAssetId !== entity.spriteAssetId) {
-      // Same entity id (e.g. another player's presence doc), different sprite - most notably
-      // another player switching skins via Profile mid-session. Load (if not already cached) and
-      // retexture in place rather than leaving the sprite stuck on its original asset.
+      // Same entity id (e.g. another player's presence doc, or a chest whose refId now resolves to
+      // structure.chest-open once opened), different sprite - most notably another player switching
+      // skins via Profile mid-session. Load (if not already cached) and retexture in place rather
+      // than leaving the sprite stuck on its original asset.
       await loadSceneTexture(this, entity.spriteAssetId);
       if (generation !== this.entityGeneration) return;
+      // Must stop any animation still playing from the OLD asset before retexturing, not just when
+      // the new asset happens to have no frameSize - an active Phaser animation references frames
+      // tied to the texture key it was created against, so it keeps overwriting the sprite's frame
+      // back to the old texture every tick even after setTexture() below, regardless of whether the
+      // new asset ends up needing its own animation immediately after. Reported live as a chest
+      // staying visually "glowing/closed" after being opened until the location was reloaded - the
+      // glow-loop animation (registered against structure.chest) kept fighting the retexture to
+      // structure.chest-open (no frameSize, so the frameSize-gated stop() below never ran for it).
+      visual.sprite.anims.stop();
       visual.sprite.setTexture(entity.spriteAssetId);
       visual.spriteAssetId = entity.spriteAssetId;
       if (getAssetDefinition(entity.spriteAssetId).frameSize) {

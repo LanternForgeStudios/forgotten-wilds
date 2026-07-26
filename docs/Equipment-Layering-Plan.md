@@ -5,17 +5,63 @@ gloves, boots, and lantern - not just the inventory/equip-menu icons that alread
 spiritTotem (the two small accessory slots) are **not** in scope - they're worn under clothes or
 held out of frame, nothing to visibly layer.
 
+**Scope expanded per `NewClaudeAsk.txt`**: the player will select from **4 appearances** (White/
+dark hair, Black/dark hair, White/blonde hair, Asian/dark hair) **× 2 genders = 8 total base
+bodies**, not just the 2 (male/female) originally planned - confirmed with the user directly (see
+below). The user's own stated requirement - "make sure they are identical to each other so when
+the equipment layers are applied it is plug and play" - is the load-bearing constraint here.
+
+## Skin selection data model (new decision, not yet implemented)
+
+Today `Player.skin` is a flat `'male' | 'female'` union (`src/types/player.ts:32`,
+`functions/src/shared-types/index.ts:83,430`), read via `skin === 'female' ? 'sprite.player.female'
+: 'sprite.player.male'` at every render call site (OverworldScene/TownScene/DungeonScene's player
+render, `PvpBattlePanel`'s opponent sprite resolution, etc. - a real, repeated pattern across
+several files).
+
+**Recommended**: split into two orthogonal fields rather than an 8-value flat union:
+
+```ts
+gender: 'male' | 'female';
+appearance: 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
+```
+
+Rationale: the Profile "Skin" tab naturally becomes two independent choices (body type, then
+appearance) rather than 8 flat radio buttons; sprite asset id resolution becomes
+`sprite.player.base.${gender}.${appearance}`; and critically, **equipment layer art only depends on
+`gender`** (body silhouette), not `appearance` (skin tone/hair) - since the whole point of "identical
+proportions" is that a boot/coat/glove layer fits identically regardless of skin tone or hairstyle.
+This keeps Phase 3/4's equipment-art scope at 2 layer-art sets (male/female), **not 8** - the
+4x-appearance multiplier only applies to the base bodies themselves, not to every equipment item on
+top of them. If that "identical proportions across all 4 appearances" requirement doesn't hold up
+once real art is in hand, this assumption needs revisiting before Phase 3.
+
+This is a genuine data-model migration (Cloud Function `setPlayerSkin.ts`, character creation flow,
+every `skin === 'female' ? ... : ...` render call site, the Profile Skin tab's UI) - scoped as its
+own step below, not assumed free.
+
 ## Status
 
-**Phase 1 in progress**: `sprite.player.base.male`/`sprite.player.base.female` (an "underwear-only"
-base body, replacing the current fully-clothed `sprite.player.male`/`sprite.player.female`) are
-being generated via the pixellab MCP as of this writing - see `docs/pixellab-asset-ids.md` for the
-character ids. Once processed into sheets (same `build_player_sheet.py` pipeline the current skins
-already use - 8 rows × 4 frames × 72×96, walk down/left/up/right then run down/left/up/right),
-they'll need their own registry ids (`sprite.player.base.male`/`.female`) - the *existing*
-`sprite.player.male`/`.female` ids should NOT be overwritten yet, since nothing renders equipment
-layers until Phase 3 lands; swapping the base in before then would make every player appear
-undressed with no compensating layers on top.
+**Phase 1 in progress**: two base bodies (no appearance specified in the prompt - likely reads as
+a default "white, dark hair" look, to be confirmed once art is in) are already generating via the
+pixellab MCP - see `docs/pixellab-asset-ids.md` for the character ids
+(`sprite.player.base.male`/`.female` working ids for now). Once visually confirmed, these become
+the `white-dark` appearance; the other 3 appearances (`black-dark`, `white-blonde`, `asian-dark`)
+still need generating for each gender - **6 more base-body characters**, same pipeline (`create_
+character` + `walking-4-frames` + `running-4-frames` per direction), explicit skin-tone/hair
+wording per prompt, same size/proportions/view/style params held constant across all 8 for
+consistency. 8 total × (1 create + 8 animation jobs) ≈ 72 generations - cheap against the ~1700
+remaining budget, but real wall-clock time given the ~5-8 min/character pipeline seen so far this
+session.
+
+Registered as `sprite.player.base.male`/`sprite.player.base.female` for now (an "underwear-only"
+base body, replacing the current fully-clothed `sprite.player.male`/`sprite.player.female`) - once
+the 8-appearance data model above is decided, these ids likely become
+`sprite.player.base.{gender}.{appearance}` instead. Processed into sheets the same way the current
+skins already are (`build_player_sheet.py` - 8 rows × 4 frames × 72×96, walk down/left/up/right
+then run down/left/up/right). The *existing* `sprite.player.male`/`.female` ids should NOT be
+overwritten yet, since nothing renders equipment layers until Phase 3 lands; swapping the base in
+before then would make every player appear undressed with no compensating layers on top.
 
 ## The hard problem: frame-perfect alignment
 
