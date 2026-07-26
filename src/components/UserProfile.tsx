@@ -1315,56 +1315,68 @@ export function UserProfile({ onClose }: UserProfileProps) {
             <p style={{ fontSize: 13, opacity: 0.85, marginTop: 0 }}>
               Choose how your character appears to yourself and other players.
             </p>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {GENDER_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => changeSkin(option.id, player.appearance)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 4,
-                    background: player.gender === option.id ? 'var(--fw-accent-dim)' : 'transparent',
-                    border: `1px solid ${player.gender === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
-                    borderRadius: 6,
-                    padding: '8px 14px',
-                    cursor: busy ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  <SpritePreviewFrame assetId={`sprite.player.base.${option.id}.${player.appearance}`} alt={option.label} />
-                  <span style={{ fontSize: 12 }}>{option.label}</span>
-                  {player.gender === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
-                </button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
-              {APPEARANCE_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => changeSkin(player.gender, option.id)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 4,
-                    background: player.appearance === option.id ? 'var(--fw-accent-dim)' : 'transparent',
-                    border: `1px solid ${player.appearance === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
-                    borderRadius: 6,
-                    padding: '6px 10px',
-                    cursor: busy ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  <SpritePreviewFrame assetId={`sprite.player.base.${player.gender}.${option.id}`} alt={option.label} />
-                  <span style={{ fontSize: 11 }}>{option.label}</span>
-                  {player.appearance === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
-                </button>
-              ))}
-            </div>
+            {(() => {
+              // Older saves predate the appearance field entirely (Firestore never wrote it), so
+              // player.appearance can be undefined here despite the type saying otherwise - default
+              // the same way the server does (setPlayerSkin.ts/resetPlayerProgress.ts's own
+              // `?? 'white-dark'`) rather than building an asset id like "...base.male.undefined".
+              const currentGender = player.gender ?? 'male';
+              const currentAppearance = player.appearance ?? 'white-dark';
+              return (
+                <>
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    {GENDER_OPTIONS.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        disabled={busy}
+                        onClick={() => changeSkin(option.id, currentAppearance)}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 4,
+                          background: currentGender === option.id ? 'var(--fw-accent-dim)' : 'transparent',
+                          border: `1px solid ${currentGender === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
+                          borderRadius: 6,
+                          padding: '8px 14px',
+                          cursor: busy ? 'not-allowed' : 'pointer',
+                        }}
+                      >
+                        <SpritePreviewFrame assetId={`sprite.player.base.${option.id}.${currentAppearance}`} alt={option.label} />
+                        <span style={{ fontSize: 12 }}>{option.label}</span>
+                        {currentGender === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
+                    {APPEARANCE_OPTIONS.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        disabled={busy}
+                        onClick={() => changeSkin(currentGender, option.id)}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 4,
+                          background: currentAppearance === option.id ? 'var(--fw-accent-dim)' : 'transparent',
+                          border: `1px solid ${currentAppearance === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
+                          borderRadius: 6,
+                          padding: '6px 10px',
+                          cursor: busy ? 'not-allowed' : 'pointer',
+                        }}
+                      >
+                        <SpritePreviewFrame assetId={`sprite.player.base.${currentGender}.${option.id}`} alt={option.label} />
+                        <span style={{ fontSize: 11 }}>{option.label}</span>
+                        {currentAppearance === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         )}
 
