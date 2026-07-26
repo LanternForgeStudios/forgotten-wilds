@@ -8,6 +8,10 @@ export type DamageType = 'physical' | 'spirit' | 'lantern';
 
 export interface Skill {
   id: string;
+  /** Display name used in combat log lines (e.g. "Frost Lance hits") - mirrors src/data/skills.ts's
+   *  own `name` field, which the client uses for UI display; this copy exists because the engine
+   *  itself (not the client) generates the log text server-side. */
+  name: string;
   kind: SkillKind;
   damageType: DamageType;
   power: number;
@@ -24,10 +28,17 @@ export interface Skill {
 }
 
 export const SKILLS: Record<string, Skill> = {
-  attack: { id: 'attack', kind: 'skill', damageType: 'physical', power: 10, spiritCost: 0 },
+  attack: { id: 'attack', name: 'Attack', kind: 'skill', damageType: 'physical', power: 10, spiritCost: 0 },
   // A Specialty Attack, gated by Spirit rather than a cooldown - see data/specialAttacks.ts for
   // the roster/unlock metadata; this entry is just its combat math.
-  'keepers-strike': { id: 'keepers-strike', kind: 'skill', damageType: 'spirit', power: 18, spiritCost: 10 },
+  'keepers-strike': {
+    id: 'keepers-strike',
+    name: "Keeper's Strike",
+    kind: 'skill',
+    damageType: 'spirit',
+    power: 18,
+    spiritCost: 10,
+  },
   // Lantern Flame moved to data/lanternAbilities.ts - it's tied to whichever lantern is equipped
   // (fueled by Lantern Oil), not a generally-learned skill like the ones in this file.
   //
@@ -39,6 +50,7 @@ export const SKILLS: Record<string, Skill> = {
   // weight), so tagging it once here covers both tiers.
   'mothling-dustwing': {
     id: 'mothling-dustwing',
+    name: 'Dustwing Flurry',
     kind: 'skill',
     damageType: 'physical',
     power: 10,
@@ -48,6 +60,7 @@ export const SKILLS: Record<string, Skill> = {
   },
   'miner-pickaxe-swing': {
     id: 'miner-pickaxe-swing',
+    name: 'Rusted Pickaxe Swing',
     kind: 'skill',
     damageType: 'physical',
     power: 14,
@@ -57,6 +70,7 @@ export const SKILLS: Record<string, Skill> = {
   },
   'coalspirit-cinderburst': {
     id: 'coalspirit-cinderburst',
+    name: 'Cinder Burst',
     kind: 'spiritArt',
     damageType: 'spirit',
     power: 16,
@@ -64,18 +78,31 @@ export const SKILLS: Record<string, Skill> = {
     inflictsAilmentId: 'burn',
     inflictAilmentChance: 0.3,
   },
-  'warden-coal-slam': { id: 'warden-coal-slam', kind: 'skill', damageType: 'physical', power: 20, spiritCost: 0 },
+  'warden-coal-slam': {
+    id: 'warden-coal-slam',
+    name: 'Coalbound Slam',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 20,
+    spiritCost: 0,
+  },
   'warden-warden-wrath': {
     id: 'warden-warden-wrath',
+    name: "Warden's Wrath",
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 30,
+    // Was 30 - at the level range this boss is actually first fought at, that reliably crossed
+    // 75+ damage per hit (playtest feedback: "feels a bit too high"). Dialed back to still read as
+    // the boss's hardest-hitting phase-2 move (well above warden-coal-slam's 20) without spiking
+    // that hard.
+    power: 24,
     spiritCost: 0,
     inflictsAilmentId: 'burn',
     inflictAilmentChance: 0.4,
   },
   'ridge-ambush': {
     id: 'ridge-ambush',
+    name: 'Ridge Ambush',
     kind: 'skill',
     damageType: 'physical',
     power: 12,
@@ -85,6 +112,7 @@ export const SKILLS: Record<string, Skill> = {
   },
   'wisp-chill': {
     id: 'wisp-chill',
+    name: 'Wisp Chill',
     kind: 'spiritArt',
     damageType: 'spirit',
     power: 14,
@@ -94,6 +122,7 @@ export const SKILLS: Record<string, Skill> = {
   },
   'briar-thorn-lash': {
     id: 'briar-thorn-lash',
+    name: 'Briar Thorn Lash',
     kind: 'skill',
     damageType: 'physical',
     power: 13,
@@ -113,6 +142,7 @@ export const SKILLS: Record<string, Skill> = {
   // be a real damage-balance change, not a doc-comment fix.
   'frost-lance': {
     id: 'frost-lance',
+    name: 'Frost Lance',
     kind: 'spiritArt',
     damageType: 'spirit',
     power: 20,
@@ -123,6 +153,7 @@ export const SKILLS: Record<string, Skill> = {
   },
   'ember-burst': {
     id: 'ember-burst',
+    name: 'Ember Burst',
     kind: 'spiritArt',
     damageType: 'spirit',
     power: 20,

@@ -101,14 +101,31 @@
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
-/* Earnings get their own larger, bright line so they jump out rather than reading like ordinary
-   body text next to the title. */
-.canvasEarnings {
-  margin: 0;
-  font-size: 20px;
+/* Reward list styling matches CombatScene.module.css's rewardList/rewardRow - one icon+line row
+ * per reward instead of a run-together sentence. Bigger/brighter than the solo version to match
+ * this overlay's celebratory tone (see .canvasMessage above), reused for both Endless Battle's
+ * wave-clear rewards and PvP's match rewards. */
+.rewardList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rewardRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 18px;
   font-weight: bold;
   color: #6fd67a;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.rewardIcon {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
 }
 
 .canvasMessageHint {
@@ -358,6 +375,15 @@
   margin: 8px 0;
   font-size: 12px;
   color: var(--fw-danger);
+}
+
+/* Hidden on mobile entirely (not just shrunk) - matches CombatScene.module.css's identical mobile
+   treatment of its own .messageOverlay: on a small screen it ate too much of the already-tight
+   battlefield view for what it added. */
+@media (max-width: 700px) {
+  .messageOverlay {
+    display: none;
+  }
 }
 
 .empty {

@@ -60,7 +60,7 @@ export const SKILLS: Skill[] = [
     description: 'A second-phase eruption of pent-up spirit fury, unlocked once the Warden is wounded.',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 30,
+    power: 24,
     spiritCost: 0,
     inflictsAilmentId: 'burn',
   },

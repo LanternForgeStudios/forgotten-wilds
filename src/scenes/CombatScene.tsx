@@ -18,14 +18,15 @@ import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useToastStore } from '@/state/useToastStore';
 import { useHudBarHeight } from '@/hooks/useExplorationViewport';
+import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useSceneStore } from '@/state/useSceneStore';
 import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS } from '@/data';
 import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
-import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
+import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
 import { TIER_ORDER } from '@/utils/tier';
-import { itemDisplayName, itemIconAssetId } from '@/utils/itemName';
+import { itemDisplayName, itemIconAssetId, groupRewardItemIds } from '@/utils/itemName';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
@@ -84,6 +85,15 @@ export function CombatScene() {
   }>({ entries: [], key: 0 });
   const [selectedAilmentId, setSelectedAilmentId] = useState<string | null>(null);
   const [showSkillMenu, setShowSkillMenu] = useState(false);
+  // None of this scene's own overlays (ailment popup, skill menu, item menu) closed on Escape
+  // before - every other overlay in the game (see useOverlayClose's other callers) does. Closes
+  // whichever of these happens to be open; 'usingItems' is deliberately excluded, matching the
+  // item menu's own click-outside/X-button guard - a batch actually in flight isn't dismissable.
+  useOverlayClose(() => {
+    if (selectedAilmentId) setSelectedAilmentId(null);
+    if (showSkillMenu) setShowSkillMenu(false);
+    if (phase === 'itemMenu') setPhase('playerTurn');
+  });
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // Up to 3 item ids queued to ride along with whatever primary action the player takes next
@@ -382,15 +392,6 @@ export function CombatScene() {
       setErrorMessage(err instanceof Error ? err.message : 'Something went wrong resolving that action.');
       setPhase('error');
     }
-  }
-
-  // Victory can award the same item multiple times (e.g. 3 separate Moth Dust drops) - grouped
-  // into "Moth Dust x3" reward lines instead of one per drop. Preserves first-seen order rather
-  // than sorting, so the reward list reads in the same order the drops actually resolved in.
-  function groupRewardItems(itemIds: string[]): { itemId: string; count: number }[] {
-    const counts = new Map<string, number>();
-    for (const id of itemIds) counts.set(id, (counts.get(id) ?? 0) + 1);
-    return [...counts.entries()].map(([itemId, count]) => ({ itemId, count }));
   }
 
   const queuedCountFor = (itemId: string) => tray.filter((id) => id === itemId).length;
@@ -705,138 +706,167 @@ export function CombatScene() {
           >
             Fast Rounds: {fastRounds ? 'On' : 'Off'}
           </button>
-          {phase === 'itemMenu' || phase === 'usingItems' ? (
-            <>
-              {combatItems.length === 0 && <p style={{ fontSize: 12, gridColumn: '1 / -1' }}>No usable items.</p>}
-              {combatItems.map((i) => {
-                const def = ITEMS.find((d) => d.id === i.itemId);
-                const cureAilmentId = def?.effect?.cureAilmentId;
-                const wouldHelp = player
-                  ? itemWouldHaveEffect(
-                      def?.effect,
-                      player.stats,
-                      playerAilments.map((a) => a.ailmentId),
-                    )
-                  : false;
-                // A cure item with no matching active ailment isn't "Full" (that wording implies a
-                // capped stat bar) - it's simply not needed right now. Conversely, when it DOES
-                // match an active ailment, highlight the row so the right cure stands out among
-                // the tray instead of making the player read every item's name to find it.
-                const queued = queuedCountFor(i.itemId);
-                const canAdd = wouldHelp && canQueueMore && queued < i.quantity;
-                return (
-                  <div
-                    key={i.itemId}
-                    className={cureAilmentId && wouldHelp ? `${styles.itemRow} ${styles.itemRowCureReady}` : styles.itemRow}
-                  >
-                    <span>
-                      {i.itemId.replace(/-/g, ' ')} x{i.quantity}
-                      {queued > 0 && ` — queued: ${queued}`}
-                      {!wouldHelp && (cureAilmentId ? ' (Not needed)' : ' (Full)')}
-                    </span>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      <button
-                        type="button"
-                        className={styles.actionButton}
-                        disabled={phase === 'usingItems' || queued === 0}
-                        onClick={() => dequeueItem(i.itemId)}
-                      >
-                        -
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.actionButton}
-                        disabled={phase === 'usingItems' || !canAdd}
-                        title={
-                          wouldHelp
-                            ? undefined
-                            : cureAilmentId
-                              ? 'Not needed right now - you do not have that ailment.'
-                              : 'Already at maximum - using this would have no effect.'
-                        }
-                        onClick={() => queueItem(i.itemId)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-              <button className={styles.actionButton} disabled={phase === 'usingItems'} onClick={finishItemMenu}>
-                {phase === 'usingItems' ? 'Using items...' : 'Done'}
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Covers both the network round-trip (phase 'resolving', before any response has
-               *  arrived) and the staggered hit-playback after it (playbackActive) - without this,
-               *  a slow response left the action buttons disabled with no visible reason, reading
-               *  as frozen rather than "still working on it" (worse on a slow/mobile connection,
-               *  where that gap can stretch to several seconds). */}
-              {(phase === 'resolving' || playbackActive) && <p className={styles.stunnedBanner}>Resolving...</p>}
-              {isStunned && canAct && (
-                <p className={styles.stunnedBanner}>You are stunned and cannot act this turn!</p>
-              )}
-              {aliveEnemies.length > 1 && canAct && (
-                <button
-                  className={styles.actionButton}
-                  style={{ gridColumn: '1 / -1' }}
-                  onClick={() => setTargetMode((m) => (m === 'all' ? 'single' : 'all'))}
-                >
-                  Target: {targetMode === 'all' ? 'All Foes' : 'Single'}
-                </button>
-              )}
-              <button className={styles.actionButton} disabled={!canAct} onClick={() => act('attack')}>
-                {weaponName}
-              </button>
-              {knownSkills.length <= 1 ? (
-                <button
-                  className={styles.actionButton}
-                  disabled={!canAct || (player?.stats.spirit ?? 0) < (knownSkills[0]?.spiritCost ?? 0) || isSilenced}
-                  title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
-                  onClick={() => act('skill', { skillId: knownSkills[0]?.id })}
-                >
-                  {knownSkills[0]?.name ?? "Keeper's Strike"} ({knownSkills[0]?.spiritCost ?? 0} SP)
-                </button>
-              ) : (
-                <button
-                  className={styles.actionButton}
-                  disabled={!canAct || isSilenced}
-                  title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
-                  onClick={() => setShowSkillMenu(true)}
-                >
-                  Select Spirit Ability
-                </button>
-              )}
-              {lanternAbilities.map((ability) => (
-                <button
-                  key={ability.id}
-                  className={styles.actionButton}
-                  disabled={!canAct || (player?.stats.lanternOil ?? 0) < ability.oilCost || isLanternDisabled}
-                  title={isLanternDisabled ? 'Frozen - the Lantern specialty is disabled.' : undefined}
-                  onClick={() => act('lanternAbility', { abilityId: ability.id })}
-                >
-                  {ability.name} ({ability.oilCost} Oil)
-                </button>
-              ))}
-              <button
-                className={styles.actionButton}
-                disabled={!canAct}
-                onClick={() => setPhase('itemMenu')}
-              >
-                Items{tray.length > 0 ? ` (${tray.length}/3)` : ''}
-              </button>
-              <button className={styles.actionButton} disabled={!canAct} onClick={() => act('defend')}>
-                Defend
-              </button>
-              <button className={styles.actionButton} disabled={!canAct} onClick={() => act('flee')}>
-                Flee
-              </button>
-            </>
+          {/* Covers both the network round-trip (phase 'resolving', before any response has
+           *  arrived) and the staggered hit-playback after it (playbackActive) - without this,
+           *  a slow response left the action buttons disabled with no visible reason, reading
+           *  as frozen rather than "still working on it" (worse on a slow/mobile connection,
+           *  where that gap can stretch to several seconds). */}
+          {(phase === 'resolving' || playbackActive) && <p className={styles.stunnedBanner}>Resolving...</p>}
+          {isStunned && canAct && (
+            <p className={styles.stunnedBanner}>You are stunned and cannot act this turn!</p>
           )}
+          {aliveEnemies.length > 1 && canAct && (
+            <button
+              className={styles.actionButton}
+              style={{ gridColumn: '1 / -1' }}
+              onClick={() => setTargetMode((m) => (m === 'all' ? 'single' : 'all'))}
+            >
+              Target: {targetMode === 'all' ? 'All Foes' : 'Single'}
+            </button>
+          )}
+          <button className={styles.actionButton} disabled={!canAct} onClick={() => act('attack')}>
+            {weaponName}
+          </button>
+          {knownSkills.length <= 1 ? (
+            <button
+              className={styles.actionButton}
+              disabled={!canAct || (player?.stats.spirit ?? 0) < (knownSkills[0]?.spiritCost ?? 0) || isSilenced}
+              title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
+              onClick={() => act('skill', { skillId: knownSkills[0]?.id })}
+            >
+              {knownSkills[0]?.name ?? "Keeper's Strike"} ({knownSkills[0]?.spiritCost ?? 0} SP)
+            </button>
+          ) : (
+            <button
+              className={styles.actionButton}
+              disabled={!canAct || isSilenced}
+              title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
+              onClick={() => setShowSkillMenu(true)}
+            >
+              Select Spirit Ability
+            </button>
+          )}
+          {lanternAbilities.map((ability) => (
+            <button
+              key={ability.id}
+              className={styles.actionButton}
+              disabled={!canAct || (player?.stats.lanternOil ?? 0) < ability.oilCost || isLanternDisabled}
+              title={isLanternDisabled ? 'Frozen - the Lantern specialty is disabled.' : undefined}
+              onClick={() => act('lanternAbility', { abilityId: ability.id })}
+            >
+              {ability.name} ({ability.oilCost} Oil)
+            </button>
+          ))}
+          <button
+            className={styles.actionButton}
+            disabled={!canAct}
+            onClick={() => setPhase('itemMenu')}
+          >
+            Items{tray.length > 0 ? ` (${tray.length}/3)` : ''}
+          </button>
+          <button className={styles.actionButton} disabled={!canAct} onClick={() => act('defend')}>
+            Defend
+          </button>
+          <button className={styles.actionButton} disabled={!canAct} onClick={() => act('flee')}>
+            Flee
+          </button>
         </Panel>
         </div>
       </div>
+
+      {(phase === 'itemMenu' || phase === 'usingItems') && (
+        <div
+          className={styles.overlay}
+          onClick={() => {
+            if (phase !== 'usingItems') setPhase('playerTurn');
+          }}
+        >
+          <Panel className={styles.itemMenuPanel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            {phase !== 'usingItems' && <OverlayCloseButton onClick={() => setPhase('playerTurn')} />}
+            <h3 style={{ margin: '0 0 10px', color: 'var(--fw-accent)' }}>Use Items</h3>
+            {combatItems.length === 0 ? (
+              <p style={{ fontSize: 12 }}>No usable items.</p>
+            ) : (
+              <div className={styles.itemMenuColumns}>
+                {ITEM_EFFECT_GROUP_ORDER.map((group) => {
+                  const groupItems = combatItems.filter(
+                    (i) => itemEffectGroupOf(ITEMS.find((d) => d.id === i.itemId)) === group,
+                  );
+                  if (groupItems.length === 0) return null;
+                  return (
+                    <div key={group} className={styles.itemMenuColumn}>
+                      <p className={styles.itemMenuColumnTitle}>{ITEM_EFFECT_GROUP_LABELS[group]}</p>
+                      {groupItems.map((i) => {
+                        const def = ITEMS.find((d) => d.id === i.itemId);
+                        const cureAilmentId = def?.effect?.cureAilmentId;
+                        const wouldHelp = player
+                          ? itemWouldHaveEffect(
+                              def?.effect,
+                              player.stats,
+                              playerAilments.map((a) => a.ailmentId),
+                            )
+                          : false;
+                        // A cure item with no matching active ailment isn't "Full" (that wording
+                        // implies a capped stat bar) - it's simply not needed right now.
+                        // Conversely, when it DOES match an active ailment, highlight the row so
+                        // the right cure stands out instead of making the player read every
+                        // item's name to find it.
+                        const queued = queuedCountFor(i.itemId);
+                        const canAdd = wouldHelp && canQueueMore && queued < i.quantity;
+                        return (
+                          <div
+                            key={i.itemId}
+                            className={cureAilmentId && wouldHelp ? `${styles.itemRow} ${styles.itemRowCureReady}` : styles.itemRow}
+                          >
+                            <span>
+                              {itemDisplayName(i.itemId)} x{i.quantity}
+                              {queued > 0 && ` — queued: ${queued}`}
+                              {!wouldHelp && (cureAilmentId ? ' (Not needed)' : ' (Full)')}
+                            </span>
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button
+                                type="button"
+                                className={styles.actionButton}
+                                disabled={phase === 'usingItems' || queued === 0}
+                                onClick={() => dequeueItem(i.itemId)}
+                              >
+                                -
+                              </button>
+                              <button
+                                type="button"
+                                className={styles.actionButton}
+                                disabled={phase === 'usingItems' || !canAdd}
+                                title={
+                                  wouldHelp
+                                    ? undefined
+                                    : cureAilmentId
+                                      ? 'Not needed right now - you do not have that ailment.'
+                                      : 'Already at maximum - using this would have no effect.'
+                                }
+                                onClick={() => queueItem(i.itemId)}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <button
+              className={styles.actionButton}
+              disabled={phase === 'usingItems'}
+              onClick={finishItemMenu}
+              style={{ marginTop: 12 }}
+            >
+              {phase === 'usingItems' ? 'Using items...' : 'Done'}
+            </button>
+          </Panel>
+        </div>
+      )}
 
       {(phase === 'victory' || phase === 'defeat' || phase === 'fled') && (
         <div className={styles.overlay}>
@@ -853,7 +883,7 @@ export function CombatScene() {
                     <span>{rewards?.gold ?? 0} Gold</span>
                   </div>
                   {rewards?.itemIds.length
-                    ? groupRewardItems(rewards.itemIds).map(({ itemId, count }) => (
+                    ? groupRewardItemIds(rewards.itemIds).map(({ itemId, count }) => (
                         <div key={itemId} className={styles.rewardRow}>
                           {itemIconAssetId(itemId) && (
                             <img src={getAssetUrl(itemIconAssetId(itemId)!)} alt="" className={styles.rewardIcon} />

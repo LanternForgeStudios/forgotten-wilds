@@ -19,7 +19,7 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
-import { itemDisplayName } from '@/utils/itemName';
+import { itemDisplayName, itemIconAssetId, groupRewardItemIds } from '@/utils/itemName';
 import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
 import { TIER_ORDER } from '@/utils/tier';
 import type { PartyBattleSession, PartyCombatHitResult, PartyEnemyHitResult } from '@/types';
@@ -417,11 +417,26 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
             <div className={styles.canvasMessage}>
               <p className={styles.canvasMessageTitle}>Wave {battle.wave} cleared!</p>
               {battle.lastWaveRewards?.[uid] && (
-                <p className={styles.canvasEarnings}>
-                  +{battle.lastWaveRewards[uid].xp} XP &nbsp;·&nbsp; +{battle.lastWaveRewards[uid].gold}g
-                  {battle.lastWaveRewards[uid].itemIds.length > 0 &&
-                    ` · ${battle.lastWaveRewards[uid].itemIds.map(itemDisplayName).join(', ')}`}
-                </p>
+                <div className={styles.rewardList}>
+                  <div className={styles.rewardRow}>
+                    <span>+{battle.lastWaveRewards[uid].xp} XP</span>
+                  </div>
+                  <div className={styles.rewardRow}>
+                    <img src={getAssetUrl('icon.currency.gold')} alt="" className={styles.rewardIcon} />
+                    <span>+{battle.lastWaveRewards[uid].gold} Gold</span>
+                  </div>
+                  {groupRewardItemIds(battle.lastWaveRewards[uid].itemIds).map(({ itemId, count }) => (
+                    <div key={itemId} className={styles.rewardRow}>
+                      {itemIconAssetId(itemId) && (
+                        <img src={getAssetUrl(itemIconAssetId(itemId)!)} alt="" className={styles.rewardIcon} />
+                      )}
+                      <span>
+                        {itemDisplayName(itemId)}
+                        {count > 1 ? ` x${count}` : ''}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               )}
               <p className={styles.canvasMessageHint}>Act below to continue to the next wave, or withdraw.</p>
             </div>

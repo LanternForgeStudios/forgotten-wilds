@@ -387,9 +387,17 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             <div className={styles.canvasMessage}>
               <p className={styles.canvasMessageTitle}>{iWon ? `You defeated ${opponentName}!` : `You were defeated by ${opponentName}.`}</p>
               {uid && battle.pvpRewards?.[uid] && (
-                <p className={styles.canvasEarnings}>
-                  +{battle.pvpRewards[uid].xp} XP{battle.pvpRewards[uid].gold > 0 && ` · +${battle.pvpRewards[uid].gold}g`}
-                </p>
+                <div className={styles.rewardList}>
+                  <div className={styles.rewardRow}>
+                    <span>+{battle.pvpRewards[uid].xp} XP</span>
+                  </div>
+                  {battle.pvpRewards[uid].gold > 0 && (
+                    <div className={styles.rewardRow}>
+                      <img src={getAssetUrl('icon.currency.gold')} alt="" className={styles.rewardIcon} />
+                      <span>+{battle.pvpRewards[uid].gold} Gold</span>
+                    </div>
+                  )}
+                </div>
               )}
               <p className={styles.canvasMessageHint}>Both of you have been restored to full health.</p>
             </div>

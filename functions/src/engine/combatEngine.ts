@@ -635,7 +635,7 @@ export function resolveRound(input: RoundInput): RoundResult {
         playerSpirit = Math.max(0, playerSpirit - skill.spiritCost);
         resolveOffensiveHits(
           skill.power,
-          "Keeper's Strike hits",
+          `${skill.name} hits`,
           (i) => weaknessMultiplier(i, skill.damageType),
           skill.damageType,
           skill.inflictsAilmentId ? { id: skill.inflictsAilmentId, chance: skill.inflictAilmentChance ?? 0 } : undefined,

@@ -198,7 +198,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 16px;
+  padding: 8px 16px;
   box-sizing: border-box;
 }
 
@@ -219,17 +219,24 @@
   border-color: var(--fw-accent);
 }
 
+/* Horizontal + tight on desktop (a wide auto-fit row instead of a narrow fixed-width 2-column
+   grid) - now that the message log lives in a floating overlay (.messageOverlay above) instead of
+   a boxed panel next to this one, there's no reason this still needs to read tall. Buttons wrap
+   to a second row only once there are more of them than fit (e.g. a multi-enemy Target toggle
+   plus a Lantern Ability), rather than always reserving 3 grid rows. Freeing this vertical space
+   is what actually grows .battleCanvasWrap, since .enemyArea is flex:1 and just absorbs whatever
+   .bottomPanel doesn't use. See the mobile media query below for the narrower 2-column override. */
 .actionsPanel {
-  width: 340px;
+  width: 100%;
+  max-width: 900px;
   flex-shrink: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
   align-content: start;
 }
 
 .itemRow {
-  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -246,12 +253,45 @@
   outline: 1px solid var(--fw-accent);
 }
 
+/* Item-use modal - a wider standalone overlay (matches the skill-select menu's .overlay pattern)
+   instead of taking over the narrow actionsPanel grid in place, so there's room for one column
+   per resource group (HP/Spirit/Oil/Cure - see ITEM_EFFECT_GROUP_ORDER) side by side instead of
+   one long scrolling list. */
+.itemMenuPanel {
+  width: min(720px, 92vw);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.itemMenuColumns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.itemMenuColumn {
+  flex: 1 1 200px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.itemMenuColumnTitle {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--fw-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .actionButton {
   background: var(--fw-accent-dim);
   border: 1px solid var(--fw-panel-border);
   color: var(--fw-text);
-  padding: 14px 8px;
-  font-size: 14px;
+  padding: 10px 8px;
+  font-size: 13px;
   border-radius: 4px;
 }
 
@@ -317,6 +357,8 @@
 
   .actionsPanel {
     width: 100%;
+    max-width: none;
+    grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
 
@@ -330,12 +372,10 @@
     padding: 4px 2px;
   }
 
+  /* Hidden on mobile entirely (not just shrunk) - on a small screen it ate too much of the
+     already-tight battlefield view for what it added; the desktop/tablet floating overlay stays,
+     mobile just has no running combat-log readout at all. */
   .messageOverlay {
-    max-width: min(200px, calc(100% - 12px));
-  }
-
-  .messageLine {
-    font-size: 11px;
-    padding: 2px 6px;
+    display: none;
   }
 }

@@ -229,7 +229,7 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
         spirit = Math.max(0, spirit - skill.spiritCost);
         resolveOffensiveHits(
           skill.power,
-          "Keeper's Strike hits",
+          `${skill.name} hits`,
           (i) => weaknessMultiplier(enemyDefs[i], skill.damageType),
           skill.damageType,
           skill.inflictsAilmentId ? { id: skill.inflictsAilmentId, chance: skill.inflictAilmentChance ?? 0 } : undefined,
@@ -450,7 +450,7 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
         spirit = Math.max(0, spirit - skill.spiritCost);
         resolveOffensiveHit(
           skill.power,
-          "Keeper's Strike hits",
+          `${skill.name} hits`,
           skill.damageType,
           skill.inflictsAilmentId ? { id: skill.inflictsAilmentId, chance: skill.inflictAilmentChance ?? 0 } : undefined,
         );
