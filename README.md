@@ -142,6 +142,11 @@ sign-in inputs, Character Creation's name field) — see `src/utils/browserLockd
   Normal linear play is unaffected either way.
 - Vitest covers the pure combat/quest/equipment engine functions (`functions/src/engine/*.test.ts`)
   but not the Cloud Functions themselves (Firestore transactions) or any client code yet.
+- Equipment-layering base bodies (8 total: 4 appearances x 2 genders, `sprite.player.base.
+  {gender}.{appearance}` in `src/assets/registry.ts`) are fully generated and registered but not
+  yet rendered anywhere in-game - see `docs/Equipment-Layering-Plan.md` for the phased plan.
+  `Player.gender`/`Player.appearance` exist in the data model already; the character-creation/
+  profile picker UI is still 2-option (gender only) until the rendering path lands.
 - The player has a real, pixellab.ai-generated 4-direction walk+run sprite sheet for both skins
   (`sprite.player.male`/`.female`), and all 14 NPC overworld sprites and all 14 dialogue portraits
   now have real art too (`src/assets/registry.ts`; originals archived under each asset folder's own

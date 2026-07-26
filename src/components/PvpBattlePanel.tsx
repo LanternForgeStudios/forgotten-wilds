@@ -19,7 +19,8 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { AILMENTS, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemDisplayName } from '@/utils/itemName';
-import { itemWouldHaveEffect } from '@/utils/itemEffect';
+import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
+import { TIER_ORDER } from '@/utils/tier';
 import type { PartyBattleSession } from '@/types';
 // Reuses Endless Battle's stylesheet - same Panel/list/bar chrome, no PvP-specific classes needed.
 import styles from './EndlessBattlePanel.module.css';
@@ -206,6 +207,17 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [battle?.lastTurnResult?.resolvedAt]);
 
+  // Accumulates every turn's log lines across the whole match (unlike lastTurnResult, which only
+  // ever holds the most recent turn) so the floating message overlay reads as a running list - see
+  // EndlessBattlePanel.tsx's identical logHistory for the full reasoning.
+  const [logHistory, setLogHistory] = useState<{ key: string; line: string }[]>([]);
+  useEffect(() => {
+    const resolvedAt = battle?.lastTurnResult?.resolvedAt;
+    if (!battle?.lastTurnResult || !resolvedAt) return;
+    const lines = battle.lastTurnResult.log.map((line, i) => ({ key: `${resolvedAt}-${i}`, line }));
+    setLogHistory((prev) => [...prev, ...lines]);
+  }, [battle?.lastTurnResult?.resolvedAt]);
+
   const opponentUid = battle?.participants.find((p) => p !== uid);
   const opponentName = opponentUid ? (names[opponentUid] ?? '...') : '...';
   const opponentVisuals = useMemo(() => {
@@ -214,7 +226,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
     return [
       {
         index: 0,
-        spriteAssetId: `sprite.player.${opponent.skin}`,
+        spriteAssetId: `sprite.player.${opponent.gender}`,
         name: opponentName,
         tierLabel: '',
         tierColor: '#ece1cf',
@@ -269,7 +281,24 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   const lanternAbilities = (lanternDef?.lanternAbilityIds ?? [])
     .map((id) => LANTERN_ABILITIES.find((a) => a.id === id))
     .filter((a): a is NonNullable<typeof a> => !!a);
-  const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');
+  // Grouped by resource restored (HP/Spirit/Oil/Cure), then by rarity tier within each group - see
+  // CombatScene.tsx's identical sort for the full reasoning.
+  const combatItems = inventory
+    .filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable')
+    .slice()
+    .sort((a, b) => {
+      const defA = ITEMS.find((d) => d.id === a.itemId);
+      const defB = ITEMS.find((d) => d.id === b.itemId);
+      const groupA = itemEffectGroupOf(defA);
+      const groupB = itemEffectGroupOf(defB);
+      const groupIndexA = groupA ? ITEM_EFFECT_GROUP_ORDER.indexOf(groupA) : ITEM_EFFECT_GROUP_ORDER.length;
+      const groupIndexB = groupB ? ITEM_EFFECT_GROUP_ORDER.indexOf(groupB) : ITEM_EFFECT_GROUP_ORDER.length;
+      if (groupIndexA !== groupIndexB) return groupIndexA - groupIndexB;
+      const tierA = defA ? TIER_ORDER[defA.tier] : 0;
+      const tierB = defB ? TIER_ORDER[defB.tier] : 0;
+      if (tierA !== tierB) return tierA - tierB;
+      return (defA?.name ?? a.itemId).localeCompare(defB?.name ?? b.itemId);
+    });
 
   async function submit(action: Parameters<typeof callSubmitPartyBattleAction>[1]) {
     setItemsUsedThisTurn(0);
@@ -365,6 +394,18 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
               <p className={styles.canvasMessageHint}>Both of you have been restored to full health.</p>
             </div>
           )}
+          {logHistory.length > 0 && (
+            <div className={styles.messageOverlay}>
+              {logHistory
+                .slice(-20)
+                .reverse()
+                .map(({ key, line }) => (
+                  <p key={key} className={styles.messageLine}>
+                    {line}
+                  </p>
+                ))}
+            </div>
+          )}
         </div>
 
         <h3 className={styles.sectionTitle}>You</h3>
@@ -412,14 +453,6 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             )}
           </div>
         </div>
-
-        {battle.lastTurnResult && (
-          <div className={styles.log}>
-            {battle.lastTurnResult.log.map((line, i) => (
-              <p key={i}>{line}</p>
-            ))}
-          </div>
-        )}
 
         {error && <p className={styles.error}>{error}</p>}
 

@@ -92,7 +92,7 @@ export function OverworldScene() {
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
-  const skin = usePlayerStore((s) => s.player?.skin ?? 'male');
+  const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
@@ -150,7 +150,7 @@ export function OverworldScene() {
   });
   const { icons: fieldEncounterIcons, consumeAt: consumeFieldEncounterAt } = useFieldEncounters(map, locationId, positionRef);
 
-  useHeartbeat(uid, displayName, locationId, position, skin);
+  useHeartbeat(uid, displayName, locationId, position, gender);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
   const { startDash, stopDash } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
 
@@ -331,7 +331,7 @@ export function OverworldScene() {
         <TileGrid
           map={map}
           player={position}
-          playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
+          playerSpriteAssetId={gender === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}

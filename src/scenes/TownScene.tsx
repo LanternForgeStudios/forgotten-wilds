@@ -76,7 +76,7 @@ export function TownScene() {
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
-  const skin = usePlayerStore((s) => s.player?.skin ?? 'male');
+  const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
   const questProgress = useQuestStore((s) => s.progress);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const openedChests = useWorldStateStore((s) => s.openedChests);
@@ -97,7 +97,7 @@ export function TownScene() {
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
   const { pending, run } = usePendingAction();
 
-  useHeartbeat(uid, displayName, locationId, position, skin);
+  useHeartbeat(uid, displayName, locationId, position, gender);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
   const { startDash, stopDash } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
 
@@ -281,7 +281,7 @@ export function TownScene() {
         id: `player-${p.uid}`,
         x: p.x,
         y: p.y,
-        spriteAssetId: p.skin === 'female' ? 'sprite.player.female' : 'sprite.player.male',
+        spriteAssetId: p.gender === 'female' ? 'sprite.player.female' : 'sprite.player.male',
         label: p.displayName,
       }));
 
@@ -304,7 +304,7 @@ export function TownScene() {
         <TileGrid
           map={map}
           player={position}
-          playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
+          playerSpriteAssetId={gender === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}

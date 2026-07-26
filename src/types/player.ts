@@ -28,8 +28,12 @@ export interface Player {
    *  a single fixed button or a "Select Spirit Ability" submenu. Always present once hydrated from
    *  the server (defaults to ['keepers-strike']), even for a save that predates this field. */
   knownSkillIds: string[];
-  /** Which player sprite variant to render (see registry.ts's sprite.player.male/female). */
-  skin: 'male' | 'female';
+  /** Body silhouette - render call sites still resolve sprite.player.male/female (registry.ts)
+   *  off this alone; `appearance` isn't wired into rendering yet. See
+   *  docs/Equipment-Layering-Plan.md and functions/src/shared-types/index.ts's matching field. */
+  gender: 'male' | 'female';
+  /** Which of the 4 base-body skin/hair variants - captured but not yet rendered, see `gender`. */
+  appearance: 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
   /** Server clock reading the last time a Daily Chest was claimed - 0 for a fresh character,
    *  which naturally means "eligible immediately" (see data/dailyChest.ts's
    *  CHEST_CLAIM_INTERVAL_MS) without a separate first-claim special case. */

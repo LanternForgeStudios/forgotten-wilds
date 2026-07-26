@@ -23,7 +23,9 @@ import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKIL
 import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
-import { itemWouldHaveEffect } from '@/utils/itemEffect';
+import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
+import { TIER_ORDER } from '@/utils/tier';
+import { itemDisplayName, itemIconAssetId } from '@/utils/itemName';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
@@ -382,13 +384,13 @@ export function CombatScene() {
     }
   }
 
-  // Victory can award the same item multiple times (e.g. 3 separate Moth Dust drops) - shown as
-  // "3 moth-dust" instead of "moth-dust, moth-dust, moth-dust". Preserves first-seen order rather
-  // than sorting, so the reward text reads in the same order the drops actually resolved in.
-  function summarizeRewardItems(itemIds: string[]): string {
+  // Victory can award the same item multiple times (e.g. 3 separate Moth Dust drops) - grouped
+  // into "Moth Dust x3" reward lines instead of one per drop. Preserves first-seen order rather
+  // than sorting, so the reward list reads in the same order the drops actually resolved in.
+  function groupRewardItems(itemIds: string[]): { itemId: string; count: number }[] {
     const counts = new Map<string, number>();
     for (const id of itemIds) counts.set(id, (counts.get(id) ?? 0) + 1);
-    return [...counts.entries()].map(([id, count]) => (count > 1 ? `${count} ${id}` : id)).join(', ');
+    return [...counts.entries()].map(([itemId, count]) => ({ itemId, count }));
   }
 
   const queuedCountFor = (itemId: string) => tray.filter((id) => id === itemId).length;
@@ -475,7 +477,25 @@ export function CombatScene() {
     }
   }
 
-  const combatItems = inventory.filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable');
+  // Grouped by resource restored (HP/Spirit/Oil/Cure - see itemEffectGroupOf), then by rarity tier
+  // within each group, so e.g. every Healing Poultice tier sits together sorted weakest-to-
+  // strongest instead of scattering alphabetically across the tray by name.
+  const combatItems = inventory
+    .filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable')
+    .slice()
+    .sort((a, b) => {
+      const defA = ITEMS.find((d) => d.id === a.itemId);
+      const defB = ITEMS.find((d) => d.id === b.itemId);
+      const groupA = itemEffectGroupOf(defA);
+      const groupB = itemEffectGroupOf(defB);
+      const groupIndexA = groupA ? ITEM_EFFECT_GROUP_ORDER.indexOf(groupA) : ITEM_EFFECT_GROUP_ORDER.length;
+      const groupIndexB = groupB ? ITEM_EFFECT_GROUP_ORDER.indexOf(groupB) : ITEM_EFFECT_GROUP_ORDER.length;
+      if (groupIndexA !== groupIndexB) return groupIndexA - groupIndexB;
+      const tierA = defA ? TIER_ORDER[defA.tier] : 0;
+      const tierB = defB ? TIER_ORDER[defB.tier] : 0;
+      if (tierA !== tierB) return tierA - tierB;
+      return (defA?.name ?? a.itemId).localeCompare(defB?.name ?? b.itemId);
+    });
   const canAct = phase === 'playerTurn' && !playbackActive;
   const canPickTarget = aliveEnemies.length > 1 && canAct;
   const combatEnded = phase === 'victory' || phase === 'defeat' || phase === 'fled' || phase === 'error';
@@ -646,11 +666,28 @@ export function CombatScene() {
                   : 'Tap an enemy to choose your target'}
               </p>
             )}
+            {/* Newest message first (reversed), keyed by each line's own index in the full `log`
+                array (not its position in this slice) so React only mounts/animates genuinely new
+                lines - older ones just shift down and get clipped once they overflow the
+                container's full-height bottom edge. Sliced generously (20) since the container now
+                spans the whole battlefield height - overflow:hidden on .messageOverlay clips
+                whatever doesn't fit, so this is a cheap upper bound, not a tuned line count. */}
+            <div className={styles.messageOverlay}>
+              {log
+                .map((line, i) => ({ line, i }))
+                .slice(-20)
+                .reverse()
+                .map(({ line, i }) => (
+                  <p key={i} className={styles.messageLine}>
+                    {line}
+                  </p>
+                ))}
+            </div>
           </div>
         </div>
 
         <div className={styles.bottomPanel}>
-        <Panel className={styles.logPanel}>
+        <Panel className={styles.actionsPanel}>
           <button
             type="button"
             className={styles.fastRoundsToggle}
@@ -668,14 +705,6 @@ export function CombatScene() {
           >
             Fast Rounds: {fastRounds ? 'On' : 'Off'}
           </button>
-          {log.slice(-4).map((line, i) => (
-            <p key={i} style={{ margin: 0 }}>
-              {line}
-            </p>
-          ))}
-        </Panel>
-
-        <Panel className={styles.actionsPanel}>
           {phase === 'itemMenu' || phase === 'usingItems' ? (
             <>
               {combatItems.length === 0 && <p style={{ fontSize: 12, gridColumn: '1 / -1' }}>No usable items.</p>}
@@ -815,10 +844,28 @@ export function CombatScene() {
             {phase === 'victory' && (
               <>
                 <h2 style={{ color: 'var(--fw-accent)' }}>Victory!</h2>
-                <p>
-                  +{rewards?.xp ?? 0} XP · +{rewards?.gold ?? 0} gold
-                  {rewards?.itemIds.length ? ` · found: ${summarizeRewardItems(rewards.itemIds)}` : ''}
-                </p>
+                <div className={styles.rewardList}>
+                  <div className={styles.rewardRow}>
+                    <span>{rewards?.xp ?? 0} XP</span>
+                  </div>
+                  <div className={styles.rewardRow}>
+                    <img src={getAssetUrl('icon.currency.gold')} alt="" className={styles.rewardIcon} />
+                    <span>{rewards?.gold ?? 0} Gold</span>
+                  </div>
+                  {rewards?.itemIds.length
+                    ? groupRewardItems(rewards.itemIds).map(({ itemId, count }) => (
+                        <div key={itemId} className={styles.rewardRow}>
+                          {itemIconAssetId(itemId) && (
+                            <img src={getAssetUrl(itemIconAssetId(itemId)!)} alt="" className={styles.rewardIcon} />
+                          )}
+                          <span>
+                            {itemDisplayName(itemId)}
+                            {count > 1 ? ` x${count}` : ''}
+                          </span>
+                        </div>
+                      ))
+                    : null}
+                </div>
                 {rewards?.leveledUp && <p style={{ color: 'var(--fw-accent)' }}>Level up!</p>}
                 {rewards?.restore && (
                   <p>

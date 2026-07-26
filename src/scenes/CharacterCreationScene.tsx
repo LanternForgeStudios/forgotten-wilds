@@ -9,7 +9,9 @@ import { INTRO_CUTSCENE } from '@/data/cutscenes';
 import { playMusic } from '@/audio/audioService';
 import styles from './TitleScene.module.css';
 
-const SKIN_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
+// Gender-only picker for now - appearance (skin tone/hair) isn't user-facing yet, see
+// docs/Equipment-Layering-Plan.md; callCreateCharacter defaults appearance to 'white-dark'.
+const GENDER_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
   { id: 'male', label: 'Male', assetId: 'sprite.player.male' },
   { id: 'female', label: 'Female', assetId: 'sprite.player.female' },
 ];
@@ -22,7 +24,7 @@ export function CharacterCreationScene() {
   }, []);
 
   const [name, setName] = useState('');
-  const [skin, setSkin] = useState<'male' | 'female'>('male');
+  const [gender, setGender] = useState<'male' | 'female'>('male');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const goTo = useSceneStore((s) => s.goTo);
@@ -32,7 +34,7 @@ export function CharacterCreationScene() {
     setError(null);
     setBusy(true);
     try {
-      const save = await callCreateCharacter(name.trim(), skin);
+      const save = await callCreateCharacter(name.trim(), gender);
       hydrateAllStores(save);
       // A brand new character's own existence is the "first time" signal - no persisted flag
       // needed, this only ever runs once per account by construction. Town only loads once the
@@ -68,18 +70,18 @@ export function CharacterCreationScene() {
             autoFocus
           />
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            {SKIN_OPTIONS.map((option) => (
+            {GENDER_OPTIONS.map((option) => (
               <button
                 key={option.id}
                 type="button"
-                onClick={() => setSkin(option.id)}
+                onClick={() => setGender(option.id)}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 4,
-                  background: skin === option.id ? 'var(--fw-accent-dim)' : 'transparent',
-                  border: `1px solid ${skin === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
+                  background: gender === option.id ? 'var(--fw-accent-dim)' : 'transparent',
+                  border: `1px solid ${gender === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
                   borderRadius: 6,
                   padding: '8px 14px',
                   cursor: 'pointer',

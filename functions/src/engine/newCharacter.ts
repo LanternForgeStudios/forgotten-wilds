@@ -5,9 +5,15 @@ export const STARTING_LOCATION_ID = 'ash-hallow';
 
 /** The exact starting stat block/equipment/location every new character (or a progress reset)
  *  begins with. Shared by createCharacter.ts and resetPlayerProgress.ts so the two can never
- *  silently drift apart. `skin` defaults to 'male' if omitted (resetPlayerProgress.ts doesn't ask
- *  again - it keeps whatever the player already had, see its own call site). */
-export function buildFreshPlayer(uid: string, name: string, now: number, skin: 'male' | 'female' = 'male'): Player {
+ *  silently drift apart. `gender`/`appearance` default if omitted (resetPlayerProgress.ts doesn't
+ *  ask again - it keeps whatever the player already had, see its own call site). */
+export function buildFreshPlayer(
+  uid: string,
+  name: string,
+  now: number,
+  gender: 'male' | 'female' = 'male',
+  appearance: 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark' = 'white-dark',
+): Player {
   return {
     uid,
     name,
@@ -33,7 +39,8 @@ export function buildFreshPlayer(uid: string, name: string, now: number, skin: '
     currentLocationId: STARTING_LOCATION_ID,
     staminaUpdatedAt: now,
     knownSkillIds: ['keepers-strike'],
-    skin,
+    gender,
+    appearance,
     lastChestClaimedAt: 0,
   };
 }

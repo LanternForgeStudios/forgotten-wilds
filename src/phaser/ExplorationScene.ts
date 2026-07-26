@@ -262,7 +262,7 @@ export class ExplorationScene extends Phaser.Scene {
     if (this.playerTextureKey === spriteAssetId) return;
     await loadSceneTexture(this, spriteAssetId);
     // Only a real spritesheet (frameSize set - today just the sprite.player fallback) has rows to
-    // build a walk/run animation from. The male/female skins (Player.skin) are still a single
+    // build a walk/run animation from. The male/female skins (Player.gender) are still a single
     // static frame with no frameSize - creating frame-numbered animations against those found zero
     // real frames every time (Phaser logs one warning per missing frame, then the broken Animation
     // object throws when setPlayer's walking/running branch below tries to play it), on every
@@ -332,7 +332,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.tweens.add({ targets: sprite, x: targetX, y: targetY, duration, ease: 'Linear' });
     }
 
-    // A static single-frame skin (male/female - see Player.skin) has no rows/frames to animate or
+    // A static single-frame skin (male/female - see Player.gender) has no rows/frames to animate or
     // select at all - only a real spritesheet (frameSize set, today just the sprite.player
     // fallback) has any frame beyond its one default. Matches setEntities' own `if
     // (def.frameSize)` guard for NPCs below.

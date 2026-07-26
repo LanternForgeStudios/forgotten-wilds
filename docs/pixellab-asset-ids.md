@@ -32,8 +32,14 @@ manual-workflow phase) but are the same account and just as targetable for a fut
 | `sprite.npc.ranger-caleb` | Ranger Caleb | `00229b8e-3874-4aed-a190-533ce692e267` (regenerated - original `78831885...` was generated without race specified in the prompt and came back white; Ranger Caleb is Black) | MCP |
 | `sprite.npc.historian-miriam` | Historian Miriam | `808a6c9f-b361-4cf1-8ade-a1b7db0c05b6` (first attempt `e36323eb...` failed - server load) | MCP |
 | `sprite.npc.mayor-eleanor-ashcroft` | Mayor Eleanor Ashcroft | `821b4aef-10e6-4cbc-8f83-5f974861bd54` (first attempt `931c7421...` failed - server load) | MCP |
-| `sprite.player.base.male` *(planned - underwear-only base body for equipment layering)* | Player Base Male | `80f01fd7-0635-4b92-9844-f366f3f05027` (first attempt `aa9fbbe8...` failed - server load) | MCP |
-| `sprite.player.base.female` *(planned - underwear-only base body for equipment layering)* | Player Base Female | `9bb1dce8-9193-4f4b-b0ab-d2e971fd3468` (first attempt `7d3be856...` failed - server load) | MCP |
+| `sprite.player.base.male.white-dark` | Player Base Male (white, dark hair) | `80f01fd7-0635-4b92-9844-f366f3f05027` (first attempt `aa9fbbe8...` failed - server load). walking-4-frames + running-4-frames both complete. Registered and built - see registry.ts. | MCP |
+| `sprite.player.base.female.white-dark` | Player Base Female (white, dark hair) | `9bb1dce8-9193-4f4b-b0ab-d2e971fd3468` (first attempt `7d3be856...` failed - server load). walking-4-frames + running-4-frames both complete. Registered and built - see registry.ts. | MCP |
+| `sprite.player.base.male.black-dark` | Player Base Male (Black, dark hair) | `af58c383-1d6f-402e-bb48-764907ce0bb0` (first attempt `c8001319...` failed - server load). walking-4-frames + running-4-frames both complete. Registered and built - see registry.ts. | MCP |
+| `sprite.player.base.female.black-dark` | Player Base Female (Black, dark hair) | `892ba84d-cbf4-4e59-8768-93975053d1b7` (first attempt `4f387151...` failed - server load). walking-4-frames + running-4-frames both complete. Registered and built - see registry.ts. | MCP |
+| `sprite.player.base.male.white-blonde` | Player Base Male (white, blonde hair) | `9c59fc25-82e5-43ad-b29a-4d513f46a00e` (first attempt `32a6d2f3...` failed - server load). walking-4-frames + running-4-frames both complete. Registered and built - see registry.ts. | MCP |
+| `sprite.player.base.female.white-blonde` | Player Base Female (white, blonde hair) | `809133bd-241a-46c9-b6d8-1d96dba316e0` (2 earlier attempts `aaead5a7...`/`d01bfdd4...` both failed - server load). walking-4-frames + running-4-frames both complete. Registered and built - see registry.ts. | MCP |
+| `sprite.player.base.male.asian-dark` | Player Base Male (Asian, dark hair) | `bdcacd02-06b7-494b-895e-2d9cd5cbef43` (first attempt `19f1f5eb...` failed - server load). walking-4-frames + running-4-frames both complete. Registered and built - see registry.ts. | MCP |
+| `sprite.player.base.female.asian-dark` | Player Base Female (Asian, dark hair) | `e0c9946d-9e1c-44a9-8ca1-ac63711e152d` (first attempt `162490ca...` failed - server load; walking's east direction also needed one retry after a transient worker-connection failure). walking-4-frames + running-4-frames both complete. Registered and built - see registry.ts. | MCP |
 
 ## Characters (enemies)
 

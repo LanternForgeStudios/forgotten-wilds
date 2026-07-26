@@ -90,7 +90,9 @@ interface UserProfileProps {
 
 type ProfileTab = 'profile' | 'friends' | 'clan' | 'skin' | 'settings' | 'reset';
 
-const SKIN_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
+// Gender-only picker for now - appearance (skin tone/hair) isn't user-facing yet, see
+// docs/Equipment-Layering-Plan.md.
+const GENDER_OPTIONS: { id: 'male' | 'female'; label: string; assetId: string }[] = [
   { id: 'male', label: 'Male', assetId: 'sprite.player.male' },
   { id: 'female', label: 'Female', assetId: 'sprite.player.female' },
 ];
@@ -396,11 +398,11 @@ export function UserProfile({ onClose }: UserProfileProps) {
     }
   }
 
-  async function changeSkin(skin: 'male' | 'female') {
+  async function changeSkin(gender: 'male' | 'female') {
     if (busy) return;
     setBusy(true);
     try {
-      await callSetPlayerSkin(skin);
+      await callSetPlayerSkin(gender);
       if (uid) await resyncSave(uid);
     } finally {
       setBusy(false);
@@ -1306,7 +1308,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
               Choose how your character appears to yourself and other players. More options may be added later.
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
-              {SKIN_OPTIONS.map((option) => (
+              {GENDER_OPTIONS.map((option) => (
                 <button
                   key={option.id}
                   type="button"
@@ -1317,8 +1319,8 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     flexDirection: 'column',
                     alignItems: 'center',
                     gap: 4,
-                    background: player.skin === option.id ? 'var(--fw-accent-dim)' : 'transparent',
-                    border: `1px solid ${player.skin === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
+                    background: player.gender === option.id ? 'var(--fw-accent-dim)' : 'transparent',
+                    border: `1px solid ${player.gender === option.id ? 'var(--fw-accent)' : 'var(--fw-panel-border)'}`,
                     borderRadius: 6,
                     padding: '8px 14px',
                     cursor: busy ? 'not-allowed' : 'pointer',
@@ -1357,7 +1359,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     );
                   })()}
                   <span style={{ fontSize: 12 }}>{option.label}</span>
-                  {player.skin === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
+                  {player.gender === option.id && <span style={{ fontSize: 10, color: 'var(--fw-accent)' }}>Selected</span>}
                 </button>
               ))}
             </div>

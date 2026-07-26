@@ -42,26 +42,31 @@ own step below, not assumed free.
 
 ## Status
 
-**Phase 1 in progress**: two base bodies (no appearance specified in the prompt - likely reads as
-a default "white, dark hair" look, to be confirmed once art is in) are already generating via the
-pixellab MCP - see `docs/pixellab-asset-ids.md` for the character ids
-(`sprite.player.base.male`/`.female` working ids for now). Once visually confirmed, these become
-the `white-dark` appearance; the other 3 appearances (`black-dark`, `white-blonde`, `asian-dark`)
-still need generating for each gender - **6 more base-body characters**, same pipeline (`create_
-character` + `walking-4-frames` + `running-4-frames` per direction), explicit skin-tone/hair
-wording per prompt, same size/proportions/view/style params held constant across all 8 for
-consistency. 8 total × (1 create + 8 animation jobs) ≈ 72 generations - cheap against the ~1700
-remaining budget, but real wall-clock time given the ~5-8 min/character pipeline seen so far this
-session.
+**Data model migration: done.** `Player.gender`/`Player.appearance` (split from the old flat
+`skin` field) are live end-to-end - shared-types (client+server), `createCharacter`/
+`setPlayerSkin`/`resetPlayerProgress`/`partyBattle.ts`'s snapshot, presence plumbing, and every
+render call site. The visible picker UI (CharacterCreationScene, UserProfile's Skin tab) is
+deliberately still 2-option (gender only) - `appearance` defaults to `white-dark` and isn't
+user-changeable yet, since exposing 4 buttons that all render identically until Phase 2/3/4 land
+would be confusing. Wire up the 4-appearance picker once real art exists for all of them.
 
-Registered as `sprite.player.base.male`/`sprite.player.base.female` for now (an "underwear-only"
-base body, replacing the current fully-clothed `sprite.player.male`/`sprite.player.female`) - once
-the 8-appearance data model above is decided, these ids likely become
-`sprite.player.base.{gender}.{appearance}` instead. Processed into sheets the same way the current
-skins already are (`build_player_sheet.py` - 8 rows × 4 frames × 72×96, walk down/left/up/right
-then run down/left/up/right). The *existing* `sprite.player.male`/`.female` ids should NOT be
-overwritten yet, since nothing renders equipment layers until Phase 3 lands; swapping the base in
-before then would make every player appear undressed with no compensating layers on top.
+**Phase 1 (base body art): all 8 of 8 done.** All 4 appearances (`white-dark`, `black-dark`,
+`white-blonde`, `asian-dark`) x 2 genders are fully generated, processed, and registered -
+`sprite.player.base.{male,female}.{white-dark,black-dark,white-blonde,asian-dark}` in registry.ts,
+all built via `scripts/build_player_sheet.py` from one shared `crop_box` (20,3,116,131) measured
+against the white-dark pair's union content-bbox and reused identically for every variant (same
+size/view/proportions/pose generation params across all 8), so every base body stays pixel-
+consistent - the actual load-bearing requirement for equipment layers to be plug-and-play later.
+See `docs/pixellab-asset-ids.md` for each variant's pixellab character id. Not yet rendered
+anywhere in-game (no render call site resolves `sprite.player.base.*` yet - that's Phase 2/3
+below); the *existing* `sprite.player.male`/`.female` (fully-clothed) ids are still what actually
+renders today and should NOT be swapped out until there's a rendering path plus at least
+placeholder-free layer art for the starter loadout.
+
+**Next up**: Phase 2 (rendering infrastructure - stack equipment-layer sprites on the base body,
+verified with a placeholder layer) is the next real step; the 4-appearance picker UI
+(CharacterCreationScene, UserProfile Skin tab) can also be built out now that real preview art
+exists for all 8 combinations, ahead of or alongside Phase 2.
 
 ## The hard problem: frame-perfect alignment
 

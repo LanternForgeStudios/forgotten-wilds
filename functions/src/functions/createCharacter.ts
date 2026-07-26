@@ -3,9 +3,13 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { buildFreshPlayer, buildFreshSaveContent } from '../engine/newCharacter';
 import type { PlayerSave, UserDirectoryDoc } from '../shared-types';
 
+const VALID_APPEARANCES = ['white-dark', 'black-dark', 'white-blonde', 'asian-dark'] as const;
+type Appearance = (typeof VALID_APPEARANCES)[number];
+
 interface CreateCharacterRequest {
   name: string;
-  skin?: 'male' | 'female';
+  gender?: 'male' | 'female';
+  appearance?: Appearance;
 }
 
 const NAME_MIN_LENGTH = 2;
@@ -32,7 +36,10 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
   }
 
   const name = validateName(request.data?.name);
-  const skin = request.data?.skin === 'female' ? 'female' : 'male';
+  const gender = request.data?.gender === 'female' ? 'female' : 'male';
+  const appearance = VALID_APPEARANCES.includes(request.data?.appearance as Appearance)
+    ? (request.data!.appearance as Appearance)
+    : 'white-dark';
 
   const db = getFirestore();
   const userRef = db.collection('users').doc(uid);
@@ -43,7 +50,7 @@ export const createCharacter = onCall<CreateCharacterRequest>(async (request) =>
     displayName: name,
     createdAt: now,
     lastLoginAt: now,
-    player: buildFreshPlayer(uid, name, now, skin),
+    player: buildFreshPlayer(uid, name, now, gender, appearance),
     ...buildFreshSaveContent(),
     updatedAt: now,
   };

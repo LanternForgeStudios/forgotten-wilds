@@ -77,10 +77,17 @@ export interface Player {
    *  fresh character (newCharacter.ts) and as a read-time fallback for any save that predates this
    *  field - never absent/undefined once read, even though older Firestore documents lack it. */
   knownSkillIds: string[];
-  /** Which player sprite variant to render (see registry.ts's sprite.player.male/female) - chosen
-   *  at character creation, changeable any time via setPlayerSkin.ts. Only two options today; the
-   *  shape is a plain string union (not an enum) so a future third option is a one-line type edit. */
-  skin: 'male' | 'female';
+  /** Body silhouette - chosen at character creation, changeable any time via setPlayerSkin.ts.
+   *  Split from `appearance` because equipment layer art (see docs/Equipment-Layering-Plan.md)
+   *  only depends on this, not on skin tone/hair - so a boot/coat layer fits identically across
+   *  every `appearance`. Today's render call sites still resolve `sprite.player.male/female`
+   *  (registry.ts) off this field alone, ignoring `appearance`, until the 4-appearance base-body
+   *  art (sprite.player.base.{gender}.{appearance}) is built and Phase 2 rendering lands. */
+  gender: 'male' | 'female';
+  /** Which of the 4 base-body skin/hair variants to render - see docs/Equipment-Layering-Plan.md.
+   *  Not yet wired into any render call site (see `gender`'s doc comment) - captured now so
+   *  character creation/profile plumbing doesn't need a second migration once the art lands. */
+  appearance: 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
   /** Server clock reading the last time a Daily Chest was claimed - 0 for a fresh character
    *  (newCharacter.ts) and as a read-time fallback for any save that predates this field (see
    *  claimDailyChest.ts), which naturally means "eligible immediately" against
@@ -424,15 +431,16 @@ export interface PartyBattleParticipantStats {
    *  locked in a fight), so there's no need for a live per-turn read the way item ownership needs
    *  (see submitPartyBattleAction's own inventory read). Used both to validate a submitted
    *  skillId/abilityId actually belongs to this participant (Phase F's action-menu enforcement)
-   *  and to know which sprite to render them as in PvP (skin). */
+   *  and to know which sprite to render them as in PvP (gender/appearance). */
   knownSkillIds: string[];
   lanternId: string | null;
-  skin: 'male' | 'female';
-  /** Snapshotted the same way as knownSkillIds/lanternId/skin above - character display name
+  gender: 'male' | 'female';
+  appearance: 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
+  /** Snapshotted the same way as knownSkillIds/lanternId/gender above - character display name
    *  doesn't change mid-battle either. Used only for log-line text (partyCombatEngine.ts), never
    *  for game-logic identity (uid still owns that everywhere else). */
   name: string;
-  /** Snapshotted the same way as knownSkillIds/lanternId/skin above (equipment can't change
+  /** Snapshotted the same way as knownSkillIds/lanternId/gender above (equipment can't change
    *  mid-battle) - the equipped weapon's attack-ailment roll, already resolved (see
    *  equipmentEngine.ts's resolveWeaponAttackAilment). Stubbed: always null today. */
   attackAilment: { id: string; chance: number } | null;

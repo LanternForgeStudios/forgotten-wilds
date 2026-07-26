@@ -13,15 +13,24 @@ import type {
 } from '@/types';
 import { functions } from './firebaseConfig';
 
-export async function callCreateCharacter(name: string, skin: 'male' | 'female' = 'male'): Promise<PlayerSave> {
-  const fn = httpsCallable<{ name: string; skin: 'male' | 'female' }, PlayerSave>(functions, 'createCharacter');
-  const result = await fn({ name, skin });
+type Appearance = 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
+
+export async function callCreateCharacter(
+  name: string,
+  gender: 'male' | 'female' = 'male',
+  appearance: Appearance = 'white-dark',
+): Promise<PlayerSave> {
+  const fn = httpsCallable<{ name: string; gender: 'male' | 'female'; appearance: Appearance }, PlayerSave>(
+    functions,
+    'createCharacter',
+  );
+  const result = await fn({ name, gender, appearance });
   return result.data;
 }
 
-export async function callSetPlayerSkin(skin: 'male' | 'female'): Promise<{ skin: 'male' | 'female' }> {
-  const fn = httpsCallable<{ skin: 'male' | 'female' }, { skin: 'male' | 'female' }>(functions, 'setPlayerSkin');
-  const result = await fn({ skin });
+export async function callSetPlayerSkin(gender: 'male' | 'female'): Promise<{ gender: 'male' | 'female' }> {
+  const fn = httpsCallable<{ gender: 'male' | 'female' }, { gender: 'male' | 'female' }>(functions, 'setPlayerSkin');
+  const result = await fn({ gender });
   return result.data;
 }
 

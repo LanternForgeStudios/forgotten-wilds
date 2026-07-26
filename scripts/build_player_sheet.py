@@ -43,6 +43,46 @@ SKINS = {
         "crop_box": (34, 24, 94, 104),  # union bbox (43,32)-(84,97) on a 128x128 Walking canvas
         "out_name": "player-female-animated.png",
     },
+    # Base bodies (equipment-layering plan) - one shared crop_box across all 8 gender x appearance
+    # variants, since every one was generated with identical size/view/proportions/pose params
+    # (see docs/pixellab-asset-ids.md), which is exactly what "identical proportions so equipment
+    # layers are plug-and-play" requires. Measured against the union of male+female white-dark's
+    # own content-bboxes on their shared 136x136 canvas: male (32,18)-(104,122), female
+    # (32,13)-(102,120) -> combined (32,13)-(104,122). crop_box below is a 96x128 (0.75 aspect,
+    # matching the 72x96 output) box centered on that combined bbox with margin for per-appearance
+    # variance (hairstyles etc. may extend slightly differently across the other 6 variants).
+    "male-player-white-dark": {
+        "crop_box": (20, 3, 116, 131),
+        "out_name": "player-base-male-white-dark-animated.png",
+    },
+    "female-player-white-dark": {
+        "crop_box": (20, 3, 116, 131),
+        "out_name": "player-base-female-white-dark-animated.png",
+    },
+    "male-player-black-dark": {
+        "crop_box": (20, 3, 116, 131),
+        "out_name": "player-base-male-black-dark-animated.png",
+    },
+    "female-player-black-dark": {
+        "crop_box": (20, 3, 116, 131),
+        "out_name": "player-base-female-black-dark-animated.png",
+    },
+    "male-player-white-blonde": {
+        "crop_box": (20, 3, 116, 131),
+        "out_name": "player-base-male-white-blonde-animated.png",
+    },
+    "female-player-white-blonde": {
+        "crop_box": (20, 3, 116, 131),
+        "out_name": "player-base-female-white-blonde-animated.png",
+    },
+    "male-player-asian-dark": {
+        "crop_box": (20, 3, 116, 131),
+        "out_name": "player-base-male-asian-dark-animated.png",
+    },
+    "female-player-asian-dark": {
+        "crop_box": (20, 3, 116, 131),
+        "out_name": "player-base-female-asian-dark-animated.png",
+    },
 }
 
 OUT_DIR = os.path.join("public", "assets", "sprites", "characters")

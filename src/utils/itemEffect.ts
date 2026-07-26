@@ -1,4 +1,28 @@
-import type { ItemEffect, Stats } from '@/types';
+import type { Item, ItemEffect, Stats } from '@/types';
+
+// Groups a consumable by which resource its effect restores - shared by CharacterMenu's Crafting
+// tab (4 short lists instead of one flat grid) and CombatScene's Items menu (so healing poultices/
+// spirit draughts/lantern oil/cures sort together by rarity tier instead of scattering
+// alphabetically across the tray).
+export type ItemEffectGroup = 'hp' | 'spirit' | 'oil' | 'cure';
+
+export const ITEM_EFFECT_GROUP_ORDER: ItemEffectGroup[] = ['hp', 'spirit', 'oil', 'cure'];
+
+export const ITEM_EFFECT_GROUP_LABELS: Record<ItemEffectGroup, string> = {
+  hp: 'Healing Poultices',
+  spirit: 'Spirit Draughts',
+  oil: 'Lantern Oil',
+  cure: 'Ailment Cures',
+};
+
+export function itemEffectGroupOf(itemDef: Item | undefined): ItemEffectGroup | undefined {
+  if (!itemDef?.effect) return undefined;
+  if (itemDef.effect.healHpPercent) return 'hp';
+  if (itemDef.effect.healSpiritPercent) return 'spirit';
+  if (itemDef.effect.restoreOilPercent) return 'oil';
+  if (itemDef.effect.cureAilmentId) return 'cure';
+  return undefined;
+}
 
 /** Whether this item has any effect that the "Use" button applies at all (as opposed to a key
  *  item/equipment with no direct-use effect). Ailment cures aren't included here - CharacterMenu's

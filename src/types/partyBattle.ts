@@ -25,7 +25,8 @@ export interface PartyBattleParticipantStats {
    *  doesn't need a live per-turn read the way item ownership does. */
   knownSkillIds: string[];
   lanternId: string | null;
-  skin: 'male' | 'female';
+  gender: 'male' | 'female';
+  appearance: 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
   /** Snapshotted the same way - see shared-types/index.ts's matching comment. Used for battle log
    *  lines only (e.g. "Alys braces, ready to absorb the next blow."). */
   name: string;

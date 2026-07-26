@@ -59,7 +59,7 @@ export function DungeonScene() {
   const battleOverlayOpen = useBattleOverlayStore((s) => s.isOpen);
   const hudBarHeight = useHudBarHeight();
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
-  const skin = usePlayerStore((s) => s.player?.skin ?? 'male');
+  const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const otherOverlaysOpen = message !== null || menuOpen || journalOpen;
@@ -78,7 +78,7 @@ export function DungeonScene() {
 
   const { pending, run } = usePendingAction();
 
-  useHeartbeat(uid, displayName, LOCATION_ID, position, skin);
+  useHeartbeat(uid, displayName, LOCATION_ID, position, gender);
   useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
   const { startDash, stopDash } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
 
@@ -236,7 +236,7 @@ export function DungeonScene() {
         <TileGrid
           map={map}
           player={position}
-          playerSpriteAssetId={skin === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
+          playerSpriteAssetId={gender === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}

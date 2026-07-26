@@ -207,9 +207,11 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
     // Backfill for a save written before the skin picker existed - same fallback
     // resetPlayerProgress.ts already uses for the identical reason. Missing here meant this whole
     // object (embedded in participantStats, written via tx.set) carried an explicit `undefined`
-    // skin field - Firestore's Admin SDK rejects that outright, so any account predating the skin
-    // picker got a bare INTERNAL error starting *any* party battle (Endless or PvP), not just once.
-    skin: save.player.skin ?? 'male',
+    // gender/appearance field - Firestore's Admin SDK rejects that outright, so any account
+    // predating the skin picker got a bare INTERNAL error starting *any* party battle (Endless or
+    // PvP), not just once.
+    gender: save.player.gender ?? 'male',
+    appearance: save.player.appearance ?? 'white-dark',
     name: save.player.name,
     attackAilment: resolveWeaponAttackAilment(save.player.equipment.weapon) ?? null,
     ailmentResistances: computeAilmentResistances(save.player.equipment),
@@ -217,9 +219,10 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
 }
 
 /** Per the design doc: "if no action is selected within 20 seconds, the character automatically
- *  performs Defend, and combat immediately proceeds to the next turn." Now applies per-player-turn
- *  (not per round) since resolution is sequential - see partyCombatEngine.ts's own top comment.
- *  Exported for endlessBattle.ts/pvpBattle.ts to reuse when they set a battle doc's first
+ *  performs [an action], and combat immediately proceeds to the next turn." (Originally Defend;
+ *  changed to Attack - see submitPartyBattleAction's resolvedAction fallback.) Applies per-player-
+ *  turn (not per round) since resolution is sequential - see partyCombatEngine.ts's own top
+ *  comment. Exported for endlessBattle.ts/pvpBattle.ts to reuse when they set a battle doc's first
  *  turnDeadlineAt, rather than each redeclaring the same constant. */
 export const TURN_TIMEOUT_MS = 20_000;
 
@@ -279,7 +282,7 @@ interface SubmitPartyBattleActionRequest {
  * Resolves exactly one player's turn - whoever `turnOrder[currentTurnIndex]` is - against the
  * LIVE enemy board, then advances to the next player. Only that active player's own submitted
  * action is accepted; once the 20s deadline passes, any client's poll (with no action of its own)
- * can force that turn to resolve with Defend substituted. Once every player in `turnOrder` has
+ * can force that turn to resolve with Attack substituted. Once every player in `turnOrder` has
  * gone this round, the enemy phase resolves once and a new round begins - see
  * partyCombatEngine.ts's own top comment for why resolution is sequential rather than
  * collect-everyone-then-resolve-at-once (two players could otherwise both target an enemy the
@@ -372,7 +375,10 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       return { resolved: false, status: 'active' as const, activeUid };
     }
 
-    const resolvedAction: CombatAction = action ?? { type: 'defend' };
+    // Timeout/stun auto-resolve defaults to Attack (not Defend) - a missing targetIndex resolves
+    // to the first alive enemy (see partyCombatEngine.ts's resolveTargetIndex), and PvP's single
+    // opponent needs no target at all, so 'attack' works with no further action data either way.
+    const resolvedAction: CombatAction = action ?? { type: 'attack' };
     // Which Specialty Attack/Lantern Ability (if any) this turn's action used - see
     // PartyBattleTurnResult.skillId/abilityId's own doc comments for why this needs to ride along
     // in the write, not just be known locally by whoever happened to submit the action.

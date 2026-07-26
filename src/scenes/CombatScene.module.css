@@ -152,36 +152,66 @@
   z-index: 2;
 }
 
+/* Floating running combat-log readout, overlaid on the left side of the battle canvas instead of
+   a separate boxed panel below the action buttons - spans the full height of the battlefield
+   window (top to bottom of .battleCanvasWrap), newest line on top, oldest lines clipped off the
+   bottom as new ones push in from the top (see .messageLine's mount-only animation - a stable key
+   per log entry, not per row position, means only genuinely new lines animate in; lines already
+   visible just shift down in place). */
+.messageOverlay {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 8px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: min(240px, calc(100% - 16px));
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.messageLine {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--fw-text);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 3px 8px;
+  border-radius: 6px;
+  animation: messageLineIn 0.25s ease-out;
+}
+
+@keyframes messageLineIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .bottomPanel {
   width: 100%;
   display: flex;
-  gap: 16px;
+  justify-content: center;
   padding: 16px;
   box-sizing: border-box;
 }
 
-/* Matches the action panel's height (flexbox's default align-items: stretch on .bottomPanel
-   handles this automatically now that there's no max-height capping it below that) - scrolls
-   internally via overflow-y if the log ever has more lines than fit. */
-.logPanel {
-  flex: 1;
-  min-width: 0;
-  overflow-y: auto;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .fastRoundsToggle {
-  align-self: flex-end;
+  grid-column: 1 / -1;
+  justify-self: end;
   background: transparent;
   border: 1px solid var(--fw-panel-border);
   color: var(--fw-text-dim);
   font-size: 10px;
   padding: 2px 8px;
   border-radius: 10px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .fastRoundsToggle:hover {
@@ -245,18 +275,67 @@
   background: rgba(0, 0, 0, 0.55);
 }
 
+/* Reward list styling matches ChestRewardReveal.module.css's rewardList/rewardRow/icon - same
+ * "icon + line per reward" visual language for every reward moment in the game. */
+.rewardList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+@keyframes rewardRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rewardRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  animation: rewardRowIn 0.4s ease-out backwards;
+}
+
+.rewardIcon {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
+
 @media (max-width: 700px) {
   .bottomPanel {
-    flex-direction: column;
-    padding: 10px;
-    gap: 10px;
+    padding: 8px;
   }
 
   .actionsPanel {
     width: 100%;
+    gap: 6px;
   }
 
-  .logPanel {
-    max-height: 70px;
+  .actionButton {
+    padding: 9px 6px;
+    font-size: 12px;
+  }
+
+  .itemRow {
+    font-size: 11px;
+    padding: 4px 2px;
+  }
+
+  .messageOverlay {
+    max-width: min(200px, calc(100% - 12px));
+  }
+
+  .messageLine {
+    font-size: 11px;
+    padding: 2px 6px;
   }
 }
