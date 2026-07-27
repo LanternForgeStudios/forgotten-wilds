@@ -1749,6 +1749,26 @@
           "value": "tileset.overworld-terrain"
         }
       ]
+    },
+    {
+      "firstgid": 605,
+      "name": "overworld-decor2",
+      "image": "../../../public/assets/tilesets/overworld-decor2.png",
+      "imagewidth": 64,
+      "imageheight": 48,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 12,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.overworld-decor2"
+        }
+      ]
     }
   ],
   "properties": [

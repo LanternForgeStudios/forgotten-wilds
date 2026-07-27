@@ -288,6 +288,7 @@ export function OverworldScene() {
       .filter((o) => o.type === 'interactable' && o.refId)
       .map((o) => {
         const isChest = o.refId!.startsWith('chest-');
+        const isShrine = POINT_LANDMARK_KIND[o.refId!] === 'shrine';
         return {
           id: o.refId!,
           x: o.x,
@@ -296,7 +297,11 @@ export function OverworldScene() {
             ? openedChests.includes(o.refId!)
               ? 'structure.chest-open'
               : 'structure.chest'
-            : 'structure.shrine',
+            : isShrine
+              ? staminaUnlocked
+                ? 'structure.shrine-activated'
+                : 'structure.shrine-dormant'
+              : 'structure.shrine-dormant',
           label: labelForInteractable(o.refId!, openedChests),
         };
       });
@@ -316,7 +321,7 @@ export function OverworldScene() {
       .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     return [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, openedChests, fieldEncounterIcons]);
+  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, openedChests, fieldEncounterIcons, staminaUnlocked]);
 
   if (!map) {
     return (

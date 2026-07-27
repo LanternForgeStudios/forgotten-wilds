@@ -190,7 +190,13 @@ export function DungeonScene() {
           };
         }
         if (o.refId === 'mine-shrine') {
-          return { id: o.refId, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' };
+          return {
+            id: o.refId,
+            x: o.x,
+            y: o.y,
+            spriteAssetId: staminaUnlocked ? 'structure.shrine-activated' : 'structure.shrine-dormant',
+            label: 'Shrine',
+          };
         }
         return {
           id: o.refId!,
@@ -221,7 +227,7 @@ export function DungeonScene() {
       .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     return [...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-  }, [map, openedChests, fieldEncounterIcons]);
+  }, [map, openedChests, fieldEncounterIcons, staminaUnlocked]);
 
   if (!map) {
     return (

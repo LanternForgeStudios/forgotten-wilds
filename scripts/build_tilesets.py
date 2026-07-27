@@ -42,6 +42,8 @@ DIRECT_COPY_SETS = [
     "raven-ridge-terrain",
     "whisper-falls-terrain",
     "black-briar-terrain",
+    "mine-floor-terrain",
+    "ironwood-trail-terrain",
 ]
 
 os.makedirs(OUT_DIR, exist_ok=True)

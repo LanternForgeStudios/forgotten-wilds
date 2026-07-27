@@ -494,6 +494,86 @@
           "value": "tileset.dungeon-building-kit"
         }
       ]
+    },
+    {
+      "firstgid": 249,
+      "name": "mine-decor",
+      "image": "../../../public/assets/tilesets/mine-decor.png",
+      "imagewidth": 64,
+      "imageheight": 48,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 12,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.mine-decor"
+        }
+      ]
+    },
+    {
+      "firstgid": 261,
+      "name": "mine-floor-terrain",
+      "image": "../../../public/assets/tilesets/mine-floor-terrain.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.mine-floor-terrain"
+        }
+      ]
+    },
+    {
+      "firstgid": 277,
+      "name": "interior-building-kit",
+      "image": "../../../public/assets/tilesets/interior-building-kit.png",
+      "imagewidth": 128,
+      "imageheight": 112,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 8,
+      "tilecount": 56,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.interior-building-kit"
+        }
+      ]
+    },
+    {
+      "firstgid": 333,
+      "name": "interior-decor",
+      "image": "../../../public/assets/tilesets/interior-decor.png",
+      "imagewidth": 80,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 5,
+      "tilecount": 20,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.interior-decor"
+        }
+      ]
     }
   ],
   "properties": [

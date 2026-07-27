@@ -587,6 +587,78 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_building_kit (square_topdown, 16x16, wall_tiles=2; wall="rough-hewn stone mine tunnel wall with old wooden support beams", floor="packed dirt and rough stone mine floor with faint old rail track marks"), 56 pieces assembled into an 8x7 grid, row-major by index, via scripts/build_tilesets.py. The tool\'s own placement_rules (role name -> grid index, e.g. floor=0, pillar=31, doors/corners/stairs/partitions by side) is the legend for which cell is which piece - archived at public/assets/tilesets/original/dungeon-building-kit/placement-rules.json since it\'s only returned by the generation API, not encoded in the image itself.',
   },
   {
+    id: 'tileset.interior-building-kit',
+    category: 'tileset',
+    intendedUse:
+      "Cozy town-building interior floor+wall architecture kit (the 9 Ash Hallow building interiors - inn, shops, offices) - a distinct wood/plaster look from dungeon-building-kit's rough mine stone, so interiors don't look like mine tunnels. Floor, connectable walls (2 tiles high), doorways per side, corners, a pillar, stairs, and partition-wall variants.",
+    filePath: 'tilesets/interior-building-kit.png',
+    dimensions: { width: 128, height: 112 },
+    frameSize: { width: 16, height: 16 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_building_kit (square_topdown, 16x16, wall_tiles=2; wall="whitewashed plaster wall with dark wood timber framing, cozy cottage interior", floor="warm honey-colored wooden plank floor"), 56 pieces assembled into an 8x7 grid, row-major by index, via scripts/build_tilesets.py. Same placement_rules legend layout as dungeon-building-kit (floor=0, pillar=31, doors/corners/stairs/partitions by side).',
+  },
+  {
+    id: 'tileset.interior-decor',
+    category: 'tileset',
+    intendedUse:
+      'Generic interior furniture decorations-layer props (the 9 Ash Hallow building interiors) - a chair, table, rug (1x1 cells), a bed, shop counter, bookshelf (2x1 blocks), a fireplace (2x2 block), a cabinet (1x2 block).',
+    filePath: 'tilesets/interior-decor.png',
+    dimensions: { width: 80, height: 64 },
+    frameSize: { width: 16, height: 16 },
+    status: 'final',
+    notes:
+      "pixellab MCP-generated: 8 separate create_map_object calls (128x128, transparent background, high top-down, basic shading, single color outline) - same genuinely-transparent-object technique as tileset.mine-decor (not create_tiles_pro). Assembled into a mixed-footprint 4x4 grid via a build_decor_objects.py-style layout. 128x128 originals archived at public/assets/tilesets/original/interior-decor/.",
+  },
+  {
+    id: 'tileset.mine-decor',
+    category: 'tileset',
+    intendedUse:
+      'Mine/dungeon decorations-layer props (Hollow Rail Mine, reusable for building interiors) - rubble, a wooden crate, a broken support beam, a broken pickaxe (1x1 cells), a rusted mine cart (2x2 block), a rail track segment (2x1 block).',
+    filePath: 'tilesets/mine-decor.png',
+    dimensions: { width: 64, height: 48 },
+    frameSize: { width: 16, height: 16 },
+    status: 'final',
+    notes:
+      "pixellab MCP-generated: 6 separate create_map_object calls (128x128, transparent background, high top-down, basic shading, single color outline), each a genuinely isolated object - unlike the earlier create_tiles_pro \"tiles\" sets (dropped: each baked its own opaque, non-matching ground color into the tile, unusable as a transparent overlay). Assembled into a mixed-footprint 4x3 grid via scripts/build_decor_objects.py - most items get one 16x16 cell, the mine cart and rail track get a 2x2/2x1 block (select the whole block in Tiled's tile picker to stamp it as one multi-tile brush). 128x128 originals archived at public/assets/tilesets/original/mine-decor/.",
+  },
+  {
+    id: 'tileset.graveyard-decor',
+    category: 'tileset',
+    intendedUse:
+      'Graveyard decorations-layer props (Black Briar Forest) - a gravestone and stone cross (1x2 cells, tall), a stone urn and wilted flowers (1x1 cells), a tangled dead bramble bush (2x2 block).',
+    filePath: 'tilesets/graveyard-decor.png',
+    dimensions: { width: 64, height: 48 },
+    frameSize: { width: 16, height: 16 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: 5 separate create_map_object calls (128x128, transparent background, high top-down, basic shading, single color outline). Assembled into a mixed-footprint 4x3 grid via scripts/build_decor_objects.py - see tileset.mine-decor\'s note for why this approach (not create_tiles_pro) and how to stamp a multi-cell item in Tiled. 128x128 originals archived at public/assets/tilesets/original/graveyard-decor/.',
+  },
+  {
+    id: 'tileset.shrine-states',
+    category: 'tileset',
+    intendedUse:
+      'Shrine, both states, as decorations-layer tiles rather than a map object - dormant (moss-covered, no glow) and activated (glowing warm spirit-light), each a 2x2 block. An alternative to structure.shrine-dormant/structure.shrine-activated (the actual object sprites TownScene.tsx/OverworldScene.tsx/DungeonScene.tsx render shrines with) if you\'d rather paint a shrine into a decorations layer for a non-interactive decorative one.',
+    filePath: 'tilesets/shrine-states.png',
+    dimensions: { width: 64, height: 32 },
+    frameSize: { width: 16, height: 16 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: activated is a create_map_object base ("a weathered stone shrine with a small altar, glowing with warm golden spirit-light, activated", 128x128, transparent, high top-down, basic shading, single color outline); dormant is a create_object_state variant of that SAME object ("make it dormant and unlit, no glow, no fire, moss-covered stone") - same technique as structure.chest-open being a state of structure.chest, so both states share one body/silhouette instead of two independently-generated (and visibly mismatched) shrines. Assembled into a 4x2 grid (each state a 2x2 block) via scripts/build_decor_objects.py. 128x128 originals archived at public/assets/tilesets/original/shrine-states/.',
+  },
+  {
+    id: 'tileset.overworld-decor2',
+    category: 'tileset',
+    intendedUse:
+      'Overworld decorations-layer props (Ironwood Trail, Raven Ridge, Whisper Falls, Black Briar Forest) - a mossy boulder cluster (2x2 block), a fallen mossy log (2x1 block), a mushroom cluster, a tree stump, a wildflower cluster (1x1 cells each).',
+    filePath: 'tilesets/overworld-decor2.png',
+    dimensions: { width: 64, height: 48 },
+    frameSize: { width: 16, height: 16 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: 5 separate create_map_object calls (128x128, transparent background, high top-down, basic shading, single color outline). Assembled into a mixed-footprint 4x3 grid via scripts/build_decor_objects.py - see tileset.mine-decor\'s note for why this approach (not create_tiles_pro) and how to stamp a multi-cell item in Tiled. Named "-2" since the original overworld-decor (create_tiles_pro, opaque backgrounds) was removed. 128x128 originals archived at public/assets/tilesets/original/overworld-decor2/.',
+  },
+  {
     id: 'tileset.raven-ridge-terrain',
     category: 'tileset',
     intendedUse:
@@ -618,6 +690,28 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="dark stagnant bog water, murky and still", upper="withered dark grass and boggy black soil, haunted marsh"). Ready 4x4 grid PNG, used as-is. Metadata archived at public/assets/tilesets/original/black-briar-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
+  },
+  {
+    id: 'tileset.mine-floor-terrain',
+    category: 'tileset',
+    intendedUse:
+      'Mine/dungeon floor texture variation (Hollow Rail Mine, reusable for building interiors) - a 4x4 Wang autotile set (16x16 tiles) transitioning plain packed dirt floor to rubble-strewn rocky floor, for textural variety alongside dungeon-building-kit\'s single floor tile.',
+    filePath: 'tilesets/mine-floor-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="packed dirt mine floor, plain and smooth", upper="rough rubble-strewn rocky mine floor with loose stone"). Ready 4x4 grid PNG, used as-is. Metadata archived at public/assets/tilesets/original/mine-floor-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
+  },
+  {
+    id: 'tileset.ironwood-trail-terrain',
+    category: 'tileset',
+    intendedUse:
+      'Ironwood Trail ground terrain - a 4x4 Wang autotile set (16x16 tiles) transitioning dark shadowy leaf-covered forest floor to dense dark haunted undergrowth, for a distinctly moodier/darker ground than the generic overworld-terrain (matching Ironwood Trail\'s "haunted forest" description) - both available on this map.',
+    filePath: 'tilesets/ironwood-trail-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="dark shadowy forest floor covered in dead fallen leaves", upper="dense dark haunted undergrowth, twisted roots and gloom"). Ready 4x4 grid PNG, used as-is. Metadata archived at public/assets/tilesets/original/ironwood-trail-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
   },
   {
     id: 'sprite.npc-1',
@@ -2254,14 +2348,27 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "Painted building facade, cropped/resized from a staged 1024x1024 render (art-staging/icons/town-hall-ash-hallow.png, real alpha, no background removal needed) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
   },
   {
-    id: 'structure.shrine',
+    id: 'structure.shrine-dormant',
     category: 'structure',
-    intendedUse: 'Marker for shrine/landmark interactables in overworld locations (e.g. Spirit Grove)',
-    filePath: 'sprites/structures/shrine.png',
+    intendedUse:
+      "Marker for a not-yet-activated shrine interactable (Ash Hallow's Town Shrine, Spirit Grove) - shown until the player's staminaUnlocked (player.stats.maxStamina > 0) flips true, see TownScene.tsx/OverworldScene.tsx. Replaces the old single-state structure.shrine.",
+    filePath: 'sprites/structures/shrine-dormant.png',
     dimensions: { width: 144, height: 144 },
     status: 'final',
     notes:
-      "Weathered stone shrine, cropped/resized from a staged 1024x1024 render (art-staging/icons/shrine.png, real alpha, no background removal needed) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
+      'pixellab MCP-generated via create_object_state on structure.shrine-activated\'s SAME base object (edit: "make it dormant and unlit, no glow, no fire, moss-covered stone") rather than an independent generation, so both states share one body/silhouette - same technique as structure.chest/chest-open. Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_shrine_states.py. Original archived at public/assets/sprites/structures/original/shrine-dormant-source.png.',
+  },
+  {
+    id: 'structure.shrine-activated',
+    category: 'structure',
+    intendedUse:
+      "Marker for an activated shrine interactable, once staminaUnlocked - a pulsing warm glow animation (single row x 9 frames of 144x144), same generic idle-animation mechanism as structure.chest's glow loop (animationLayoutForSprite's fallback branch, no new game code needed).",
+    filePath: 'sprites/structures/shrine-activated-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object base ("a weathered stone shrine with a small altar, glowing with warm golden spirit-light, activated", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the spirit-light glow pulsating and flickering warmly", 9 frames). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_shrine_states.py. 128x128 originals archived at public/assets/sprites/structures/original/shrine-activated-glow/.',
   },
   {
     id: 'structure.chest',

@@ -263,7 +263,13 @@ export function TownScene() {
 
     const shrineEntities: GridEntity[] = map.objects
       .filter((o) => o.type === 'interactable' && o.refId && SHRINES.has(o.refId))
-      .map((o) => ({ id: o.refId!, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' }));
+      .map((o) => ({
+        id: o.refId!,
+        x: o.x,
+        y: o.y,
+        spriteAssetId: staminaUnlocked ? 'structure.shrine-activated' : 'structure.shrine-dormant',
+        label: 'Shrine',
+      }));
 
     // Every transition that doesn't already get a building facade (buildingEntities above) -
     // mainly each interior's own door back outside - gets the generic pulsing exit marker instead
@@ -287,7 +293,7 @@ export function TownScene() {
       }));
 
     return [...npcEntities, ...buildingEntities, ...shrineEntities, ...exitEntities, ...otherPlayerEntities];
-  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, presences, uid, locationId]);
+  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, presences, uid, locationId, staminaUnlocked]);
 
   if (!map) {
     return (

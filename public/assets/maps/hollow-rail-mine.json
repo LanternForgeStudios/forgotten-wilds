@@ -2136,6 +2136,46 @@
           "value": "tileset.dungeon-building-kit"
         }
       ]
+    },
+    {
+      "firstgid": 189,
+      "name": "mine-decor",
+      "image": "../../../public/assets/tilesets/mine-decor.png",
+      "imagewidth": 64,
+      "imageheight": 48,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 12,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.mine-decor"
+        }
+      ]
+    },
+    {
+      "firstgid": 201,
+      "name": "mine-floor-terrain",
+      "image": "../../../public/assets/tilesets/mine-floor-terrain.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.mine-floor-terrain"
+        }
+      ]
     }
   ],
   "properties": [
