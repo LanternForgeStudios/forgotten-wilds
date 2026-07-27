@@ -10,6 +10,9 @@ export type PartyBattleMode = 'endless' | 'pvp';
 export type PartyBattleStatus = 'active' | 'awaitingContinueVote' | 'victory' | 'defeated' | 'withdrawn';
 
 export interface PartyBattleParticipantStats {
+  /** Snapshotted once at battle start - see shared-types/index.ts's matching comment. Display only
+   *  (e.g. the PvP opponent's level chip). */
+  level: number;
   hp: number;
   maxHp: number;
   spirit: number;

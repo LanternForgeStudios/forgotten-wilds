@@ -231,7 +231,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
         tierLabel: '',
         tierColor: '#ece1cf',
         tier: 'regular' as const,
-        level: 0,
+        level: opponent.level,
         hp: opponent.hp,
         maxHp: opponent.maxHp,
         isBoss: false,

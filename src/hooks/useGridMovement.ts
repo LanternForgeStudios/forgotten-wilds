@@ -38,7 +38,7 @@ const FACING_TO_DELTA: Record<Facing, { dx: number; dy: number }> = {
 // once it wanders away from there.
 const BLOCKING_OBJECT_TYPES = new Set(['interactable']);
 
-export function isWalkable(map: TileMap, x: number, y: number, facing?: Facing): boolean {
+export function isWalkable(map: TileMap, x: number, y: number): boolean {
   if (x < 0 || y < 0 || x >= map.width || y >= map.height) return false;
   const ground = map.layers.find((l) => l.name === 'ground');
   if (!ground) return false;
@@ -55,13 +55,9 @@ export function isWalkable(map: TileMap, x: number, y: number, facing?: Facing):
   if (collisionBlocked) return false;
   const blocked = map.objects.some((o) => BLOCKING_OBJECT_TYPES.has(o.type) && o.x === x && o.y === y);
   if (blocked) return false;
-  // A gated transition (e.g. a building door) only behaves like open floor when approached from
-  // its required direction - from any other side it's a wall, so you can't slip past a building
-  // by walking across its door tile sideways.
-  const gatedTransition = map.objects.find(
-    (o) => o.type === 'transition' && o.x === x && o.y === y && o.requiredFacing,
-  );
-  if (gatedTransition && gatedTransition.requiredFacing !== facing) return false;
+  // Transitions (building entrances, map edges, etc.) are always open floor from every direction -
+  // a player should be able to walk onto and trigger one from any side, not just a map-authored
+  // requiredFacing. That field still exists on older map data but is no longer enforced here.
   return true;
 }
 
@@ -156,7 +152,7 @@ export function useGridMovement({
       const nextY = current.y + delta.dy;
       const dynamicallyBlocked = dynamicBlockersRef.current?.some((b) => b.x === nextX && b.y === nextY);
 
-      if (!isWalkable(map, nextX, nextY, facing) || dynamicallyBlocked) {
+      if (!isWalkable(map, nextX, nextY) || dynamicallyBlocked) {
         if (current.facing !== facing) setPosition({ ...current, facing });
         return;
       }

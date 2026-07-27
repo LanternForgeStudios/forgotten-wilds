@@ -266,13 +266,11 @@ export function TownScene() {
       .map((o) => ({ id: o.refId!, x: o.x, y: o.y, spriteAssetId: 'structure.shrine', label: 'Shrine' }));
 
     // Every transition that doesn't already get a building facade (buildingEntities above) -
-    // mainly each interior's own door back outside, which previously had no visual marker at all
-    // and just looked like plain floor. Reuses the generic structure.door placeholder,
-    // stub-registered for exactly this "map-edge/doorway marker" purpose but never actually wired
-    // in until now.
+    // mainly each interior's own door back outside - gets the generic pulsing exit marker instead
+    // of looking like plain floor.
     const exitEntities: GridEntity[] = map.objects
       .filter((o) => o.type === 'transition' && o.refId && !BUILDING_MARKERS[o.refId])
-      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     const now = Date.now();
     const otherPlayerEntities: GridEntity[] = presences

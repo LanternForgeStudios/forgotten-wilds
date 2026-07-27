@@ -214,11 +214,11 @@ export function DungeonScene() {
     }));
 
     // Every transition (the entrance from Black Briar Forest, the exit to the Mine Office) gets a
-    // visible marker instead of looking like plain ground - same generic structure.door
-    // placeholder TownScene/OverworldScene use for their own exits.
+    // visible pulsing exit marker instead of looking like plain ground - same generic marker
+    // TownScene/OverworldScene use for their own exits.
     const exitEntities: GridEntity[] = map.objects
       .filter((o) => o.type === 'transition' && o.refId)
-      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     return [...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
   }, [map, openedChests, fieldEncounterIcons]);

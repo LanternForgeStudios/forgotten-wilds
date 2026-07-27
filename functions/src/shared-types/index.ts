@@ -412,6 +412,10 @@ export type PartyBattleStatus = 'active' | 'awaitingContinueVote' | 'victory' | 
  *  a party fight has one authoritative, self-contained state rather than depending on a second
  *  document staying in sync. */
 export interface PartyBattleParticipantStats {
+  /** Snapshotted once at battle start, same as knownSkillIds/lanternId/gender below - a player's
+   *  level can't change mid-battle either. Used for display only (e.g. the PvP opponent's level
+   *  chip), never for combat math (stats are already the leveled values). */
+  level: number;
   hp: number;
   maxHp: number;
   spirit: number;

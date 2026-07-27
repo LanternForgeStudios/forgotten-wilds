@@ -96,13 +96,9 @@ export function useLocationExploration({
       }
     }
 
-    const transition = map.objects.find(
-      (o) =>
-        o.type === 'transition' &&
-        o.x === pos.x &&
-        o.y === pos.y &&
-        (!o.requiredFacing || o.requiredFacing === pos.facing),
-    );
+    // Triggers from any approach direction - see isWalkable's own note in useGridMovement.ts, which
+    // no longer treats a requiredFacing mismatch as a wall either.
+    const transition = map.objects.find((o) => o.type === 'transition' && o.x === pos.x && o.y === pos.y);
     if (transition?.refId) {
       const blockedMessage = getBlockedMessage(transition.refId, useQuestStore.getState().progress);
       if (blockedMessage) {

@@ -191,6 +191,7 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
   if (!save.player.knownSkillIds) save.player.knownSkillIds = ['keepers-strike'];
   backfillPlayerEquipment(save);
   return {
+    level: save.player.level,
     hp: save.player.stats.maxHp,
     maxHp: save.player.stats.maxHp,
     spirit: save.player.stats.maxSpirit,

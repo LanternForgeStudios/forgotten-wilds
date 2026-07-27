@@ -2208,14 +2208,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "pixellab MCP-generated via create_object_state on the SAME closed-chest object (edit: \"open the lid fully, empty dark interior, no glow\") rather than an independent generation, so the two states share the same body/palette per the checklist doc's explicit requirement. Cropped to its square content bbox and resized to 48x48 with LANCZOS. Build script: scripts/build_chest.py. 128x128 original archived at public/assets/sprites/structures/original/chest-open.png.",
   },
   {
-    id: 'structure.door',
+    id: 'structure.exit-marker',
     category: 'structure',
-    intendedUse: 'Generic standalone door marker - not yet referenced by any map (building entrances currently render via the structure.* facade markers instead)',
-    filePath: 'sprites/structures/door.svg',
-    dimensions: { width: 48, height: 96 },
-    status: 'placeholder',
+    intendedUse:
+      'Marker for every non-building-facade transition tile in Town/Overworld/Dungeon (each interior\'s door back outside, cave mouths, map-edge transitions, etc.) - replaces the old structure.door placeholder. A pulsing glow animation (single row x 9 frames of 48x48), same generic idle-animation mechanism as structure.chest - upsertEntity already plays any frameSize\'d sprite\'s single row automatically, no new game code needed. Generic by design (a weathered wooden sign, not an architectural door/archway) so it reads correctly in any location kind.',
+    filePath: 'sprites/structures/exit-marker-glow.png',
+    dimensions: { width: 432, height: 48 },
+    frameSize: { width: 48, height: 48 },
+    status: 'final',
     notes:
-      "Generated SVG placeholder, stub-registered for future map-building use. Dimensions bumped 32x64 -> 48x96 per docs/Asset-Production-Checklist.md's current target spec - see structure.house's note for why.",
+      'pixellab MCP-generated: create_1_direction_object (128x128, top-down view, 4 candidates reviewed - picked the plain wooden sign with a red arrow + "EXIT" text, the most universally generic and legible of the 4) + animate_object (v3 mode, "the red arrow and EXIT text pulsating and glowing brightly", 9 frames). Each frame cropped to its own square content bbox and resized to 48x48 with LANCZOS. Build script: scripts/build_exit_marker.py. 128x128 originals archived at public/assets/sprites/structures/original/exit-marker/.',
   },
   {
     id: 'structure.tree',

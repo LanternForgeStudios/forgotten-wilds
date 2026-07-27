@@ -309,11 +309,11 @@ export function OverworldScene() {
       displayScale: enemyMapIconScale(icon.spriteAssetId, icon.isBoss),
     }));
 
-    // Every transition (region-to-region crossings) gets a visible marker instead of looking like
-    // plain ground - the generic structure.door placeholder, same as TownScene's interior exits.
+    // Every transition (region-to-region crossings) gets a visible pulsing exit marker instead of
+    // looking like plain ground - same generic marker as TownScene's interior exits.
     const exitEntities: GridEntity[] = map.objects
       .filter((o) => o.type === 'transition' && o.refId)
-      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.door', label: 'Exit' }));
+      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     return [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
   }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, openedChests, fieldEncounterIcons]);

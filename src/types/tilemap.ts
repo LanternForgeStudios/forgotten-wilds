@@ -28,10 +28,10 @@ export interface MapObject {
   /** for npc objects: max tile distance the npc will wander from this spawn point (cosmetic client-side
    *  animation only, not server state). Omitted/undefined means the npc stands still. */
   wanderRadius?: number;
-  /** for transition objects: the player must be moving in this direction to trigger the transition
-   *  (e.g. a building door only opens if you walk "up" into it from the street) - stepping onto the
-   *  tile from another direction just walks onto it as a normal floor tile. Omitted means any
-   *  direction triggers it, which is correct for map-edge transitions only reachable from one side. */
+  /** Legacy field, parsed from older map data but no longer enforced - every transition now
+   *  triggers from any approach direction (see useGridMovement.ts's isWalkable and
+   *  useLocationExploration.ts's handleStep). Kept on the type so existing map JSON with this
+   *  property still parses without error; safe to omit on any new map. */
   requiredFacing?: 'up' | 'down' | 'left' | 'right';
 }
 
