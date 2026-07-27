@@ -428,6 +428,66 @@
           "value": "tileset.velmora-environments-16"
         }
       ]
+    },
+    {
+      "firstgid": 193,
+      "name": "dungeon-building-kit",
+      "image": "../../../public/assets/tilesets/dungeon-building-kit.png",
+      "imagewidth": 128,
+      "imageheight": 112,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 8,
+      "tilecount": 56,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.dungeon-building-kit"
+        }
+      ]
+    },
+    {
+      "firstgid": 249,
+      "name": "dungeon-decor",
+      "image": "../../../public/assets/tilesets/dungeon-decor.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.dungeon-decor"
+        }
+      ]
+    },
+    {
+      "firstgid": 265,
+      "name": "dungeon-overhang",
+      "image": "../../../public/assets/tilesets/dungeon-overhang.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.dungeon-overhang"
+        }
+      ]
     }
   ],
   "properties": [

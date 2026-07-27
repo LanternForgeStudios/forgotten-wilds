@@ -382,13 +382,50 @@ finally produced an actual round ball.
 Two 48×48 9-slice panel borders (Kenney CC0 "Fantasy UI Borders," already real assets, not
 generated placeholders) - fine to leave as-is; only revisit if you want a fully custom UI skin.
 
-## Tilesets (already-uploaded packs - mostly a wiring decision, not new art to commission)
+## Tilesets
 
-You already have a large library of real, uploaded tileset packs not yet used in any map
+### pixellab-generated terrain/decoration/overhang sets (10 - all done, wired into maps)
+
+Real, license-clean tilesets generated via pixellab MCP for the game's 3 location kinds, replacing
+the need to lean on the uploaded packs below (most of which carry a "provenance unconfirmed"
+caveat - not safe to ship as final without clearing that up first). Each location kind gets a
+terrain autotile set (`create_topdown_tileset`, a 4x4 Wang set - grass/dirt/water transitions with
+clean hand-paintable edges), a decorations set (`create_tiles_pro`, 16 independent prop-tile
+variations), and an overhang set (same tool, tree canopy/roof/ceiling pieces rendered above the
+player). Dungeon additionally gets a full `create_building_kit` floor+wall+door+pillar+stairs
+architecture set instead of a plain terrain autotile, since an interior needs real walls, not a
+ground transition.
+
+| Tileset | Tiles | Generation |
+|---|---|---|
+| `tileset.town-terrain` | 16 (4x4 Wang) | `create_topdown_tileset`: packed dirt path → mowed grass |
+| `tileset.town-decor` | 16 | `create_tiles_pro`: wildflowers, fallen leaves, path pebbles, cracked dirt, tall grass, plank fragment |
+| `tileset.town-overhang` | 16 | `create_tiles_pro`: autumn tree canopy (center/edge/corner), weathered roof eave |
+| `tileset.overworld-terrain` | 16 (4x4 Wang) | `create_topdown_tileset`: rocky dirt trail → wild mountain grass |
+| `tileset.overworld-water` | 16 (4x4 Wang) | `create_topdown_tileset`: stream water → grass, wet mossy rock transition |
+| `tileset.overworld-decor` | 16 | `create_tiles_pro`: mossy boulders, fallen log, mushrooms, ferns, wildflowers, rocks |
+| `tileset.overworld-overhang` | 16 | `create_tiles_pro`: dense forest canopy (center/edge/corner), hanging moss/vine |
+| `tileset.dungeon-building-kit` | 56 | `create_building_kit`: rough stone mine wall + timber beams, packed dirt/stone floor with rail marks - floor/walls/doorways/corners/pillar/stairs/partitions (legend: `public/assets/tilesets/original/dungeon-building-kit/placement-rules.json`) |
+| `tileset.dungeon-decor` | 16 | `create_tiles_pro`: rubble, rusted rail segment, puddle, cracked floor, pickaxe fragment, crate |
+| `tileset.dungeon-overhang` | 16 | `create_tiles_pro`: wooden support beams, hanging chain/lantern hook, rocky ceiling outcrop/arch |
+
+Wired as additional embedded tilesets (own `tilesetAssetId` property, per "Multiple tilesets per
+map" in `docs/Tiled-Map-Authoring.md`) onto: `ash-hallow` (town set), `ironwood-trail`/
+`raven-ridge`/`black-briar-forest` (overworld set), `whisper-falls` (overworld set + water), and
+`hollow-rail-mine` + all 9 Ash Hallow building interiors (dungeon set). Available to pick from
+immediately when any of those maps is opened in Tiled - not pre-painted onto any layer, since
+that's a hand-authoring step. Build script: `scripts/build_tilesets.py` (tile-grid assembly from
+the raw pixellab exports) + `scripts/wire_new_tilesets.py` (map-JSON wiring, safe to re-run).
+
+### Already-uploaded packs (mostly a wiring decision if you ever need them, not new art to commission)
+
+You also already have a large library of real, uploaded tileset packs not yet used in any map
 (grassland, a "Time Fantasy"-style pack, a Velmora-branded pack, a graveyard set, water/beach/cliff/
 path sheets, and more - see the `tileset` category in `src/assets/registry.ts` for the full list
-with dimensions). **Before generating new tileset art, look through these first** - most outdoor/
-dungeon terrain needs are probably already covered.
+with dimensions). Most carry a "provenance unconfirmed, verify license before shipping as final"
+note - the pixellab-generated sets above sidestep that entirely, so treat this library as a
+fallback for one-off needs (e.g. `tileset.graveyard-set`, already in use by `black-briar-forest`)
+rather than the default.
 
 (Done: the 14 mislabeled entries that used to live here - `tx-player`, `velmora-slime-animation`,
 and the 12 uploaded `npc-N` sheets - have been moved to `sprites/characters/`/`sprites/enemies/`

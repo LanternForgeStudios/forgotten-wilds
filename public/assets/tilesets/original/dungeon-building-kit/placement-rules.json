@@ -1,0 +1,27 @@
+{
+  "rule_type": "composed (arity 8)",
+  "connectivity": "same",
+  "terrains": ["wall", "empty"],
+  "grid": "8 columns x 7 rows, row-major (index = row*8 + col), assembled by scripts/build_tilesets.py",
+  "parts": {
+    "floor": { "index": 0 },
+    "sides": { "E": 2, "N": 1, "S": 3, "W": 4 },
+    "corners": { "NE": 5, "NW": 8, "SE": 6, "SW": 7 },
+    "outer_corners": { "NE": 9, "NW": 12, "SE": 10, "SW": 11 },
+    "partition": { "E": 15, "N": 14, "S": 16, "W": 17, "hub": 13 },
+    "partition_wall": { "E": 19, "N": 18, "S": 20, "W": 21 },
+    "partition_multi": { "ES": 24, "NE": 22, "NW": 23, "SW": 25, "ESW": 29, "NES": 26, "NEW": 28, "NSW": 27, "NESW": 30 },
+    "pillar": { "index": 31 },
+    "doors": { "Ea": 34, "Eb": 35, "Na": 32, "Nb": 33, "Sa": 36, "Sb": 37, "Wa": 38, "Wb": 39 },
+    "stairs": { "indices": [40, 41] },
+    "stairs_east": { "indices": [42, 43] },
+    "floor_roof": { "index": 44 },
+    "partition_doors": { "Ha": 47, "Hb": 48, "Va": 45, "Vb": 46 },
+    "outer_multi": { "EW": 55, "NS": 54, "ESW": 52, "NES": 49, "NEW": 50, "NSW": 51, "NESW": 53 }
+  },
+  "materials": {
+    "wall": "rough-hewn stone mine tunnel wall with old wooden support beams",
+    "floor": "packed dirt and rough stone mine floor with faint old rail track marks"
+  },
+  "note": "Not every one of the 56 indices was individually AI-painted - some are template-derived variants of a painted piece (see the original 'painted' index list in the pixellab generation response: 0,1,4,8,14,17,31,32,33,38,39,40,41,42,43,44,45,46,47,48). Use this legend to identify which grid cell in dungeon-building-kit.png is which architectural piece when painting a Tiled tileset's per-tile properties or picking tiles by hand."
+}

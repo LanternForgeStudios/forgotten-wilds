@@ -2124,6 +2124,66 @@
           "value": "tileset.trees-signs-rocks-bridge-16"
         }
       ]
+    },
+    {
+      "firstgid": 589,
+      "name": "town-terrain",
+      "image": "../../../public/assets/tilesets/town-terrain.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.town-terrain"
+        }
+      ]
+    },
+    {
+      "firstgid": 605,
+      "name": "town-decor",
+      "image": "../../../public/assets/tilesets/town-decor.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.town-decor"
+        }
+      ]
+    },
+    {
+      "firstgid": 621,
+      "name": "town-overhang",
+      "image": "../../../public/assets/tilesets/town-overhang.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.town-overhang"
+        }
+      ]
     }
   ],
   "properties": [

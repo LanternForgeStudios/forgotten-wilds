@@ -1732,6 +1732,66 @@
       "tileheight": 16,
       "tilerendersize": "grid",
       "tilewidth": 16
+    },
+    {
+      "firstgid": 1399,
+      "name": "overworld-terrain",
+      "image": "../../../public/assets/tilesets/overworld-terrain.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.overworld-terrain"
+        }
+      ]
+    },
+    {
+      "firstgid": 1415,
+      "name": "overworld-decor",
+      "image": "../../../public/assets/tilesets/overworld-decor.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.overworld-decor"
+        }
+      ]
+    },
+    {
+      "firstgid": 1431,
+      "name": "overworld-overhang",
+      "image": "../../../public/assets/tilesets/overworld-overhang.png",
+      "imagewidth": 64,
+      "imageheight": 64,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "margin": 0,
+      "spacing": 0,
+      "columns": 4,
+      "tilecount": 16,
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.overworld-overhang"
+        }
+      ]
     }
   ],
   "tilewidth": 16,
