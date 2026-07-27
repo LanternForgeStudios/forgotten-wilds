@@ -66,6 +66,15 @@ const ZONE_LANDMARK_KIND: Record<string, 'visitOnly' | 'fragment'> = {
   'mossy-creek': 'fragment',
 };
 
+/** Sprite for each 'fragment'-kind point interactable - these are NOT shrines (no dormant/activated
+ *  state), so each needs its own bespoke marker rather than falling back to the shrine sprite. */
+const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
+  'fallen-watchtower': 'structure.landmark-watchtower',
+  'water-fragment': 'structure.landmark-water-glimmer',
+  'frostbound-treatise-cache': 'structure.landmark-frost-cache',
+  'ember-codex-tunnel': 'structure.landmark-tunnel-entrance',
+};
+
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
 function labelForInteractable(refId: string, openedChests: string[]): string {
@@ -289,19 +298,20 @@ export function OverworldScene() {
       .map((o) => {
         const isChest = o.refId!.startsWith('chest-');
         const isShrine = POINT_LANDMARK_KIND[o.refId!] === 'shrine';
+        const spriteAssetId = isChest
+          ? openedChests.includes(o.refId!)
+            ? 'structure.chest-open'
+            : 'structure.chest'
+          : isShrine
+            ? staminaUnlocked
+              ? 'structure.shrine-activated'
+              : 'structure.shrine-dormant'
+            : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');
         return {
           id: o.refId!,
           x: o.x,
           y: o.y,
-          spriteAssetId: isChest
-            ? openedChests.includes(o.refId!)
-              ? 'structure.chest-open'
-              : 'structure.chest'
-            : isShrine
-              ? staminaUnlocked
-                ? 'structure.shrine-activated'
-                : 'structure.shrine-dormant'
-              : 'structure.shrine-dormant',
+          spriteAssetId,
           label: labelForInteractable(o.refId!, openedChests),
         };
       });

@@ -2371,6 +2371,51 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object base ("a weathered stone shrine with a small altar, glowing with warm golden spirit-light, activated", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the spirit-light glow pulsating and flickering warmly", 9 frames). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_shrine_states.py. 128x128 originals archived at public/assets/sprites/structures/original/shrine-activated-glow/.',
   },
   {
+    id: 'structure.landmark-watchtower',
+    category: 'structure',
+    intendedUse:
+      "Marker for Ironwood Trail's Fallen Watchtower point interactable (grants wind-fragment) - was incorrectly falling back to structure.shrine-dormant/activated (OverworldScene.tsx's interactableEntities mapping had no per-refId sprite for non-chest/non-shrine 'fragment' landmarks, only a blanket shrine-shaped default), which read as an unlit shrine even after the fragment had already been collected.",
+    filePath: 'sprites/structures/landmark-watchtower.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("crumbling ruined stone watchtower, wind-worn broken battlements, ivy and moss", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/watchtower-ruin-source.png.',
+  },
+  {
+    id: 'structure.landmark-frost-cache',
+    category: 'structure',
+    intendedUse:
+      'Marker for Whisper Falls\' "a hidden cache behind the falls" point interactable (grants frostbound-treatise) - same shrine-fallback mismatch as structure.landmark-watchtower.',
+    filePath: 'sprites/structures/landmark-frost-cache.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("weathered wooden cache box wrapped in old rope, rimed with frost and icicles, tucked among wet rocks", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/frost-cache-source.png.',
+  },
+  {
+    id: 'structure.landmark-tunnel-entrance',
+    category: 'structure',
+    intendedUse:
+      'Marker for Raven Ridge\'s "an overlooked maintenance tunnel" point interactable (grants ember-codex) - same shrine-fallback mismatch as structure.landmark-watchtower.',
+    filePath: 'sprites/structures/landmark-tunnel-entrance.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("small overlooked mine tunnel entrance, dark opening braced with old wooden planks, overgrown and neglected", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/tunnel-entrance-source.png.',
+  },
+  {
+    id: 'structure.landmark-water-glimmer',
+    category: 'structure',
+    intendedUse:
+      'Marker for Whisper Falls\' "a faint glimmer in the pool" point interactable (grants water-fragment) - same shrine-fallback mismatch as structure.landmark-watchtower. Animated (a genuine motion candidate - a pulsing/glimmering shard reads much better in motion than static) via the same generic single-row idle-loop mechanism as structure.chest/structure.shrine-activated.',
+    filePath: 'sprites/structures/landmark-water-glimmer-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("small circular forest pool of clear water surrounded by smooth wet stones and reeds, a faint glowing turquoise magical shard glimmering just beneath the surface", 128x128, high top-down, medium shading, single color outline, high detail) + animate_object (v3 mode, "the magical shard glimmering and pulsing softly beneath the water, gentle rippling reflections", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/water-glimmer-glow/.',
+  },
+  {
     id: 'structure.chest',
     category: 'structure',
     intendedUse:
