@@ -550,31 +550,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 64, height: 64 },
     status: 'final',
     notes:
-      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16 tiles, high top-down view, basic shading, single color outline; lower="packed dirt path, warm brown, worn earth in an old Appalachian mining town", upper="short mowed grass, warm muted autumn green"). Output is a ready 4x4 grid PNG from the tool\'s own /image endpoint, used as-is (no reassembly needed - unlike the create_tiles_pro sets below, a topdown_tileset\'s corner-matching structure is already baked into this grid). Metadata (per-tile NW/NE/SW/SE corner values, for hand-matching adjacent tiles in Tiled) archived at public/assets/tilesets/original/town-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
-  },
-  {
-    id: 'tileset.town-decor',
-    category: 'tileset',
-    intendedUse:
-      'Town decorations-layer tiles (Ash Hallow) - wildflowers, fallen leaves, path pebbles, cracked dirt, tall grass, a wooden plank fragment. Paint onto a decorations-N layer above ground.',
-    filePath: 'tilesets/town-decor.png',
-    dimensions: { width: 64, height: 64 },
-    frameSize: { width: 16, height: 16 },
-    status: 'final',
-    notes:
-      'pixellab MCP-generated via create_tiles_pro (square_topdown, 16x16, high top-down view, numbered-prompt style: "1). small cluster of wildflowers on grass 2). scattered fallen autumn leaves on grass 3). small pebbles and stones on dirt path 4). patch of dry cracked dirt 5). tuft of tall grass 6). wooden plank fragment on ground"), which returned 16 independent tile variations - assembled into a 4x4 grid, row-major by index, via scripts/build_tilesets.py. frameSize set purely so the registry records the 16x16 cell size for reference - this asset is used as a Tiled tileset (sliced by Tiled\'s own tile grid), not as a Phaser animated sprite sheet.',
-  },
-  {
-    id: 'tileset.town-overhang',
-    category: 'tileset',
-    intendedUse:
-      'Town overhang-layer tiles (Ash Hallow) - autumn tree canopy pieces (center/edge/corner) plus a weathered wooden roof-eave piece, rendered above the player (tree canopies, roof lines the player walks under).',
-    filePath: 'tilesets/town-overhang.png',
-    dimensions: { width: 64, height: 64 },
-    frameSize: { width: 16, height: 16 },
-    status: 'final',
-    notes:
-      'pixellab MCP-generated via create_tiles_pro (square_topdown, 16x16, high top-down view, "1). autumn tree canopy center, dense warm orange and rust foliage 2). autumn tree canopy edge 3). autumn tree canopy corner piece 4). weathered wooden roof eave overhang with shingles"), 16 variations assembled into a 4x4 grid. Build script: scripts/build_tilesets.py.',
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16 tiles, high top-down view, basic shading, single color outline; lower="packed dirt path, warm brown, worn earth in an old Appalachian mining town", upper="short mowed grass, warm muted autumn green"). Output is a ready 4x4 grid PNG from the tool\'s own /image endpoint, used as-is (a topdown_tileset\'s corner-matching structure is already baked into this grid). Metadata (per-tile NW/NE/SW/SE corner values, for hand-matching adjacent tiles in Tiled) archived at public/assets/tilesets/original/town-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
   },
   {
     id: 'tileset.overworld-terrain',
@@ -599,30 +575,6 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="clear mountain stream water, cool blue-green", upper="wild mountain grass, moss green", transition="wet mossy rocks at the water\'s edge", transition_size=0.5). Ready 4x4 grid PNG, used as-is. Metadata archived at public/assets/tilesets/original/overworld-water/metadata.json. Build script: scripts/build_tilesets.py.',
   },
   {
-    id: 'tileset.overworld-decor',
-    category: 'tileset',
-    intendedUse:
-      'Overworld decorations-layer tiles - mossy boulders, a fallen mossy log, mushroom clusters, ferns, wildflowers, scattered rocks.',
-    filePath: 'tilesets/overworld-decor.png',
-    dimensions: { width: 64, height: 64 },
-    frameSize: { width: 16, height: 16 },
-    status: 'final',
-    notes:
-      'pixellab MCP-generated via create_tiles_pro (square_topdown, 16x16, high top-down view, "1). mossy boulder cluster 2). fallen log covered in moss 3). small mushroom cluster 4). fern patch 5). wild mountain wildflowers 6). scattered rocks and pebbles"), 16 variations assembled into a 4x4 grid. Build script: scripts/build_tilesets.py.',
-  },
-  {
-    id: 'tileset.overworld-overhang',
-    category: 'tileset',
-    intendedUse:
-      'Overworld overhang-layer tiles - dense autumn forest canopy (center/edge/corner) plus a hanging moss/vine piece, rendered above the player under tree cover.',
-    filePath: 'tilesets/overworld-overhang.png',
-    dimensions: { width: 64, height: 64 },
-    frameSize: { width: 16, height: 16 },
-    status: 'final',
-    notes:
-      'pixellab MCP-generated via create_tiles_pro (square_topdown, 16x16, high top-down view, "1). dense forest canopy center, autumn leaves 2). forest canopy edge 3). forest canopy corner piece 4). hanging moss and vine overhang"), 16 variations assembled into a 4x4 grid. Build script: scripts/build_tilesets.py.',
-  },
-  {
     id: 'tileset.dungeon-building-kit',
     category: 'tileset',
     intendedUse:
@@ -635,28 +587,37 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_building_kit (square_topdown, 16x16, wall_tiles=2; wall="rough-hewn stone mine tunnel wall with old wooden support beams", floor="packed dirt and rough stone mine floor with faint old rail track marks"), 56 pieces assembled into an 8x7 grid, row-major by index, via scripts/build_tilesets.py. The tool\'s own placement_rules (role name -> grid index, e.g. floor=0, pillar=31, doors/corners/stairs/partitions by side) is the legend for which cell is which piece - archived at public/assets/tilesets/original/dungeon-building-kit/placement-rules.json since it\'s only returned by the generation API, not encoded in the image itself.',
   },
   {
-    id: 'tileset.dungeon-decor',
+    id: 'tileset.raven-ridge-terrain',
     category: 'tileset',
     intendedUse:
-      'Dungeon/mine decorations-layer tiles - rubble, a rusted mine-cart rail segment, a floor puddle, a cracked floor tile, an abandoned pickaxe fragment, a wooden crate.',
-    filePath: 'tilesets/dungeon-decor.png',
+      "Raven Ridge ground terrain - a 4x4 Wang autotile set (16x16 tiles) transitioning rough grey stone mountain path to sparse windswept rocky ground with hardy grass, distinct from the generic overworld-terrain (both available on this map).",
+    filePath: 'tilesets/raven-ridge-terrain.png',
     dimensions: { width: 64, height: 64 },
-    frameSize: { width: 16, height: 16 },
     status: 'final',
     notes:
-      'pixellab MCP-generated via create_tiles_pro (square_topdown, 16x16, high top-down view, "1). scattered rubble and rock debris 2). rusted mine cart rail track segment 3). small dark puddle on stone floor 4). cracked stone floor tile 5). abandoned pickaxe tool fragment 6). old wooden crate"), 16 variations assembled into a 4x4 grid. Build script: scripts/build_tilesets.py.',
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="rough grey stone mountain path, worn rock", upper="sparse windswept rocky ground with patches of hardy grass"). Ready 4x4 grid PNG, used as-is. Metadata archived at public/assets/tilesets/original/raven-ridge-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
   },
   {
-    id: 'tileset.dungeon-overhang',
+    id: 'tileset.whisper-falls-terrain',
     category: 'tileset',
     intendedUse:
-      'Dungeon/mine overhang-layer tiles - wooden support beams, a hanging chain/lantern hook, a rocky ceiling outcrop, a stone ceiling arch, rendered above the player under low mine-tunnel ceilings.',
-    filePath: 'tilesets/dungeon-overhang.png',
+      "Whisper Falls ground terrain - a 4x4 Wang autotile set (16x16 tiles) transitioning wet dark stone slick with waterfall spray to damp moss-covered ground, distinct from the generic overworld-terrain/overworld-water (both also available on this map).",
+    filePath: 'tilesets/whisper-falls-terrain.png',
     dimensions: { width: 64, height: 64 },
-    frameSize: { width: 16, height: 16 },
     status: 'final',
     notes:
-      'pixellab MCP-generated via create_tiles_pro (square_topdown, 16x16, high top-down view, "1). wooden mine support beam overhang 2). hanging chain and lantern hook overhang 3). rocky cave ceiling outcrop overhang 4). rough stone ceiling arch overhang"), 16 variations assembled into a 4x4 grid. Build script: scripts/build_tilesets.py.',
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="wet dark stone slick with waterfall spray", upper="damp moss-covered ground near a waterfall"). Ready 4x4 grid PNG, used as-is. Metadata archived at public/assets/tilesets/original/whisper-falls-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
+  },
+  {
+    id: 'tileset.black-briar-terrain',
+    category: 'tileset',
+    intendedUse:
+      "Black Briar Forest ground terrain - a 4x4 Wang autotile set (16x16 tiles) transitioning dark stagnant bog water to withered dark grass and boggy soil, for the haunted marsh mood distinct from the generic overworld-terrain (both also available on this map, alongside the existing Graveyard_Set pack).",
+    filePath: 'tilesets/black-briar-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="dark stagnant bog water, murky and still", upper="withered dark grass and boggy black soil, haunted marsh"). Ready 4x4 grid PNG, used as-is. Metadata archived at public/assets/tilesets/original/black-briar-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
   },
   {
     id: 'sprite.npc-1',

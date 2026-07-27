@@ -39,7 +39,7 @@
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 161, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 163, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 163, 0,
-            0, 0, 0, 0, 627, 627, 627, 627, 627, 627, 627, 0, 0, 0, 0, 0, 0, 0, 0, 161, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 119, 119, 119, 119, 119, 119, 119, 119, 0, 0, 0, 0, 0, 0, 0, 161, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 589, 589, 589, 589, 589, 589, 589, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 157, 158, 159, 160, 161, 0, 0, 0, 0, 0, 486, 487, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 163, 173, 174, 175, 176, 177, 0, 0, 0, 0, 161, 502, 503, 161, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -333,44 +333,6 @@
                  "name":"tilesetAssetId",
                  "type":"string",
                  "value":"tileset.overworld-water"
-                }],
-         "spacing":0,
-         "tilecount":16,
-         "tileheight":16,
-         "tilewidth":16
-        }, 
-        {
-         "columns":4,
-         "firstgid":627,
-         "image":"..\/tilesets\/overworld-decor.png",
-         "imageheight":64,
-         "imagewidth":64,
-         "margin":0,
-         "name":"overworld-decor",
-         "properties":[
-                {
-                 "name":"tilesetAssetId",
-                 "type":"string",
-                 "value":"tileset.overworld-decor"
-                }],
-         "spacing":0,
-         "tilecount":16,
-         "tileheight":16,
-         "tilewidth":16
-        }, 
-        {
-         "columns":4,
-         "firstgid":643,
-         "image":"..\/tilesets\/overworld-overhang.png",
-         "imageheight":64,
-         "imagewidth":64,
-         "margin":0,
-         "name":"overworld-overhang",
-         "properties":[
-                {
-                 "name":"tilesetAssetId",
-                 "type":"string",
-                 "value":"tileset.overworld-overhang"
                 }],
          "spacing":0,
          "tilecount":16,

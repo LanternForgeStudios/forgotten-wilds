@@ -1,22 +1,24 @@
-"""Build the pixellab-generated town/overworld/dungeon tilesets into game-ready 16x16-grid PNGs.
+"""Build the pixellab-generated town/overworld/dungeon TERRAIN tilesets into game-ready 16x16-grid
+PNGs. Terrain autotiles only (create_topdown_tileset / create_building_kit) - decoration/overhang
+sets generated via create_tiles_pro were tried and dropped: each independent "tile" variation bakes
+its own opaque, non-matching ground color into the image (unlike a Wang tileset, purpose-built for
+seamless tiling), so it shows a visible mismatched rectangle wherever painted over real terrain.
+Not attempting to fix that - just sticking to terrain autotiles + building kits, which don't have
+this problem.
 
-Three kinds of pixellab MCP output land here, each processed differently:
-- create_topdown_tileset (terrain autotiles: town-terrain, overworld-terrain, overworld-water):
-  already downloaded as a ready 4x4 grid PNG (tileset.png) via the tool's own /image endpoint -
-  just copied straight through, no reassembly.
-- create_tiles_pro (decoration/overhang prop sets, 16 independent tile variations each): downloaded
-  as 16 separate tile_N.png files - assembled here into a 4x4 grid (64x64), row-major by index.
-- create_building_kit (dungeon-building-kit, 56 pieces: floor/walls/doors/corners/pillar/stairs/
-  partitions): downloaded as 56 separate tile_N.png files - assembled into an 8x7 grid (128x112),
-  row-major by index. The tool's own `placement_rules` (role -> tile index) from get_tiles_pro is
-  the legend for which grid cell is which piece - archived alongside as placement-rules.json so
-  it's not lost once this script clears staging.
+- create_topdown_tileset output (town-terrain, overworld-terrain, overworld-water,
+  raven-ridge-terrain, whisper-falls-terrain, black-briar-terrain): already downloaded as a ready
+  4x4 grid PNG (tileset.png) via the tool's own /image endpoint - just copied straight through.
+- create_building_kit output (dungeon-building-kit, 56 pieces: floor/walls/doors/corners/pillar/
+  stairs/partitions): downloaded as 56 separate tile_N.png files - assembled into an 8x7 grid
+  (128x112), row-major by index. The tool's own placement_rules (role -> tile index) from
+  get_tiles_pro is the legend for which grid cell is which piece - archived alongside as
+  placement-rules.json since it's only returned by the generation API, not encoded in the image.
 
 Source layout: art-staging/tilesets/<name>/ (either tileset.png, or tile_0.png..tile_N.png)
 Output: public/assets/tilesets/<name>.png
 """
 
-import json
 import os
 import shutil
 from PIL import Image
@@ -27,19 +29,20 @@ ORIGINALS_ROOT = os.path.join(OUT_DIR, "original")
 
 TILE = 16
 
-# name -> (grid_cols, grid_rows, tile_count) for create_tiles_pro grid assembly
+# name -> (grid_cols, grid_rows, tile_count) for create_building_kit grid assembly
 GRID_SETS = {
-    "town-decor": (4, 4, 16),
-    "overworld-decor": (4, 4, 16),
-    "dungeon-decor": (4, 4, 16),
-    "town-overhang": (4, 4, 16),
-    "overworld-overhang": (4, 4, 16),
-    "dungeon-overhang": (4, 4, 16),
     "dungeon-building-kit": (8, 7, 56),
 }
 
 # name -> already-a-grid PNG from create_topdown_tileset, just copy through
-DIRECT_COPY_SETS = ["town-terrain", "overworld-terrain", "overworld-water"]
+DIRECT_COPY_SETS = [
+    "town-terrain",
+    "overworld-terrain",
+    "overworld-water",
+    "raven-ridge-terrain",
+    "whisper-falls-terrain",
+    "black-briar-terrain",
+]
 
 os.makedirs(OUT_DIR, exist_ok=True)
 os.makedirs(ORIGINALS_ROOT, exist_ok=True)

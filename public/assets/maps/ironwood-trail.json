@@ -2772,46 +2772,6 @@
           "value": "tileset.overworld-terrain"
         }
       ]
-    },
-    {
-      "firstgid": 605,
-      "name": "overworld-decor",
-      "image": "../../../public/assets/tilesets/overworld-decor.png",
-      "imagewidth": 64,
-      "imageheight": 64,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 4,
-      "tilecount": 16,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.overworld-decor"
-        }
-      ]
-    },
-    {
-      "firstgid": 621,
-      "name": "overworld-overhang",
-      "image": "../../../public/assets/tilesets/overworld-overhang.png",
-      "imagewidth": 64,
-      "imageheight": 64,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 4,
-      "tilecount": 16,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.overworld-overhang"
-        }
-      ]
     }
   ],
   "tilewidth": 16,
