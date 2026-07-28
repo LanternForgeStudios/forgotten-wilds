@@ -220,10 +220,16 @@ since this whole quest chain is only offered after the Iron Mountains main story
 gates access to both locations) has been completed, no additional mechanical gating is needed. Each
 is a normal world-item pickup, the same pattern used by existing fragment quest items.
 
-The ailment system in this game is one-directional today — only the player can be inflicted with
-an ailment (by an enemy's attack), and there is no mechanism for a player skill to inflict an
-ailment on an enemy. So while Frost Lance and Ember Burst are still themed around Freeze/Burn (via
-their name, description, and the enemy-family effectiveness bonus above), they do **not** actually
-inflict Freeze/Burn on the enemy in combat — they're pure damage. A real enemy-ailment system
-(frozen enemy skips its turn, burned enemy takes damage-over-time, etc.) is a legitimate future
-combat-engine project, but is out of scope for this quest chain.
+Update (later session): an enemy-ailment system now exists. Frost Lance and Ember Burst each have a
+30% chance to actually inflict their themed ailment (Freeze / Burn respectively) on an enemy, gated
+by that enemy's own `vulnerableAilments` (enemies.ts) - coalSpirits are vulnerable to Freeze,
+waterSpirits/briarSpirits to Burn, matching the family-effectiveness pairing above. Rolls against a
+non-vulnerable enemy are a harmless no-op, not an error.
+
+The `effectiveAgainstFamilies` bonus-damage relationship described above is still **not** wired up
+for these two Skills specifically, though - only a Lantern Ability reads that field today (see
+skills.ts's own comment on frost-lance/ember-burst). So the ailment-infliction half of "effective
+against X" is real; the bonus-damage half isn't. Player-facing skill descriptions don't promise the
+damage bonus, so this isn't a broken promise to players, but it's a real gap between this doc's
+"Gameplay Purpose" bullets and actual combat math if the intent is ever revisited - either extend
+weakness-bonus handling to Skill actions, or update those bullets to only claim the ailment effect.

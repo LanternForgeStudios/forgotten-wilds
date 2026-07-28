@@ -171,7 +171,7 @@ export const NPCS: Npc[] = [
     portraitAssetId: 'portrait.nell-ashby',
     locationId: 'ash-hallow',
     dialogue: [
-      { speaker: 'Nell Ashby', text: "You have GOT to hear about the lantern. THE lantern. The one that went missing in the mine." },
+      { speaker: 'Nell Ashby', text: "You simply must hear about the lantern - the one that vanished into Hollow Rail and never came back, not even as a story two people tell the same way." },
       {
         speaker: 'Nell Ashby',
         text: "Every old miner tells it differently, which means there's a real story buried somewhere under all of them.",
@@ -286,6 +286,18 @@ export const NPCS: Npc[] = [
           { speaker: 'Historian Miriam', text: "Shrines remember. That's the whole of what I know for certain, and somehow it's still not enough." },
         ],
       },
+      // Shown while the-first-flame is active but not yet completed (ash-hallow-tour is its
+      // prerequisite, and no later-listed variant's quest is complete yet at that point) - the
+      // "why shrines matter" beat the-first-flame's own description promises, delivered before the
+      // player lights it rather than after (that's what the questId: 'the-first-flame' variant
+      // above is for - the post-completion reaction).
+      {
+        questId: 'ash-hallow-tour',
+        lines: [
+          { speaker: 'Historian Miriam', text: "Every shrine in Mytherra is bound to something living, or something that used to be. Light one, and you're not lighting a lamp - you're reminding a memory how to breathe." },
+          { speaker: 'Historian Miriam', text: "The Town Shrine's sat dark since before I was born. Go on - I'll want to know exactly how it felt." },
+        ],
+      },
     ],
   },
   {
@@ -367,7 +379,7 @@ export const NPCS: Npc[] = [
     portraitAssetId: 'portrait.mayor-eleanor-ashcroft',
     locationId: 'ash-hallow-town-hall',
     dialogue: [
-      { speaker: 'Mayor Eleanor Ashcroft', text: "Keep the lanterns lit and the roads clear — that's the whole of my platform, near enough." },
+      { speaker: 'Mayor Eleanor Ashcroft', text: "Ash Hallow's stood at this crossroads since before the Silence, and it'll stand after whatever's coming too - so long as someone keeps the lanterns lit." },
       { speaker: 'Mayor Eleanor Ashcroft', text: "Folks around here trust a Keeper more than they trust me, and that's exactly how it should be." },
     ],
     gameplayHook: { type: 'lore' },

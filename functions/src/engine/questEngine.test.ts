@@ -119,6 +119,29 @@ describe('applyQuestRewards', () => {
     expect(save.player.stats.maxHp).toBeGreaterThan(60);
   });
 
+  it('autoEquip fills an empty slot with a granted equipment item, in addition to inventory', () => {
+    const save = emptySave();
+    applyQuestRewards(save, [
+      { questId: 'a-new-keeper', reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'], autoEquip: true } },
+    ]);
+    expect(save.player.equipment.armor).toBe('travelers-cloak');
+    expect(save.inventory).toEqual([{ itemId: 'travelers-cloak', quantity: 1 }]);
+  });
+
+  it('autoEquip never overwrites gear already equipped in that slot', () => {
+    const save = emptySave({
+      player: {
+        ...emptySave().player,
+        equipment: { weapon: null, armor: 'ash-hallow-formal-attire', boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null },
+      },
+    });
+    applyQuestRewards(save, [
+      { questId: 'a-new-keeper', reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'], autoEquip: true } },
+    ]);
+    expect(save.player.equipment.armor).toBe('ash-hallow-formal-attire');
+    expect(save.inventory).toEqual([{ itemId: 'travelers-cloak', quantity: 1 }]);
+  });
+
   it('adds a grantLoreId reward to the journal, without duplicating an already-unlocked entry', () => {
     const save = emptySave({ journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: ['lore-great-silence'], bossesDefeated: [], itemsDiscovered: [] } });
     applyQuestRewards(save, [

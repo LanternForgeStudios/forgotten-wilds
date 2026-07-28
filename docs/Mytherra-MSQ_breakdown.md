@@ -102,6 +102,12 @@ Lantern of the First Promise
 Journal of Legends
 Traveler's Cloak
 100 XP
+
+(Implemented as: the Lantern of the First Promise (keepers-lantern) and the Journal are part of
+every fresh character's baseline starting kit (newCharacter.ts) rather than a quest-completion
+reward specifically, so the actual a-new-keeper reward is just the Traveler's Cloak (now
+auto-equipped on completion, not just granted to inventory) + 10 XP + 20 gold - scaled down to
+match every other Prologue/Chapter 1 quest's reward size, all of which sit in the 10-50 XP range.)
 Unlocks
 
 MSF-P-002
@@ -198,6 +204,13 @@ Spirit Essence
 Unlocks
 
 MSF-P-004
+
+(Implemented as: Beat 1's "learn its history" is a required talkToNpc objective on Historian
+Miriam - not Elias - since she's the quest giver and the town's domain expert on shrines; her
+dialogue for this delivers the actual "why shrines matter" beat before the player lights it. Beat
+3's "return to Elias, discuss the restoration" is not implemented - the quest completes on the
+shrine interaction alone, no follow-up conversation required. Kept simple for MVP; worth adding if
+this quest ever gets a revisit pass.)
 
 MSF-P-004
 Beyond the Lantern Light

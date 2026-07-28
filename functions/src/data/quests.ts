@@ -26,9 +26,10 @@ export interface QuestDef {
     gold: number;
     itemIds?: string[];
     spiritEssence?: number;
-    /** A Specialty Attack id (data/skills.ts) to add to Player.knownSkillIds on completion -
-     *  plumbing for future quest-taught Specialty Attacks (see CombatScene.tsx's "Select Spirit
-     *  Ability" submenu). No quest uses this yet. */
+    /** A Specialty Attack id (data/skills.ts) to add to Player.knownSkillIds on completion - used
+     *  by the two Forgotten Treatises side quests (frostbound-pages grants frost-lance,
+     *  embers-beneath-stone grants ember-burst; see CombatScene.tsx's "Select Spirit Ability"
+     *  submenu). */
     grantSkillId?: string;
     /** Unlocks Stamina/Dash on completion (see interactWithShrine.ts) - a generic reward flag
      *  rather than a hardcoded quest id check, the same way grantSkillId is generic rather than a
@@ -37,6 +38,13 @@ export interface QuestDef {
     /** A lore entry id (src/data/lore.ts - client-display-only, no server-side copy of the text)
      *  to add to JournalState.loreUnlocked on completion. */
     grantLoreId?: string;
+    /** Equips each of reward.itemIds that's an EQUIPMENT-table entry into its slot, but ONLY if
+     *  that slot is currently empty - never overwrites gear the player already has on. Granting
+     *  the item to inventory happens either way (grantItem, same as any reward); this just also
+     *  fills the slot so a starter-kit item (e.g. a-new-keeper's travelers-cloak) actually shows up
+     *  on the character immediately instead of sitting unequipped until the player thinks to open
+     *  the Equipment screen themselves. Only 'a-new-keeper' sets this today. */
+    autoEquip?: boolean;
   };
 }
 
@@ -49,7 +57,7 @@ export const QUESTS: Record<string, QuestDef> = {
     id: 'a-new-keeper',
     prerequisiteQuestId: null,
     objectives: [{ id: 'talk-elias', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 }],
-    reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'] },
+    reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'], autoEquip: true },
   },
   'ash-hallow-tour': {
     id: 'ash-hallow-tour',
@@ -69,7 +77,10 @@ export const QUESTS: Record<string, QuestDef> = {
   'the-first-flame': {
     id: 'the-first-flame',
     prerequisiteQuestId: 'ash-hallow-tour',
-    objectives: [{ id: 'light-shrine', type: 'interactWithShrine', targetId: 'ash-hallow-shrine', requiredCount: 1 }],
+    objectives: [
+      { id: 'talk-miriam-shrine', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1 },
+      { id: 'light-shrine', type: 'interactWithShrine', targetId: 'ash-hallow-shrine', requiredCount: 1 },
+    ],
     reward: { xp: 10, gold: 20, spiritEssence: 15 },
   },
   'beyond-the-lantern-light': {

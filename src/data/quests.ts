@@ -51,6 +51,13 @@ export const QUESTS: Quest[] = [
     prerequisiteQuestId: 'ash-hallow-tour',
     objectives: [
       {
+        id: 'talk-miriam-shrine',
+        type: 'talkToNpc',
+        description: "Ask Historian Miriam why shrines matter to the Lantern Keepers.",
+        targetId: 'historian-miriam',
+        requiredCount: 1,
+      },
+      {
         id: 'light-shrine',
         type: 'interactWithShrine',
         description: 'Rekindle the Ash Hallow Town Shrine.',

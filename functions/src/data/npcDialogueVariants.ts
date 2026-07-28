@@ -23,6 +23,7 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
     'the-mountain-remembers',
     'fragments-of-the-first-promise',
     'the-first-flame',
+    'ash-hallow-tour',
   ],
   'hunter-garrick': ['shadows-on-raven-ridge', 'strange-tracks'],
   'spirit-child': ['rekindling-spirit-grove', 'the-forgotten-shrine'],

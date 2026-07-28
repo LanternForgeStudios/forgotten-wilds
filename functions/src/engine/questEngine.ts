@@ -1,5 +1,6 @@
 import { QUESTS, type QuestDef, type QuestObjectiveType } from '../data/quests';
 import { NPC_DIALOGUE_VARIANT_QUEST_IDS } from '../data/npcDialogueVariants';
+import { EQUIPMENT } from '../data/equipment';
 import { grantItem } from './inventoryEngine';
 import { applyLevelUp } from './levelingEngine';
 import type { PlayerSave, QuestProgress } from '../shared-types';
@@ -121,6 +122,11 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
       // A unique reward item already owned some other way is skipped, not an error - the quest
       // still completes and its xp/gold still land.
       grantItem(save, itemId);
+      // Only fills an empty slot - never swaps out gear the player already equipped some other way.
+      const equipDef = reward.autoEquip ? EQUIPMENT[itemId] : undefined;
+      if (equipDef && !save.player.equipment[equipDef.slot]) {
+        save.player.equipment[equipDef.slot] = itemId;
+      }
     }
     // Already-known is a no-op, not an error - same "safe to re-grant" spirit as the item case
     // above (matters if this quest is ever re-completable, or the player already learned it some
