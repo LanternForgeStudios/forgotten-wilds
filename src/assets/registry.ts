@@ -1410,6 +1410,18 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user removed the hood from the raw generated art in every frame during manual positioning (didn't read well at this scale/angle) - final art is hood-less. Anchor data recorded under category 'worn-torso' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3), same as every other Phase 3 pilot item - the base body's own running pose is genuinely different from walking (confirmed by direct pixel comparison, not just a duplicated row), so this will visibly drift out of alignment during a Dash until a real running-frame pass is done for the whole pilot loadout.",
   },
   {
+    id: 'sprite.equipment.weathered-walking-staff',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot (docs/Equipment-Layering-Plan.md) - drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout. Only down/up/right directions have real art - facing west/left, the right hand (and anything held in it) is occluded behind the torso in this game's 3/4-view base body, so that row stays fully transparent by design (mirror image of structure.landmark's left-hand-only lantern occlusion).",
+    filePath: 'sprites/equipment/weathered-walking-staff-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user deleted and rotated the staff art in many frames (beyond simple repositioning) specifically to reveal the forearm/hand underneath, so the final result reads as genuinely gripped rather than just overlapping - same 'trim the item art for a believable held look' technique as the cloak's hood removal. Anchor data recorded under category 'held-right-hand' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see this note's sibling entries for why that's a real (not yet fixed) alignment gap during a Dash.",
+  },
+  {
     id: 'battle.enemy.mothling',
     category: 'enemy',
     intendedUse: 'Battle sprite for mothling - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',

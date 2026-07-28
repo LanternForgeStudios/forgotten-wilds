@@ -17,6 +17,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 5, attack: 4 },
     tier: 'common',
     familyId: 'walking-staff',
+    layerSpriteAssetId: { male: 'sprite.equipment.weathered-walking-staff', female: '' },
   },
   {
     id: 'ironwood-walking-staff',
