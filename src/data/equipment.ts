@@ -77,6 +77,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { defense: 1, speed: 2 },
     tier: 'common',
     familyId: 'traveler-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.traveler-boots', female: '' },
   },
   {
     id: 'trail-boots',
@@ -168,6 +169,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     tier: 'legendary',
     oilCapacity: 30,
     lanternAbilityIds: ['lantern-flame'],
+    layerSpriteAssetId: { male: 'sprite.equipment.keepers-lantern', female: '' },
   },
   {
     id: 'miners-lost-lantern-equipped',

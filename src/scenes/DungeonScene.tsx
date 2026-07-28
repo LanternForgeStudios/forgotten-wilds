@@ -25,7 +25,7 @@ import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { isTypingTarget } from '@/utils/keyboard';
 import { itemDisplayName } from '@/utils/itemName';
-import { resolveEquipmentLayers } from '@/utils/equipmentLayers';
+import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
@@ -62,6 +62,7 @@ export function DungeonScene() {
   const hudBarHeight = useHudBarHeight();
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
+  const appearance = usePlayerStore((s) => s.player?.appearance ?? 'white-dark');
   const equipment = usePlayerStore((s) => s.player?.equipment);
   const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const { scale, viewportSize } = useExplorationViewport();
@@ -249,7 +250,7 @@ export function DungeonScene() {
         <TileGrid
           map={map}
           player={position}
-          playerSpriteAssetId={gender === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
+          playerSpriteAssetId={resolvePlayerBaseSpriteAssetId(gender, appearance)}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}

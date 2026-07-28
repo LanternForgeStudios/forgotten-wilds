@@ -30,7 +30,7 @@ import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS } from '@/data';
 import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
-import { resolveEquipmentLayers } from '@/utils/equipmentLayers';
+import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
@@ -89,6 +89,7 @@ export function TownScene() {
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
+  const appearance = usePlayerStore((s) => s.player?.appearance ?? 'white-dark');
   const equipment = usePlayerStore((s) => s.player?.equipment);
   const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const questProgress = useQuestStore((s) => s.progress);
@@ -336,7 +337,7 @@ export function TownScene() {
         <TileGrid
           map={map}
           player={position}
-          playerSpriteAssetId={gender === 'female' ? 'sprite.player.female' : 'sprite.player.male'}
+          playerSpriteAssetId={resolvePlayerBaseSpriteAssetId(gender, appearance)}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}

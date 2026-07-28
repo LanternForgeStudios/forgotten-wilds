@@ -1296,7 +1296,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player.base.male.white-dark',
     category: 'character',
-    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - male, white/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Not yet rendered anywhere - Player.gender/appearance are captured but no render call site resolves sprite.player.base.* yet (Phase 2/3 of the plan).',
+    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - male, white/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Now the actual player sprite rendered in Town/Overworld/Dungeon (see resolvePlayerBaseSpriteAssetId in src/utils/equipmentLayers.ts) - replaced the old fully-dressed sprite.player.male/female placeholder once the Phase 3 pilot had real equipment-layer art to show on top of it. sprite.player.male/female are kept registered and unused, not deleted, so reverting is a one-line change if the layering approach is ever abandoned.',
     filePath: 'sprites/characters/player-base-male-white-dark-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
@@ -1306,7 +1306,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player.base.female.white-dark',
     category: 'character',
-    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - female, white/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Not yet rendered anywhere - see sprite.player.base.male.white-dark\'s note.',
+    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - female, white/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Now the actual player sprite rendered for this gender/appearance combo - see sprite.player.base.male.white-dark\'s note.',
     filePath: 'sprites/characters/player-base-female-white-dark-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
@@ -1316,7 +1316,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player.base.male.black-dark',
     category: 'character',
-    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - male, Black/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Not yet rendered anywhere - see sprite.player.base.male.white-dark\'s note.',
+    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - male, Black/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Now the actual player sprite rendered for this gender/appearance combo - see sprite.player.base.male.white-dark\'s note.',
     filePath: 'sprites/characters/player-base-male-black-dark-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
@@ -1326,7 +1326,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player.base.female.black-dark',
     category: 'character',
-    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - female, Black/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Not yet rendered anywhere - see sprite.player.base.male.white-dark\'s note.',
+    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - female, Black/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Now the actual player sprite rendered for this gender/appearance combo - see sprite.player.base.male.white-dark\'s note.',
     filePath: 'sprites/characters/player-base-female-black-dark-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
@@ -1336,7 +1336,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player.base.male.white-blonde',
     category: 'character',
-    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - male, white/blonde-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Not yet rendered anywhere - see sprite.player.base.male.white-dark\'s note.',
+    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - male, white/blonde-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Now the actual player sprite rendered for this gender/appearance combo - see sprite.player.base.male.white-dark\'s note.',
     filePath: 'sprites/characters/player-base-male-white-blonde-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
@@ -1346,7 +1346,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player.base.male.asian-dark',
     category: 'character',
-    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - male, Asian/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Not yet rendered anywhere - see sprite.player.base.male.white-dark\'s note.',
+    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - male, Asian/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Now the actual player sprite rendered for this gender/appearance combo - see sprite.player.base.male.white-dark\'s note.',
     filePath: 'sprites/characters/player-base-male-asian-dark-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
@@ -1356,7 +1356,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player.base.female.white-blonde',
     category: 'character',
-    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - female, white/blonde-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Not yet rendered anywhere - see sprite.player.base.male.white-dark\'s note.',
+    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - female, white/blonde-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Now the actual player sprite rendered for this gender/appearance combo - see sprite.player.base.male.white-dark\'s note.',
     filePath: 'sprites/characters/player-base-female-white-blonde-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
@@ -1366,12 +1366,36 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.player.base.female.asian-dark',
     category: 'character',
-    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - female, Asian/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Not yet rendered anywhere - see sprite.player.base.male.white-dark\'s note.',
+    intendedUse: 'Equipment-layering base body (docs/Equipment-Layering-Plan.md) - female, Asian/dark-hair appearance, underwear only, 4-direction walk+run animation (8 rows x 4 frames of 72x96). Now the actual player sprite rendered for this gender/appearance combo - see sprite.player.base.male.white-dark\'s note.',
     filePath: 'sprites/characters/player-base-female-asian-dark-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes: 'pixellab.ai-generated (character e0c9946d-9e1c-44a9-8ca1-ac63711e152d - see docs/pixellab-asset-ids.md), same generation/crop/build pipeline as sprite.player.base.male.white-dark - shared crop_box (20,3,116,131). Originals archived at public/assets/sprites/characters/original/female-player-asian-dark/.',
+  },
+  {
+    id: 'sprite.equipment.keepers-lantern',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot (docs/Equipment-Layering-Plan.md) - drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout so the two stay pixel-locked (see ExplorationScene.ts's setPlayer). Only down/left/up directions have real art - facing east/right, the left hand (and anything held in it) is occluded behind the torso in this game's 3/4-view base body, so that row stays fully transparent by design.",
+    filePath: 'sprites/equipment/keepers-lantern-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Phase 3 pilot - hand-positioned by the user (the earlier automated anchor/grip-math placement, scripts/build_equipment_layer.py, produced unusable results). Source frames staged at art-staging/equipment-layers-manual/keepers-lantern/ (already exact 72x96 canvases, item positioned to align with the corresponding _reference frame - no scaling/placement math needed, just direct per-frame compositing). Build script: scripts/build_equipment_layer_manual.py, which also records this item's per-frame bounding-box center into docs/equipment-layer-anchors.json (category 'held-left-hand') for reuse when positioning a future item in the same slot/hand.",
+  },
+  {
+    id: 'sprite.equipment.traveler-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot (docs/Equipment-Layering-Plan.md) - drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout. All 4 directions have real art (boots are visible from every facing, unlike a one-hand-held item).",
+    filePath: 'sprites/equipment/traveler-boots-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Each frame is two source files (left-foot/right-foot, positioned independently) composited together before going into the sheet - the raw pixellab generation had a defect (one boot tipped over), so both feet in the source frames are cropped from the one good upright boot, mirrored for the other side. Anchor data recorded under category 'paired-feet' in docs/equipment-layer-anchors.json.",
   },
   {
     id: 'battle.enemy.mothling',

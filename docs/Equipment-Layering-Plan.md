@@ -57,11 +57,19 @@ all built via `scripts/build_player_sheet.py` from one shared `crop_box` (20,3,1
 against the white-dark pair's union content-bbox and reused identically for every variant (same
 size/view/proportions/pose generation params across all 8), so every base body stays pixel-
 consistent - the actual load-bearing requirement for equipment layers to be plug-and-play later.
-See `docs/pixellab-asset-ids.md` for each variant's pixellab character id. Not yet rendered
-anywhere in-game (no render call site resolves `sprite.player.base.*` yet - that's Phase 2/3
-below); the *existing* `sprite.player.male`/`.female` (fully-clothed) ids are still what actually
-renders today and should NOT be swapped out until there's a rendering path plus at least
-placeholder-free layer art for the starter loadout.
+See `docs/pixellab-asset-ids.md` for each variant's pixellab character id.
+
+**Base sprite swap: done.** `sprite.player.base.{gender}.{appearance}` is now the actual player
+sprite rendered in Town/Overworld/Dungeon (`resolvePlayerBaseSpriteAssetId`,
+`src/utils/equipmentLayers.ts`), replacing the old fully-clothed `sprite.player.male`/`.female`.
+Made once Phase 3's first 2 pilot items (below) had real layer art to composite on top of it,
+rather than waiting for all 5 - a bare/underwear look in not-yet-covered slots is expected during
+the pilot. `sprite.player.male`/`.female` are kept registered and unused (not deleted), so
+reverting to the old fully-dressed sprite is a one-line change in `resolvePlayerBaseSpriteAssetId`
+if the layering approach is ever abandoned. Only the LOCAL player's own sprite switched - other
+players' presence entities (seen walking around by others) still render `sprite.player.male`/
+`.female`, since presence data doesn't carry equipment and switching that too is a separate,
+larger effort (broadcasting live equipment state, not just gender/appearance).
 
 **4-appearance picker UI: done.** CharacterCreationScene and UserProfile's Skin tab both expose
 gender + appearance as two independent choices with live preview art (`SpritePreviewFrame`, a
@@ -81,13 +89,11 @@ resolved layer list through via the new shared `resolveEquipmentLayers` util
 `layerSpriteAssetId[gender]` (new optional field on `EquipmentItem`). Verified end-to-end with a
 temporary placeholder layer (a real base-body sheet standing in for "armor") before removal -
 confirmed via live scene-graph inspection that position/scale/depth and all 4 walk directions'
-animation frames stay perfectly synced between the base sprite and its layer. Resolves to `[]` in
-practice today since no equipment item sets `layerSpriteAssetId` yet - **no visible change to the
-game** until Phase 3 ships real art. The base sprite itself is still `sprite.player.male/female`
-(not yet swapped to `sprite.player.base.*`) - that swap happens together with Phase 3/4's art, not
-before.
+animation frames stay perfectly synced between the base sprite and its layer. Now visibly live for
+the 2 equipment items with real layer art (see Phase 3 below) - resolves to `[]` for every other
+equipped item, same as before.
 
-**Next up**: Phase 3 (pilot loadout - walking-only, male-only, see that section above).
+**Next up**: finish Phase 3 (pilot loadout - walking-only, male-only, see that section below).
 
 ## The hard problem: frame-perfect alignment
 
@@ -188,17 +194,37 @@ renders identically to today (base body alone, no layers) and that the plumbing 
 resolved layer list → stacked sprites) works end-to-end with a single test placeholder layer
 (even a solid-color rectangle sprite) before spending art-generation effort.
 
-**Phase 3 (pilot)**: pick ONE full loadout (e.g. the Prologue starter kit - `travelers-cloak`,
+**Phase 3 (pilot)**: pick ONE full loadout (the Prologue starter kit - `travelers-cloak`,
 `weathered-walking-staff`, `traveler-boots`, `work-gloves`, `keepers-lantern`) and take it all the
-way through: generate, align via the offset-tuning workflow above, verify in-game. Deliberately
-narrowed twice (confirmed with the user) to keep the first pass through this workflow fast:
-**walking frames only** (16 cells - 4 directions × 4 frames - not the full 32; running frames get
-added once the workflow is proven) and **male base body only** (female equipment art is a genuinely
-separate generation+alignment pass given different proportions, not a resize - do it once the male
-pipeline is validated, not in parallel with figuring it out). This proves/refines the alignment
-workflow on the smallest real slice before committing to all 19 existing equipment items x 2
-genders x 2 animation states (soon more items too, once Mythic/Legendary tiers get built out per
-`functions/src/data/equipment.ts`'s own stubbed-for-later comment).
+way through: generate, align, verify in-game. Deliberately narrowed twice (confirmed with the
+user) to keep the first pass through this workflow fast: **walking frames only** (16 cells - 4
+directions × 4 frames - not the full 32; running frames get added once the workflow is proven) and
+**male base body only** (female equipment art is a genuinely separate generation+alignment pass
+given different proportions, not a resize - do it once the male pipeline is validated).
+
+The original plan here was automated placement (per-item ANCHOR/grip/target_h math,
+`scripts/build_equipment_layer.py`) - abandoned after the results looked unusable in practice
+("looks like junk"; the automated boots/gloves/cloak/lantern all landed visibly wrong). Replaced
+with hand-positioning: the user is given a working folder per item (`_reference/{direction}-
+frame{N}.png` showing the bare base body to align against, `{item}/{direction}-frame{N}.png` with
+the item's own art sitting at a neutral (0,0) starting point on an otherwise-empty 72x96 canvas)
+and repositions the art directly, frame by frame, in their own image editor. `scripts/
+build_equipment_layer_manual.py` then just directly composites each finished frame into the sheet
+- no placement math at all, since the hand-positioned frames are already exactly where they need
+to be.
+
+That script also measures and records each finished item's actual bounding-box center per frame
+into `docs/equipment-layer-anchors.json`, keyed by category (`held-left-hand`, `held-right-hand`,
+`worn-torso`, `paired-feet`, `paired-hands`) rather than by item id - the idea being that a
+**future** item in an already-covered category (e.g. a second lantern, another pair of boots) can
+be auto-scaled/centered on that measured anchor as a strong starting point instead of requiring
+full manual positioning again, with just a quick visual check/nudge rather than 16 frames of
+from-scratch editing. Not yet exercised on a second item in any category - the pilot's own 5 items
+are all first entries in their category so far.
+
+Progress: `keepers-lantern` (held-left-hand) and `traveler-boots` (paired-feet) done, hand-
+positioned, verified in-game (base sprite swap above). `travelers-cloak` (worn-torso),
+`weathered-walking-staff` (held-right-hand), `work-gloves` (paired-hands) in progress.
 
 **Phase 4**: roll out the remaining equipment families (walking-staff, keeper-coat,
 traveler-boots, work-gloves lines, the second unique lantern) using the now-proven pipeline. Each
