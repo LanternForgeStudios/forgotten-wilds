@@ -46,7 +46,7 @@ ITEM_SPEC = {
     # moment their manual-edit folders land in art-staging/equipment-layers-manual/ - no code
     # change needed for the next 3 items, just `cp` the finished folder in and re-run.
     "travelers-cloak": {"category": "worn-torso", "kind": "single", "directions": DIRECTIONS},
-    "weathered-walking-staff": {"category": "held-right-hand", "kind": "single", "directions": ["down", "up", "right"]},
+    "weathered-walking-staff": {"category": "held-right-hand", "kind": "single", "directions": ["down", "up", "right", "left"]},
     "work-gloves": {"category": "paired-hands", "kind": "paired", "part": "hand", "directions": DIRECTIONS},
 }
 

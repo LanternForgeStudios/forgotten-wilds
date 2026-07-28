@@ -1413,13 +1413,13 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     id: 'sprite.equipment.weathered-walking-staff',
     category: 'character',
     intendedUse:
-      "Equipment layer for the weapon slot (docs/Equipment-Layering-Plan.md) - drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout. Only down/up/right directions have real art - facing west/left, the right hand (and anything held in it) is occluded behind the torso in this game's 3/4-view base body, so that row stays fully transparent by design (mirror image of structure.landmark's left-hand-only lantern occlusion).",
+      "Equipment layer for the weapon slot (docs/Equipment-Layering-Plan.md) - drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout. All 4 directions have real art - unlike the lantern (a compact item fully occluded facing its off-hand direction), a walking staff is long enough that it still visibly extends past the body facing west/left even though the gripping right hand itself is on the far side, so that direction needed its own real frames rather than staying transparent.",
     filePath: 'sprites/equipment/weathered-walking-staff-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user deleted and rotated the staff art in many frames (beyond simple repositioning) specifically to reveal the forearm/hand underneath, so the final result reads as genuinely gripped rather than just overlapping - same 'trim the item art for a believable held look' technique as the cloak's hood removal. Anchor data recorded under category 'held-right-hand' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see this note's sibling entries for why that's a real (not yet fixed) alignment gap during a Dash.",
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user deleted and rotated the staff art in many frames (beyond simple repositioning) specifically to reveal the forearm/hand underneath, so the final result reads as genuinely gripped rather than just overlapping - same 'trim the item art for a believable held look' technique as the cloak's hood removal. down/up/right positioned first; left added in a follow-up round once the user realized the staff still reads past the body on that side too - started from the right-facing frames mirrored horizontally as a neutral starting point (scripts/build_equipment_layer_manual.py doesn't do this automatically, it was a one-off ImageOps.mirror step), then hand-repositioned/re-trimmed since a straight mirror puts the hand-cutout on the wrong side. Anchor data recorded under category 'held-right-hand' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see this note's sibling entries for why that's a real (not yet fixed) alignment gap during a Dash.",
   },
   {
     id: 'battle.enemy.mothling',
