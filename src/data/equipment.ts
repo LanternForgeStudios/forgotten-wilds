@@ -212,5 +212,6 @@ export const EQUIPMENT: EquipmentItem[] = [
     iconAssetId: 'icon.equipment.travelers-cloak',
     statBonuses: { maxHp: 5, speed: 1 },
     tier: 'common',
+    layerSpriteAssetId: { male: 'sprite.equipment.travelers-cloak', female: '' },
   },
 ];

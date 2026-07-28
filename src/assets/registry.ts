@@ -1383,7 +1383,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Phase 3 pilot - hand-positioned by the user (the earlier automated anchor/grip-math placement, scripts/build_equipment_layer.py, produced unusable results). Source frames staged at art-staging/equipment-layers-manual/keepers-lantern/ (already exact 72x96 canvases, item positioned to align with the corresponding _reference frame - no scaling/placement math needed, just direct per-frame compositing). Build script: scripts/build_equipment_layer_manual.py, which also records this item's per-frame bounding-box center into docs/equipment-layer-anchors.json (category 'held-left-hand') for reuse when positioning a future item in the same slot/hand.",
+      "Phase 3 pilot - hand-positioned by the user (the earlier automated anchor/grip-math placement, scripts/build_equipment_layer.py, produced unusable results). Source frames staged at art-staging/equipment-layers-manual/keepers-lantern/ (already exact 72x96 canvases, item positioned to align with the corresponding _reference frame - no scaling/placement math needed, just direct per-frame compositing). Build script: scripts/build_equipment_layer_manual.py, which also records this item's per-frame bounding-box center into docs/equipment-layer-anchors.json (category 'held-left-hand') for reuse when positioning a future item in the same slot/hand. Running-cycle rows (4-7) still duplicate walking (0-3) - see sprite.equipment.travelers-cloak's note on why that's a real (not yet fixed) alignment gap during a Dash.",
   },
   {
     id: 'sprite.equipment.traveler-boots',
@@ -1395,7 +1395,19 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Each frame is two source files (left-foot/right-foot, positioned independently) composited together before going into the sheet - the raw pixellab generation had a defect (one boot tipped over), so both feet in the source frames are cropped from the one good upright boot, mirrored for the other side. Anchor data recorded under category 'paired-feet' in docs/equipment-layer-anchors.json.",
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Each frame is two source files (left-foot/right-foot, positioned independently) composited together before going into the sheet - the raw pixellab generation had a defect (one boot tipped over), so both feet in the source frames are cropped from the one good upright boot, mirrored for the other side. Anchor data recorded under category 'paired-feet' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see sprite.equipment.travelers-cloak's note on why that's a real (not yet fixed) alignment gap during a Dash.",
+  },
+  {
+    id: 'sprite.equipment.travelers-cloak',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the armor slot (docs/Equipment-Layering-Plan.md) - drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout. All 4 directions have real art (worn on both shoulders, always visible regardless of facing).",
+    filePath: 'sprites/equipment/travelers-cloak-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user removed the hood from the raw generated art in every frame during manual positioning (didn't read well at this scale/angle) - final art is hood-less. Anchor data recorded under category 'worn-torso' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3), same as every other Phase 3 pilot item - the base body's own running pose is genuinely different from walking (confirmed by direct pixel comparison, not just a duplicated row), so this will visibly drift out of alignment during a Dash until a real running-frame pass is done for the whole pilot loadout.",
   },
   {
     id: 'battle.enemy.mothling',
