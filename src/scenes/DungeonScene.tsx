@@ -41,6 +41,7 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId === 'coalbound-warden') return 'something vast, ember-lit';
   if (refId === 'miners-lost-lantern') return 'Lantern Relic';
   if (refId === 'mine-shrine') return 'Shrine';
+  if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';
   return 'something';
 }
 
@@ -197,6 +198,9 @@ export function DungeonScene() {
             spriteAssetId: staminaUnlocked ? 'structure.shrine-activated' : 'structure.shrine-dormant',
             label: 'Shrine',
           };
+        }
+        if (o.refId!.startsWith('glowing-mushroom')) {
+          return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: 'structure.decor-glowing-mushroom', label: 'Glowing Mushroom' };
         }
         return {
           id: o.refId!,

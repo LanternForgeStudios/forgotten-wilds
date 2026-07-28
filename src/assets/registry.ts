@@ -2416,6 +2416,30 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("small circular forest pool of clear water surrounded by smooth wet stones and reeds, a faint glowing turquoise magical shard glimmering just beneath the surface", 128x128, high top-down, medium shading, single color outline, high detail) + animate_object (v3 mode, "the magical shard glimmering and pulsing softly beneath the water, gentle rippling reflections", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/water-glimmer-glow/.',
   },
   {
+    id: 'structure.decor-fireplace',
+    category: 'structure',
+    intendedUse:
+      "Purely decorative, non-gated ambient prop for Ash Hallow building interiors (Inn, Elias Rowan's home, the Blacksmith forge) - one of the two decor items picked up per the standing \"animate decor that would read better in motion\" ask (the other is structure.decor-glowing-mushroom). Animated flicker (single row x 9 frames of 96x96), same generic idle-loop mechanism as structure.chest - no new animation code needed, only the TownScene.tsx rendering/interact wiring for a non-gameplay decorative interactable.",
+    filePath: 'sprites/structures/decor-fireplace-glow.png',
+    dimensions: { width: 864, height: 96 },
+    frameSize: { width: 96, height: 96 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("a small stone hearth fireplace built into a wall, with a low warm fire burning inside", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the fire flickering and crackling, flames dancing, warm glowing embers", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 96x96 with LANCZOS. Build script: scripts/build_ambient_decor.py. 128x128 originals archived at public/assets/sprites/structures/original/fireplace-glow/.',
+  },
+  {
+    id: 'structure.decor-glowing-mushroom',
+    category: 'structure',
+    intendedUse:
+      "Purely decorative, non-gated ambient prop scattered a couple of times each across Ironwood Trail/Raven Ridge/Whisper Falls/Black Briar Forest/Hollow Rail Mine - the other of the two decor items picked up per the standing \"animate decor that would read better in motion\" ask. Distinct from overworld-decor2's plain static mushroom tile (that one stays as ordinary ambient ground decor); this is a special bioluminescent variant meant to stand out as a small found-in-the-world detail, same way structure.chest/landmark markers do.",
+    filePath: 'sprites/structures/decor-glowing-mushroom-glow.png',
+    dimensions: { width: 576, height: 64 },
+    frameSize: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("a small cluster of magical bioluminescent mushrooms glowing softly with blue-green light, forest floor fungi", 96x96, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the mushrooms glowing and pulsing softly with magical bioluminescent light", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 64x64 with LANCZOS. Build script: scripts/build_ambient_decor.py. 96x96 originals archived at public/assets/sprites/structures/original/glowing-mushroom-glow/.',
+  },
+  {
     id: 'structure.chest',
     category: 'structure',
     intendedUse:

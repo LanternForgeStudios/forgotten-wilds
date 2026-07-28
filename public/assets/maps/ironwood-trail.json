@@ -7250,6 +7250,42 @@
           "width": 0,
           "x": 512,
           "y": 128
+        },
+        {
+          "id": 16,
+          "name": "",
+          "type": "interactable",
+          "x": 800,
+          "y": 160,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "glowing-mushroom-1"
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "name": "",
+          "type": "interactable",
+          "x": 880,
+          "y": 560,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "glowing-mushroom-2"
+            }
+          ]
         }
       ],
       "opacity": 1,
@@ -7260,7 +7296,7 @@
     }
   ],
   "nextlayerid": 4,
-  "nextobjectid": 16,
+  "nextobjectid": 18,
   "orientation": "orthogonal",
   "properties": [
     {

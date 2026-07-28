@@ -59,6 +59,17 @@ const BUILDING_MARKERS: Record<string, { label: string; spriteAssetId: string }>
  *  the same way OverworldScene routes shrine landmarks through interactWithShrine. */
 const SHRINES = new Set(['ash-hallow-shrine']);
 
+/** Purely decorative, non-gated interactables (no Cloud Function call - just a flavor message),
+ *  keyed by refId. Animated via structure.decor-fireplace's own frameSize idle loop, same generic
+ *  mechanism as structure.chest/structure.shrine-activated - no new animation code needed here. */
+const DECOR_ENTITIES: Record<string, { label: string; spriteAssetId: string; flavorText: string }> = {
+  fireplace: {
+    label: 'Fireplace',
+    spriteAssetId: 'structure.decor-fireplace',
+    flavorText: 'The fire crackles warmly, filling the room with a gentle heat.',
+  },
+};
+
 export function TownScene() {
   const locationId = useSceneStore((s) => s.params.locationId) ?? 'ash-hallow';
   // One theme for Ash Hallow and all its interiors - playMusic no-ops if it's already playing, so
@@ -164,6 +175,13 @@ export function TownScene() {
           );
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : `Could not reach ${name}.`));
+      return;
+    }
+    const decorObject = map.objects.find(
+      (o) => o.type === 'interactable' && o.refId && DECOR_ENTITIES[o.refId] && o.x === target.x && o.y === target.y,
+    );
+    if (decorObject?.refId) {
+      setMessage(DECOR_ENTITIES[decorObject.refId].flavorText);
       return;
     }
     const shrineObject = map.objects.find(
@@ -278,6 +296,13 @@ export function TownScene() {
       .filter((o) => o.type === 'transition' && o.refId && !BUILDING_MARKERS[o.refId])
       .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
+    const decorEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'interactable' && o.refId && DECOR_ENTITIES[o.refId])
+      .map((o) => {
+        const decor = DECOR_ENTITIES[o.refId!];
+        return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: decor.spriteAssetId, label: decor.label };
+      });
+
     const now = Date.now();
     const otherPlayerEntities: GridEntity[] = presences
       .filter(
@@ -292,7 +317,7 @@ export function TownScene() {
         label: p.displayName,
       }));
 
-    return [...npcEntities, ...buildingEntities, ...shrineEntities, ...exitEntities, ...otherPlayerEntities];
+    return [...npcEntities, ...buildingEntities, ...shrineEntities, ...decorEntities, ...exitEntities, ...otherPlayerEntities];
   }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, presences, uid, locationId, staminaUnlocked]);
 
   if (!map) {

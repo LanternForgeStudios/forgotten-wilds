@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 8,
+  "nextobjectid": 10,
   "layers": [
     {
       "id": 1,
@@ -5303,6 +5303,42 @@
               "name": "refId",
               "type": "string",
               "value": "ember-codex-tunnel"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "",
+          "type": "interactable",
+          "x": 720,
+          "y": 160,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "glowing-mushroom-1"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "",
+          "type": "interactable",
+          "x": 800,
+          "y": 480,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "glowing-mushroom-2"
             }
           ]
         }

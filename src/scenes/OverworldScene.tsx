@@ -75,6 +75,14 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'ember-codex-tunnel': 'structure.landmark-tunnel-entrance',
 };
 
+/** Purely decorative, non-gated interactable - no Cloud Function call, falls through to
+ *  attemptInteract's generic "you find X" flavor branch at the bottom (labelForInteractable
+ *  below supplies the label). Multiple instances per map share this refId prefix (each with a
+ *  unique numeric suffix, same convention as chest-<location>-<n>). */
+function isGlowingMushroom(refId: string): boolean {
+  return refId.startsWith('glowing-mushroom');
+}
+
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
 function labelForInteractable(refId: string, openedChests: string[]): string {
@@ -82,6 +90,7 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId === 'water-fragment') return 'a faint glimmer in the pool';
   if (refId === 'frostbound-treatise-cache') return 'a hidden cache behind the falls';
   if (refId === 'ember-codex-tunnel') return 'an overlooked maintenance tunnel';
+  if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';
   const landmark = LOCATIONS.find((l) => l.id === refId);
   if (landmark) return landmark.name;
   return 'something';
@@ -306,7 +315,9 @@ export function OverworldScene() {
             ? staminaUnlocked
               ? 'structure.shrine-activated'
               : 'structure.shrine-dormant'
-            : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');
+            : isGlowingMushroom(o.refId!)
+              ? 'structure.decor-glowing-mushroom'
+              : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');
         return {
           id: o.refId!,
           x: o.x,
