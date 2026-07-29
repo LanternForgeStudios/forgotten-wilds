@@ -1,5 +1,5 @@
 {
-  "_readme": "Per-category equipment-layer anchor data, measured from real hand-positioned art (not guessed) - see scripts/build_equipment_layer_manual.py's own header for the full story. Each category (e.g. 'held-left-hand', 'worn-torso') maps item-id -> direction -> [4 frames], each frame either null (item has no art for that direction) or {cx, cy, w, h} - the bounding-box center/size (in px, within the item's own 72x96 canvas) of where that item's art actually sits once correctly positioned. To place a NEW item in an already-populated category: scale the new item's own art so its height is close to an existing entry's h for that direction/frame, then center it on that entry's (cx, cy) as a starting point - this should land close for a similarly-shaped item (e.g. another cloak, another one-handed held prop) but always do a quick visual check/nudge afterward, since the anchor tells you WHERE on the body to attach, not how a differently-shaped item's own art should be positioned within itself.",
+  "_readme": "Per-category equipment-layer anchor data, measured from real hand-positioned art - see scripts/build_equipment_layer_manual.py's header for the walking-pose shape and how to use it as a starting point for a new item. Top-level keys are pose buckets: entries directly under a category name (e.g. 'held-left-hand') are the WALKING pose; entries under the 'running' key follow the identical category->item->direction->frames shape but for the running pose (rows 4-7) - see scripts/build_equipment_layer_running.py.",
   "held-left-hand": {
     "keepers-lantern": {
       "down": [
@@ -512,6 +512,90 @@
           "h": 27
         }
       ]
+    }
+  },
+  "running": {
+    "held-left-hand": {
+      "keepers-lantern": {
+        "down": [
+          {
+            "cx": 48.0,
+            "cy": 54.0,
+            "w": 12,
+            "h": 18
+          },
+          {
+            "cx": 48.0,
+            "cy": 58.0,
+            "w": 14,
+            "h": 18
+          },
+          {
+            "cx": 47.0,
+            "cy": 64.0,
+            "w": 12,
+            "h": 18
+          },
+          {
+            "cx": 47.0,
+            "cy": 68.0,
+            "w": 12,
+            "h": 18
+          }
+        ],
+        "left": [
+          {
+            "cx": 55.0,
+            "cy": 65.0,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "cx": 54.5,
+            "cy": 65.5,
+            "w": 15,
+            "h": 15
+          },
+          {
+            "cx": 19.5,
+            "cy": 61.0,
+            "w": 11,
+            "h": 16
+          },
+          {
+            "cx": 27.5,
+            "cy": 69.0,
+            "w": 11,
+            "h": 16
+          }
+        ],
+        "up": [
+          {
+            "cx": 25.0,
+            "cy": 67.0,
+            "w": 12,
+            "h": 18
+          },
+          {
+            "cx": 25.0,
+            "cy": 71.0,
+            "w": 12,
+            "h": 18
+          },
+          {
+            "cx": 25.0,
+            "cy": 59.0,
+            "w": 12,
+            "h": 18
+          },
+          {
+            "cx": 26.0,
+            "cy": 60.5,
+            "w": 12,
+            "h": 17
+          }
+        ]
+      }
     }
   }
 }

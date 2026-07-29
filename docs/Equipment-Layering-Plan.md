@@ -237,9 +237,39 @@ Progress: **all 5 pilot items done for the male walking pass** - `keepers-lanter
 hand), `traveler-boots` (paired-feet), `travelers-cloak` (worn-torso), `weathered-walking-staff`
 (held-right-hand, all 4 directions including the west/left set added in a follow-up round),
 `work-gloves` (paired-hands), all hand-positioned and verified in-game (base sprite swap above).
-Next: the running-pose round (male, same 5 items) and the female walking + running rounds - working
-folders for all three already prepared (see the user's scratchpad `manual-edit-running/`,
-`manual-edit-female-walking/`, `manual-edit-female-running/`), waiting on the user's edits.
+
+**Male running pass: `keepers-lantern` done** (down/left/up, matching its walking-pass direction
+coverage) - verified the lantern tracks the running arm's pumping swing naturally across all 4
+frames of each direction. Patched via `scripts/build_equipment_layer_running.py`, a deliberately
+different script from the walking pass's `build_equipment_layer_manual.py`: it overwrites ONLY the
+running-row (4-7) cell of an item's ALREADY-BUILT output sheet, for exactly the (direction, frame)
+pairs that have a staged running-pose source frame, leaving every walking-row pixel and every
+not-yet-updated running cell untouched. This is the fix for the clobbering gotcha noted above -
+running this script for one item can never affect any other item's sheet, or even that same item's
+own walking rows. Anchor data recorded under a new top-level `"running"` bucket in
+`docs/equipment-layer-anchors.json` (same category->item->direction->frames shape as the walking
+entries, nested one level deeper so the two poses never collide).
+
+**Starting-frame regeneration, done for all 3 remaining working folders**: the running/female
+working folders' item starting frames are now sourced by cropping directly from each item's LIVE,
+already-built (and possibly hand-touched-up) male walking sheet - not from the original
+`art-staging/equipment-layers-manual/` source frames, which go stale the moment a sheet gets a
+direct touch-up after the fact (happened once already with `traveler-boots`/`travelers-cloak`) or
+predate a later follow-up round (`weathered-walking-staff`'s original batch predated its own
+west/left-frame round entirely). For paired items (boots/gloves), a real connected-component split
+is used for down/up (both sides genuinely visible, confirmed by direct pixel inspection - not a
+naive half-cut) with side assignment via the same anatomical anchor convention the original
+`build_equipment_layer.py` ANCHORS table used; left/right facing frames duplicate the single
+visible blob into both output files (matches those directions' own documented occlusion rule -
+only one side is ever really there) rather than risk mis-slicing one glove into two garbage
+pieces. One frame (`work-gloves` up-facing frame 3) didn't cleanly match the expected 2-segment
+case and fell back to the safe duplicate-whole-cell behavior - flagged in each folder's own
+README for the user to trim by hand.
+
+Remaining: `traveler-boots`, `travelers-cloak`, `weathered-walking-staff`, `work-gloves` still need
+their male running-pose pass (working folder `manual-edit-running/` ready for all 4). Then the
+female walking + running rounds - working folders (`manual-edit-female-walking/`,
+`manual-edit-female-running/`) ready for all 5 items, waiting on the user's edits.
 
 **Phase 4**: roll out the remaining equipment families (walking-staff, keeper-coat,
 traveler-boots, work-gloves lines, the second unique lantern) using the now-proven pipeline. Each
