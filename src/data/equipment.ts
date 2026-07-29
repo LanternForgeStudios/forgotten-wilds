@@ -28,6 +28,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 3, attack: 7, speed: 1 },
     tier: 'uncommon',
     familyId: 'walking-staff',
+    layerSpriteAssetId: { male: 'sprite.equipment.ironwood-walking-staff', female: '' },
   },
   {
     id: 'spiritwood-walking-staff',
@@ -184,6 +185,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     unique: true,
     oilCapacity: 35,
     lanternAbilityIds: ['steadfast-ember'],
+    layerSpriteAssetId: { male: 'sprite.equipment.miners-lost-lantern-equipped', female: '' },
   },
   {
     id: 'stone-wolf-totem',

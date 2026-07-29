@@ -1422,6 +1422,30 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user deleted and rotated the staff art in many frames (beyond simple repositioning) specifically to reveal the forearm/hand underneath, so the final result reads as genuinely gripped rather than just overlapping - same 'trim the item art for a believable held look' technique as the cloak's hood removal. down/up/right positioned first; left added in a follow-up round once the user realized the staff still reads past the body on that side too - started from the right-facing frames mirrored horizontally as a neutral starting point (scripts/build_equipment_layer_manual.py doesn't do this automatically, it was a one-off ImageOps.mirror step), then hand-repositioned/re-trimmed since a straight mirror puts the hand-cutout on the wrong side. Anchor data recorded under category 'held-right-hand' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see this note's sibling entries for why that's a real (not yet fixed) alignment gap during a Dash.",
   },
   {
+    id: 'sprite.equipment.ironwood-walking-staff',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - Ironwood Walking Staff, same 'walking-staff' family as sprite.equipment.weathered-walking-staff, same cane/crook silhouette per its icon art (just a darker ironwood tone), so it reuses that item's hand-positioned art directly rather than needing its own manual pass. All 4 directions, walking + running, matching weathered-walking-staff's own coverage.",
+    filePath: 'sprites/equipment/ironwood-walking-staff-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py - a per-material gradient-map recolor of sprite.equipment.weathered-walking-staff's already-finished sheet (100% of its hand-positioning/rotation/grip-trim reused unchanged; only the RGB values differ). Colors driven by a 2-cluster k-means (in RGB space, not hue - an earlier hue-based version produced a visible pink wash on this item's desaturated palette) fit to weathered-walking-staff.png vs ironwood-walking-staff.png's own icon colors, clusters paired by brightness rank, each pixel remapped via a per-cluster value-sorted gradient so all existing shading/highlights are preserved. Verified by eye against the icon at full size (the character-composite preview alone reads slightly more saturated than intended due to viewing scale/dark background, but the actual output pixel colors were confirmed numerically close to the icon's own palette). Anchor table entries copied from weathered-walking-staff (identical geometry).",
+  },
+  {
+    id: 'sprite.equipment.miners-lost-lantern-equipped',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - Lantern of Enduring Embers (the Hollow Rail Mine quest-reward lantern), same hurricane-lantern silhouette as sprite.equipment.keepers-lantern per its icon art (darker ironbound tone vs. keepers-lantern's brass), so it reuses that item's hand-positioned art directly. Down/left/up directions, walking + running, matching keepers-lantern's own coverage (including its right-frame follow-up).",
+    filePath: 'sprites/equipment/miners-lost-lantern-equipped-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py - a per-material gradient-map recolor of sprite.equipment.keepers-lantern's already-finished sheet (100% of its hand-positioning/rotation/grip-trim reused unchanged). 2-cluster k-means (RGB space) separates the warm glow-glass material from the dark frame material in both icons independently, pairing clusters by brightness rank (the glow cluster is reliably the brighter one in both), so the flame doesn't bleed into the frame's palette or vice versa. Anchor table entries copied from keepers-lantern (identical geometry).",
+  },
+  {
     id: 'sprite.equipment.work-gloves',
     category: 'character',
     intendedUse:
