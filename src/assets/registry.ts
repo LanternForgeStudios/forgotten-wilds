@@ -2488,6 +2488,29 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("a small cluster of magical bioluminescent mushrooms glowing softly with blue-green light, forest floor fungi", 96x96, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the mushrooms glowing and pulsing softly with magical bioluminescent light", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 64x64 with LANCZOS. Build script: scripts/build_ambient_decor.py. 96x96 originals archived at public/assets/sprites/structures/original/glowing-mushroom-glow/.',
   },
   {
+    id: 'structure.lantern-relic-dormant',
+    category: 'structure',
+    intendedUse:
+      "Marker for the Hollow Rail Mine \"Lantern Relic\" world-item interactable (miners-lost-lantern) before it's been collected - a pulsing amber glow animation (single row x 9 frames of 64x64) so it reads as a findable pickup, same generic idle-animation mechanism as structure.chest/structure.shrine-activated. Replaces the old single-state icon.item.miners-lost-lantern, which showed identically whether or not the player had already taken it - every other one-time pickup in the game (chests, shrines) already distinguishes before/after, this brings the lantern relic in line.",
+    filePath: 'sprites/structures/lantern-relic-glow.png',
+    dimensions: { width: 576, height: 64 },
+    frameSize: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("an old brass miner\'s lantern half-buried in loose mine rubble and broken rock, dark glass panes, glowing warmly with a faint amber light", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the lantern\'s amber glow pulsating and flickering warmly, drawing the eye", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 64x64 with LANCZOS. Build script: scripts/build_lantern_relic.py. 128x128 originals archived at public/assets/sprites/structures/original/lantern-relic-glow/.',
+  },
+  {
+    id: 'structure.lantern-relic-collected',
+    category: 'structure',
+    intendedUse:
+      'Marker for the Lantern Relic interactable once already collected - a static, non-glowing empty rubble pile, distinct art from structure.lantern-relic-dormant (not just a different label), same "before/after is genuinely different art, not a recolor" requirement structure.chest/chest-open already established.',
+    filePath: 'sprites/structures/lantern-relic-collected.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_object_state on the SAME lantern-in-rubble object (edit: "the lantern is gone, leaving behind just an empty scattered pile of loose mine rubble and broken rock where it once sat, no glow, no light") rather than an independent generation, so the two states share the same rubble-pile silhouette - same technique as structure.chest/chest-open. Cropped to its square content bbox and resized to 64x64 with LANCZOS. Build script: scripts/build_lantern_relic.py. 128x128 original archived at public/assets/sprites/structures/original/lantern-relic-collected-source.png.',
+  },
+  {
     id: 'structure.chest',
     category: 'structure',
     intendedUse:

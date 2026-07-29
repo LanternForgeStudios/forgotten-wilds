@@ -22,6 +22,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
+import { useInventoryStore } from '@/state/useInventoryStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { isTypingTarget } from '@/utils/keyboard';
 import { itemDisplayName } from '@/utils/itemName';
@@ -51,6 +52,12 @@ export function DungeonScene() {
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
   const openedChests = useWorldStateStore((s) => s.openedChests);
+  // miners-lost-lantern is granted to inventory once and never removed/consumed (see
+  // collectWorldItem.ts), so its presence there is a reliable "already collected" signal - same
+  // idea as openedChests above, just derived from inventory instead of a dedicated Firestore list
+  // since this is the only world-item pickup that currently needs a visual before/after state.
+  const inventory = useInventoryStore((s) => s.items);
+  const lanternRelicCollected = inventory.some((i) => i.itemId === 'miners-lost-lantern');
   useEffect(() => {
     void playMusic('music.dungeon');
   }, []);
@@ -203,15 +210,20 @@ export function DungeonScene() {
         if (o.refId!.startsWith('glowing-mushroom')) {
           return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: 'structure.decor-glowing-mushroom', label: 'Glowing Mushroom' };
         }
+        if (o.refId === 'miners-lost-lantern') {
+          return {
+            id: o.refId,
+            x: o.x,
+            y: o.y,
+            spriteAssetId: lanternRelicCollected ? 'structure.lantern-relic-collected' : 'structure.lantern-relic-dormant',
+            label: lanternRelicCollected ? 'Empty Alcove' : 'Lantern Relic',
+          };
+        }
         return {
           id: o.refId!,
           x: o.x,
           y: o.y,
-          spriteAssetId: o.refId!.startsWith('chest-')
-            ? openedChests.includes(o.refId!)
-              ? 'structure.chest-open'
-              : 'structure.chest'
-            : 'icon.item.miners-lost-lantern',
+          spriteAssetId: openedChests.includes(o.refId!) ? 'structure.chest-open' : 'structure.chest',
           label: labelForInteractable(o.refId!, openedChests),
         };
       });
@@ -232,7 +244,7 @@ export function DungeonScene() {
       .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     return [...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-  }, [map, openedChests, fieldEncounterIcons, staminaUnlocked]);
+  }, [map, openedChests, fieldEncounterIcons, staminaUnlocked, lanternRelicCollected]);
 
   if (!map) {
     return (
