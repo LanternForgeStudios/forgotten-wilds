@@ -1,16 +1,23 @@
-"""Seeds a brand-new item's manual-edit working folder (art-staging/equipment-layers-manual/<item>/)
-with the item's own flat icon art sitting at a neutral (0,0) starting point on an otherwise-empty
-72x96 canvas, per direction/frame - the same starting state travelers-cloak/weathered-walking-staff
-were originally handed to the user in, before any hand-positioning existed. Only for "single" kind
-items (one piece of worn/held art, not a paired left/right item like boots/gloves) - a paired item
-needs the source icon manually split into two halves first, which this script doesn't attempt.
+"""Seeds a brand-new item's manual-edit working folder with the item's own flat icon art sitting
+at a neutral (0,0) starting point on an otherwise-empty 72x96 canvas, per direction/frame - the
+same starting state travelers-cloak/weathered-walking-staff were originally handed to the user in,
+before any hand-positioning existed. Only for "single" kind items (one piece of worn/held art, not
+a paired left/right item like boots/gloves) - a paired item needs the source icon manually split
+into two halves first, which this script doesn't attempt.
+
+IMPORTANT: this writes into the user's own external hand-editing scratchpad (wherever their
+manual-edit/manual-edit-running/manual-edit-female-walking/manual-edit-female-running folders
+actually live - ask if unknown, don't guess), NOT into art-staging/equipment-layers-manual/ in
+this repo - that repo location is only for FINISHED hand-positioned art, copied in once the user
+hands a folder back. Seeding a raw/unpositioned folder there would look like real, ready-to-build
+art to build_equipment_layer_manual.py (which rebuilds every registered item on every run).
 
 The icon is cropped to its own alpha bounding box (so no wasted transparent margin skews the
 neutral starting position), then scaled down with LANCZOS only if it doesn't already fit within
 the 72x96 frame - never scaled up, since these are 128x128-generated icons and upscaling would
 just soften them further before the user has even started positioning.
 
-Usage: python scripts/seed_equipment_layer_manual.py <item-id> <icon-path> [direction ...]
+Usage: python scripts/seed_equipment_layer_manual.py <item-id> <icon-path> <output-root> [direction ...]
   (directions default to down left up right if omitted)
 """
 
@@ -21,10 +28,8 @@ from PIL import Image
 FRAME_SIZE = (72, 96)
 DIRECTIONS_DEFAULT = ["down", "left", "up", "right"]
 
-STAGING_ROOT = os.path.join("art-staging", "equipment-layers-manual")
 
-
-def seed_item(item_name: str, icon_path: str, directions):
+def seed_item(item_name: str, icon_path: str, out_root: str, directions):
     icon = Image.open(icon_path).convert("RGBA")
     bbox = icon.getbbox()
     if bbox is not None:
@@ -34,7 +39,7 @@ def seed_item(item_name: str, icon_path: str, directions):
         scale = min(FRAME_SIZE[0] / icon.width, FRAME_SIZE[1] / icon.height)
         icon = icon.resize((max(1, round(icon.width * scale)), max(1, round(icon.height * scale))), Image.LANCZOS)
 
-    out_dir = os.path.join(STAGING_ROOT, item_name)
+    out_dir = os.path.join(out_root, item_name)
     os.makedirs(out_dir, exist_ok=True)
 
     for direction in directions:
@@ -48,10 +53,11 @@ def seed_item(item_name: str, icon_path: str, directions):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("usage: python scripts/seed_equipment_layer_manual.py <item-id> <icon-path> [direction ...]")
+    if len(sys.argv) < 4:
+        print("usage: python scripts/seed_equipment_layer_manual.py <item-id> <icon-path> <output-root> [direction ...]")
         sys.exit(1)
     item_id = sys.argv[1]
     icon_path_arg = sys.argv[2]
-    dirs = sys.argv[3:] or DIRECTIONS_DEFAULT
-    seed_item(item_id, icon_path_arg, dirs)
+    output_root = sys.argv[3]
+    dirs = sys.argv[4:] or DIRECTIONS_DEFAULT
+    seed_item(item_id, icon_path_arg, output_root, dirs)
