@@ -1395,7 +1395,19 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Each frame is two source files (left-foot/right-foot, positioned independently) composited together before going into the sheet - the raw pixellab generation had a defect (one boot tipped over), so both feet in the source frames are cropped from the one good upright boot, mirrored for the other side. Anchor data recorded under category 'paired-feet' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see sprite.equipment.travelers-cloak's note on why that's a real (not yet fixed) alignment gap during a Dash.",
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Each frame is two source files (left-foot/right-foot, positioned independently) composited together before going into the sheet - the raw pixellab generation had a defect (one boot tipped over), so both feet in the source frames are cropped from the one good upright boot, mirrored for the other side. Anchor data recorded under category 'paired-feet' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) are now real hand-positioned art too (finished by the user, not the walking-row duplicate every item starts with) - full male walking+running coverage.",
+  },
+  {
+    id: 'sprite.equipment.trail-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - Trail Boots, same 'traveler-boots' family as sprite.equipment.traveler-boots, same ankle-boot silhouette per its icon art (just a darker reddish-brown leather tone), so it reuses that item's hand-positioned art directly via a palette swap rather than needing its own manual pass. All 4 directions, walking + running, matching traveler-boots' own full coverage.",
+    filePath: 'sprites/equipment/trail-boots-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2 material clusters, RGB k-means, population-rank pairing) from sprite.equipment.traveler-boots - visually confirmed via composite render (down/right/running-left) against the male base body. Anchor entries copied from traveler-boots' own 'paired-feet' category (identical geometry, only color changed). ranger-boots (same family, rare tier) was NOT generated this way - it's a genuinely taller knee-high boot silhouette, not a same-shape recolor candidate.",
   },
   {
     id: 'sprite.equipment.travelers-cloak',
@@ -1503,7 +1515,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Fifth and final item of the male walking pass. Each frame is two source files (left-hand/right-hand, positioned independently) composited together before going into the sheet, same 'paired' technique as sprite.equipment.traveler-boots. Anchor data recorded under category 'paired-hands' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see this note's sibling entries for why that's a real (not yet fixed) alignment gap during a Dash, to be addressed in the follow-up running-pose round now that all 5 male walking items are done.",
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Fifth and final item of the male walking pass. Each frame is two source files (left-hand/right-hand, positioned independently) composited together before going into the sheet, same 'paired' technique as sprite.equipment.traveler-boots. Anchor data recorded under category 'paired-hands' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) are now real hand-positioned art too (finished by the user, not the walking-row duplicate every item starts with) - full male walking+running coverage.",
   },
   {
     id: 'battle.enemy.mothling',

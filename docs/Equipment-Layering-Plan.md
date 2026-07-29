@@ -358,6 +358,27 @@ those real rotated views from one description in a single call - used for `trave
 (64x64, low top-down). Once complete, its down/left/up/right renders replace the flat-icon seed in
 all 4 working folders the same way, still positioned at neutral (0,0) per frame.
 
+**`traveler-boots`/`work-gloves` male walking+running now finished** (both hand-positioned by the
+user, running rows are real art, not the walking-row duplicate) - completing all 5 Phase 3 pilot
+items for full male animation coverage. Rolled out to the rest of each family the same way the
+`walking-staff`/`keeper-coat` families were:
+
+- `trail-boots` (uncommon, `traveler-boots` family) - `palette_swap_equipment_layer.py` from
+  `traveler-boots`. Same ankle-boot silhouette per icon art (just a darker reddish-brown leather
+  tone), a clean same-shape recolor candidate. Visually confirmed via composite render (down,
+  right, running-left) against the male base body - reads correctly in every pose checked.
+- `ranger-boots` (rare, same family) - **NOT auto-generated**. Its icon shows genuinely
+  knee-high boots, not an ankle-boot recolor candidate - `estimate_transform_equipment_layer.py`'s
+  own docs explicitly warn against this case (it clips the result to the reference's silhouette,
+  which would chop a taller boot's shaft down to `traveler-boots`' ankle height). That script also
+  has no paired-item (left-foot/right-foot) support at all yet, unlike `palette_swap`'s technique,
+  which is silhouette-agnostic (recolors whatever pixels are already there, however they're laid
+  out) and works for a paired item for free. Needs real hand-positioning, or a paired-item-aware
+  version of the estimate-transform technique, whichever the user prefers when picked back up.
+- `leather-gauntlets`/`keepers-gauntlets` (uncommon/rare, `work-gloves` family) - **NOT
+  auto-generated**, same reasoning as `ranger-boots`: both are visibly bulkier gauntlets with
+  forearm coverage, not a same-shape recolor of `work-gloves`' plain hand silhouette.
+
 ## Open questions for later phases
 
 - Exact z-order when a lantern is "held" vs. worn on a belt - depends on the actual generated pose,

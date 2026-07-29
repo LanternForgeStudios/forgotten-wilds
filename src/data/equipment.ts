@@ -124,6 +124,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { defense: 2, speed: 4 },
     tier: 'uncommon',
     familyId: 'traveler-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.trail-boots', female: '' },
   },
   {
     id: 'ranger-boots',
