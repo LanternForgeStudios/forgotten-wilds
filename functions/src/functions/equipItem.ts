@@ -6,7 +6,8 @@ import type { PlayerSave } from '../shared-types';
 
 const VALID_SLOTS = new Set<EquipmentSlot>([
   'weapon',
-  'armor',
+  'chest',
+  'legs',
   'boots',
   'gloves',
   'charm',

@@ -14,7 +14,7 @@ import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
 import { formatStatBonuses } from '@/utils/statBonuses';
 import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
-import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
+import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
 import { TIER_LABELS, TIER_ORDER } from '@/utils/tier';
 import { playSound } from '@/audio/audioService';
 import styles from './CharacterMenu.module.css';
@@ -34,13 +34,10 @@ const SUBTAB_LABELS: Record<InventorySubTab, string> = {
   unique: 'Unique',
 };
 
-/** Order matches how the slot-type filter is meant to read left to right when narrowing the
- *  Inventory tab's Equipment subtab, not EQUIPMENT_SLOTS's equip-tab display order. */
-const SLOT_FILTER_ORDER: EquipmentSlot[] = ['armor', 'weapon', 'boots', 'gloves', 'lantern', 'charm', 'spiritTotem'];
-
 const SLOT_FILTER_LABELS: Record<EquipmentSlot, string> = {
   weapon: 'Weapon',
-  armor: 'Armor',
+  chest: 'Chest',
+  legs: 'Legs',
   boots: 'Boots',
   gloves: 'Gloves',
   charm: 'Charm',

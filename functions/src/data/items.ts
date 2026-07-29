@@ -187,10 +187,11 @@ export const SHOP_PRICES: Record<string, number> = {
   // Common-tier equipment only, per the canonical rarity progression (Common: "merchants, enemy
   // drops, common chests"). Uncommon/Rare gear comes from chests instead. Split with no overlap
   // between the two Ash Hallow gear shops: Blacksmith stocks Weapon/Charm/Spirit Totem (no totem
-  // currently at common tier), Armory stocks Armor/Boots/Gloves.
+  // currently at common tier), Armory stocks Chest/Legs/Boots/Gloves.
   'weathered-walking-staff': 30,
   'river-stone-charm': 25,
   'worn-keeper-coat': 30,
+  'worn-keeper-trousers': 26,
   'traveler-boots': 25,
   'work-gloves': 20,
 };
@@ -201,7 +202,7 @@ export const SHOP_PRICES: Record<string, number> = {
 export const SHOP_CATALOGS: Record<string, string[]> = {
   'mara-ash-general-store': ['keepers-lantern', 'antidote', 'eye-drops'],
   'ash-hallow-blacksmith-forge': ['weathered-walking-staff', 'river-stone-charm'],
-  'ash-hallow-armory': ['worn-keeper-coat', 'traveler-boots', 'work-gloves'],
+  'ash-hallow-armory': ['worn-keeper-coat', 'worn-keeper-trousers', 'traveler-boots', 'work-gloves'],
   apothecary: [
     'healing-poultice',
     'greater-healing-poultice',

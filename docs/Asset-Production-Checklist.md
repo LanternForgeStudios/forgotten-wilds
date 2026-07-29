@@ -244,7 +244,7 @@ script: `scripts/build_chest.py`. 128×128 originals archived at
 |---|---|---|
 | Door *(standalone, not yet placed on any map - stubbed for future use)* | 48×96 | Standalone rustic wooden plank door with iron hinges, weathered, transparent background, matches the Ash Hallow building-facade style above. |
 
-## Icons (52 - inventory/equipment/currency)
+## Icons (56 - inventory/equipment/currency)
 
 **Spec (all tiers)**: PNG, transparent background, single centered object, simple flat-shaded
 lighting - these are small UI icons, not illustrations, so avoid busy detail that won't read at
@@ -259,7 +259,7 @@ generation prompt should target 128×128 regardless. The build/processing step d
 in this doc already follows - see e.g. the building-facade pipeline's `original/` folder). The
 point: if the in-game size ever needs to change again later (as already happened once with the
 building facades, 72×72 → 144×144), there's a real 128×128 source to re-resize from instead of
-needing to regenerate the art from scratch. All 52 are now built (`status: 'final'` in the
+needing to regenerate the art from scratch. All 56 are now built (`status: 'final'` in the
 registry) - see each subsection below for generation notes.
 
 ### Items (22 - generate 128×128, final 64×64: consumables, materials, key items) - all 22 done
@@ -322,12 +322,14 @@ its own.
 | Blind | 64×64 | Simple flat-shaded fantasy game icon badge of a grey crossed-out eye symbol, centered, transparent background. |
 | Silence | 64×64 | Simple flat-shaded fantasy game icon badge of a muted purple crossed-out sound-wave symbol, centered, transparent background. |
 
-### Equipment (20 - generate 128×128, final 64×64, across 7 rarity families + 2 unique lanterns) - all 20 done
+### Equipment (24 - generate 128×128, final 64×64, across 8 rarity families + 2 unique lanterns) - all 24 done
 
-Same pixellab MCP `create_map_object` pipeline as the sections above. All 20 matched their prompts
-cleanly on the first attempt except **Ghost Miner's Coin**, which came back as a generic old
-coin/medallion (human-profile bust, stars) rather than anything distinctly "ghost"-themed or
-glowing - accepted as-is since it still reads clearly as an old coin/token, the core concept.
+Same pixellab MCP `create_map_object` pipeline as the sections above. All 20 of the original batch
+matched their prompts cleanly on the first attempt except **Ghost Miner's Coin**, which came back
+as a generic old coin/medallion (human-profile bust, stars) rather than anything distinctly
+"ghost"-themed or glowing - accepted as-is since it still reads clearly as an old coin/token, the
+core concept. The 4 Legs items added alongside the Armor→Chest rename/Legs-slot addition (Traveler's
+Pants, Worn/Reinforced/Veteran Keeper Trousers) also matched cleanly on the first attempt.
 
 | Equipment | Final Size | Generation prompt |
 |---|---|---|
@@ -337,6 +339,9 @@ glowing - accepted as-is since it still reads clearly as an old coin/token, the 
 | Worn Keeper Coat *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a patched, hand-me-down long coat in the Lantern Keeper cut, centered, transparent background. |
 | Reinforced Keeper Coat *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a sturdier Keeper coat lined with visible boiled-leather seams, centered, transparent background. |
 | Veteran Keeper Coat *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a battle-worn but well-kept Keeper coat with a subtle insignia, centered, transparent background. |
+| Worn Keeper Trousers *(common, legs)* | 64×64 | Simple flat-shaded fantasy game icon of patched, hand-me-down trousers in the Lantern Keeper cut, centered, transparent background. |
+| Reinforced Keeper Trousers *(uncommon, legs)* | 64×64 | Simple flat-shaded fantasy game icon of sturdier Keeper trousers lined with visible boiled-leather seams at the knee, centered, transparent background. |
+| Veteran Keeper Trousers *(rare, legs)* | 64×64 | Simple flat-shaded fantasy game icon of battle-worn but well-kept Keeper trousers with a subtle insignia patch, centered, transparent background. |
 | Traveler Boots *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain sturdy pair of leather traveling boots, centered, transparent background. |
 | Trail Boots *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a broken-in pair of ridge-trail boots with reinforced soles, centered, transparent background. |
 | Ranger Boots *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a light, sure-footed pair of scout's boots, centered, transparent background. |
@@ -351,6 +356,7 @@ glowing - accepted as-is since it still reads clearly as an old coin/token, the 
 | Stone Wolf Totem *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a small wolf figure carved from grey mountain stone, centered, transparent background. |
 | Mountain Guardian Totem *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a stone totem carved in the likeness of a great bear guardian, centered, transparent background. |
 | Traveler's Cloak *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain folded wool traveling cloak, centered, transparent background. |
+| Traveler's Pants *(common, legs)* | 64×64 | Simple flat-shaded fantasy game icon of a plain folded wool traveling trousers, centered, transparent background. |
 
 ### Currency (4 - generate 128×128, final 32×32) - all 4 done
 

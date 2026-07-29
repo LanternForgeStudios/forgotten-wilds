@@ -53,7 +53,8 @@ describe('backfillPlayerEquipment', () => {
     backfillPlayerEquipment(save);
     expect(save.player.equipment).toEqual({
       weapon: null,
-      armor: null,
+      chest: null,
+      legs: null,
       boots: null,
       gloves: null,
       charm: null,
@@ -62,10 +63,11 @@ describe('backfillPlayerEquipment', () => {
     });
   });
 
-  it('leaves an existing equipment block untouched', () => {
+  it('leaves an already-current equipment block untouched', () => {
     const equipment: PlayerEquipment = {
       weapon: 'weathered-walking-staff',
-      armor: null,
+      chest: null,
+      legs: null,
       boots: null,
       gloves: null,
       charm: null,
@@ -75,6 +77,46 @@ describe('backfillPlayerEquipment', () => {
     const save = { player: { equipment } } as unknown as PlayerSave;
     backfillPlayerEquipment(save);
     expect(save.player.equipment).toBe(equipment);
+  });
+
+  it("migrates a save written before the 'armor'->'chest' rename, preserving what was equipped", () => {
+    const equipment = {
+      weapon: null,
+      armor: 'travelers-cloak',
+      boots: null,
+      gloves: null,
+      charm: null,
+      lantern: null,
+      spiritTotem: null,
+    } as unknown as PlayerEquipment;
+    const save = { player: { equipment } } as unknown as PlayerSave;
+    backfillPlayerEquipment(save);
+    expect(save.player.equipment).toEqual({
+      weapon: null,
+      chest: 'travelers-cloak',
+      legs: null,
+      boots: null,
+      gloves: null,
+      charm: null,
+      lantern: null,
+      spiritTotem: null,
+    });
+  });
+
+  it("backfills a missing 'legs' key on a save that predates that slot", () => {
+    const equipment = {
+      weapon: null,
+      chest: 'travelers-cloak',
+      boots: null,
+      gloves: null,
+      charm: null,
+      lantern: null,
+      spiritTotem: null,
+    } as unknown as PlayerEquipment;
+    const save = { player: { equipment } } as unknown as PlayerSave;
+    backfillPlayerEquipment(save);
+    expect(save.player.equipment.legs).toBe(null);
+    expect(save.player.equipment.chest).toBe('travelers-cloak');
   });
 });
 
@@ -96,7 +138,8 @@ describe('resolveWeaponAttackAilment', () => {
 describe('computeAilmentResistances', () => {
   const emptyEquipment: PlayerEquipment = {
     weapon: null,
-    armor: null,
+    chest: null,
+    legs: null,
     boots: null,
     gloves: null,
     charm: null,

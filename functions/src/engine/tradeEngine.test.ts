@@ -10,7 +10,8 @@ import type { InventoryItem, PlayerEquipment, PlayerSave, TradeOfferSide } from 
 
 const NO_EQUIPMENT: PlayerEquipment = {
   weapon: null,
-  armor: null,
+  chest: null,
+  legs: null,
   boots: null,
   gloves: null,
   charm: null,

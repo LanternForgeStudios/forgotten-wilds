@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { ITEMS, EQUIPMENT } from '@/data';
-import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
+import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
 import { itemDisplayName } from '@/utils/itemName';
 import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './UserProfile.module.css';
@@ -19,8 +19,6 @@ const TRADE_TYPE_LABELS: Record<Exclude<TradeTypeFilter, 'all'>, string> = {
   lanternUpgrade: 'Lantern Upgrades',
   materials: 'Materials',
 };
-
-const SLOT_FILTER_ORDER: EquipmentSlot[] = ['armor', 'weapon', 'boots', 'gloves', 'lantern', 'charm', 'spiritTotem'];
 
 function tradeTypeOf(itemDef: (typeof ITEMS)[number] | undefined, equipDef: (typeof EQUIPMENT)[number] | undefined): TradeTypeFilter {
   if (equipDef) return 'equipment';

@@ -1,4 +1,5 @@
 import { STARTING_STATS } from '../data/leveling';
+import { freshPlayerEquipment } from './equipmentEngine';
 import type { Player, PlayerSave } from '../shared-types';
 
 export const STARTING_LOCATION_ID = 'ash-hallow';
@@ -27,15 +28,7 @@ export function buildFreshPlayer(
     spiritRank: 'Unawakened',
     explorerRank: 'Newcomer',
     regionalReputation: 0,
-    equipment: {
-      weapon: null,
-      armor: null,
-      boots: null,
-      gloves: null,
-      charm: null,
-      lantern: 'keepers-lantern',
-      spiritTotem: null,
-    },
+    equipment: { ...freshPlayerEquipment(), lantern: 'keepers-lantern' },
     currentLocationId: STARTING_LOCATION_ID,
     staminaUpdatedAt: now,
     knownSkillIds: ['keepers-strike'],

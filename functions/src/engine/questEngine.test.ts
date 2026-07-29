@@ -20,7 +20,7 @@ function emptySave(overrides: Partial<PlayerSave> = {}): PlayerSave {
       spiritRank: 'Unawakened',
       explorerRank: 'Newcomer',
       regionalReputation: 0,
-      equipment: { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null },
+      equipment: { weapon: null, chest: null, legs: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null },
       currentLocationId: 'ash-hallow',
     },
     inventory: [],
@@ -124,7 +124,7 @@ describe('applyQuestRewards', () => {
     applyQuestRewards(save, [
       { questId: 'a-new-keeper', reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'], autoEquip: true } },
     ]);
-    expect(save.player.equipment.armor).toBe('travelers-cloak');
+    expect(save.player.equipment.chest).toBe('travelers-cloak');
     expect(save.inventory).toEqual([{ itemId: 'travelers-cloak', quantity: 1 }]);
   });
 
@@ -132,13 +132,13 @@ describe('applyQuestRewards', () => {
     const save = emptySave({
       player: {
         ...emptySave().player,
-        equipment: { weapon: null, armor: 'ash-hallow-formal-attire', boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null },
+        equipment: { weapon: null, chest: 'ash-hallow-formal-attire', legs: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null },
       },
     });
     applyQuestRewards(save, [
       { questId: 'a-new-keeper', reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'], autoEquip: true } },
     ]);
-    expect(save.player.equipment.armor).toBe('ash-hallow-formal-attire');
+    expect(save.player.equipment.chest).toBe('ash-hallow-formal-attire');
     expect(save.inventory).toEqual([{ itemId: 'travelers-cloak', quantity: 1 }]);
   });
 

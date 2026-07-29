@@ -27,14 +27,15 @@ const OVERHANG_DEPTH = 1000;
  *  than any plausible decoration-layer count. */
 const ENTITY_DEPTH = 500;
 /** Stacking order for equipment layer sprites, as small fractional offsets from the base player
- *  sprite's own ENTITY_DEPTH (see docs/Equipment-Layering-Plan.md) - boots under armor under
- *  gloves under weapon/lantern. Tuned by eye once real layer art exists; weapon and lantern share
- *  a tier for now since which one should render "on top" depends on the actual generated pose
- *  (open question in the plan doc). A slot with no offset listed falls back to 0.5 (above every
- *  named slot) rather than silently rendering under the base body. */
+ *  sprite's own ENTITY_DEPTH (see docs/Equipment-Layering-Plan.md) - boots under legs under chest
+ *  under gloves under weapon/lantern. Tuned by eye once real layer art exists; weapon and lantern
+ *  share a tier for now since which one should render "on top" depends on the actual generated
+ *  pose (open question in the plan doc). A slot with no offset listed falls back to 0.5 (above
+ *  every named slot) rather than silently rendering under the base body. */
 const EQUIPMENT_LAYER_DEPTH_OFFSET: Partial<Record<EquipmentSlot, number>> = {
   boots: 0.1,
-  armor: 0.2,
+  legs: 0.15,
+  chest: 0.2,
   gloves: 0.3,
   weapon: 0.4,
   lantern: 0.4,

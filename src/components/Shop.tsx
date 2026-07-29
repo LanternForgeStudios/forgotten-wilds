@@ -12,7 +12,7 @@ import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useToastStore } from '@/state/useToastStore';
 import { sellPriceFor } from '@/utils/sellPrice';
 import { formatStatBonuses } from '@/utils/statBonuses';
-import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
+import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
 import { SHOP_LISTINGS, SHOP_TITLES, SHOP_CATALOGS, ITEMS, EQUIPMENT } from '@/data';
 import { playSound } from '@/audio/audioService';
 import type { EquipmentSlot, ItemCategory } from '@/types';
@@ -39,9 +39,6 @@ const SELL_TYPE_LABELS: Record<Exclude<SellTypeFilter, 'all'>, string> = {
   lanternUpgrade: 'Lantern Upgrades',
   materials: 'Materials',
 };
-
-/** Order matches CharacterMenu.tsx's SLOT_FILTER_ORDER convention. */
-const SLOT_FILTER_ORDER: EquipmentSlot[] = ['armor', 'weapon', 'boots', 'gloves', 'lantern', 'charm', 'spiritTotem'];
 
 function sellTypeOf(itemDef: (typeof ITEMS)[number] | undefined, equipDef: (typeof EQUIPMENT)[number] | undefined): SellTypeFilter {
   if (equipDef) return 'equipment';

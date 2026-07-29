@@ -11,7 +11,8 @@ import type { PartyCombatHitResult, PartyEnemyHitResult, PvpHitResult } from '..
 
 export type EquipmentSlot =
   | 'weapon'
-  | 'armor'
+  | 'chest'
+  | 'legs'
   | 'boots'
   | 'gloves'
   | 'charm'

@@ -20,7 +20,8 @@ export interface Stats {
 
 export type EquipmentSlot =
   | 'weapon'
-  | 'armor'
+  | 'chest'
+  | 'legs'
   | 'boots'
   | 'gloves'
   | 'charm'
@@ -29,7 +30,8 @@ export type EquipmentSlot =
 
 export const EQUIPMENT_SLOTS: EquipmentSlot[] = [
   'weapon',
-  'armor',
+  'chest',
+  'legs',
   'boots',
   'gloves',
   'charm',

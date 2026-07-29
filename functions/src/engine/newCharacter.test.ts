@@ -23,7 +23,8 @@ describe('buildFreshPlayer', () => {
     const player = buildFreshPlayer('uid-1', 'Tester', 1000);
     expect(player.equipment).toEqual({
       weapon: null,
-      armor: null,
+      chest: null,
+      legs: null,
       boots: null,
       gloves: null,
       charm: null,

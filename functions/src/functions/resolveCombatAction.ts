@@ -11,7 +11,7 @@ import {
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
 import { grantItem, itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
-import { computeAilmentResistances, resolveWeaponAttackAilment } from '../engine/equipmentEngine';
+import { backfillPlayerEquipment, computeAilmentResistances, resolveWeaponAttackAilment } from '../engine/equipmentEngine';
 import { ENEMIES } from '../data/enemies';
 import { ITEMS } from '../data/items';
 import { SKILLS } from '../data/skills';
@@ -67,14 +67,13 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     // matching pattern in inventoryEngine.ts. Persisted below via the unconditional tx.set(userRef,
     // save), so this only ever needs to run once per player.
     if (!save.player.knownSkillIds) save.player.knownSkillIds = ['keepers-strike'];
-    // Backfill for a save written before the equipment system existed - matches buildFreshPlayer's
-    // own defaults (newCharacter.ts). Every action type now reads save.player.equipment
-    // unconditionally below (computeAilmentResistances/resolveWeaponAttackAilment), where before
-    // this stub feature only 'lanternAbility' ever touched it - an account missing this field
-    // entirely crashed with a bare INTERNAL error on every action, not just lanternAbility.
-    if (!save.player.equipment) {
-      save.player.equipment = { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
-    }
+    // Backfill for a save written before the equipment system existed, and migrate a save that
+    // predates the 'armor'->'chest' rename/'legs' slot (see backfillPlayerEquipment's own doc).
+    // Every action type now reads save.player.equipment unconditionally below
+    // (computeAilmentResistances/resolveWeaponAttackAilment), where before this stub feature only
+    // 'lanternAbility' ever touched it - an account missing this field entirely crashed with a
+    // bare INTERNAL error on every action, not just lanternAbility.
+    backfillPlayerEquipment(save);
 
     // Data-driven rather than hardcoding "if silence"/"if freeze" - any current or future ailment
     // whose effect sets blocksSkill/disablesLanternAbility gates the matching action, keyed off

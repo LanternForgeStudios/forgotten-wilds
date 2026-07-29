@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type DocumentReference, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { rollWaveEnemies } from '../engine/endlessBattleEngine';
+import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import {
   restoreParticipantsAndClearLocks,
   fullyRestoredParticipantStats,
@@ -136,14 +137,13 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
     const staleBattles = await resolveStaleLocks(tx, db, lockSnaps);
 
     const saves = userSnaps.map((snap) => snap.data() as PlayerSave);
-    // Backfill for a save written before the equipment system existed (see
-    // resolveCombatAction.ts's identical comment) - this loop and fullyRestoredParticipantStats
-    // both read save.player.equipment unconditionally below, so it must be a real object for
-    // every participant before anything else in this transaction touches it.
+    // Backfill for a save written before the equipment system existed, and migrate a save that
+    // predates the 'armor'->'chest' rename/'legs' slot (see backfillPlayerEquipment's own doc) -
+    // this loop and fullyRestoredParticipantStats both read save.player.equipment unconditionally
+    // below, so it must be a real, up-to-date object for every participant before anything else
+    // in this transaction touches it.
     for (const save of saves) {
-      if (!save.player.equipment) {
-        save.player.equipment = { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
-      }
+      backfillPlayerEquipment(save);
     }
     const locationId = saves[0].player.currentLocationId;
     if (!saves.every((s) => s.player.currentLocationId === locationId)) {

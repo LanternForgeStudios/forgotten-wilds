@@ -57,7 +57,7 @@ export const QUESTS: Record<string, QuestDef> = {
     id: 'a-new-keeper',
     prerequisiteQuestId: null,
     objectives: [{ id: 'talk-elias', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 }],
-    reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'], autoEquip: true },
+    reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak', 'traveler-pants'], autoEquip: true },
   },
   'ash-hallow-tour': {
     id: 'ash-hallow-tour',

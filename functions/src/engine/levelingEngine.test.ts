@@ -21,7 +21,7 @@ function saveAtLevel(level: number, xp: number): PlayerSave {
       spiritRank: 'Unawakened',
       explorerRank: 'Newcomer',
       regionalReputation: 0,
-      equipment: { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null },
+      equipment: { weapon: null, chest: null, legs: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null },
       currentLocationId: 'ash-hallow',
     },
     inventory: [],

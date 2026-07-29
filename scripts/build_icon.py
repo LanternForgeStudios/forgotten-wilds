@@ -68,6 +68,10 @@ ICONS = {
     "stone-wolf-totem": (64, 64),
     "mountain-guardian-totem": (64, 64),
     "travelers-cloak": (64, 64),
+    "traveler-pants": (64, 64),
+    "worn-keeper-trousers": (64, 64),
+    "reinforced-keeper-trousers": (64, 64),
+    "veteran-keeper-trousers": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")

@@ -1,6 +1,14 @@
 import { EQUIPMENT, type StatBonuses } from '../data/equipment';
 import type { AilmentResistance, PlayerEquipment, PlayerSave, Stats } from '../shared-types';
 
+/** The full, empty equipment shape every PlayerSave should have - the single source of truth for
+ *  backfillPlayerEquipment below and every other call site that used to hand-roll this same
+ *  literal (endlessBattle.ts, pvpBattle.ts, resolveCombatAction.ts) before the 'armor'->'chest'
+ *  rename/'legs' addition made keeping N independent copies in sync too risky. */
+export function freshPlayerEquipment(): PlayerEquipment {
+  return { weapon: null, chest: null, legs: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
+}
+
 /** Backfill for a save written before the equipment system existed - player.equipment is entirely
  *  absent from the Firestore doc for these, not just empty, so any unguarded `save.player.
  *  equipment.X` read throws a bare INTERNAL error. Matches buildFreshPlayer's own defaults
@@ -9,10 +17,24 @@ import type { AilmentResistance, PlayerEquipment, PlayerSave, Stats } from '../s
  *  duplicating the same object literal) specifically so a new call site can't reintroduce this
  *  crash by forgetting to copy it; a prior version of this fix shipped as four separate inline
  *  copies and still missed six other real call sites (equipItem/unequipItem/sellItem/trade.ts,
- *  and partyBattle.ts's restoreParticipantsAndClearLocks/restoreAndRewardPvpParticipants). */
+ *  and partyBattle.ts's restoreParticipantsAndClearLocks/restoreAndRewardPvpParticipants). Also
+ *  the one place that migrates a pre-rename save's 'armor' key to 'chest' and backfills 'legs'
+ *  for any save that predates that slot - see the two migration steps below. */
 export function backfillPlayerEquipment(save: PlayerSave): void {
   if (!save.player.equipment) {
-    save.player.equipment = { weapon: null, armor: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
+    save.player.equipment = freshPlayerEquipment();
+    return;
+  }
+  // Migrates a save written before the 'armor'->'chest' rename - the old key would otherwise sit
+  // orphaned (nothing reads it anymore) and silently drop whatever the player had equipped there.
+  const legacy = save.player.equipment as PlayerEquipment & { armor?: string | null };
+  if (legacy.armor !== undefined && legacy.chest === undefined) {
+    legacy.chest = legacy.armor;
+    delete legacy.armor;
+  }
+  // Backfills the new 'legs' slot for any save (old or freshly migrated above) that predates it.
+  if (legacy.legs === undefined) {
+    legacy.legs = null;
   }
 }
 

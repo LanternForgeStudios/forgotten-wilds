@@ -321,6 +321,25 @@ different assets for the same item, generated independently. (All 6 items above 
 icons from an earlier session's equipment-icon batch - that's what made both scripts possible
 without any new pixellab generation.)
 
+**Legs slot added (new category, no existing anchor to auto-place from)**: the Armor→Chest
+rename/Legs-slot addition needs its own equipment-layer art, same workflow as every other slot.
+`traveler-pants` and `worn-keeper-trousers` are the two family-founding items (matching
+`travelers-cloak`/`worn-keeper-coat`'s role for their own families) - since `worn-legs` is a brand
+new anchor-table category with no prior entry, neither `palette_swap_equipment_layer.py` nor
+`estimate_transform_equipment_layer.py` can bootstrap them; they need real hand-positioning like
+the original Phase 3 pilot. A new script, `scripts/seed_equipment_layer_manual.py`, recreates the
+"item's icon at a neutral (0,0) starting point on an otherwise-empty 72x96 canvas" seed state that
+the original 5 pilot items were bootstrapped from (that step predated any committed script - this
+one exists so it doesn't need reinventing a third time) - crops the icon to its own alpha bbox,
+scales down with LANCZOS only if it doesn't already fit the 72x96 frame, never up. Working folders
+seeded: `art-staging/equipment-layers-manual/traveler-pants/` and `.../worn-keeper-trousers/`
+(16 starting frames each, reusing the existing shared `_reference/` base-body crops), waiting on
+the user's hand-positioning. Both registered ahead of time in `build_equipment_layer_manual.py`'s
+`ITEM_SPEC` under category `worn-legs`, same "picked up automatically once handed back" pattern as
+the Legs slot's siblings. Once `worn-keeper-trousers` is finished, `reinforced-keeper-trousers` and
+`veteran-keeper-trousers` can be auto-recolored via `palette_swap_equipment_layer.py`, mirroring
+exactly how the `keeper-coat` family's own uncommon/rare tiers were completed.
+
 ## Open questions for later phases
 
 - Exact z-order when a lantern is "held" vs. worn on a belt - depends on the actual generated pose,

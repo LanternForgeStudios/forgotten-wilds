@@ -2,7 +2,7 @@
 
 import type { AilmentResistance } from '../shared-types';
 
-export type EquipmentSlot = 'weapon' | 'armor' | 'boots' | 'gloves' | 'charm' | 'lantern' | 'spiritTotem';
+export type EquipmentSlot = 'weapon' | 'chest' | 'legs' | 'boots' | 'gloves' | 'charm' | 'lantern' | 'spiritTotem';
 // Ascending order: Common < Uncommon < Rare < Mythic < Legendary. Per the canonical equipment
 // design (docs/Mytherra-Equipment_breakdown.md) - Legendary is a named, story-tied artifact that
 // ends its equipment family, ranked above Mythic.
@@ -76,24 +76,48 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   },
   'worn-keeper-coat': {
     id: 'worn-keeper-coat',
-    slot: 'armor',
+    slot: 'chest',
     statBonuses: { maxHp: 12, defense: 3 },
     tier: 'common',
     familyId: 'keeper-coat',
   },
   'reinforced-keeper-coat': {
     id: 'reinforced-keeper-coat',
-    slot: 'armor',
+    slot: 'chest',
     statBonuses: { maxHp: 18, defense: 5, speed: -1 },
     tier: 'uncommon',
     familyId: 'keeper-coat',
   },
   'veteran-keeper-coat': {
     id: 'veteran-keeper-coat',
-    slot: 'armor',
+    slot: 'chest',
     statBonuses: { maxHp: 20, maxSpirit: 8, defense: 7, speed: 1 },
     tier: 'rare',
     familyId: 'keeper-coat',
+  },
+  // Legs counterparts of the keeper-coat family - same three tiers, reduced-magnitude versions
+  // of the matching coat's bonuses (per the canonical design, Legs is "lower protection" than
+  // Chest, not a second full armor slot).
+  'worn-keeper-trousers': {
+    id: 'worn-keeper-trousers',
+    slot: 'legs',
+    statBonuses: { maxHp: 8, defense: 2 },
+    tier: 'common',
+    familyId: 'keeper-trousers',
+  },
+  'reinforced-keeper-trousers': {
+    id: 'reinforced-keeper-trousers',
+    slot: 'legs',
+    statBonuses: { maxHp: 12, defense: 3, speed: -1 },
+    tier: 'uncommon',
+    familyId: 'keeper-trousers',
+  },
+  'veteran-keeper-trousers': {
+    id: 'veteran-keeper-trousers',
+    slot: 'legs',
+    statBonuses: { maxHp: 14, maxSpirit: 4, defense: 4, speed: 1 },
+    tier: 'rare',
+    familyId: 'keeper-trousers',
   },
   'traveler-boots': {
     id: 'traveler-boots',
@@ -200,8 +224,16 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   // relic, so owning it doesn't need to block ever granting another copy.
   'travelers-cloak': {
     id: 'travelers-cloak',
-    slot: 'armor',
+    slot: 'chest',
     statBonuses: { maxHp: 5, speed: 1 },
+    tier: 'common',
+  },
+  // Prologue reward (MSF-P-001), matching lower for travelers-cloak - granted/auto-equipped
+  // alongside it. Not unique, same reasoning as travelers-cloak above.
+  'traveler-pants': {
+    id: 'traveler-pants',
+    slot: 'legs',
+    statBonuses: { maxHp: 3, speed: 1 },
     tier: 'common',
   },
 };

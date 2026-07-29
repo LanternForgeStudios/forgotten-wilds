@@ -48,6 +48,12 @@ ITEM_SPEC = {
     "travelers-cloak": {"category": "worn-torso", "kind": "single", "directions": DIRECTIONS},
     "weathered-walking-staff": {"category": "held-right-hand", "kind": "single", "directions": ["down", "up", "right", "left"]},
     "work-gloves": {"category": "paired-hands", "kind": "paired", "part": "hand", "directions": DIRECTIONS},
+    # Registered ahead of time for the new Legs slot, same reason as the 3 items above - picked up
+    # automatically once the user hands back hand-positioned frames, no code change needed then.
+    # Seeded via scripts/seed_equipment_layer_manual.py (icon at a neutral (0,0) start, no prior
+    # same-category anchor to auto-place from since these are the category's first entries).
+    "traveler-pants": {"category": "worn-legs", "kind": "single", "directions": DIRECTIONS},
+    "worn-keeper-trousers": {"category": "worn-legs", "kind": "single", "directions": DIRECTIONS},
 }
 
 

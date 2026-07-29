@@ -2086,6 +2086,46 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/travelers-cloak.png.',
   },
   {
+    id: 'icon.equipment.traveler-pants',
+    category: 'icon',
+    intendedUse: "Equipment icon for traveler-pants (Prologue starting-kit legs, matching lower for travelers-cloak)",
+    filePath: 'icons/traveler-pants.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/traveler-pants.png.',
+  },
+  {
+    id: 'icon.equipment.worn-keeper-trousers',
+    category: 'icon',
+    intendedUse: "Equipment icon for worn-keeper-trousers (Common-tier keeper-trousers family, legs counterpart of worn-keeper-coat)",
+    filePath: 'icons/worn-keeper-trousers.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/worn-keeper-trousers.png.',
+  },
+  {
+    id: 'icon.equipment.reinforced-keeper-trousers',
+    category: 'icon',
+    intendedUse: "Equipment icon for reinforced-keeper-trousers (Uncommon-tier keeper-trousers family, legs counterpart of reinforced-keeper-coat)",
+    filePath: 'icons/reinforced-keeper-trousers.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/reinforced-keeper-trousers.png.',
+  },
+  {
+    id: 'icon.equipment.veteran-keeper-trousers',
+    category: 'icon',
+    intendedUse: "Equipment icon for veteran-keeper-trousers (Rare-tier keeper-trousers family, legs counterpart of veteran-keeper-coat)",
+    filePath: 'icons/veteran-keeper-trousers.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/veteran-keeper-trousers.png.',
+  },
+  {
     id: 'icon.item.guardian-memory-fragment-1',
     category: 'icon',
     intendedUse: 'Item icon for guardian-memory-fragment-1',
