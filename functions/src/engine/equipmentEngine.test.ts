@@ -3,9 +3,11 @@ import {
   adjustStatsForBonuses,
   backfillPlayerEquipment,
   computeAilmentResistances,
+  equipIntoSlot,
   resolveWeaponAttackAilment,
   setLanternOilCapacity,
 } from './equipmentEngine';
+import type { EquipmentDefinition } from '../data/equipment';
 import type { PlayerEquipment, PlayerSave, Stats } from '../shared-types';
 
 function stats(overrides: Partial<Stats> = {}): Stats {
@@ -44,6 +46,49 @@ describe('adjustStatsForBonuses', () => {
     expect(s.attack).toBe(0);
     expect(s.defense).toBe(0);
     expect(s.maxHp).toBe(1);
+  });
+});
+
+describe('equipIntoSlot', () => {
+  const cloakDef: EquipmentDefinition = {
+    id: 'travelers-cloak',
+    slot: 'chest',
+    statBonuses: { maxHp: 5, speed: 1 },
+    tier: 'common',
+  };
+  const lanternDef: EquipmentDefinition = {
+    id: 'keepers-lantern',
+    slot: 'lantern',
+    statBonuses: { maxSpirit: 5 },
+    tier: 'legendary',
+    oilCapacity: 30,
+  };
+
+  function save(equipment: Partial<PlayerEquipment> = {}): PlayerSave {
+    return {
+      player: {
+        stats: stats({ lanternOil: 0, maxLanternOil: 0 }),
+        equipment: { weapon: null, chest: null, legs: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null, ...equipment },
+      },
+    } as unknown as PlayerSave;
+  }
+
+  it('applies the item stat bonuses and assigns it into its own slot', () => {
+    const s = save();
+    equipIntoSlot(s, 'travelers-cloak', cloakDef);
+    expect(s.player.equipment.chest).toBe('travelers-cloak');
+    expect(s.player.stats.maxHp).toBe(65);
+    expect(s.player.stats.speed).toBe(7);
+  });
+
+  it('sets lantern oil capacity for a lantern-slot item, leaves it untouched for others', () => {
+    const s = save();
+    equipIntoSlot(s, 'travelers-cloak', cloakDef);
+    expect(s.player.stats.maxLanternOil).toBe(0);
+
+    equipIntoSlot(s, 'keepers-lantern', lanternDef);
+    expect(s.player.equipment.lantern).toBe('keepers-lantern');
+    expect(s.player.stats.maxLanternOil).toBe(30);
   });
 });
 

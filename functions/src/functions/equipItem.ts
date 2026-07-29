@@ -1,19 +1,13 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { EQUIPMENT, type EquipmentSlot } from '../data/equipment';
-import { adjustStatsForBonuses, backfillPlayerEquipment, setLanternOilCapacity } from '../engine/equipmentEngine';
+import { adjustStatsForBonuses, backfillPlayerEquipment, equipIntoSlot, freshPlayerEquipment, setLanternOilCapacity } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
 
-const VALID_SLOTS = new Set<EquipmentSlot>([
-  'weapon',
-  'chest',
-  'legs',
-  'boots',
-  'gloves',
-  'charm',
-  'lantern',
-  'spiritTotem',
-]);
+// Derived from freshPlayerEquipment() (the canonical slot list) rather than its own hardcoded
+// literal, so a future slot add/rename can't drift this validation set out of sync the way it
+// would have to be remembered by hand otherwise.
+const VALID_SLOTS = new Set<EquipmentSlot>(Object.keys(freshPlayerEquipment()) as EquipmentSlot[]);
 
 interface EquipItemRequest {
   itemId: string;
@@ -50,9 +44,7 @@ export const equipItem = onCall<EquipItemRequest>(async (request) => {
       const previousDef = EQUIPMENT[previousItemId];
       if (previousDef) adjustStatsForBonuses(save.player.stats, previousDef.statBonuses, -1);
     }
-    adjustStatsForBonuses(save.player.stats, def.statBonuses, 1);
-    if (slot === 'lantern') setLanternOilCapacity(save.player.stats, def.oilCapacity ?? 0);
-    save.player.equipment[slot] = itemId;
+    equipIntoSlot(save, itemId, def);
 
     save.updatedAt = Date.now();
     tx.set(userRef, save);

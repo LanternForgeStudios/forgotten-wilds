@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards, currentNpcDialogueVariantKey } from '../engine/questEngine';
+import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface TalkToNpcRequest {
@@ -50,6 +51,7 @@ export const talkToNpc = onCall<TalkToNpcRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+    backfillPlayerEquipment(save);
 
     if (save.player.currentLocationId !== NPC_LOCATIONS[npcId]) {
       throw new HttpsError('failed-precondition', 'You are not at that location.');

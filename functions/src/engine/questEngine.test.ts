@@ -119,16 +119,21 @@ describe('applyQuestRewards', () => {
     expect(save.player.stats.maxHp).toBeGreaterThan(60);
   });
 
-  it('autoEquip fills an empty slot with a granted equipment item, in addition to inventory', () => {
+  it('autoEquip fills an empty slot with a granted equipment item, applies its stat bonuses, in addition to inventory', () => {
     const save = emptySave();
     applyQuestRewards(save, [
       { questId: 'a-new-keeper', reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak'], autoEquip: true } },
     ]);
     expect(save.player.equipment.chest).toBe('travelers-cloak');
     expect(save.inventory).toEqual([{ itemId: 'travelers-cloak', quantity: 1 }]);
+    // travelers-cloak: { maxHp: 5, speed: 1 } - regression check for a real bug where autoEquip
+    // set the equipment slot directly without ever calling adjustStatsForBonuses, so a
+    // quest-granted item showed as equipped but its bonuses never actually applied to stats.
+    expect(save.player.stats.maxHp).toBe(65);
+    expect(save.player.stats.speed).toBe(7);
   });
 
-  it('autoEquip never overwrites gear already equipped in that slot', () => {
+  it('autoEquip never overwrites gear already equipped in that slot, or its stats', () => {
     const save = emptySave({
       player: {
         ...emptySave().player,
@@ -140,6 +145,8 @@ describe('applyQuestRewards', () => {
     ]);
     expect(save.player.equipment.chest).toBe('ash-hallow-formal-attire');
     expect(save.inventory).toEqual([{ itemId: 'travelers-cloak', quantity: 1 }]);
+    expect(save.player.stats.maxHp).toBe(60);
+    expect(save.player.stats.speed).toBe(6);
   });
 
   it('adds a grantLoreId reward to the journal, without duplicating an already-unlocked entry', () => {

@@ -1,8 +1,12 @@
 // Authoritative — the client's src/data/equipment.ts is a display copy only.
 
-import type { AilmentResistance } from '../shared-types';
+import type { AilmentResistance, EquipmentSlot } from '../shared-types';
 
-export type EquipmentSlot = 'weapon' | 'chest' | 'legs' | 'boots' | 'gloves' | 'charm' | 'lantern' | 'spiritTotem';
+// Re-exported (not redeclared) from shared-types - both files live inside functions/ (the same
+// deployed bundle), so there's no risk of the src/ import resolving locally but 404ing once
+// deployed the way there would be across the client/server boundary; independently redeclaring
+// this identical union here just risked the two drifting the next time a slot is added/renamed.
+export type { EquipmentSlot };
 // Ascending order: Common < Uncommon < Rare < Mythic < Legendary. Per the canonical equipment
 // design (docs/Mytherra-Equipment_breakdown.md) - Legendary is a named, story-tied artifact that
 // ends its equipment family, ranked above Mythic.

@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { LANDMARK_PARENT_LOCATION } from '../data/locations';
 import type { PlayerSave } from '../shared-types';
 
@@ -31,6 +32,7 @@ export const visitLandmark = onCall<VisitLandmarkRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+    backfillPlayerEquipment(save);
 
     if (save.player.currentLocationId !== LANDMARK_PARENT_LOCATION[landmarkId]) {
       throw new HttpsError('failed-precondition', 'You are not at that location.');

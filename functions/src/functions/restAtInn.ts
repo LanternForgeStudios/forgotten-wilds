@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { INN_REST_COST } from '../data/items';
+import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { restoreFullVitals } from '../engine/levelingEngine';
 import type { PlayerSave } from '../shared-types';
 
@@ -20,6 +21,7 @@ export const restAtInn = onCall(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+    backfillPlayerEquipment(save);
 
     // Every other location-bound interactable (chests, shrines, world items) checks this - rest
     // at the inn was missing it entirely, letting any client fully heal from anywhere for flat

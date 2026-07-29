@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
 
 interface EnterLocationRequest {
@@ -52,6 +53,7 @@ export const enterLocation = onCall<EnterLocationRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+    backfillPlayerEquipment(save);
 
     const requiredQuestId = LOCATION_GATES[locationId];
     if (requiredQuestId && save.quests[requiredQuestId]?.status !== 'completed') {

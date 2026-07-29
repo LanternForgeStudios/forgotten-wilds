@@ -21,7 +21,7 @@ export const QUESTS: Quest[] = [
         requiredCount: 1,
       },
     ],
-    reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak', 'traveler-pants'] },
+    reward: { xp: 10, gold: 20, itemIds: ['travelers-cloak', 'traveler-pants'], autoEquip: true },
   },
   {
     id: 'ash-hallow-tour',

@@ -25,6 +25,9 @@ export interface QuestReward {
   /** A lore entry id (see data/lore.ts) granted on completion - display-only mirror of the
    *  server's grantLoreId (functions/src/data/quests.ts). */
   grantLoreId?: string;
+  /** Whether a granted equipment item auto-equips into its slot on completion - display-only
+   *  mirror of the server's autoEquip (functions/src/data/quests.ts). */
+  autoEquip?: boolean;
 }
 
 /** Display-only grouping for the Quest Log's tabs - not read by any server logic. */

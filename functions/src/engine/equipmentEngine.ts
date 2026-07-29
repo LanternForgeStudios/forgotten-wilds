@@ -1,4 +1,4 @@
-import { EQUIPMENT, type StatBonuses } from '../data/equipment';
+import { EQUIPMENT, type EquipmentDefinition, type StatBonuses } from '../data/equipment';
 import type { AilmentResistance, PlayerEquipment, PlayerSave, Stats } from '../shared-types';
 
 /** The full, empty equipment shape every PlayerSave should have - the single source of truth for
@@ -49,6 +49,20 @@ export function adjustStatsForBonuses(stats: Stats, bonuses: StatBonuses, sign: 
 
   stats.hp = Math.min(stats.hp, stats.maxHp);
   stats.spirit = Math.min(stats.spirit, stats.maxSpirit);
+}
+
+/** Applies itemId's stat bonuses (and lantern-oil capacity, if it's a lantern) and assigns it into
+ *  its own def.slot - the shared "how to equip an item" step used both by equipItem.ts (which
+ *  strips the previous occupant's bonuses first via adjustStatsForBonuses(...,-1), if any, before
+ *  calling this) and questEngine.ts's autoEquip reward path (which only ever acts on an already-
+ *  empty slot, so there's nothing to strip first). Centralized so the two call sites can't drift
+ *  the way autoEquip's own inline `equipment[slot] = itemId` once did - it set the slot without
+ *  ever applying the item's stat bonuses, so a quest-granted item showed as equipped but its
+ *  bonuses were silently never added to the player's stats. */
+export function equipIntoSlot(save: PlayerSave, itemId: string, def: EquipmentDefinition): void {
+  adjustStatsForBonuses(save.player.stats, def.statBonuses, 1);
+  if (def.slot === 'lantern') setLanternOilCapacity(save.player.stats, def.oilCapacity ?? 0);
+  save.player.equipment[def.slot] = itemId;
 }
 
 /** Resolves the equipped weapon's attackAilment (see EquipmentDefinition) into the plain

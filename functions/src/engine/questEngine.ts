@@ -3,6 +3,7 @@ import { NPC_DIALOGUE_VARIANT_QUEST_IDS } from '../data/npcDialogueVariants';
 import { EQUIPMENT } from '../data/equipment';
 import { grantItem } from './inventoryEngine';
 import { applyLevelUp } from './levelingEngine';
+import { equipIntoSlot } from './equipmentEngine';
 import type { PlayerSave, QuestProgress } from '../shared-types';
 
 export function effectiveStatus(
@@ -125,7 +126,7 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
       // Only fills an empty slot - never swaps out gear the player already equipped some other way.
       const equipDef = reward.autoEquip ? EQUIPMENT[itemId] : undefined;
       if (equipDef && !save.player.equipment[equipDef.slot]) {
-        save.player.equipment[equipDef.slot] = itemId;
+        equipIntoSlot(save, itemId, equipDef);
       }
     }
     // Already-known is a no-op, not an error - same "safe to re-grant" spirit as the item case

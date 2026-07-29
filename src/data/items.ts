@@ -1,6 +1,6 @@
 import type { Item, ShopListing } from '@/types';
 
-// Display copy only — functions/src/data/{items,prices}.ts are the authoritative source used server-side.
+// Display copy only — functions/src/data/items.ts is the authoritative source used server-side.
 export const ITEMS: Item[] = [
   {
     id: 'healing-poultice',
@@ -308,7 +308,7 @@ export const ITEMS: Item[] = [
   },
 ];
 
-// Display copy only — functions/src/data/prices.ts is authoritative for purchaseItem.
+// Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.
 export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'healing-poultice', price: 15, currency: 'gold' },
   { itemId: 'greater-healing-poultice', price: 45, currency: 'gold' },
