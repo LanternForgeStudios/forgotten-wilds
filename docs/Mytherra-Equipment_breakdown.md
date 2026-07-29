@@ -5,7 +5,8 @@ I'd also recommend that Legendary equipment should feel handcrafted and unique, 
 Equipment Philosophy
 Equipment Slots
 Weapon
-Armor
+Chest
+Legs
 Boots
 Gloves
 Charm
@@ -37,7 +38,7 @@ Each town splits merchant-sold equipment across two services, with no overlap in
 stocks:
 
 Blacksmith	Weapon, Charm, Spirit Totem (occasionally other equipables)
-Armory	Armor, Boots, Gloves
+Armory	Chest, Legs, Boots, Gloves
 
 Region 1 — Iron Mountains
 
@@ -51,13 +52,20 @@ Ashwood Spear	Uncommon	0	+3	+7	0	+1
 Ghostbreaker Hammer	Rare	+10	0	+10	+2	-2
 Warden's Maul	Mythic	+20	+5	+16	+5	-2
 Memorykeeper's Staff	Legendary	+25	+25	+18	+4	+2
-Armor
+Chest
 Item	Tier	HP	SP	ATK	DEF	SPD
 Keeper's Coat	Common	+12	0	0	+3	0
 Reinforced Vest	Uncommon	+18	0	0	+5	-1
 Ghostwoven Cloak	Rare	+20	+8	0	+7	+1
 Mountain Guardian Mail	Mythic	+35	+10	+2	+12	-1
 Mantle of Enduring Stone	Legendary	+45	+15	+4	+16	+2
+Legs
+Item	Tier	HP	SP	ATK	DEF	SPD
+Keeper's Trousers	Common	+8	0	0	+2	0
+Reinforced Leggings	Uncommon	+12	0	0	+3	-1
+Ghostwoven Leggings	Rare	+14	+4	0	+4	+1
+Mountain Guardian Greaves	Mythic	+22	+6	+1	+7	-1
+Greaves of Enduring Stone	Legendary	+28	+9	+2	+9	+2
 Boots
 Item	Tier	HP	SP	ATK	DEF	SPD
 Leather Boots	Common	0	0	0	+1	+2
@@ -192,6 +200,8 @@ This creates a coherent progression where players recognize an item line evolvin
 
 I think that's the right decision. In fact, I would go one step further and define this as one of the core design principles of Forgotten Wilds.
 
+**Update (implementation)**: the original single "Armor" slot was split into two — **Chest** (renamed from Armor, same role) and **Legs** (new). Legs carries the same kind of stat bonuses as Chest but at lower magnitude, per the "lower protection than Chest" design used below — every existing Chest family gets a matching Legs family at the same tiers, so region content always ships both together. This document has been updated throughout to reflect the split; treat every table below as canonical for both slots going forward.
+
 Instead of thinking in terms of "items," think in terms of equipment families. This gives the world consistency and makes it much easier to expand for years.
 
 For example, if Version 3.0 introduces a new mountain region, you simply add another equipment family rather than inventing dozens of unrelated items.
@@ -236,7 +246,7 @@ Legendary	Memorykeeper's Staff
 
 The player immediately recognizes the family.
 
-Armor Family
+Chest Family
 Keeper's Coat
 Tier	Item
 Common	Worn Keeper Coat
@@ -244,6 +254,14 @@ Uncommon	Reinforced Keeper Coat
 Rare	Veteran Keeper Coat
 Mythic	Guardian Keeper Coat
 Legendary	Mantle of the First Keeper
+Legs Family
+Keeper's Trousers
+Tier	Item
+Common	Worn Keeper Trousers
+Uncommon	Reinforced Keeper Trousers
+Rare	Veteran Keeper Trousers
+Mythic	Guardian Keeper Trousers
+Legendary	Leggings of the First Keeper
 Boots Family
 Tier	Item
 Common	Traveler Boots
@@ -276,7 +294,8 @@ So the Iron Mountains becomes:
 
 Slot	Family
 Weapon	Walking Staff
-Armor	Keeper Coat
+Chest	Keeper Coat
+Legs	Keeper Trousers
 Boots	Traveler Boots
 Gloves	Work Gloves
 Charm	Mountain Charms
@@ -287,7 +306,8 @@ Then the Crimson Bayou introduces completely different families.
 
 Slot	Family
 Weapon	Cypress Cane
-Armor	Bayou Vestments
+Chest	Bayou Vestments
+Legs	Bayou Leg-Wraps
 Boots	Marsh Boots
 Gloves	Mire Gloves
 Charm	Swamp Talismans
@@ -331,23 +351,24 @@ Future Regions
 Every new region only needs to introduce:
 
 One Weapon Family
-One Armor Family
+One Chest Family
+One Legs Family
 One Boots Family
 One Gloves Family
 One Charm Family
 One Lantern
 One Spirit Totem
 
-That's only seven new families per region, keeping content creation manageable while giving each area a distinct identity.
+That's only eight new families per region, keeping content creation manageable while giving each area a distinct identity.
 
 Suggested Master Equipment Catalog (Version 1)
 
 If we use this approach, the base game would include:
 
-Region	Weapon	Armor	Boots	Gloves	Charm	Lantern	Totem
-Iron Mountains	Walking Staff	Keeper Coat	Traveler Boots	Work Gloves	Mountain Charm	2 Lanterns	3 Totems
-Crimson Bayou	Cypress Cane	Bayou Vestments	Marsh Boots	Mire Gloves	Bayou Charm	1 Lantern	3 Totems
-Endless Prairie	Prairie Spear	Buffalo Hide	Wind Boots	Rider Gloves	Sky Charm	1 Lantern	3 Totems
-Whispering Pines	Cedar Staff	Bark Armor	Root Boots	Vine Gloves	Cedar Charm	1 Lantern	3 Totems
-Shattered Desert	Sunblade	Nomad Robes	Sand Boots	Dune Wraps	Star Charm	1 Lantern	3 Totems
-Frozen Frontier	Frost Pike	Winter Coat	Glacier Boots	Fur Gloves	Aurora Charm	1 Lantern	3 Totems
+Region	Weapon	Chest	Legs	Boots	Gloves	Charm	Lantern	Totem
+Iron Mountains	Walking Staff	Keeper Coat	Keeper Trousers	Traveler Boots	Work Gloves	Mountain Charm	2 Lanterns	3 Totems
+Crimson Bayou	Cypress Cane	Bayou Vestments	Bayou Leg-Wraps	Marsh Boots	Mire Gloves	Bayou Charm	1 Lantern	3 Totems
+Endless Prairie	Prairie Spear	Buffalo Hide	Rider's Chaps	Wind Boots	Rider Gloves	Sky Charm	1 Lantern	3 Totems
+Whispering Pines	Cedar Staff	Bark Armor	Root-Woven Leggings	Root Boots	Vine Gloves	Cedar Charm	1 Lantern	3 Totems
+Shattered Desert	Sunblade	Nomad Robes	Nomad Leggings	Sand Boots	Dune Wraps	Star Charm	1 Lantern	3 Totems
+Frozen Frontier	Frost Pike	Winter Coat	Winter Leggings	Glacier Boots	Fur Gloves	Aurora Charm	1 Lantern	3 Totems
