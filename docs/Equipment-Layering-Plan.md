@@ -266,10 +266,19 @@ pieces. One frame (`work-gloves` up-facing frame 3) didn't cleanly match the exp
 case and fell back to the safe duplicate-whole-cell behavior - flagged in each folder's own
 README for the user to trim by hand.
 
-Remaining: `traveler-boots`, `travelers-cloak`, `weathered-walking-staff`, `work-gloves` still need
-their male running-pose pass (working folder `manual-edit-running/` ready for all 4). Then the
-female walking + running rounds - working folders (`manual-edit-female-walking/`,
-`manual-edit-female-running/`) ready for all 5 items, waiting on the user's edits.
+**Male running pass: `keepers-lantern`, `travelers-cloak`, `weathered-walking-staff` done** (all
+verified in-game via direct compositing - cloak billows naturally through the run cycle, staff
+swings dynamically with the sprint). `keepers-lantern` also picked up a genuinely missing
+direction along the way - it turned out the lantern is visible facing right/east too (not fully
+occluded as originally assumed), so a real right-frame set was added for BOTH walking and running
+via a new script, `build_equipment_layer_add_direction.py` (the walking-pose counterpart to
+`build_equipment_layer_running.py`'s same clobber-safe patch-only-what-changed approach - see that
+script's own header for why a full rebuild isn't safe once other items carry direct touch-ups).
+
+Remaining: `traveler-boots`, `work-gloves` still need their male running-pose pass (working folder
+`manual-edit-running/` ready for both). Then the female walking + running rounds - working folders
+(`manual-edit-female-walking/`, `manual-edit-female-running/`) ready for all 5 items (including
+keepers-lantern's right direction), waiting on the user's edits.
 
 **Phase 4**: roll out the remaining equipment families (walking-staff, keeper-coat,
 traveler-boots, work-gloves lines, the second unique lantern) using the now-proven pipeline. Each
