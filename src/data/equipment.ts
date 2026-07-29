@@ -109,6 +109,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 1, defense: 1 },
     tier: 'common',
     familyId: 'work-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.work-gloves', female: '' },
   },
   {
     id: 'leather-gauntlets',

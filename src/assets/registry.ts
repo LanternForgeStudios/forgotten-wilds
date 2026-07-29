@@ -1422,6 +1422,18 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user deleted and rotated the staff art in many frames (beyond simple repositioning) specifically to reveal the forearm/hand underneath, so the final result reads as genuinely gripped rather than just overlapping - same 'trim the item art for a believable held look' technique as the cloak's hood removal. down/up/right positioned first; left added in a follow-up round once the user realized the staff still reads past the body on that side too - started from the right-facing frames mirrored horizontally as a neutral starting point (scripts/build_equipment_layer_manual.py doesn't do this automatically, it was a one-off ImageOps.mirror step), then hand-repositioned/re-trimmed since a straight mirror puts the hand-cutout on the wrong side. Anchor data recorded under category 'held-right-hand' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see this note's sibling entries for why that's a real (not yet fixed) alignment gap during a Dash.",
   },
   {
+    id: 'sprite.equipment.work-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot (docs/Equipment-Layering-Plan.md) - drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout. All 4 directions have real art, but facing west/left or east/right only the near-side hand's glove is drawn (the far hand isn't distinctly rendered in the base body's own profile frames either, same occlusion rule as the lantern/staff) - down/up show both gloves.",
+    filePath: 'sprites/equipment/work-gloves-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Fifth and final item of the male walking pass. Each frame is two source files (left-hand/right-hand, positioned independently) composited together before going into the sheet, same 'paired' technique as sprite.equipment.traveler-boots. Anchor data recorded under category 'paired-hands' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see this note's sibling entries for why that's a real (not yet fixed) alignment gap during a Dash, to be addressed in the follow-up running-pose round now that all 5 male walking items are done.",
+  },
+  {
     id: 'battle.enemy.mothling',
     category: 'enemy',
     intendedUse: 'Battle sprite for mothling - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',

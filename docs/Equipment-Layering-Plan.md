@@ -222,9 +222,24 @@ full manual positioning again, with just a quick visual check/nudge rather than 
 from-scratch editing. Not yet exercised on a second item in any category - the pilot's own 5 items
 are all first entries in their category so far.
 
-Progress: `keepers-lantern` (held-left-hand) and `traveler-boots` (paired-feet) done, hand-
-positioned, verified in-game (base sprite swap above). `travelers-cloak` (worn-torso),
-`weathered-walking-staff` (held-right-hand), `work-gloves` (paired-hands) in progress.
+**Gotcha, hit once already**: `build_equipment_layer_manual.py` rebuilds *every* item's output
+sheet from its `art-staging/equipment-layers-manual/<item>/` source frames every time it runs, not
+just the item that changed. If a finished output PNG (`public/assets/sprites/equipment/<item>-
+male-animated.png`) is ever hand-touched-up directly (skipping the source-frame stage), re-running
+the script for a *different* item silently overwrites that touch-up back to the un-touched-up
+composite - happened once with `traveler-boots`/`travelers-cloak` right after the user hand-edited
+those two output sheets directly, caught via `git diff --stat` before committing and restored with
+`git checkout HEAD -- <path>`. Takeaway: either touch up the *source frames* (so a rebuild
+reproduces the fix) or re-stage any output-level touch-up as new source frames before running the
+script again for anything else.
+
+Progress: **all 5 pilot items done for the male walking pass** - `keepers-lantern` (held-left-
+hand), `traveler-boots` (paired-feet), `travelers-cloak` (worn-torso), `weathered-walking-staff`
+(held-right-hand, all 4 directions including the west/left set added in a follow-up round),
+`work-gloves` (paired-hands), all hand-positioned and verified in-game (base sprite swap above).
+Next: the running-pose round (male, same 5 items) and the female walking + running rounds - working
+folders for all three already prepared (see the user's scratchpad `manual-edit-running/`,
+`manual-edit-female-walking/`, `manual-edit-female-running/`), waiting on the user's edits.
 
 **Phase 4**: roll out the remaining equipment families (walking-staff, keeper-coat,
 traveler-boots, work-gloves lines, the second unique lantern) using the now-proven pipeline. Each
