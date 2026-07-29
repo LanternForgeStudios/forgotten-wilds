@@ -40,7 +40,7 @@ ANCHOR_TABLE_PATH = os.path.join("docs", "equipment-layer-anchors.json")
 #   category: the reusable-anchor bucket future same-slot items should look up.
 #   kind: "single" (one file per cell) or "paired" (two files per cell, suffixed -left-<part>/-right-<part>).
 ITEM_SPEC = {
-    "keepers-lantern": {"category": "held-left-hand", "kind": "single", "directions": ["down", "left", "up"]},
+    "keepers-lantern": {"category": "held-left-hand", "kind": "single", "directions": ["down", "left", "up", "right"]},
     "traveler-boots": {"category": "paired-feet", "kind": "paired", "part": "foot", "directions": DIRECTIONS},
     # Registered here ahead of time so re-running this script picks them up automatically the
     # moment their manual-edit folders land in art-staging/equipment-layers-manual/ - no code

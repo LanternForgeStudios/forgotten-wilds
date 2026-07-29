@@ -31,7 +31,7 @@ FRAME = (72, 96)
 WALK_ROW = {"down": 0, "left": 1, "up": 2, "right": 3}
 
 ITEM_SPEC = {
-    "keepers-lantern": {"kind": "single", "directions": ["down", "left", "up"]},
+    "keepers-lantern": {"kind": "single", "directions": ["down", "left", "up", "right"]},
     "traveler-boots": {"kind": "paired", "part": "foot", "directions": ["down", "left", "up", "right"]},
     "travelers-cloak": {"kind": "single", "directions": ["down", "left", "up", "right"]},
     "weathered-walking-staff": {"kind": "single", "directions": ["down", "up", "right", "left"]},

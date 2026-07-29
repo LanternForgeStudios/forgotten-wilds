@@ -46,7 +46,7 @@ ANCHOR_TABLE_PATH = os.path.join("docs", "equipment-layer-anchors.json")
 # build_equipment_layer_manual.py's ITEM_SPEC (kept as a separate copy rather than a shared
 # import so this script has no dependency on that one's module-load side effects).
 ITEM_SPEC = {
-    "keepers-lantern": {"category": "held-left-hand", "kind": "single", "directions": ["down", "left", "up"]},
+    "keepers-lantern": {"category": "held-left-hand", "kind": "single", "directions": ["down", "left", "up", "right"]},
     "traveler-boots": {"category": "paired-feet", "kind": "paired", "part": "foot", "directions": ["down", "left", "up", "right"]},
     "travelers-cloak": {"category": "worn-torso", "kind": "single", "directions": ["down", "left", "up", "right"]},
     "weathered-walking-staff": {"category": "held-right-hand", "kind": "single", "directions": ["down", "up", "right", "left"]},
