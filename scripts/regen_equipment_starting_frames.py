@@ -16,9 +16,13 @@ just duplicate the single visible blob rather than risk mis-slicing one glove/bo
 garbage pieces - same fallback used whenever a down/up frame doesn't cleanly show the expected
 2 segments (printed as a warning so it can be checked/trimmed by hand).
 
-Usage: python scripts/regen_equipment_starting_frames.py <out_root> [item ...]
+Usage: python scripts/regen_equipment_starting_frames.py <out_root> [--pose=running] [item ...]
   out_root: the working-folder root to (re)populate, e.g. a scratchpad path like
             .../manual-edit-running or .../manual-edit-female-walking.
+  --pose=running: crop from the sheet's running rows (4-7) instead of its walking rows (0-3) -
+            use when reseeding a manual-edit-running (or female-running) folder from a sheet
+            whose running pass is itself now finished/live, same "always crop from the live sheet,
+            never stale source frames" reasoning as the walking case. Defaults to walking.
   With no item names given, regenerates all 5 pilot items. Safe to re-run - always regenerates
   fresh from the current live sheets, overwriting whatever was there before.
 """
@@ -72,7 +76,8 @@ def find_segments(im):
     return segs
 
 
-def regen(out_root, items):
+def regen(out_root, items, pose="walking"):
+    row_offset = 4 if pose == "running" else 0
     for item_name in items:
         spec = ITEM_SPEC[item_name]
         sheet_path = os.path.join(SHEET_DIR, f"{item_name}-male-animated.png")
@@ -80,7 +85,7 @@ def regen(out_root, items):
         out_dir = os.path.join(out_root, item_name)
         os.makedirs(out_dir, exist_ok=True)
         for direction in spec["directions"]:
-            row = WALK_ROW[direction]
+            row = WALK_ROW[direction] + row_offset
             for frame in range(4):
                 full_cell = cell(sheet, row, frame)
                 bbox = full_cell.getbbox()
@@ -116,9 +121,17 @@ def regen(out_root, items):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("usage: python scripts/regen_equipment_starting_frames.py <out_root> [item ...]")
+        print("usage: python scripts/regen_equipment_starting_frames.py <out_root> [--pose=running] [item ...]")
         sys.exit(1)
     out_root = sys.argv[1]
-    requested = sys.argv[2:] or list(ITEM_SPEC.keys())
-    regen(out_root, requested)
+    rest = sys.argv[2:]
+    pose_arg = "walking"
+    remaining = []
+    for a in rest:
+        if a.startswith("--pose="):
+            pose_arg = a.split("=", 1)[1]
+        else:
+            remaining.append(a)
+    requested = remaining or list(ITEM_SPEC.keys())
+    regen(out_root, requested, pose=pose_arg)
     print("done")
