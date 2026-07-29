@@ -39,6 +39,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 10, attack: 10, defense: 2, speed: -2 },
     tier: 'rare',
     familyId: 'walking-staff',
+    layerSpriteAssetId: { male: 'sprite.equipment.spiritwood-walking-staff', female: '' },
   },
   {
     id: 'worn-keeper-coat',
@@ -49,6 +50,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 12, defense: 3 },
     tier: 'common',
     familyId: 'keeper-coat',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-keeper-coat', female: '' },
   },
   {
     id: 'reinforced-keeper-coat',
@@ -59,6 +61,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 18, defense: 5, speed: -1 },
     tier: 'uncommon',
     familyId: 'keeper-coat',
+    layerSpriteAssetId: { male: 'sprite.equipment.reinforced-keeper-coat', female: '' },
   },
   {
     id: 'veteran-keeper-coat',
@@ -69,6 +72,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 20, maxSpirit: 8, defense: 7, speed: 1 },
     tier: 'rare',
     familyId: 'keeper-coat',
+    layerSpriteAssetId: { male: 'sprite.equipment.veteran-keeper-coat', female: '' },
   },
   {
     id: 'traveler-boots',

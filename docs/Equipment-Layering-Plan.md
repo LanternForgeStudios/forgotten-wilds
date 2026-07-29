@@ -280,11 +280,46 @@ Remaining: `traveler-boots`, `work-gloves` still need their male running-pose pa
 (`manual-edit-female-walking/`, `manual-edit-female-running/`) ready for all 5 items (including
 keepers-lantern's right direction), waiting on the user's edits.
 
-**Phase 4**: roll out the remaining equipment families (walking-staff, keeper-coat,
-traveler-boots, work-gloves lines, the second unique lantern) using the now-proven pipeline. Each
-item still needs its own flat `icon.equipment.*` UI icon too (deferred separately, per
+**Phase 4 (started)**: roll out the remaining equipment families using the now-proven pipeline -
+but for same-family SIBLING items (a lower/higher tier of gear that's the same worn/held object,
+just a different material - e.g. Ironwood Walking Staff vs. Weathered Walking Staff), full manual
+hand-positioning turned out to be unnecessary duplicate effort. Two new scripts auto-derive a
+sibling's sheet from whichever family member was already hand-positioned:
+
+- `scripts/palette_swap_equipment_layer.py` - for a sibling with the SAME silhouette (confirmed by
+  comparing icon art first), a per-material gradient-map recolor: k-means clusters each icon's
+  colors in RGB space, clusters paired by POPULATION rank (largest-to-largest material - more
+  robust than an earlier brightness-rank version, which broke on a high-contrast icon by pairing a
+  tiny near-white highlight cluster against the source's whole dominant body color), each pixel
+  remapped through a per-cluster value-sorted ramp so all existing shading/highlights survive
+  unchanged - only the base color differs. Reuses 100% of the reference's hand-positioning and
+  inherits its full running-pose coverage for free (operates on the whole 8-row sheet).
+  Shipped: `ironwood-walking-staff` (from `weathered-walking-staff`), `miners-lost-lantern-equipped`
+  (from `keepers-lantern`), `reinforced-keeper-coat` + `veteran-keeper-coat` (from
+  `worn-keeper-coat`). Not perfect on every icon - `veteran-keeper-coat`'s true olive-green got
+  averaged into a warm brown/gold blend since 2 clusters can't cleanly separate 3+ real materials
+  from one icon; flagged as a known gap in that item's own registry note rather than hidden.
+
+- `scripts/estimate_transform_equipment_layer.py` - EXPERIMENTAL, for a sibling with a genuinely
+  DIFFERENT silhouette (not a recolor candidate). Per frame: PCA on the reference frame's alpha
+  mask estimates its rotation angle (skip via `--no-rotation` for a worn torso garment, where PCA
+  on a roughly body-shaped blob gives meaningless/erratic angles - confirmed by checking
+  `travelers-cloak`'s own frame-to-frame angles before attempting `worn-keeper-coat`); the new
+  item's own flat icon is rotated by the delta, scaled to the reference's recorded anchor height,
+  centered on its recorded position, then clipped to the reference frame's own silhouette
+  (reproduces its hand-tuned grip-trim notch for free, at the cost of constraining the new item's
+  width to the reference's). Shipped: `spiritwood-walking-staff` (from `weathered-walking-staff`,
+  rotation-estimated - reads convincingly as gripped and follows the arm swing) and
+  `worn-keeper-coat` (from `travelers-cloak`, `--no-rotation` - reads as a genuinely fitted coat,
+  collar/lapels/pockets all visible; a few running frames have minor edge artifacts worth an
+  eventual manual touch-up pass). Always visually QA before trusting a result from this script -
+  it's meaningfully less certain than a same-shape recolor or real hand-positioning.
+
+Each item still needs its own flat `icon.equipment.*` UI icon too (deferred separately, per
 `Asset-Production-Checklist.md`'s Equipment section) - the layer sprite and the icon are two
-different assets for the same item, generated independently.
+different assets for the same item, generated independently. (All 6 items above already had their
+icons from an earlier session's equipment-icon batch - that's what made both scripts possible
+without any new pixellab generation.)
 
 ## Open questions for later phases
 

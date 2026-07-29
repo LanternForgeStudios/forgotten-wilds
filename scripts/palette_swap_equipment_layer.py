@@ -168,9 +168,20 @@ def build_recolor(source_item, target_item, n_materials=2):
     target_clusters = [c for c in target_clusters if c]
     n = min(len(source_clusters), len(target_clusters))
 
-    # Pair by brightness rank (brightest source cluster -> brightest target cluster, etc.).
-    source_clusters.sort(key=cluster_mean_value, reverse=True)
-    target_clusters.sort(key=cluster_mean_value, reverse=True)
+    # Pair by POPULATION rank (largest source cluster -> largest target cluster, etc.), not
+    # brightness rank. Brightness-rank pairing broke on veteran-keeper-coat: k-means splits a
+    # low-contrast icon into "the true dominant material" (huge cluster) and "a handful of stray
+    # near-white rim-light/anti-aliasing pixels" (tiny cluster) - if the tiny highlight cluster
+    # happens to be brighter than the source's own dominant-material cluster, brightness pairing
+    # maps the source's whole visible body color onto that minority highlight, washing the result
+    # out. Population rank instead directly captures "the material that covers most of the
+    # surface should map to the material that covers most of the surface," regardless of which
+    # one happens to be lighter or darker overall.
+    def cluster_population(cluster):
+        return sum(cnt for _, cnt in cluster)
+
+    source_clusters.sort(key=cluster_population, reverse=True)
+    target_clusters.sort(key=cluster_population, reverse=True)
     source_ramps = [cluster_ramp(source_clusters[i]) for i in range(n)]
     target_ramps = [cluster_ramp(target_clusters[i]) for i in range(n)]
     source_centroids = [cluster_centroid_rgb(source_clusters[i]) for i in range(n)]

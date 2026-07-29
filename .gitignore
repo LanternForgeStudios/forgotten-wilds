@@ -26,6 +26,10 @@ ui-debug.log
 # User's personal scratch folder for editing art before it moves into the staging pipeline
 art-staging/tmp-working/
 
+# Python bytecode cache from scripts/*.py
+__pycache__/
+*.pyc
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1431,7 +1431,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py - a per-material gradient-map recolor of sprite.equipment.weathered-walking-staff's already-finished sheet (100% of its hand-positioning/rotation/grip-trim reused unchanged; only the RGB values differ). Colors driven by a 2-cluster k-means (in RGB space, not hue - an earlier hue-based version produced a visible pink wash on this item's desaturated palette) fit to weathered-walking-staff.png vs ironwood-walking-staff.png's own icon colors, clusters paired by brightness rank, each pixel remapped via a per-cluster value-sorted gradient so all existing shading/highlights are preserved. Verified by eye against the icon at full size (the character-composite preview alone reads slightly more saturated than intended due to viewing scale/dark background, but the actual output pixel colors were confirmed numerically close to the icon's own palette). Anchor table entries copied from weathered-walking-staff (identical geometry).",
+      "Auto-generated via scripts/palette_swap_equipment_layer.py - a per-material gradient-map recolor of sprite.equipment.weathered-walking-staff's already-finished sheet (100% of its hand-positioning/rotation/grip-trim reused unchanged; only the RGB values differ). Colors driven by a 2-cluster k-means (in RGB space, not hue - an earlier hue-based version produced a visible pink wash on this item's desaturated palette) fit to weathered-walking-staff.png vs ironwood-walking-staff.png's own icon colors, clusters paired by POPULATION rank (largest source material -> largest target material - an earlier brightness-rank pairing broke badly on veteran-keeper-coat's higher-contrast icon, see that item's own note), each pixel remapped via a per-cluster value-sorted gradient so all existing shading/highlights are preserved. Verified by eye against the icon at full size (the character-composite preview alone reads slightly more saturated than intended due to viewing scale/dark background, but the actual output pixel colors were confirmed numerically close to the icon's own palette). Anchor table entries copied from weathered-walking-staff (identical geometry).",
   },
   {
     id: 'sprite.equipment.miners-lost-lantern-equipped',
@@ -1443,7 +1443,55 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py - a per-material gradient-map recolor of sprite.equipment.keepers-lantern's already-finished sheet (100% of its hand-positioning/rotation/grip-trim reused unchanged). 2-cluster k-means (RGB space) separates the warm glow-glass material from the dark frame material in both icons independently, pairing clusters by brightness rank (the glow cluster is reliably the brighter one in both), so the flame doesn't bleed into the frame's palette or vice versa. Anchor table entries copied from keepers-lantern (identical geometry).",
+      "Auto-generated via scripts/palette_swap_equipment_layer.py - a per-material gradient-map recolor of sprite.equipment.keepers-lantern's already-finished sheet (100% of its hand-positioning/rotation/grip-trim reused unchanged). 2-cluster k-means (RGB space) separates the warm glow-glass material from the dark frame material in both icons independently, clusters paired by POPULATION rank (largest-to-largest - the frame is reliably the larger-coverage material in both, more robust than brightness rank, see veteran-keeper-coat's note for why that distinction matters), so the flame doesn't bleed into the frame's palette or vice versa. Anchor table entries copied from keepers-lantern (identical geometry).",
+  },
+  {
+    id: 'sprite.equipment.spiritwood-walking-staff',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - Spiritwood Walking Staff, same 'walking-staff' family as sprite.equipment.weathered-walking-staff but a genuinely DIFFERENT silhouette per its icon art (a straight mossy-capped rod, no crook handle) - not a recolor candidate. Same down/up/right/left coverage as weathered-walking-staff, walking + running.",
+    filePath: 'sprites/equipment/spiritwood-walking-staff-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "EXPERIMENTAL auto-generation via scripts/estimate_transform_equipment_layer.py, since the shape differs from its family's hand-positioned reference (weathered-walking-staff) - not a simple recolor. Per frame: PCA on the reference frame's own alpha-mask pixel cloud estimates its rotation angle; the same PCA run on spiritwood's own flat icon estimates its native angle; the icon art is rotated by the difference, scaled to match the reference frame's recorded anchor-table height, centered on its recorded (cx,cy), then clipped to the reference frame's own alpha silhouette (reproduces the reference's hand-tuned grip-trim notch for free, at the cost of constraining spiritwood's own width to the reference's). Verified by eye against the base body across all 4 directions x 4 frames, both walking and running - reads convincingly as gripped and follows the arm swing naturally, but this technique is inherently less certain than a direct recolor or real hand-positioning, so treat any future frame that looks off as a candidate for manual touch-up rather than assuming the algorithm is exactly right.",
+  },
+  {
+    id: 'sprite.equipment.worn-keeper-coat',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the armor slot - Worn Keeper Coat, the base item of the 'keeper-coat' family - a structured, buttoned/lapelled coat, genuinely different from sprite.equipment.travelers-cloak's loose hooded poncho shape per their icon art, not a recolor candidate.",
+    filePath: 'sprites/equipment/worn-keeper-coat-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "EXPERIMENTAL auto-generation via scripts/estimate_transform_equipment_layer.py --no-rotation (same technique as sprite.equipment.spiritwood-walking-staff, but with rotation estimation disabled - a worn torso garment isn't held at a swinging angle the way a staff is, and PCA on a roughly torso-shaped blob's alpha mask gave visibly erratic/meaningless angles when checked against travelers-cloak's own frames before attempting this). Scaled to the reference's recorded per-frame height, centered on its recorded position, clipped to the reference frame's own silhouette. Reads as a genuinely fitted coat (collar/lapels/pockets all visible) across all 4 directions, walking + running - a few running frames have minor edge artifacts (a small detached fragment near a shoulder in some frames) worth a manual touch-up pass eventually, but overall convincing. This is now the reference/base item for reinforced-keeper-coat and veteran-keeper-coat, which ARE same-shape recolor candidates of this one (not of travelers-cloak).",
+  },
+  {
+    id: 'sprite.equipment.reinforced-keeper-coat',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the armor slot - Reinforced Keeper Coat, same 'keeper-coat' family/silhouette as sprite.equipment.worn-keeper-coat, just a different (tan/khaki) tone per its icon art.",
+    filePath: 'sprites/equipment/reinforced-keeper-coat-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py - a 2-cluster palette-swap recolor of sprite.equipment.worn-keeper-coat's already-finished sheet (100% of its hand-positioning/scale/silhouette reused unchanged, all 8 rows including running - see that item's own note for the technique). Clusters paired by POPULATION rank (largest source material -> largest target material), not brightness rank - see veteran-keeper-coat's note for why that distinction mattered.",
+  },
+  {
+    id: 'sprite.equipment.veteran-keeper-coat',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the armor slot - Veteran Keeper Coat, same 'keeper-coat' family/silhouette as sprite.equipment.worn-keeper-coat, a browner/gold-trimmed tone per its icon art.",
+    filePath: 'sprites/equipment/veteran-keeper-coat-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py, same technique as reinforced-keeper-coat. Went through 2 real fixes before landing here, both worth keeping in mind for any future recolor of a high-contrast/multi-material icon: (1) 3 material clusters produced a badly wrong cream/white result - the extra cluster fragmented similar-brightness materials unpredictably, so this item was regenerated with 2 clusters like everything else; (2) even at 2 clusters, pairing by BRIGHTNESS rank (the original technique) mapped the source's whole dominant body color onto the target's tiny near-white rim-light/anti-aliasing cluster rather than its true dominant olive material, since that highlight cluster happened to average brighter than the true body cluster despite covering a tiny fraction of the pixels - fixed by switching the pairing key to cluster POPULATION (largest-to-largest) for every item this script produces, not just this one. Even after both fixes, the result reads as a warm brown/gold-trimmed coat rather than the icon's true olive-green (k-means with only 2 clusters can't cleanly isolate 3+ real materials - olive body, black trim, gold accent - from a single icon, so the 'body' cluster ends up an averaged blend) - genuinely differentiated from the other two coats and not visually broken, but a known color-accuracy gap flagged here rather than silently presented as exact. A manual touch-up or a smarter multi-material assignment (matched by hue similarity, not just population/brightness rank) would be the way to actually fix the color if that becomes worth doing.",
   },
   {
     id: 'sprite.equipment.work-gloves',
