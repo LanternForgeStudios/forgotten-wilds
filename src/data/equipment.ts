@@ -157,6 +157,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 5, attack: 2, defense: 2 },
     tier: 'uncommon',
     familyId: 'work-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.leather-gauntlets', female: '' },
   },
   {
     id: 'keepers-gauntlets',
@@ -167,6 +168,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 8, attack: 4, defense: 4 },
     tier: 'rare',
     familyId: 'work-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.keepers-gauntlets', female: '' },
   },
   {
     id: 'river-stone-charm',

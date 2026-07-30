@@ -1530,6 +1530,30 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. Fifth and final item of the male walking pass. Each frame is two source files (left-hand/right-hand, positioned independently) composited together before going into the sheet, same 'paired' technique as sprite.equipment.traveler-boots. Anchor data recorded under category 'paired-hands' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) are now real hand-positioned art too (finished by the user, not the walking-row duplicate every item starts with) - full male walking+running coverage.",
   },
   {
+    id: 'sprite.equipment.leather-gauntlets',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - Leather Gauntlets, same 'work-gloves' family as sprite.equipment.work-gloves, but visibly bulkier with forearm coverage per its icon art - not a same-shape recolor candidate, so hand-positioned directly rather than auto-generated (same reasoning/approach as sprite.equipment.ranger-boots).",
+    filePath: 'sprites/equipment/leather-gauntlets-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Hand-positioned by the user directly as a finished full sheet (not via the usual art-staging/equipment-layers-manual/ source-frame working folder) - all 4 directions, walking + running. Visually confirmed via composite render (down/left/running-up) against the male base body. Anchor entries (docs/equipment-layer-anchors.json, category 'paired-hands') recorded straight from the live sheet via scripts/record_anchor_from_sheet.py, since no source-frame build step existed to record them the usual way.",
+  },
+  {
+    id: 'sprite.equipment.keepers-gauntlets',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - Keeper's Gauntlets, same 'work-gloves' family as sprite.equipment.work-gloves/leather-gauntlets, same bulkier armored-gauntlet silhouette as leather-gauntlets - hand-positioned directly rather than auto-generated.",
+    filePath: 'sprites/equipment/keepers-gauntlets-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Hand-positioned by the user directly as a finished full sheet - all 4 directions, walking + running. Visually confirmed via composite render (down/running-up) against the male base body. Anchor entries (docs/equipment-layer-anchors.json, category 'paired-hands') recorded straight from the live sheet via scripts/record_anchor_from_sheet.py. Completes the work-gloves family (common/uncommon/rare) for full male animation coverage, alongside ranger-boots completing traveler-boots.",
+  },
+  {
     id: 'battle.enemy.mothling',
     category: 'enemy',
     intendedUse: 'Battle sprite for mothling - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',

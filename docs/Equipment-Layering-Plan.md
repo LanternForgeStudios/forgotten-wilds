@@ -376,16 +376,23 @@ items for full male animation coverage. Rolled out to the rest of each family th
   Visually confirmed via composite render (down/left/running-up) - reads correctly.
   `traveler-boots`, `trail-boots`, and `ranger-boots` are now ALL done for full male animation
   coverage, completing the `traveler-boots` family.
-- `leather-gauntlets`/`keepers-gauntlets` (uncommon/rare, `work-gloves` family) - still **NOT**
-  generated, same reasoning `ranger-boots` had (visibly bulkier gauntlets with forearm coverage,
-  not a same-shape recolor of `work-gloves`' plain hand silhouette) - unless the user hand-
-  positions these the same way they just did for `ranger-boots`.
+- `leather-gauntlets`/`keepers-gauntlets` (uncommon/rare, `work-gloves` family) - **Done**, same
+  way as `ranger-boots`: initially flagged as not a same-shape recolor candidate for `work-gloves`
+  (visibly bulkier gauntlets with forearm coverage), then hand-positioned directly as finished
+  full sheets by the user. Visually confirmed via composite render (down/left/running-up) - reads
+  correctly. Completes the `work-gloves` family (common/uncommon/rare) for full male animation
+  coverage.
 
-Anchor-table entries for all 3 boots items were (re-)recorded directly from their live sheets via
-a new script, `scripts/record_anchor_from_sheet.py`, rather than trusted from the original
-build/palette-swap step - necessary once a sheet gets hand-touched-up after the fact (the exact
-"anchor data can go stale" gotcha already documented above), and the only way to get anchor data
-at all for `ranger-boots`, which never went through a source-frame build step to record any.
+Anchor-table entries for all 3 boots items and both gauntlet items were (re-)recorded directly
+from their live sheets via a new script, `scripts/record_anchor_from_sheet.py`, rather than
+trusted from the original build/palette-swap step - necessary once a sheet gets hand-touched-up
+after the fact (the exact "anchor data can go stale" gotcha already documented above), and the
+only way to get anchor data at all for the 3 items (`ranger-boots`, `leather-gauntlets`,
+`keepers-gauntlets`) that never went through a source-frame build step to record any.
+
+**Both Phase 3 pilot families (`traveler-boots`, `work-gloves`) are now fully complete** across
+all 3 tiers each, for full male walking+running animation coverage - the last 2 items of the
+original 5-item pilot's own "roll out the rest of the family" follow-up work.
 
 ## Open questions for later phases
 
