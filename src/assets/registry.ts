@@ -1401,13 +1401,25 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     id: 'sprite.equipment.trail-boots',
     category: 'character',
     intendedUse:
-      "Equipment layer for the boots slot - Trail Boots, same 'traveler-boots' family as sprite.equipment.traveler-boots, same ankle-boot silhouette per its icon art (just a darker reddish-brown leather tone), so it reuses that item's hand-positioned art directly via a palette swap rather than needing its own manual pass. All 4 directions, walking + running, matching traveler-boots' own full coverage.",
+      "Equipment layer for the boots slot - Trail Boots, same 'traveler-boots' family as sprite.equipment.traveler-boots, same ankle-boot silhouette per its icon art (just a darker reddish-brown leather tone).",
     filePath: 'sprites/equipment/trail-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py (2 material clusters, RGB k-means, population-rank pairing) from sprite.equipment.traveler-boots - visually confirmed via composite render (down/right/running-left) against the male base body. Anchor entries copied from traveler-boots' own 'paired-feet' category (identical geometry, only color changed). ranger-boots (same family, rare tier) was NOT generated this way - it's a genuinely taller knee-high boot silhouette, not a same-shape recolor candidate.",
+      "Base generated via scripts/palette_swap_equipment_layer.py (2 material clusters, RGB k-means, population-rank pairing) from sprite.equipment.traveler-boots, then hand-touched-up directly by the user for the final result. Anchor entries (docs/equipment-layer-anchors.json, category 'paired-feet') recorded straight from this live sheet via scripts/record_anchor_from_sheet.py, not copied from traveler-boots, since the touch-up may have shifted pixels from the original recolor.",
+  },
+  {
+    id: 'sprite.equipment.ranger-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - Ranger Boots, same 'traveler-boots' family as sprite.equipment.traveler-boots/trail-boots, but a genuinely taller knee-high silhouette per its icon art - not a same-shape recolor candidate, so hand-positioned directly rather than auto-generated.",
+    filePath: 'sprites/equipment/ranger-boots-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Hand-positioned by the user directly as a finished full sheet (not via the usual art-staging/equipment-layers-manual/ source-frame working folder) - all 4 directions, walking + running. Visually confirmed via composite render (down/left/running-up) against the male base body. Anchor entries (docs/equipment-layer-anchors.json, category 'paired-feet') recorded straight from the live sheet via scripts/record_anchor_from_sheet.py, since no source-frame build step existed to record them the usual way.",
   },
   {
     id: 'sprite.equipment.travelers-cloak',

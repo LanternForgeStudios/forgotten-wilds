@@ -363,21 +363,29 @@ user, running rows are real art, not the walking-row duplicate) - completing all
 items for full male animation coverage. Rolled out to the rest of each family the same way the
 `walking-staff`/`keeper-coat` families were:
 
-- `trail-boots` (uncommon, `traveler-boots` family) - `palette_swap_equipment_layer.py` from
-  `traveler-boots`. Same ankle-boot silhouette per icon art (just a darker reddish-brown leather
-  tone), a clean same-shape recolor candidate. Visually confirmed via composite render (down,
-  right, running-left) against the male base body - reads correctly in every pose checked.
-- `ranger-boots` (rare, same family) - **NOT auto-generated**. Its icon shows genuinely
-  knee-high boots, not an ankle-boot recolor candidate - `estimate_transform_equipment_layer.py`'s
-  own docs explicitly warn against this case (it clips the result to the reference's silhouette,
-  which would chop a taller boot's shaft down to `traveler-boots`' ankle height). That script also
-  has no paired-item (left-foot/right-foot) support at all yet, unlike `palette_swap`'s technique,
-  which is silhouette-agnostic (recolors whatever pixels are already there, however they're laid
-  out) and works for a paired item for free. Needs real hand-positioning, or a paired-item-aware
-  version of the estimate-transform technique, whichever the user prefers when picked back up.
-- `leather-gauntlets`/`keepers-gauntlets` (uncommon/rare, `work-gloves` family) - **NOT
-  auto-generated**, same reasoning as `ranger-boots`: both are visibly bulkier gauntlets with
-  forearm coverage, not a same-shape recolor of `work-gloves`' plain hand silhouette.
+- `trail-boots` (uncommon, `traveler-boots` family) - base generated via
+  `palette_swap_equipment_layer.py` from `traveler-boots` (same ankle-boot silhouette per icon
+  art, just a darker reddish-brown leather tone), then hand-touched-up directly by the user for
+  the final result. Visually confirmed via composite render.
+- `ranger-boots` (rare, same family) - initially flagged as **not** a palette-swap/estimate-
+  transform candidate (its icon shows genuinely knee-high boots, not an ankle-boot recolor -
+  `estimate_transform_equipment_layer.py`'s own docs warn against clipping a taller silhouette
+  down to a shorter reference, and it has no paired-item support anyway). **Done anyway, by hand**:
+  the user hand-positioned the full 8-row sheet directly (not via the usual `art-staging/
+  equipment-layers-manual/` source-frame working folder - a finished sheet handed back whole).
+  Visually confirmed via composite render (down/left/running-up) - reads correctly.
+  `traveler-boots`, `trail-boots`, and `ranger-boots` are now ALL done for full male animation
+  coverage, completing the `traveler-boots` family.
+- `leather-gauntlets`/`keepers-gauntlets` (uncommon/rare, `work-gloves` family) - still **NOT**
+  generated, same reasoning `ranger-boots` had (visibly bulkier gauntlets with forearm coverage,
+  not a same-shape recolor of `work-gloves`' plain hand silhouette) - unless the user hand-
+  positions these the same way they just did for `ranger-boots`.
+
+Anchor-table entries for all 3 boots items were (re-)recorded directly from their live sheets via
+a new script, `scripts/record_anchor_from_sheet.py`, rather than trusted from the original
+build/palette-swap step - necessary once a sheet gets hand-touched-up after the fact (the exact
+"anchor data can go stale" gotcha already documented above), and the only way to get anchor data
+at all for `ranger-boots`, which never went through a source-frame build step to record any.
 
 ## Open questions for later phases
 
