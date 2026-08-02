@@ -45,6 +45,14 @@ export interface QuestDef {
      *  on the character immediately instead of sitting unequipped until the player thinks to open
      *  the Equipment screen themselves. Only 'a-new-keeper' sets this today. */
     autoEquip?: boolean;
+    /** Adds to Player.regionalReputation on completion - same additive shape as spiritEssence.
+     *  This is currently ONE running total across the whole game, not tracked per-region, despite
+     *  docs/Mytherra-MSQ_breakdown.md describing region-specific reputation rewards (e.g. "Iron
+     *  Mountains Regional Reputation," "Bayou Regional Reputation") - seeded here as a global
+     *  counter since that's what the existing player.regionalReputation field actually is; a real
+     *  per-region model is a bigger data-model change, not something to build as a side effect of
+     *  one quest reward. First real usage: 'the-waters-remember' (MSF-CB-010). */
+    regionalReputation?: number;
   };
 }
 

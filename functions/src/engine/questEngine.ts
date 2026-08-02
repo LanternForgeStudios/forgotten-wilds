@@ -119,6 +119,7 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
     save.player.xp += reward.xp;
     save.player.gold += reward.gold;
     save.player.spiritEssence += reward.spiritEssence ?? 0;
+    save.player.regionalReputation += reward.regionalReputation ?? 0;
     for (const itemId of reward.itemIds ?? []) {
       // A unique reward item already owned some other way is skipped, not an error - the quest
       // still completes and its xp/gold still land.

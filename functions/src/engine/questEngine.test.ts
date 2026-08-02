@@ -104,6 +104,24 @@ describe('applyQuestRewards', () => {
     expect(save.inventory).toEqual([{ itemId: 'healing-poultice', quantity: 1 }]);
   });
 
+  it('adds regionalReputation to the save, additively across multiple completions', () => {
+    const save = emptySave();
+    applyQuestRewards(save, [
+      { questId: 'a-new-keeper', reward: { xp: 0, gold: 0, regionalReputation: 15 } },
+    ]);
+    expect(save.player.regionalReputation).toBe(15);
+    applyQuestRewards(save, [
+      { questId: 'ash-hallow-tour', reward: { xp: 0, gold: 0, regionalReputation: 5 } },
+    ]);
+    expect(save.player.regionalReputation).toBe(20);
+  });
+
+  it('leaves regionalReputation untouched when a reward does not set it', () => {
+    const save = emptySave();
+    applyQuestRewards(save, [{ questId: 'a-new-keeper', reward: { xp: 10, gold: 0 } }]);
+    expect(save.player.regionalReputation).toBe(0);
+  });
+
   it('stacks reward items onto existing inventory quantities', () => {
     const save = emptySave({ inventory: [{ itemId: 'healing-poultice', quantity: 2 }] });
     applyQuestRewards(save, [

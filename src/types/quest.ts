@@ -28,6 +28,10 @@ export interface QuestReward {
   /** Whether a granted equipment item auto-equips into its slot on completion - display-only
    *  mirror of the server's autoEquip (functions/src/data/quests.ts). */
   autoEquip?: boolean;
+  /** Added to Player.regionalReputation on completion - display-only mirror of the server's
+   *  regionalReputation (functions/src/data/quests.ts). Currently one global running total, not
+   *  tracked per-region. */
+  regionalReputation?: number;
 }
 
 /** Display-only grouping for the Quest Log's tabs - not read by any server logic. */

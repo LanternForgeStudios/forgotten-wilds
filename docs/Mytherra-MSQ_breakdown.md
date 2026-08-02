@@ -917,6 +917,59 @@ guardian_memory_1_viewed
 crimson_bayou_unlocked
 Unlocks
 
+Prologue/Chapter 1/Chapter 2 Implementation Notes
+
+These decisions were made when cross-checking this doc against the current codebase, and are
+recorded here so the doc stays the accurate source of truth (same purpose as the Implementation
+Notes section in docs/Mytherra-SQ_breakdown.md):
+
+Quest id mapping (MSF id → actual `functions/src/data/quests.ts` id, authoritative, matches
+`QUEST_ORDER`): MSF-P-001 `a-new-keeper`, MSF-P-002 `ash-hallow-tour`, MSF-P-003 `the-first-flame`,
+MSF-P-004 `beyond-the-lantern-light`, MSF-IM-001 `strange-tracks`, MSF-IM-002
+`the-forgotten-shrine`, MSF-IM-003 `fragments-of-the-first-promise`, MSF-IM-004
+`rekindling-spirit-grove`, MSF-IM-005 `shadows-on-raven-ridge`, MSF-IM-006 `beneath-hollow-rail`,
+MSF-IM-007 `into-hollow-rail`, MSF-IM-008 `the-lost-expedition`, MSF-IM-009
+`embers-that-never-faded`, MSF-IM-010 `the-shrine-below`, MSF-IM-011 `the-coalbound-warden`,
+MSF-IM-012 `the-mountain-remembers`.
+
+"World Flags" (used throughout this doc - `player_is_lantern_keeper`, `shops_unlocked`,
+`spirit_grove_discovered`, etc.) are **not** a literal system in the codebase - there is no generic
+flag bag on the player save (confirmed: zero `worldFlag`/`WorldFlag` references anywhere).
+Every one of them is, in practice, just "this quest's prerequisite-gated status is now
+`completed`" - `effectiveStatus()` (questEngine.ts) walks the `prerequisiteQuestId` chain, and
+that's the only gating mechanism that exists. A small number of flags needed an actual dedicated
+mechanic instead of being purely narrative, and got one: `grantsStaminaUnlock` (only
+`rekindling-spirit-grove` sets it - real Stamina/Dash unlock logic in `interactWithShrine.ts`, not
+just flavor text for `forest_hidden_paths_open`) and `autoEquip` (`a-new-keeper` - auto-equips the
+granted starter gear instead of leaving it in inventory). Every other World Flag in this section
+is purely narrative framing, not a tracked piece of state beyond the quest itself being complete.
+
+"Regional Reputation" (promised as a reward at MSF-IM-004 and MSF-IM-012) was never actually
+implemented as a reward anywhere - `player.regionalReputation` (`shared-types/index.ts`) exists as
+a single global number, initialized to 0, but nothing increments it. Neither
+`rekindling-spirit-grove` nor `the-mountain-remembers`'s actual `QuestReward` grants any. It's also
+modeled as ONE running total across the whole game, not siloed per-region the way "Iron Mountains
+Regional Reputation" implies - a real per-region model is a bigger data-model change than this
+reconciliation pass is doing. Left as-is for the already-shipped Iron Mountains rewards (changing
+what an existing quest grants is a balance decision, not a doc-accuracy fix); Crimson Bayou's own
+MSF-CB-010 is where this reward type gets a real implementation for the first time (see Volume II).
+
+"New merchant inventory unlocked" (MSF-IM-012) was also never implemented as a live-triggered
+unlock - there's no quest-completion check anywhere in `purchaseItem.ts` or the shop catalogs
+(`SHOP_CATALOGS`/`SHOP_PRICES` in `items.ts`). Every Ash Hallow shop's full catalog has simply been
+available from the moment its location is reachable. Treat this reward type the same way going
+forward (a shop's catalog is authored with its full intended stock from the start, not gated behind
+a specific quest) rather than building a new dynamic-unlock mechanic.
+
+This doc's "Story Beats" (usually 2-3 per quest, each listing several narrative objectives) almost
+never map 1:1 to the actual tracked `QuestObjectiveDef[]` in code - most of a quest's beats are
+delivered as NPC dialogue/flavor text around a small number of real objectives (often just one
+`talkToNpc`), not as separately-tracked objectives. Two spots already had a hand-written
+"(Implemented as: ...)" note explaining a specific simplification (MSF-P-001, MSF-P-003) - the
+pattern is the same for nearly every quest in this section, just not previously written down
+quest-by-quest. Read `functions/src/data/quests.ts` directly for the real objective list of any
+given quest rather than assuming this doc's Story Beats are literal.
+
 Volume II – Crimson Bayou
 
 IRON MOUNTAINS REGION COMPLETION
