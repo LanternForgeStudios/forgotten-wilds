@@ -131,6 +131,59 @@ export const SKILLS: Record<string, Skill> = {
     inflictAilmentChance: 0.3,
   },
 
+  // Crimson Bayou (MSQ Volume II) enemy signature moves - same one-tag-covers-both-tiers
+  // convention as the Iron Mountains set above: a Marsh Crocodile's death roll stuns, a Bog
+  // Witch's hex poisons, a Rougarou's claw rakes blind the eyes, and the Ancient Serpent
+  // Guardian's venom fang (its phase-2 unlock, mirroring warden-warden-wrath) poisons harder.
+  'croc-death-roll': {
+    id: 'croc-death-roll',
+    name: 'Death Roll',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 13,
+    spiritCost: 0,
+    inflictsAilmentId: 'stun',
+    inflictAilmentChance: 0.25,
+  },
+  'hag-withering-hex': {
+    id: 'hag-withering-hex',
+    name: 'Withering Hex',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 15,
+    spiritCost: 0,
+    inflictsAilmentId: 'poison',
+    inflictAilmentChance: 0.3,
+  },
+  'rougarou-feral-rend': {
+    id: 'rougarou-feral-rend',
+    name: 'Feral Rend',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 13,
+    spiritCost: 0,
+    inflictsAilmentId: 'blind',
+    inflictAilmentChance: 0.3,
+  },
+  'serpent-guardian-coil-crush': {
+    id: 'serpent-guardian-coil-crush',
+    name: 'Coil Crush',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 20,
+    spiritCost: 0,
+  },
+  'serpent-guardian-venom-fang': {
+    id: 'serpent-guardian-venom-fang',
+    name: 'Venom Fang',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 24,
+    spiritCost: 0,
+    inflictsAilmentId: 'poison',
+    inflictAilmentChance: 0.4,
+  },
+
   // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Forgotten Treatises).
   // Themed around Freeze/Burn via name/description and (now that enemies can be afflicted) an
   // ailment matching that theme, which only lands on a vulnerable target (coalSpirits/

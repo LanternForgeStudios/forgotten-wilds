@@ -1718,6 +1718,83 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'pixellab.ai-generated idle/fight-stance loop (art-staging/enemies/The_Coalbound_Warden_boss_monster_Boss_Massive/animations/Fight_Stance_Idle/south/frame_00{0-7}.png, 248x248 each), cropped to just the creature and upscaled to 256x256 (boss tier, matching coalbound-warden\'s existing 256x256 placeholder size). Both BattleScene.ts and ExplorationScene.ts play this same idle loop automatically via animationLayoutForSprite, no mode-specific code needed. Build script: scripts/build_enemy_idle_sheet.py. Full export (including the unused 8-directional rotations) archived at public/assets/sprites/enemies/original/coalbound-warden/.',
   },
   {
+    id: 'battle.enemy.marsh-crocodile',
+    category: 'enemy',
+    intendedUse: 'Battle sprite for marsh-crocodile - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing idle animation (single row x 9 frames of 128x128)',
+    filePath: 'sprites/enemies/marsh-crocodile-idle.png',
+    dimensions: { width: 1152, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, quadruped/lion template, size 56 + animate_character\'s "idle" template, south direction only, 9 frames). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py (union alpha-bbox across all staged frames), same technique as build_bayou_npc_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/marsh-crocodile/.',
+  },
+  {
+    id: 'battle.enemy.bog-ravager',
+    category: 'enemy',
+    intendedUse: 'Battle sprite for bog-ravager - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing idle animation (single row x 9 frames of 128x128)',
+    filePath: 'sprites/enemies/bog-ravager-idle.png',
+    dimensions: { width: 1152, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, quadruped/lion template, size 64 + animate_character\'s "idle" template, south direction only, 9 frames). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/bog-ravager/.',
+  },
+  {
+    id: 'battle.enemy.bog-hag',
+    category: 'enemy',
+    intendedUse: 'Battle sprite for bog-hag - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',
+    filePath: 'sprites/enemies/bog-hag-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, humanoid, size 56 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/bog-hag/.',
+  },
+  {
+    id: 'battle.enemy.cypress-witch',
+    category: 'enemy',
+    intendedUse: 'Battle sprite for cypress-witch - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',
+    filePath: 'sprites/enemies/cypress-witch-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, humanoid, size 64 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/cypress-witch/.',
+  },
+  {
+    id: 'battle.enemy.rougarou-stalker',
+    category: 'enemy',
+    intendedUse: 'Battle sprite for rougarou-stalker - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',
+    filePath: 'sprites/enemies/rougarou-stalker-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, humanoid, size 56 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/rougarou-stalker/.',
+  },
+  {
+    id: 'battle.enemy.alpha-rougarou',
+    category: 'enemy',
+    intendedUse: 'Battle sprite for alpha-rougarou - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',
+    filePath: 'sprites/enemies/alpha-rougarou-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, humanoid, size 64 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/alpha-rougarou/.',
+  },
+  {
+    id: 'battle.enemy.ancient-serpent-guardian',
+    category: 'enemy',
+    intendedUse: 'Battle sprite for ancient-serpent-guardian (boss tier) - also reused as its overworld map marker icon - front-facing "fight stance" idle animation (single row x 8 frames of 256x256)',
+    filePath: 'sprites/enemies/ancient-serpent-guardian-idle.png',
+    dimensions: { width: 2048, height: 256 },
+    frameSize: { width: 256, height: 256 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, humanoid, size 128 + animate_character\'s fight-stance-idle-8-frames template, south direction only, boss tier matching coalbound-warden\'s 256x256 convention). Came out as a bipedal serpentine/naga-like guardian rather than a literal coiled snake shape - no quadruped "snake" template exists in the pixellab tool, and this reads well as an ancient humanoid guardian. Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/ancient-serpent-guardian/.',
+  },
+  {
     id: 'icon.item.healing-poultice',
     category: 'icon',
     intendedUse: 'Item icon for healing-poultice',
@@ -2236,6 +2313,46 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ember-codex.png.',
+  },
+  {
+    id: 'icon.item.croc-hide',
+    category: 'icon',
+    intendedUse: 'Item icon for croc-hide',
+    filePath: 'icons/croc-hide.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/croc-hide.png.',
+  },
+  {
+    id: 'icon.item.bog-ash',
+    category: 'icon',
+    intendedUse: 'Item icon for bog-ash',
+    filePath: 'icons/bog-ash.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/bog-ash.png.',
+  },
+  {
+    id: 'icon.item.rougarou-claw',
+    category: 'icon',
+    intendedUse: 'Item icon for rougarou-claw',
+    filePath: 'icons/rougarou-claw.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/rougarou-claw.png.',
+  },
+  {
+    id: 'icon.item.ancient-serpent-scale',
+    category: 'icon',
+    intendedUse: 'Item icon for ancient-serpent-scale',
+    filePath: 'icons/ancient-serpent-scale.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ancient-serpent-scale.png.',
   },
   {
     id: 'icon.currency.gold',

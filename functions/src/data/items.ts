@@ -168,6 +168,17 @@ export const ITEMS: Record<string, ItemDefinition> = {
   // Iron Mountains Side Quests (docs/Mytherra-SQ_breakdown.md): The Forgotten Treatises
   'frostbound-treatise': { id: 'frostbound-treatise', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'ember-codex': { id: 'ember-codex', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // Crimson Bayou (MSQ Volume II) enemy loot materials
+  'croc-hide': { id: 'croc-hide', category: 'materials', usableInCombat: false, tier: 'common' },
+  'bog-ash': { id: 'bog-ash', category: 'materials', usableInCombat: false, tier: 'common' },
+  'rougarou-claw': { id: 'rougarou-claw', category: 'materials', usableInCombat: false, tier: 'uncommon' },
+  'ancient-serpent-scale': {
+    id: 'ancient-serpent-scale',
+    category: 'keyItem',
+    usableInCombat: false,
+    tier: 'legendary',
+    unique: true,
+  },
 };
 
 export const SHOP_PRICES: Record<string, number> = {

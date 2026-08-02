@@ -72,6 +72,10 @@ ICONS = {
     "worn-keeper-trousers": (64, 64),
     "reinforced-keeper-trousers": (64, 64),
     "veteran-keeper-trousers": (64, 64),
+    "croc-hide": (64, 64),
+    "bog-ash": (64, 64),
+    "rougarou-claw": (64, 64),
+    "ancient-serpent-scale": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")

@@ -26,7 +26,17 @@ export type EnemyTier = 'regular' | 'elite' | 'boss';
 export interface Enemy {
   id: string;
   name: string;
-  family: 'mothlings' | 'restlessMiners' | 'coalSpirits' | 'cliffDwellers' | 'waterSpirits' | 'briarSpirits' | 'boss';
+  family:
+    | 'mothlings'
+    | 'restlessMiners'
+    | 'coalSpirits'
+    | 'cliffDwellers'
+    | 'waterSpirits'
+    | 'briarSpirits'
+    | 'swampCrocs'
+    | 'bogWitches'
+    | 'rougarou'
+    | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
   battleSpriteAssetId: string;

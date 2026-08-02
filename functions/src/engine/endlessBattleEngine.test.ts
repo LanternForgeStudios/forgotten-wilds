@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveLevelForWave, isMilestoneWave, milestoneChestTier, rollWaveEnemies } from './endlessBattleEngine';
+import { ENEMIES } from '../data/enemies';
+
+const isBossEnemyId = (enemyId: string) => ENEMIES[enemyId]?.tier === 'boss';
 
 describe('effectiveLevelForWave', () => {
   it('starts at the party average level on wave 1', () => {
@@ -69,14 +72,14 @@ describe('rollWaveEnemies', () => {
   it('always includes a boss-tier enemy on milestone waves (5, 10, 15...)', () => {
     for (const wave of [5, 10, 15]) {
       const enemies = rollWaveEnemies(wave, 20);
-      expect(enemies.some((e) => e.enemyId === 'coalbound-warden')).toBe(true);
+      expect(enemies.some((e) => isBossEnemyId(e.enemyId))).toBe(true);
     }
   });
 
   it('never includes a boss-tier enemy on a non-milestone wave', () => {
     for (let i = 0; i < 30; i++) {
       const enemies = rollWaveEnemies(3, 20);
-      expect(enemies.some((e) => e.enemyId === 'coalbound-warden')).toBe(false);
+      expect(enemies.some((e) => isBossEnemyId(e.enemyId))).toBe(false);
     }
   });
 });

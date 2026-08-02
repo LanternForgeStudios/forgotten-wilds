@@ -21,7 +21,17 @@ export type EnemyTier = 'regular' | 'elite' | 'boss';
 export interface EnemyDefinition {
   id: string;
   name: string;
-  family: 'mothlings' | 'restlessMiners' | 'coalSpirits' | 'cliffDwellers' | 'waterSpirits' | 'briarSpirits' | 'boss';
+  family:
+    | 'mothlings'
+    | 'restlessMiners'
+    | 'coalSpirits'
+    | 'cliffDwellers'
+    | 'waterSpirits'
+    | 'briarSpirits'
+    | 'swampCrocs'
+    | 'bogWitches'
+    | 'rougarou'
+    | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
   stats: { maxHp: number; attack: number; defense: number; speed: number };
@@ -321,6 +331,162 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'burn-salve', chance: 0.25, minQuantity: 1, maxQuantity: 2 },
     ],
   },
+
+  // --- Crimson Bayou (MSQ Volume II) ---
+  // Base stats/rewards authored a step above Iron Mountains' own late-region numbers (Briar
+  // Spirits: 32/48 maxHp, 16/24 xp) since this content comes later in the story - see
+  // rollEnemyLevel/scaledEnemyStats above for how level-scaling then carries that lead across the
+  // whole 1-100 range regardless of authored base.
+  'marsh-crocodile': {
+    id: 'marsh-crocodile',
+    name: 'Marsh Crocodile',
+    family: 'swampCrocs',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'physical',
+    // croc-death-roll inflicts Stun - no cure item exists for Stun (same as restless-miner's own
+    // pickaxe-swing), so vulnerableAilments below deliberately excludes it too.
+    vulnerableAilments: ['burn', 'poison', 'freeze'],
+    stats: { maxHp: 36, attack: 10, defense: 7, speed: 7 },
+    moves: [
+      { skillId: 'attack', weight: 3 },
+      { skillId: 'croc-death-roll', weight: 1 },
+    ],
+    xpReward: 18,
+    goldReward: 10,
+    lootTable: [{ itemId: 'croc-hide', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+  },
+  'bog-ravager': {
+    id: 'bog-ravager',
+    name: 'Bog Ravager',
+    family: 'swampCrocs',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'physical',
+    vulnerableAilments: ['burn', 'poison', 'freeze'],
+    stats: { maxHp: 54, attack: 13, defense: 9, speed: 9 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'croc-death-roll', weight: 2 },
+    ],
+    xpReward: 27,
+    goldReward: 15,
+    lootTable: [{ itemId: 'croc-hide', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+  },
+  'bog-hag': {
+    id: 'bog-hag',
+    name: 'Bog Hag',
+    family: 'bogWitches',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'stun'],
+    stats: { maxHp: 34, attack: 10, defense: 5, speed: 9 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'hag-withering-hex', weight: 2 },
+    ],
+    xpReward: 19,
+    goldReward: 11,
+    lootTable: [
+      { itemId: 'bog-ash', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      // hag-withering-hex inflicts Poison - antidote cures it.
+      { itemId: 'antidote', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  'cypress-witch': {
+    id: 'cypress-witch',
+    name: 'Cypress Witch',
+    family: 'bogWitches',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'stun'],
+    stats: { maxHp: 52, attack: 13, defense: 7, speed: 11 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'hag-withering-hex', weight: 3 },
+    ],
+    xpReward: 28,
+    goldReward: 16,
+    lootTable: [
+      { itemId: 'bog-ash', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'spirit-draught', chance: 0.15, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'antidote', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  'rougarou-stalker': {
+    id: 'rougarou-stalker',
+    name: 'Rougarou Stalker',
+    family: 'rougarou',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'lantern',
+    vulnerableAilments: ['burn', 'silence', 'stun'],
+    stats: { maxHp: 37, attack: 11, defense: 6, speed: 11 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'rougarou-feral-rend', weight: 2 },
+    ],
+    xpReward: 20,
+    goldReward: 11,
+    lootTable: [
+      { itemId: 'rougarou-claw', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      // rougarou-feral-rend inflicts Blind - eye-drops cures it.
+      { itemId: 'eye-drops', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  'alpha-rougarou': {
+    id: 'alpha-rougarou',
+    name: 'Alpha Rougarou',
+    family: 'rougarou',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'lantern',
+    vulnerableAilments: ['burn', 'silence', 'stun'],
+    stats: { maxHp: 56, attack: 14, defense: 8, speed: 13 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'rougarou-feral-rend', weight: 3 },
+    ],
+    xpReward: 29,
+    goldReward: 17,
+    lootTable: [
+      { itemId: 'rougarou-claw', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'eye-drops', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  // Boss stat block for MSF-CB-009 "Guardian of the Deep" - Phase 3 of the Crimson Bayou build
+  // only authors the fight itself (stats/moves/loot); prerequisiteQuestId and the
+  // BOSS_REQUIRED_LOCATION/BOSS_REGION_LOCATIONS wiring that actually make it reachable are left
+  // for Phase 5, once the guardian-of-the-deep quest and the Temple of the Deep Current dungeon
+  // location it's fought in both exist (until then this entry is inert - effectiveStatus() safely
+  // returns 'locked' for a not-yet-defined quest id, and no location will ever match an unset
+  // BOSS_REQUIRED_LOCATION entry, so startEncounter.ts's precondition check just always fails).
+  'ancient-serpent-guardian': {
+    id: 'ancient-serpent-guardian',
+    name: 'Ancient Serpent Guardian',
+    family: 'boss',
+    tier: 'boss',
+    isBoss: true,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['freeze', 'stun'],
+    stats: { maxHp: 185, attack: 16, defense: 10, speed: 10 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'serpent-guardian-coil-crush', weight: 2 },
+      { skillId: 'serpent-guardian-venom-fang', weight: 2, unlocksAtHpFraction: 0.5 },
+    ],
+    xpReward: 200,
+    goldReward: 110,
+    lootTable: [
+      { itemId: 'ancient-serpent-scale', chance: 1, minQuantity: 1, maxQuantity: 1 },
+      // serpent-guardian-venom-fang inflicts Poison - a modest chance at an antidote alongside the
+      // guaranteed trophy.
+      { itemId: 'antidote', chance: 0.25, minQuantity: 1, maxQuantity: 2 },
+    ],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -346,6 +512,18 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
     { enemyId: 'briar-wraith', weight: 3 },
     { enemyId: 'cemetery-shade', weight: 1 },
   ],
+  'murkwater-trails': [
+    { enemyId: 'marsh-crocodile', weight: 3 },
+    { enemyId: 'bog-ravager', weight: 1 },
+  ],
+  'cypress-marsh': [
+    { enemyId: 'bog-hag', weight: 3 },
+    { enemyId: 'cypress-witch', weight: 1 },
+  ],
+  'hidden-river-landing': [
+    { enemyId: 'rougarou-stalker', weight: 3 },
+    { enemyId: 'alpha-rougarou', weight: 1 },
+  ],
 };
 
 /** Which locations a boss's optional "adds" (0-3 additional enemies that can join the fight) may
@@ -355,4 +533,8 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
  *  content-authoring bug), so no filtering for that case is needed here. */
 export const BOSS_REGION_LOCATIONS: Record<string, string[]> = {
   'coalbound-warden': ['ironwood-trail', 'raven-ridge', 'whisper-falls', 'black-briar-forest', 'hollow-rail-mine'],
+  // ancient-serpent-guardian intentionally not listed yet - it isn't reachable at all until
+  // Phase 5 wires up its prerequisiteQuestId and BOSS_REQUIRED_LOCATION (see the enemy's own doc
+  // comment above), so there's no fight for these "adds" to join in the meantime. Phase 5 should
+  // add an entry here once the Temple of the Deep Current dungeon locations exist.
 };

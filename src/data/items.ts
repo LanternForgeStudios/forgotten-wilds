@@ -306,6 +306,43 @@ export const ITEMS: Item[] = [
     tier: 'rare',
     unique: true,
   },
+  {
+    id: 'croc-hide',
+    name: 'Croc Hide',
+    description: 'A strip of leathery hide from a bayou marsh crocodile.',
+    category: 'materials',
+    iconAssetId: 'icon.item.croc-hide',
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'bog-ash',
+    name: 'Bog Ash',
+    description: 'A pinch of grey ash, all that a hag hex leaves behind.',
+    category: 'materials',
+    iconAssetId: 'icon.item.bog-ash',
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'rougarou-claw',
+    name: 'Rougarou Claw',
+    description: 'A long, curved claw, still faintly warm.',
+    category: 'materials',
+    iconAssetId: 'icon.item.rougarou-claw',
+    stackable: true,
+    tier: 'uncommon',
+  },
+  {
+    id: 'ancient-serpent-scale',
+    name: 'Ancient Serpent Scale',
+    description: "A single scale from the Ancient Serpent Guardian, still cool as deep river water.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.ancient-serpent-scale',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.
