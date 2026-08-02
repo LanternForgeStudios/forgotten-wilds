@@ -1,0 +1,56 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.crimson-bayou-water-marsh",
+      "name": "crimson-bayou-water-marsh",
+      "image": "crimson-bayou-water-marsh.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.crimson-bayou-decor",
+      "name": "crimson-bayou-decor",
+      "image": "crimson-bayou-decor.png",
+      "imageWidth": 128,
+      "imageHeight": 144,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 28, "tileId": { "tileset": 1, "id": 6 } },
+        { "x": 34, "y": 30, "tileId": { "tileset": 1, "id": 0 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 44 }, { "tileset": 1, "id": 46 } ],
+          "count": 10,
+          "seed": 23,
+          "avoid": [
+            { "x": 30, "y": 4 }, { "x": 30, "y": 20 }, { "x": 30, "y": 28 }, { "x": 34, "y": 30 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 30, "y": 3, "refId": "from-mirehaven" },
+    { "type": "transition", "x": 30, "y": 0, "refId": "mirehaven", "targetSpawnId": "from-hidden-river-landing" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "npc", "x": 28, "y": 24, "refId": "sabine-thorne", "wanderRadius": 3 },
+    { "type": "interactable", "x": 34, "y": 30, "refId": "heart-seed-river" }
+  ]
+}

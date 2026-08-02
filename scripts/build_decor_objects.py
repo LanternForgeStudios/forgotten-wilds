@@ -49,6 +49,13 @@ LAYOUTS = {
         "tree-stump": (3, 1, 1, 1),
         "wildflower": (0, 2, 1, 1),
     },
+    "crimson-bayou-decor": {
+        "cypress-tree": (0, 0, 4, 6),
+        "reeds": (4, 0, 2, 3),
+        "dock-post": (6, 0, 2, 3),
+        "lily-pad": (4, 3, 2, 2),
+        "rowboat": (0, 6, 4, 3),
+    },
 }
 
 STAGING_ROOT = os.path.join("art-staging", "tilesets")

@@ -1,0 +1,76 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.crimson-bayou-boardwalk",
+      "name": "crimson-bayou-boardwalk",
+      "image": "crimson-bayou-boardwalk.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.crimson-bayou-decor",
+      "name": "crimson-bayou-decor",
+      "image": "crimson-bayou-decor.png",
+      "imageWidth": 128,
+      "imageHeight": 144,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 6, "y": 6, "tileId": { "tileset": 1, "id": 0 } },
+        { "x": 56, "y": 6, "tileId": { "tileset": 1, "id": 0 } },
+        { "x": 6, "y": 32, "tileId": { "tileset": 1, "id": 0 } },
+        { "x": 56, "y": 32, "tileId": { "tileset": 1, "id": 0 } },
+        { "x": 30, "y": 4, "tileId": { "tileset": 1, "id": 0 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 44 }, { "tileset": 1, "id": 46 } ],
+          "count": 12,
+          "seed": 7,
+          "avoid": [
+            { "x": 30, "y": 20 }, { "x": 20, "y": 14 }, { "x": 44, "y": 14 },
+            { "x": 20, "y": 26 }, { "x": 44, "y": 26 }, { "x": 30, "y": 8 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 30, "y": 22, "refId": "default" },
+    { "type": "spawnPoint", "x": 2, "y": 20, "refId": "from-cypress-marsh" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "cypress-marsh", "targetSpawnId": "from-mirehaven" },
+    { "type": "spawnPoint", "x": 63, "y": 20, "refId": "from-murkwater-trails" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "murkwater-trails", "targetSpawnId": "from-mirehaven" },
+    { "type": "spawnPoint", "x": 30, "y": 39, "refId": "from-hidden-river-landing" },
+    { "type": "transition", "x": 30, "y": 39, "refId": "hidden-river-landing", "targetSpawnId": "from-mirehaven" },
+
+    { "type": "spawnPoint", "x": 20, "y": 14, "refId": "from-mirehaven-town-hall" },
+    { "type": "transition", "x": 20, "y": 14, "refId": "mirehaven-town-hall", "targetSpawnId": "from-mirehaven", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 20, "y": 26, "refId": "from-mirehaven-archive" },
+    { "type": "transition", "x": 20, "y": 26, "refId": "mirehaven-archive", "targetSpawnId": "from-mirehaven", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 44, "y": 14, "refId": "from-mirehaven-inn" },
+    { "type": "transition", "x": 44, "y": 14, "refId": "mirehaven-inn", "targetSpawnId": "from-mirehaven", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 44, "y": 26, "refId": "from-mirehaven-general-store" },
+    { "type": "transition", "x": 44, "y": 26, "refId": "mirehaven-general-store", "targetSpawnId": "from-mirehaven", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 30, "y": 8, "refId": "from-mirehaven-blacksmith" },
+    { "type": "transition", "x": 30, "y": 8, "refId": "mirehaven-blacksmith", "targetSpawnId": "from-mirehaven", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 30, "y": 30, "refId": "from-mirehaven-armory" },
+    { "type": "transition", "x": 30, "y": 30, "refId": "mirehaven-armory", "targetSpawnId": "from-mirehaven", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 12, "y": 20, "refId": "from-mirehaven-herbalist" },
+    { "type": "transition", "x": 12, "y": 20, "refId": "mirehaven-herbalist", "targetSpawnId": "from-mirehaven" }
+  ]
+}

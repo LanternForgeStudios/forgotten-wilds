@@ -37,6 +37,7 @@ export const KNOWN_SHRINES: Record<string, Set<string>> = {
   'ironwood-trail': new Set(['spirit-grove']),
   'ash-hallow': new Set(['ash-hallow-shrine']),
   'hollow-rail-mine': new Set(['mine-shrine']),
+  'cypress-marsh': new Set(['mother-cypress-shrine']),
 };
 
 /** Which parent map's location each landmark lives within - visitLandmark.ts's own lookup, used to
@@ -50,4 +51,5 @@ export const LANDMARK_PARENT_LOCATION: Record<string, string> = {
   'spirit-grove': 'ironwood-trail',
   'mossy-creek': 'ironwood-trail',
   'fallen-watchtower': 'ironwood-trail',
+  'mother-cypress-shrine': 'cypress-marsh',
 };

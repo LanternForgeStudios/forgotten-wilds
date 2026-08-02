@@ -44,6 +44,8 @@ DIRECT_COPY_SETS = [
     "black-briar-terrain",
     "mine-floor-terrain",
     "ironwood-trail-terrain",
+    "crimson-bayou-water-marsh",
+    "crimson-bayou-boardwalk",
 ]
 
 os.makedirs(OUT_DIR, exist_ok=True)

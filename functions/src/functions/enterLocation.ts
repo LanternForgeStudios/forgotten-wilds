@@ -16,6 +16,13 @@ const LOCATION_GATES: Record<string, string> = {
   'raven-ridge': 'the-forgotten-shrine',
   'whisper-falls': 'the-forgotten-shrine',
   'hollow-rail-mine': 'shadows-on-raven-ridge',
+  // Crimson Bayou is unlocked entirely by Iron Mountains' own finale (MSF-IM-012) - the same
+  // single-gate-per-region-entry-point model as Iron Mountains' own 'ironwood-trail', not a
+  // separate gate per field map (MSF-CB-002 sends the player to all three in any order).
+  mirehaven: 'the-mountain-remembers',
+  'cypress-marsh': 'the-mountain-remembers',
+  'murkwater-trails': 'the-mountain-remembers',
+  'hidden-river-landing': 'the-mountain-remembers',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -34,6 +41,17 @@ const KNOWN_LOCATION_IDS = new Set([
   'ash-hallow-archive',
   'ash-hallow-mine-office',
   'ash-hallow-town-hall',
+  'mirehaven',
+  'cypress-marsh',
+  'murkwater-trails',
+  'hidden-river-landing',
+  'mirehaven-town-hall',
+  'mirehaven-archive',
+  'mirehaven-inn',
+  'mirehaven-general-store',
+  'mirehaven-blacksmith',
+  'mirehaven-armory',
+  'mirehaven-herbalist',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

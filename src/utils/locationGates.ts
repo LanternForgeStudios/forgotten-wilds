@@ -15,6 +15,13 @@ export const LOCATION_GATES: Record<string, string> = {
   'raven-ridge': 'the-forgotten-shrine',
   'whisper-falls': 'the-forgotten-shrine',
   'hollow-rail-mine': 'shadows-on-raven-ridge',
+  // Crimson Bayou is unlocked entirely by Iron Mountains' own finale (MSF-IM-012) - the same
+  // single-gate-per-region-entry-point model as Iron Mountains' own 'ironwood-trail', not a
+  // separate gate per field map (MSF-CB-002 sends the player to all three in any order).
+  mirehaven: 'the-mountain-remembers',
+  'cypress-marsh': 'the-mountain-remembers',
+  'murkwater-trails': 'the-mountain-remembers',
+  'hidden-river-landing': 'the-mountain-remembers',
 };
 
 /** Returns a player-facing message if `locationId` is gated and not yet unlocked, or null if it's
