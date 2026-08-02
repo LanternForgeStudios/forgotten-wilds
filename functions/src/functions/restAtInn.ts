@@ -5,10 +5,9 @@ import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { restoreFullVitals } from '../engine/levelingEngine';
 import type { PlayerSave } from '../shared-types';
 
-// Only one inn exists today, so unlike openChest.ts/interactWithShrine.ts this doesn't need a
-// client-supplied locationId to look up against - just a fixed id to check the player's own
-// (server-authoritative) currentLocationId against.
-const INN_LOCATION_ID = 'ash-hallow-inn';
+// No client-supplied locationId needed (unlike openChest.ts/interactWithShrine.ts) - the player's
+// own (server-authoritative) currentLocationId is checked directly against every known inn.
+const INN_LOCATION_IDS = new Set(['ash-hallow-inn', 'mirehaven-inn']);
 
 export const restAtInn = onCall(async (request) => {
   const uid = request.auth?.uid;
@@ -26,7 +25,7 @@ export const restAtInn = onCall(async (request) => {
     // Every other location-bound interactable (chests, shrines, world items) checks this - rest
     // at the inn was missing it entirely, letting any client fully heal from anywhere for flat
     // gold rather than requiring the trip back to town the rest of the exploration loop assumes.
-    if (save.player.currentLocationId !== INN_LOCATION_ID) {
+    if (!INN_LOCATION_IDS.has(save.player.currentLocationId)) {
       throw new HttpsError('failed-precondition', 'You are not at the inn.');
     }
 

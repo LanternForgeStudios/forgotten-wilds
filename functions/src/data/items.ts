@@ -214,6 +214,22 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'eye-drops',
     'echo-herb',
   ],
+  // Crimson Bayou (Mirehaven) - only the two general-goods shops are stocked so far. Toussaint's
+  // Forge and Delphine's Armory are real NPCs/locations but sell nothing yet, since no Bayou-
+  // specific weapon/charm/chest/legs/boots/gloves items have been generated (out of scope for the
+  // region's own current build pass - deliberately deferred, not an oversight).
+  'remy-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
+  'noelle-herbalist': [
+    'healing-poultice',
+    'greater-healing-poultice',
+    'spirit-draught',
+    'lantern-oil',
+    'antidote',
+    'burn-salve',
+    'thaw-crystal',
+    'eye-drops',
+    'echo-herb',
+  ],
 };
 
 export const INN_REST_COST = 100;

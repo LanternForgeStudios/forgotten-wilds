@@ -340,6 +340,8 @@ export const SHOP_TITLES: Record<string, string> = {
   'ash-hallow-blacksmith-forge': 'The Ash Hallow Forge',
   'ash-hallow-armory': 'The Ash Hallow Armory',
   apothecary: "Willow's Apothecary",
+  'remy-general-store': "Mirehaven's General Store",
+  'noelle-herbalist': "Mirehaven's Herbalist",
 };
 
 export const SHOP_CATALOGS: Record<string, string[]> = {
@@ -347,6 +349,18 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
   'ash-hallow-blacksmith-forge': ['weathered-walking-staff', 'river-stone-charm'],
   'ash-hallow-armory': ['worn-keeper-coat', 'worn-keeper-trousers', 'traveler-boots', 'work-gloves'],
   apothecary: [
+    'healing-poultice',
+    'greater-healing-poultice',
+    'spirit-draught',
+    'lantern-oil',
+    'antidote',
+    'burn-salve',
+    'thaw-crystal',
+    'eye-drops',
+    'echo-herb',
+  ],
+  'remy-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
+  'noelle-herbalist': [
     'healing-poultice',
     'greater-healing-poultice',
     'spirit-draught',

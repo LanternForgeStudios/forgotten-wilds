@@ -20,6 +20,8 @@ const SHOP_LOCATIONS: Record<string, string> = {
   'ash-hallow-blacksmith-forge': 'ash-hallow-blacksmith',
   'ash-hallow-armory': 'ash-hallow-armory',
   apothecary: 'ash-hallow-apothecary',
+  'remy-general-store': 'mirehaven-general-store',
+  'noelle-herbalist': 'mirehaven-herbalist',
 };
 
 export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
