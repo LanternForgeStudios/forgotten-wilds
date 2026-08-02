@@ -156,6 +156,19 @@
       "x": 17,
       "y": 9,
       "refId": "water-fragment"
+    },
+    {
+      "type": "spawnPoint",
+      "x": 17,
+      "y": 20,
+      "refId": "from-mirehaven"
+    },
+    {
+      "type": "transition",
+      "x": 17,
+      "y": 21,
+      "refId": "mirehaven",
+      "targetSpawnId": "from-whisper-falls"
     }
   ]
 }
