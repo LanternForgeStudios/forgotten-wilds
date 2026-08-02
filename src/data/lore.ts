@@ -55,4 +55,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: 'The Ember Codex, recovered from an overlooked maintenance tunnel at Raven Ridge: Lantern Keepers who traveled alongside the miners of Hollow Rail learned to harness the warmth of forge spirits, burning away corruption rather than consuming it. The restored technique is known today as Ember Burst.',
     unlockedAt: 0,
   },
+  {
+    id: 'lore-vanishing-memories',
+    title: 'The Vanishing Memories',
+    body: "Bayou Historian Lucien Boudreaux's notes on the Journal of Legends: written records remain untouched, but the living memories behind them are quietly disappearing - names, family histories, whole traditions, gone from the minds that once held them. Whatever is happening in the Crimson Bayou, it isn't corruption like the Iron Mountains saw. Something is erasing memory itself.",
+    unlockedAt: 0,
+  },
+  {
+    id: 'lore-mother-cypress',
+    title: 'Mother Cypress',
+    body: "The oldest tree in Cypress Marsh, and the heart of its shrine. Its Heart Seed - scattered in three pieces across the Bayou long before anyone now living can remember - is what let it hold the Bayou's memories safe. With the Seed restored, the waterways that had gone stagnant and forgotten begin to open again.",
+    unlockedAt: 0,
+  },
 ];

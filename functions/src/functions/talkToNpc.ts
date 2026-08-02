@@ -31,6 +31,15 @@ const NPC_LOCATIONS: Record<string, string> = {
   'hunter-garrick': 'ironwood-trail',
   'spirit-child': 'ironwood-trail',
   'ranger-caleb': 'raven-ridge',
+  'mayor-celeste-broussard': 'mirehaven-town-hall',
+  'lucien-boudreaux': 'mirehaven-archive',
+  'marsh-spirit': 'cypress-marsh',
+  'sabine-thorne': 'hidden-river-landing',
+  'innkeep-odette': 'mirehaven-inn',
+  'merchant-remy': 'mirehaven-general-store',
+  'blacksmith-toussaint': 'mirehaven-blacksmith',
+  'armorer-delphine': 'mirehaven-armory',
+  'herbalist-noelle': 'mirehaven-herbalist',
 };
 const KNOWN_NPC_IDS = new Set(Object.keys(NPC_LOCATIONS));
 

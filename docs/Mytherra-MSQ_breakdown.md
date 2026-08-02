@@ -1244,6 +1244,41 @@ Explored Hidden River Landing.
 Restored Mother Cypress Shrine.
 Opened the Temple of the Deep Current.
 Learned that memories are disappearing rather than simply becoming corrupted.
+
+Chapter 3 Implementation Notes
+
+Recorded here the same way as the Prologue/Ch1/Ch2 notes above, since this is the first Volume II
+content actually built:
+
+Quest id mapping: MSF-CB-001 `a-long-road-south`, MSF-CB-002 `forgotten-names`, MSF-CB-003
+`the-silent-grove`, MSF-CB-004 `seeds-of-memory`, MSF-CB-005 `beneath-still-waters`.
+
+World Flags (`mirehaven_discovered`, `bayou_story_started`, `memory_loss_confirmed`,
+`marsh_spirit_met`, `mother_cypress_found`, `mother_cypress_restored`,
+`deep_current_temple_found`) follow the same convention established above - each is implicit in
+its quest reaching `completed`, not a tracked field. "Regional map unlocked" (MSF-CB-001's reward)
+has no unlock mechanic in this codebase (the world map has always been fully visible) and was
+dropped rather than built as a one-off.
+
+MSF-CB-002's "three memory sites" (Old Cemetery, River Landing, Cypress Marsh) map onto the three
+real field `Location`s already built for Chapter 3 (`murkwater-trails`, `hidden-river-landing`,
+`cypress-marsh`) rather than separate sub-landmarks - "Old Cemetery" exists only as a decorative,
+ungated `zone` object within `murkwater-trails`'s own map (flavor only, not a quest target).
+
+MSF-CB-005's "Establish dungeon checkpoint" beat isn't implemented as reaching a Temple of the Deep
+Current location, since none of Chapter 4's dungeon maps exist yet (that's Chapter 4's own build
+pass) - `beneath-still-waters` instead ends on clearing the temple entrance's Rougarou Stalkers,
+with the actual Temple maps/entry picked up by MSF-CB-006 once Chapter 4 is built.
+
+Building this chapter's NPC interactions surfaced two real, pre-existing gaps left over from the
+region-scaffolding/NPC build passes, both fixed as part of this quest work rather than worked
+around: `talkToNpc.ts`'s `NPC_LOCATIONS` allowlist never had entries for any of the 9 Bayou NPCs
+(so every conversation with them - including opening a shop or the inn - silently failed
+server-side, even though the client-side dialogue panel still opened and masked the failure); and
+`OverworldScene.tsx`'s `POINT_LANDMARK_KIND`/`FRAGMENT_SPRITE_ASSET_ID` tables had no entries for
+`mother-cypress-shrine` or the three `heart-seed-*` interactables, so touching them did nothing.
+Both are now wired the same way their Iron Mountains equivalents are.
+
 Chapter 4 — The Deep Current
 Story Theme
 

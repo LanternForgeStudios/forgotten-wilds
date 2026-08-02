@@ -56,6 +56,11 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   'water-fragment': 'fragment',
   'frostbound-treatise-cache': 'fragment',
   'ember-codex-tunnel': 'fragment',
+  // Crimson Bayou (MSQ Volume II)
+  'mother-cypress-shrine': 'shrine',
+  'heart-seed-cypress': 'fragment',
+  'heart-seed-murkwater': 'fragment',
+  'heart-seed-river': 'fragment',
 };
 /** Which Cloud Function a walk-in `zone` landmark fires the instant the player's tile enters it -
  *  no Interact needed. Hunter's Camp and Spirit Grove (the clearing, not its shrine) are pure
@@ -73,6 +78,10 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'water-fragment': 'structure.landmark-water-glimmer',
   'frostbound-treatise-cache': 'structure.landmark-frost-cache',
   'ember-codex-tunnel': 'structure.landmark-tunnel-entrance',
+  // Crimson Bayou (MSQ Volume II) - all 3 Heart Seed fragments share one marker sprite
+  'heart-seed-cypress': 'structure.landmark-heart-seed',
+  'heart-seed-murkwater': 'structure.landmark-heart-seed',
+  'heart-seed-river': 'structure.landmark-heart-seed',
 };
 
 /** Purely decorative, non-gated interactable - no Cloud Function call, falls through to

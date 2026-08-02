@@ -34,6 +34,7 @@ STATIC = {
     "watchtower-ruin-source.png": "landmark-watchtower",
     "frost-cache-source.png": "landmark-frost-cache",
     "tunnel-entrance-source.png": "landmark-tunnel-entrance",
+    "heart-seed-source.png": "landmark-heart-seed",
 }
 
 

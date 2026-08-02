@@ -2315,6 +2315,36 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ember-codex.png.',
   },
   {
+    id: 'icon.item.heart-seed-cypress',
+    category: 'icon',
+    intendedUse: 'Item icon for heart-seed-cypress',
+    filePath: 'icons/heart-seed-cypress.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      "Shares its source art with structure.landmark-heart-seed (the same create_map_object generation, 200x200, high top-down, medium shading, selective outline - copied into art-staging/icons/ under each of the 3 heart-seed item ids since all 3 are visually the same collectible), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. Original archived at public/assets/icons/original/heart-seed-cypress.png.",
+  },
+  {
+    id: 'icon.item.heart-seed-murkwater',
+    category: 'icon',
+    intendedUse: 'Item icon for heart-seed-murkwater',
+    filePath: 'icons/heart-seed-murkwater.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'Shares its source art with structure.landmark-heart-seed - see icon.item.heart-seed-cypress\'s note. Build script: scripts/build_icon.py. Original archived at public/assets/icons/original/heart-seed-murkwater.png.',
+  },
+  {
+    id: 'icon.item.heart-seed-river',
+    category: 'icon',
+    intendedUse: 'Item icon for heart-seed-river',
+    filePath: 'icons/heart-seed-river.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'Shares its source art with structure.landmark-heart-seed - see icon.item.heart-seed-cypress\'s note. Build script: scripts/build_icon.py. Original archived at public/assets/icons/original/heart-seed-river.png.',
+  },
+  {
     id: 'icon.item.croc-hide',
     category: 'icon',
     intendedUse: 'Item icon for croc-hide',
@@ -3043,6 +3073,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated: create_map_object ("small overlooked mine tunnel entrance, dark opening braced with old wooden planks, overgrown and neglected", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/tunnel-entrance-source.png.',
+  },
+  {
+    id: 'structure.landmark-heart-seed',
+    category: 'structure',
+    intendedUse:
+      "Marker for Crimson Bayou's 3 Heart Seed fragment interactables (heart-seed-cypress/heart-seed-murkwater/heart-seed-river, one per Chapter 3 field map) - shared by all 3 refIds since they're the same collectible, just placed in 3 different locations.",
+    filePath: 'sprites/structures/landmark-heart-seed.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("a glowing seed pod nestled among mossy cypress roots, soft golden-green magical light, ancient nature relic", 200x200, high top-down, medium shading, selective outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 200x200 original archived at public/assets/sprites/structures/original/heart-seed-source.png.',
   },
   {
     id: 'structure.landmark-water-glimmer',

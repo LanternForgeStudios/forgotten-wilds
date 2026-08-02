@@ -168,6 +168,11 @@ export const ITEMS: Record<string, ItemDefinition> = {
   // Iron Mountains Side Quests (docs/Mytherra-SQ_breakdown.md): The Forgotten Treatises
   'frostbound-treatise': { id: 'frostbound-treatise', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'ember-codex': { id: 'ember-codex', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // Crimson Bayou (MSQ Volume II): the 3 Heart Seed fragments for Mother Cypress Shrine (MSF-CB-004,
+  // 'seeds-of-memory') - same shape as Iron Mountains' stone/water/wind Guardian Sigil fragments.
+  'heart-seed-cypress': { id: 'heart-seed-cypress', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'heart-seed-murkwater': { id: 'heart-seed-murkwater', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'heart-seed-river': { id: 'heart-seed-river', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   // Crimson Bayou (MSQ Volume II) enemy loot materials
   'croc-hide': { id: 'croc-hide', category: 'materials', usableInCombat: false, tier: 'common' },
   'bog-ash': { id: 'bog-ash', category: 'materials', usableInCombat: false, tier: 'common' },

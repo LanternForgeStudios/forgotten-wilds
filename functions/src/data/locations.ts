@@ -26,6 +26,16 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'raven-ridge': {
     'ember-codex-tunnel': 'ember-codex',
   },
+  // Crimson Bayou (MSQ Volume II) - the 3 Heart Seed fragments, one per Chapter 3 field map.
+  'cypress-marsh': {
+    'heart-seed-cypress': 'heart-seed-cypress',
+  },
+  'murkwater-trails': {
+    'heart-seed-murkwater': 'heart-seed-murkwater',
+  },
+  'hidden-river-landing': {
+    'heart-seed-river': 'heart-seed-river',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's

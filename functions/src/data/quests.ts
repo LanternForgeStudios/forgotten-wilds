@@ -228,6 +228,61 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'ember-burst', grantLoreId: 'forgotten-treatise-ii' },
   },
+
+  // --- Crimson Bayou (MSQ Volume II), Chapter 3: Whispers in the Water ---
+  // Kebab-case id mapping (MSF id -> id here), per the Implementation Notes convention established
+  // for Prologue/Ch1/Ch2 above: MSF-CB-001 a-long-road-south, MSF-CB-002 forgotten-names,
+  // MSF-CB-003 the-silent-grove, MSF-CB-004 seeds-of-memory, MSF-CB-005 beneath-still-waters.
+  'a-long-road-south': {
+    id: 'a-long-road-south',
+    prerequisiteQuestId: 'the-mountain-remembers',
+    objectives: [
+      { id: 'reach-mirehaven', type: 'reachLocation', targetId: 'mirehaven', requiredCount: 1 },
+      { id: 'talk-celeste', type: 'talkToNpc', targetId: 'mayor-celeste-broussard', requiredCount: 1 },
+      { id: 'talk-lucien', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+    ],
+    reward: { xp: 30, gold: 20 },
+  },
+  'forgotten-names': {
+    id: 'forgotten-names',
+    prerequisiteQuestId: 'a-long-road-south',
+    objectives: [
+      { id: 'reach-cypress-marsh', type: 'reachLocation', targetId: 'cypress-marsh', requiredCount: 1 },
+      { id: 'reach-murkwater-trails', type: 'reachLocation', targetId: 'murkwater-trails', requiredCount: 1 },
+      { id: 'reach-hidden-river-landing', type: 'reachLocation', targetId: 'hidden-river-landing', requiredCount: 1 },
+      { id: 'talk-marsh-spirit', type: 'talkToNpc', targetId: 'marsh-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 25, gold: 15, grantLoreId: 'lore-vanishing-memories' },
+  },
+  'the-silent-grove': {
+    id: 'the-silent-grove',
+    prerequisiteQuestId: 'forgotten-names',
+    objectives: [
+      { id: 'investigate-mother-cypress', type: 'interactWithShrine', targetId: 'mother-cypress-shrine', requiredCount: 1 },
+      { id: 'talk-lucien-2', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+    ],
+    reward: { xp: 20, gold: 10 },
+  },
+  'seeds-of-memory': {
+    id: 'seeds-of-memory',
+    prerequisiteQuestId: 'the-silent-grove',
+    objectives: [
+      { id: 'get-heart-seed-cypress', type: 'collectItem', targetId: 'heart-seed-cypress', requiredCount: 1 },
+      { id: 'get-heart-seed-murkwater', type: 'collectItem', targetId: 'heart-seed-murkwater', requiredCount: 1 },
+      { id: 'get-heart-seed-river', type: 'collectItem', targetId: 'heart-seed-river', requiredCount: 1 },
+      { id: 'restore-mother-cypress', type: 'interactWithShrine', targetId: 'mother-cypress-shrine', requiredCount: 1 },
+    ],
+    reward: { xp: 60, gold: 30, spiritEssence: 15, grantLoreId: 'lore-mother-cypress' },
+  },
+  'beneath-still-waters': {
+    id: 'beneath-still-waters',
+    prerequisiteQuestId: 'seeds-of-memory',
+    objectives: [
+      { id: 'talk-sabine', type: 'talkToNpc', targetId: 'sabine-thorne', requiredCount: 1 },
+      { id: 'clear-entrance', type: 'defeatEnemies', targetId: 'rougarou-stalker', requiredCount: 2 },
+    ],
+    reward: { xp: 40, gold: 25 },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -250,4 +305,9 @@ export const QUEST_ORDER = [
   'the-mountain-remembers',
   'frostbound-pages',
   'embers-beneath-stone',
+  'a-long-road-south',
+  'forgotten-names',
+  'the-silent-grove',
+  'seeds-of-memory',
+  'beneath-still-waters',
 ];

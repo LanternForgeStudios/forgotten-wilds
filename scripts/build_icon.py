@@ -76,6 +76,9 @@ ICONS = {
     "bog-ash": (64, 64),
     "rougarou-claw": (64, 64),
     "ancient-serpent-scale": (64, 64),
+    "heart-seed-cypress": (64, 64),
+    "heart-seed-murkwater": (64, 64),
+    "heart-seed-river": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")
