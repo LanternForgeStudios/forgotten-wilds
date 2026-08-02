@@ -394,6 +394,65 @@ only way to get anchor data at all for the 3 items (`ranger-boots`, `leather-gau
 all 3 tiers each, for full male walking+running animation coverage - the last 2 items of the
 original 5-item pilot's own "roll out the rest of the family" follow-up work.
 
+## Current status / resume point (for picking this back up cleanly)
+
+**Male walking + running — fully done, all shipped, nothing pending:**
+- `travelers-cloak`/`worn-keeper-coat` family (chest): `travelers-cloak`, `worn-keeper-coat`,
+  `reinforced-keeper-coat`, `veteran-keeper-coat`.
+- `weathered-walking-staff` family (weapon): `weathered-walking-staff`, `ironwood-walking-staff`,
+  `spiritwood-walking-staff`.
+- `keepers-lantern` family (lantern): `keepers-lantern`, `miners-lost-lantern-equipped`.
+- `traveler-boots` family (boots): `traveler-boots`, `trail-boots`, `ranger-boots` - all 3 tiers,
+  the last 2 auto-generated then hand-touched-up/hand-positioned by the user.
+- `work-gloves` family (gloves): `work-gloves`, `leather-gauntlets`, `keepers-gauntlets` - all 3
+  tiers, same story as boots.
+
+**Legs slot (new, this session) — in progress, NOT yet started by the user:**
+- `traveler-pants` (Prologue starter item, matching lower for `travelers-cloak`) is the one
+  family-founding item that needs real hand-positioning - `worn-keeper-trousers` will derive from
+  it automatically via `estimate_transform_equipment_layer.py` once it's done, then
+  `reinforced-/veteran-keeper-trousers` auto-recolor from that, mirroring the `keeper-coat` family.
+- Seeded with real per-direction pixellab art (not a flat icon) into all 4 of the user's scratchpad
+  working folders, ready to hand-position: male walking, male running, female walking, female
+  running (female seeded now even though female work hasn't started, at the user's request, so
+  it's ready when picked up).
+- **User is actively working on this now** (male Legs first, then moving to male Chest cleanup,
+  then all of female).
+
+**Chest slot — "cleanup" pass in progress:** the `travelers-cloak`/`worn-keeper-coat` family
+already shipped (see above), but the user is doing a further hand-touch-up cleanup pass on it -
+nature/scope of that cleanup not yet specified to Claude; check in on what's changed when it's
+handed back the same way `traveler-boots`/`work-gloves` were (`git status` on
+`public/assets/sprites/equipment/`, re-run `scripts/record_anchor_from_sheet.py` for whatever
+changed, visually QA via composite render, register/update registry notes, commit).
+
+**Female (all slots) — not started yet.** Working folders (`manual-edit-female-walking/`,
+`manual-edit-female-running/`) exist and are seeded for every item done so far, ready whenever the
+user gets to it.
+
+**Where the user's hand-editing happens** (NOT in this repo - an external per-job scratchpad,
+confirmed directly by the user this session):
+```
+C:\Users\bobt\AppData\Local\Temp\claude\C--BobsProjects-claude-elevera-health-workspace-LanternForgeStudios-forgotten-wilds\cb5f3fe3-785b-4c5a-b217-3edad23e52f8\scratchpad\
+  manual-edit\                   (male walking)
+  manual-edit-running\           (male running)
+  manual-edit-female-walking\
+  manual-edit-female-running\
+```
+Each has a `README.txt` (kept current with per-item notes/caveats) and an `_reference/` folder of
+bare-base-body crops to align against. **This path is tied to a specific job/session id and may
+not persist indefinitely** - if it's ever inaccessible in a future session, ask the user for the
+current path rather than assuming it's still there.
+
+**When the user hands back finished sheets**: they've been hand-editing the FINAL output sheets
+directly in `public/assets/sprites/equipment/<item>-male-animated.png` (not always going through
+the source-frame working folder first) - the reliable way to know what changed is `git status`/
+`git diff --stat` on that directory, not assuming anything based on the working folders alone.
+After any hand-edit: visually QA via a composite render against the base body (a few representative
+frames - down/left/running poses), re-run `scripts/record_anchor_from_sheet.py` for the changed
+item(s), update/add the `sprite.equipment.*` registry entry and its notes, add `layerSpriteAssetId`
+to `src/data/equipment.ts` if it's a brand-new item, build (`npx tsc -b`), commit, push.
+
 ## Open questions for later phases
 
 - Exact z-order when a lantern is "held" vs. worn on a belt - depends on the actual generated pose,
