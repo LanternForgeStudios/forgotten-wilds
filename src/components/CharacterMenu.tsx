@@ -476,11 +476,11 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
 
           const selectedRecipe = craftingSelectedId ? RECIPES[craftingSelectedId] : undefined;
           const selectedItem = selectedRecipe ? ITEMS.find((i) => i.id === selectedRecipe.outputItemId) : undefined;
-          const canCraft =
-            !!selectedRecipe &&
-            selectedRecipe.materials.every(
-              (m) => (inventory.find((entry) => entry.itemId === m.itemId)?.quantity ?? 0) >= m.quantity,
-            );
+          // A material slot now accepts any of several item ids (see types/recipe.ts) - owned
+          // quantity is summed across whichever of them the player actually has.
+          const ownedForMaterial = (itemIds: string[]) =>
+            itemIds.reduce((sum, id) => sum + (inventory.find((entry) => entry.itemId === id)?.quantity ?? 0), 0);
+          const canCraft = !!selectedRecipe && selectedRecipe.materials.every((m) => ownedForMaterial(m.itemIds) >= m.quantity);
 
           return (
             <div>
@@ -537,12 +537,16 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                         <strong>Materials needed</strong>
                       </p>
                       {selectedRecipe.materials.map((m) => {
-                        const owned = inventory.find((entry) => entry.itemId === m.itemId)?.quantity ?? 0;
+                        const owned = ownedForMaterial(m.itemIds);
                         const short = owned < m.quantity;
-                        const materialName = ITEMS.find((i) => i.id === m.itemId)?.name ?? m.itemId.replace(/-/g, ' ');
+                        // "X or Y" when a slot accepts more than one material, so the player knows
+                        // either one contributes toward the same quantity requirement.
+                        const materialName = m.itemIds
+                          .map((id) => ITEMS.find((i) => i.id === id)?.name ?? id.replace(/-/g, ' '))
+                          .join(' or ');
                         return (
                           <p
-                            key={m.itemId}
+                            key={m.itemIds.join('|')}
                             style={{ fontSize: 12, margin: '2px 0', color: short ? 'var(--fw-danger)' : 'var(--fw-text)' }}
                           >
                             {materialName}: {owned} / {m.quantity}

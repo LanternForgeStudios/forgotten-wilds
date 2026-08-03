@@ -246,6 +246,163 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     unique: true,
     familyId: 'cypress-spirits',
   },
+  // Crimson Bayou's own Common-through-Rare equipment families (docs/Mytherra-Equipment_breakdown.md
+  // Region 2 table: Cypress Cane / Bayou Vestments / Bayou Leg-Wraps / Marsh Boots / Mire Gloves /
+  // Bayou Charm / Cypress Spirits) - same "one new family per slot per region" pattern Iron
+  // Mountains established, so higher Iron Mountains tiers stay relevant by their own perks rather
+  // than being obsoleted. No layerSpriteAssetId yet for weapon/chest/legs/boots/gloves - same
+  // "fully functional without one, added later" precedent as lantern-of-still-waters-equipped
+  // above and the keeper-trousers family before its own layer art existed.
+  'weathered-cypress-cane': {
+    id: 'weathered-cypress-cane',
+    slot: 'weapon',
+    statBonuses: { maxSpirit: 6, attack: 3, speed: 1 },
+    tier: 'common',
+    familyId: 'cypress-cane',
+  },
+  'bound-cypress-cane': {
+    id: 'bound-cypress-cane',
+    slot: 'weapon',
+    statBonuses: { maxSpirit: 4, attack: 6, speed: 2 },
+    tier: 'uncommon',
+    familyId: 'cypress-cane',
+  },
+  // Named separately from the cane family in the design doc ("Rougarou Fang Blade") but slotted as
+  // its Rare tier - same family progression shape as every other Rare cap in this pass.
+  'rougarou-fang-blade': {
+    id: 'rougarou-fang-blade',
+    slot: 'weapon',
+    statBonuses: { maxHp: 8, attack: 11, speed: 3, defense: -1 },
+    tier: 'rare',
+    familyId: 'cypress-cane',
+  },
+  'tattered-bayou-vestments': {
+    id: 'tattered-bayou-vestments',
+    slot: 'chest',
+    statBonuses: { maxHp: 10, defense: 2, speed: 1 },
+    tier: 'common',
+    familyId: 'bayou-vestments',
+  },
+  'woven-bayou-vestments': {
+    id: 'woven-bayou-vestments',
+    slot: 'chest',
+    statBonuses: { maxHp: 15, defense: 4, speed: 2 },
+    tier: 'uncommon',
+    familyId: 'bayou-vestments',
+  },
+  'warden-bayou-vestments': {
+    id: 'warden-bayou-vestments',
+    slot: 'chest',
+    statBonuses: { maxHp: 18, maxSpirit: 6, defense: 6, speed: 3 },
+    tier: 'rare',
+    familyId: 'bayou-vestments',
+  },
+  'worn-bayou-leg-wraps': {
+    id: 'worn-bayou-leg-wraps',
+    slot: 'legs',
+    statBonuses: { maxHp: 6, defense: 1, speed: 1 },
+    tier: 'common',
+    familyId: 'bayou-leg-wraps',
+  },
+  'woven-bayou-leg-wraps': {
+    id: 'woven-bayou-leg-wraps',
+    slot: 'legs',
+    statBonuses: { maxHp: 9, defense: 2, speed: 2 },
+    tier: 'uncommon',
+    familyId: 'bayou-leg-wraps',
+  },
+  'warden-bayou-leg-wraps': {
+    id: 'warden-bayou-leg-wraps',
+    slot: 'legs',
+    statBonuses: { maxHp: 11, maxSpirit: 3, defense: 3, speed: 3 },
+    tier: 'rare',
+    familyId: 'bayou-leg-wraps',
+  },
+  'worn-marsh-boots': {
+    id: 'worn-marsh-boots',
+    slot: 'boots',
+    statBonuses: { defense: 1, speed: 3 },
+    tier: 'common',
+    familyId: 'marsh-boots',
+  },
+  'sturdy-marsh-boots': {
+    id: 'sturdy-marsh-boots',
+    slot: 'boots',
+    statBonuses: { defense: 2, speed: 5 },
+    tier: 'uncommon',
+    familyId: 'marsh-boots',
+  },
+  'mosswalker-boots': {
+    id: 'mosswalker-boots',
+    slot: 'boots',
+    statBonuses: { attack: 1, defense: 3, speed: 7 },
+    tier: 'rare',
+    familyId: 'marsh-boots',
+  },
+  'worn-mire-gloves': {
+    id: 'worn-mire-gloves',
+    slot: 'gloves',
+    statBonuses: { attack: 1, defense: 1 },
+    tier: 'common',
+    familyId: 'mire-gloves',
+  },
+  'reinforced-mire-gloves': {
+    id: 'reinforced-mire-gloves',
+    slot: 'gloves',
+    statBonuses: { maxHp: 4, attack: 2, defense: 2 },
+    tier: 'uncommon',
+    familyId: 'mire-gloves',
+  },
+  // The family's Rare cap gets a genuine Poison resistance perk rather than just bigger numbers -
+  // handling mire life without getting stung by it - matching hag-withering-hex's Poison
+  // (bog-hag/cypress-witch) being this region's signature status threat.
+  'warden-mire-gloves': {
+    id: 'warden-mire-gloves',
+    slot: 'gloves',
+    statBonuses: { maxHp: 7, attack: 3, defense: 4 },
+    tier: 'rare',
+    familyId: 'mire-gloves',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 30 }],
+  },
+  'marsh-reed-charm': {
+    id: 'marsh-reed-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 3 },
+    tier: 'common',
+    familyId: 'bayou-charm',
+  },
+  'swamp-talisman': {
+    id: 'swamp-talisman',
+    slot: 'charm',
+    statBonuses: { speed: 2 },
+    tier: 'uncommon',
+    familyId: 'bayou-charm',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 15 }],
+  },
+  'witch-warded-charm': {
+    id: 'witch-warded-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 6 },
+    tier: 'rare',
+    familyId: 'bayou-charm',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 30 }],
+  },
+  // Cypress Spirits family, Rare and Mythic tiers - mother-cypress-totem above is this family's
+  // Legendary cap (already granted as the Ancient Serpent Guardian's boss reward).
+  'swamp-wisp-totem': {
+    id: 'swamp-wisp-totem',
+    slot: 'spiritTotem',
+    statBonuses: { speed: 4, maxSpirit: 3 },
+    tier: 'rare',
+    familyId: 'cypress-spirits',
+  },
+  'cypress-guardian-totem': {
+    id: 'cypress-guardian-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxHp: 8, maxSpirit: 8, defense: 3 },
+    tier: 'mythic',
+    familyId: 'cypress-spirits',
+  },
   // Prologue reward (MSF-P-001) - a starting-kit armor piece, not part of any regional family.
   // Not unique - it's a plain wool cloak given to every new Lantern Keeper, not a one-of-a-kind
   // relic, so owning it doesn't need to block ever granting another copy.

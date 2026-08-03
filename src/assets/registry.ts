@@ -1708,6 +1708,336 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: "Hand-finished by the user directly as a full sheet, completing gender parity for the work-gloves family - the last of the 15 pre-existing layered items to reach full male+female coverage.",
   },
   {
+    id: 'sprite.equipment.weathered-cypress-cane',
+    category: 'character',
+    intendedUse: "Equipment layer for the weapon slot - Weathered Cypress Cane (common, Cypress Cane family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/weathered-cypress-cane-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.weathered-cypress-cane-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the weapon slot - Weathered Cypress Cane (common, Cypress Cane family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/weathered-cypress-cane-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.bound-cypress-cane',
+    category: 'character',
+    intendedUse: "Equipment layer for the weapon slot - Bound Cypress Cane (uncommon, Cypress Cane family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/bound-cypress-cane-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.bound-cypress-cane-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the weapon slot - Bound Cypress Cane (uncommon, Cypress Cane family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/bound-cypress-cane-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.rougarou-fang-blade',
+    category: 'character',
+    intendedUse: "Equipment layer for the weapon slot - Rougarou Fang Blade (rare, Cypress Cane family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/rougarou-fang-blade-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.rougarou-fang-blade-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the weapon slot - Rougarou Fang Blade (rare, Cypress Cane family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/rougarou-fang-blade-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.tattered-bayou-vestments',
+    category: 'character',
+    intendedUse: "Equipment layer for the chest slot - Tattered Bayou Vestments (common, Bayou Vestments family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/tattered-bayou-vestments-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.travelers-cloak, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.tattered-bayou-vestments-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the chest slot - Tattered Bayou Vestments (common, Bayou Vestments family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/tattered-bayou-vestments-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.travelers-cloak-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.woven-bayou-vestments',
+    category: 'character',
+    intendedUse: "Equipment layer for the chest slot - Woven Bayou Vestments (uncommon, Bayou Vestments family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/woven-bayou-vestments-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.travelers-cloak, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.woven-bayou-vestments-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the chest slot - Woven Bayou Vestments (uncommon, Bayou Vestments family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/woven-bayou-vestments-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.travelers-cloak-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.warden-bayou-vestments',
+    category: 'character',
+    intendedUse: "Equipment layer for the chest slot - Warden Bayou Vestments (rare, Bayou Vestments family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/warden-bayou-vestments-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.travelers-cloak, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.warden-bayou-vestments-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the chest slot - Warden Bayou Vestments (rare, Bayou Vestments family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/warden-bayou-vestments-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.travelers-cloak-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.worn-bayou-leg-wraps',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Worn Bayou Leg-Wraps (common, Bayou Leg-Wraps family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-bayou-leg-wraps-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-pants, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.worn-bayou-leg-wraps-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Worn Bayou Leg-Wraps (common, Bayou Leg-Wraps family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-bayou-leg-wraps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-pants-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.woven-bayou-leg-wraps',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Woven Bayou Leg-Wraps (uncommon, Bayou Leg-Wraps family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/woven-bayou-leg-wraps-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-pants, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.woven-bayou-leg-wraps-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Woven Bayou Leg-Wraps (uncommon, Bayou Leg-Wraps family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/woven-bayou-leg-wraps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-pants-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.warden-bayou-leg-wraps',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Warden Bayou Leg-Wraps (rare, Bayou Leg-Wraps family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/warden-bayou-leg-wraps-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-pants, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.warden-bayou-leg-wraps-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Warden Bayou Leg-Wraps (rare, Bayou Leg-Wraps family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/warden-bayou-leg-wraps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-pants-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.worn-marsh-boots',
+    category: 'character',
+    intendedUse: "Equipment layer for the boots slot - Worn Marsh Boots (common, Marsh Boots family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-marsh-boots-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-boots, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.worn-marsh-boots-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the boots slot - Worn Marsh Boots (common, Marsh Boots family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-marsh-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-boots-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.sturdy-marsh-boots',
+    category: 'character',
+    intendedUse: "Equipment layer for the boots slot - Sturdy Marsh Boots (uncommon, Marsh Boots family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/sturdy-marsh-boots-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-boots, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.sturdy-marsh-boots-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the boots slot - Sturdy Marsh Boots (uncommon, Marsh Boots family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/sturdy-marsh-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-boots-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.mosswalker-boots',
+    category: 'character',
+    intendedUse: "Equipment layer for the boots slot - Mosswalker Boots (rare, Marsh Boots family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/mosswalker-boots-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-boots, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.mosswalker-boots-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the boots slot - Mosswalker Boots (rare, Marsh Boots family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/mosswalker-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-boots-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.worn-mire-gloves',
+    category: 'character',
+    intendedUse: "Equipment layer for the gloves slot - Worn Mire Gloves (common, Mire Gloves family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-mire-gloves-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.work-gloves, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.worn-mire-gloves-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the gloves slot - Worn Mire Gloves (common, Mire Gloves family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-mire-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.work-gloves-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.reinforced-mire-gloves',
+    category: 'character',
+    intendedUse: "Equipment layer for the gloves slot - Reinforced Mire Gloves (uncommon, Mire Gloves family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/reinforced-mire-gloves-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.work-gloves, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.reinforced-mire-gloves-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the gloves slot - Reinforced Mire Gloves (uncommon, Mire Gloves family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/reinforced-mire-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.work-gloves-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.warden-mire-gloves',
+    category: 'character',
+    intendedUse: "Equipment layer for the gloves slot - Warden Mire Gloves (rare, Mire Gloves family), drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/warden-mire-gloves-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.work-gloves, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
+    id: 'sprite.equipment.warden-mire-gloves-female',
+    category: 'character',
+    intendedUse: "Equipment layer for the gloves slot - Warden Mire Gloves (rare, Mire Gloves family) (female), drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/warden-mire-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.work-gloves-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+  },
+  {
     id: 'sprite.equipment.keepers-lantern-female',
     category: 'character',
     intendedUse: "Female-body counterpart to sprite.equipment.keepers-lantern, same lantern-slot layer role.",
@@ -2483,6 +2813,206 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/mother-cypress-totem.png.',
+  },
+  {
+    id: 'icon.equipment.weathered-cypress-cane',
+    category: 'icon',
+    intendedUse: 'Equipment icon for weathered-cypress-cane (common, Cypress Cane family)',
+    filePath: 'icons/weathered-cypress-cane.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-cypress-cane.png.',
+  },
+  {
+    id: 'icon.equipment.bound-cypress-cane',
+    category: 'icon',
+    intendedUse: 'Equipment icon for bound-cypress-cane (uncommon, Cypress Cane family)',
+    filePath: 'icons/bound-cypress-cane.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/bound-cypress-cane.png.',
+  },
+  {
+    id: 'icon.equipment.rougarou-fang-blade',
+    category: 'icon',
+    intendedUse: 'Equipment icon for rougarou-fang-blade (rare, Cypress Cane family)',
+    filePath: 'icons/rougarou-fang-blade.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/rougarou-fang-blade.png.',
+  },
+  {
+    id: 'icon.equipment.tattered-bayou-vestments',
+    category: 'icon',
+    intendedUse: 'Equipment icon for tattered-bayou-vestments (common, Bayou Vestments family)',
+    filePath: 'icons/tattered-bayou-vestments.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/tattered-bayou-vestments.png.',
+  },
+  {
+    id: 'icon.equipment.woven-bayou-vestments',
+    category: 'icon',
+    intendedUse: 'Equipment icon for woven-bayou-vestments (uncommon, Bayou Vestments family)',
+    filePath: 'icons/woven-bayou-vestments.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/woven-bayou-vestments.png.',
+  },
+  {
+    id: 'icon.equipment.warden-bayou-vestments',
+    category: 'icon',
+    intendedUse: 'Equipment icon for warden-bayou-vestments (rare, Bayou Vestments family)',
+    filePath: 'icons/warden-bayou-vestments.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/warden-bayou-vestments.png.',
+  },
+  {
+    id: 'icon.equipment.worn-bayou-leg-wraps',
+    category: 'icon',
+    intendedUse: 'Equipment icon for worn-bayou-leg-wraps (common, Bayou Leg-Wraps family)',
+    filePath: 'icons/worn-bayou-leg-wraps.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/worn-bayou-leg-wraps.png.',
+  },
+  {
+    id: 'icon.equipment.woven-bayou-leg-wraps',
+    category: 'icon',
+    intendedUse: 'Equipment icon for woven-bayou-leg-wraps (uncommon, Bayou Leg-Wraps family)',
+    filePath: 'icons/woven-bayou-leg-wraps.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/woven-bayou-leg-wraps.png.',
+  },
+  {
+    id: 'icon.equipment.warden-bayou-leg-wraps',
+    category: 'icon',
+    intendedUse: 'Equipment icon for warden-bayou-leg-wraps (rare, Bayou Leg-Wraps family)',
+    filePath: 'icons/warden-bayou-leg-wraps.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/warden-bayou-leg-wraps.png.',
+  },
+  {
+    id: 'icon.equipment.worn-marsh-boots',
+    category: 'icon',
+    intendedUse: 'Equipment icon for worn-marsh-boots (common, Marsh Boots family)',
+    filePath: 'icons/worn-marsh-boots.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/worn-marsh-boots.png.',
+  },
+  {
+    id: 'icon.equipment.sturdy-marsh-boots',
+    category: 'icon',
+    intendedUse: 'Equipment icon for sturdy-marsh-boots (uncommon, Marsh Boots family)',
+    filePath: 'icons/sturdy-marsh-boots.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/sturdy-marsh-boots.png.',
+  },
+  {
+    id: 'icon.equipment.mosswalker-boots',
+    category: 'icon',
+    intendedUse: 'Equipment icon for mosswalker-boots (rare, Marsh Boots family)',
+    filePath: 'icons/mosswalker-boots.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/mosswalker-boots.png.',
+  },
+  {
+    id: 'icon.equipment.worn-mire-gloves',
+    category: 'icon',
+    intendedUse: 'Equipment icon for worn-mire-gloves (common, Mire Gloves family)',
+    filePath: 'icons/worn-mire-gloves.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/worn-mire-gloves.png.',
+  },
+  {
+    id: 'icon.equipment.reinforced-mire-gloves',
+    category: 'icon',
+    intendedUse: 'Equipment icon for reinforced-mire-gloves (uncommon, Mire Gloves family)',
+    filePath: 'icons/reinforced-mire-gloves.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/reinforced-mire-gloves.png.',
+  },
+  {
+    id: 'icon.equipment.warden-mire-gloves',
+    category: 'icon',
+    intendedUse: 'Equipment icon for warden-mire-gloves (rare, Mire Gloves family)',
+    filePath: 'icons/warden-mire-gloves.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/warden-mire-gloves.png.',
+  },
+  {
+    id: 'icon.equipment.marsh-reed-charm',
+    category: 'icon',
+    intendedUse: 'Equipment icon for marsh-reed-charm (common, Bayou Charm family)',
+    filePath: 'icons/marsh-reed-charm.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/marsh-reed-charm.png.',
+  },
+  {
+    id: 'icon.equipment.swamp-talisman',
+    category: 'icon',
+    intendedUse: 'Equipment icon for swamp-talisman (uncommon, Bayou Charm family)',
+    filePath: 'icons/swamp-talisman.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/swamp-talisman.png.',
+  },
+  {
+    id: 'icon.equipment.witch-warded-charm',
+    category: 'icon',
+    intendedUse: 'Equipment icon for witch-warded-charm (rare, Bayou Charm family)',
+    filePath: 'icons/witch-warded-charm.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/witch-warded-charm.png.',
+  },
+  {
+    id: 'icon.equipment.swamp-wisp-totem',
+    category: 'icon',
+    intendedUse: 'Equipment icon for swamp-wisp-totem (rare, Cypress Spirits family)',
+    filePath: 'icons/swamp-wisp-totem.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/swamp-wisp-totem.png.',
+  },
+  {
+    id: 'icon.equipment.cypress-guardian-totem',
+    category: 'icon',
+    intendedUse: 'Equipment icon for cypress-guardian-totem (mythic, Cypress Spirits family)',
+    filePath: 'icons/cypress-guardian-totem.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/cypress-guardian-totem.png.',
   },
   {
     id: 'icon.equipment.travelers-cloak',
@@ -3517,6 +4047,29 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated via create_object_state on the SAME lantern-in-rubble object (edit: "the lantern is gone, leaving behind just an empty scattered pile of loose mine rubble and broken rock where it once sat, no glow, no light") rather than an independent generation, so the two states share the same rubble-pile silhouette - same technique as structure.chest/chest-open. Cropped to its square content bbox and resized to 64x64 with LANCZOS. Build script: scripts/build_lantern_relic.py. 128x128 original archived at public/assets/sprites/structures/original/lantern-relic-collected-source.png.',
+  },
+  {
+    id: 'structure.temple-records-dormant',
+    category: 'structure',
+    intendedUse:
+      "Marker for the Temple of the Deep Current's Temple Records world-item interactable before collection - replaces the generic structure.chest placeholder it launched with (see DungeonScene.tsx's WORLD_ITEM_INTERACTABLES table). An animated single-row 9-frame sheet (gentle shimmer/glow pulse over the waterlogged records), same generic idle-animation mechanism as structure.chest/structure.shrine-activated.",
+    filePath: 'sprites/structures/temple-records-dormant.png',
+    dimensions: { width: 576, height: 64 },
+    frameSize: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_1_direction_object ("ancient waterlogged temple records - stacked stone tablets and scroll cache resting in a shallow reflecting pool, faint magical shimmer on the water surface", 64x64, top-down) - a 16-candidate review batch, picked the frame reading most clearly as an open scroll/tablet stack - then animate_object (v3 mode, "faint magical shimmer and gentle glow pulsing across the ancient records", 8 frames + kept reference = 9 stored). Cropped to square content bbox and resized to 64x64 with LANCZOS, same pipeline as structure.chest. Build script: scripts/build_temple_records.py. Original archived at public/assets/sprites/structures/original/temple-records-dormant/.',
+  },
+  {
+    id: 'structure.temple-records-collected',
+    category: 'structure',
+    intendedUse:
+      'Marker for the Temple Records interactable once already collected - a static, non-glowing empty stone basin, distinct art from structure.temple-records-dormant (not just a different label), same "before/after is genuinely different art" requirement structure.chest/chest-open established.',
+    filePath: 'sprites/structures/temple-records-collected.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_object_state on the SAME records-and-pool object (edit: "records removed, leaving only the empty shallow stone reflecting pool basin, no glow, drained and bare") rather than an independent generation, so both states share the same pool-basin silhouette - same technique as structure.chest/chest-open. Cropped to its square content bbox and resized to 64x64 with LANCZOS. Build script: scripts/build_temple_records.py. Original archived at public/assets/sprites/structures/original/temple-records-collected-source.png.',
   },
   {
     id: 'structure.chest',
