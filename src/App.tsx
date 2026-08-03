@@ -14,17 +14,18 @@ import { Cutscene } from '@/components/cutscene/Cutscene';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { WELCOME_BACK_CUTSCENE } from '@/data/cutscenes';
 import { LOCATIONS } from '@/data';
+import { homeTownFor } from '@/utils/locationHomeTown';
 
 /** On a completely fresh page load (not an in-session scene transition - see the "signedIn"
  *  branch below), always resume in a town rather than exactly wherever the player was standing -
  *  mid-dungeon or deep in an overworld trail on a cold reload used to force the Town scene onto a
  *  non-town map, which doesn't render correctly (Town's own object/entity handling doesn't know
- *  what to do with a dungeon's or overworld's objects). Only one region's town (Ash Hallow) exists
- *  in the built content today - falls back to it for any non-town location until a real
- *  region->town mapping exists for a second town. */
+ *  what to do with a dungeon's or overworld's objects). Resumes in the town nearest the region the
+ *  player was actually in (homeTownFor), not always Ash Hallow - a player who logged off in
+ *  Crimson Bayou should land back in Mirehaven, not get bounced all the way to Iron Mountains. */
 function freshLoadStartLocationId(lastLocationId: string): string {
   const location = LOCATIONS.find((l) => l.id === lastLocationId);
-  return location?.kind === 'town' ? lastLocationId : 'ash-hallow';
+  return location?.kind === 'town' ? lastLocationId : homeTownFor(lastLocationId);
 }
 
 function App() {

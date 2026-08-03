@@ -24,8 +24,10 @@ import type {
 /** Endless Battle can only be started from a Town - the only place clan members can actually see
  *  each other via presence (Overworld/Dungeon scenes don't track it - see PlayerHUD.tsx's own doc
  *  comment). Wave enemies themselves aren't tied to this location at all (see
- *  endlessBattleEngine.ts) - this set exists purely to gate *where a party can form*. */
-const TOWN_LOCATION_IDS = new Set(['ash-hallow']);
+ *  endlessBattleEngine.ts) - this set exists purely to gate *where a party can form*. Every
+ *  region's own main town square goes here (not building interiors - forming a party from inside
+ *  a shop isn't a scenario worth supporting) - add the next one when the next region ships. */
+const TOWN_LOCATION_IDS = new Set(['ash-hallow', 'mirehaven']);
 
 /** A non-terminal battle with no activity for this long is treated as abandoned (e.g. every
  *  participant's tab closed before the run ever reached a real end) rather than permanently

@@ -18,6 +18,7 @@ import { SKILLS } from '../data/skills';
 import { EQUIPMENT } from '../data/equipment';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { AILMENTS } from '../data/ailments';
+import { homeTownFor } from '../data/locationHomeTown';
 import type { CombatAction, CombatSession, PlayerSave } from '../shared-types';
 
 interface ResolveCombatActionRequest {
@@ -221,10 +222,12 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         restore,
       };
     } else if (result.phase === 'defeat') {
-      // Soft respawn at the inn - no punishing penalty, per design decision in the plan.
+      // Soft respawn at the inn - no punishing penalty, per design decision in the plan. Sent back
+      // to the town nearest wherever the fight actually happened (homeTownFor), not always Ash
+      // Hallow - a Crimson Bayou defeat should land the player in Mirehaven.
       save.player.stats.hp = Math.round(save.player.stats.maxHp * 0.5);
       save.player.stats.spirit = Math.round(save.player.stats.maxSpirit * 0.5);
-      save.player.currentLocationId = 'ash-hallow';
+      save.player.currentLocationId = homeTownFor(save.player.currentLocationId);
     }
 
     save.updatedAt = Date.now();
