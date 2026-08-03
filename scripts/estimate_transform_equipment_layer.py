@@ -28,7 +28,7 @@ This is meaningfully less certain than the palette-swap script's same-shape case
 QA the result (composited against the base body) before treating it as final; expect some frames
 may need manual touch-up.
 
-Usage: python scripts/estimate_transform_equipment_layer.py <reference_item> <target_item> <category> [directions...]
+Usage: python scripts/estimate_transform_equipment_layer.py <reference_item> <target_item> <category> [directions...] [--pose=running] [--gender=female]
   reference_item: an item with an already-built sheet + recorded anchor-table entries.
   target_item: the new item id - sourced from its own existing flat icon at
                public/assets/icons/original/<target_item>.png (already a clean, transparent,
@@ -36,7 +36,12 @@ Usage: python scripts/estimate_transform_equipment_layer.py <reference_item> <ta
                map-object generation needed).
   category: the anchor-table bucket to read the reference's per-frame (cx,cy,w,h) from.
   directions: which directions to process (defaults to whatever the reference item covers).
-Writes: public/assets/sprites/equipment/<target_item>-male-animated.png (walking rows only -
+  --gender=female: run against the female base body/reference sheet instead of male (default
+    male) - matches palette_swap_equipment_layer.py's own <item>-<gender>-animated.png convention.
+    Anchor data is read/written under a "-female" suffixed item key within the SAME category
+    bucket (e.g. category["ironwood-walking-staff-female"]) so it never collides with the male
+    entries for the same reference item.
+Writes: public/assets/sprites/equipment/<target_item>-<gender>-animated.png (walking rows only -
         running needs its own reference-frame-informed pass once walking is confirmed good).
 """
 
@@ -115,7 +120,7 @@ def transform_frame(raw_art, native_angle, target_angle, target_h, target_cx, ta
     return canvas
 
 
-def run(reference_item, target_item, category, directions, pose="walking", use_rotation=True):
+def run(reference_item, target_item, category, directions, pose="walking", use_rotation=True, gender="male"):
     raw_path = os.path.join(ICON_DIR, f"{target_item}.png")
     if not os.path.exists(raw_path):
         print(f"aborting: {raw_path} not found")
@@ -124,16 +129,21 @@ def run(reference_item, target_item, category, directions, pose="walking", use_r
     native_angle = pca_angle_deg(alpha_points(raw_art)) if use_rotation else 0.0
     print(f"{target_item} raw art native angle: {native_angle:.1f} deg" if use_rotation else f"{target_item}: rotation estimation disabled (not an elongated/held item)")
 
-    ref_sheet_path = os.path.join(SHEET_DIR, f"{reference_item}-male-animated.png")
+    ref_sheet_path = os.path.join(SHEET_DIR, f"{reference_item}-{gender}-animated.png")
     ref_sheet = Image.open(ref_sheet_path).convert("RGBA")
     row_map = WALK_ROW if pose == "walking" else RUN_ROW
+
+    # Female anchor data is kept in the SAME category bucket as male, under a "-female" suffixed
+    # key on the reference item id, so it never collides with the male entries already recorded
+    # for that same reference item.
+    anchor_item_key = reference_item if gender == "male" else f"{reference_item}-female"
 
     with open(ANCHOR_TABLE_PATH, "r", encoding="utf-8") as f:
         table = json.load(f)
     anchor_bucket = table.get(category, {}) if pose == "walking" else table.get("running", {}).get(category, {})
-    ref_anchors = anchor_bucket.get(reference_item)
+    ref_anchors = anchor_bucket.get(anchor_item_key)
     if ref_anchors is None:
-        print(f"aborting: no {pose}-pose anchor entries for {reference_item} in category {category}")
+        print(f"aborting: no {pose}-pose anchor entries for {anchor_item_key} in category {category}")
         return
 
     # Walking builds a fresh 8-row sheet (running rows filled in by a separate pass, or left as
@@ -143,7 +153,7 @@ def run(reference_item, target_item, category, directions, pose="walking", use_r
     if pose == "walking":
         out_sheet = Image.new("RGBA", (FRAME_SIZE[0] * 4, FRAME_SIZE[1] * 8), (0, 0, 0, 0))
     else:
-        out_path_existing = os.path.join(SHEET_DIR, f"{target_item}-male-animated.png")
+        out_path_existing = os.path.join(SHEET_DIR, f"{target_item}-{gender}-animated.png")
         if not os.path.exists(out_path_existing):
             print(f"aborting: {out_path_existing} doesn't exist yet - run the walking pass first")
             return
@@ -172,14 +182,15 @@ def run(reference_item, target_item, category, directions, pose="walking", use_r
                 if bbox else None
             )
 
-    out_path = os.path.join(SHEET_DIR, f"{target_item}-male-animated.png")
+    out_path = os.path.join(SHEET_DIR, f"{target_item}-{gender}-animated.png")
     out_sheet.save(out_path, format="PNG", optimize=True)
-    print(f"{target_item}: estimated-transform {pose} build -> {out_path}")
+    print(f"{target_item} ({gender}): estimated-transform {pose} build -> {out_path}")
 
+    target_anchor_key = target_item if gender == "male" else f"{target_item}-female"
     if pose == "walking":
-        table.setdefault(category, {})[target_item] = new_anchors
+        table.setdefault(category, {})[target_anchor_key] = new_anchors
     else:
-        table.setdefault("running", {}).setdefault(category, {})[target_item] = new_anchors
+        table.setdefault("running", {}).setdefault(category, {})[target_anchor_key] = new_anchors
     with open(ANCHOR_TABLE_PATH, "w", encoding="utf-8") as f:
         json.dump(table, f, indent=2)
         f.write("\n")
@@ -187,20 +198,23 @@ def run(reference_item, target_item, category, directions, pose="walking", use_r
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
-        print("usage: python scripts/estimate_transform_equipment_layer.py <reference_item> <target_item> <category> [directions...] [--pose=running]")
+        print("usage: python scripts/estimate_transform_equipment_layer.py <reference_item> <target_item> <category> [directions...] [--pose=running] [--gender=female]")
         sys.exit(1)
     reference_item, target_item, category = sys.argv[1], sys.argv[2], sys.argv[3]
     rest = sys.argv[4:]
     pose = "walking"
     use_rotation = True
+    gender = "male"
     directions = []
     for arg in rest:
         if arg.startswith("--pose="):
             pose = arg.split("=", 1)[1]
+        elif arg.startswith("--gender="):
+            gender = arg.split("=", 1)[1]
         elif arg == "--no-rotation":
             use_rotation = False
         else:
             directions.append(arg)
     directions = directions or ["down", "left", "up", "right"]
-    run(reference_item, target_item, category, directions, pose, use_rotation)
+    run(reference_item, target_item, category, directions, pose, use_rotation, gender)
     print("done")

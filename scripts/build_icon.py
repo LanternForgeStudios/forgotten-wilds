@@ -110,6 +110,28 @@ ICONS = {
     "miners-pick": (64, 64),
     "ashwood-spear": (64, 64),
     "miners-mallet": (64, 64),
+    # Iron Mountains Uncommon/Rare tiers of the 4 new weapon-type families.
+    "ironbound-sword": (64, 64),
+    "ironbound-axe": (64, 64),
+    "ironbound-spear": (64, 64),
+    "ironbound-war-maul": (64, 64),
+    "wardens-broadsword": (64, 64),
+    "ghost-miners-axe": (64, 64),
+    "ridgehunters-spear": (64, 64),
+    "ghostbreaker-warhammer": (64, 64),
+    # Crimson Bayou's own 4 new weapon-type families, all 3 tiers each.
+    "weathered-bog-cutlass": (64, 64),
+    "weathered-bog-axe": (64, 64),
+    "weathered-reed-spear": (64, 64),
+    "weathered-bog-maul": (64, 64),
+    "bound-bog-cutlass": (64, 64),
+    "bound-bog-axe": (64, 64),
+    "bound-reed-spear": (64, 64),
+    "bound-bog-maul": (64, 64),
+    "serpent-fang-sword": (64, 64),
+    "rougarou-claw-axe": (64, 64),
+    "serpent-guard-spear": (64, 64),
+    "rougarou-warclub": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")

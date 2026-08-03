@@ -428,3 +428,23 @@ granted purely via quest reward and are fully decoupled from whatever weapon is 
 `grantSkillId` in `functions/src/engine/questEngine.ts`), so this entire system is art + equipment-
 data only. A "weapon type gates which Skills you can use" mechanic is a real option for later, not
 part of this rollout.
+
+### Status (2026-08-03): data shipped for all 20 new items, layer art pending review
+
+All 4 founders (Common tier, Iron Mountains) and the full Uncommon/Rare rollout for Iron Mountains
+plus all 3 tiers for Crimson Bayou are live as real, purchasable equipment - icons, stats, and shop
+wiring all done. Layer-sprite art (the visible in-hand weapon on the overworld sprite) is a
+separate, still-in-progress track - see `docs/Asset-Production-Checklist.md`'s "Equipment
+weapon-layer sprites" section for exactly what's generated vs. still needs manual review/touch-up.
+
+| Type | Iron Mountains family (`iron-sword`/`miners-pick`/`ashwood-spear`/`miners-mallet`) | Crimson Bayou family (`bog-cutlass`/`bog-axe`/`reed-spear`/`bog-maul`) |
+|---|---|---|
+| Sword | Weathered Iron Sword (C) -> Ironbound Sword (U) -> Warden's Broadsword (R) | Weathered Bog Cutlass (C) -> Bound Bog Cutlass (U) -> Serpent Fang Sword (R) |
+| Axe | Miner's Pick (C) -> Ironbound Axe (U) -> Ghost Miner's Axe (R) | Weathered Bog Axe (C) -> Bound Bog Axe (U) -> Rougarou Claw Axe (R) |
+| Spear | Ashwood Spear (C) -> Ironbound Spear (U) -> Ridgehunter's Spear (R) | Weathered Reed Spear (C) -> Bound Reed Spear (U) -> Serpent-Guard Spear (R) |
+| Hammer | Miner's Mallet (C) -> Ironbound War-Maul (U) -> Ghostbreaker Warhammer (R) | Weathered Bog Maul (C) -> Bound Bog Maul (U) -> Rougarou Warclub (R) |
+
+Earn paths mirror the existing walking-staff/cypress-cane precedent exactly: Common+Uncommon tiers
+sold at each region's own weapon shop (Ash Hallow Forge / Toussaint's Forge), Rare tiers unlocked
+at that shop once the region's MSQ finale completes (`the-mountain-remembers` / `the-waters-
+remember`) - no chest placements needed, no map edits.

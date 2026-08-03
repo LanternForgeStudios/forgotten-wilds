@@ -383,6 +383,46 @@ finally produced an actual round ball.
 | Festival Tokens *(unused, reserved for future systems - low priority)* | 32×32 | Simple flat-shaded fantasy game icon of a small carved wooden festival token, centered, transparent background. |
 | Premium Currency *(unused, reserved for future systems - low priority)* | 32×32 | Simple flat-shaded fantasy game icon of a small faceted gemstone, centered, transparent background. |
 
+## Equipment weapon-layer sprites (auto-generated, need manual review)
+
+The 4 new universal weapon-type founders (docs/Mytherra-Equipment_breakdown.md's "Weapon Types"
+section) each got a first-pass equipment-layer sheet via `scripts/estimate_transform_equipment_
+layer.py` (reference: `ironwood-walking-staff`, category `held-right-hand`) instead of the usual
+full hand-positioning pass, at the user's request ("auto generating the sprite sheets... using the
+staff sprite as the bases... I can then go in and edit the full sprite sheet after") - faster than
+a from-scratch manual-edit pass, but the script's own docs flag it as **EXPERIMENTAL** and less
+reliable than real hand-positioning or a same-shape recolor: it estimates rotation via PCA and
+clips the new item's silhouette to the staff's own (thin, rod-shaped) outline, so a wider blade can
+come out visibly thinner/rescaled, and grip alignment against the hand is approximate frame-to-
+frame, not hand-verified.
+
+**Status: both male AND female walking frames now generated, all 8 sheets unreviewed.** Female
+sheets used the same script extended with a `--gender=female` flag (mirroring
+`palette_swap_equipment_layer.py`'s own convention) against `ironwood-walking-staff-female`'s
+existing hand-finished sheet as reference (its anchor data didn't exist yet either - bootstrapped
+via `scripts/record_anchor_from_sheet.py`, also now gender-parameterized the same way). Running
+rows (4-7) are still fully blank/transparent for all 8 - the script only fills the walking rows
+(rows 0-3); `layerSpriteAssetId` is deliberately NOT yet wired into `src/data/equipment.ts` for any
+of these 4 items, and none of the other 16 region-flavored tier items (Iron Mountains Uncommon/Rare
++ all of Crimson Bayou's own new families) have been palette-swapped from them yet - do that only
+after these 4 are confirmed good, so a bad founder doesn't cascade into 16 bad siblings.
+
+| Item | Male file | Female file | What to check |
+|---|---|---|---|
+| Weathered Iron Sword | `weathered-iron-sword-male-animated.png` | `weathered-iron-sword-female-animated.png` | Blade width/length reads too thin (clipped to the staff's own rod silhouette) - grip position against the hand across all 4 directions x 4 frames. |
+| Miner's Pick | `miners-pick-male-animated.png` | `miners-pick-female-animated.png` | Axe head detaches from the haft in a couple of frames (most visible on the "up"-facing row) - reattach/reposition those. |
+| Ashwood Spear | `ashwood-spear-male-animated.png` | `ashwood-spear-female-animated.png` | Same "up"-facing detachment issue as the axe; shaft length may read short relative to a spear's usual proportions. |
+| Miner's Mallet | `miners-mallet-male-animated.png` | `miners-mallet-female-animated.png` | Hammer head sometimes reads as a separate floating shape rather than fixed to the haft's end - most visible on the "up"-facing row. |
+
+(All paths relative to `public/assets/sprites/equipment/`.)
+
+Once these 8 are hand-touched-up and confirmed good: re-run `scripts/record_anchor_from_sheet.py`
+for each (male AND `--gender=female`), wire `layerSpriteAssetId: { male: 'sprite.equipment.<item>',
+female: 'sprite.equipment.<item>-female' }` into `src/data/equipment.ts`, register each in
+`src/assets/registry.ts`, then run running-row work and `scripts/palette_swap_equipment_layer.py`
+(male and female, per its own `[gender]` argument) to derive the other 16 region-flavored tier
+items from these 4 corrected founders.
+
 ## UI (2 - low priority, already serviceable)
 
 Two 48×48 9-slice panel borders (Kenney CC0 "Fantasy UI Borders," already real assets, not

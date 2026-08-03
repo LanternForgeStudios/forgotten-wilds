@@ -244,12 +244,38 @@ export const SHOP_PRICES: Record<string, number> = {
   'veteran-keeper-trousers': 120,
   'trail-boots': 70,
   'keepers-gauntlets': 130,
+  // Iron Mountains' 4 new weapon-type families (docs/Mytherra-Equipment_breakdown.md's "Weapon
+  // Types" section) - Uncommon tiers priced with the rest of the base catalog, Rare tiers priced
+  // (and gated) alongside spiritwood-walking-staff above.
+  'ironbound-sword': 68,
+  'ironbound-axe': 65,
+  'ironbound-spear': 64,
+  'ironbound-war-maul': 64,
+  'wardens-broadsword': 145,
+  'ghost-miners-axe': 140,
+  'ridgehunters-spear': 135,
+  'ghostbreaker-warhammer': 145,
   // Crimson Bayou - Cypress Cane/Bayou Vestments/Bayou Leg-Wraps/Marsh Boots/Mire Gloves/Bayou
   // Charm families, Common+Uncommon tiers (Rare comes from the region's own chests/boss instead,
   // same "shops stock the lower tiers" rule as Iron Mountains). Split the same Blacksmith/Armory
   // way: weapon/charm to Toussaint, chest/legs/boots/gloves to Delphine.
   'weathered-cypress-cane': 32,
   'bound-cypress-cane': 65,
+  // Crimson Bayou's own 4 new weapon-type families - Common/Uncommon priced with the rest of the
+  // base catalog, matching cypress-cane's own pricing scale; Rare tiers priced (and gated) with
+  // witch-warded-charm below.
+  'weathered-bog-cutlass': 32,
+  'weathered-bog-axe': 30,
+  'weathered-reed-spear': 29,
+  'weathered-bog-maul': 29,
+  'bound-bog-cutlass': 68,
+  'bound-bog-axe': 65,
+  'bound-reed-spear': 64,
+  'bound-bog-maul': 64,
+  'serpent-fang-sword': 145,
+  'rougarou-claw-axe': 140,
+  'serpent-guard-spear': 135,
+  'rougarou-warclub': 145,
   'marsh-reed-charm': 22,
   'swamp-talisman': 50,
   'tattered-bayou-vestments': 32,
@@ -273,11 +299,32 @@ export const SHOP_PRICES: Record<string, number> = {
  *  effectiveShopCatalog below). Adding a new region/shop's own late-game unlock is just a new
  *  entry here - no code changes needed anywhere else. */
 export const SHOP_UNLOCK_TIERS: Record<string, { questId: string; itemIds: string[] }[]> = {
-  'ash-hallow-blacksmith-forge': [{ questId: 'the-mountain-remembers', itemIds: ['spiritwood-walking-staff', 'mountain-knot'] }],
+  'ash-hallow-blacksmith-forge': [
+    {
+      questId: 'the-mountain-remembers',
+      itemIds: [
+        'spiritwood-walking-staff',
+        'mountain-knot',
+        'wardens-broadsword',
+        'ghost-miners-axe',
+        'ridgehunters-spear',
+        'ghostbreaker-warhammer',
+      ],
+    },
+  ],
   'ash-hallow-armory': [
     { questId: 'the-mountain-remembers', itemIds: ['veteran-keeper-coat', 'veteran-keeper-trousers', 'trail-boots', 'keepers-gauntlets'] },
   ],
-  'toussaint-forge': [{ questId: 'seeds-of-memory', itemIds: ['witch-warded-charm'] }],
+  'toussaint-forge': [
+    { questId: 'seeds-of-memory', itemIds: ['witch-warded-charm'] },
+    // Bayou's own 4 new Rare-tier weapons - gated behind the region's finale, same convention as
+    // Iron Mountains' Rare weapon tier above (spiritwood-walking-staff etc. behind
+    // the-mountain-remembers).
+    {
+      questId: 'the-waters-remember',
+      itemIds: ['serpent-fang-sword', 'rougarou-claw-axe', 'serpent-guard-spear', 'rougarou-warclub'],
+    },
+  ],
 };
 
 /** A shop's full purchasable catalog right now - its base SHOP_CATALOGS stock plus every

@@ -460,10 +460,34 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'veteran-keeper-trousers', price: 120, currency: 'gold' },
   { itemId: 'trail-boots', price: 70, currency: 'gold' },
   { itemId: 'keepers-gauntlets', price: 130, currency: 'gold' },
+  // Iron Mountains' 4 new weapon-type families - Uncommon priced with the base catalog, Rare
+  // priced (and gated) alongside spiritwood-walking-staff above.
+  { itemId: 'ironbound-sword', price: 68, currency: 'gold' },
+  { itemId: 'ironbound-axe', price: 65, currency: 'gold' },
+  { itemId: 'ironbound-spear', price: 64, currency: 'gold' },
+  { itemId: 'ironbound-war-maul', price: 64, currency: 'gold' },
+  { itemId: 'wardens-broadsword', price: 145, currency: 'gold' },
+  { itemId: 'ghost-miners-axe', price: 140, currency: 'gold' },
+  { itemId: 'ridgehunters-spear', price: 135, currency: 'gold' },
+  { itemId: 'ghostbreaker-warhammer', price: 145, currency: 'gold' },
   // Crimson Bayou - Cypress Cane/Bayou Vestments/Bayou Leg-Wraps/Marsh Boots/Mire Gloves/Bayou
   // Charm families, Common+Uncommon tiers.
   { itemId: 'weathered-cypress-cane', price: 32, currency: 'gold' },
   { itemId: 'bound-cypress-cane', price: 65, currency: 'gold' },
+  // Crimson Bayou's own 4 new weapon-type families - Common/Uncommon priced with the base
+  // catalog, Rare priced (and gated) with witch-warded-charm below.
+  { itemId: 'weathered-bog-cutlass', price: 32, currency: 'gold' },
+  { itemId: 'weathered-bog-axe', price: 30, currency: 'gold' },
+  { itemId: 'weathered-reed-spear', price: 29, currency: 'gold' },
+  { itemId: 'weathered-bog-maul', price: 29, currency: 'gold' },
+  { itemId: 'bound-bog-cutlass', price: 68, currency: 'gold' },
+  { itemId: 'bound-bog-axe', price: 65, currency: 'gold' },
+  { itemId: 'bound-reed-spear', price: 64, currency: 'gold' },
+  { itemId: 'bound-bog-maul', price: 64, currency: 'gold' },
+  { itemId: 'serpent-fang-sword', price: 145, currency: 'gold' },
+  { itemId: 'rougarou-claw-axe', price: 140, currency: 'gold' },
+  { itemId: 'serpent-guard-spear', price: 135, currency: 'gold' },
+  { itemId: 'rougarou-warclub', price: 145, currency: 'gold' },
   { itemId: 'marsh-reed-charm', price: 22, currency: 'gold' },
   { itemId: 'swamp-talisman', price: 50, currency: 'gold' },
   { itemId: 'tattered-bayou-vestments', price: 32, currency: 'gold' },
@@ -525,7 +549,20 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'eye-drops',
     'echo-herb',
   ],
-  'toussaint-forge': ['weathered-cypress-cane', 'bound-cypress-cane', 'marsh-reed-charm', 'swamp-talisman'],
+  'toussaint-forge': [
+    'weathered-cypress-cane',
+    'bound-cypress-cane',
+    'weathered-bog-cutlass',
+    'weathered-bog-axe',
+    'weathered-reed-spear',
+    'weathered-bog-maul',
+    'bound-bog-cutlass',
+    'bound-bog-axe',
+    'bound-reed-spear',
+    'bound-bog-maul',
+    'marsh-reed-charm',
+    'swamp-talisman',
+  ],
   'delphine-armory': [
     'tattered-bayou-vestments',
     'woven-bayou-vestments',
@@ -543,11 +580,29 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
  *  rationale; this display copy exists so Shop.tsx can show the same effective catalog the server
  *  will actually accept a purchase against). */
 export const SHOP_UNLOCK_TIERS: Record<string, { questId: string; itemIds: string[] }[]> = {
-  'ash-hallow-blacksmith-forge': [{ questId: 'the-mountain-remembers', itemIds: ['spiritwood-walking-staff', 'mountain-knot'] }],
+  'ash-hallow-blacksmith-forge': [
+    {
+      questId: 'the-mountain-remembers',
+      itemIds: [
+        'spiritwood-walking-staff',
+        'mountain-knot',
+        'wardens-broadsword',
+        'ghost-miners-axe',
+        'ridgehunters-spear',
+        'ghostbreaker-warhammer',
+      ],
+    },
+  ],
   'ash-hallow-armory': [
     { questId: 'the-mountain-remembers', itemIds: ['veteran-keeper-coat', 'veteran-keeper-trousers', 'trail-boots', 'keepers-gauntlets'] },
   ],
-  'toussaint-forge': [{ questId: 'seeds-of-memory', itemIds: ['witch-warded-charm'] }],
+  'toussaint-forge': [
+    { questId: 'seeds-of-memory', itemIds: ['witch-warded-charm'] },
+    {
+      questId: 'the-waters-remember',
+      itemIds: ['serpent-fang-sword', 'rougarou-claw-axe', 'serpent-guard-spear', 'rougarou-warclub'],
+    },
+  ],
 };
 
 /** A shop's full purchasable catalog right now - see functions/src/data/items.ts's identical

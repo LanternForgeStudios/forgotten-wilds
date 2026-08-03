@@ -2661,6 +2661,206 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/miners-mallet.png. First generation attempt read as a double-bit axe rather than a blunt hammer ("war-pick" framing confused the model) - regenerated with explicit "no blade or spike" wording.',
   },
   {
+    id: 'icon.equipment.ironbound-sword',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ironbound-sword (Iron Mountains Sword family, uncommon)',
+    filePath: 'icons/ironbound-sword.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ironbound-sword.png.',
+  },
+  {
+    id: 'icon.equipment.ironbound-axe',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ironbound-axe (Iron Mountains Axe family, uncommon)',
+    filePath: 'icons/ironbound-axe.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ironbound-axe.png.',
+  },
+  {
+    id: 'icon.equipment.ironbound-spear',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ironbound-spear (Iron Mountains Spear family, uncommon)',
+    filePath: 'icons/ironbound-spear.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ironbound-spear.png.',
+  },
+  {
+    id: 'icon.equipment.ironbound-war-maul',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ironbound-war-maul (Iron Mountains Hammer family, uncommon)',
+    filePath: 'icons/ironbound-war-maul.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ironbound-war-maul.png.',
+  },
+  {
+    id: 'icon.equipment.wardens-broadsword',
+    category: 'icon',
+    intendedUse: 'Equipment icon for wardens-broadsword (Iron Mountains Sword family, rare)',
+    filePath: 'icons/wardens-broadsword.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/wardens-broadsword.png.',
+  },
+  {
+    id: 'icon.equipment.ghost-miners-axe',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ghost-miners-axe (Iron Mountains Axe family, rare)',
+    filePath: 'icons/ghost-miners-axe.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ghost-miners-axe.png.',
+  },
+  {
+    id: 'icon.equipment.ridgehunters-spear',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ridgehunters-spear (Iron Mountains Spear family, rare)',
+    filePath: 'icons/ridgehunters-spear.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ridgehunters-spear.png.',
+  },
+  {
+    id: 'icon.equipment.ghostbreaker-warhammer',
+    category: 'icon',
+    intendedUse: 'Equipment icon for ghostbreaker-warhammer (Iron Mountains Hammer family, rare)',
+    filePath: 'icons/ghostbreaker-warhammer.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ghostbreaker-warhammer.png.',
+  },
+  {
+    id: 'icon.equipment.weathered-bog-cutlass',
+    category: 'icon',
+    intendedUse: 'Equipment icon for weathered-bog-cutlass (Crimson Bayou Sword family, common)',
+    filePath: 'icons/weathered-bog-cutlass.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-bog-cutlass.png.',
+  },
+  {
+    id: 'icon.equipment.weathered-bog-axe',
+    category: 'icon',
+    intendedUse: 'Equipment icon for weathered-bog-axe (Crimson Bayou Axe family, common)',
+    filePath: 'icons/weathered-bog-axe.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-bog-axe.png.',
+  },
+  {
+    id: 'icon.equipment.weathered-reed-spear',
+    category: 'icon',
+    intendedUse: 'Equipment icon for weathered-reed-spear (Crimson Bayou Spear family, common)',
+    filePath: 'icons/weathered-reed-spear.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-reed-spear.png.',
+  },
+  {
+    id: 'icon.equipment.weathered-bog-maul',
+    category: 'icon',
+    intendedUse: 'Equipment icon for weathered-bog-maul (Crimson Bayou Hammer family, common)',
+    filePath: 'icons/weathered-bog-maul.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-bog-maul.png.',
+  },
+  {
+    id: 'icon.equipment.bound-bog-cutlass',
+    category: 'icon',
+    intendedUse: 'Equipment icon for bound-bog-cutlass (Crimson Bayou Sword family, uncommon)',
+    filePath: 'icons/bound-bog-cutlass.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/bound-bog-cutlass.png.',
+  },
+  {
+    id: 'icon.equipment.bound-bog-axe',
+    category: 'icon',
+    intendedUse: 'Equipment icon for bound-bog-axe (Crimson Bayou Axe family, uncommon)',
+    filePath: 'icons/bound-bog-axe.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/bound-bog-axe.png.',
+  },
+  {
+    id: 'icon.equipment.bound-reed-spear',
+    category: 'icon',
+    intendedUse: 'Equipment icon for bound-reed-spear (Crimson Bayou Spear family, uncommon)',
+    filePath: 'icons/bound-reed-spear.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/bound-reed-spear.png.',
+  },
+  {
+    id: 'icon.equipment.bound-bog-maul',
+    category: 'icon',
+    intendedUse: 'Equipment icon for bound-bog-maul (Crimson Bayou Hammer family, uncommon)',
+    filePath: 'icons/bound-bog-maul.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/bound-bog-maul.png.',
+  },
+  {
+    id: 'icon.equipment.serpent-fang-sword',
+    category: 'icon',
+    intendedUse: 'Equipment icon for serpent-fang-sword (Crimson Bayou Sword family, rare)',
+    filePath: 'icons/serpent-fang-sword.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/serpent-fang-sword.png.',
+  },
+  {
+    id: 'icon.equipment.rougarou-claw-axe',
+    category: 'icon',
+    intendedUse: 'Equipment icon for rougarou-claw-axe (Crimson Bayou Axe family, rare)',
+    filePath: 'icons/rougarou-claw-axe.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/rougarou-claw-axe.png.',
+  },
+  {
+    id: 'icon.equipment.serpent-guard-spear',
+    category: 'icon',
+    intendedUse: 'Equipment icon for serpent-guard-spear (Crimson Bayou Spear family, rare)',
+    filePath: 'icons/serpent-guard-spear.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/serpent-guard-spear.png.',
+  },
+  {
+    id: 'icon.equipment.rougarou-warclub',
+    category: 'icon',
+    intendedUse: 'Equipment icon for rougarou-warclub (Crimson Bayou Hammer family, rare)',
+    filePath: 'icons/rougarou-warclub.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/rougarou-warclub.png.',
+  },
+  {
     id: 'icon.equipment.ironwood-walking-staff',
     category: 'icon',
     intendedUse: 'Equipment icon for ironwood-walking-staff (Walking Staff family, uncommon)',
