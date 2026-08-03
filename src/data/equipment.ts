@@ -35,6 +35,41 @@ export const EQUIPMENT: EquipmentItem[] = [
     tier: 'common',
     familyId: 'iron-sword',
   },
+  // Axe weapon type founder - layerSpriteAssetId omitted for now, same as weathered-iron-sword,
+  // pending hand-positioning (docs/Equipment-Layering-Plan.md).
+  {
+    id: 'miners-pick',
+    name: "Miner's Pick",
+    description: "A mining pick, its point re-forged for fighting rather than digging.",
+    slot: 'weapon',
+    iconAssetId: 'icon.equipment.miners-pick',
+    statBonuses: { attack: 6, defense: 1, speed: -1 },
+    tier: 'common',
+    familyId: 'miners-pick',
+  },
+  // Spear weapon type founder - layerSpriteAssetId omitted for now, pending hand-positioning.
+  {
+    id: 'ashwood-spear',
+    name: 'Ashwood Spear',
+    description: 'A short ashwood spear, light enough to carry one-handed on the mountain trails.',
+    slot: 'weapon',
+    iconAssetId: 'icon.equipment.ashwood-spear',
+    statBonuses: { attack: 5, maxHp: 4 },
+    tier: 'common',
+    familyId: 'ashwood-spear',
+  },
+  // Hammer weapon type founder - built one-handed (mace/war-maul). layerSpriteAssetId omitted for
+  // now, pending hand-positioning.
+  {
+    id: 'miners-mallet',
+    name: "Miner's Mallet",
+    description: 'A blacksmith\'s maul, its haft worn smooth from years at the forge before it ever saw a fight.',
+    slot: 'weapon',
+    iconAssetId: 'icon.equipment.miners-mallet',
+    statBonuses: { attack: 5, defense: 2, speed: -1 },
+    tier: 'common',
+    familyId: 'miners-mallet',
+  },
   {
     id: 'ironwood-walking-staff',
     name: 'Ironwood Walking Staff',

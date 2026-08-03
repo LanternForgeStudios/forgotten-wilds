@@ -107,6 +107,9 @@ ICONS = {
     "drowned-ledger": (64, 64),
     "bogwater-almanac": (64, 64),
     "weathered-iron-sword": (64, 64),
+    "miners-pick": (64, 64),
+    "ashwood-spear": (64, 64),
+    "miners-mallet": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")

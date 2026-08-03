@@ -227,6 +227,9 @@ export const SHOP_PRICES: Record<string, number> = {
   // Universal Sword weapon-type founder (docs/Mytherra-Equipment_breakdown.md's "Weapon Types"
   // section) - same common-tier price as weathered-walking-staff, its Staff-type sibling.
   'weathered-iron-sword': 30,
+  'miners-pick': 28,
+  'ashwood-spear': 27,
+  'miners-mallet': 27,
   'river-stone-charm': 25,
   'worn-keeper-coat': 30,
   'worn-keeper-trousers': 26,
@@ -293,7 +296,14 @@ export function effectiveShopCatalog(shopId: string, completedQuestIds: Set<stri
 // hand with src/data/items.ts's SHOP_CATALOGS (display copy).
 export const SHOP_CATALOGS: Record<string, string[]> = {
   'mara-ash-general-store': ['keepers-lantern', 'antidote', 'eye-drops'],
-  'ash-hallow-blacksmith-forge': ['weathered-walking-staff', 'weathered-iron-sword', 'river-stone-charm'],
+  'ash-hallow-blacksmith-forge': [
+    'weathered-walking-staff',
+    'weathered-iron-sword',
+    'miners-pick',
+    'ashwood-spear',
+    'miners-mallet',
+    'river-stone-charm',
+  ],
   'ash-hallow-armory': ['worn-keeper-coat', 'worn-keeper-trousers', 'traveler-boots', 'work-gloves'],
   apothecary: [
     'healing-poultice',

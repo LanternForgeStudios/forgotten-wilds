@@ -2628,6 +2628,39 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-iron-sword.png.',
   },
   {
+    id: 'icon.equipment.miners-pick',
+    category: 'icon',
+    intendedUse:
+      "Equipment icon for miners-pick (Iron Mountains Axe family, common) - the universal Axe weapon-type founder item (docs/Mytherra-Equipment_breakdown.md's \"Weapon Types\" section).",
+    filePath: 'icons/miners-pick.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/miners-pick.png.',
+  },
+  {
+    id: 'icon.equipment.ashwood-spear',
+    category: 'icon',
+    intendedUse:
+      "Equipment icon for ashwood-spear (Iron Mountains Spear family, common) - the universal Spear weapon-type founder item (docs/Mytherra-Equipment_breakdown.md's \"Weapon Types\" section), built one-handed.",
+    filePath: 'icons/ashwood-spear.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/ashwood-spear.png.',
+  },
+  {
+    id: 'icon.equipment.miners-mallet',
+    category: 'icon',
+    intendedUse:
+      "Equipment icon for miners-mallet (Iron Mountains Hammer family, common) - the universal Hammer weapon-type founder item (docs/Mytherra-Equipment_breakdown.md's \"Weapon Types\" section), deliberately built one-handed (a mace/war-maul, not a two-handed maul - no held-two-hand anchor category exists).",
+    filePath: 'icons/miners-mallet.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/miners-mallet.png. First generation attempt read as a double-bit axe rather than a blunt hammer ("war-pick" framing confused the model) - regenerated with explicit "no blade or spike" wording.',
+  },
+  {
     id: 'icon.equipment.ironwood-walking-staff',
     category: 'icon',
     intendedUse: 'Equipment icon for ironwood-walking-staff (Walking Staff family, uncommon)',

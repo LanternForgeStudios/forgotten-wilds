@@ -77,6 +77,33 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'common',
     familyId: 'iron-sword',
   },
+  // Axe weapon type founder - heavier hit than Sword, at the cost of speed (leans defense instead
+  // of the Sword line's speed-leaning split).
+  'miners-pick': {
+    id: 'miners-pick',
+    slot: 'weapon',
+    statBonuses: { attack: 6, defense: 1, speed: -1 },
+    tier: 'common',
+    familyId: 'miners-pick',
+  },
+  // Spear weapon type founder - reach/endurance flavor (HP bonus instead of Sword/Axe's
+  // speed/defense split).
+  'ashwood-spear': {
+    id: 'ashwood-spear',
+    slot: 'weapon',
+    statBonuses: { attack: 5, maxHp: 4 },
+    tier: 'common',
+    familyId: 'ashwood-spear',
+  },
+  // Hammer weapon type founder - built one-handed (mace/war-maul, not a two-handed maul - no
+  // held-two-hand anchor category exists). Heaviest/slowest of the 4 new types, defense-leaning.
+  'miners-mallet': {
+    id: 'miners-mallet',
+    slot: 'weapon',
+    statBonuses: { attack: 5, defense: 2, speed: -1 },
+    tier: 'common',
+    familyId: 'miners-mallet',
+  },
   'ironwood-walking-staff': {
     id: 'ironwood-walking-staff',
     slot: 'weapon',

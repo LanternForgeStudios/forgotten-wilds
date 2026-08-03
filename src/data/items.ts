@@ -445,6 +445,9 @@ export const SHOP_LISTINGS: ShopListing[] = [
   // Universal Sword weapon-type founder (docs/Mytherra-Equipment_breakdown.md's "Weapon Types"
   // section) - same common-tier price as weathered-walking-staff, its Staff-type sibling.
   { itemId: 'weathered-iron-sword', price: 30, currency: 'gold' },
+  { itemId: 'miners-pick', price: 28, currency: 'gold' },
+  { itemId: 'ashwood-spear', price: 27, currency: 'gold' },
+  { itemId: 'miners-mallet', price: 27, currency: 'gold' },
   { itemId: 'river-stone-charm', price: 25, currency: 'gold' },
   { itemId: 'worn-keeper-coat', price: 30, currency: 'gold' },
   { itemId: 'worn-keeper-trousers', price: 26, currency: 'gold' },
@@ -490,7 +493,14 @@ export const SHOP_TITLES: Record<string, string> = {
 
 export const SHOP_CATALOGS: Record<string, string[]> = {
   'mara-ash-general-store': ['keepers-lantern', 'antidote', 'eye-drops'],
-  'ash-hallow-blacksmith-forge': ['weathered-walking-staff', 'weathered-iron-sword', 'river-stone-charm'],
+  'ash-hallow-blacksmith-forge': [
+    'weathered-walking-staff',
+    'weathered-iron-sword',
+    'miners-pick',
+    'ashwood-spear',
+    'miners-mallet',
+    'river-stone-charm',
+  ],
   'ash-hallow-armory': ['worn-keeper-coat', 'worn-keeper-trousers', 'traveler-boots', 'work-gloves'],
   apothecary: [
     'healing-poultice',
