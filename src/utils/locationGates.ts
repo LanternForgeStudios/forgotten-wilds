@@ -22,6 +22,7 @@ export const LOCATION_GATES: Record<string, string> = {
   'cypress-marsh': 'the-mountain-remembers',
   'murkwater-trails': 'the-mountain-remembers',
   'hidden-river-landing': 'the-mountain-remembers',
+  'temple-of-the-deep-current': 'beneath-still-waters',
 };
 
 /** Returns a player-facing message if `locationId` is gated and not yet unlocked, or null if it's

@@ -23,6 +23,11 @@ const LOCATION_GATES: Record<string, string> = {
   'cypress-marsh': 'the-mountain-remembers',
   'murkwater-trails': 'the-mountain-remembers',
   'hidden-river-landing': 'the-mountain-remembers',
+  // Chapter 4's dungeon - gated on the last Chapter 3 quest (beneath-still-waters), the same
+  // "latest quest safely completed *before* the location is ever needed" rule
+  // src/utils/locationGates.ts's own comment documents (into-the-deep-current's own first
+  // objective is reaching this location, so gating on it directly would be circular).
+  'temple-of-the-deep-current': 'beneath-still-waters',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -52,6 +57,7 @@ const KNOWN_LOCATION_IDS = new Set([
   'mirehaven-blacksmith',
   'mirehaven-armory',
   'mirehaven-herbalist',
+  'temple-of-the-deep-current',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

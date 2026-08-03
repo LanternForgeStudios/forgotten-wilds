@@ -51,6 +51,9 @@
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
     { "type": "npc", "x": 28, "y": 24, "refId": "sabine-thorne", "wanderRadius": 3 },
-    { "type": "interactable", "x": 34, "y": 30, "refId": "heart-seed-river" }
+    { "type": "interactable", "x": 34, "y": 30, "refId": "heart-seed-river" },
+
+    { "type": "spawnPoint", "x": 30, "y": 38, "refId": "from-temple-of-the-deep-current" },
+    { "type": "transition", "x": 30, "y": 39, "refId": "temple-of-the-deep-current", "targetSpawnId": "from-hidden-river-landing" }
   ]
 }

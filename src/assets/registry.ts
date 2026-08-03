@@ -2551,6 +2551,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'Authored by hand to the Tiled JSON schema, using tileset.tiny-dungeon. Added in Phase 8.',
   },
   {
+    id: 'map.temple-of-the-deep-current',
+    category: 'map',
+    intendedUse: "Tiled JSON map for the Temple of the Deep Current dungeon (Crimson Bayou Chapter 4) - a single map, not the design doc's 5 named sub-areas, matching Hollow Rail Mine's own precedent (see docs/Mytherra-MSQ_breakdown.md's Chapter 4 Implementation Notes).",
+    filePath: 'maps/temple-of-the-deep-current.json',
+    dimensions: null,
+    status: 'placeholder',
+    notes: 'Generated via scripts/genMapRicher.mjs from scripts/map-specs-richer/temple-of-the-deep-current.json, reusing tileset.tiny-dungeon (same generic dungeon tileset as Hollow Rail Mine) - no new tileset generation for this region\'s second dungeon.',
+  },
+  {
     id: 'map.ash-hallow-elias-house',
     category: 'map',
     intendedUse: "Tiled JSON map for Elias Rowan's house interior, in Ash Hallow",

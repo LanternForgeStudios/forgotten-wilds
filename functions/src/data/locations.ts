@@ -36,6 +36,12 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'hidden-river-landing': {
     'heart-seed-river': 'heart-seed-river',
   },
+  // Temple of the Deep Current (Chapter 4 dungeon) - refId equals the granted item's own id,
+  // matching every other WORLD_ITEMS entry's convention.
+  'temple-of-the-deep-current': {
+    'temple-records': 'temple-records',
+    'lantern-of-still-waters': 'lantern-of-still-waters',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's

@@ -331,6 +331,21 @@ export const LOCATIONS: Location[] = [
     fastTravel: true,
   },
   {
+    id: 'temple-of-the-deep-current',
+    name: 'Temple of the Deep Current',
+    kind: 'dungeon',
+    description: 'A flooded ancient temple beneath Hidden River Landing, once tended by Lantern Keepers alongside the Ancient Serpent Guardian.',
+    mapAssetId: 'map.temple-of-the-deep-current',
+    battleBackgroundAssetId: 'battle-bg.forest',
+    encounterTable: [
+      { enemyId: 'bog-ravager', weight: 2 },
+      { enemyId: 'cypress-witch', weight: 2 },
+      { enemyId: 'alpha-rougarou', weight: 2 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
     id: 'mirehaven-town-hall',
     name: 'Mirehaven Town Hall',
     kind: 'town',

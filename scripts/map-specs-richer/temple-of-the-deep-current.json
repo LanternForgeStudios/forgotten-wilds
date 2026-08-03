@@ -1,0 +1,45 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.tiny-dungeon",
+      "name": "tiny-dungeon",
+      "image": "tiny-dungeon.png",
+      "imageWidth": 192,
+      "imageHeight": 176,
+      "tileSize": 16,
+      "nonWalkableIds": [
+        0
+      ]
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 24 },
+    "border": { "tileset": 0, "id": 0 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 20, "y": 14, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 44, "y": 14, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 20, "y": 26, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 44, "y": 26, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 32, "y": 30, "tileId": { "tileset": 0, "id": 25 } }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 30, "y": 2, "refId": "from-hidden-river-landing" },
+    { "type": "transition", "x": 30, "y": 0, "refId": "hidden-river-landing", "targetSpawnId": "from-temple-of-the-deep-current" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "interactable", "x": 20, "y": 14, "refId": "temple-records-cache" },
+    { "type": "interactable", "x": 44, "y": 26, "refId": "lantern-sanctuary" },
+
+    { "type": "interactable", "x": 32, "y": 30, "refId": "ancient-serpent-guardian-chamber" }
+  ]
+}
