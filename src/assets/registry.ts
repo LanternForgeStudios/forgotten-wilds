@@ -1477,7 +1477,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user deleted and rotated the staff art in many frames (beyond simple repositioning) specifically to reveal the forearm/hand underneath, so the final result reads as genuinely gripped rather than just overlapping - same 'trim the item art for a believable held look' technique as the cloak's hood removal. down/up/right positioned first; left added in a follow-up round once the user realized the staff still reads past the body on that side too - started from the right-facing frames mirrored horizontally as a neutral starting point (scripts/build_equipment_layer_manual.py doesn't do this automatically, it was a one-off ImageOps.mirror step), then hand-repositioned/re-trimmed since a straight mirror puts the hand-cutout on the wrong side. Anchor data recorded under category 'held-right-hand' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3) - see this note's sibling entries for why that's a real (not yet fixed) alignment gap during a Dash.",
+      "Originally a Phase 3 pilot hand-positioned directly by the user (down/up/right first, left added in a follow-up round via a mirrored-then-re-trimmed starting point) - see git history for that original account. SUPERSEDED: regenerated via scripts/palette_swap_equipment_layer.py, recolored from sprite.equipment.ironwood-walking-staff (not the reverse - ironwood-walking-staff was itself once a recolor of this file, but the user hand-fixed several misaligned/misrotated frames directly on ironwood's sheet, making IT the more correct reference; this file now inherits that fix instead of carrying the original pre-fix positioning forward). Anchor data still recorded under category 'held-right-hand' in docs/equipment-layer-anchors.json (copied automatically, unchanged geometry). Running-cycle rows (4-7) are real running-pose art, not a walking duplicate, inherited from ironwood-walking-staff's own coverage.",
   },
   {
     id: 'sprite.equipment.ironwood-walking-staff',
@@ -1489,7 +1489,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py - a per-material gradient-map recolor of sprite.equipment.weathered-walking-staff's already-finished sheet (100% of its hand-positioning/rotation/grip-trim reused unchanged; only the RGB values differ). Colors driven by a 2-cluster k-means (in RGB space, not hue - an earlier hue-based version produced a visible pink wash on this item's desaturated palette) fit to weathered-walking-staff.png vs ironwood-walking-staff.png's own icon colors, clusters paired by POPULATION rank (largest source material -> largest target material - an earlier brightness-rank pairing broke badly on veteran-keeper-coat's higher-contrast icon, see that item's own note), each pixel remapped via a per-cluster value-sorted gradient so all existing shading/highlights are preserved. Verified by eye against the icon at full size (the character-composite preview alone reads slightly more saturated than intended due to viewing scale/dark background, but the actual output pixel colors were confirmed numerically close to the icon's own palette). Anchor table entries copied from weathered-walking-staff (identical geometry).",
+      "Auto-generated via scripts/palette_swap_equipment_layer.py - a per-material gradient-map recolor of sprite.equipment.weathered-walking-staff's already-finished sheet (100% of its hand-positioning/rotation/grip-trim reused unchanged; only the RGB values differ). Colors driven by a 2-cluster k-means (in RGB space, not hue - an earlier hue-based version produced a visible pink wash on this item's desaturated palette) fit to weathered-walking-staff.png vs ironwood-walking-staff.png's own icon colors, clusters paired by POPULATION rank (largest source material -> largest target material - an earlier brightness-rank pairing broke badly on veteran-keeper-coat's higher-contrast icon, see that item's own note), each pixel remapped via a per-cluster value-sorted gradient so all existing shading/highlights are preserved. Verified by eye against the icon at full size (the character-composite preview alone reads slightly more saturated than intended due to viewing scale/dark background, but the actual output pixel colors were confirmed numerically close to the icon's own palette). Anchor table entries copied from weathered-walking-staff (identical geometry). UPDATE: the user hand-fixed several misaligned/misrotated frames directly on this sheet afterward (still a palette-swap-derived recolor underneath, but no longer byte-identical geometry to weathered-walking-staff) - this is now the reference template for the whole walking-staff/cane family going forward (see sprite.equipment.weathered-cypress-cane etc., regenerated from this sheet rather than weathered-walking-staff once the fix landed), not just a one-off touch-up.",
   },
   {
     id: 'sprite.equipment.miners-lost-lantern-equipped',
@@ -1595,7 +1595,8 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: "Hand-finished by the user directly as a full sheet, completing gender parity for the full Phase 3/4 equipment-layering loadout - all 4 directions, walking + running, matching the male sheet's own coverage.",
+    notes:
+      "Originally hand-finished by the user directly as a full sheet, completing gender parity for the full Phase 3/4 equipment-layering loadout. SUPERSEDED: regenerated via scripts/palette_swap_equipment_layer.py, recolored from sprite.equipment.ironwood-walking-staff-female once the user hand-fixed several misaligned/misrotated frames on that sheet - see sprite.equipment.weathered-walking-staff's own (male) note for the full reasoning.",
   },
   {
     id: 'sprite.equipment.ironwood-walking-staff-female',
@@ -1605,7 +1606,8 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: "Hand-finished by the user directly as a full sheet, completing gender parity for the walking-staff family.",
+    notes:
+      "Hand-finished by the user directly as a full sheet, completing gender parity for the walking-staff family. UPDATE: the user hand-fixed several misaligned/misrotated frames directly on this sheet in a later pass - now the female reference template for the whole walking-staff/cane family (see sprite.equipment.weathered-cypress-cane-female etc., regenerated from this sheet once the fix landed), not just a one-off touch-up.",
   },
   {
     id: 'sprite.equipment.spiritwood-walking-staff-female',
@@ -1716,7 +1718,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+      "Regenerated from sprite.equipment.ironwood-walking-staff (not weathered-walking-staff - see that item's own updated note) once the user hand-fixed several misaligned frames on the Iron Mountains staff sheets, so the fix cascades into every staff-family item rather than leaving this one still built from the pre-fix source. Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
   },
   {
     id: 'sprite.equipment.weathered-cypress-cane-female',
@@ -1727,7 +1729,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+      "Regenerated from sprite.equipment.ironwood-walking-staff-female (not weathered-walking-staff-female - see that item's own updated note) once the user hand-fixed several misaligned frames on the Iron Mountains staff sheets, so the fix cascades into every staff-family item rather than leaving this one still built from the pre-fix source. Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
   },
   {
     id: 'sprite.equipment.bound-cypress-cane',
@@ -1738,7 +1740,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+      "Regenerated from sprite.equipment.ironwood-walking-staff (not weathered-walking-staff - see that item's own updated note) once the user hand-fixed several misaligned frames on the Iron Mountains staff sheets, so the fix cascades into every staff-family item rather than leaving this one still built from the pre-fix source. Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
   },
   {
     id: 'sprite.equipment.bound-cypress-cane-female',
@@ -1749,7 +1751,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+      "Regenerated from sprite.equipment.ironwood-walking-staff-female (not weathered-walking-staff-female - see that item's own updated note) once the user hand-fixed several misaligned frames on the Iron Mountains staff sheets, so the fix cascades into every staff-family item rather than leaving this one still built from the pre-fix source. Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
   },
   {
     id: 'sprite.equipment.rougarou-fang-blade',
@@ -1760,7 +1762,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
+      "Regenerated from sprite.equipment.ironwood-walking-staff (not weathered-walking-staff - see that item's own updated note) once the user hand-fixed several misaligned frames on the Iron Mountains staff sheets, so the fix cascades into every staff-family item rather than leaving this one still built from the pre-fix source. Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the male base sheet. Anchor table entries copied automatically from that same base.",
   },
   {
     id: 'sprite.equipment.rougarou-fang-blade-female',
@@ -1771,7 +1773,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.weathered-walking-staff-female, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
+      "Regenerated from sprite.equipment.ironwood-walking-staff-female (not weathered-walking-staff-female - see that item's own updated note) once the user hand-fixed several misaligned frames on the Iron Mountains staff sheets, so the fix cascades into every staff-family item rather than leaving this one still built from the pre-fix source. Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor, same silhouette/hand-positioning/grip-trim/running-pose reused unchanged - only surface colors differ), run against the female base sheet. Anchor table entries copied automatically from that same base.",
   },
   {
     id: 'sprite.equipment.tattered-bayou-vestments',

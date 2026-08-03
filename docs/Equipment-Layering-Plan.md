@@ -433,6 +433,32 @@ base sprites going forward:
 status text in this doc calls the shipped chest item `worn-keeper-coat`; verify which is correct
 against `public/assets/sprites/equipment/` directly rather than assuming either name.)
 
+### Update (2026-08-03): `ironwood-walking-staff` is now the walking-staff/cane family's template
+
+Contrary to the "no same-shape recolor precedent" framing above, the weapon slot's
+`weathered-walking-staff`/`ironwood-walking-staff`/`spiritwood-walking-staff` family (and Crimson
+Bayou's own `weathered-cypress-cane`/`bound-cypress-cane`/`rougarou-fang-blade` cane family, which
+shares the same cane/staff silhouette) **does** have a working `palette_swap_equipment_layer.py`
+recolor precedent, same as chest/boots/gloves/legs - it just wasn't named as a fixed template
+before now, since `weathered-walking-staff` (the original hand-positioned item) was the implicit
+source.
+
+That changed when the user hand-fixed several misaligned/misrotated frames directly on
+`ironwood-walking-staff-male-animated`/`ironwood-walking-staff-female-animated` (both were
+themselves originally palette-swap recolors of `weathered-walking-staff`, but the hand-fix makes
+them the more correct sheets now). **`ironwood-walking-staff-male-animated`/
+`ironwood-walking-staff-female-animated` are now the reference template for every walking-staff/
+cane-family item, not `weathered-walking-staff`** - both `weathered-walking-staff` itself and the 3
+Crimson Bayou cane items were regenerated from this corrected pair so the frame fix cascades
+through the whole family instead of only benefiting the one item it started on. Any *new*
+staff/cane-shaped weapon (a future region's own) should likewise be palette-swapped from
+`ironwood-walking-staff-{male,female}-animated`, not `weathered-walking-staff`.
+
+Updated base-sprite list, superseding the "Male/Female base sprites" bullets above for the weapon
+slot specifically (chest/boots/gloves/legs bases are unchanged):
+- Weapon/staff family template: `ironwood-walking-staff-male-animated`,
+  `ironwood-walking-staff-female-animated`.
+
 ## Current status / resume point (for picking this back up cleanly) — SUPERSEDED, see update above
 
 **Male walking + running — fully done, all shipped, nothing pending:**
