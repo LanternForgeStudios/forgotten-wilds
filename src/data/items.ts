@@ -373,6 +373,36 @@ export const ITEMS: Item[] = [
     tier: 'legendary',
     unique: true,
   },
+  {
+    id: 'temple-records',
+    name: 'Temple Records',
+    description: 'Waterlogged records recovered from the Reflection Pools, describing the ancient Lantern Keepers who once tended this temple.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.temple-records',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'lantern-of-still-waters',
+    name: 'Lantern of Still Waters',
+    description: 'Found deep in the Lantern Sanctuary - unlit, but unmistakably a Legendary Lantern.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.lantern-of-still-waters',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'guardian-memory-fragment-2',
+    name: 'Guardian Memory Fragment II',
+    description: 'A fragment of Mother Cypress\'s memory: the Guardians accepted a great sacrifice, sealed by trusted allies - the reason still hidden.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.guardian-memory-fragment-2',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

@@ -67,4 +67,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The oldest tree in Cypress Marsh, and the heart of its shrine. Its Heart Seed - scattered in three pieces across the Bayou long before anyone now living can remember - is what let it hold the Bayou's memories safe. With the Seed restored, the waterways that had gone stagnant and forgotten begin to open again.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-temple-records',
+    title: 'The Temple of the Deep Current',
+    body: "Lucien Boudreaux, translating the waterlogged Temple Records: long before Mirehaven had a name, Lantern Keepers tended this temple alongside the Ancient Serpent Guardian, keeping the current's memory safe the way Mother Cypress keeps the marsh's. Something changed. The Guardian was sealed, and the temple was left to flood.",
+    unlockedAt: 0,
+  },
+  {
+    id: 'lore-keeper-elise-duvall',
+    title: 'Keeper Elise Duvall',
+    body: 'A history recovered in the Lantern Sanctuary: Elise Duvall was the last Lantern Keeper to tend the Temple of the Deep Current before the sealing. She left her lantern behind rather than let it go dark with her - the Lantern of Still Waters, still lit, still waiting.',
+    unlockedAt: 0,
+  },
 ];

@@ -457,13 +457,8 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'eye-drops', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
   },
-  // Boss stat block for MSF-CB-009 "Guardian of the Deep" - Phase 3 of the Crimson Bayou build
-  // only authors the fight itself (stats/moves/loot); prerequisiteQuestId and the
-  // BOSS_REQUIRED_LOCATION/BOSS_REGION_LOCATIONS wiring that actually make it reachable are left
-  // for Phase 5, once the guardian-of-the-deep quest and the Temple of the Deep Current dungeon
-  // location it's fought in both exist (until then this entry is inert - effectiveStatus() safely
-  // returns 'locked' for a not-yet-defined quest id, and no location will ever match an unset
-  // BOSS_REQUIRED_LOCATION entry, so startEncounter.ts's precondition check just always fails).
+  // Boss stat block for MSF-CB-009 "Guardian of the Deep". Now fully reachable as of Phase 5 - see
+  // BOSS_REQUIRED_LOCATION/BOSS_REGION_LOCATIONS below and the quest's own prerequisiteQuestId.
   'ancient-serpent-guardian': {
     id: 'ancient-serpent-guardian',
     name: 'Ancient Serpent Guardian',
@@ -471,6 +466,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     tier: 'boss',
     isBoss: true,
     weaknessDamageType: 'spirit',
+    prerequisiteQuestId: 'lantern-beneath-still-waters',
     vulnerableAilments: ['freeze', 'stun'],
     stats: { maxHp: 185, attack: 16, defense: 10, speed: 10 },
     moves: [
@@ -524,6 +520,14 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
     { enemyId: 'rougarou-stalker', weight: 3 },
     { enemyId: 'alpha-rougarou', weight: 1 },
   ],
+  // Temple of the Deep Current (Chapter 4 dungeon) - the region's toughest regular/elite mix,
+  // drawn from all 3 Chapter 3 families rather than introducing a dungeon-exclusive one, matching
+  // Hollow Rail Mine's own precedent of drawing from more than one family within a single dungeon.
+  'temple-of-the-deep-current': [
+    { enemyId: 'bog-ravager', weight: 2 },
+    { enemyId: 'cypress-witch', weight: 2 },
+    { enemyId: 'alpha-rougarou', weight: 2 },
+  ],
 };
 
 /** Which locations a boss's optional "adds" (0-3 additional enemies that can join the fight) may
@@ -533,8 +537,10 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
  *  content-authoring bug), so no filtering for that case is needed here. */
 export const BOSS_REGION_LOCATIONS: Record<string, string[]> = {
   'coalbound-warden': ['ironwood-trail', 'raven-ridge', 'whisper-falls', 'black-briar-forest', 'hollow-rail-mine'],
-  // ancient-serpent-guardian intentionally not listed yet - it isn't reachable at all until
-  // Phase 5 wires up its prerequisiteQuestId and BOSS_REQUIRED_LOCATION (see the enemy's own doc
-  // comment above), so there's no fight for these "adds" to join in the meantime. Phase 5 should
-  // add an entry here once the Temple of the Deep Current dungeon locations exist.
+  'ancient-serpent-guardian': [
+    'cypress-marsh',
+    'murkwater-trails',
+    'hidden-river-landing',
+    'temple-of-the-deep-current',
+  ],
 };

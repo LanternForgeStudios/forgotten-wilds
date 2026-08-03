@@ -223,6 +223,29 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     unique: true,
     familyId: 'mountain-spirits',
   },
+  // Crimson Bayou (MSQ Volume II): the region's Legendary Lantern (MSF-CB-008), following the same
+  // found-item-then-equipped-upgrade pattern as miners-lost-lantern-equipped. No layerSpriteAssetId
+  // yet - equipment-layer sprite generation is out of scope for this region build (per the approved
+  // plan); the item is fully functional (stats, ability, inventory icon) without one, same as most
+  // equipment in this game before its own layer art exists.
+  'lantern-of-still-waters-equipped': {
+    id: 'lantern-of-still-waters-equipped',
+    slot: 'lantern',
+    statBonuses: { maxSpirit: 16, defense: 3 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 35,
+    lanternAbilityIds: ['still-waters-calm'],
+  },
+  // Legendary reward for defeating the Ancient Serpent Guardian (MSF-CB-009).
+  'mother-cypress-totem': {
+    id: 'mother-cypress-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxSpirit: 20, maxHp: 10, defense: 6 },
+    tier: 'legendary',
+    unique: true,
+    familyId: 'cypress-spirits',
+  },
   // Prologue reward (MSF-P-001) - a starting-kit armor piece, not part of any regional family.
   // Not unique - it's a plain wool cloak given to every new Lantern Keeper, not a one-of-a-kind
   // relic, so owning it doesn't need to block ever granting another copy.

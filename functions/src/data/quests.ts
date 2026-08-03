@@ -283,6 +283,51 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 40, gold: 25 },
   },
+
+  // --- Crimson Bayou (MSQ Volume II), Chapter 4: The Deep Current ---
+  // Kebab-case id mapping: MSF-CB-006 into-the-deep-current, MSF-CB-007 reflections-of-the-past,
+  // MSF-CB-008 lantern-beneath-still-waters, MSF-CB-009 guardian-of-the-deep, MSF-CB-010
+  // the-waters-remember.
+  'into-the-deep-current': {
+    id: 'into-the-deep-current',
+    prerequisiteQuestId: 'beneath-still-waters',
+    objectives: [
+      { id: 'reach-temple', type: 'reachLocation', targetId: 'temple-of-the-deep-current', requiredCount: 1 },
+      { id: 'clear-flooded-gallery', type: 'defeatEnemies', targetId: 'marsh-crocodile', requiredCount: 2 },
+    ],
+    reward: { xp: 40, gold: 20 },
+  },
+  'reflections-of-the-past': {
+    id: 'reflections-of-the-past',
+    prerequisiteQuestId: 'into-the-deep-current',
+    objectives: [
+      { id: 'get-temple-records', type: 'collectItem', targetId: 'temple-records', requiredCount: 1 },
+      { id: 'talk-lucien-temple', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+    ],
+    reward: { xp: 30, gold: 15, grantLoreId: 'lore-temple-records' },
+  },
+  'lantern-beneath-still-waters': {
+    id: 'lantern-beneath-still-waters',
+    prerequisiteQuestId: 'reflections-of-the-past',
+    objectives: [{ id: 'get-lantern', type: 'collectItem', targetId: 'lantern-of-still-waters', requiredCount: 1 }],
+    reward: { xp: 50, gold: 0, itemIds: ['lantern-of-still-waters-equipped'], grantLoreId: 'lore-keeper-elise-duvall' },
+  },
+  'guardian-of-the-deep': {
+    id: 'guardian-of-the-deep',
+    prerequisiteQuestId: 'lantern-beneath-still-waters',
+    objectives: [{ id: 'defeat-guardian', type: 'defeatBoss', targetId: 'ancient-serpent-guardian', requiredCount: 1 }],
+    reward: { xp: 200, gold: 110, itemIds: ['mother-cypress-totem'] },
+  },
+  'the-waters-remember': {
+    id: 'the-waters-remember',
+    prerequisiteQuestId: 'guardian-of-the-deep',
+    objectives: [
+      { id: 'talk-lucien-final', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+      { id: 'witness-mother-cypress', type: 'interactWithShrine', targetId: 'mother-cypress-shrine', requiredCount: 1 },
+    ],
+    // First real usage of regionalReputation (see Phase 0's reconciliation note on this field).
+    reward: { xp: 60, gold: 30, itemIds: ['guardian-memory-fragment-2'], regionalReputation: 50 },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -310,4 +355,9 @@ export const QUEST_ORDER = [
   'the-silent-grove',
   'seeds-of-memory',
   'beneath-still-waters',
+  'into-the-deep-current',
+  'reflections-of-the-past',
+  'lantern-beneath-still-waters',
+  'guardian-of-the-deep',
+  'the-waters-remember',
 ];

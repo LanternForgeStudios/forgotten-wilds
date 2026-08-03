@@ -31,4 +31,12 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
       "The Miner's Lost Lantern burns with a warmth that outlasted its owner - draw on it to steady yourself and recover HP.",
     sfxAssetId: 'sfx.lanternAbility.steadfast-ember',
   },
+  {
+    id: 'still-waters-calm',
+    name: 'Still Waters Calm',
+    category: 'defensive',
+    oilCost: 10,
+    description:
+      "The Lantern of Still Waters settles the current around you - incoming blows land as gently as ripples for a moment.",
+  },
 ];

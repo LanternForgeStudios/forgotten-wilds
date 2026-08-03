@@ -354,4 +354,81 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 40, gold: 25 },
   },
+
+  // --- Crimson Bayou (MSQ Volume II), Chapter 4: The Deep Current ---
+  {
+    id: 'into-the-deep-current',
+    name: 'Into the Deep Current',
+    giverNpcId: 'sabine-thorne',
+    description: 'Begin the descent into the Temple of the Deep Current.',
+    category: 'main',
+    prerequisiteQuestId: 'beneath-still-waters',
+    objectives: [
+      { id: 'reach-temple', type: 'reachLocation', description: 'Enter the Temple of the Deep Current.', targetId: 'temple-of-the-deep-current', requiredCount: 1 },
+      { id: 'clear-flooded-gallery', type: 'defeatEnemies', description: 'Clear the Flooded Gallery and restore the water flow.', targetId: 'marsh-crocodile', requiredCount: 2 },
+    ],
+    reward: { xp: 40, gold: 20 },
+  },
+  {
+    id: 'reflections-of-the-past',
+    name: 'Reflections of the Past',
+    giverNpcId: 'lucien-boudreaux',
+    description: 'Explore the Reflection Pools and learn more about the ancient Lantern Keepers.',
+    category: 'main',
+    prerequisiteQuestId: 'into-the-deep-current',
+    objectives: [
+      { id: 'get-temple-records', type: 'collectItem', description: 'Recover the Temple Records from the Reflection Pools.', targetId: 'temple-records', requiredCount: 1 },
+      { id: 'talk-lucien-temple', type: 'talkToNpc', description: 'Bring the Temple Records to Lucien Boudreaux.', targetId: 'lucien-boudreaux', requiredCount: 1 },
+    ],
+    reward: { xp: 30, gold: 15, grantLoreId: 'lore-temple-records' },
+  },
+  {
+    id: 'lantern-beneath-still-waters',
+    name: 'Lantern Beneath Still Waters',
+    giverNpcId: 'lucien-boudreaux',
+    description: 'Investigate the Lantern Sanctuary and recover the second legendary Lantern.',
+    category: 'main',
+    prerequisiteQuestId: 'reflections-of-the-past',
+    objectives: [
+      {
+        id: 'get-lantern',
+        type: 'collectItem',
+        description: 'Claim the Lantern of Still Waters from the Lantern Sanctuary.',
+        targetId: 'lantern-of-still-waters',
+        requiredCount: 1,
+      },
+    ],
+    reward: { xp: 50, gold: 0, itemIds: ['lantern-of-still-waters-equipped'], grantLoreId: 'lore-keeper-elise-duvall' },
+  },
+  {
+    id: 'guardian-of-the-deep',
+    name: 'Guardian of the Deep',
+    giverNpcId: 'sabine-thorne',
+    description: 'Reach the Guardian Chamber and confront the Ancient Serpent Guardian.',
+    category: 'main',
+    prerequisiteQuestId: 'lantern-beneath-still-waters',
+    objectives: [
+      { id: 'defeat-guardian', type: 'defeatBoss', description: 'Defeat the Ancient Serpent Guardian.', targetId: 'ancient-serpent-guardian', requiredCount: 1 },
+    ],
+    reward: { xp: 200, gold: 110, itemIds: ['mother-cypress-totem'] },
+  },
+  {
+    id: 'the-waters-remember',
+    name: 'The Waters Remember',
+    giverNpcId: 'lucien-boudreaux',
+    description: 'Return to Mirehaven and witness the second Guardian Memory.',
+    category: 'main',
+    prerequisiteQuestId: 'guardian-of-the-deep',
+    objectives: [
+      { id: 'talk-lucien-final', type: 'talkToNpc', description: 'Report to Lucien Boudreaux.', targetId: 'lucien-boudreaux', requiredCount: 1 },
+      {
+        id: 'witness-mother-cypress',
+        type: 'interactWithShrine',
+        description: 'Return to Mother Cypress Shrine and witness Guardian Memory II.',
+        targetId: 'mother-cypress-shrine',
+        requiredCount: 1,
+      },
+    ],
+    reward: { xp: 60, gold: 30, itemIds: ['guardian-memory-fragment-2'], regionalReputation: 50 },
+  },
 ];

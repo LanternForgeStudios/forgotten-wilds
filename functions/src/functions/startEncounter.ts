@@ -20,6 +20,7 @@ interface StartEncounterRequest {
  *  boss fight, not for gating where the fight can start. */
 const BOSS_REQUIRED_LOCATION: Record<string, string> = {
   'coalbound-warden': 'hollow-rail-mine',
+  'ancient-serpent-guardian': 'temple-of-the-deep-current',
 };
 
 export const startEncounter = onCall<StartEncounterRequest>(async (request) => {

@@ -184,6 +184,20 @@ export const ITEMS: Record<string, ItemDefinition> = {
     tier: 'legendary',
     unique: true,
   },
+  // Crimson Bayou (MSQ Volume II), Chapter 4: The Deep Current
+  'temple-records': { id: 'temple-records', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // The lantern as first FOUND in the Lantern Sanctuary (MSF-CB-008's collectItem target) - the
+  // quest reward then grants the real equippable 'lantern-of-still-waters-equipped', same
+  // found-item vs. equipped-upgrade split as Iron Mountains' miners-lost-lantern /
+  // miners-lost-lantern-equipped.
+  'lantern-of-still-waters': { id: 'lantern-of-still-waters', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'guardian-memory-fragment-2': {
+    id: 'guardian-memory-fragment-2',
+    category: 'keyItem',
+    usableInCombat: false,
+    tier: 'legendary',
+    unique: true,
+  },
 };
 
 export const SHOP_PRICES: Record<string, number> = {
