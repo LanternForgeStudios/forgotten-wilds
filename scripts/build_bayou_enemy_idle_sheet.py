@@ -21,6 +21,44 @@ ORIGINALS_ROOT = os.path.join("public", "assets", "sprites", "enemies", "origina
 OUT_DIR = os.path.join("public", "assets", "sprites", "enemies")
 
 
+def fit_aspect(crop_box, target_size, canvas_size):
+    """Expand the shorter dimension of crop_box (symmetrically) so its aspect ratio matches
+    target_size's, before any resize happens - resizing a crop straight into a differently-shaped
+    target without this stretches the content non-uniformly (verified: 1.7x-2.24x more horizontal
+    stretch than vertical across every Bayou NPC/enemy built before this fix, including the boss).
+    Clamped to the source canvas; if there isn't room to fully expand (rare, character near a
+    canvas edge), takes as much as fits rather than leaving the box unexpanded."""
+    l, t, r, b = crop_box
+    w, h = r - l, b - t
+    target_w, target_h = target_size
+    target_aspect = target_w / target_h
+    current_aspect = w / h if h else target_aspect
+
+    if current_aspect < target_aspect:
+        new_w = h * target_aspect
+        delta = (new_w - w) / 2
+        l, r = l - delta, r + delta
+    elif current_aspect > target_aspect:
+        new_h = w / target_aspect
+        delta = (new_h - h) / 2
+        t, b = t - delta, b + delta
+
+    cw, ch = canvas_size
+    if l < 0:
+        r -= l
+        l = 0
+    if t < 0:
+        b -= t
+        t = 0
+    if r > cw:
+        l -= r - cw
+        r = cw
+    if b > ch:
+        t -= b - ch
+        b = ch
+    return (max(0, round(l)), max(0, round(t)), min(cw, round(r)), min(ch, round(b)))
+
+
 def build(slug, staged_folder, target_size):
     staging_dir = next(
         (os.path.join(root, staged_folder) for root in STAGING_ROOTS if os.path.isdir(os.path.join(root, staged_folder))),
@@ -59,6 +97,7 @@ def build(slug, staged_folder, target_size):
     w, h = images[0].size
     pad = max(4, round(w * 0.02))
     crop_box = (max(0, l - pad), max(0, t - pad), min(w, r + pad), min(h, b + pad))
+    crop_box = fit_aspect(crop_box, target_size, (w, h))
 
     sheet = Image.new("RGBA", (target_size[0] * len(images), target_size[1]), (0, 0, 0, 0))
     for i, im in enumerate(images):
