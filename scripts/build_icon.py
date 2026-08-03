@@ -79,6 +79,11 @@ ICONS = {
     "heart-seed-cypress": (64, 64),
     "heart-seed-murkwater": (64, 64),
     "heart-seed-river": (64, 64),
+    "temple-records": (64, 64),
+    "lantern-of-still-waters": (64, 64),
+    "lantern-of-still-waters-equipped": (64, 64),
+    "mother-cypress-totem": (64, 64),
+    "guardian-memory-fragment-2": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")

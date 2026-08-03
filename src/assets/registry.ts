@@ -1465,7 +1465,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user removed the hood from the raw generated art in every frame during manual positioning (didn't read well at this scale/angle) - final art is hood-less. Anchor data recorded under category 'worn-torso' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) still duplicate walking (0-3), same as every other Phase 3 pilot item - the base body's own running pose is genuinely different from walking (confirmed by direct pixel comparison, not just a duplicated row), so this will visibly drift out of alignment during a Dash until a real running-frame pass is done for the whole pilot loadout.",
+      "Phase 3 pilot - hand-positioned by the user, same pipeline/build script as sprite.equipment.keepers-lantern. The user removed the hood from the raw generated art in every frame during manual positioning (didn't read well at this scale/angle) - final art is hood-less. Anchor data recorded under category 'worn-torso' in docs/equipment-layer-anchors.json. Running-cycle rows (4-7) are now real hand-positioned art too (fixed in a later touch-up pass, not the walking-row duplicate this note originally flagged) - full male walking+running coverage.",
   },
   {
     id: 'sprite.equipment.weathered-walking-staff',
@@ -1525,7 +1525,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "EXPERIMENTAL auto-generation via scripts/estimate_transform_equipment_layer.py --no-rotation (same technique as sprite.equipment.spiritwood-walking-staff, but with rotation estimation disabled - a worn torso garment isn't held at a swinging angle the way a staff is, and PCA on a roughly torso-shaped blob's alpha mask gave visibly erratic/meaningless angles when checked against travelers-cloak's own frames before attempting this). Scaled to the reference's recorded per-frame height, centered on its recorded position, clipped to the reference frame's own silhouette. Reads as a genuinely fitted coat (collar/lapels/pockets all visible) across all 4 directions, walking + running - a few running frames have minor edge artifacts (a small detached fragment near a shoulder in some frames) worth a manual touch-up pass eventually, but overall convincing. This is now the reference/base item for reinforced-keeper-coat and veteran-keeper-coat, which ARE same-shape recolor candidates of this one (not of travelers-cloak).",
+      "EXPERIMENTAL auto-generation via scripts/estimate_transform_equipment_layer.py --no-rotation (same technique as sprite.equipment.spiritwood-walking-staff, but with rotation estimation disabled - a worn torso garment isn't held at a swinging angle the way a staff is, and PCA on a roughly torso-shaped blob's alpha mask gave visibly erratic/meaningless angles when checked against travelers-cloak's own frames before attempting this). Scaled to the reference's recorded per-frame height, centered on its recorded position, clipped to the reference frame's own silhouette. Reads as a genuinely fitted coat (collar/lapels/pockets all visible) across all 4 directions, walking + running - a later hand touch-up pass by the user fixed the earlier minor running-frame shoulder artifacts from the auto-generation step. This is now the reference/base item for reinforced-keeper-coat and veteran-keeper-coat, which ARE same-shape recolor candidates of this one (not of travelers-cloak).",
   },
   {
     id: 'sprite.equipment.reinforced-keeper-coat',
@@ -1745,7 +1745,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: "Hand-finished by the user directly as a full sheet - the first legs-slot item with real layered art (the other keeper-trousers items have no layerSpriteAssetId yet). All 4 directions, walking + running.",
+    notes: "Hand-finished by the user directly as a full sheet - the first legs-slot item with real layered art, and the recolor base for the keeper-trousers family (see sprite.equipment.worn-keeper-trousers etc.). All 4 directions, walking + running.",
   },
   {
     id: 'sprite.equipment.traveler-pants-female',
@@ -1756,6 +1756,66 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes: "Hand-finished by the user directly as a full sheet, matching traveler-pants (male)'s own coverage.",
+  },
+  {
+    id: 'sprite.equipment.worn-keeper-trousers',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Worn Keeper Trousers, same 'keeper-trousers' family as the icon art suggests a matching plain-trouser silhouette to traveler-pants, so it reuses that item's geometry directly.",
+    filePath: 'sprites/equipment/worn-keeper-trousers-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes: "Auto-generated via scripts/palette_swap_equipment_layer.py (2-cluster palette-swap recolor of sprite.equipment.traveler-pants, 100% of its hand-positioning/silhouette reused unchanged, all 8 rows including running).",
+  },
+  {
+    id: 'sprite.equipment.worn-keeper-trousers-female',
+    category: 'character',
+    intendedUse: "Female-body counterpart to sprite.equipment.worn-keeper-trousers, same legs-slot layer role.",
+    filePath: 'sprites/equipment/worn-keeper-trousers-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes: "Auto-generated via scripts/palette_swap_equipment_layer.py, recolored from sprite.equipment.traveler-pants-female (same technique as the male sheet, run against the female base instead).",
+  },
+  {
+    id: 'sprite.equipment.reinforced-keeper-trousers',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Reinforced Keeper Trousers, same 'keeper-trousers' family/silhouette as sprite.equipment.worn-keeper-trousers, a different tone per its icon art.",
+    filePath: 'sprites/equipment/reinforced-keeper-trousers-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes: "Auto-generated via scripts/palette_swap_equipment_layer.py, recolored directly from sprite.equipment.traveler-pants (not from worn-keeper-trousers) - each keeper-trousers tier is an independent recolor of the same traveler-pants base geometry.",
+  },
+  {
+    id: 'sprite.equipment.reinforced-keeper-trousers-female',
+    category: 'character',
+    intendedUse: "Female-body counterpart to sprite.equipment.reinforced-keeper-trousers, same legs-slot layer role.",
+    filePath: 'sprites/equipment/reinforced-keeper-trousers-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes: "Auto-generated via scripts/palette_swap_equipment_layer.py, recolored from sprite.equipment.traveler-pants-female.",
+  },
+  {
+    id: 'sprite.equipment.veteran-keeper-trousers',
+    category: 'character',
+    intendedUse: "Equipment layer for the legs slot - Veteran Keeper Trousers, same 'keeper-trousers' family/silhouette as sprite.equipment.worn-keeper-trousers, a different tone per its icon art.",
+    filePath: 'sprites/equipment/veteran-keeper-trousers-male-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes: "Auto-generated via scripts/palette_swap_equipment_layer.py, recolored directly from sprite.equipment.traveler-pants - completes the keeper-trousers family (common/uncommon/rare) for full male+female animation coverage.",
+  },
+  {
+    id: 'sprite.equipment.veteran-keeper-trousers-female',
+    category: 'character',
+    intendedUse: "Female-body counterpart to sprite.equipment.veteran-keeper-trousers, same legs-slot layer role.",
+    filePath: 'sprites/equipment/veteran-keeper-trousers-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes: "Auto-generated via scripts/palette_swap_equipment_layer.py, recolored from sprite.equipment.traveler-pants-female.",
   },
   {
     id: 'battle.enemy.mothling',
@@ -2405,6 +2465,26 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/mountain-guardian-totem.png.',
   },
   {
+    id: 'icon.equipment.lantern-of-still-waters-equipped',
+    category: 'icon',
+    intendedUse: 'Equipment icon for lantern-of-still-waters-equipped (Lantern of Still Waters, Chapter 4 boss-area reward)',
+    filePath: 'icons/lantern-of-still-waters-equipped.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/lantern-of-still-waters-equipped.png.',
+  },
+  {
+    id: 'icon.equipment.mother-cypress-totem',
+    category: 'icon',
+    intendedUse: 'Equipment icon for mother-cypress-totem (Cypress Spirits family, legendary - Ancient Serpent Guardian reward)',
+    filePath: 'icons/mother-cypress-totem.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/mother-cypress-totem.png.',
+  },
+  {
     id: 'icon.equipment.travelers-cloak',
     category: 'icon',
     intendedUse: "Equipment icon for travelers-cloak (Prologue starting-kit armor)",
@@ -2463,6 +2543,36 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. First attempt read as a cute rounded ghost/blob character rather than a "shard" - re-prompted with explicit "angular crystal shard (faceted gem shape, not round)" to fix it. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/guardian-memory-fragment-1.png.',
+  },
+  {
+    id: 'icon.item.guardian-memory-fragment-2',
+    category: 'icon',
+    intendedUse: 'Item icon for guardian-memory-fragment-2 (Chapter 4 boss reward)',
+    filePath: 'icons/guardian-memory-fragment-2.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS - prompted with the "angular crystal shard (faceted gem shape, not round)" wording guardian-memory-fragment-1 needed a re-prompt to reach, so this one landed correctly on the first attempt. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/guardian-memory-fragment-2.png.',
+  },
+  {
+    id: 'icon.item.temple-records',
+    category: 'icon',
+    intendedUse: 'Item icon for temple-records (Chapter 4 key item)',
+    filePath: 'icons/temple-records.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/temple-records.png.',
+  },
+  {
+    id: 'icon.item.lantern-of-still-waters',
+    category: 'icon',
+    intendedUse: "Item icon for lantern-of-still-waters (Chapter 4 key item - the found/unequipped state, before the player equips it as lantern-of-still-waters-equipped)",
+    filePath: 'icons/lantern-of-still-waters.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS - prompted as a dormant/unlit lantern to read distinctly from icon.equipment.lantern-of-still-waters-equipped\'s lit, calm-flame version, same found-item-then-equipped-upgrade visual pattern as miners-lost-lantern vs miners-lost-lantern-equipped. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/lantern-of-still-waters.png.',
   },
   {
     id: 'icon.item.frostbound-treatise',

@@ -29,15 +29,19 @@ material's palette. So:
      sheet's existing shading/highlight work while only substituting the base hue/saturation.
   5. Alpha channel (and therefore the exact silhouette/position/rotation/trim) is untouched.
 
-Usage: python scripts/palette_swap_equipment_layer.py <source_item> <target_item> [n_materials]
-  source_item: an item with an already-built public/assets/sprites/equipment/<item>-male-animated.png
+Usage: python scripts/palette_swap_equipment_layer.py <source_item> <target_item> [n_materials] [gender]
+  source_item: an item with an already-built public/assets/sprites/equipment/<item>-<gender>-animated.png
   target_item: the new item id - must have an icon at public/assets/icons/original/<item>.png
   n_materials: how many distinct hue-clusters to detect (default 2 - most props are "body + accent")
-Writes: public/assets/sprites/equipment/<target_item>-male-animated.png (full 8-row sheet, walking
-        AND running - inherits whatever rows the source sheet has, so a source with real running
-        art produces a target with real running art too, no extra work needed).
+  gender: 'male' or 'female' (default 'male') - runs the identical recolor against the female base
+    sheet when generating a female counterpart, so a same-family item's male and female sheets
+    are each recolored from their own gendered source rather than derived from one another.
+Writes: public/assets/sprites/equipment/<target_item>-<gender>-animated.png (full 8-row sheet,
+        walking AND running - inherits whatever rows the source sheet has, so a source with real
+        running art produces a target with real running art too, no extra work needed).
         docs/equipment-layer-anchors.json - copies the source item's anchor entries under the
-        target item's own id too (the geometry is identical, only color changed).
+        target item's own id too (the geometry is identical, only color changed; anchor entries
+        aren't gender-specific, so this only needs to happen once per target item).
 """
 
 import json
@@ -149,8 +153,8 @@ def cluster_centroid_rgb(cluster):
     return tuple(sum(rgb[i] * cnt for rgb, cnt in cluster) / total_w for i in range(3))
 
 
-def build_recolor(source_item, target_item, n_materials=2):
-    source_sheet_path = os.path.join(SHEET_DIR, f"{source_item}-male-animated.png")
+def build_recolor(source_item, target_item, n_materials=2, gender="male"):
+    source_sheet_path = os.path.join(SHEET_DIR, f"{source_item}-{gender}-animated.png")
     source_icon_path = os.path.join(ICON_DIR, f"{source_item}.png")
     target_icon_path = os.path.join(ICON_DIR, f"{target_item}.png")
     for p in (source_sheet_path, source_icon_path, target_icon_path):
@@ -214,9 +218,9 @@ def build_recolor(source_item, target_item, n_materials=2):
             new_rgb = cache[key]
             px[x, y] = (int(new_rgb[0]), int(new_rgb[1]), int(new_rgb[2]), a)
 
-    out_path = os.path.join(SHEET_DIR, f"{target_item}-male-animated.png")
+    out_path = os.path.join(SHEET_DIR, f"{target_item}-{gender}-animated.png")
     sheet.save(out_path, format="PNG", optimize=True)
-    print(f"{target_item}: recolored from {source_item} ({n} material cluster(s)) -> {out_path}")
+    print(f"{target_item} ({gender}): recolored from {source_item} ({n} material cluster(s)) -> {out_path}")
     return True
 
 
@@ -246,10 +250,11 @@ def copy_anchor_entries(source_item, target_item):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("usage: python scripts/palette_swap_equipment_layer.py <source_item> <target_item> [n_materials]")
+        print("usage: python scripts/palette_swap_equipment_layer.py <source_item> <target_item> [n_materials] [gender]")
         sys.exit(1)
     source_item, target_item = sys.argv[1], sys.argv[2]
     n_materials = int(sys.argv[3]) if len(sys.argv) > 3 else 2
-    if build_recolor(source_item, target_item, n_materials):
+    gender = sys.argv[4] if len(sys.argv) > 4 else "male"
+    if build_recolor(source_item, target_item, n_materials, gender):
         copy_anchor_entries(source_item, target_item)
     print("done")

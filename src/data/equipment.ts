@@ -83,6 +83,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 8, defense: 2 },
     tier: 'common',
     familyId: 'keeper-trousers',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-keeper-trousers', female: 'sprite.equipment.worn-keeper-trousers-female' },
   },
   {
     id: 'reinforced-keeper-trousers',
@@ -93,6 +94,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 12, defense: 3, speed: -1 },
     tier: 'uncommon',
     familyId: 'keeper-trousers',
+    layerSpriteAssetId: { male: 'sprite.equipment.reinforced-keeper-trousers', female: 'sprite.equipment.reinforced-keeper-trousers-female' },
   },
   {
     id: 'veteran-keeper-trousers',
@@ -103,6 +105,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 14, maxSpirit: 4, defense: 4, speed: 1 },
     tier: 'rare',
     familyId: 'keeper-trousers',
+    layerSpriteAssetId: { male: 'sprite.equipment.veteran-keeper-trousers', female: 'sprite.equipment.veteran-keeper-trousers-female' },
   },
   {
     id: 'traveler-boots',
