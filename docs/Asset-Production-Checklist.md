@@ -441,6 +441,47 @@ whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, an
 
 ---
 
+## Things Claude can't generate itself (need external production)
+
+Everything above this line is producible in-house via the pixellab MCP server (characters, objects,
+tilesets, icons, UI panels via `create_ui_asset`). The categories below are genuinely outside that
+toolset's capability - flagging them here so they don't quietly stay unaddressed on the assumption
+that "everything is pixellab-generatable, it just hasn't been asked for yet."
+
+- **Cut-scenes / cinematics.** No video- or sequential-animation-generation tool exists in this
+  toolset. Any story beat that wants a real cinematic (the Great Silence reveal, a Guardian's full
+  memory playback, an ending) needs either external video production, or a scope change to
+  something this codebase can actually build (e.g. a scripted in-engine sequence using existing
+  sprites/dialogue boxes/camera pans - buildable, just not "generated art").
+- **Voice acting / spoken dialogue audio.** `create_vocal_animation`/`create_talking_gif`/
+  `get_lip_sync` exist, but they only produce *visual* mouth-shape animation timed to a line of
+  text (visemes) for an animated talking-portrait feature - none of them synthesize actual spoken
+  audio. This game doesn't use animated talking portraits today (dialogue is text + a static
+  portrait), so this only matters if that UI style is ever adopted; either way, real voiced
+  narration needs an external TTS pass or voice actor, not something generatable here.
+- **Custom music composition.** No music-generation tool exists. The Audio section above was
+  entirely sourced by picking existing tracks from an already-staged CC-BY licensed library
+  (FarBeyond Studio - Freebies Vol. 1) - if a future region wants a genuinely new musical theme
+  rather than reusing/re-picking from that library, that's an external composition need.
+- **Painterly high-resolution art matching Ash Hallow's existing building facades.** Ash Hallow's
+  10 building-facade/shrine sprites (`structure.house`, `.inn`, `.armory`, etc.) were NOT
+  pixellab-generated - they're externally-produced painterly renders (~1024-1254px, staged directly
+  into `art-staging/icons/` and processed by `scripts/build_structure_icon.py`). `create_map_object`
+  (pixellab's own equivalent) caps at 400x400 and produces this project's usual flat-shaded pixel-art
+  style, not that painterly look - so a pixellab-generated Mirehaven building (see below) is a
+  genuine placeholder in a visibly different style, not a drop-in match. If Crimson Bayou's (or any
+  future region's) buildings should match Ash Hallow's painterly quality exactly, that art needs to
+  come from the same external source/process Ash Hallow's did, not pixellab.
+  - **Concrete current instance**: Mirehaven's 7 building facades (`mirehaven-town-hall`, `-archive`,
+    `-inn`, `-general-store`, `-blacksmith`, `-armory`, `-herbalist`) had no facade art at all until
+    this pass - every entrance was rendering as the generic pulsing exit marker. Generated as
+    pixellab placeholders (`create_map_object`, 300x300, cropped/resized to 144x144 via the same
+    pipeline as the Ash Hallow set) so the town isn't missing entrances entirely, but flagged here as
+    a stylistic mismatch worth a real painterly pass later if Mirehaven should visually match Ash
+    Hallow's quality bar.
+
+---
+
 ## Audio - all 7 music + 21 sfx mapped to real files
 
 Every id below now has a real file wired in (`status: 'final'` in `src/assets/registry.ts`),

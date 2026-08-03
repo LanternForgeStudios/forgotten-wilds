@@ -59,6 +59,37 @@ manual-workflow phase) but are the same account and just as targetable for a fut
 | `battle.enemy.cemetery-shade` | Cemetery Shade | `0852bdf2-4c6d-4978-b639-2252b017eab2` | website (pre-MCP) |
 | `battle.enemy.coalbound-warden` | The Coalbound Warden (boss) | `1660ee75-d976-4bc0-8d93-697fc08ea799` | website (pre-MCP) |
 
+## Characters (Crimson Bayou NPCs, Volume II)
+
+Regenerated once during Phase 4.5's aspect-ratio/resolution remediation - ids below are the
+CURRENT (larger, correctly-proportioned) generation, not the original half-size ones. This table
+was missing entirely until that regeneration pass required looking every one of these back up by
+name via `list_characters` paging (no name filter exists), so recording them now for next time.
+
+| Registry id | Name | pixellab character_id | Generated via |
+|---|---|---|---|
+| `sprite.npc.mayor-celeste-broussard` | Mayor Celeste Broussard | `5b3dc498-cf96-4c19-b715-5c56d57cba76` | MCP |
+| `sprite.npc.lucien-boudreaux` | Lucien Boudreaux | `ba1d5096-e42d-4d95-9d46-f5798a380691` | MCP |
+| `sprite.npc.marsh-spirit` | Marsh Spirit | `4011989f-be9f-4196-bba7-8fc2ec0066d8` | MCP - roams (wanderRadius), so also has a walking-4-frames animation (4 directions) on top of the idle loop, same as the Iron Mountains NPC_WALK_ASSET_IDS set. |
+| `sprite.npc.sabine-thorne` | Warden Sabine Thorne | `9508284c-9d66-469f-9b3b-a02b5642069a` | MCP - roams, same walking-4-frames addition as Marsh Spirit above. |
+| `sprite.npc.armorer-delphine` | Armorer Delphine | `6a8d2f46-343f-4fff-bd6d-53ce91474fa9` | MCP |
+| `sprite.npc.herbalist-noelle` | Herbalist Noelle | `90c1caf5-1d20-40a9-97e8-85fd5d9f5e3a` | MCP |
+| `sprite.npc.innkeep-odette` | Innkeep Odette | `0f35bd3e-62b2-4552-8c5d-e65673ddcfb2` | MCP |
+| `sprite.npc.merchant-remy` | Merchant Remy | `286eca70-8734-415b-b665-40683f38517f` | MCP |
+| `sprite.npc.blacksmith-toussaint` | Blacksmith Toussaint | `49217e7a-2a65-4f12-9e89-f51c2da6a9a1` | MCP |
+
+## Characters (Crimson Bayou enemies, Volume II)
+
+| Registry id | Name | pixellab character_id | Generated via |
+|---|---|---|---|
+| `battle.enemy.marsh-crocodile` | Marsh Crocodile | `0a031680-e9d8-4f64-890a-f3ca3ec54f23` | MCP |
+| `battle.enemy.bog-ravager` | Bog Ravager | `833f257e-cc40-4b11-99f7-6a8bd9594151` | MCP |
+| `battle.enemy.bog-hag` | Bog Hag | `4a2d7920-9964-4d67-b7fc-0e024fc48719` | MCP |
+| `battle.enemy.cypress-witch` | Cypress Witch | `4eecc112-e63c-40a8-bb3f-887d41260a1f` | MCP |
+| `battle.enemy.rougarou-stalker` | Rougarou Stalker | `8edf2706-d3b8-488f-b3f0-3ec1bf6fef71` | MCP |
+| `battle.enemy.alpha-rougarou` | Alpha Rougarou | `615544d4-e571-49b4-964b-cc2c9f22f3c1` | MCP |
+| `battle.enemy.ancient-serpent-guardian` | Ancient Serpent Guardian (boss) | `a51adeef-e467-45a8-83f6-2ea48a11b37b` | MCP |
+
 ## Discarded/failed generations (not used by any registry entry)
 
 | pixellab character_id | Note |
