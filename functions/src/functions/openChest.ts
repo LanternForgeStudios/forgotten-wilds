@@ -24,6 +24,25 @@ const CHESTS: Record<string, Record<string, string>> = {
     'chest-mine-2': 'leather-gauntlets',
     'chest-mine-3': 'stone-wolf-totem',
   },
+  // Crimson Bayou field maps - same "uncommon/rare equipment with no other earn path yet" rule,
+  // now that Mirehaven's own shops sell nothing (SHOP_CATALOGS' own comment: no Bayou-specific
+  // weapon/charm/chest/legs/boots/gloves items exist yet). One materials chest per map rounds out
+  // the crafting-material drop rate rather than making every chest an equipment freebie.
+  'cypress-marsh': {
+    'chest-cypress-marsh-1': 'veteran-keeper-coat',
+    'chest-cypress-marsh-2': 'reinforced-keeper-trousers',
+    'chest-cypress-marsh-3': 'croc-hide',
+  },
+  'murkwater-trails': {
+    'chest-murkwater-trails-1': 'trail-boots',
+    'chest-murkwater-trails-2': 'keepers-gauntlets',
+    'chest-murkwater-trails-3': 'bog-ash',
+  },
+  'hidden-river-landing': {
+    'chest-hidden-river-landing-1': 'spiritwood-walking-staff',
+    'chest-hidden-river-landing-2': 'veteran-keeper-trousers',
+    'chest-hidden-river-landing-3': 'ancient-serpent-scale',
+  },
 };
 
 export const openChest = onCall<OpenChestRequest>(async (request) => {

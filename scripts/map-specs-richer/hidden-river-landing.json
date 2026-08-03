@@ -37,7 +37,8 @@
           "count": 10,
           "seed": 23,
           "avoid": [
-            { "x": 30, "y": 4 }, { "x": 30, "y": 20 }, { "x": 30, "y": 28 }, { "x": 34, "y": 30 }
+            { "x": 30, "y": 4 }, { "x": 30, "y": 20 }, { "x": 30, "y": 28 }, { "x": 34, "y": 30 },
+            { "x": 12, "y": 10 }, { "x": 50, "y": 8 }, { "x": 46, "y": 34 }
           ]
         }
       ]
@@ -54,6 +55,10 @@
     { "type": "interactable", "x": 34, "y": 30, "refId": "heart-seed-river" },
 
     { "type": "spawnPoint", "x": 30, "y": 38, "refId": "from-temple-of-the-deep-current" },
-    { "type": "transition", "x": 30, "y": 39, "refId": "temple-of-the-deep-current", "targetSpawnId": "from-hidden-river-landing" }
+    { "type": "transition", "x": 30, "y": 39, "refId": "temple-of-the-deep-current", "targetSpawnId": "from-hidden-river-landing" },
+
+    { "type": "interactable", "x": 12, "y": 10, "refId": "chest-hidden-river-landing-1" },
+    { "type": "interactable", "x": 50, "y": 8, "refId": "chest-hidden-river-landing-2" },
+    { "type": "interactable", "x": 46, "y": 34, "refId": "chest-hidden-river-landing-3" }
   ]
 }

@@ -37,7 +37,8 @@
           "seed": 19,
           "avoid": [
             { "x": 2, "y": 20 }, { "x": 30, "y": 20 }, { "x": 34, "y": 24 },
-            { "x": 40, "y": 12 }
+            { "x": 40, "y": 12 },
+            { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 }
           ]
         }
       ]
@@ -51,6 +52,10 @@
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
     { "type": "zone", "x": 32, "y": 22, "width": 6, "height": 6, "refId": "old-cemetery" },
-    { "type": "interactable", "x": 34, "y": 24, "refId": "heart-seed-murkwater" }
+    { "type": "interactable", "x": 34, "y": 24, "refId": "heart-seed-murkwater" },
+
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-murkwater-trails-1" },
+    { "type": "interactable", "x": 52, "y": 10, "refId": "chest-murkwater-trails-2" },
+    { "type": "interactable", "x": 54, "y": 32, "refId": "chest-murkwater-trails-3" }
   ]
 }

@@ -38,7 +38,8 @@
           "seed": 11,
           "avoid": [
             { "x": 30, "y": 20 }, { "x": 20, "y": 18 }, { "x": 22, "y": 22 },
-            { "x": 2, "y": 20 }, { "x": 44, "y": 18 }, { "x": 48, "y": 24 }
+            { "x": 2, "y": 20 }, { "x": 44, "y": 18 }, { "x": 48, "y": 24 },
+            { "x": 10, "y": 10 }, { "x": 50, "y": 12 }, { "x": 14, "y": 32 }
           ]
         }
       ]
@@ -55,6 +56,10 @@
     { "type": "interactable", "x": 20, "y": 20, "refId": "mother-cypress-shrine" },
     { "type": "interactable", "x": 22, "y": 22, "refId": "heart-seed-cypress" },
 
-    { "type": "npc", "x": 26, "y": 14, "refId": "marsh-spirit", "wanderRadius": 3 }
+    { "type": "npc", "x": 26, "y": 14, "refId": "marsh-spirit", "wanderRadius": 3 },
+
+    { "type": "interactable", "x": 10, "y": 10, "refId": "chest-cypress-marsh-1" },
+    { "type": "interactable", "x": 50, "y": 12, "refId": "chest-cypress-marsh-2" },
+    { "type": "interactable", "x": 14, "y": 32, "refId": "chest-cypress-marsh-3" }
   ]
 }
