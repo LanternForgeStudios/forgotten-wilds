@@ -970,6 +970,24 @@ pattern is the same for nearly every quest in this section, just not previously 
 quest-by-quest. Read `functions/src/data/quests.ts` directly for the real objective list of any
 given quest rather than assuming this doc's Story Beats are literal.
 
+**A dungeon chapter's "Primary Maps" list is narrative framing, not a literal map count - every
+dungeon in this doc has always been built as exactly one `Location`/one Tiled map, regardless of
+how many sub-areas the prose names.** Hollow Rail Mine's own chapter lists 7 "Primary Maps"
+(Entrance, Upper Shafts, Flooded Tunnels, Crystal Caverns, Forgotten Memorial, Forgotten Shrine,
+Mine Heart) but shipped as the single `hollow-rail-mine` Location; its named sub-areas that needed
+to be *reachable* (the shrine) exist as a landmark/interactable placed within that one map
+(`mine-shrine`, dispatched via a lookup table, not a separate map or Location) rather than as
+additional maps or transitions. Temple of the Deep Current (Chapter 4, below) follows the identical
+pattern: its doc-listed "Primary Maps" (Temple Entrance, Flooded Gallery, Reflection Pools, Lantern
+Sanctuary, Guardian Chamber) are one `temple-of-the-deep-current` Location with the chapter's key
+destinations (Temple Records, the Lantern of Still Waters, the Ancient Serpent Guardian) placed as
+interactables/boss triggers inside it. **Apply this same pattern to every future region's dungeon
+chapter**: author one Location/map per dungeon, and represent its named sub-areas as
+interactable/boss-trigger placements within that map (dispatched through a data-driven lookup
+table - see `src/scenes/DungeonScene.tsx`'s `BOSS_TRIGGERS`/`SHRINE_INTERACTABLES`/
+`WORLD_ITEM_INTERACTABLES`, which is intentionally generalized to support any number of dungeon
+Locations this way) rather than building a literal multi-map dungeon or a bespoke scene per region.
+
 Volume II – Crimson Bayou
 
 IRON MOUNTAINS REGION COMPLETION
@@ -1266,9 +1284,11 @@ real field `Location`s already built for Chapter 3 (`murkwater-trails`, `hidden-
 ungated `zone` object within `murkwater-trails`'s own map (flavor only, not a quest target).
 
 MSF-CB-005's "Establish dungeon checkpoint" beat isn't implemented as reaching a Temple of the Deep
-Current location, since none of Chapter 4's dungeon maps exist yet (that's Chapter 4's own build
-pass) - `beneath-still-waters` instead ends on clearing the temple entrance's Rougarou Stalkers,
-with the actual Temple maps/entry picked up by MSF-CB-006 once Chapter 4 is built.
+Current location, since Chapter 4's dungeon didn't exist yet at the time Chapter 3 was built (it
+was picked up in Chapter 4's own build pass, see its Implementation Notes below) -
+`beneath-still-waters` instead ends on clearing the temple entrance's Rougarou Stalkers, with the
+actual Temple map/entry (a single `temple-of-the-deep-current` Location, per the dungeon-map
+convention noted above) reached via MSF-CB-006.
 
 Building this chapter's NPC interactions surfaced two real, pre-existing gaps left over from the
 region-scaffolding/NPC build passes, both fixed as part of this quest work rather than worked
