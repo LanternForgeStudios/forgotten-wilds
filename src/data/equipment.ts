@@ -17,7 +17,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 5, attack: 4 },
     tier: 'common',
     familyId: 'walking-staff',
-    layerSpriteAssetId: { male: 'sprite.equipment.weathered-walking-staff', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.weathered-walking-staff', female: 'sprite.equipment.weathered-walking-staff-female' },
   },
   {
     id: 'ironwood-walking-staff',
@@ -28,7 +28,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 3, attack: 7, speed: 1 },
     tier: 'uncommon',
     familyId: 'walking-staff',
-    layerSpriteAssetId: { male: 'sprite.equipment.ironwood-walking-staff', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.ironwood-walking-staff', female: 'sprite.equipment.ironwood-walking-staff-female' },
   },
   {
     id: 'spiritwood-walking-staff',
@@ -39,7 +39,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 10, attack: 10, defense: 2, speed: -2 },
     tier: 'rare',
     familyId: 'walking-staff',
-    layerSpriteAssetId: { male: 'sprite.equipment.spiritwood-walking-staff', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.spiritwood-walking-staff', female: 'sprite.equipment.spiritwood-walking-staff-female' },
   },
   {
     id: 'worn-keeper-coat',
@@ -50,7 +50,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 12, defense: 3 },
     tier: 'common',
     familyId: 'keeper-coat',
-    layerSpriteAssetId: { male: 'sprite.equipment.worn-keeper-coat', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-keeper-coat', female: 'sprite.equipment.worn-keeper-coat-female' },
   },
   {
     id: 'reinforced-keeper-coat',
@@ -61,7 +61,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 18, defense: 5, speed: -1 },
     tier: 'uncommon',
     familyId: 'keeper-coat',
-    layerSpriteAssetId: { male: 'sprite.equipment.reinforced-keeper-coat', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.reinforced-keeper-coat', female: 'sprite.equipment.reinforced-keeper-coat-female' },
   },
   {
     id: 'veteran-keeper-coat',
@@ -72,7 +72,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 20, maxSpirit: 8, defense: 7, speed: 1 },
     tier: 'rare',
     familyId: 'keeper-coat',
-    layerSpriteAssetId: { male: 'sprite.equipment.veteran-keeper-coat', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.veteran-keeper-coat', female: 'sprite.equipment.veteran-keeper-coat-female' },
   },
   {
     id: 'worn-keeper-trousers',
@@ -113,7 +113,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { defense: 1, speed: 2 },
     tier: 'common',
     familyId: 'traveler-boots',
-    layerSpriteAssetId: { male: 'sprite.equipment.traveler-boots', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.traveler-boots', female: 'sprite.equipment.traveler-boots-female' },
   },
   {
     id: 'trail-boots',
@@ -124,7 +124,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { defense: 2, speed: 4 },
     tier: 'uncommon',
     familyId: 'traveler-boots',
-    layerSpriteAssetId: { male: 'sprite.equipment.trail-boots', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.trail-boots', female: 'sprite.equipment.trail-boots-female' },
   },
   {
     id: 'ranger-boots',
@@ -135,7 +135,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 1, defense: 3, speed: 6 },
     tier: 'rare',
     familyId: 'traveler-boots',
-    layerSpriteAssetId: { male: 'sprite.equipment.ranger-boots', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.ranger-boots', female: 'sprite.equipment.ranger-boots-female' },
   },
   {
     id: 'work-gloves',
@@ -146,7 +146,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 1, defense: 1 },
     tier: 'common',
     familyId: 'work-gloves',
-    layerSpriteAssetId: { male: 'sprite.equipment.work-gloves', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.work-gloves', female: 'sprite.equipment.work-gloves-female' },
   },
   {
     id: 'leather-gauntlets',
@@ -157,7 +157,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 5, attack: 2, defense: 2 },
     tier: 'uncommon',
     familyId: 'work-gloves',
-    layerSpriteAssetId: { male: 'sprite.equipment.leather-gauntlets', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.leather-gauntlets', female: 'sprite.equipment.leather-gauntlets-female' },
   },
   {
     id: 'keepers-gauntlets',
@@ -168,7 +168,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 8, attack: 4, defense: 4 },
     tier: 'rare',
     familyId: 'work-gloves',
-    layerSpriteAssetId: { male: 'sprite.equipment.keepers-gauntlets', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.keepers-gauntlets', female: 'sprite.equipment.keepers-gauntlets-female' },
   },
   {
     id: 'river-stone-charm',
@@ -210,7 +210,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     tier: 'legendary',
     oilCapacity: 30,
     lanternAbilityIds: ['lantern-flame'],
-    layerSpriteAssetId: { male: 'sprite.equipment.keepers-lantern', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.keepers-lantern', female: 'sprite.equipment.keepers-lantern-female' },
   },
   {
     id: 'miners-lost-lantern-equipped',
@@ -223,7 +223,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     unique: true,
     oilCapacity: 35,
     lanternAbilityIds: ['steadfast-ember'],
-    layerSpriteAssetId: { male: 'sprite.equipment.miners-lost-lantern-equipped', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.miners-lost-lantern-equipped', female: 'sprite.equipment.miners-lost-lantern-equipped-female' },
   },
   {
     id: 'stone-wolf-totem',
@@ -277,7 +277,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     iconAssetId: 'icon.equipment.travelers-cloak',
     statBonuses: { maxHp: 5, speed: 1 },
     tier: 'common',
-    layerSpriteAssetId: { male: 'sprite.equipment.travelers-cloak', female: '' },
+    layerSpriteAssetId: { male: 'sprite.equipment.travelers-cloak', female: 'sprite.equipment.travelers-cloak-female' },
   },
   {
     id: 'traveler-pants',
@@ -287,5 +287,6 @@ export const EQUIPMENT: EquipmentItem[] = [
     iconAssetId: 'icon.equipment.traveler-pants',
     statBonuses: { maxHp: 3, speed: 1 },
     tier: 'common',
+    layerSpriteAssetId: { male: 'sprite.equipment.traveler-pants', female: 'sprite.equipment.traveler-pants-female' },
   },
 ];
