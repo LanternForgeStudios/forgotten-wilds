@@ -32,6 +32,7 @@ import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
+import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { playMusic, playSound } from '@/audio/audioService';
@@ -53,6 +54,15 @@ const BUILDING_MARKERS: Record<string, { label: string; spriteAssetId: string }>
   'ash-hallow-archive': { label: 'The Archive', spriteAssetId: 'structure.archive' },
   'ash-hallow-mine-office': { label: 'Mine Office', spriteAssetId: 'structure.mine-office' },
   'ash-hallow-town-hall': { label: 'Town Hall', spriteAssetId: 'structure.town-hall' },
+  // Crimson Bayou (MSQ Volume II) - every entrance rendered as the generic exit marker until this
+  // pass added placeholder facade art (see structure.mirehaven-town-hall's registry note).
+  'mirehaven-town-hall': { label: 'Town Hall', spriteAssetId: 'structure.mirehaven-town-hall' },
+  'mirehaven-archive': { label: 'The Archive', spriteAssetId: 'structure.mirehaven-archive' },
+  'mirehaven-inn': { label: 'The Inn', spriteAssetId: 'structure.mirehaven-inn' },
+  'mirehaven-general-store': { label: 'General Store', spriteAssetId: 'structure.mirehaven-general-store' },
+  'mirehaven-blacksmith': { label: "Toussaint's Forge", spriteAssetId: 'structure.mirehaven-blacksmith' },
+  'mirehaven-armory': { label: "Delphine's Armory", spriteAssetId: 'structure.mirehaven-armory' },
+  'mirehaven-herbalist': { label: 'Herbalist', spriteAssetId: 'structure.mirehaven-herbalist' },
 };
 
 /** Shrine interactables on the open town map (currently just Ash Hallow's Town Shrine) - handled
@@ -286,7 +296,7 @@ export function TownScene() {
         id: o.refId!,
         x: o.x,
         y: o.y,
-        spriteAssetId: staminaUnlocked ? 'structure.shrine-activated' : 'structure.shrine-dormant',
+        spriteAssetId: shrineSpriteAssetId(o.refId!, questProgress),
         label: 'Shrine',
       }));
 
@@ -319,7 +329,7 @@ export function TownScene() {
       }));
 
     return [...npcEntities, ...buildingEntities, ...shrineEntities, ...decorEntities, ...exitEntities, ...otherPlayerEntities];
-  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, presences, uid, locationId, staminaUnlocked]);
+  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, presences, uid, locationId]);
 
   if (!map) {
     return (

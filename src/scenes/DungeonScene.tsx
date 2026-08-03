@@ -28,6 +28,7 @@ import { isTypingTarget } from '@/utils/keyboard';
 import { itemDisplayName } from '@/utils/itemName';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
+import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
 import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { playMusic, playSound } from '@/audio/audioService';
@@ -264,7 +265,7 @@ export function DungeonScene() {
             id: refId,
             x: o.x,
             y: o.y,
-            spriteAssetId: staminaUnlocked ? 'structure.shrine-activated' : 'structure.shrine-dormant',
+            spriteAssetId: shrineSpriteAssetId(refId, questProgress),
             label: 'Shrine',
           };
         }
@@ -307,7 +308,7 @@ export function DungeonScene() {
       .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     return [...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-  }, [map, openedChests, fieldEncounterIcons, staminaUnlocked, inventory]);
+  }, [map, openedChests, fieldEncounterIcons, questProgress, inventory]);
 
   if (!map) {
     return (

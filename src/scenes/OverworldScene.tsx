@@ -23,6 +23,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
+import { useInventoryStore } from '@/state/useInventoryStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import {
   callOpenChest,
@@ -38,6 +39,7 @@ import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
+import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
 import { playMusic, playSound } from '@/audio/audioService';
 import type { Npc } from '@/types';
 import styles from './TownScene.module.css';
@@ -71,8 +73,10 @@ const ZONE_LANDMARK_KIND: Record<string, 'visitOnly' | 'fragment'> = {
   'mossy-creek': 'fragment',
 };
 
-/** Sprite for each 'fragment'-kind point interactable - these are NOT shrines (no dormant/activated
- *  state), so each needs its own bespoke marker rather than falling back to the shrine sprite. */
+/** Sprite for each 'fragment'-kind point interactable - these are NOT shrines (no lit/dormant
+ *  restoration state), so each needs its own bespoke marker rather than falling back to the shrine
+ *  sprite. This is the marker shown BEFORE collection; see FRAGMENT_COLLECTED_SPRITE_ASSET_ID for
+ *  any of these that also have a distinct after-collection look. */
 const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'fallen-watchtower': 'structure.landmark-watchtower',
   'water-fragment': 'structure.landmark-water-glimmer',
@@ -82,6 +86,18 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'heart-seed-cypress': 'structure.landmark-heart-seed',
   'heart-seed-murkwater': 'structure.landmark-heart-seed',
   'heart-seed-river': 'structure.landmark-heart-seed',
+};
+
+/** Post-collection sprite override for a 'fragment'-kind interactable, shown once its item is in
+ *  the player's inventory (collectWorldItem.ts grants it once and never removes it, so presence in
+ *  inventory IS the "collected" flag - same convention DungeonScene.tsx's isWorldItemCollected
+ *  uses). Only entries here get a distinct collected look; anything absent keeps showing its normal
+ *  FRAGMENT_SPRITE_ASSET_ID forever (matches every fragment before the Heart Seeds, which never had
+ *  this problem called out). */
+const FRAGMENT_COLLECTED_SPRITE_ASSET_ID: Record<string, string> = {
+  'heart-seed-cypress': 'structure.landmark-heart-seed-collected',
+  'heart-seed-murkwater': 'structure.landmark-heart-seed-collected',
+  'heart-seed-river': 'structure.landmark-heart-seed-collected',
 };
 
 /** Purely decorative, non-gated interactable - no Cloud Function call, falls through to
@@ -119,6 +135,7 @@ export function OverworldScene() {
   const questProgress = useQuestStore((s) => s.progress);
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
+  const inventory = useInventoryStore((s) => s.items);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
   const appearance = usePlayerStore((s) => s.player?.appearance ?? 'white-dark');
@@ -322,12 +339,12 @@ export function OverworldScene() {
             ? 'structure.chest-open'
             : 'structure.chest'
           : isShrine
-            ? staminaUnlocked
-              ? 'structure.shrine-activated'
-              : 'structure.shrine-dormant'
+            ? shrineSpriteAssetId(o.refId!, questProgress)
             : isGlowingMushroom(o.refId!)
               ? 'structure.decor-glowing-mushroom'
-              : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');
+              : inventory.some((i) => i.itemId === o.refId) && FRAGMENT_COLLECTED_SPRITE_ASSET_ID[o.refId!]
+                ? FRAGMENT_COLLECTED_SPRITE_ASSET_ID[o.refId!]
+                : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');
         return {
           id: o.refId!,
           x: o.x,
@@ -352,7 +369,7 @@ export function OverworldScene() {
       .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     return [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, openedChests, fieldEncounterIcons, staminaUnlocked]);
+  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, openedChests, fieldEncounterIcons, inventory]);
 
   if (!map) {
     return (

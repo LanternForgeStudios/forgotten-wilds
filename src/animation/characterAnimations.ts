@@ -39,6 +39,10 @@ const NPC_WALK_ASSET_IDS = new Set([
   'sprite.npc.hunter-garrick',
   'sprite.npc.spirit-child',
   'sprite.npc.ranger-caleb',
+  // Crimson Bayou (MSQ Volume II) - marsh-spirit/sabine-thorne both roam (wanderRadius) but were
+  // built with idle-only sheets initially, same gap this whole set exists to avoid.
+  'sprite.npc.marsh-spirit',
+  'sprite.npc.sabine-thorne',
 ]);
 /** Row layout for NPC_WALK_ASSET_IDS sheets: row 0 idle (breathing), rows 1-4 walking by facing -
  *  a fixed convention (not per-NPC configurable) since the build script that assembles these

@@ -3087,12 +3087,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.marsh-spirit',
     category: 'character',
-    intendedUse: "Overworld sprite for marsh-spirit - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT's shape)",
-    filePath: 'sprites/characters/marsh-spirit-idle.png',
-    dimensions: { width: 288, height: 96 },
+    intendedUse:
+      "Overworld sprite for marsh-spirit - a wandering NPC (wanderRadius on its cypress-marsh.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/marsh-spirit-walk.png',
+    dimensions: { width: 288, height: 480 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: "Generated via the pixellab MCP server (create_character with proportions preset 'stylized' for a visually distinct spirit look + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/marsh-spirit/.",
+    notes:
+      "Generated via the pixellab MCP server (create_character with proportions preset 'stylized' for a visually distinct spirit look + animate_character breathing-idle template for the idle row, walking-4-frames template across all 4 cardinal directions for the walk rows). Was idle-only until this pass added the walk rows, added to NPC_WALK_ASSET_IDS in characterAnimations.ts to actually use them - a roaming NPC previously slid across tiles with no walk-cycle at all. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/marsh-spirit/.",
   },
   {
     id: 'portrait.marsh-spirit',
@@ -3106,12 +3108,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.sabine-thorne',
     category: 'character',
-    intendedUse: "Overworld sprite for sabine-thorne - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT's shape)",
-    filePath: 'sprites/characters/sabine-thorne-idle.png',
-    dimensions: { width: 288, height: 96 },
+    intendedUse:
+      "Overworld sprite for sabine-thorne - a wandering NPC (wanderRadius on its hidden-river-landing.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/sabine-thorne-walk.png',
+    dimensions: { width: 288, height: 480 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated via the pixellab MCP server (create_character + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/sabine-thorne/.',
+    notes:
+      'Generated via the pixellab MCP server (create_character + animate_character breathing-idle template for the idle row, walking-4-frames template across all 4 cardinal directions for the walk rows). Was idle-only until this pass added the walk rows, added to NPC_WALK_ASSET_IDS in characterAnimations.ts to actually use them - a roaming NPC previously slid across tiles with no walk-cycle at all. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/sabine-thorne/.',
   },
   {
     id: 'portrait.sabine-thorne',
@@ -3308,6 +3312,76 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "Painted building facade, cropped/resized from a staged 1024x1024 render (art-staging/icons/town-hall-ash-hallow.png, real alpha, no background removal needed) via scripts/build_structure_icon.py - see structure.house's note for the pipeline. Original archived to public/assets/sprites/structures/original/.",
   },
   {
+    id: 'structure.mirehaven-town-hall',
+    category: 'structure',
+    intendedUse: 'Overworld building-facade marker for Mirehaven Town Hall door (Mayor Celeste Broussard)',
+    filePath: 'sprites/structures/mirehaven-town-hall.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      "PLACEHOLDER, not a stylistic match for Ash Hallow's painted facades above - see docs/Asset-Production-Checklist.md's \"Things Claude can't generate itself\" section for why. pixellab MCP-generated via create_map_object (300x300, high top-down, medium shading, selective outline, \"small bayou town hall building, weathered wood and cypress beams, raised on stilts above the marsh, swamp town architecture\"), which came back with a baked-in mid-gray background despite the API reporting transparent - background punched via a per-image flood-fill from each corner (scripts/build_mirehaven_building_placeholders.py), then cropped to square bbox and resized to 144x144 with LANCZOS, same target size/pipeline shape as the Ash Hallow set. Every one of Mirehaven's 7 buildings had NO facade art at all before this pass - every entrance rendered as the generic pulsing exit marker. 300x300 original archived at public/assets/sprites/structures/original/mirehaven-town-hall-source.png.",
+  },
+  {
+    id: 'structure.mirehaven-archive',
+    category: 'structure',
+    intendedUse: 'Overworld building-facade marker for the Mirehaven Archive door (Lucien Boudreaux)',
+    filePath: 'sprites/structures/mirehaven-archive.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      "PLACEHOLDER - see structure.mirehaven-town-hall's note for the pipeline/caveat. create_map_object prompt: \"small bayou archive records building, wooden stilted structure with shuttered windows, swamp town architecture\". 300x300 original archived at public/assets/sprites/structures/original/mirehaven-archive-source.png.",
+  },
+  {
+    id: 'structure.mirehaven-inn',
+    category: 'structure',
+    intendedUse: 'Overworld building-facade marker for the Mirehaven Inn door (Innkeep Odette)',
+    filePath: 'sprites/structures/mirehaven-inn.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      "PLACEHOLDER - see structure.mirehaven-town-hall's note for the pipeline/caveat. create_map_object prompt: \"cozy bayou inn building, wooden stilted structure with a welcoming porch and lantern light, swamp town architecture\". 300x300 original archived at public/assets/sprites/structures/original/mirehaven-inn-source.png.",
+  },
+  {
+    id: 'structure.mirehaven-general-store',
+    category: 'structure',
+    intendedUse: 'Overworld building-facade marker for the Mirehaven General Store door (Merchant Remy)',
+    filePath: 'sprites/structures/mirehaven-general-store.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      "PLACEHOLDER - see structure.mirehaven-town-hall's note for the pipeline/caveat. create_map_object prompt: \"small bayou general store building, wooden stilted shop with a covered porch and goods on display, swamp town architecture\". 300x300 original archived at public/assets/sprites/structures/original/mirehaven-general-store-source.png.",
+  },
+  {
+    id: 'structure.mirehaven-blacksmith',
+    category: 'structure',
+    intendedUse: "Overworld building-facade marker for Toussaint's Forge door (Blacksmith Toussaint)",
+    filePath: 'sprites/structures/mirehaven-blacksmith.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      "PLACEHOLDER - see structure.mirehaven-town-hall's note for the pipeline/caveat. create_map_object prompt: \"bayou blacksmith forge building, wooden stilted structure with a stone chimney and forge smoke, swamp town architecture\". 300x300 original archived at public/assets/sprites/structures/original/mirehaven-blacksmith-source.png.",
+  },
+  {
+    id: 'structure.mirehaven-armory',
+    category: 'structure',
+    intendedUse: "Overworld building-facade marker for Delphine's Armory door (Armorer Delphine)",
+    filePath: 'sprites/structures/mirehaven-armory.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      "PLACEHOLDER - see structure.mirehaven-town-hall's note for the pipeline/caveat. create_map_object prompt: \"bayou armory building, wooden stilted structure with weapon racks visible outside, swamp town architecture\". 300x300 original archived at public/assets/sprites/structures/original/mirehaven-armory-source.png.",
+  },
+  {
+    id: 'structure.mirehaven-herbalist',
+    category: 'structure',
+    intendedUse: "Overworld building-facade marker for the Mirehaven Herbalist door (Herbalist Noelle)",
+    filePath: 'sprites/structures/mirehaven-herbalist.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      "PLACEHOLDER - see structure.mirehaven-town-hall's note for the pipeline/caveat. create_map_object prompt: \"bayou herbalist shop building, wooden stilted structure covered in hanging herbs and vines, swamp town architecture\". 300x300 original archived at public/assets/sprites/structures/original/mirehaven-herbalist-source.png.",
+  },
+  {
     id: 'structure.shrine-dormant',
     category: 'structure',
     intendedUse:
@@ -3373,6 +3447,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated: create_map_object ("a glowing seed pod nestled among mossy cypress roots, soft golden-green magical light, ancient nature relic", 200x200, high top-down, medium shading, selective outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 200x200 original archived at public/assets/sprites/structures/original/heart-seed-source.png.',
+  },
+  {
+    id: 'structure.landmark-heart-seed-collected',
+    category: 'structure',
+    intendedUse:
+      "Post-collection state for the 3 Heart Seed fragment interactables - shown once the player has picked up that map's own heart-seed-* item, so the landmark reads as emptied instead of still glowing/active. Shared by all 3 refIds, same as structure.landmark-heart-seed.",
+    filePath: 'sprites/structures/landmark-heart-seed-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("empty mossy hollow among cypress roots where a seed pod once rested, faint dim residual glow, dormant nature relic, no glowing light", 200x200, high top-down, medium shading, selective outline). Same crop/resize pipeline as structure.landmark-heart-seed. Build script: scripts/build_landmark_objects.py. 200x200 original archived at public/assets/sprites/structures/original/heart-seed-collected-source.png.',
   },
   {
     id: 'structure.landmark-water-glimmer',
