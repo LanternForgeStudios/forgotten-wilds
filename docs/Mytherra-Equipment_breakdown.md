@@ -372,3 +372,59 @@ Endless Prairie	Prairie Spear	Buffalo Hide	Rider's Chaps	Wind Boots	Rider Gloves
 Whispering Pines	Cedar Staff	Bark Armor	Root-Woven Leggings	Root Boots	Vine Gloves	Cedar Charm	1 Lantern	3 Totems
 Shattered Desert	Sunblade	Nomad Robes	Nomad Leggings	Sand Boots	Dune Wraps	Star Charm	1 Lantern	3 Totems
 Frozen Frontier	Frost Pike	Winter Coat	Winter Leggings	Glacier Boots	Fur Gloves	Aurora Charm	1 Lantern	3 Totems
+
+Weapon Types (added later)
+
+Every weapon family above (Walking Staff, Cypress Cane, Prairie Spear, Cedar Staff, Sunblade, Frost
+Pike, ...) has always been, in effect, a themed instance of some underlying weapon *silhouette* -
+this table's own future-region names already assumed that ("Prairie Spear" is a Spear, "Sunblade"
+is a Sword, "Frost Pike" is a Spear/Pike, "Cedar Staff" is a Staff) without the game ever mechanizing
+it. This section formalizes that into 5 universal weapon **types**:
+
+Type	Grip
+Staff	One-handed, `held-right-hand` anchor (the original type - Walking Staff/Cypress Cane)
+Sword	One-handed, `held-right-hand` anchor
+Axe	One-handed, `held-right-hand` anchor
+Spear	One-handed, `held-right-hand` anchor
+Hammer	One-handed (built as a mace/war-pick, not a two-handed maul - see note below), `held-right-hand` anchor
+
+Each type gets exactly **one hand-positioned founder art pass** (male + female), built once and
+shared across every region via `palette_swap_equipment_layer.py` - the same technique already used
+for the entire Cypress Cane family (itself a palette-swap of the Walking Staff founder) and for
+Ironwood Walking Staff. A region's own weapon **family** (the themed name in the catalog table
+above) is still one specific type, reskinned with that region's own palette/flavor names and stat
+progression - this doesn't change how regions work, it only means "which of the 5 founder
+silhouettes does this region's weapon reskin from" is now a real, shared choice instead of every
+region inventing (and hand-positioning) its own silhouette from scratch.
+
+**"One new family per region" still holds for every future region** - Endless Prairie still only
+gets one new weapon family (Prairie Spear, drawn from the Spear type), not five. The one exception
+is a one-time retroactive grant: Iron Mountains and Crimson Bayou were both built before this system
+existed and both only ever got a Staff-type family (Cypress Cane is a palette-swap of Walking
+Staff's own silhouette) - so both regions retroactively gain their own Sword/Axe/Spear/Hammer
+family too, instead of being permanently stuck with only one weapon type while every later region
+gets to pick from five. This is called out explicitly as a one-time exception so it doesn't read as
+an inconsistency in the "one family per region" rule later.
+
+Future region -> weapon type mapping (so later region work doesn't have to re-derive this from the
+catalog table's flavor names):
+
+Region	Named Weapon	Type
+Endless Prairie	Prairie Spear	Spear
+Whispering Pines	Cedar Staff	Staff
+Shattered Desert	Sunblade	Sword
+Frozen Frontier	Frost Pike	Spear
+
+Hammer note: a genuinely two-handed weapon has no supporting anchor category in
+`docs/Equipment-Layering-Plan.md`'s equipment-layer system today (`held-right-hand`,
+`held-left-hand`, `worn-torso`, `paired-feet`, `paired-hands`, `running` - no `held-two-hand`).
+Rather than build new anchor-system plumbing for a single weapon type, Hammer is deliberately built
+as a one-handed mace/war-pick, staying within the existing `held-right-hand` category like every
+other type. A true two-handed weapon remains a real option for a future region if the anchor system
+is ever extended to support one, but that's out of scope here.
+
+No combat-engine changes come with this: weapon type has no mechanical footing today (Skills are
+granted purely via quest reward and are fully decoupled from whatever weapon is equipped - see
+`grantSkillId` in `functions/src/engine/questEngine.ts`), so this entire system is art + equipment-
+data only. A "weapon type gates which Skills you can use" mechanic is a real option for later, not
+part of this rollout.
