@@ -5238,7 +5238,7 @@
             {
               "name": "refId",
               "type": "string",
-              "value": "temple-records-cache"
+              "value": "temple-records"
             }
           ]
         },
@@ -5256,7 +5256,7 @@
             {
               "name": "refId",
               "type": "string",
-              "value": "lantern-sanctuary"
+              "value": "lantern-of-still-waters"
             }
           ]
         },
@@ -5274,7 +5274,7 @@
             {
               "name": "refId",
               "type": "string",
-              "value": "ancient-serpent-guardian-chamber"
+              "value": "ancient-serpent-guardian"
             }
           ]
         }

@@ -76,8 +76,8 @@ const WORLD_ITEM_INTERACTABLES: Record<
     label: 'Temple Records',
     foundMessage: 'You recover a stack of waterlogged records, miraculously still legible.',
     alreadyMessage: "There's nothing left here — you already recovered the records.",
-    dormantSpriteAssetId: 'structure.chest',
-    collectedSpriteAssetId: 'structure.chest-open',
+    dormantSpriteAssetId: 'structure.temple-records-dormant',
+    collectedSpriteAssetId: 'structure.temple-records-collected',
   },
   'lantern-of-still-waters': {
     label: 'Lantern Sanctuary',
