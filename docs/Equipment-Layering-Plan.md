@@ -394,7 +394,46 @@ only way to get anchor data at all for the 3 items (`ranger-boots`, `leather-gau
 all 3 tiers each, for full male walking+running animation coverage - the last 2 items of the
 original 5-item pilot's own "roll out the rest of the family" follow-up work.
 
-## Current status / resume point (for picking this back up cleanly)
+## Update (2026-08-02): male AND female equipment layers now complete
+
+The user has finished hand-editing **both male and female** equipment layer sprites for every item
+covered so far (walking + running, all slots) - full sprites saved directly into
+`public/assets/sprites/equipment/`. This supersedes the "Legs slot in progress" / "Chest slot
+cleanup in progress" / "Female not started" statuses recorded below (kept for historical context,
+not current). Next session picking this up should start with `git status`/`git diff --stat` on
+`public/assets/sprites/equipment/` to see exactly what's new/changed since the last commit
+recorded in this doc, then work through the same QA checklist as any hand-edit handoff (composite-
+render QA, `record_anchor_from_sheet.py`, registry updates, `layerSpriteAssetId` wiring, build,
+commit) - do not assume file names/coverage from this doc's older status text without verifying
+against the actual directory contents first.
+
+### Workflow for future equipment pieces (per the user's own instructions, not yet exercised)
+
+**Lantern and weapon layers** (categories with no same-shape recolor precedent - each new item
+needs its own pose/grip alignment): generate a new pixellab icon for the item first, then use the
+same anchor-based scripts already built this project (`build_equipment_layer_manual.py` /
+`build_equipment_layer_running.py` / `build_equipment_layer_add_direction.py` family), referencing
+the user's own hand-edited sheet as the template for which anchor points and pixels should be
+visible - **the male and female anchor-point templates need updating first**, using the CURRENT
+male/female animation samples (the just-finished sheets in `public/assets/sprites/equipment/`) as
+the reference for which pixels/anchors are actually correct now, not whatever anchor data predates
+this hand-edit pass.
+
+**Chest, boots, gloves, legs layers** (categories that already have a finished base item per
+gender): generate new items in these slots by taking the existing base-item sprite and adjusting
+color/hue to match the new item's own icon as closely as possible - the same idea as
+`palette_swap_equipment_layer.py`'s existing recolor approach, but explicitly keyed off these named
+base sprites going forward:
+- Male base sprites: `traveler-pants-male-animated`, `work-keeper-coat-male-animated`,
+  `leather-gauntlets-male-animated`, `traveler-boots-male-animated`.
+- Female base sprites: `traveler-pants-female-animated`, `work-keeper-coat-female-animated`,
+  `leather-gauntlets-female-animated`, `traveler-boots-female-animated`.
+
+(Note: `work-keeper-coat-*` here - confirm against the actual committed filename, since earlier
+status text in this doc calls the shipped chest item `worn-keeper-coat`; verify which is correct
+against `public/assets/sprites/equipment/` directly rather than assuming either name.)
+
+## Current status / resume point (for picking this back up cleanly) — SUPERSEDED, see update above
 
 **Male walking + running — fully done, all shipped, nothing pending:**
 - `travelers-cloak`/`worn-keeper-coat` family (chest): `travelers-cloak`, `worn-keeper-coat`,
