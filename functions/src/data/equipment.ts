@@ -64,6 +64,19 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'common',
     familyId: 'walking-staff',
   },
+  // Sword weapon type (docs/Mytherra-Equipment_breakdown.md's "Weapon Types" section) -
+  // weathered-iron-sword is the universal Sword founder item: its (still-pending) layer sprite
+  // becomes the shared palette-swap template for every region's own Sword-type family, the same
+  // role weathered-walking-staff plays for Staff. Common-tier stat split mirrors
+  // weathered-walking-staff's own (same total bonus budget), just attack-leaning instead of
+  // spirit-leaning to read as a physical weapon rather than a spirit-focused one.
+  'weathered-iron-sword': {
+    id: 'weathered-iron-sword',
+    slot: 'weapon',
+    statBonuses: { attack: 7, speed: 1 },
+    tier: 'common',
+    familyId: 'iron-sword',
+  },
   'ironwood-walking-staff': {
     id: 'ironwood-walking-staff',
     slot: 'weapon',

@@ -2617,6 +2617,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-walking-staff.png.',
   },
   {
+    id: 'icon.equipment.weathered-iron-sword',
+    category: 'icon',
+    intendedUse:
+      'Equipment icon for weathered-iron-sword (Iron Mountains Sword family, common) - the universal Sword weapon-type founder item (docs/Mytherra-Equipment_breakdown.md\'s "Weapon Types" section); its layer sprite becomes the shared palette-swap template for every region\'s own Sword-type family.',
+    filePath: 'icons/weathered-iron-sword.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/weathered-iron-sword.png.',
+  },
+  {
     id: 'icon.equipment.ironwood-walking-staff',
     category: 'icon',
     intendedUse: 'Equipment icon for ironwood-walking-staff (Walking Staff family, uncommon)',

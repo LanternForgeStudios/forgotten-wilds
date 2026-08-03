@@ -19,6 +19,22 @@ export const EQUIPMENT: EquipmentItem[] = [
     familyId: 'walking-staff',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-walking-staff', female: 'sprite.equipment.weathered-walking-staff-female' },
   },
+  // Sword weapon type (docs/Mytherra-Equipment_breakdown.md's "Weapon Types" section) -
+  // weathered-iron-sword is the universal Sword founder item. layerSpriteAssetId deliberately
+  // omitted for now - its layer sprite needs real hand-positioning (no same-shape recolor
+  // precedent exists yet for a Sword), same "optional until art lands" convention every equipment
+  // item follows (see docs/Equipment-Layering-Plan.md). Renders with no visible weapon layer until
+  // that's added, same as every other item before its own art existed.
+  {
+    id: 'weathered-iron-sword',
+    name: 'Weathered Iron Sword',
+    description: 'A plain iron shortsword, its edge dulled by years of honest use rather than neglect.',
+    slot: 'weapon',
+    iconAssetId: 'icon.equipment.weathered-iron-sword',
+    statBonuses: { attack: 7, speed: 1 },
+    tier: 'common',
+    familyId: 'iron-sword',
+  },
   {
     id: 'ironwood-walking-staff',
     name: 'Ironwood Walking Staff',
