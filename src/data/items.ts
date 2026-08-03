@@ -427,6 +427,28 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'worn-keeper-trousers', price: 26, currency: 'gold' },
   { itemId: 'traveler-boots', price: 25, currency: 'gold' },
   { itemId: 'work-gloves', price: 20, currency: 'gold' },
+  // Iron Mountains' own Uncommon/Rare items with no other earn path - see SHOP_UNLOCK_TIERS below.
+  { itemId: 'mountain-knot', price: 55, currency: 'gold' },
+  { itemId: 'spiritwood-walking-staff', price: 140, currency: 'gold' },
+  { itemId: 'veteran-keeper-coat', price: 150, currency: 'gold' },
+  { itemId: 'veteran-keeper-trousers', price: 120, currency: 'gold' },
+  { itemId: 'trail-boots', price: 70, currency: 'gold' },
+  { itemId: 'keepers-gauntlets', price: 130, currency: 'gold' },
+  // Crimson Bayou - Cypress Cane/Bayou Vestments/Bayou Leg-Wraps/Marsh Boots/Mire Gloves/Bayou
+  // Charm families, Common+Uncommon tiers.
+  { itemId: 'weathered-cypress-cane', price: 32, currency: 'gold' },
+  { itemId: 'bound-cypress-cane', price: 65, currency: 'gold' },
+  { itemId: 'marsh-reed-charm', price: 22, currency: 'gold' },
+  { itemId: 'swamp-talisman', price: 50, currency: 'gold' },
+  { itemId: 'tattered-bayou-vestments', price: 32, currency: 'gold' },
+  { itemId: 'woven-bayou-vestments', price: 65, currency: 'gold' },
+  { itemId: 'worn-bayou-leg-wraps', price: 28, currency: 'gold' },
+  { itemId: 'woven-bayou-leg-wraps', price: 58, currency: 'gold' },
+  { itemId: 'worn-marsh-boots', price: 26, currency: 'gold' },
+  { itemId: 'sturdy-marsh-boots', price: 60, currency: 'gold' },
+  { itemId: 'worn-mire-gloves', price: 22, currency: 'gold' },
+  { itemId: 'reinforced-mire-gloves', price: 52, currency: 'gold' },
+  { itemId: 'witch-warded-charm', price: 145, currency: 'gold' },
 ];
 
 // Display-only grouping of SHOP_LISTINGS by which NPC/building sells it - purchaseItem.ts itself
@@ -439,6 +461,8 @@ export const SHOP_TITLES: Record<string, string> = {
   apothecary: "Willow's Apothecary",
   'remy-general-store': "Mirehaven's General Store",
   'noelle-herbalist': "Mirehaven's Herbalist",
+  'toussaint-forge': "Toussaint's Forge",
+  'delphine-armory': "Delphine's Armory",
 };
 
 export const SHOP_CATALOGS: Record<string, string[]> = {
@@ -468,6 +492,38 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'eye-drops',
     'echo-herb',
   ],
+  'toussaint-forge': ['weathered-cypress-cane', 'bound-cypress-cane', 'marsh-reed-charm', 'swamp-talisman'],
+  'delphine-armory': [
+    'tattered-bayou-vestments',
+    'woven-bayou-vestments',
+    'worn-bayou-leg-wraps',
+    'woven-bayou-leg-wraps',
+    'worn-marsh-boots',
+    'sturdy-marsh-boots',
+    'worn-mire-gloves',
+    'reinforced-mire-gloves',
+  ],
 };
+
+/** Additional items a shop unlocks once a specific quest completes - kept in sync by hand with the
+ *  identical table in functions/src/data/items.ts (see that file's own comment for the full
+ *  rationale; this display copy exists so Shop.tsx can show the same effective catalog the server
+ *  will actually accept a purchase against). */
+export const SHOP_UNLOCK_TIERS: Record<string, { questId: string; itemIds: string[] }[]> = {
+  'ash-hallow-blacksmith-forge': [{ questId: 'the-mountain-remembers', itemIds: ['spiritwood-walking-staff', 'mountain-knot'] }],
+  'ash-hallow-armory': [
+    { questId: 'the-mountain-remembers', itemIds: ['veteran-keeper-coat', 'veteran-keeper-trousers', 'trail-boots', 'keepers-gauntlets'] },
+  ],
+  'toussaint-forge': [{ questId: 'seeds-of-memory', itemIds: ['witch-warded-charm'] }],
+};
+
+/** A shop's full purchasable catalog right now - see functions/src/data/items.ts's identical
+ *  function for the full rationale. */
+export function effectiveShopCatalog(shopId: string, completedQuestIds: Set<string>): string[] {
+  const base = SHOP_CATALOGS[shopId] ?? [];
+  const tiers = SHOP_UNLOCK_TIERS[shopId] ?? [];
+  const unlocked = tiers.filter((tier) => completedQuestIds.has(tier.questId)).flatMap((tier) => tier.itemIds);
+  return [...base, ...unlocked];
+}
 
 export const INN_REST_COST = 100;

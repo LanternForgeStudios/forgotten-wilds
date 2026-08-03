@@ -481,6 +481,11 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       // serpent-guardian-venom-fang inflicts Poison - a modest chance at an antidote alongside the
       // guaranteed trophy.
       { itemId: 'antidote', chance: 0.25, minQuantity: 1, maxQuantity: 2 },
+      // Cypress Spirits family's Mythic tier (mother-cypress-totem, granted via the Mother Cypress
+      // Shrine restoration quest, is this family's Legendary cap) - a real, if not guaranteed,
+      // earn path for it, same "not every rare+ item needs a unique quest thread" reasoning as the
+      // region's own chest loot.
+      { itemId: 'cypress-guardian-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
     ],
   },
 };

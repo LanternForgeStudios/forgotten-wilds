@@ -398,6 +398,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Mayor Celeste Broussard', text: "Half this town can't remember their own grandmother's name anymore. I'd call it strange, if strange still meant anything out here." },
     ],
     gameplayHook: { type: 'lore' },
+    dialogueVariants: [
+      {
+        questId: 'the-waters-remember',
+        lines: [
+          { speaker: 'Mayor Celeste Broussard', text: "The names are coming back, one porch at a time. I remember my own grandmother's laugh again - I'd nearly lost it for good." },
+          { speaker: 'Mayor Celeste Broussard', text: "Whatever you woke beneath that temple, Keeper, it's given Mirehaven something it hasn't had in years: a future worth remembering." },
+        ],
+      },
+      {
+        questId: 'seeds-of-memory',
+        lines: [
+          { speaker: 'Mayor Celeste Broussard', text: "Mother Cypress stirs again - half the boardwalk's talking about the color coming back to the marsh." },
+          { speaker: 'Mayor Celeste Broussard', text: "Whatever's happening beneath the water now, I trust you to see it through the same as you did her." },
+        ],
+      },
+    ],
   },
   {
     id: 'lucien-boudreaux',
@@ -411,6 +427,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Lucien Boudreaux', text: "It's not corruption spreading through the Bayou, Keeper. It's forgetting. Names, faces, whole family lines - gone quiet, like a candle with no one left to remember lighting it." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['forgotten-names', 'seeds-of-memory', 'reflections-of-the-past'] },
+    dialogueVariants: [
+      {
+        questId: 'the-waters-remember',
+        lines: [
+          { speaker: 'Lucien Boudreaux', text: "The archive's filling back in, memory by memory. I've started a new shelf just for what you brought back." },
+          { speaker: 'Lucien Boudreaux', text: "Historian Miriam will want every page of this. The Bayou's story finally has an ending worth writing down." },
+        ],
+      },
+      {
+        questId: 'reflections-of-the-past',
+        lines: [
+          { speaker: 'Lucien Boudreaux', text: "Those temple records confirmed what I feared - the memory-loss was never natural. Something down there has been feeding on it." },
+          { speaker: 'Lucien Boudreaux', text: "Sabine's going to need you again, and soon. Whatever's beneath the temple isn't finished." },
+        ],
+      },
+    ],
   },
   {
     id: 'marsh-spirit',
@@ -424,6 +456,21 @@ export const NPCS: Npc[] = [
       { speaker: 'Marsh Spirit', text: "Mother Cypress sleeps without her Heart Seed. Find it, and she may wake enough to remember what took it." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['the-silent-grove'] },
+    dialogueVariants: [
+      {
+        questId: 'the-waters-remember',
+        lines: [
+          { speaker: 'Marsh Spirit', text: 'The marsh sings again. Even the roots remember your name now, small lantern-light.' },
+        ],
+      },
+      {
+        questId: 'seeds-of-memory',
+        lines: [
+          { speaker: 'Marsh Spirit', text: 'Mother Cypress wakes, slow as a season turning. She remembers you now.' },
+          { speaker: 'Marsh Spirit', text: '...go on. The river still hides something she cannot see from her roots.' },
+        ],
+      },
+    ],
   },
   {
     id: 'sabine-thorne',
@@ -437,6 +484,26 @@ export const NPCS: Npc[] = [
       { speaker: 'Warden Sabine Thorne', text: "I've kept this landing safe for eleven years. Whatever's down there, I mean to know what it is before it decides for me." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['beneath-still-waters', 'guardian-of-the-deep'] },
+    dialogueVariants: [
+      {
+        questId: 'the-waters-remember',
+        lines: [
+          { speaker: 'Warden Sabine Thorne', text: "The river's gone quiet in the good way now. Eleven years I kept this landing - you gave it back its future in a season." },
+        ],
+      },
+      {
+        questId: 'guardian-of-the-deep',
+        lines: [
+          { speaker: 'Warden Sabine Thorne', text: 'The Guardian sleeps easy now, and so will I, for the first time in longer than I care to admit.' },
+        ],
+      },
+      {
+        questId: 'beneath-still-waters',
+        lines: [
+          { speaker: 'Warden Sabine Thorne', text: "You found the temple entrance. Good. Now the real question starts - what's actually down there, and what it wants." },
+        ],
+      },
+    ],
   },
   {
     id: 'innkeep-odette',
@@ -450,6 +517,20 @@ export const NPCS: Npc[] = [
       { speaker: 'Odette', text: "Half my regulars stopped remembering why they keep coming back. I still remember why I keep the door open, at least." },
     ],
     gameplayHook: { type: 'inn', innId: 'odette-inn' },
+    dialogueVariants: [
+      {
+        questId: 'the-waters-remember',
+        lines: [
+          { speaker: 'Odette', text: 'My regulars are back, and they remember why they used to come. That\'s worth more to me than the coin.' },
+        ],
+      },
+      {
+        questId: 'lantern-beneath-still-waters',
+        lines: [
+          { speaker: 'Odette', text: "Word's spreading about that lantern you pulled from beneath the temple. Half the bar's asking after it." },
+        ],
+      },
+    ],
   },
   {
     id: 'merchant-remy',
@@ -463,6 +544,20 @@ export const NPCS: Npc[] = [
       { speaker: 'Remy', text: "Lantern oil, antidotes, the odd curiosity off a trade barge. Ask if you don't see it - I probably know someone who's got it." },
     ],
     gameplayHook: { type: 'shop', shopId: 'remy-general-store' },
+    dialogueVariants: [
+      {
+        questId: 'the-waters-remember',
+        lines: [
+          { speaker: 'Remy', text: "Trade's actually good now - people are coming back to Mirehaven instead of just passing through." },
+        ],
+      },
+      {
+        questId: 'beneath-still-waters',
+        lines: [
+          { speaker: 'Remy', text: "Whatever's down in that temple, it's got Sabine spooked, and she doesn't spook easy. Watch yourself out there." },
+        ],
+      },
+    ],
   },
   {
     id: 'blacksmith-toussaint',
@@ -473,9 +568,17 @@ export const NPCS: Npc[] = [
     locationId: 'mirehaven-blacksmith',
     dialogue: [
       { speaker: 'Toussaint', text: "Forge stays lit even when the damp gets into everything else. Bayou iron's stubborn that way." },
-      { speaker: 'Toussaint', text: "Not much on the racks worth selling yet - still working out what actually holds up out here. Give it time." },
+      { speaker: 'Toussaint', text: "Cypress canes and a few warded charms, all Bayou-made. Take a look at the racks." },
     ],
-    gameplayHook: { type: 'lore' },
+    gameplayHook: { type: 'shop', shopId: 'toussaint-forge' },
+    dialogueVariants: [
+      {
+        questId: 'seeds-of-memory',
+        lines: [
+          { speaker: 'Toussaint', text: "Finally finished a piece worth the warding - a charm strong enough to shrug off a bog witch's poison. It's yours if you want it." },
+        ],
+      },
+    ],
   },
   {
     id: 'armorer-delphine',
@@ -486,9 +589,9 @@ export const NPCS: Npc[] = [
     locationId: 'mirehaven-armory',
     dialogue: [
       { speaker: 'Delphine', text: "Mire-treated leather, fitted to actually move in. Ash Hallow gear wasn't built for water up to your knees." },
-      { speaker: 'Delphine', text: "Nothing finished enough to sell yet. Come back once I've stopped throwing half of it back in the dye vat." },
+      { speaker: 'Delphine', text: "Vestments, leg-wraps, boots, gloves - all cut for wading, not walking. Have a look." },
     ],
-    gameplayHook: { type: 'lore' },
+    gameplayHook: { type: 'shop', shopId: 'delphine-armory' },
   },
   {
     id: 'herbalist-noelle',
@@ -502,5 +605,19 @@ export const NPCS: Npc[] = [
       { speaker: 'Noelle', text: "Poultices, draughts, something for the ailments that come with wet feet and worse water. Take what you need." },
     ],
     gameplayHook: { type: 'shop', shopId: 'noelle-herbalist' },
+    dialogueVariants: [
+      {
+        questId: 'the-waters-remember',
+        lines: [
+          { speaker: 'Noelle', text: 'Even the herbs smell different now - sharper, like the marsh itself is breathing easier.' },
+        ],
+      },
+      {
+        questId: 'seeds-of-memory',
+        lines: [
+          { speaker: 'Noelle', text: "Mother Cypress waking up changed the whole marsh overnight. My tonics have never worked better." },
+        ],
+      },
+    ],
   },
 ];

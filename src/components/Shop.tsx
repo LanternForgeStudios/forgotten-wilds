@@ -6,6 +6,7 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useAuthStore } from '@/state/useAuthStore';
+import { useQuestStore } from '@/state/useQuestStore';
 import { callPurchaseItem, callSellItem } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
@@ -13,7 +14,7 @@ import { useToastStore } from '@/state/useToastStore';
 import { sellPriceFor } from '@/utils/sellPrice';
 import { formatStatBonuses } from '@/utils/statBonuses';
 import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
-import { SHOP_LISTINGS, SHOP_TITLES, SHOP_CATALOGS, ITEMS, EQUIPMENT } from '@/data';
+import { SHOP_LISTINGS, SHOP_TITLES, effectiveShopCatalog, ITEMS, EQUIPMENT } from '@/data';
 import { playSound } from '@/audio/audioService';
 import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
@@ -57,6 +58,7 @@ export function Shop({ shopId, onClose }: ShopProps) {
   const player = usePlayerStore((s) => s.player);
   const inventory = useInventoryStore((s) => s.items);
   const uid = useAuthStore((s) => s.user?.uid);
+  const questProgress = useQuestStore((s) => s.progress);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -112,7 +114,8 @@ export function Shop({ shopId, onClose }: ShopProps) {
     }
   }
 
-  const catalog = SHOP_CATALOGS[shopId] ?? [];
+  const completedQuestIds = new Set(Object.keys(questProgress).filter((id) => questProgress[id]?.status === 'completed'));
+  const catalog = effectiveShopCatalog(shopId, completedQuestIds);
   const listings = SHOP_LISTINGS.filter((l) => catalog.includes(l.itemId));
   const selectedDef = selectedItemId ? defFor(selectedItemId) : undefined;
   const selectedOwnedQuantity = selectedItemId

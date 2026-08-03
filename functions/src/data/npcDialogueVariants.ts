@@ -27,4 +27,13 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   ],
   'hunter-garrick': ['shadows-on-raven-ridge', 'strange-tracks'],
   'spirit-child': ['rekindling-spirit-grove', 'the-forgotten-shrine'],
+  // Crimson Bayou (MSQ Volume II)
+  'mayor-celeste-broussard': ['the-waters-remember', 'seeds-of-memory'],
+  'lucien-boudreaux': ['the-waters-remember', 'reflections-of-the-past'],
+  'marsh-spirit': ['the-waters-remember', 'seeds-of-memory'],
+  'sabine-thorne': ['the-waters-remember', 'guardian-of-the-deep', 'beneath-still-waters'],
+  'innkeep-odette': ['the-waters-remember', 'lantern-beneath-still-waters'],
+  'merchant-remy': ['the-waters-remember', 'beneath-still-waters'],
+  'herbalist-noelle': ['the-waters-remember', 'seeds-of-memory'],
+  'blacksmith-toussaint': ['seeds-of-memory'],
 };

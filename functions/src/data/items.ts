@@ -224,7 +224,61 @@ export const SHOP_PRICES: Record<string, number> = {
   'worn-keeper-trousers': 26,
   'traveler-boots': 25,
   'work-gloves': 20,
+  // Iron Mountains' own Uncommon/Rare items that had no other earn path (see SHOP_UNLOCK_TIERS
+  // below - these only become purchasable once the-mountain-remembers completes). Priced above
+  // their tier's usual chest-only peers since a shop purchase is a guaranteed, no-luck alternative.
+  'mountain-knot': 55,
+  'spiritwood-walking-staff': 140,
+  'veteran-keeper-coat': 150,
+  'veteran-keeper-trousers': 120,
+  'trail-boots': 70,
+  'keepers-gauntlets': 130,
+  // Crimson Bayou - Cypress Cane/Bayou Vestments/Bayou Leg-Wraps/Marsh Boots/Mire Gloves/Bayou
+  // Charm families, Common+Uncommon tiers (Rare comes from the region's own chests/boss instead,
+  // same "shops stock the lower tiers" rule as Iron Mountains). Split the same Blacksmith/Armory
+  // way: weapon/charm to Toussaint, chest/legs/boots/gloves to Delphine.
+  'weathered-cypress-cane': 32,
+  'bound-cypress-cane': 65,
+  'marsh-reed-charm': 22,
+  'swamp-talisman': 50,
+  'tattered-bayou-vestments': 32,
+  'woven-bayou-vestments': 65,
+  'worn-bayou-leg-wraps': 28,
+  'woven-bayou-leg-wraps': 58,
+  'worn-marsh-boots': 26,
+  'sturdy-marsh-boots': 60,
+  'worn-mire-gloves': 22,
+  'reinforced-mire-gloves': 52,
+  // Bayou's own late-game unlock (see SHOP_UNLOCK_TIERS) - the one Rare item sold rather than
+  // chest/boss-found, since it's a charm (Toussaint's own department) and no Bayou chest needed a
+  // sixth slot for it.
+  'witch-warded-charm': 145,
 };
+
+/** Additional items a shop unlocks once a specific quest completes, layered ON TOP of its
+ *  SHOP_CATALOGS base stock (never a replacement) - lets a shop's stock grow as the player
+ *  advances the MSQ without ever touching its base catalog. Any number of tiers per shop; a
+ *  completed tier's items simply get added to that shop's effective catalog (see
+ *  effectiveShopCatalog below). Adding a new region/shop's own late-game unlock is just a new
+ *  entry here - no code changes needed anywhere else. */
+export const SHOP_UNLOCK_TIERS: Record<string, { questId: string; itemIds: string[] }[]> = {
+  'ash-hallow-blacksmith-forge': [{ questId: 'the-mountain-remembers', itemIds: ['spiritwood-walking-staff', 'mountain-knot'] }],
+  'ash-hallow-armory': [
+    { questId: 'the-mountain-remembers', itemIds: ['veteran-keeper-coat', 'veteran-keeper-trousers', 'trail-boots', 'keepers-gauntlets'] },
+  ],
+  'toussaint-forge': [{ questId: 'seeds-of-memory', itemIds: ['witch-warded-charm'] }],
+};
+
+/** A shop's full purchasable catalog right now - its base SHOP_CATALOGS stock plus every
+ *  SHOP_UNLOCK_TIERS tier whose gating quest is already completed. `completedQuestIds` should be
+ *  every quest id the player has finished (see purchaseItem.ts/Shop.tsx's own callers for how
+ *  that set gets built from a PlayerSave vs. the client's quest-progress store). */
+export function effectiveShopCatalog(shopId: string, completedQuestIds: Set<string>): string[] {
+  const base = SHOP_CATALOGS[shopId] ?? [];
+  const tiers = SHOP_UNLOCK_TIERS[shopId] ?? [];
+  const unlocked = tiers.filter((tier) => completedQuestIds.has(tier.questId)).flatMap((tier) => tier.itemIds);
+  return [...base, ...unlocked];
+}
 
 // Authoritative per-shop catalogs - purchaseItem.ts validates the requested itemId actually
 // belongs to the given shopId, not just that it exists somewhere in SHOP_PRICES. Keep in sync by
@@ -244,10 +298,7 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'eye-drops',
     'echo-herb',
   ],
-  // Crimson Bayou (Mirehaven) - only the two general-goods shops are stocked so far. Toussaint's
-  // Forge and Delphine's Armory are real NPCs/locations but sell nothing yet, since no Bayou-
-  // specific weapon/charm/chest/legs/boots/gloves items have been generated (out of scope for the
-  // region's own current build pass - deliberately deferred, not an oversight).
+  // Crimson Bayou (Mirehaven)
   'remy-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
   'noelle-herbalist': [
     'healing-poultice',
@@ -259,6 +310,21 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'thaw-crystal',
     'eye-drops',
     'echo-herb',
+  ],
+  // Common+Uncommon Cypress Cane/Bayou Charm stock (see SHOP_UNLOCK_TIERS for the Rare unlock).
+  'toussaint-forge': ['weathered-cypress-cane', 'bound-cypress-cane', 'marsh-reed-charm', 'swamp-talisman'],
+  // Common+Uncommon Bayou Vestments/Leg-Wraps/Marsh Boots/Mire Gloves stock - Rare tier of every
+  // one of these families is chest/boss-found instead (see cypress-marsh/murkwater-trails/
+  // hidden-river-landing's own chest loot and the Ancient Serpent Guardian's own loot table).
+  'delphine-armory': [
+    'tattered-bayou-vestments',
+    'woven-bayou-vestments',
+    'worn-bayou-leg-wraps',
+    'woven-bayou-leg-wraps',
+    'worn-marsh-boots',
+    'sturdy-marsh-boots',
+    'worn-mire-gloves',
+    'reinforced-mire-gloves',
   ],
 };
 

@@ -24,23 +24,26 @@ const CHESTS: Record<string, Record<string, string>> = {
     'chest-mine-2': 'leather-gauntlets',
     'chest-mine-3': 'stone-wolf-totem',
   },
-  // Crimson Bayou field maps - same "uncommon/rare equipment with no other earn path yet" rule,
-  // now that Mirehaven's own shops sell nothing (SHOP_CATALOGS' own comment: no Bayou-specific
-  // weapon/charm/chest/legs/boots/gloves items exist yet). One materials chest per map rounds out
-  // the crafting-material drop rate rather than making every chest an equipment freebie.
+  // Crimson Bayou field maps - now stocked with the region's own Rare-tier equipment (Cypress
+  // Cane/Bayou Vestments/Bayou Leg-Wraps/Marsh Boots/Mire Gloves/Cypress Spirits families - see
+  // equipment.ts), rather than Iron Mountains leftovers with no earn path of their own. Those
+  // Iron Mountains items got a real earn path instead via SHOP_UNLOCK_TIERS
+  // (ash-hallow-blacksmith-forge/ash-hallow-armory, unlocked by the-mountain-remembers). One
+  // materials chest per map rounds out the crafting-material drop rate rather than making every
+  // chest an equipment freebie.
   'cypress-marsh': {
-    'chest-cypress-marsh-1': 'veteran-keeper-coat',
-    'chest-cypress-marsh-2': 'reinforced-keeper-trousers',
+    'chest-cypress-marsh-1': 'rougarou-fang-blade',
+    'chest-cypress-marsh-2': 'warden-bayou-vestments',
     'chest-cypress-marsh-3': 'croc-hide',
   },
   'murkwater-trails': {
-    'chest-murkwater-trails-1': 'trail-boots',
-    'chest-murkwater-trails-2': 'keepers-gauntlets',
+    'chest-murkwater-trails-1': 'mosswalker-boots',
+    'chest-murkwater-trails-2': 'warden-mire-gloves',
     'chest-murkwater-trails-3': 'bog-ash',
   },
   'hidden-river-landing': {
-    'chest-hidden-river-landing-1': 'spiritwood-walking-staff',
-    'chest-hidden-river-landing-2': 'veteran-keeper-trousers',
+    'chest-hidden-river-landing-1': 'warden-bayou-leg-wraps',
+    'chest-hidden-river-landing-2': 'swamp-wisp-totem',
     'chest-hidden-river-landing-3': 'ancient-serpent-scale',
   },
 };

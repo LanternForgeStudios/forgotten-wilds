@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { SHOP_PRICES, SHOP_CATALOGS, ITEMS } from '../data/items';
+import { SHOP_PRICES, effectiveShopCatalog, ITEMS } from '../data/items';
 import { grantItem } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
 
@@ -22,6 +22,8 @@ const SHOP_LOCATIONS: Record<string, string> = {
   apothecary: 'ash-hallow-apothecary',
   'remy-general-store': 'mirehaven-general-store',
   'noelle-herbalist': 'mirehaven-herbalist',
+  'toussaint-forge': 'mirehaven-blacksmith',
+  'delphine-armory': 'mirehaven-armory',
 };
 
 export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
@@ -31,11 +33,7 @@ export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
   const itemId = request.data?.itemId;
   const shopId = request.data?.shopId;
   const price = itemId ? SHOP_PRICES[itemId] : undefined;
-  if (price === undefined) throw new HttpsError('invalid-argument', 'That item is not for sale here.');
-  // Confirms the item is actually stocked by the shop the client claims to have opened - without
-  // this, any item in the flat SHOP_PRICES table could be bought regardless of which NPC/shopId
-  // the request came from.
-  if (typeof shopId !== 'string' || !SHOP_CATALOGS[shopId]?.includes(itemId)) {
+  if (price === undefined || typeof shopId !== 'string') {
     throw new HttpsError('invalid-argument', 'That item is not for sale here.');
   }
 
@@ -46,6 +44,14 @@ export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {
     const snap = await tx.get(userRef);
     if (!snap.exists) throw new HttpsError('failed-precondition', 'No character found.');
     const save = snap.data() as PlayerSave;
+
+    // Confirms the item is actually stocked by the shop the client claims to have opened (base
+    // catalog, or an unlock tier the player has already earned) - without this, any item in the
+    // flat SHOP_PRICES table could be bought regardless of which NPC/shopId the request came from.
+    const completedQuestIds = new Set(Object.keys(save.quests).filter((id) => save.quests[id].status === 'completed'));
+    if (!effectiveShopCatalog(shopId, completedQuestIds).includes(itemId)) {
+      throw new HttpsError('invalid-argument', 'That item is not for sale here.');
+    }
 
     if (save.player.currentLocationId !== SHOP_LOCATIONS[shopId]) {
       throw new HttpsError('failed-precondition', 'You are not at that location.');
