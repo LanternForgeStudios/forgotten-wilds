@@ -79,4 +79,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: 'A history recovered in the Lantern Sanctuary: Elise Duvall was the last Lantern Keeper to tend the Temple of the Deep Current before the sealing. She left her lantern behind rather than let it go dark with her - the Lantern of Still Waters, still lit, still waiting.',
     unlockedAt: 0,
   },
+  {
+    id: 'drowned-ledger-i',
+    title: 'The Drowned Ledger: Marsh Rites',
+    body: "The Drowned Ledger, salvaged from the silt of Murkwater Trails and translated by Lucien Boudreaux: before the Great Silence, Lantern Keepers stationed in the marsh distilled a toxin from bog-nettle and crocodile-bile, turning the swamp's own venom back on its creatures. The restored technique is known today as Marsh Toxin.",
+    unlockedAt: 0,
+  },
+  {
+    id: 'drowned-ledger-ii',
+    title: 'The Bogwater Almanac: Silence of the Reeds',
+    body: "The Bogwater Almanac, recovered half-buried in the silt of Cypress Marsh: a second volume of survival technique, describing how Keepers wove reed-song into a hush that could quiet a rougarou's howl before it ever turned into a claw. The restored technique is known today as Hush of the Reeds.",
+    unlockedAt: 0,
+  },
 ];

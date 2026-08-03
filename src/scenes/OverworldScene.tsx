@@ -63,6 +63,9 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   'heart-seed-cypress': 'fragment',
   'heart-seed-murkwater': 'fragment',
   'heart-seed-river': 'fragment',
+  // Crimson Bayou side quest (The Drowned Ledgers)
+  'drowned-ledger-cache': 'fragment',
+  'bogwater-almanac-cache': 'fragment',
 };
 /** Which Cloud Function a walk-in `zone` landmark fires the instant the player's tile enters it -
  *  no Interact needed. Hunter's Camp and Spirit Grove (the clearing, not its shrine) are pure
@@ -86,6 +89,9 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'heart-seed-cypress': 'structure.landmark-heart-seed',
   'heart-seed-murkwater': 'structure.landmark-heart-seed',
   'heart-seed-river': 'structure.landmark-heart-seed',
+  // Crimson Bayou side quest (The Drowned Ledgers) - each has its own bespoke marker
+  'drowned-ledger-cache': 'structure.landmark-drowned-ledger-cache',
+  'bogwater-almanac-cache': 'structure.landmark-bogwater-almanac-cache',
 };
 
 /** Post-collection sprite override for a 'fragment'-kind interactable, shown once its item is in
@@ -115,6 +121,8 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId === 'water-fragment') return 'a faint glimmer in the pool';
   if (refId === 'frostbound-treatise-cache') return 'a hidden cache behind the falls';
   if (refId === 'ember-codex-tunnel') return 'an overlooked maintenance tunnel';
+  if (refId === 'drowned-ledger-cache') return 'a hidden cache in the reeds';
+  if (refId === 'bogwater-almanac-cache') return 'a mossy cypress hollow';
   if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';
   const landmark = LOCATIONS.find((l) => l.id === refId);
   if (landmark) return landmark.name;

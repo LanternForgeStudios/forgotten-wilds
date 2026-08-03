@@ -29,9 +29,11 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   // Crimson Bayou (MSQ Volume II) - the 3 Heart Seed fragments, one per Chapter 3 field map.
   'cypress-marsh': {
     'heart-seed-cypress': 'heart-seed-cypress',
+    'bogwater-almanac-cache': 'bogwater-almanac',
   },
   'murkwater-trails': {
     'heart-seed-murkwater': 'heart-seed-murkwater',
+    'drowned-ledger-cache': 'drowned-ledger',
   },
   'hidden-river-landing': {
     'heart-seed-river': 'heart-seed-river',

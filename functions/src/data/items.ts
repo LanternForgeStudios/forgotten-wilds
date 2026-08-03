@@ -191,6 +191,11 @@ export const ITEMS: Record<string, ItemDefinition> = {
   // found-item vs. equipped-upgrade split as Iron Mountains' miners-lost-lantern /
   // miners-lost-lantern-equipped.
   'lantern-of-still-waters': { id: 'lantern-of-still-waters', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // Crimson Bayou's own side quest (docs/Mytherra-SQ_breakdown.md, "The Drowned Ledgers" - parallel
+  // to Iron Mountains' Forgotten Treatises): 2 hidden key items, collectItem targets for
+  // the-drowned-ledger/the-bogwater-almanac, each turning into a quest-taught Skill + Lore entry.
+  'drowned-ledger': { id: 'drowned-ledger', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'bogwater-almanac': { id: 'bogwater-almanac', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'guardian-memory-fragment-2': {
     id: 'guardian-memory-fragment-2',
     category: 'keyItem',

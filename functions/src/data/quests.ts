@@ -328,6 +328,30 @@ export const QUESTS: Record<string, QuestDef> = {
     // First real usage of regionalReputation (see Phase 0's reconciliation note on this field).
     reward: { xp: 60, gold: 30, itemIds: ['guardian-memory-fragment-2'], regionalReputation: 50 },
   },
+
+  // --- Crimson Bayou Side Quests (docs/Mytherra-SQ_breakdown.md): The Drowned Ledgers ---
+  // Mirrors Iron Mountains' Forgotten Treatises pattern exactly: collect a hidden key item, turn
+  // it in to a giver NPC then a translator NPC, reward grants a quest-taught Skill + Lore entry.
+  'the-drowned-ledger': {
+    id: 'the-drowned-ledger',
+    prerequisiteQuestId: 'the-waters-remember',
+    objectives: [
+      { id: 'get-drowned-ledger', type: 'collectItem', targetId: 'drowned-ledger', requiredCount: 1 },
+      { id: 'talk-celeste-ledger', type: 'talkToNpc', targetId: 'mayor-celeste-broussard', requiredCount: 1 },
+      { id: 'talk-lucien-ledger', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'marsh-toxin', grantLoreId: 'drowned-ledger-i' },
+  },
+  'the-bogwater-almanac': {
+    id: 'the-bogwater-almanac',
+    prerequisiteQuestId: 'the-drowned-ledger',
+    objectives: [
+      { id: 'get-bogwater-almanac', type: 'collectItem', targetId: 'bogwater-almanac', requiredCount: 1 },
+      { id: 'talk-celeste-almanac', type: 'talkToNpc', targetId: 'mayor-celeste-broussard', requiredCount: 1 },
+      { id: 'talk-lucien-almanac', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'hush-of-reeds', grantLoreId: 'drowned-ledger-ii' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -360,4 +384,6 @@ export const QUEST_ORDER = [
   'lantern-beneath-still-waters',
   'guardian-of-the-deep',
   'the-waters-remember',
+  'the-drowned-ledger',
+  'the-bogwater-almanac',
 ];

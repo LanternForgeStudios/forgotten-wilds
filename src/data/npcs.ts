@@ -397,8 +397,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Mayor Celeste Broussard', text: "A Lantern Keeper, this far south? Elias Rowan's letters said you might come. Welcome to Mirehaven - mind the boardwalks after dark, they don't always agree on which way is down." },
       { speaker: 'Mayor Celeste Broussard', text: "Half this town can't remember their own grandmother's name anymore. I'd call it strange, if strange still meant anything out here." },
     ],
-    gameplayHook: { type: 'lore' },
+    gameplayHook: { type: 'questGiver', questIds: ['the-drowned-ledger', 'the-bogwater-almanac'] },
     dialogueVariants: [
+      {
+        questId: 'the-bogwater-almanac',
+        lines: [
+          { speaker: 'Mayor Celeste Broussard', text: "The Bogwater Almanac, and the Drowned Ledger before it - two whole volumes of the town's own history, pulled back out of the silt." },
+          { speaker: 'Mayor Celeste Broussard', text: "Lucien hasn't stopped talking about it. Mirehaven owes you more than it can put in a ledger of its own, Keeper." },
+        ],
+      },
+      {
+        questId: 'the-drowned-ledger',
+        lines: [
+          { speaker: 'Mayor Celeste Broussard', text: "The Drowned Ledger, whole again. Half the names in there I hadn't heard spoken since before the Silence." },
+          { speaker: 'Mayor Celeste Broussard', text: "If there's a second volume out there in the marsh, I'd very much like Lucien to see it." },
+        ],
+      },
       {
         questId: 'the-waters-remember',
         lines: [
@@ -426,8 +440,25 @@ export const NPCS: Npc[] = [
       { speaker: 'Lucien Boudreaux', text: "Every shelf in this archive is fighting the damp, and losing. Half these records will be pulp before I finish reading them." },
       { speaker: 'Lucien Boudreaux', text: "It's not corruption spreading through the Bayou, Keeper. It's forgetting. Names, faces, whole family lines - gone quiet, like a candle with no one left to remember lighting it." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['forgotten-names', 'seeds-of-memory', 'reflections-of-the-past'] },
+    gameplayHook: {
+      type: 'questGiver',
+      questIds: ['the-bogwater-almanac', 'the-drowned-ledger', 'forgotten-names', 'seeds-of-memory', 'reflections-of-the-past'],
+    },
     dialogueVariants: [
+      {
+        questId: 'the-bogwater-almanac',
+        lines: [
+          { speaker: 'Lucien Boudreaux', text: "Hush of the Reeds, restored from the Almanac's second volume. A rougarou's howl won't get the chance to turn into a claw, not with this." },
+          { speaker: 'Lucien Boudreaux', text: "Two Keeper disciplines pulled out of the silt in as many weeks. I don't know what else this marsh is still keeping from us." },
+        ],
+      },
+      {
+        questId: 'the-drowned-ledger',
+        lines: [
+          { speaker: 'Lucien Boudreaux', text: "The Drowned Ledger's translated at last. Marsh Toxin, they called it - turning the swamp's own venom back on its creatures." },
+          { speaker: 'Lucien Boudreaux', text: "There's a second volume mentioned in the margins, the Bogwater Almanac. If it's still out there, I'd like very much to read it." },
+        ],
+      },
       {
         questId: 'the-waters-remember',
         lines: [

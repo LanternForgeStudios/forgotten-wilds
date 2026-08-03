@@ -3097,6 +3097,26 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/temple-records.png.',
   },
   {
+    id: 'icon.item.drowned-ledger',
+    category: 'icon',
+    intendedUse: "Item icon for drowned-ledger (The Drowned Ledgers side quest key item)",
+    filePath: 'icons/drowned-ledger.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/drowned-ledger.png.',
+  },
+  {
+    id: 'icon.item.bogwater-almanac',
+    category: 'icon',
+    intendedUse: "Item icon for bogwater-almanac (The Drowned Ledgers side quest key item, second tier)",
+    filePath: 'icons/bogwater-almanac.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_map_object (128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/bogwater-almanac.png.',
+  },
+  {
     id: 'icon.item.lantern-of-still-waters',
     category: 'icon',
     intendedUse: "Item icon for lantern-of-still-waters (Chapter 4 key item - the found/unequipped state, before the player equips it as lantern-of-still-waters-equipped)",
@@ -3990,6 +4010,28 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated: create_map_object ("empty mossy hollow among cypress roots where a seed pod once rested, faint dim residual glow, dormant nature relic, no glowing light", 200x200, high top-down, medium shading, selective outline). Same crop/resize pipeline as structure.landmark-heart-seed. Build script: scripts/build_landmark_objects.py. 200x200 original archived at public/assets/sprites/structures/original/heart-seed-collected-source.png.',
+  },
+  {
+    id: 'structure.landmark-drowned-ledger-cache',
+    category: 'structure',
+    intendedUse:
+      'Marker for Murkwater Trails\' "a hidden cache in the reeds" point interactable (grants drowned-ledger, The Drowned Ledgers side quest) - same shrine-fallback mismatch as structure.landmark-watchtower.',
+    filePath: 'sprites/structures/landmark-drowned-ledger-cache.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("half-buried wooden cache box wedged among marsh reeds and mud, waterlogged and swollen, bound with old rope, swamp water dripping off the lid", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/drowned-ledger-cache-source.png.',
+  },
+  {
+    id: 'structure.landmark-bogwater-almanac-cache',
+    category: 'structure',
+    intendedUse:
+      'Marker for Cypress Marsh\'s "a mossy cypress hollow" point interactable (grants bogwater-almanac, The Drowned Ledgers side quest, second tier) - same shrine-fallback mismatch as structure.landmark-watchtower.',
+    filePath: 'sprites/structures/landmark-bogwater-almanac-cache.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("mossy hollow at the base of a cypress tree, half-sunk in bog water, an old leather-bound book just visible tucked inside among the roots", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/bogwater-almanac-cache-source.png.',
   },
   {
     id: 'structure.landmark-water-glimmer',

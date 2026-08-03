@@ -104,6 +104,8 @@ ICONS = {
     "witch-warded-charm": (64, 64),
     "swamp-wisp-totem": (64, 64),
     "cypress-guardian-totem": (64, 64),
+    "drowned-ledger": (64, 64),
+    "bogwater-almanac": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")

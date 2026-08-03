@@ -233,3 +233,186 @@ against X" is real; the bonus-damage half isn't. Player-facing skill description
 damage bonus, so this isn't a broken promise to players, but it's a real gap between this doc's
 "Gameplay Purpose" bullets and actual combat math if the intent is ever revisited - either extend
 weakness-bonus handling to Skill actions, or update those bullets to only claim the ailment effect.
+
+Crimson Bayou Side Quest Chain
+The Drowned Ledgers
+
+Availability
+
+Begins after completing MSF-CB-010 – The Waters Remember (quest id: the-waters-remember)
+Given by Mayor Celeste Broussard
+Sequential quest chain (Quest 2 unlocks only after Quest 1 is complete)
+
+SQ-CB-01 (quest id: the-drowned-ledger)
+The Drowned Ledger
+Story Purpose
+
+Recover a waterlogged ledger from Murkwater Trails, pieced back together page by page from the
+silt. Lucien Boudreaux translates it, restoring a Lantern Keeper technique for turning the marsh's
+own venom back on its creatures.
+
+Quest Giver
+
+Mayor Celeste Broussard
+
+Starting Location
+
+Mirehaven Town Hall (locationId: mirehaven-town-hall)
+
+Quest Summary
+
+With Mirehaven's memory restored, Mayor Celeste asks the Keeper to help recover pieces of the
+town's own written history - not myth this time, but a mundane administrative record the Silence
+nearly erased along with everyone's memory of it: the toll-keeper's ledger of who passed through
+the marsh roads, and why.
+
+Major Quest Flow
+Step 1
+
+Speak with Mayor Celeste Broussard.
+
+Step 2
+
+Travel to Murkwater Trails.
+
+Recover the Drowned Ledger, salvaged from the silt.
+
+Step 3
+
+Return to Mayor Celeste Broussard.
+
+She recognizes the handwriting but can't make out the water-damaged dialect, and sends the Keeper
+to Lucien Boudreaux.
+
+Step 4
+
+Deliver the ledger to Lucien Boudreaux at the Mirehaven Archive.
+
+He translates it: before the Great Silence, Lantern Keepers stationed in the marsh distilled a
+toxin from bog-nettle and crocodile-bile, turning the swamp's own venom back on its creatures.
+
+The knowledge is added to the Journal of Legends.
+
+He teaches the restored technique.
+
+Rewards
+Journal Unlock
+
+The Drowned Ledger: Marsh Rites
+
+Spirit Specialty
+
+Marsh Toxin
+
+Spirit Attack
+Poison Element
+Medium Spirit Damage
+Chance to inflict Poison
+
+Gameplay Purpose
+
+Effective against: swampCrocs (marsh-crocodile, bog-ravager) - genuinely vulnerable to Poison
+(enemies.ts's vulnerableAilments), unlike the Iron Mountains Treatise skills' inert
+effectiveAgainstFamilies bonus (see Implementation Notes below).
+
+Unlocks
+
+SQ-CB-02 (quest id: the-bogwater-almanac)
+
+SQ-CB-02 (quest id: the-bogwater-almanac)
+The Bogwater Almanac
+Story Purpose
+
+Recover a second lost volume mentioned in the Drowned Ledger's margins, half-buried in the silt of
+Cypress Marsh. Lucien reconstructs a second technique: a reed-song hush that quiets a howl before
+it turns into a claw.
+
+Quest Giver
+
+Mayor Celeste Broussard
+
+Starting Location
+
+Mirehaven Town Hall (locationId: mirehaven-town-hall)
+
+Quest Summary
+
+The Drowned Ledger's margins reference a second volume - the Bogwater Almanac - describing older
+Lantern Keeper survival technique. Celeste and Lucien both want it recovered before the marsh takes
+it back for good.
+
+Major Quest Flow
+Step 1
+
+Speak with Mayor Celeste Broussard.
+
+Step 2
+
+Travel to Cypress Marsh.
+
+Recover the Bogwater Almanac from a mossy cypress hollow.
+
+Step 3
+
+Return to Mayor Celeste Broussard.
+
+Step 4
+
+Deliver the almanac to Lucien Boudreaux at the Mirehaven Archive.
+
+He translates a second restored technique: Keepers wove reed-song into a hush that could quiet a
+rougarou's howl before it ever turned into a claw.
+
+The knowledge is added to the Journal of Legends.
+
+He teaches the restored technique.
+
+Rewards
+Journal Unlock
+
+The Bogwater Almanac: Silence of the Reeds
+
+Spirit Specialty
+
+Hush of the Reeds
+
+Spirit Attack
+Medium Spirit Damage
+Chance to inflict Silence
+
+Gameplay Purpose
+
+Effective against: rougarou (rougarou-stalker, alpha-rougarou) - genuinely vulnerable to Silence
+(enemies.ts's vulnerableAilments).
+
+Narrative Benefits
+
+These quests accomplish several things:
+
+Give Mayor Celeste an ongoing role beyond the MSQ's own dialogue-variant beats.
+Reinforce Lucien Boudreaux as the Bayou's own translator/archivist, mirroring Historian Miriam's
+role in Iron Mountains.
+Expand the Journal of Legends with Bayou-specific historical discoveries.
+Give the Bayou its own side-quest-taught Skill pair, matching Iron Mountains' Frost Lance/Ember
+Burst precedent instead of leaving that region without one.
+
+Implementation Notes
+
+Mirrors the Forgotten Treatises chain exactly (same collect-item -> giver NPC -> translator NPC ->
+grantSkillId + grantLoreId reward shape, zero new engine code). Item ids: drowned-ledger (from
+Murkwater Trails, refId drowned-ledger-cache) and bogwater-almanac (from Cypress Marsh, refId
+bogwater-almanac-cache) - both new key items, deliberately not reusing ancient-serpent-scale (an
+existing boss-loot trophy with no quest tie-in).
+
+Unlike Frost Lance/Ember Burst's effectiveAgainstFamilies (set but never actually read for a
+'skill' action - see this doc's Iron Mountains Implementation Notes above), Marsh Toxin and Hush of
+the Reeds were deliberately paired with ailments that land on a real vulnerability: swampCrocs are
+vulnerable to Poison and rougarou to Silence (enemies.ts's vulnerableAilments). The
+effectiveAgainstFamilies field is still set on both (for display/flavor consistency with the
+existing Skill shape) but is equally inert for bonus damage - only the ailment-infliction half is
+functional, same caveat as the Iron Mountains pair.
+
+Mayor Celeste Broussard's gameplayHook changed from `{ type: 'lore' }` to `{ type: 'questGiver',
+questIds: [...] }` to give her this role - not strictly required mechanically (no true "quest
+start" gate reads giverNpcId or gameplayHook.type; talkToNpc objectives match on NPC id alone), but
+kept for data-model consistency with every other quest-giving NPC in npcs.ts.

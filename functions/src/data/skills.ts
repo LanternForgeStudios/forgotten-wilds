@@ -215,4 +215,32 @@ export const SKILLS: Record<string, Skill> = {
     inflictsAilmentId: 'burn',
     inflictAilmentChance: 0.3,
   },
+
+  // Quest-taught Specialty Attacks, Crimson Bayou's own side quest (docs/Mytherra-SQ_breakdown.md,
+  // "The Drowned Ledgers"). Same shape/convention as frost-lance/ember-burst above - ailments
+  // chosen to actually land on a real Bayou enemy family's vulnerableAilments (see enemies.ts),
+  // not just flavor-matched like effectiveAgainstFamilies (still inert for a 'skill' action, same
+  // gap noted above).
+  'marsh-toxin': {
+    id: 'marsh-toxin',
+    name: 'Marsh Toxin',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['swampCrocs'],
+    inflictsAilmentId: 'poison',
+    inflictAilmentChance: 0.3,
+  },
+  'hush-of-reeds': {
+    id: 'hush-of-reeds',
+    name: 'Hush of the Reeds',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['rougarou'],
+    inflictsAilmentId: 'silence',
+    inflictAilmentChance: 0.3,
+  },
 };

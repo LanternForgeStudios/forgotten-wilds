@@ -431,4 +431,34 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 60, gold: 30, itemIds: ['guardian-memory-fragment-2'], regionalReputation: 50 },
   },
+
+  // --- Crimson Bayou Side Quests (docs/Mytherra-SQ_breakdown.md): The Drowned Ledgers ---
+  {
+    id: 'the-drowned-ledger',
+    name: 'The Drowned Ledger',
+    giverNpcId: 'mayor-celeste-broussard',
+    description: "Recover a waterlogged ledger from the Murkwater Trails, pieced together page by page from the silt.",
+    category: 'side',
+    prerequisiteQuestId: 'the-waters-remember',
+    objectives: [
+      { id: 'get-drowned-ledger', type: 'collectItem', description: 'Recover the Drowned Ledger from the Murkwater Trails.', targetId: 'drowned-ledger', requiredCount: 1 },
+      { id: 'talk-celeste-ledger', type: 'talkToNpc', description: "Return to Mayor Celeste Broussard at Mirehaven Town Hall.", targetId: 'mayor-celeste-broussard', requiredCount: 1 },
+      { id: 'talk-lucien-ledger', type: 'talkToNpc', description: 'Deliver the ledger to Lucien Boudreaux at the Mirehaven Archive.', targetId: 'lucien-boudreaux', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'marsh-toxin', grantLoreId: 'drowned-ledger-i' },
+  },
+  {
+    id: 'the-bogwater-almanac',
+    name: 'The Bogwater Almanac',
+    giverNpcId: 'mayor-celeste-broussard',
+    description: 'Recover a second lost volume, half-buried in the silt of Cypress Marsh.',
+    category: 'side',
+    prerequisiteQuestId: 'the-drowned-ledger',
+    objectives: [
+      { id: 'get-bogwater-almanac', type: 'collectItem', description: 'Recover the Bogwater Almanac from Cypress Marsh.', targetId: 'bogwater-almanac', requiredCount: 1 },
+      { id: 'talk-celeste-almanac', type: 'talkToNpc', description: "Return to Mayor Celeste Broussard at Mirehaven Town Hall.", targetId: 'mayor-celeste-broussard', requiredCount: 1 },
+      { id: 'talk-lucien-almanac', type: 'talkToNpc', description: 'Deliver the almanac to Lucien Boudreaux at the Mirehaven Archive.', targetId: 'lucien-boudreaux', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'hush-of-reeds', grantLoreId: 'drowned-ledger-ii' },
+  },
 ];

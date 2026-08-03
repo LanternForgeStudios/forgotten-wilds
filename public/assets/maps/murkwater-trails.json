@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 9,
+  "nextobjectid": 10,
   "layers": [
     {
       "id": 1,
@@ -5311,6 +5311,24 @@
               "name": "refId",
               "type": "string",
               "value": "chest-murkwater-trails-3"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "",
+          "type": "interactable",
+          "x": 736,
+          "y": 480,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "drowned-ledger-cache"
             }
           ]
         }

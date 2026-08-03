@@ -169,4 +169,27 @@ export const SKILLS: Skill[] = [
     inflictsAilmentId: 'burn',
     sfxAssetId: 'sfx.skill.ember-burst',
   },
+  // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Drowned Ledgers)
+  {
+    id: 'marsh-toxin',
+    name: 'Marsh Toxin',
+    description: 'A restored Lantern Keeper technique, recovered from the Drowned Ledger - a distilled venom turned back on the marsh.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['swampCrocs'],
+    inflictsAilmentId: 'poison',
+  },
+  {
+    id: 'hush-of-reeds',
+    name: 'Hush of the Reeds',
+    description: 'A restored Lantern Keeper technique, recovered from the Bogwater Almanac - a reed-song hush that quiets a howl before it turns into a claw.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['rougarou'],
+    inflictsAilmentId: 'silence',
+  },
 ];
