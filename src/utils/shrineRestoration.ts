@@ -12,6 +12,7 @@ export const SHRINE_RESTORED_QUEST: Record<string, string> = {
   'spirit-grove': 'rekindling-spirit-grove',
   'mine-shrine': 'the-shrine-below',
   'mother-cypress-shrine': 'seeds-of-memory',
+  'stone-circle-carvings': 'the-stone-circles',
 };
 
 /** Sprite asset id for a shrine's current lit/dormant state, given its refId and the player's

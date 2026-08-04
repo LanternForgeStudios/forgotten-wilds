@@ -132,6 +132,7 @@ ICONS = {
     "rougarou-claw-axe": (64, 64),
     "serpent-guard-spear": (64, 64),
     "rougarou-warclub": (64, 64),
+    "wind-stone": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")

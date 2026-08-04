@@ -651,4 +651,152 @@ export const NPCS: Npc[] = [
       },
     ],
   },
+
+  // --- Endless Prairie (MSQ Volume III), Chapter 5: Where the Sky Meets the Earth ---
+  {
+    id: 'chief-aiyana-whitefeather',
+    name: 'Chief Aiyana Whitefeather',
+    title: 'Chief of Highwind Crossing',
+    spriteAssetId: 'sprite.npc.chief-aiyana-whitefeather',
+    portraitAssetId: 'portrait.chief-aiyana-whitefeather',
+    locationId: 'highwind-crossing-chiefs-lodge',
+    dialogue: [
+      { speaker: 'Chief Aiyana Whitefeather', text: "A Lantern Keeper, all the way from the mountains and the bayou both. Elias Rowan's letters found their way to us eventually." },
+      { speaker: 'Chief Aiyana Whitefeather', text: "The wind carries more than dust out here, Keeper. It carries voices, if the Sacred Hills decide you're worth listening to." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['across-open-skies', 'climbing-thunderbird-mesa'] },
+    dialogueVariants: [
+      {
+        questId: 'climbing-thunderbird-mesa',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "You've reached the mesa's foot. Even from here, I can feel the old weight of it - like the wind itself remembers something we don't." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "Rest before you climb, Keeper. Whatever waits up there has waited a long time. It can wait one more night." },
+        ],
+      },
+      {
+        questId: 'across-open-skies',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "Highwind Crossing is yours to walk as you please, Keeper. Scout Niska can point you toward the herd, if you're looking for a place to start." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'elder-koda-running-elk',
+    name: 'Elder Koda Running Elk',
+    title: "Keeper of the Prairie's Memory",
+    spriteAssetId: 'sprite.npc.elder-koda-running-elk',
+    portraitAssetId: 'portrait.elder-koda-running-elk',
+    locationId: 'highwind-crossing-spirit-lodge',
+    dialogue: [
+      { speaker: 'Elder Koda Running Elk', text: 'Every carving in the Stone Circles has a story behind it. Most of them, I only know half of - the wind took the rest long before I was born.' },
+      { speaker: 'Elder Koda Running Elk', text: "You have the look of someone the old stories were waiting for. Sit, if you'd like. The lodge keeps its own time." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['the-stone-circles'] },
+    dialogueVariants: [
+      {
+        questId: 'the-stone-circles',
+        lines: [
+          { speaker: 'Elder Koda Running Elk', text: "So it's true. Lantern Keepers and Guardian Spirits, standing side by side at those circles - not master and servant, not hunter and hunted. Equals." },
+          { speaker: 'Elder Koda Running Elk', text: "I've spent forty years guessing at what those carvings meant. I never once guessed that." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'scout-niska',
+    name: 'Niska',
+    title: 'Prairie Scout',
+    spriteAssetId: 'sprite.npc.scout-niska',
+    portraitAssetId: 'portrait.scout-niska',
+    locationId: 'highwind-crossing',
+    dialogue: [
+      { speaker: 'Niska', text: "Keep to the trails and the grass won't hide anything from you. Wander off them and you're on your own, same as anyone." },
+      { speaker: 'Niska', text: "The herd's still running the old paths, far as I've tracked them. Whatever's out past Golden Prairie, they're not afraid of it yet." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['following-the-herd'] },
+    dialogueVariants: [
+      {
+        questId: 'following-the-herd',
+        lines: [
+          { speaker: 'Niska', text: "Followed the herd clean into the Sacred Hills, did you? I've tracked that ground a hundred times and never once felt it look back at me the way it must have looked at you." },
+          { speaker: 'Niska', text: "Chief Aiyana will want to hear this straight from you, not secondhand from me." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'prairie-spirit',
+    name: 'Prairie Spirit',
+    title: 'Voice of the Sacred Hills',
+    spriteAssetId: 'sprite.npc.prairie-spirit',
+    portraitAssetId: 'portrait.prairie-spirit',
+    locationId: 'sacred-hills',
+    dialogue: [
+      { speaker: 'Prairie Spirit', text: '...another lantern-light, small against all this open sky. The wind brought you here for a reason, same as it brings everything.' },
+      { speaker: 'Prairie Spirit', text: 'Three stones hold what the wind remembers - scattered when the remembering stopped mattering to anyone. Find them, and you might hear what I hear.' },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['voices-on-the-wind'] },
+    dialogueVariants: [
+      {
+        questId: 'voices-on-the-wind',
+        lines: [
+          { speaker: 'Prairie Spirit', text: 'Three stones, three voices, one wind carrying all of them at once. You hear it now too, don\'t you? Even if you can\'t yet make out the words.' },
+          { speaker: 'Prairie Spirit', text: 'Elder Koda will make more sense of it than I can. I only carry the sound. He carries the memory of what it meant.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'innkeeper-hattie',
+    name: 'Hattie',
+    title: 'Innkeeper',
+    spriteAssetId: 'sprite.npc.innkeeper-hattie',
+    portraitAssetId: 'portrait.innkeeper-hattie',
+    locationId: 'highwind-crossing-inn',
+    dialogue: [
+      { speaker: 'Hattie', text: "Porch faces west, so you can watch the sun go down over the grass while you eat. Best seat in Highwind Crossing, if you ask me." },
+      { speaker: 'Hattie', text: 'Wind gets into everything out here, but it never gets into my kitchen. Rest up, Keeper - the prairie will still be there tomorrow.' },
+    ],
+    gameplayHook: { type: 'inn', innId: 'hattie-inn' },
+  },
+  {
+    id: 'storekeeper-wyatt',
+    name: 'Wyatt',
+    title: 'General Store Owner',
+    spriteAssetId: 'sprite.npc.storekeeper-wyatt',
+    portraitAssetId: 'portrait.storekeeper-wyatt',
+    locationId: 'highwind-crossing-general-store',
+    dialogue: [
+      { speaker: 'Wyatt', text: "Traders come through Highwind Crossing every few weeks, so stock changes more than you'd think out here at the edge of everything." },
+      { speaker: 'Wyatt', text: 'Lantern oil, antidotes, the usual trail supplies. Ask if you need something specific - I keep a mental list of who owes who a favor.' },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'wyatt-general-store' },
+  },
+  {
+    id: 'blacksmith-garrett',
+    name: 'Garrett',
+    title: 'Blacksmith',
+    spriteAssetId: 'sprite.npc.blacksmith-garrett',
+    portraitAssetId: 'portrait.blacksmith-garrett',
+    locationId: 'highwind-crossing-blacksmith',
+    dialogue: [
+      { speaker: 'Garrett', text: "Prairie nights get colder than folks expect. Steel that can't take the temperature swing doesn't last a season out here." },
+      { speaker: 'Garrett', text: "Spears, mostly - reach matters more than you'd think when the grass hides half of what's stalking you. Take a look at the racks." },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'garrett-forge' },
+  },
+  {
+    id: 'armorer-ruth',
+    name: 'Ruth',
+    title: 'Armorer',
+    spriteAssetId: 'sprite.npc.armorer-ruth',
+    portraitAssetId: 'portrait.armorer-ruth',
+    locationId: 'highwind-crossing-armory',
+    dialogue: [
+      { speaker: 'Ruth', text: "Buffalo hide breathes better than anything shipped in from the mountains. You'll thank me the first time you're walking at midday." },
+      { speaker: 'Ruth', text: "Coats, wraps, boots, gloves - all cut for riding and walking both. Have a look." },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'ruth-armory' },
+  },
 ];

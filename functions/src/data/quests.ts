@@ -352,6 +352,68 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'hush-of-reeds', grantLoreId: 'drowned-ledger-ii' },
   },
+
+  // --- Endless Prairie (MSQ Volume III), Chapter 5: Where the Sky Meets the Earth ---
+  // Kebab-case id mapping: MSF-EP-001 across-open-skies, MSF-EP-002 following-the-herd, MSF-EP-003
+  // voices-on-the-wind, MSF-EP-004 the-stone-circles, MSF-EP-005 climbing-thunderbird-mesa. Gated
+  // behind the Bayou MSQ finale (the-waters-remember), not its side quests, matching how Bayou's
+  // own a-long-road-south gated behind the-mountain-remembers rather than Iron Mountains' side
+  // quests. Per docs/Mytherra-Location_breakdown.md's Implementation Notes: MSF-EP-005 as
+  // documented continues into Thunderbird Mesa's interior (Summit Temple, Guardian Trials) - that
+  // part is Chapter 6's scope. This quest ends at reaching Thunderbird Mesa Approach instead.
+  'across-open-skies': {
+    id: 'across-open-skies',
+    prerequisiteQuestId: 'the-waters-remember',
+    objectives: [
+      { id: 'reach-highwind-crossing', type: 'reachLocation', targetId: 'highwind-crossing', requiredCount: 1 },
+      { id: 'talk-chief-aiyana', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
+      { id: 'talk-elder-koda', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1 },
+    ],
+    reward: { xp: 30, gold: 20 },
+  },
+  'following-the-herd': {
+    id: 'following-the-herd',
+    prerequisiteQuestId: 'across-open-skies',
+    objectives: [
+      { id: 'talk-niska-start', type: 'talkToNpc', targetId: 'scout-niska', requiredCount: 1 },
+      { id: 'reach-spirit-herd-plains', type: 'reachLocation', targetId: 'spirit-herd-plains', requiredCount: 1 },
+      { id: 'reach-sacred-hills', type: 'reachLocation', targetId: 'sacred-hills', requiredCount: 1 },
+      { id: 'talk-prairie-spirit-meet', type: 'talkToNpc', targetId: 'prairie-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 25, gold: 15 },
+  },
+  'voices-on-the-wind': {
+    id: 'voices-on-the-wind',
+    prerequisiteQuestId: 'following-the-herd',
+    objectives: [
+      { id: 'get-wind-stone-golden-prairie', type: 'collectItem', targetId: 'wind-stone-golden-prairie', requiredCount: 1 },
+      { id: 'get-wind-stone-spirit-herd-plains', type: 'collectItem', targetId: 'wind-stone-spirit-herd-plains', requiredCount: 1 },
+      { id: 'get-wind-stone-stone-circle-valley', type: 'collectItem', targetId: 'wind-stone-stone-circle-valley', requiredCount: 1 },
+      // Sacred Hills has no separate shrine landmark - Prairie Spirit herself is the shrine's
+      // living voice, so restoration is a conversation, not an interactWithShrine objective.
+      { id: 'talk-prairie-spirit-restore', type: 'talkToNpc', targetId: 'prairie-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 60, gold: 30, spiritEssence: 15 },
+  },
+  'the-stone-circles': {
+    id: 'the-stone-circles',
+    prerequisiteQuestId: 'voices-on-the-wind',
+    objectives: [
+      { id: 'reach-stone-circle-valley', type: 'reachLocation', targetId: 'stone-circle-valley', requiredCount: 1 },
+      { id: 'investigate-carvings', type: 'interactWithShrine', targetId: 'stone-circle-carvings', requiredCount: 1 },
+      { id: 'talk-koda-report', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1 },
+    ],
+    reward: { xp: 50, gold: 25, grantLoreId: 'lore-stone-circle-carvings' },
+  },
+  'climbing-thunderbird-mesa': {
+    id: 'climbing-thunderbird-mesa',
+    prerequisiteQuestId: 'the-stone-circles',
+    objectives: [
+      { id: 'talk-aiyana-final', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
+      { id: 'reach-thunderbird-mesa-approach', type: 'reachLocation', targetId: 'thunderbird-mesa-approach', requiredCount: 1 },
+    ],
+    reward: { xp: 80, gold: 40, itemIds: ['guardian-memory-fragment-3'], regionalReputation: 50 },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -386,4 +448,9 @@ export const QUEST_ORDER = [
   'the-waters-remember',
   'the-drowned-ledger',
   'the-bogwater-almanac',
+  'across-open-skies',
+  'following-the-herd',
+  'voices-on-the-wind',
+  'the-stone-circles',
+  'climbing-thunderbird-mesa',
 ];

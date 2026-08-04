@@ -89,6 +89,9 @@ const INTERACTABLE_LABEL_FALLBACK: Record<string, string> = {
   'mine-shrine': 'Mine Shrine',
   'ash-hallow-shrine': 'Town Shrine',
   'miners-lost-lantern': "Miner's Lost Lantern",
+  'wind-stone-golden-prairie': 'Wind Stone',
+  'wind-stone-spirit-herd-plains': 'Wind Stone',
+  'wind-stone-stone-circle-valley': 'Wind Stone',
 };
 
 /** Reverse of functions/src/functions/collectWorldItem.ts's WORLD_ITEMS map (itemId -> the
@@ -101,6 +104,9 @@ const COLLECT_ITEM_LANDMARK_REF_ID: Record<string, string> = {
   'wind-fragment': 'fallen-watchtower',
   'water-fragment': 'water-fragment',
   'miners-lost-lantern': 'miners-lost-lantern',
+  'wind-stone-golden-prairie': 'wind-stone-golden-prairie',
+  'wind-stone-spirit-herd-plains': 'wind-stone-spirit-herd-plains',
+  'wind-stone-stone-circle-valley': 'wind-stone-stone-circle-valley',
 };
 
 /** Resolves a mini-map display name + whether this is a major boss (drawn in a distinct color) for

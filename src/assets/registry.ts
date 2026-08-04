@@ -3984,6 +3984,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Shares its source art with structure.landmark-heart-seed - see icon.item.heart-seed-cypress\'s note. Build script: scripts/build_icon.py. Original archived at public/assets/icons/original/heart-seed-river.png.',
   },
   {
+    id: 'icon.item.wind-stone',
+    category: 'icon',
+    intendedUse: 'Item icon for the 3 wind-stone-* item ids (Endless Prairie, Chapter 5) - shared since all 3 are the same collectible, just placed in 3 different field maps.',
+    filePath: 'icons/wind-stone.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      "Shares its source art with structure.landmark-wind-stone (the same create_map_object generation, 128x128, high top-down, medium shading, selective outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. Original archived at public/assets/icons/original/wind-stone.png.",
+  },
+  {
     id: 'icon.item.croc-hide',
     category: 'icon',
     intendedUse: 'Item icon for croc-hide',
@@ -4947,6 +4957,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated: create_map_object ("mossy hollow at the base of a cypress tree, half-sunk in bog water, an old leather-bound book just visible tucked inside among the roots", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/bogwater-almanac-cache-source.png.',
+  },
+  {
+    id: 'structure.landmark-wind-stone',
+    category: 'structure',
+    intendedUse:
+      "Marker for Endless Prairie's 3 Wind Stone fragment interactables (wind-stone-golden-prairie/wind-stone-spirit-herd-plains/wind-stone-stone-circle-valley, one per Chapter 5 field map) - shared by all 3 refIds since they're the same collectible, just placed in 3 different locations.",
+    filePath: 'sprites/structures/landmark-wind-stone.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("a smooth grey standing stone carved with spiral wind-mark glyphs, faint pale-blue magical light glowing from within the carvings, ancient prairie relic, no other objects", 128x128, high top-down, medium shading, selective outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/wind-stone-source.png.',
   },
   {
     id: 'structure.landmark-water-glimmer',

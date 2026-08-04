@@ -173,6 +173,11 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'heart-seed-cypress': { id: 'heart-seed-cypress', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'heart-seed-murkwater': { id: 'heart-seed-murkwater', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'heart-seed-river': { id: 'heart-seed-river', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // Endless Prairie (MSQ Volume III, Chapter 5): the 3 Wind Stone fragments for the Sacred Hills
+  // shrine (MSF-EP-003, 'voices-on-the-wind') - same shape as the Heart Seed fragments above.
+  'wind-stone-golden-prairie': { id: 'wind-stone-golden-prairie', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'wind-stone-spirit-herd-plains': { id: 'wind-stone-spirit-herd-plains', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'wind-stone-stone-circle-valley': { id: 'wind-stone-stone-circle-valley', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   // Crimson Bayou (MSQ Volume II) enemy loot materials
   'croc-hide': { id: 'croc-hide', category: 'materials', usableInCombat: false, tier: 'common' },
   'bog-ash': { id: 'bog-ash', category: 'materials', usableInCombat: false, tier: 'common' },
@@ -198,6 +203,15 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'bogwater-almanac': { id: 'bogwater-almanac', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'guardian-memory-fragment-2': {
     id: 'guardian-memory-fragment-2',
+    category: 'keyItem',
+    usableInCombat: false,
+    tier: 'legendary',
+    unique: true,
+  },
+  // Endless Prairie (MSQ Volume III, Chapter 5) finale reward - continues the same
+  // per-chapter-finale numbering as guardian-memory-fragment-1 (Iron Mountains)/-2 (Crimson Bayou).
+  'guardian-memory-fragment-3': {
+    id: 'guardian-memory-fragment-3',
     category: 'keyItem',
     usableInCombat: false,
     tier: 'legendary',
@@ -391,6 +405,10 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'worn-mire-gloves',
     'reinforced-mire-gloves',
   ],
+  // Endless Prairie (Highwind Crossing, MSQ Volume III). garrett-forge/ruth-armory catalogs wait
+  // for Phase 5's Prairie Spear/Buffalo Hide/Rider's Chaps/Wind Boots/Rider Gloves/Sky Charm items
+  // to exist - added here once they're real.
+  'wyatt-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
 };
 
 export const INN_REST_COST = 100;

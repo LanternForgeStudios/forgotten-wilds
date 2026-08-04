@@ -38,6 +38,7 @@ STATIC = {
     "heart-seed-collected-source.png": "landmark-heart-seed-collected",
     "drowned-ledger-cache-source.png": "landmark-drowned-ledger-cache",
     "bogwater-almanac-cache-source.png": "landmark-bogwater-almanac-cache",
+    "wind-stone-source.png": "landmark-wind-stone",
 }
 
 

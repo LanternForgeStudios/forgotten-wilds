@@ -44,6 +44,16 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
     'temple-records': 'temple-records',
     'lantern-of-still-waters': 'lantern-of-still-waters',
   },
+  // Endless Prairie (MSQ Volume III) - the 3 Wind Stone fragments, one per Chapter 5 field map.
+  'golden-prairie': {
+    'wind-stone-golden-prairie': 'wind-stone-golden-prairie',
+  },
+  'spirit-herd-plains': {
+    'wind-stone-spirit-herd-plains': 'wind-stone-spirit-herd-plains',
+  },
+  'stone-circle-valley': {
+    'wind-stone-stone-circle-valley': 'wind-stone-stone-circle-valley',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's
@@ -56,6 +66,7 @@ export const KNOWN_SHRINES: Record<string, Set<string>> = {
   'ash-hallow': new Set(['ash-hallow-shrine']),
   'hollow-rail-mine': new Set(['mine-shrine']),
   'cypress-marsh': new Set(['mother-cypress-shrine']),
+  'stone-circle-valley': new Set(['stone-circle-carvings']),
 };
 
 /** Which parent map's location each landmark lives within - visitLandmark.ts's own lookup, used to

@@ -91,4 +91,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The Bogwater Almanac, recovered half-buried in the silt of Cypress Marsh: a second volume of survival technique, describing how Keepers wove reed-song into a hush that could quiet a rougarou's howl before it ever turned into a claw. The restored technique is known today as Hush of the Reeds.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-stone-circle-carvings',
+    title: 'The Stone Circles',
+    body: "Elder Koda Running Elk, reading the Stone Circle Valley carvings against the Journal of Legends: the figures aren't Lantern Keepers standing watch over Guardian Spirits, as every account since the Great Silence assumes. They're carved shoulder to shoulder, as equals. Whatever the modern order believes about its own founding, the stones remember something different.",
+    unlockedAt: 0,
+  },
 ];

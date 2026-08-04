@@ -66,6 +66,11 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   // Crimson Bayou side quest (The Drowned Ledgers)
   'drowned-ledger-cache': 'fragment',
   'bogwater-almanac-cache': 'fragment',
+  // Endless Prairie (MSQ Volume III, Chapter 5)
+  'stone-circle-carvings': 'shrine',
+  'wind-stone-golden-prairie': 'fragment',
+  'wind-stone-spirit-herd-plains': 'fragment',
+  'wind-stone-stone-circle-valley': 'fragment',
 };
 /** Which Cloud Function a walk-in `zone` landmark fires the instant the player's tile enters it -
  *  no Interact needed. Hunter's Camp and Spirit Grove (the clearing, not its shrine) are pure
@@ -92,6 +97,10 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   // Crimson Bayou side quest (The Drowned Ledgers) - each has its own bespoke marker
   'drowned-ledger-cache': 'structure.landmark-drowned-ledger-cache',
   'bogwater-almanac-cache': 'structure.landmark-bogwater-almanac-cache',
+  // Endless Prairie (MSQ Volume III) - all 3 Wind Stone fragments share one marker sprite.
+  'wind-stone-golden-prairie': 'structure.landmark-wind-stone',
+  'wind-stone-spirit-herd-plains': 'structure.landmark-wind-stone',
+  'wind-stone-stone-circle-valley': 'structure.landmark-wind-stone',
 };
 
 /** Post-collection sprite override for a 'fragment'-kind interactable, shown once its item is in
@@ -123,6 +132,7 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId === 'ember-codex-tunnel') return 'an overlooked maintenance tunnel';
   if (refId === 'drowned-ledger-cache') return 'a hidden cache in the reeds';
   if (refId === 'bogwater-almanac-cache') return 'a mossy cypress hollow';
+  if (refId.startsWith('wind-stone-')) return 'a stone humming faintly with wind';
   if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';
   const landmark = LOCATIONS.find((l) => l.id === refId);
   if (landmark) return landmark.name;

@@ -336,6 +336,38 @@ export const ITEMS: Item[] = [
     tier: 'rare',
     unique: true,
   },
+  // Endless Prairie (MSQ Volume III, Chapter 5) - the 3 Wind Stone fragments, one per field map,
+  // collected for MSF-EP-003 "Voices on the Wind" to restore the Sacred Hills shrine.
+  {
+    id: 'wind-stone-golden-prairie',
+    name: 'Wind Stone (Golden Prairie)',
+    description: "A stone carved with spiral wind-marks, one of three needed to restore Sacred Hills' dormant shrine.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.wind-stone',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'wind-stone-spirit-herd-plains',
+    name: 'Wind Stone (Spirit Herd Plains)',
+    description: "A stone carved with spiral wind-marks, one of three needed to restore Sacred Hills' dormant shrine.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.wind-stone',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'wind-stone-stone-circle-valley',
+    name: 'Wind Stone (Stone Circle Valley)',
+    description: "A stone carved with spiral wind-marks, one of three needed to restore Sacred Hills' dormant shrine.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.wind-stone',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
   {
     id: 'croc-hide',
     name: 'Croc Hide',
@@ -419,6 +451,16 @@ export const ITEMS: Item[] = [
     description: 'A fragment of Mother Cypress\'s memory: the Guardians accepted a great sacrifice, sealed by trusted allies - the reason still hidden.',
     category: 'keyItem',
     iconAssetId: 'icon.item.guardian-memory-fragment-2',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
+  {
+    id: 'guardian-memory-fragment-3',
+    name: 'Guardian Memory Fragment III',
+    description: "A fragment of the Stone Circles' carved memory: Lantern Keepers and Guardian Spirits once stood side by side, equals in a promise the modern order has forgotten.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.guardian-memory-fragment-3',
     stackable: false,
     tier: 'legendary',
     unique: true,
@@ -513,6 +555,9 @@ export const SHOP_TITLES: Record<string, string> = {
   'noelle-herbalist': "Mirehaven's Herbalist",
   'toussaint-forge': "Toussaint's Forge",
   'delphine-armory': "Delphine's Armory",
+  'wyatt-general-store': "Highwind Crossing's General Store",
+  'garrett-forge': 'The Highwind Forge',
+  'ruth-armory': 'The Highwind Armory',
 };
 
 export const SHOP_CATALOGS: Record<string, string[]> = {
@@ -573,6 +618,9 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'worn-mire-gloves',
     'reinforced-mire-gloves',
   ],
+  // Endless Prairie (Highwind Crossing, MSQ Volume III). garrett-forge/ruth-armory catalogs wait
+  // for Phase 5's Prairie equipment items to exist.
+  'wyatt-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
 };
 
 /** Additional items a shop unlocks once a specific quest completes - kept in sync by hand with the
