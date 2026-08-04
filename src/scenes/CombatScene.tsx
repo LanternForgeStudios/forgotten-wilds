@@ -28,6 +28,7 @@ import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_E
 import { TIER_ORDER } from '@/utils/tier';
 import { itemDisplayName, itemIconAssetId, groupRewardItemIds } from '@/utils/itemName';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
+import { homeTownFor } from '@/utils/locationHomeTown';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
@@ -458,12 +459,13 @@ export function CombatScene() {
       pendingDefeatResyncRef.current = false;
       await resyncSave(uid);
     }
-    const targetLocationId = wasDefeat ? 'ash-hallow' : locationId;
+    const targetLocationId = wasDefeat ? homeTownFor(locationId) : locationId;
     const targetLocation = LOCATIONS.find((l) => l.id === targetLocationId);
     const scene = targetLocation ? sceneForLocationKind(targetLocation.kind) : 'town';
     // Restore the exact tile the fight was triggered from, rather than dumping the player back at
     // the map's default spawn - but only within the same location; a defeat sends the player to
-    // Ash Hallow instead, where the original coordinates from a different map don't apply.
+    // their region's own home town instead (see homeTownFor), where the original coordinates from
+    // a different map don't apply.
     const preserveSpawn = targetLocationId === locationId;
     const goToExploration = () =>
       goTo(scene, {
