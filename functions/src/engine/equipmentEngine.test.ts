@@ -196,10 +196,23 @@ describe('computeAilmentResistances', () => {
     expect(computeAilmentResistances(emptyEquipment)).toEqual([]);
   });
 
-  it('returns [] for real equipped items, since none set ailmentResistance today', () => {
+  it('returns [] for real equipped items that grant no ailment resistance', () => {
     expect(
       computeAilmentResistances({ ...emptyEquipment, weapon: 'weathered-walking-staff', lantern: 'keepers-lantern' }),
     ).toEqual([]);
+  });
+
+  it('picks up a real equipped item that DOES grant an ailment resistance', () => {
+    expect(computeAilmentResistances({ ...emptyEquipment, gloves: 'keepers-gauntlets' })).toEqual([
+      { ailmentId: 'burn', reductionPercent: 0.3 },
+    ]);
+  });
+
+  it('sums resistances from multiple equipped items against the same ailment', () => {
+    expect(computeAilmentResistances({ ...emptyEquipment, gloves: 'keepers-gauntlets', charm: 'ghost-miners-coin' })).toEqual([
+      { ailmentId: 'burn', reductionPercent: 0.3 },
+      { ailmentId: 'burn', reductionPercent: 0.3 },
+    ]);
   });
 });
 

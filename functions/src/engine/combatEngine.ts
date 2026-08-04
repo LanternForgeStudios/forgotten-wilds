@@ -189,7 +189,7 @@ export interface RoundInput {
   attackAilment?: { id: string; chance: number };
   /** The player's flattened equipped-item ailment resistance (see equipmentEngine.ts's
    *  computeAilmentResistances) - reduces the chance of an enemy's own move afflicting the player.
-   *  Stubbed: always [] today. */
+   *  [] whenever the player has nothing equipped that grants a resistance. */
   ailmentResistances: AilmentResistance[];
 }
 
@@ -501,7 +501,8 @@ export function resolveRound(input: RoundInput): RoundResult {
     // Only rolled once the attack itself has already landed (see Skill.inflictAilmentChance's doc
     // comment) - a missed attack (the branch above, which returns early) never reaches here. The
     // player's equipped-item resistance (see equipmentEngine.ts's computeAilmentResistances)
-    // reduces the effective chance - a no-op today since no authored item sets it yet.
+    // reduces the effective chance - a no-op only when the player has nothing equipped that
+    // resists this specific ailment.
     if (
       skill.inflictsAilmentId &&
       Math.random() < applyAilmentResistance(skill.inflictAilmentChance ?? 0, skill.inflictsAilmentId, input.ailmentResistances)

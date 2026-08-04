@@ -150,8 +150,8 @@ export function isStunned(ailments: ActiveAilment[]): boolean {
 /** Reduces an ailment-infliction chance by the target's equipped resistance to that specific
  *  ailment id (see EquipmentDefinition.ailmentResistance) - every equipped item with a matching
  *  entry sums, clamped to [0, 1] so stacking several can't push the effective chance negative or
- *  leave it unreduced. Always a no-op today (returns `chance` unchanged) since no authored item
- *  sets ailmentResistance yet - this is the stub's one live piece of math, waiting on content. */
+ *  leave it unreduced. `reductionPercent` on each entry is a 0-1 FRACTION (1 = fully blocks that
+ *  ailment) despite its name - a no-op only when nothing equipped grants a matching resistance. */
 export function applyAilmentResistance(chance: number, ailmentId: string, resistances: AilmentResistance[]): number {
   const totalReduction = resistances
     .filter((r) => r.ailmentId === ailmentId)

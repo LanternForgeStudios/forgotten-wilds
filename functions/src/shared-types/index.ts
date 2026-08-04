@@ -200,7 +200,8 @@ export interface ActiveAilment {
 
 /** One equipped item's reduction toward a specific ailment (see
  *  EquipmentDefinition.ailmentResistance) - a flattened list of these, gathered from every
- *  equipped item, is what combatMath.ts's applyAilmentResistance reduces a chance by. */
+ *  equipped item, is what combatMath.ts's applyAilmentResistance reduces a chance by.
+ *  `reductionPercent` is a 0-1 FRACTION despite its name (1 = 100% resistance) - not 0-100. */
 export interface AilmentResistance {
   ailmentId: string;
   reductionPercent: number;
@@ -450,7 +451,8 @@ export interface PartyBattleParticipantStats {
    *  equipmentEngine.ts's resolveWeaponAttackAilment). Stubbed: always null today. */
   attackAilment: { id: string; chance: number } | null;
   /** Snapshotted the same way - this participant's flattened equipped-item ailment resistance
-   *  (see equipmentEngine.ts's computeAilmentResistances). Stubbed: always [] today. */
+   *  (see equipmentEngine.ts's computeAilmentResistances). [] whenever nothing equipped grants
+   *  one. */
   ailmentResistances: AilmentResistance[];
 }
 

@@ -46,8 +46,10 @@ export interface EquipmentDefinition {
   attackAilment?: { ailmentId: string; chance: number };
   /** Any slot: reduces the wielder's own chance of being afflicted by a matching ailment while
    *  equipped. Entries from every equipped item with a matching ailmentId sum (see
-   *  combatMath.ts's applyAilmentResistance for the clamp). Stubbed for future item content - no
-   *  authored item sets this yet. */
+   *  combatMath.ts's applyAilmentResistance for the clamp). `reductionPercent` is a 0-1 FRACTION
+   *  despite its name (1 = 100% resistance, matching applyAilmentResistance's own clamp to
+   *  [0, 1]) - not a 0-100 number. First used by Crimson Bayou's mire-gloves/bayou-charm Rare
+   *  tiers (Poison) and Iron Mountains' mountain-charm/work-gloves Rare tiers (Burn). */
   ailmentResistance?: AilmentResistance[];
 }
 
@@ -258,12 +260,16 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'uncommon',
     familyId: 'work-gloves',
   },
+  // The family's Rare cap gets a genuine Burn resistance perk rather than just bigger numbers -
+  // matching warden-warden-wrath/coalspirit-cinderburst's Burn being Iron Mountains' own
+  // signature status threat, the same way mire-gloves' Rare cap resists Poison for the Bayou.
   'keepers-gauntlets': {
     id: 'keepers-gauntlets',
     slot: 'gloves',
     statBonuses: { maxHp: 8, attack: 4, defense: 4 },
     tier: 'rare',
     familyId: 'work-gloves',
+    ailmentResistance: [{ ailmentId: 'burn', reductionPercent: 0.3 }],
   },
   'river-stone-charm': {
     id: 'river-stone-charm',
@@ -278,6 +284,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { speed: 2 },
     tier: 'uncommon',
     familyId: 'mountain-charm',
+    ailmentResistance: [{ ailmentId: 'burn', reductionPercent: 0.15 }],
   },
   'ghost-miners-coin': {
     id: 'ghost-miners-coin',
@@ -285,6 +292,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxSpirit: 5 },
     tier: 'rare',
     familyId: 'mountain-charm',
+    ailmentResistance: [{ ailmentId: 'burn', reductionPercent: 0.3 }],
   },
   'keepers-lantern': {
     id: 'keepers-lantern',
@@ -550,7 +558,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 7, attack: 3, defense: 4 },
     tier: 'rare',
     familyId: 'mire-gloves',
-    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 30 }],
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
   },
   'marsh-reed-charm': {
     id: 'marsh-reed-charm',
@@ -565,7 +573,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { speed: 2 },
     tier: 'uncommon',
     familyId: 'bayou-charm',
-    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 15 }],
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.15 }],
   },
   'witch-warded-charm': {
     id: 'witch-warded-charm',
@@ -573,7 +581,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxSpirit: 6 },
     tier: 'rare',
     familyId: 'bayou-charm',
-    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 30 }],
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
   },
   // Cypress Spirits family, Rare and Mythic tiers - mother-cypress-totem above is this family's
   // Legendary cap (already granted as the Ancient Serpent Guardian's boss reward).

@@ -6,7 +6,7 @@ import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
 import { EQUIPMENT, STARTING_STATS, STAT_GROWTH_PER_LEVEL, XP_THRESHOLDS } from '@/data';
 import { EQUIPMENT_SLOTS } from '@/types';
-import { formatStatBonuses } from '@/utils/statBonuses';
+import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
 import styles from './CharacterStats.module.css';
@@ -159,6 +159,9 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
                     {def.name}
                     {formatStatBonuses(def.statBonuses) && (
                       <span className={styles.slotBonus}> {formatStatBonuses(def.statBonuses)}</span>
+                    )}
+                    {formatAilmentResistance(def.ailmentResistance) && (
+                      <span className={styles.slotBonus}> {formatAilmentResistance(def.ailmentResistance)}</span>
                     )}
                   </span>
                 </>

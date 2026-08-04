@@ -292,7 +292,7 @@ export interface PvpDefenderInput {
   ailments: ActiveAilment[];
   /** The opponent's flattened equipped-item ailment resistance (see equipmentEngine.ts's
    *  computeAilmentResistances) - reduces the chance of a landed hit's ailment roll succeeding
-   *  against them. Stubbed: always [] today. */
+   *  against them. [] whenever they have nothing equipped that grants a resistance. */
   ailmentResistances: AilmentResistance[];
 }
 
@@ -386,7 +386,8 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
 
   // Mirrors resolveOffensiveHits'/resolveOffensiveHit's shared "ailment" param elsewhere - rolled
   // once per landed (non-missed), non-defeating hit, chance reduced by the opponent's own
-  // equipped resistance (a no-op today, since no item sets ailmentResistance yet).
+  // equipped resistance (see combatMath.ts's applyAilmentResistance) - a no-op only when the
+  // opponent has nothing equipped that resists this specific ailment.
   function resolveOffensiveHit(power: number, verb: string, damageType: DamageType, ailment?: { id: string; chance: number }) {
     const attackMultiplier = ailmentAttackMultiplier(ailments);
     const blindChance = damageType === 'physical' ? blindMissChance(ailments) : 0;
@@ -519,7 +520,7 @@ export interface PartyEnemyPhasePlayerState {
   defending: boolean;
   /** This player's flattened equipped-item ailment resistance (see equipmentEngine.ts's
    *  computeAilmentResistances) - reduces the chance of an enemy's own move afflicting them.
-   *  Stubbed: always [] today. */
+   *  [] whenever they have nothing equipped that grants a resistance. */
   ailmentResistances: AilmentResistance[];
 }
 
@@ -649,8 +650,8 @@ export function resolvePartyEnemyPhase(
           log.push(attackLogLine);
 
           // target's own equipped-item resistance (see equipmentEngine.ts's
-          // computeAilmentResistances) reduces the effective chance - a no-op today since no
-          // authored item sets it yet.
+          // computeAilmentResistances) reduces the effective chance - a no-op only when the
+          // target has nothing equipped that resists this specific ailment.
           if (
             skill.inflictsAilmentId &&
             Math.random() < applyAilmentResistance(skill.inflictAilmentChance ?? 0, skill.inflictsAilmentId, target.ailmentResistances)

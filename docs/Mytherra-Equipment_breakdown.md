@@ -429,13 +429,15 @@ granted purely via quest reward and are fully decoupled from whatever weapon is 
 data only. A "weapon type gates which Skills you can use" mechanic is a real option for later, not
 part of this rollout.
 
-### Status (2026-08-03): data shipped for all 20 new items, layer art pending review
+### Status (2026-08-03): all 24 items shipped, including layer art
 
 All 4 founders (Common tier, Iron Mountains) and the full Uncommon/Rare rollout for Iron Mountains
-plus all 3 tiers for Crimson Bayou are live as real, purchasable equipment - icons, stats, and shop
-wiring all done. Layer-sprite art (the visible in-hand weapon on the overworld sprite) is a
-separate, still-in-progress track - see `docs/Asset-Production-Checklist.md`'s "Equipment
-weapon-layer sprites" section for exactly what's generated vs. still needs manual review/touch-up.
+plus all 3 tiers for Crimson Bayou are live as real, purchasable equipment - icons, stats, shop
+wiring, AND layer-sprite art (the visible in-hand weapon on the overworld sprite, both genders,
+walking+running) all done. The 4 founders were hand-corrected by the user from an initial
+estimate-transform pass; the other 20 region-flavored siblings are palette-swap recolors of their
+type's founder - see `docs/Asset-Production-Checklist.md`'s "Equipment weapon-layer sprites"
+section for the full pipeline history and one still-open discrepancy (`ashwood-spear-female`).
 
 | Type | Iron Mountains family (`iron-sword`/`miners-pick`/`ashwood-spear`/`miners-mallet`) | Crimson Bayou family (`bog-cutlass`/`bog-axe`/`reed-spear`/`bog-maul`) |
 |---|---|---|

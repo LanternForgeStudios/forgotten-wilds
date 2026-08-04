@@ -12,7 +12,7 @@ import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useToastStore } from '@/state/useToastStore';
 import { sellPriceFor } from '@/utils/sellPrice';
-import { formatStatBonuses } from '@/utils/statBonuses';
+import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
 import { SHOP_LISTINGS, SHOP_TITLES, effectiveShopCatalog, ITEMS, EQUIPMENT } from '@/data';
 import { playSound } from '@/audio/audioService';
@@ -328,6 +328,9 @@ export function Shop({ shopId, onClose }: ShopProps) {
             <p className={styles.detailDescription}>{selectedDef.description}</p>
             {'statBonuses' in selectedDef && formatStatBonuses(selectedDef.statBonuses) && (
               <p className={styles.detailStats}>{formatStatBonuses(selectedDef.statBonuses)}</p>
+            )}
+            {'ailmentResistance' in selectedDef && formatAilmentResistance(selectedDef.ailmentResistance) && (
+              <p className={styles.detailStats}>{formatAilmentResistance(selectedDef.ailmentResistance)}</p>
             )}
             {'effect' in selectedDef && selectedDef.effect && (
               <p className={styles.detailStats}>

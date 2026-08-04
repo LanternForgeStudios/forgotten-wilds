@@ -63,7 +63,8 @@ export interface EquipmentItem {
    *  only, combat math is server-authoritative. */
   attackAilment?: { ailmentId: string; chance: number };
   /** Any slot: reduces the wielder's chance of being afflicted by a matching ailment while
-   *  equipped. Display copy only, see functions/src/data/equipment.ts. */
+   *  equipped. `reductionPercent` is a 0-1 FRACTION despite its name (1 = 100% resistance) - not
+   *  0-100. Display copy only, see functions/src/data/equipment.ts. */
   ailmentResistance?: { ailmentId: string; reductionPercent: number }[];
   /** Overworld sprite sheet rendered as a layer on top of the base player body when this item is
    *  equipped (see docs/Equipment-Layering-Plan.md) - keyed by gender since layer art only depends

@@ -13,7 +13,7 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { TIER_LABELS, TIER_COLORS } from '@/utils/tier';
 import { sellPriceFor } from '@/utils/sellPrice';
-import { formatStatBonuses } from '@/utils/statBonuses';
+import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { AILMENTS, ENEMIES, ITEMS, EQUIPMENT, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
 import type { Enemy, EnemyTier, Item, EquipmentItem, ItemCategory, Quest, QuestCategory } from '@/types';
@@ -774,7 +774,10 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
           if (entry.item?.effect?.restoreOilPercent)
             uses.push(`Restores ${Math.round(entry.item.effect.restoreOilPercent * 100)}% Lantern Oil`);
           if (entry.item?.effect?.reviveOnDefeat) uses.push('Revives on defeat');
-          const statBonusText = entry.equipment ? formatStatBonuses(entry.equipment.statBonuses) : undefined;
+          const ailmentResistanceText = entry.equipment ? formatAilmentResistance(entry.equipment.ailmentResistance) : undefined;
+          const statBonusText = entry.equipment
+            ? [formatStatBonuses(entry.equipment.statBonuses), ailmentResistanceText].filter(Boolean).join('  ·  ')
+            : undefined;
           return (
             <div
               className={styles.overlay}

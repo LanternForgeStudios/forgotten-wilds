@@ -11,7 +11,7 @@ import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { ITEMS, EQUIPMENT, RECIPES } from '@/data';
 import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
-import { formatStatBonuses } from '@/utils/statBonuses';
+import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
 import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
@@ -331,6 +331,11 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                                 {formatStatBonuses(equipDef.statBonuses)}
                               </span>
                             )}
+                            {formatAilmentResistance(equipDef.ailmentResistance) && (
+                              <span style={{ fontSize: 10, color: 'var(--fw-spirit)', opacity: 0.85 }}>
+                                {formatAilmentResistance(equipDef.ailmentResistance)}
+                              </span>
+                            )}
                           </>
                         ) : (
                           <button
@@ -396,6 +401,9 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       {selected.equipDef && formatStatBonuses(selected.equipDef.statBonuses) && (
                         <p className={styles.detailStats}>{formatStatBonuses(selected.equipDef.statBonuses)}</p>
                       )}
+                      {selected.equipDef && formatAilmentResistance(selected.equipDef.ailmentResistance) && (
+                        <p className={styles.detailStats}>{formatAilmentResistance(selected.equipDef.ailmentResistance)}</p>
+                      )}
                       {selected.itemDef?.effect && (
                         <p className={styles.detailStats}>
                           {selected.itemDef.effect.healHpPercent
@@ -435,6 +443,11 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                         {formatStatBonuses(equipDef.statBonuses) && (
                           <span style={{ fontSize: 11, color: 'var(--fw-spirit)', marginLeft: 8 }}>
                             {formatStatBonuses(equipDef.statBonuses)}
+                          </span>
+                        )}
+                        {formatAilmentResistance(equipDef.ailmentResistance) && (
+                          <span style={{ fontSize: 11, color: 'var(--fw-spirit)', marginLeft: 8 }}>
+                            {formatAilmentResistance(equipDef.ailmentResistance)}
                           </span>
                         )}
                         <span style={{ marginLeft: 8 }}>
@@ -608,6 +621,9 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       <p style={{ fontSize: 11, opacity: 0.85, margin: 0, textAlign: 'center' }}>{def.description}</p>
                       {formatStatBonuses(def.statBonuses) && (
                         <span style={{ fontSize: 10, color: 'var(--fw-spirit)' }}>{formatStatBonuses(def.statBonuses)}</span>
+                      )}
+                      {formatAilmentResistance(def.ailmentResistance) && (
+                        <span style={{ fontSize: 10, color: 'var(--fw-spirit)' }}>{formatAilmentResistance(def.ailmentResistance)}</span>
                       )}
                     </div>
                   );

@@ -79,8 +79,9 @@ export function resolveWeaponAttackAilment(weaponId: string | null | undefined):
 }
 
 /** Flattens every equipped item's ailmentResistance entries (see EquipmentDefinition) into one
- *  list, ready for combatMath.ts's applyAilmentResistance. Always [] today since no authored item
- *  sets ailmentResistance yet. */
+ *  list, ready for combatMath.ts's applyAilmentResistance. [] whenever nothing equipped grants a
+ *  resistance - real content does now (Crimson Bayou's mire-gloves/bayou-charm Rare tiers vs.
+ *  Poison, Iron Mountains' mountain-charm/work-gloves Rare tiers vs. Burn). */
 export function computeAilmentResistances(equipment: PlayerEquipment): AilmentResistance[] {
   return Object.values(equipment)
     .filter((id): id is string => !!id)
