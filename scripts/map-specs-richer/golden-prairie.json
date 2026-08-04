@@ -1,0 +1,62 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.endless-prairie-terrain",
+      "name": "endless-prairie-terrain",
+      "image": "endless-prairie-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.endless-prairie-decor",
+      "name": "endless-prairie-decor",
+      "image": "endless-prairie-decor.png",
+      "imageWidth": 96,
+      "imageHeight": 80,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 40, "y": 12, "tileId": { "tileset": 1, "id": 2 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 16,
+          "seed": 31,
+          "avoid": [
+            { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 34, "y": 24 },
+            { "x": 40, "y": 12 },
+            { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-highwind-crossing" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "highwind-crossing", "targetSpawnId": "from-golden-prairie" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-spirit-herd-plains" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "spirit-herd-plains", "targetSpawnId": "from-golden-prairie" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "interactable", "x": 34, "y": 24, "refId": "wind-stone-golden-prairie" },
+
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-golden-prairie-1" },
+    { "type": "interactable", "x": 52, "y": 10, "refId": "chest-golden-prairie-2" },
+    { "type": "interactable", "x": 54, "y": 32, "refId": "chest-golden-prairie-3" }
+  ]
+}

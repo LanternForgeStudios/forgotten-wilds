@@ -1,0 +1,62 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.endless-prairie-terrain",
+      "name": "endless-prairie-terrain",
+      "image": "endless-prairie-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.endless-prairie-decor",
+      "name": "endless-prairie-decor",
+      "image": "endless-prairie-decor.png",
+      "imageWidth": 96,
+      "imageHeight": 80,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 16, "tileId": { "tileset": 1, "id": 6 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 6 } ],
+          "count": 14,
+          "seed": 33,
+          "avoid": [
+            { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 22, "y": 22 },
+            { "x": 30, "y": 16 },
+            { "x": 10, "y": 10 }, { "x": 50, "y": 12 }, { "x": 14, "y": 32 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-spirit-herd-plains" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "spirit-herd-plains", "targetSpawnId": "from-sacred-hills" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-stone-circle-valley" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "stone-circle-valley", "targetSpawnId": "from-sacred-hills" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "npc", "x": 30, "y": 16, "refId": "prairie-spirit", "wanderRadius": 2 },
+
+    { "type": "interactable", "x": 10, "y": 10, "refId": "chest-sacred-hills-1" },
+    { "type": "interactable", "x": 50, "y": 12, "refId": "chest-sacred-hills-2" },
+    { "type": "interactable", "x": 14, "y": 32, "refId": "chest-sacred-hills-3" }
+  ]
+}

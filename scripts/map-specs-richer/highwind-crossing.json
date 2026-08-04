@@ -1,0 +1,71 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.highwind-crossing-terrain",
+      "name": "highwind-crossing-terrain",
+      "image": "highwind-crossing-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.endless-prairie-decor",
+      "name": "endless-prairie-decor",
+      "image": "endless-prairie-decor.png",
+      "imageWidth": 96,
+      "imageHeight": 80,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 20, "tileId": { "tileset": 1, "id": 12 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 10,
+          "seed": 21,
+          "avoid": [
+            { "x": 30, "y": 22 }, { "x": 0, "y": 20 },
+            { "x": 20, "y": 14 }, { "x": 44, "y": 14 },
+            { "x": 20, "y": 26 }, { "x": 44, "y": 26 },
+            { "x": 30, "y": 8 }, { "x": 30, "y": 30 },
+            { "x": 12, "y": 20 }, { "x": 30, "y": 20 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 30, "y": 22, "refId": "default" },
+    { "type": "spawnPoint", "x": 2, "y": 20, "refId": "from-golden-prairie" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "golden-prairie", "targetSpawnId": "from-highwind-crossing" },
+
+    { "type": "npc", "x": 30, "y": 20, "refId": "scout-niska", "wanderRadius": 4 },
+
+    { "type": "spawnPoint", "x": 20, "y": 14, "refId": "from-highwind-crossing-chiefs-lodge" },
+    { "type": "transition", "x": 20, "y": 14, "refId": "highwind-crossing-chiefs-lodge", "targetSpawnId": "from-highwind-crossing", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 44, "y": 14, "refId": "from-highwind-crossing-spirit-lodge" },
+    { "type": "transition", "x": 44, "y": 14, "refId": "highwind-crossing-spirit-lodge", "targetSpawnId": "from-highwind-crossing", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 20, "y": 26, "refId": "from-highwind-crossing-inn" },
+    { "type": "transition", "x": 20, "y": 26, "refId": "highwind-crossing-inn", "targetSpawnId": "from-highwind-crossing", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 44, "y": 26, "refId": "from-highwind-crossing-general-store" },
+    { "type": "transition", "x": 44, "y": 26, "refId": "highwind-crossing-general-store", "targetSpawnId": "from-highwind-crossing", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 30, "y": 8, "refId": "from-highwind-crossing-blacksmith" },
+    { "type": "transition", "x": 30, "y": 8, "refId": "highwind-crossing-blacksmith", "targetSpawnId": "from-highwind-crossing", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 12, "y": 20, "refId": "from-highwind-crossing-armory" },
+    { "type": "transition", "x": 12, "y": 20, "refId": "highwind-crossing-armory", "targetSpawnId": "from-highwind-crossing" }
+  ]
+}

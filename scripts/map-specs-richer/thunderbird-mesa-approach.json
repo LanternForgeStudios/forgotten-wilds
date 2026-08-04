@@ -1,0 +1,55 @@
+{
+  "width": 48,
+  "height": 32,
+  "tilesets": [
+    {
+      "assetId": "tileset.endless-prairie-terrain",
+      "name": "endless-prairie-terrain",
+      "image": "endless-prairie-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.endless-prairie-decor",
+      "name": "endless-prairie-decor",
+      "image": "endless-prairie-decor.png",
+      "imageWidth": 96,
+      "imageHeight": 80,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 0 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 12, "y": 10, "tileId": { "tileset": 1, "id": 6 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 44, "height": 28 },
+          "tileIds": [ { "tileset": 1, "id": 6 } ],
+          "count": 8,
+          "seed": 35,
+          "avoid": [
+            { "x": 2, "y": 16 }, { "x": 44, "y": 16 }, { "x": 12, "y": 10 },
+            { "x": 10, "y": 8 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 16, "refId": "from-stone-circle-valley" },
+    { "type": "transition", "x": 0, "y": 16, "refId": "stone-circle-valley", "targetSpawnId": "from-thunderbird-mesa-approach" },
+    { "type": "spawnPoint", "x": 24, "y": 16, "refId": "default" },
+
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-thunderbird-mesa-approach-1" }
+  ]
+}

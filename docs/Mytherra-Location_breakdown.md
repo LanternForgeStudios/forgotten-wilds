@@ -208,6 +208,23 @@ Boss:
 
 Thunderbird
 
+Implementation Notes (Chapter 5, shipped): this section's granular "Overworld Areas" list disagreed
+with `Mytherra-MSQ_breakdown.md`'s own "Primary Maps" for Chapter 5 ("Where the Sky Meets the
+Earth") - this doc named 12 separate areas for the whole region, the MSQ doc named 5 maps for
+Chapter 5 alone. Resolved the same way Iron Mountains' Mossy Creek/Fallen Watchtower are landmarks
+*within* Ironwood Trail rather than separate maps: the MSQ doc's 5 Primary Maps became the actual
+shipped `Location` entries (Highwind Crossing town + Golden Prairie, Spirit Herd Plains, Sacred
+Hills, Stone Circle Valley field maps), and this list's extra names became landmarks/interactables
+within them - `Buffalo Herd` and `Stone Rings` in particular are the literal in-game interactable
+refIds now (`spirit-herd-plains`/`stone-circle-valley` respectively), not separate locations.
+`Thunderbird Mesa Approach` is a 6th field map, added beyond this doc's own list, serving as
+Chapter 5's closing destination (MSF-EP-005) and the physical hand-off point to Chapter 6's
+Thunderbird Mesa dungeon (this doc's own Main Dungeon section above, not yet built). Town building
+list: `Trading Post`/`Stable` weren't built as their own interiors for Chapter 5 (no NPC/mechanic
+needed one yet) - `Spirit Lodge` and a `Chief's Lodge` (this doc didn't name a leader's building;
+added to house Chief Aiyana Whitefeather, matching every other region's leader-gets-a-hall
+convention) cover the recurring cast instead.
+
 4. Whispering Pines
 Primary Town
 Cedarwatch

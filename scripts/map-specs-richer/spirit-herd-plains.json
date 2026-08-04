@@ -1,0 +1,63 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.endless-prairie-terrain",
+      "name": "endless-prairie-terrain",
+      "image": "endless-prairie-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.endless-prairie-decor",
+      "name": "endless-prairie-decor",
+      "image": "endless-prairie-decor.png",
+      "imageWidth": 96,
+      "imageHeight": 80,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 44, "y": 18, "tileId": { "tileset": 1, "id": 4 } },
+        { "x": 48, "y": 24, "tileId": { "tileset": 1, "id": 4 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 14,
+          "seed": 32,
+          "avoid": [
+            { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 30, "y": 20 },
+            { "x": 44, "y": 18 }, { "x": 48, "y": 24 },
+            { "x": 10, "y": 10 }, { "x": 50, "y": 12 }, { "x": 14, "y": 32 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-golden-prairie" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "golden-prairie", "targetSpawnId": "from-spirit-herd-plains" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-sacred-hills" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "sacred-hills", "targetSpawnId": "from-spirit-herd-plains" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "interactable", "x": 30, "y": 30, "refId": "wind-stone-spirit-herd-plains" },
+
+    { "type": "interactable", "x": 10, "y": 10, "refId": "chest-spirit-herd-plains-1" },
+    { "type": "interactable", "x": 50, "y": 12, "refId": "chest-spirit-herd-plains-2" },
+    { "type": "interactable", "x": 14, "y": 32, "refId": "chest-spirit-herd-plains-3" }
+  ]
+}
