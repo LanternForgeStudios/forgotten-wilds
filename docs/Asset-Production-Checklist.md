@@ -406,11 +406,10 @@ real layer art and are wired into `src/data/equipment.ts` via `layerSpriteAssetI
   looks visually off, especially higher-saturation Rare-tier recolors (e.g. `ghostbreaker-
   warhammer`'s glowing pale-blue rune effect, `serpent-fang-sword`'s bone-white hilt).
 
-**One open discrepancy, not yet resolved**: `ashwood-spear-female-animated.png`'s file timestamp
-did NOT change alongside the other 7 founder sheets in the same hand-edit batch, even though the
-user's own message said "male and female" were both finished for all 4 items - it's possible this
-one file wasn't re-saved. Worth a quick double-check/re-save if the female Spear looks off in-game
-(it's currently still running the original estimate-transform output, not a hand-correction).
+(`ashwood-spear-female-animated.png`'s file timestamp didn't change alongside the other 7 founder
+sheets in the same hand-edit batch - flagged and checked with the user, who confirmed the original
+estimate-transform output already looked good as-is and didn't need a hand-correction pass. Not an
+issue.)
 
 ## UI (2 - low priority, already serviceable)
 
