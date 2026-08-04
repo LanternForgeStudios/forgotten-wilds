@@ -36,6 +36,8 @@ export interface Enemy {
     | 'swampCrocs'
     | 'bogWitches'
     | 'rougarou'
+    | 'windSpirits'
+    | 'prairieWolves'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;

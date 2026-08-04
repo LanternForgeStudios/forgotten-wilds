@@ -31,6 +31,8 @@ export interface EnemyDefinition {
     | 'swampCrocs'
     | 'bogWitches'
     | 'rougarou'
+    | 'windSpirits'
+    | 'prairieWolves'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
@@ -488,6 +490,81 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'cypress-guardian-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
     ],
   },
+
+  // --- Endless Prairie (MSQ Volume III) ---
+  // Base stats/rewards authored a step above Crimson Bayou's own (Rougarou: 37/56 maxHp, 20/29
+  // xp), matching the "power creep by story position" convention used for Bayou-over-Iron-
+  // Mountains above.
+  'wind-wisp': {
+    id: 'wind-wisp',
+    name: 'Wind Wisp',
+    family: 'windSpirits',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    // wisp-hush-gale inflicts Silence - excluded here (immune to what it deals out).
+    vulnerableAilments: ['burn', 'freeze', 'poison'],
+    stats: { maxHp: 41, attack: 12, defense: 8, speed: 12 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'wisp-hush-gale', weight: 2 },
+    ],
+    xpReward: 22,
+    goldReward: 12,
+    lootTable: [{ itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 }],
+  },
+  'storm-wisp': {
+    id: 'storm-wisp',
+    name: 'Storm Wisp',
+    family: 'windSpirits',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'poison'],
+    stats: { maxHp: 61, attack: 15, defense: 10, speed: 15 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'wisp-hush-gale', weight: 3 },
+    ],
+    xpReward: 32,
+    goldReward: 18,
+    lootTable: [{ itemId: 'lantern-oil', chance: 0.2, minQuantity: 1, maxQuantity: 2 }],
+  },
+  'prairie-wolf': {
+    id: 'prairie-wolf',
+    name: 'Prairie Wolf',
+    family: 'prairieWolves',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'physical',
+    // wolf-pack-takedown inflicts Stun - excluded here (immune to what it deals out).
+    vulnerableAilments: ['burn', 'poison', 'blind'],
+    stats: { maxHp: 42, attack: 13, defense: 7, speed: 11 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'wolf-pack-takedown', weight: 2 },
+    ],
+    xpReward: 22,
+    goldReward: 12,
+    lootTable: [{ itemId: 'healing-poultice', chance: 0.12, minQuantity: 1, maxQuantity: 1 }],
+  },
+  'dire-prairie-wolf': {
+    id: 'dire-prairie-wolf',
+    name: 'Dire Prairie Wolf',
+    family: 'prairieWolves',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'physical',
+    vulnerableAilments: ['burn', 'poison', 'blind'],
+    stats: { maxHp: 62, attack: 16, defense: 9, speed: 14 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'wolf-pack-takedown', weight: 3 },
+    ],
+    xpReward: 32,
+    goldReward: 18,
+    lootTable: [{ itemId: 'healing-poultice', chance: 0.18, minQuantity: 1, maxQuantity: 2 }],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -532,6 +609,28 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
     { enemyId: 'bog-ravager', weight: 2 },
     { enemyId: 'cypress-witch', weight: 2 },
     { enemyId: 'alpha-rougarou', weight: 2 },
+  ],
+  // Endless Prairie (MSQ Volume III, Chapter 5) - matches each field map's encounterTable in
+  // src/data/locations.ts exactly.
+  'golden-prairie': [
+    { enemyId: 'prairie-wolf', weight: 3 },
+    { enemyId: 'dire-prairie-wolf', weight: 1 },
+  ],
+  'spirit-herd-plains': [
+    { enemyId: 'prairie-wolf', weight: 2 },
+    { enemyId: 'wind-wisp', weight: 2 },
+  ],
+  'sacred-hills': [
+    { enemyId: 'wind-wisp', weight: 3 },
+    { enemyId: 'storm-wisp', weight: 1 },
+  ],
+  'stone-circle-valley': [
+    { enemyId: 'wind-wisp', weight: 2 },
+    { enemyId: 'storm-wisp', weight: 2 },
+  ],
+  'thunderbird-mesa-approach': [
+    { enemyId: 'storm-wisp', weight: 2 },
+    { enemyId: 'dire-prairie-wolf', weight: 2 },
   ],
 };
 

@@ -144,6 +144,27 @@ export const SKILLS: Skill[] = [
     spiritCost: 0,
     inflictsAilmentId: 'poison',
   },
+  // Endless Prairie (MSQ Volume III) enemy signature moves
+  {
+    id: 'wisp-hush-gale',
+    name: 'Hush Gale',
+    description: 'A gust that steals the breath from a shout before it can become a spirit art.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 13,
+    spiritCost: 0,
+    inflictsAilmentId: 'silence',
+  },
+  {
+    id: 'wolf-pack-takedown',
+    name: 'Pack Takedown',
+    description: 'A coordinated pack tackle that bowls the target flat before it can recover its footing.',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 13,
+    spiritCost: 0,
+    inflictsAilmentId: 'stun',
+  },
   // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Forgotten Treatises)
   {
     id: 'frost-lance',

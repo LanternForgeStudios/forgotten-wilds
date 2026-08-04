@@ -184,6 +184,34 @@ export const SKILLS: Record<string, Skill> = {
     inflictAilmentChance: 0.4,
   },
 
+  // --- Endless Prairie (MSQ Volume III) enemy signature moves ---
+  // windSpirits (wind-wisp/storm-wisp) - the region's own signature ailment, Silence, matching
+  // Iron Mountains' Burn / Crimson Bayou's Poison as the ailment the region's Rare-tier equipment
+  // resists (see equipment.ts). Regular and elite share the same move, weighted higher on elite -
+  // same convention as bog-hag/cypress-witch sharing hag-withering-hex above.
+  'wisp-hush-gale': {
+    id: 'wisp-hush-gale',
+    name: 'Hush Gale',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 13,
+    spiritCost: 0,
+    inflictsAilmentId: 'silence',
+    inflictAilmentChance: 0.3,
+  },
+  // prairieWolves (prairie-wolf/dire-prairie-wolf) - a pack tackle that bowls the target over,
+  // same Stun ailment/chance as croc-death-roll above (no cure item exists for Stun).
+  'wolf-pack-takedown': {
+    id: 'wolf-pack-takedown',
+    name: 'Pack Takedown',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 13,
+    spiritCost: 0,
+    inflictsAilmentId: 'stun',
+    inflictAilmentChance: 0.25,
+  },
+
   // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Forgotten Treatises).
   // Themed around Freeze/Burn via name/description and (now that enemies can be afflicted) an
   // ailment matching that theme, which only lands on a vulnerable target (coalSpirits/
