@@ -20,6 +20,12 @@ export const LOCATION_HOME_TOWN: Record<string, string> = {
   'murkwater-trails': 'mirehaven',
   'hidden-river-landing': 'mirehaven',
   'temple-of-the-deep-current': 'mirehaven',
+  // Endless Prairie (MSQ Volume III, Chapter 5)
+  'golden-prairie': 'highwind-crossing',
+  'spirit-herd-plains': 'highwind-crossing',
+  'sacred-hills': 'highwind-crossing',
+  'stone-circle-valley': 'highwind-crossing',
+  'thunderbird-mesa-approach': 'highwind-crossing',
 };
 
 /** Resolves the home town for any location id - falls back to Ash Hallow for an unmapped id. */

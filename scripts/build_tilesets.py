@@ -46,6 +46,8 @@ DIRECT_COPY_SETS = [
     "ironwood-trail-terrain",
     "crimson-bayou-water-marsh",
     "crimson-bayou-boardwalk",
+    "endless-prairie-terrain",
+    "highwind-crossing-terrain",
 ]
 
 os.makedirs(OUT_DIR, exist_ok=True)

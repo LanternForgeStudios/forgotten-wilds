@@ -748,6 +748,40 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: 5 separate create_map_object calls (transparent background, high top-down, basic shading, single color outline). Assembled into a mixed-footprint 8x9 grid via scripts/build_decor_objects.py - see tileset.mine-decor\'s note for why this approach (not create_tiles_pro) and how to stamp a multi-cell item in Tiled. Originals archived at public/assets/tilesets/original/crimson-bayou-decor/.',
   },
   {
+    id: 'tileset.endless-prairie-terrain',
+    category: 'tileset',
+    intendedUse:
+      'Endless Prairie field terrain (Golden Prairie, Spirit Herd Plains, Sacred Hills, Stone Circle Valley, Thunderbird Mesa Approach) - a 4x4 Wang autotile set (16x16 tiles) transitioning packed dirt trail to golden windswept prairie grass, the region\'s primary field terrain.',
+    filePath: 'tilesets/endless-prairie-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="packed dirt trail, worn earth path, light brown", upper="golden prairie grass, tall swaying blades, warm gold-green", transition_size=0.5, transition="grass thinning into bare dirt, scattered clumps"). Ready 4x4 grid PNG, used as-is. Upper base tile chained into tileset.highwind-crossing-terrain for visual continuity between field and town terrain. Build script: scripts/build_tilesets.py.',
+  },
+  {
+    id: 'tileset.highwind-crossing-terrain',
+    category: 'tileset',
+    intendedUse:
+      'Highwind Crossing town terrain - a 4x4 Wang autotile set (16x16 tiles) transitioning the same golden prairie grass as tileset.endless-prairie-terrain into hard-packed dirt town road, for the frontier town\'s streets.',
+    filePath: 'tilesets/highwind-crossing-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="golden prairie grass, tall swaying blades, warm gold-green" chained via lower_base_tile_id from tileset.endless-prairie-terrain\'s own upper terrain - same grass tiles connect seamlessly between the two sets; upper="hard-packed dirt town road, wagon-wheel ruts, frontier settlement"). Ready 4x4 grid PNG, used as-is. Build script: scripts/build_tilesets.py.',
+  },
+  {
+    id: 'tileset.endless-prairie-decor',
+    category: 'tileset',
+    intendedUse:
+      'Endless Prairie decorations-layer props - a tall prairie-grass tuft (2x2 block), a wildflower cluster (2x2), a weathered bison skull marker (2x2), a small carved stone marker (2x2), and a weathered hitching post (2x3).',
+    filePath: 'tilesets/endless-prairie-decor.png',
+    dimensions: { width: 96, height: 80 },
+    frameSize: { width: 16, height: 16 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: 5 separate create_map_object calls (transparent background, high top-down, basic shading, single color outline). Assembled into a mixed-footprint 6x5 grid via scripts/build_decor_objects.py - see tileset.crimson-bayou-decor\'s note for how to stamp a multi-cell item in Tiled. Originals archived at public/assets/tilesets/original/endless-prairie-decor/.',
+  },
+  {
     id: 'sprite.npc-1',
     category: 'character',
     intendedUse: 'Uploaded NPC character sheet 1 - not yet assigned to any specific NPC or wired into any map',

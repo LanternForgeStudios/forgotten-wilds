@@ -56,6 +56,13 @@ LAYOUTS = {
         "lily-pad": (4, 3, 2, 2),
         "rowboat": (0, 6, 4, 3),
     },
+    "endless-prairie-decor": {
+        "grass-tuft": (0, 0, 2, 2),
+        "wildflower-cluster": (2, 0, 2, 2),
+        "buffalo-skull": (4, 0, 2, 2),
+        "stone-marker": (0, 2, 2, 2),
+        "hitching-post": (2, 2, 2, 3),
+    },
 }
 
 STAGING_ROOT = os.path.join("art-staging", "tilesets")
