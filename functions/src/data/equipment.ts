@@ -616,4 +616,155 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 3, speed: 1 },
     tier: 'common',
   },
+
+  // --- Endless Prairie (MSQ Volume III) canonical equipment families ---
+  // Common through Rare only, matching every prior region's own first pass - Mythic/Legendary
+  // rows (White Buffalo Totem's higher tiers, etc.) wait for Chapter 6's quest content.
+  // Prairie Spear is a straight palette-swap of the Spear weapon type's founder (ashwood-spear) -
+  // same stat progression as every other region's Spear-type instance (weapon TYPES share a flat
+  // stat budget across regions, unlike armor families, which get the region-to-region power-creep
+  // treatment below - see reed-spear's identical numbers in Crimson Bayou above).
+  'weathered-prairie-spear': {
+    id: 'weathered-prairie-spear',
+    slot: 'weapon',
+    statBonuses: { attack: 5, maxHp: 4 },
+    tier: 'common',
+    familyId: 'prairie-spear',
+  },
+  'bound-prairie-spear': {
+    id: 'bound-prairie-spear',
+    slot: 'weapon',
+    statBonuses: { attack: 8, maxHp: 6, speed: 1 },
+    tier: 'uncommon',
+    familyId: 'prairie-spear',
+  },
+  'windriders-spear': {
+    id: 'windriders-spear',
+    slot: 'weapon',
+    statBonuses: { attack: 12, maxHp: 10, defense: 1 },
+    tier: 'rare',
+    familyId: 'prairie-spear',
+  },
+  // Buffalo Hide (chest) - a step above Crimson Bayou's own Bayou Vestments, speed-leaning per the
+  // region's Speed/Critical/Balanced-offense theme (docs/Mytherra-Equipment_breakdown.md).
+  'worn-buffalo-hide': {
+    id: 'worn-buffalo-hide',
+    slot: 'chest',
+    statBonuses: { maxHp: 12, defense: 2, speed: 2 },
+    tier: 'common',
+    familyId: 'buffalo-hide',
+  },
+  'banded-buffalo-hide': {
+    id: 'banded-buffalo-hide',
+    slot: 'chest',
+    statBonuses: { maxHp: 17, defense: 4, speed: 3 },
+    tier: 'uncommon',
+    familyId: 'buffalo-hide',
+  },
+  'chieftains-buffalo-hide': {
+    id: 'chieftains-buffalo-hide',
+    slot: 'chest',
+    statBonuses: { maxHp: 20, maxSpirit: 6, defense: 6, speed: 4 },
+    tier: 'rare',
+    familyId: 'buffalo-hide',
+  },
+  // Rider's Chaps (legs) - matches Buffalo Hide's own step-above-Bayou-Leg-Wraps progression.
+  'worn-riders-chaps': {
+    id: 'worn-riders-chaps',
+    slot: 'legs',
+    statBonuses: { maxHp: 7, defense: 1, speed: 2 },
+    tier: 'common',
+    familyId: 'riders-chaps',
+  },
+  'banded-riders-chaps': {
+    id: 'banded-riders-chaps',
+    slot: 'legs',
+    statBonuses: { maxHp: 10, defense: 2, speed: 3 },
+    tier: 'uncommon',
+    familyId: 'riders-chaps',
+  },
+  'windborn-riders-chaps': {
+    id: 'windborn-riders-chaps',
+    slot: 'legs',
+    statBonuses: { maxHp: 12, maxSpirit: 3, defense: 3, speed: 4 },
+    tier: 'rare',
+    familyId: 'riders-chaps',
+  },
+  // Wind Boots - a step above Marsh Boots, leaning even harder into speed than Bayou's own boots
+  // did, matching the region's own theme.
+  'worn-wind-boots': {
+    id: 'worn-wind-boots',
+    slot: 'boots',
+    statBonuses: { defense: 1, speed: 4 },
+    tier: 'common',
+    familyId: 'wind-boots',
+  },
+  'swift-wind-boots': {
+    id: 'swift-wind-boots',
+    slot: 'boots',
+    statBonuses: { defense: 2, speed: 6 },
+    tier: 'uncommon',
+    familyId: 'wind-boots',
+  },
+  'windrunner-boots': {
+    id: 'windrunner-boots',
+    slot: 'boots',
+    statBonuses: { attack: 1, defense: 3, speed: 8 },
+    tier: 'rare',
+    familyId: 'wind-boots',
+  },
+  // Rider Gloves - a step above Mire Gloves. Rare cap gets a genuine Silence resistance perk, same
+  // "Rare-tier resistance to the region's own signature ailment" pattern as warden-mire-gloves'
+  // Poison resistance above - Silence is Endless Prairie's own signature threat (windSpirits'
+  // wisp-hush-gale).
+  'worn-rider-gloves': {
+    id: 'worn-rider-gloves',
+    slot: 'gloves',
+    statBonuses: { attack: 1, defense: 2 },
+    tier: 'common',
+    familyId: 'rider-gloves',
+  },
+  'reinforced-rider-gloves': {
+    id: 'reinforced-rider-gloves',
+    slot: 'gloves',
+    statBonuses: { maxHp: 5, attack: 3, defense: 3 },
+    tier: 'uncommon',
+    familyId: 'rider-gloves',
+  },
+  'warden-rider-gloves': {
+    id: 'warden-rider-gloves',
+    slot: 'gloves',
+    statBonuses: { maxHp: 8, attack: 4, defense: 5 },
+    tier: 'rare',
+    familyId: 'rider-gloves',
+    ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.3 }],
+  },
+  // Sky Charm - a step above Bayou Charm, same Uncommon+Rare Silence-resistance split as the Bayou
+  // Charm family's own Poison resistance.
+  'feather-sky-charm': {
+    id: 'feather-sky-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 4 },
+    tier: 'common',
+    familyId: 'sky-charm',
+  },
+  'woven-sky-charm': {
+    id: 'woven-sky-charm',
+    slot: 'charm',
+    statBonuses: { speed: 3 },
+    tier: 'uncommon',
+    familyId: 'sky-charm',
+    ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.15 }],
+  },
+  // Named for the side quest's own unrecorded Lantern Keeper (see docs/Mytherra-SQ_breakdown.md,
+  // "The Winter Counts") - the same kind of story-flavor naming windrunner-boots draws from the
+  // region's own catalog examples.
+  'skywalkers-charm': {
+    id: 'skywalkers-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 7 },
+    tier: 'rare',
+    familyId: 'sky-charm',
+    ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.3 }],
+  },
 };

@@ -46,6 +46,32 @@ const CHESTS: Record<string, Record<string, string>> = {
     'chest-hidden-river-landing-2': 'swamp-wisp-totem',
     'chest-hidden-river-landing-3': 'ancient-serpent-scale',
   },
+  // Endless Prairie (MSQ Volume III, Chapter 5) - 5 field maps instead of Bayou's 3, so the 6 Rare
+  // equipment pieces spread 1-2 per map instead of a flat "2 equipment + 1 material" split;
+  // materials fill every other chest slot.
+  'golden-prairie': {
+    'chest-golden-prairie-1': 'windriders-spear',
+    'chest-golden-prairie-2': 'wisp-feather',
+    'chest-golden-prairie-3': 'prairie-wolf-pelt',
+  },
+  'spirit-herd-plains': {
+    'chest-spirit-herd-plains-1': 'chieftains-buffalo-hide',
+    'chest-spirit-herd-plains-2': 'windborn-riders-chaps',
+    'chest-spirit-herd-plains-3': 'wisp-feather',
+  },
+  'sacred-hills': {
+    'chest-sacred-hills-1': 'windrunner-boots',
+    'chest-sacred-hills-2': 'warden-rider-gloves',
+    'chest-sacred-hills-3': 'prairie-wolf-pelt',
+  },
+  'stone-circle-valley': {
+    'chest-stone-circle-valley-1': 'skywalkers-charm',
+    'chest-stone-circle-valley-2': 'wisp-feather',
+    'chest-stone-circle-valley-3': 'prairie-wolf-pelt',
+  },
+  'thunderbird-mesa-approach': {
+    'chest-thunderbird-mesa-approach-1': 'wisp-feather',
+  },
 };
 
 export const openChest = onCall<OpenChestRequest>(async (request) => {

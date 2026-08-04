@@ -580,6 +580,19 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'worn-mire-gloves', price: 22, currency: 'gold' },
   { itemId: 'reinforced-mire-gloves', price: 52, currency: 'gold' },
   { itemId: 'witch-warded-charm', price: 145, currency: 'gold' },
+  // Endless Prairie - Common+Uncommon only, matching functions/src/data/items.ts's SHOP_PRICES.
+  { itemId: 'weathered-prairie-spear', price: 30, currency: 'gold' },
+  { itemId: 'bound-prairie-spear', price: 66, currency: 'gold' },
+  { itemId: 'feather-sky-charm', price: 24, currency: 'gold' },
+  { itemId: 'woven-sky-charm', price: 52, currency: 'gold' },
+  { itemId: 'worn-buffalo-hide', price: 34, currency: 'gold' },
+  { itemId: 'banded-buffalo-hide', price: 68, currency: 'gold' },
+  { itemId: 'worn-riders-chaps', price: 30, currency: 'gold' },
+  { itemId: 'banded-riders-chaps', price: 60, currency: 'gold' },
+  { itemId: 'worn-wind-boots', price: 28, currency: 'gold' },
+  { itemId: 'swift-wind-boots', price: 62, currency: 'gold' },
+  { itemId: 'worn-rider-gloves', price: 24, currency: 'gold' },
+  { itemId: 'reinforced-rider-gloves', price: 54, currency: 'gold' },
 ];
 
 // Display-only grouping of SHOP_LISTINGS by which NPC/building sells it - purchaseItem.ts itself
@@ -657,9 +670,18 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'worn-mire-gloves',
     'reinforced-mire-gloves',
   ],
-  // Endless Prairie (Highwind Crossing, MSQ Volume III). garrett-forge/ruth-armory catalogs wait
-  // for Phase 5's Prairie equipment items to exist.
   'wyatt-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
+  'garrett-forge': ['weathered-prairie-spear', 'bound-prairie-spear', 'feather-sky-charm', 'woven-sky-charm'],
+  'ruth-armory': [
+    'worn-buffalo-hide',
+    'banded-buffalo-hide',
+    'worn-riders-chaps',
+    'banded-riders-chaps',
+    'worn-wind-boots',
+    'swift-wind-boots',
+    'worn-rider-gloves',
+    'reinforced-rider-gloves',
+  ],
 };
 
 /** Additional items a shop unlocks once a specific quest completes - kept in sync by hand with the

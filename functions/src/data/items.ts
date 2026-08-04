@@ -311,6 +311,22 @@ export const SHOP_PRICES: Record<string, number> = {
   // chest/boss-found, since it's a charm (Toussaint's own department) and no Bayou chest needed a
   // sixth slot for it.
   'witch-warded-charm': 145,
+  // Endless Prairie - Prairie Spear/Buffalo Hide/Rider's Chaps/Wind Boots/Rider Gloves/Sky Charm,
+  // Common+Uncommon only (Rare tier of every family is chest-found - see openChest.ts's Chapter 5
+  // CHESTS entries). Priced a step above Bayou's own scale, same modest region-to-region increase
+  // seen from Iron Mountains to Bayou above.
+  'weathered-prairie-spear': 30,
+  'bound-prairie-spear': 66,
+  'feather-sky-charm': 24,
+  'woven-sky-charm': 52,
+  'worn-buffalo-hide': 34,
+  'banded-buffalo-hide': 68,
+  'worn-riders-chaps': 30,
+  'banded-riders-chaps': 60,
+  'worn-wind-boots': 28,
+  'swift-wind-boots': 62,
+  'worn-rider-gloves': 24,
+  'reinforced-rider-gloves': 54,
 };
 
 /** Additional items a shop unlocks once a specific quest completes, layered ON TOP of its
@@ -412,10 +428,22 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'worn-mire-gloves',
     'reinforced-mire-gloves',
   ],
-  // Endless Prairie (Highwind Crossing, MSQ Volume III). garrett-forge/ruth-armory catalogs wait
-  // for Phase 5's Prairie Spear/Buffalo Hide/Rider's Chaps/Wind Boots/Rider Gloves/Sky Charm items
-  // to exist - added here once they're real.
   'wyatt-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
+  // Common+Uncommon Prairie Spear/Sky Charm stock, matching toussaint-forge's cane+charm pairing -
+  // Rare tier of both is chest-found instead (see the Chapter 5 field maps' own chest loot above).
+  'garrett-forge': ['weathered-prairie-spear', 'bound-prairie-spear', 'feather-sky-charm', 'woven-sky-charm'],
+  // Common+Uncommon Buffalo Hide/Rider's Chaps/Wind Boots/Rider Gloves stock, matching
+  // delphine-armory's own pattern - Rare tier of every family is chest-found instead.
+  'ruth-armory': [
+    'worn-buffalo-hide',
+    'banded-buffalo-hide',
+    'worn-riders-chaps',
+    'banded-riders-chaps',
+    'worn-wind-boots',
+    'swift-wind-boots',
+    'worn-rider-gloves',
+    'reinforced-rider-gloves',
+  ],
 };
 
 export const INN_REST_COST = 100;
