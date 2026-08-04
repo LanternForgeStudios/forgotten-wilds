@@ -511,7 +511,11 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 22,
     goldReward: 12,
-    lootTable: [{ itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 }],
+    lootTable: [
+      { itemId: 'wisp-feather', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      // wisp-hush-gale inflicts Silence - echo-herb cures it.
+      { itemId: 'echo-herb', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'storm-wisp': {
     id: 'storm-wisp',
@@ -528,7 +532,10 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 32,
     goldReward: 18,
-    lootTable: [{ itemId: 'lantern-oil', chance: 0.2, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'wisp-feather', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'echo-herb', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
   'prairie-wolf': {
     id: 'prairie-wolf',
@@ -546,7 +553,9 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 22,
     goldReward: 12,
-    lootTable: [{ itemId: 'healing-poultice', chance: 0.12, minQuantity: 1, maxQuantity: 1 }],
+    // wolf-pack-takedown inflicts Stun, which has no cure item (same as marsh-crocodile's own
+    // Stun-inflicting croc-death-roll) - no cure-drop chance here for the same reason.
+    lootTable: [{ itemId: 'prairie-wolf-pelt', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
   },
   'dire-prairie-wolf': {
     id: 'dire-prairie-wolf',
@@ -563,7 +572,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 32,
     goldReward: 18,
-    lootTable: [{ itemId: 'healing-poultice', chance: 0.18, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [{ itemId: 'prairie-wolf-pelt', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
   },
 };
 

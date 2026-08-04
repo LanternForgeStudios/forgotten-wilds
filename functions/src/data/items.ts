@@ -182,6 +182,9 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'croc-hide': { id: 'croc-hide', category: 'materials', usableInCombat: false, tier: 'common' },
   'bog-ash': { id: 'bog-ash', category: 'materials', usableInCombat: false, tier: 'common' },
   'rougarou-claw': { id: 'rougarou-claw', category: 'materials', usableInCombat: false, tier: 'uncommon' },
+  // Endless Prairie (MSQ Volume III, Chapter 5) enemy loot materials
+  'wisp-feather': { id: 'wisp-feather', category: 'materials', usableInCombat: false, tier: 'common' },
+  'prairie-wolf-pelt': { id: 'prairie-wolf-pelt', category: 'materials', usableInCombat: false, tier: 'common' },
   'ancient-serpent-scale': {
     id: 'ancient-serpent-scale',
     category: 'keyItem',

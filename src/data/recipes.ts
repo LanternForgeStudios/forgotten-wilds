@@ -9,13 +9,14 @@ const MOTH_DUST_OR = ['moth-dust'];
 const MOTH_DUST_OR_EYE_DROPS = ['moth-dust', 'rougarou-claw'];
 const SILVER_DROPLET_OR = ['silver-droplet'];
 const EMBER_SHARD_OR = ['ember-shard', 'ancient-serpent-scale'];
+const WOLF_FANG_OR = ['wolf-fang', 'wisp-feather'];
 
 export const RECIPES: Record<string, Recipe> = {
   antidote: { outputItemId: 'antidote', materials: [{ itemIds: WITHERED_BRAMBLE_OR, quantity: 2 }] },
   'burn-salve': { outputItemId: 'burn-salve', materials: [{ itemIds: EMBER_SHARD_OR, quantity: 2 }] },
   'thaw-crystal': { outputItemId: 'thaw-crystal', materials: [{ itemIds: SILVER_DROPLET_OR, quantity: 2 }] },
   'eye-drops': { outputItemId: 'eye-drops', materials: [{ itemIds: MOTH_DUST_OR_EYE_DROPS, quantity: 2 }] },
-  'echo-herb': { outputItemId: 'echo-herb', materials: [{ itemIds: ['wolf-fang'], quantity: 2 }] },
+  'echo-herb': { outputItemId: 'echo-herb', materials: [{ itemIds: WOLF_FANG_OR, quantity: 2 }] },
 
   'healing-poultice': { outputItemId: 'healing-poultice', materials: [{ itemIds: MOTH_DUST_OR, quantity: 2 }] },
   'greater-healing-poultice': {

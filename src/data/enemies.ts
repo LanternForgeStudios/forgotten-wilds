@@ -484,7 +484,10 @@ export const ENEMIES: Enemy[] = [
     vulnerableAilments: ['burn', 'freeze', 'poison'],
     xpReward: 22,
     goldReward: 12,
-    lootTable: [{ itemId: 'lantern-oil', chance: 0.15, minQuantity: 1, maxQuantity: 1 }],
+    lootTable: [
+      { itemId: 'wisp-feather', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'echo-herb', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'A restless current given shape, drawn to the open grassland where nothing blocks the wind.',
   },
   {
@@ -504,7 +507,10 @@ export const ENEMIES: Enemy[] = [
     vulnerableAilments: ['burn', 'freeze', 'poison'],
     xpReward: 32,
     goldReward: 18,
-    lootTable: [{ itemId: 'lantern-oil', chance: 0.2, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [
+      { itemId: 'wisp-feather', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'echo-herb', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: 'What a Wind Wisp becomes when a storm feeds it - the hush it leaves behind is not silence, it is absence.',
   },
   {
@@ -524,7 +530,7 @@ export const ENEMIES: Enemy[] = [
     vulnerableAilments: ['burn', 'poison', 'blind'],
     xpReward: 22,
     goldReward: 12,
-    lootTable: [{ itemId: 'healing-poultice', chance: 0.12, minQuantity: 1, maxQuantity: 1 }],
+    lootTable: [{ itemId: 'prairie-wolf-pelt', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
     loreBlurb: "Runs the herd's edges in loose packs, testing for stragglers - a pursuer that never seems to tire first.",
   },
   {
@@ -544,7 +550,7 @@ export const ENEMIES: Enemy[] = [
     vulnerableAilments: ['burn', 'poison', 'blind'],
     xpReward: 32,
     goldReward: 18,
-    lootTable: [{ itemId: 'healing-poultice', chance: 0.18, minQuantity: 1, maxQuantity: 2 }],
+    lootTable: [{ itemId: 'prairie-wolf-pelt', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
     loreBlurb: 'Old enough and big enough to lead by itself - a pack of dire wolves is really just one, and its shadow.',
   },
 ];

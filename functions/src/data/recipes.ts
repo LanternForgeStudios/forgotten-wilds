@@ -34,6 +34,7 @@ const MOTH_DUST_OR = ['moth-dust']; // no Bayou material shares moth-dust's HP-r
 const MOTH_DUST_OR_EYE_DROPS = ['moth-dust', 'rougarou-claw']; // both tied to Blind (rougarou-feral-rend)
 const SILVER_DROPLET_OR = ['silver-droplet']; // no Bayou material shares this one's Freeze/Spirit role
 const EMBER_SHARD_OR = ['ember-shard', 'ancient-serpent-scale']; // both a rare "precious ingredient" role, not tied to one ailment
+const WOLF_FANG_OR = ['wolf-fang', 'wisp-feather']; // both tied to Silence (echo-herb cures it; wisp-hush-gale inflicts it)
 
 export const RECIPES: Record<string, Recipe> = {
   // Ailment cures - one themed material (now possibly one of several, see the pools above),
@@ -42,7 +43,7 @@ export const RECIPES: Record<string, Recipe> = {
   'burn-salve': { outputItemId: 'burn-salve', materials: [{ itemIds: EMBER_SHARD_OR, quantity: 2 }] },
   'thaw-crystal': { outputItemId: 'thaw-crystal', materials: [{ itemIds: SILVER_DROPLET_OR, quantity: 2 }] },
   'eye-drops': { outputItemId: 'eye-drops', materials: [{ itemIds: MOTH_DUST_OR_EYE_DROPS, quantity: 2 }] },
-  'echo-herb': { outputItemId: 'echo-herb', materials: [{ itemIds: ['wolf-fang'], quantity: 2 }] },
+  'echo-herb': { outputItemId: 'echo-herb', materials: [{ itemIds: WOLF_FANG_OR, quantity: 2 }] },
 
   // HP line - moth-dust base, ember-shard (or its alternates) mixed in at uncommon and above.
   'healing-poultice': { outputItemId: 'healing-poultice', materials: [{ itemIds: MOTH_DUST_OR, quantity: 2 }] },

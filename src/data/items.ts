@@ -395,6 +395,25 @@ export const ITEMS: Item[] = [
     stackable: true,
     tier: 'uncommon',
   },
+  // Endless Prairie (MSQ Volume III, Chapter 5) enemy loot materials
+  {
+    id: 'wisp-feather',
+    name: 'Wisp Feather',
+    description: 'A single feather-shaped wisp of condensed wind, still humming faintly.',
+    category: 'materials',
+    iconAssetId: 'icon.item.wisp-feather',
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'prairie-wolf-pelt',
+    name: 'Prairie Wolf Pelt',
+    description: 'A thick grey pelt, built to shrug off the open prairie\'s cold nights.',
+    category: 'materials',
+    iconAssetId: 'icon.item.prairie-wolf-pelt',
+    stackable: true,
+    tier: 'common',
+  },
   {
     id: 'ancient-serpent-scale',
     name: 'Ancient Serpent Scale',
