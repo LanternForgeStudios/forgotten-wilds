@@ -414,6 +414,31 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 80, gold: 40, itemIds: ['guardian-memory-fragment-3'], regionalReputation: 50 },
   },
+
+  // --- Endless Prairie Side Quest (docs/Mytherra-SQ_breakdown.md): The Winter Counts ---
+  // Mirrors Iron Mountains' Forgotten Treatises / Crimson Bayou's Drowned Ledgers exactly: collect
+  // a hidden key item, turn it in to a giver NPC then a translator NPC, reward grants a
+  // quest-taught Skill + Lore entry.
+  'the-first-winter-count': {
+    id: 'the-first-winter-count',
+    prerequisiteQuestId: 'climbing-thunderbird-mesa',
+    objectives: [
+      { id: 'get-winter-count-hide-i', type: 'collectItem', targetId: 'winter-count-hide-i', requiredCount: 1 },
+      { id: 'talk-aiyana-winter-count-i', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
+      { id: 'talk-koda-winter-count-i', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'winters-memory', grantLoreId: 'winter-count-i' },
+  },
+  'the-second-winter-count': {
+    id: 'the-second-winter-count',
+    prerequisiteQuestId: 'the-first-winter-count',
+    objectives: [
+      { id: 'get-winter-count-hide-ii', type: 'collectItem', targetId: 'winter-count-hide-ii', requiredCount: 1 },
+      { id: 'talk-aiyana-winter-count-ii', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
+      { id: 'talk-koda-winter-count-ii', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'prairie-wildfire', grantLoreId: 'winter-count-ii' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -453,4 +478,6 @@ export const QUEST_ORDER = [
   'voices-on-the-wind',
   'the-stone-circles',
   'climbing-thunderbird-mesa',
+  'the-first-winter-count',
+  'the-second-winter-count',
 ];

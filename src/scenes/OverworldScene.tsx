@@ -71,6 +71,11 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   'wind-stone-golden-prairie': 'fragment',
   'wind-stone-spirit-herd-plains': 'fragment',
   'wind-stone-stone-circle-valley': 'fragment',
+  // Endless Prairie side quest (The Winter Counts) - no FRAGMENT_SPRITE_ASSET_ID entry yet (see
+  // below), so these fall back to structure.shrine-dormant until Phase 7's art pass gives them
+  // their own hide-bundle marker. Blocked on PixelLab quota, not forgotten.
+  'winter-count-hide-i-cache': 'fragment',
+  'winter-count-hide-ii-cache': 'fragment',
 };
 /** Which Cloud Function a walk-in `zone` landmark fires the instant the player's tile enters it -
  *  no Interact needed. Hunter's Camp and Spirit Grove (the clearing, not its shrine) are pure
@@ -133,6 +138,7 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId === 'drowned-ledger-cache') return 'a hidden cache in the reeds';
   if (refId === 'bogwater-almanac-cache') return 'a mossy cypress hollow';
   if (refId.startsWith('wind-stone-')) return 'a stone humming faintly with wind';
+  if (refId === 'winter-count-hide-i-cache' || refId === 'winter-count-hide-ii-cache') return 'a painted hide half-buried in the grass';
   if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';
   const landmark = LOCATIONS.find((l) => l.id === refId);
   if (landmark) return landmark.name;

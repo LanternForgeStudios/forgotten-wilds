@@ -97,8 +97,9 @@ const INTERACTABLE_LABEL_FALLBACK: Record<string, string> = {
 /** Reverse of functions/src/functions/collectWorldItem.ts's WORLD_ITEMS map (itemId -> the
  *  interactable refId that grants it) - a collectItem objective's targetId is an item id, not a
  *  map refId, so a quest like "recover the Stone Fragment from Mossy Creek" needs this to resolve
- *  which on-map landmark to highlight. Every collectItem objective in the game's quest data is one
- *  of these four (verified against quests.ts) - keep in sync by hand if a new one is added. */
+ *  which on-map landmark to highlight. Not every collectItem objective needs an entry here (the
+ *  Heart Seeds and The Drowned Ledgers' key items never got one, and still don't) - only add one
+ *  when the on-map landmark is worth highlighting. Keep in sync by hand if a new one is added. */
 const COLLECT_ITEM_LANDMARK_REF_ID: Record<string, string> = {
   'stone-fragment': 'mossy-creek',
   'wind-fragment': 'fallen-watchtower',

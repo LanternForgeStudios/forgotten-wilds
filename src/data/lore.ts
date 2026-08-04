@@ -97,4 +97,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "Elder Koda Running Elk, reading the Stone Circle Valley carvings against the Journal of Legends: the figures aren't Lantern Keepers standing watch over Guardian Spirits, as every account since the Great Silence assumes. They're carved shoulder to shoulder, as equals. Whatever the modern order believes about its own founding, the stones remember something different.",
     unlockedAt: 0,
   },
+  {
+    id: 'winter-count-i',
+    title: 'The First Winter Count',
+    body: "Elder Koda Running Elk, reading the hide's pictographs: a winter cold enough to freeze the wind itself, remembered by a single painted figure standing between the herd and the storm. Not a hunter. A Lantern Keeper, keeping watch the same way Chief Aiyana's own people still do.",
+    unlockedAt: 0,
+  },
+  {
+    id: 'winter-count-ii',
+    title: 'The Second Winter Count',
+    body: "The second hide continues where the first ends: the same painted figure, years later, setting a controlled burn ahead of a wolf pack to save a stranded herd. Elder Koda has a name for what the hide calls this Keeper - Windwalker - but no record of what became of them after.",
+    unlockedAt: 0,
+  },
 ];

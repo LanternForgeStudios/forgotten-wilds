@@ -416,3 +416,179 @@ Mayor Celeste Broussard's gameplayHook changed from `{ type: 'lore' }` to `{ typ
 questIds: [...] }` to give her this role - not strictly required mechanically (no true "quest
 start" gate reads giverNpcId or gameplayHook.type; talkToNpc objectives match on NPC id alone), but
 kept for data-model consistency with every other quest-giving NPC in npcs.ts.
+
+The Winter Counts
+
+Availability
+
+Begins after completing MSF-EP-005 – Climbing Thunderbird Mesa (quest id: climbing-thunderbird-mesa)
+Given by Chief Aiyana Whitefeather
+Sequential quest chain (Quest 2 unlocks only after Quest 1 is complete)
+
+SQ-EP-01 (quest id: the-first-winter-count)
+The First Winter Count
+Story Purpose
+
+Recover a painted hide, half-buried in the Golden Prairie grass, recording a winter long past.
+Elder Koda Running Elk reads its pictographs, restoring a Lantern Keeper technique remembered from
+the cold it describes.
+
+Quest Giver
+
+Chief Aiyana Whitefeather
+
+Starting Location
+
+The Chief's Lodge (locationId: highwind-crossing-chiefs-lodge)
+
+Quest Summary
+
+With Chapter 5 complete, Chief Aiyana mentions a painted hide her scouts have seen half-buried out
+on the prairie for years, never recovered - plains peoples' own record of hard winters, migrations,
+and the figures who stood with the herds through them.
+
+Major Quest Flow
+Step 1
+
+Speak with Chief Aiyana Whitefeather.
+
+Step 2
+
+Travel to Golden Prairie.
+
+Recover the Winter Count hide, half-buried in the grass.
+
+Step 3
+
+Return to Chief Aiyana Whitefeather.
+
+She recognizes the pictographs as older than the town itself, and sends the Keeper to Elder Koda.
+
+Step 4
+
+Deliver the hide to Elder Koda Running Elk at the Spirit Lodge.
+
+He reads it: a winter cold enough to freeze the wind itself, remembered by a single painted figure
+standing between the herd and the storm - not a hunter, a Lantern Keeper.
+
+The knowledge is added to the Journal of Legends.
+
+He teaches the restored technique.
+
+Rewards
+Journal Unlock
+
+The First Winter Count
+
+Spirit Specialty
+
+Winter's Memory
+
+Spirit Attack
+Medium Spirit Damage
+Chance to inflict Freeze
+
+Gameplay Purpose
+
+Effective against: windSpirits (wind-wisp, storm-wisp) - genuinely vulnerable to Freeze
+(enemies.ts's vulnerableAilments).
+
+Unlocks
+
+SQ-EP-02 (quest id: the-second-winter-count)
+
+SQ-EP-02 (quest id: the-second-winter-count)
+The Second Winter Count
+Story Purpose
+
+Recover a second painted hide, tucked away in Spirit Herd Plains, continuing the story the first
+one began. Elder Koda reconstructs a second technique: a controlled burn turned against what
+stalks the grass.
+
+Quest Giver
+
+Chief Aiyana Whitefeather
+
+Starting Location
+
+The Chief's Lodge (locationId: highwind-crossing-chiefs-lodge)
+
+Quest Summary
+
+The first hide ends mid-story. Chief Aiyana recalls a second one, seen further out in Spirit Herd
+Plains, that scouts always meant to retrieve and never did.
+
+Major Quest Flow
+Step 1
+
+Speak with Chief Aiyana Whitefeather.
+
+Step 2
+
+Travel to Spirit Herd Plains.
+
+Recover the second Winter Count hide.
+
+Step 3
+
+Return to Chief Aiyana Whitefeather.
+
+Step 4
+
+Deliver the hide to Elder Koda Running Elk at the Spirit Lodge.
+
+He reads the continuation: the same painted figure, years later, setting a controlled burn ahead of
+a wolf pack to save a stranded herd. The hide names them Windwalker - Koda has no record of what
+became of them after.
+
+The knowledge is added to the Journal of Legends.
+
+He teaches the restored technique.
+
+Rewards
+Journal Unlock
+
+The Second Winter Count
+
+Spirit Specialty
+
+Prairie Wildfire
+
+Spirit Attack
+Medium Spirit Damage
+Chance to inflict Burn
+
+Gameplay Purpose
+
+Effective against: prairieWolves (prairie-wolf, dire-prairie-wolf) - genuinely vulnerable to Burn
+(enemies.ts's vulnerableAilments).
+
+Narrative Benefits
+
+These quests accomplish several things:
+
+Give Chief Aiyana an ongoing role beyond the MSQ's own dialogue-variant beats.
+Reinforce Elder Koda Running Elk as the Prairie's own translator/lore-keeper, mirroring Historian
+Miriam and Lucien Boudreaux's roles in the prior two regions.
+Expand the Journal of Legends with Prairie-specific historical discoveries, and seed a named
+figure (Windwalker) who never appears elsewhere in Chapter 5's own content - left open rather than
+explained, the same way the two Guardian Memory Fragments per chapter are left for a later payoff.
+Give the Prairie its own side-quest-taught Skill pair, matching the Forgotten Treatises/Drowned
+Ledgers precedent instead of leaving this region without one.
+
+Implementation Notes
+
+Mirrors the Forgotten Treatises/Drowned Ledgers chains exactly (same collect-item -> giver NPC ->
+translator NPC -> grantSkillId + grantLoreId reward shape, zero new engine code). Item ids:
+winter-count-hide-i (from Golden Prairie, refId winter-count-hide-i-cache) and winter-count-hide-ii
+(from Spirit Herd Plains, refId winter-count-hide-ii-cache) - both new key items.
+
+Winter's Memory and Prairie Wildfire were paired with ailments that land on a real vulnerability
+the same way Marsh Toxin/Hush of the Reeds were: windSpirits are vulnerable to Freeze and
+prairieWolves to Burn (enemies.ts's vulnerableAilments). effectiveAgainstFamilies is set on both
+for display/flavor consistency but is inert for bonus damage, same caveat as every prior
+quest-taught Skill.
+
+Chief Aiyana Whitefeather's and Elder Koda Running Elk's gameplayHook.questIds were extended to
+include both new quest ids (same data-model-consistency reasoning as Mayor Celeste Broussard's own
+change above).

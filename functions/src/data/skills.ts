@@ -271,4 +271,29 @@ export const SKILLS: Record<string, Skill> = {
     inflictsAilmentId: 'silence',
     inflictAilmentChance: 0.3,
   },
+
+  // Quest-taught Specialty Attacks, Endless Prairie's own side quest (docs/Mytherra-SQ_breakdown.md,
+  // "The Winter Counts"). Same shape/convention as the prior two side-quest pairs above.
+  'winters-memory': {
+    id: 'winters-memory',
+    name: "Winter's Memory",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['windSpirits'],
+    inflictsAilmentId: 'freeze',
+    inflictAilmentChance: 0.3,
+  },
+  'prairie-wildfire': {
+    id: 'prairie-wildfire',
+    name: 'Prairie Wildfire',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['prairieWolves'],
+    inflictsAilmentId: 'burn',
+    inflictAilmentChance: 0.3,
+  },
 };

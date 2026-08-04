@@ -178,6 +178,10 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'wind-stone-golden-prairie': { id: 'wind-stone-golden-prairie', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'wind-stone-spirit-herd-plains': { id: 'wind-stone-spirit-herd-plains', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'wind-stone-stone-circle-valley': { id: 'wind-stone-stone-circle-valley', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // Endless Prairie side quest (docs/Mytherra-SQ_breakdown.md, "The Winter Counts"): 2 hidden key
+  // items, collectItem targets for the-first-winter-count/the-second-winter-count.
+  'winter-count-hide-i': { id: 'winter-count-hide-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'winter-count-hide-ii': { id: 'winter-count-hide-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   // Crimson Bayou (MSQ Volume II) enemy loot materials
   'croc-hide': { id: 'croc-hide', category: 'materials', usableInCombat: false, tier: 'common' },
   'bog-ash': { id: 'bog-ash', category: 'materials', usableInCombat: false, tier: 'common' },

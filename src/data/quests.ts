@@ -564,4 +564,34 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 80, gold: 40, itemIds: ['guardian-memory-fragment-3'], regionalReputation: 50 },
   },
+
+  // --- Endless Prairie Side Quest (docs/Mytherra-SQ_breakdown.md): The Winter Counts ---
+  {
+    id: 'the-first-winter-count',
+    name: 'The First Winter Count',
+    giverNpcId: 'chief-aiyana-whitefeather',
+    description: 'Recover a painted hide half-buried in the Golden Prairie grass, recording a winter long past.',
+    category: 'side',
+    prerequisiteQuestId: 'climbing-thunderbird-mesa',
+    objectives: [
+      { id: 'get-winter-count-hide-i', type: 'collectItem', description: 'Recover the Winter Count hide from Golden Prairie.', targetId: 'winter-count-hide-i', requiredCount: 1 },
+      { id: 'talk-aiyana-winter-count-i', type: 'talkToNpc', description: 'Bring the hide to Chief Aiyana Whitefeather.', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
+      { id: 'talk-koda-winter-count-i', type: 'talkToNpc', description: "Have Elder Koda Running Elk read the hide's pictographs.", targetId: 'elder-koda-running-elk', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'winters-memory', grantLoreId: 'winter-count-i' },
+  },
+  {
+    id: 'the-second-winter-count',
+    name: 'The Second Winter Count',
+    giverNpcId: 'chief-aiyana-whitefeather',
+    description: 'Recover a second painted hide, tucked away in Spirit Herd Plains.',
+    category: 'side',
+    prerequisiteQuestId: 'the-first-winter-count',
+    objectives: [
+      { id: 'get-winter-count-hide-ii', type: 'collectItem', description: 'Recover the Winter Count hide from Spirit Herd Plains.', targetId: 'winter-count-hide-ii', requiredCount: 1 },
+      { id: 'talk-aiyana-winter-count-ii', type: 'talkToNpc', description: 'Bring the hide to Chief Aiyana Whitefeather.', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
+      { id: 'talk-koda-winter-count-ii', type: 'talkToNpc', description: "Have Elder Koda Running Elk read the hide's pictographs.", targetId: 'elder-koda-running-elk', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'prairie-wildfire', grantLoreId: 'winter-count-ii' },
+  },
 ];

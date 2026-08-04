@@ -42,8 +42,13 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   'herbalist-noelle': ['the-waters-remember', 'seeds-of-memory'],
   'blacksmith-toussaint': ['seeds-of-memory'],
   // Endless Prairie (MSQ Volume III, Chapter 5)
-  'chief-aiyana-whitefeather': ['climbing-thunderbird-mesa', 'across-open-skies'],
-  'elder-koda-running-elk': ['the-stone-circles'],
+  'chief-aiyana-whitefeather': [
+    'the-second-winter-count',
+    'the-first-winter-count',
+    'climbing-thunderbird-mesa',
+    'across-open-skies',
+  ],
+  'elder-koda-running-elk': ['the-second-winter-count', 'the-first-winter-count', 'the-stone-circles'],
   'scout-niska': ['following-the-herd'],
   'prairie-spirit': ['voices-on-the-wind'],
 };

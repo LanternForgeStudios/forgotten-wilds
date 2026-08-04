@@ -39,7 +39,8 @@
           "avoid": [
             { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 30, "y": 20 },
             { "x": 44, "y": 18 }, { "x": 48, "y": 24 },
-            { "x": 10, "y": 10 }, { "x": 50, "y": 12 }, { "x": 14, "y": 32 }
+            { "x": 10, "y": 10 }, { "x": 50, "y": 12 }, { "x": 14, "y": 32 },
+            { "x": 48, "y": 32 }
           ]
         }
       ]
@@ -55,6 +56,7 @@
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
     { "type": "interactable", "x": 30, "y": 30, "refId": "wind-stone-spirit-herd-plains" },
+    { "type": "interactable", "x": 48, "y": 32, "refId": "winter-count-hide-ii-cache" },
 
     { "type": "interactable", "x": 10, "y": 10, "refId": "chest-spirit-herd-plains-1" },
     { "type": "interactable", "x": 50, "y": 12, "refId": "chest-spirit-herd-plains-2" },

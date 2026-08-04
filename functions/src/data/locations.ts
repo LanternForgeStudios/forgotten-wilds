@@ -44,12 +44,15 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
     'temple-records': 'temple-records',
     'lantern-of-still-waters': 'lantern-of-still-waters',
   },
-  // Endless Prairie (MSQ Volume III) - the 3 Wind Stone fragments, one per Chapter 5 field map.
+  // Endless Prairie (MSQ Volume III) - the 3 Wind Stone fragments, one per Chapter 5 field map,
+  // plus the 2 hidden Winter Count hides for the region's own side quest (The Winter Counts).
   'golden-prairie': {
     'wind-stone-golden-prairie': 'wind-stone-golden-prairie',
+    'winter-count-hide-i-cache': 'winter-count-hide-i',
   },
   'spirit-herd-plains': {
     'wind-stone-spirit-herd-plains': 'wind-stone-spirit-herd-plains',
+    'winter-count-hide-ii-cache': 'winter-count-hide-ii',
   },
   'stone-circle-valley': {
     'wind-stone-stone-circle-valley': 'wind-stone-stone-circle-valley',

@@ -664,8 +664,25 @@ export const NPCS: Npc[] = [
       { speaker: 'Chief Aiyana Whitefeather', text: "A Lantern Keeper, all the way from the mountains and the bayou both. Elias Rowan's letters found their way to us eventually." },
       { speaker: 'Chief Aiyana Whitefeather', text: "The wind carries more than dust out here, Keeper. It carries voices, if the Sacred Hills decide you're worth listening to." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['across-open-skies', 'climbing-thunderbird-mesa'] },
+    gameplayHook: {
+      type: 'questGiver',
+      questIds: ['across-open-skies', 'climbing-thunderbird-mesa', 'the-first-winter-count', 'the-second-winter-count'],
+    },
     dialogueVariants: [
+      {
+        questId: 'the-second-winter-count',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "Windwalker. A name out of a hide older than this town, and Koda still couldn't tell me what became of them." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "Maybe that's the point. Some stories are kept so the ending stays open for whoever finds it next." },
+        ],
+      },
+      {
+        questId: 'the-first-winter-count',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "A Lantern Keeper standing between the herd and a killing winter. I always assumed the old stories exaggerated. Maybe they didn't." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "There was a second hide, once - further out in Spirit Herd Plains. Nobody ever went back for it." },
+        ],
+      },
       {
         questId: 'climbing-thunderbird-mesa',
         lines: [
@@ -692,8 +709,25 @@ export const NPCS: Npc[] = [
       { speaker: 'Elder Koda Running Elk', text: 'Every carving in the Stone Circles has a story behind it. Most of them, I only know half of - the wind took the rest long before I was born.' },
       { speaker: 'Elder Koda Running Elk', text: "You have the look of someone the old stories were waiting for. Sit, if you'd like. The lodge keeps its own time." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-stone-circles'] },
+    gameplayHook: {
+      type: 'questGiver',
+      questIds: ['the-stone-circles', 'the-first-winter-count', 'the-second-winter-count'],
+    },
     dialogueVariants: [
+      {
+        questId: 'the-second-winter-count',
+        lines: [
+          { speaker: 'Elder Koda Running Elk', text: 'The second hide names them Windwalker. A Lantern Keeper who set a controlled burn to turn a wolf pack off a stranded herd - years after the first hide\'s winter.' },
+          { speaker: 'Elder Koda Running Elk', text: "I have no record of what became of them. Forty years of guessing carvings, and now I have a new mystery to lose sleep over." },
+        ],
+      },
+      {
+        questId: 'the-first-winter-count',
+        lines: [
+          { speaker: 'Elder Koda Running Elk', text: 'This hide is older than anything in the Spirit Lodge. A Lantern Keeper, painted standing between the herd and a winter cold enough to freeze the wind itself.' },
+          { speaker: 'Elder Koda Running Elk', text: "The story doesn't end here, though. Whoever painted this meant for there to be a second hide." },
+        ],
+      },
       {
         questId: 'the-stone-circles',
         lines: [

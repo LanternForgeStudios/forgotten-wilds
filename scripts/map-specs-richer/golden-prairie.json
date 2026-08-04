@@ -38,7 +38,8 @@
           "avoid": [
             { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 34, "y": 24 },
             { "x": 40, "y": 12 },
-            { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 }
+            { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 },
+            { "x": 20, "y": 30 }
           ]
         }
       ]
@@ -54,6 +55,7 @@
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
     { "type": "interactable", "x": 34, "y": 24, "refId": "wind-stone-golden-prairie" },
+    { "type": "interactable", "x": 20, "y": 30, "refId": "winter-count-hide-i-cache" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-golden-prairie-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-golden-prairie-2" },
