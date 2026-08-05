@@ -608,4 +608,81 @@ export const LOCATIONS: Location[] = [
     fastTravel: false,
     parentLocationId: 'stone-circle-valley',
   },
+
+  // Endless Prairie (MSQ Volume III), Chapter 6: Wings of the First Promise - the Thunderbird Mesa
+  // dungeon. 5 chained Location entries (kind: 'dungeon'), linked by transition/spawnPoint pairs
+  // the same way field maps already link, rather than one big map - matches the MSQ doc's own beat
+  // structure (each room is its own "reach X" milestone). No precedent in this codebase for a
+  // multi-room dungeon built this way (both Iron Mountains' and Crimson Bayou's dungeons are a
+  // single map/Location each) but the chaining machinery itself is 100% the same generic
+  // transition/spawnPoint/reachLocation mechanism every other map boundary already uses. Reuses
+  // battle-bg.hollow-rail-mine (a real dungeon-interior background) rather than the generic
+  // battle-bg.forest Temple of the Deep Current settled for.
+  {
+    id: 'summit-temple',
+    name: 'Summit Temple',
+    kind: 'dungeon',
+    description: 'A wind-scoured stone temple at the foot of Thunderbird Mesa, its halls still humming with old, half-forgotten mechanisms.',
+    mapAssetId: 'map.summit-temple',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'wind-wisp', weight: 3 },
+      { enemyId: 'storm-wisp', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'sky-bridge',
+    name: 'Sky Bridge',
+    kind: 'dungeon',
+    description: 'A narrow stone span arcing over open cloud, the wind strong enough here to lean into.',
+    mapAssetId: 'map.sky-bridge',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'storm-wisp', weight: 2 },
+      { enemyId: 'storm-fledgling', weight: 2 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'storm-galleries',
+    name: 'Storm Galleries',
+    kind: 'dungeon',
+    description: 'Open-air chambers where lightning gathers instead of dispersing, crackling between carved stone pillars.',
+    mapAssetId: 'map.storm-galleries',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'storm-fledgling', weight: 3 },
+      { enemyId: 'thunder-roc', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'lantern-sanctuary',
+    name: 'Lantern Sanctuary',
+    kind: 'dungeon',
+    description: 'A quiet round chamber where a single lantern has burned, untended, since long before Highwind Crossing had a name.',
+    mapAssetId: 'map.lantern-sanctuary',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [{ enemyId: 'storm-wisp', weight: 1 }],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'guardian-peak',
+    name: 'Guardian Peak',
+    kind: 'dungeon',
+    description: "The mesa's true summit, open to the sky on every side - where the Great Thunderbird still keeps its long watch.",
+    mapAssetId: 'map.guardian-peak',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'thunder-roc', weight: 2 },
+      { enemyId: 'dire-prairie-wolf', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
 ];

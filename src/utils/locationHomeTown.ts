@@ -27,6 +27,13 @@ export const LOCATION_HOME_TOWN: Record<string, string> = {
   'sacred-hills': 'highwind-crossing',
   'stone-circle-valley': 'highwind-crossing',
   'thunderbird-mesa-approach': 'highwind-crossing',
+  'stone-circle-carvings': 'highwind-crossing',
+  // Endless Prairie (MSQ Volume III, Chapter 6) - Thunderbird Mesa dungeon (5 chained rooms).
+  'summit-temple': 'highwind-crossing',
+  'sky-bridge': 'highwind-crossing',
+  'storm-galleries': 'highwind-crossing',
+  'lantern-sanctuary': 'highwind-crossing',
+  'guardian-peak': 'highwind-crossing',
 };
 
 /** Resolves the home town for any location id - falls back to Ash Hallow for an unmapped id

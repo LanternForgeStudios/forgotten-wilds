@@ -49,6 +49,8 @@
     { "type": "spawnPoint", "x": 3, "y": 16, "refId": "from-stone-circle-valley" },
     { "type": "transition", "x": 0, "y": 16, "refId": "stone-circle-valley", "targetSpawnId": "from-thunderbird-mesa-approach" },
     { "type": "spawnPoint", "x": 24, "y": 16, "refId": "default" },
+    { "type": "spawnPoint", "x": 44, "y": 16, "refId": "from-summit-temple" },
+    { "type": "transition", "x": 47, "y": 16, "refId": "summit-temple", "targetSpawnId": "from-thunderbird-mesa-approach" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-thunderbird-mesa-approach-1" }
   ]
