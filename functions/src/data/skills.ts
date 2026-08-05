@@ -212,6 +212,39 @@ export const SKILLS: Record<string, Skill> = {
     inflictAilmentChance: 0.25,
   },
 
+  // --- Endless Prairie (MSQ Volume III, Chapter 6) enemy signature moves ---
+  // stormAvians (storm-fledgling/thunder-roc) - a blinding wing-flash, Chapter 6's own regular
+  // trash-mob ailment (windSpirits already claimed Silence, prairieWolves already claimed Stun).
+  'storm-flash': {
+    id: 'storm-flash',
+    name: 'Storm Flash',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 14,
+    spiritCost: 0,
+    inflictsAilmentId: 'blind',
+    inflictAilmentChance: 0.3,
+  },
+  // Great Thunderbird boss moves.
+  'thunderbird-wing-slam': {
+    id: 'thunderbird-wing-slam',
+    name: 'Wing Slam',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 20,
+    spiritCost: 0,
+  },
+  'thunderbird-storm-judgment': {
+    id: 'thunderbird-storm-judgment',
+    name: "Storm's Judgment",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 24,
+    spiritCost: 0,
+    inflictsAilmentId: 'silence',
+    inflictAilmentChance: 0.4,
+  },
+
   // Quest-taught Specialty Attacks (docs/Mytherra-SQ_breakdown.md, The Forgotten Treatises).
   // Themed around Freeze/Burn via name/description and (now that enemies can be afflicted) an
   // ailment matching that theme, which only lands on a vulnerable target (coalSpirits/

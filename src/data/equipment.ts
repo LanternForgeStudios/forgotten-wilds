@@ -1000,4 +1000,14 @@ export const EQUIPMENT: EquipmentItem[] = [
     tier: 'rare',
     familyId: 'white-buffalo-totem',
   },
+  {
+    id: 'elder-buffalo-totem',
+    name: 'Elder Buffalo Totem',
+    description: 'A larger totem, carved in the likeness of an ancient herd elder who has weathered a hundred storms.',
+    slot: 'spiritTotem',
+    iconAssetId: 'icon.equipment.elder-buffalo-totem',
+    statBonuses: { maxHp: 10, maxSpirit: 9, defense: 4 },
+    tier: 'mythic',
+    familyId: 'white-buffalo-totem',
+  },
 ];

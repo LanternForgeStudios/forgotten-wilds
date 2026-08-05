@@ -779,4 +779,15 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'rare',
     familyId: 'white-buffalo-totem',
   },
+  // Mythic tier - Great Thunderbird's own lootTable chance drop (Chapter 6), same
+  // "not every rare+ item needs a unique quest thread" pattern as cypress-guardian-totem. The
+  // family's Legendary cap (thunderbird-totem) is a guaranteed reward from the boss-defeat quest
+  // itself instead - see MSF-EP-008.
+  'elder-buffalo-totem': {
+    id: 'elder-buffalo-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxHp: 10, maxSpirit: 9, defense: 4 },
+    tier: 'mythic',
+    familyId: 'white-buffalo-totem',
+  },
 };

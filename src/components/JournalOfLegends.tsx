@@ -123,6 +123,7 @@ const ENEMY_FAMILY_LABELS: Record<Enemy['family'], string> = {
   rougarou: 'Rougarou',
   windSpirits: 'Wind Spirits',
   prairieWolves: 'Prairie Wolves',
+  stormAvians: 'Storm Avians',
   boss: 'Boss',
 };
 

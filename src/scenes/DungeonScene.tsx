@@ -50,6 +50,11 @@ const BOSS_TRIGGERS: Record<string, { prerequisiteQuestId: string; approachLabel
     approachLabel: 'something ancient, coiled in the dark water',
     blockedMessage: 'Something ancient stirs in the flooded dark ahead — but the way feels barred to you, for now.',
   },
+  'great-thunderbird': {
+    prerequisiteQuestId: 'keeper-of-the-open-sky',
+    approachLabel: 'something vast, wreathed in storm-light, watching from the open sky',
+    blockedMessage: 'Something vast stirs against the sky ahead — but the way feels barred to you, for now.',
+  },
 };
 
 /** Shrine-kind interactables (interactWithShrine.ts), keyed by refId. */

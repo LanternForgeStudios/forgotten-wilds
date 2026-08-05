@@ -33,6 +33,7 @@ export interface EnemyDefinition {
     | 'rougarou'
     | 'windSpirits'
     | 'prairieWolves'
+    | 'stormAvians'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
@@ -574,6 +575,77 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     goldReward: 18,
     lootTable: [{ itemId: 'prairie-wolf-pelt', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
   },
+
+  // --- Endless Prairie (MSQ Volume III), Chapter 6: Wings of the First Promise ---
+  // Base stats/rewards authored a step above Chapter 5's own Prairie families (windSpirits:
+  // 41/61 maxHp, prairieWolves: 42/62 maxHp), matching the established power-creep-by-story-
+  // position convention.
+  'storm-fledgling': {
+    id: 'storm-fledgling',
+    name: 'Storm Fledgling',
+    family: 'stormAvians',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'lantern',
+    // storm-flash inflicts Blind - excluded here (immune to what it deals out).
+    vulnerableAilments: ['freeze', 'poison', 'stun'],
+    stats: { maxHp: 48, attack: 14, defense: 9, speed: 13 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'storm-flash', weight: 2 },
+    ],
+    xpReward: 26,
+    goldReward: 14,
+    lootTable: [{ itemId: 'eye-drops', chance: 0.15, minQuantity: 1, maxQuantity: 1 }],
+  },
+  'thunder-roc': {
+    id: 'thunder-roc',
+    name: 'Thunder Roc',
+    family: 'stormAvians',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'lantern',
+    vulnerableAilments: ['freeze', 'poison', 'stun'],
+    stats: { maxHp: 70, attack: 17, defense: 12, speed: 16 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'storm-flash', weight: 3 },
+    ],
+    xpReward: 36,
+    goldReward: 20,
+    lootTable: [{ itemId: 'eye-drops', chance: 0.2, minQuantity: 1, maxQuantity: 2 }],
+  },
+  // Boss stat block for MSF-EP-008 "The Great Thunderbird". Gated behind MSF-EP-007 (recovering
+  // the Lantern of Open Skies) - see BOSS_REQUIRED_LOCATION (startEncounter.ts) and
+  // BOSS_REGION_LOCATIONS below.
+  'great-thunderbird': {
+    id: 'great-thunderbird',
+    name: 'Great Thunderbird',
+    family: 'boss',
+    tier: 'boss',
+    isBoss: true,
+    weaknessDamageType: 'spirit',
+    prerequisiteQuestId: 'keeper-of-the-open-sky',
+    vulnerableAilments: ['freeze', 'stun'],
+    stats: { maxHp: 230, attack: 19, defense: 12, speed: 13 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'thunderbird-wing-slam', weight: 2 },
+      { skillId: 'thunderbird-storm-judgment', weight: 2, unlocksAtHpFraction: 0.5 },
+    ],
+    xpReward: 260,
+    goldReward: 140,
+    lootTable: [
+      { itemId: 'thunderbird-feather', chance: 1, minQuantity: 1, maxQuantity: 1 },
+      // thunderbird-storm-judgment inflicts Silence - echo-herb cures it.
+      { itemId: 'echo-herb', chance: 0.25, minQuantity: 1, maxQuantity: 2 },
+      // White Buffalo Totem family's Mythic tier - a real, if not guaranteed, earn path (same
+      // "not every rare+ item needs a unique quest thread" reasoning as every prior boss's own
+      // chest/loot bonus). The Legendary cap (thunderbird-totem) is this boss's quest reward
+      // instead - see MSF-EP-008.
+      { itemId: 'elder-buffalo-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -641,6 +713,25 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
     { enemyId: 'storm-wisp', weight: 2 },
     { enemyId: 'dire-prairie-wolf', weight: 2 },
   ],
+  // Endless Prairie (MSQ Volume III, Chapter 6) - Thunderbird Mesa dungeon rooms, matching each
+  // room's own encounterTable in src/data/locations.ts exactly.
+  'summit-temple': [
+    { enemyId: 'wind-wisp', weight: 3 },
+    { enemyId: 'storm-wisp', weight: 1 },
+  ],
+  'sky-bridge': [
+    { enemyId: 'storm-wisp', weight: 2 },
+    { enemyId: 'storm-fledgling', weight: 2 },
+  ],
+  'storm-galleries': [
+    { enemyId: 'storm-fledgling', weight: 3 },
+    { enemyId: 'thunder-roc', weight: 1 },
+  ],
+  'lantern-sanctuary': [{ enemyId: 'storm-wisp', weight: 1 }],
+  'guardian-peak': [
+    { enemyId: 'thunder-roc', weight: 2 },
+    { enemyId: 'dire-prairie-wolf', weight: 1 },
+  ],
 };
 
 /** Which locations a boss's optional "adds" (0-3 additional enemies that can join the fight) may
@@ -656,4 +747,5 @@ export const BOSS_REGION_LOCATIONS: Record<string, string[]> = {
     'hidden-river-landing',
     'temple-of-the-deep-current',
   ],
+  'great-thunderbird': ['sky-bridge', 'storm-galleries', 'lantern-sanctuary', 'guardian-peak'],
 };

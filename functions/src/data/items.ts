@@ -182,6 +182,9 @@ export const ITEMS: Record<string, ItemDefinition> = {
   // items, collectItem targets for the-first-winter-count/the-second-winter-count.
   'winter-count-hide-i': { id: 'winter-count-hide-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'winter-count-hide-ii': { id: 'winter-count-hide-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // Endless Prairie (MSQ Volume III, Chapter 6): Great Thunderbird's guaranteed boss-kill trophy,
+  // same shape as ancient-serpent-scale.
+  'thunderbird-feather': { id: 'thunderbird-feather', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   // Crimson Bayou (MSQ Volume II) enemy loot materials
   'croc-hide': { id: 'croc-hide', category: 'materials', usableInCombat: false, tier: 'common' },
   'bog-ash': { id: 'bog-ash', category: 'materials', usableInCombat: false, tier: 'common' },

@@ -105,6 +105,13 @@ add("icons/guardian-memory-fragment-3.svg", 64, 64, "FRAG 3", "#9a70c0", "#5a388
 # --- Chapter 6: Wings of the First Promise (retroactive Phase 0 fix) ---
 add("icons/white-buffalo-totem.svg", 64, 64, "TOTEM", "#d8d0c0", "#8a8070")
 
+# --- Chapter 6: Wings of the First Promise (Phase 2 - new enemies) ---
+add("sprites/enemies/storm-fledgling-idle.svg", 128, 128, "STORM", "#8a94a8", "#4a5468")
+add("sprites/enemies/thunder-roc-idle.svg", 128, 128, "ROC", "#6a7898", "#3a4258")
+add("sprites/enemies/great-thunderbird-idle.svg", 256, 256, "THUNDERBIRD", "#7a5aa0", "#3a2258", font_size=24)
+add("icons/thunderbird-feather.svg", 64, 64, "FTHR", "#9a7cc0", "#5a3888")
+add("icons/elder-buffalo-totem.svg", 64, 64, "TOTEM", "#c8c0b0", "#78705f")
+
 
 if __name__ == "__main__":
     write_all()

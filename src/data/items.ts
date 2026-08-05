@@ -389,6 +389,16 @@ export const ITEMS: Item[] = [
     unique: true,
   },
   {
+    id: 'thunderbird-feather',
+    name: 'Thunderbird Feather',
+    description: 'A single feather, still faintly crackling with stormlight, shed by the Great Thunderbird itself.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.thunderbird-feather',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
+  {
     id: 'croc-hide',
     name: 'Croc Hide',
     description: 'A strip of leathery hide from a bayou marsh crocodile.',
