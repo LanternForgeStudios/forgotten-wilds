@@ -610,4 +610,17 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 40, gold: 20 },
   },
+  {
+    id: 'keeper-of-the-open-sky',
+    name: 'Keeper of the Open Sky',
+    giverNpcId: 'chief-aiyana-whitefeather',
+    description: 'Discover the Lantern Sanctuary and claim the legendary lantern waiting within.',
+    category: 'main',
+    prerequisiteQuestId: 'temple-above-the-clouds',
+    objectives: [
+      { id: 'reach-lantern-sanctuary', type: 'reachLocation', description: 'Discover the Lantern Sanctuary.', targetId: 'lantern-sanctuary', requiredCount: 1 },
+      { id: 'get-lantern-of-open-skies', type: 'collectItem', description: 'Claim the Lantern of Open Skies.', targetId: 'lantern-of-open-skies', requiredCount: 1 },
+    ],
+    reward: { xp: 50, gold: 0, itemIds: ['lantern-of-open-skies-equipped'], grantLoreId: 'lore-keeper-talon-greywind' },
+  },
 ];

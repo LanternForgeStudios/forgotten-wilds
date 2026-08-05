@@ -672,9 +672,17 @@ export const NPCS: Npc[] = [
         'the-first-winter-count',
         'the-second-winter-count',
         'temple-above-the-clouds',
+        'keeper-of-the-open-sky',
       ],
     },
     dialogueVariants: [
+      {
+        questId: 'keeper-of-the-open-sky',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "A second legendary lantern, and a name to go with it - Talon Greywind. The old lodge songs mention a Greywind. I never once connected it to a Lantern Keeper." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "Whatever's waiting at Guardian Peak, Keeper, you won't be walking in unlit." },
+        ],
+      },
       {
         questId: 'temple-above-the-clouds',
         lines: [

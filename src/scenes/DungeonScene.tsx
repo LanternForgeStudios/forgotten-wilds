@@ -92,6 +92,13 @@ const WORLD_ITEM_INTERACTABLES: Record<
     dormantSpriteAssetId: 'structure.lantern-relic-dormant',
     collectedSpriteAssetId: 'structure.lantern-relic-collected',
   },
+  'lantern-of-open-skies': {
+    label: 'Lantern Sanctuary',
+    foundMessage: 'A second legendary lantern, unlit and waiting, its glass etched with a spiral wind-pattern. You lift it free.',
+    alreadyMessage: "There's nothing left here — you already claimed the lantern.",
+    dormantSpriteAssetId: 'structure.lantern-relic-dormant',
+    collectedSpriteAssetId: 'structure.lantern-relic-collected',
+  },
 };
 
 /** Display name for any interactable on this map, shared between the entity labels and the

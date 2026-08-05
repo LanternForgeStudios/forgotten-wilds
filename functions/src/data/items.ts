@@ -185,6 +185,10 @@ export const ITEMS: Record<string, ItemDefinition> = {
   // Endless Prairie (MSQ Volume III, Chapter 6): Great Thunderbird's guaranteed boss-kill trophy,
   // same shape as ancient-serpent-scale.
   'thunderbird-feather': { id: 'thunderbird-feather', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
+  // Found as first FOUND in Lantern Sanctuary (MSF-EP-007's collectItem target) - the quest reward
+  // then grants the real equippable 'lantern-of-open-skies-equipped', same found-item vs.
+  // equipped-upgrade split as lantern-of-still-waters/miners-lost-lantern.
+  'lantern-of-open-skies': { id: 'lantern-of-open-skies', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   // Crimson Bayou (MSQ Volume II) enemy loot materials
   'croc-hide': { id: 'croc-hide', category: 'materials', usableInCombat: false, tier: 'common' },
   'bog-ash': { id: 'bog-ash', category: 'materials', usableInCombat: false, tier: 'common' },

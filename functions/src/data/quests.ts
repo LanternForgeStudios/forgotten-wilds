@@ -455,6 +455,15 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 40, gold: 20 },
   },
+  'keeper-of-the-open-sky': {
+    id: 'keeper-of-the-open-sky',
+    prerequisiteQuestId: 'temple-above-the-clouds',
+    objectives: [
+      { id: 'reach-lantern-sanctuary', type: 'reachLocation', targetId: 'lantern-sanctuary', requiredCount: 1 },
+      { id: 'get-lantern-of-open-skies', type: 'collectItem', targetId: 'lantern-of-open-skies', requiredCount: 1 },
+    ],
+    reward: { xp: 50, gold: 0, itemIds: ['lantern-of-open-skies-equipped'], grantLoreId: 'lore-keeper-talon-greywind' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -497,4 +506,5 @@ export const QUEST_ORDER = [
   'the-first-winter-count',
   'the-second-winter-count',
   'temple-above-the-clouds',
+  'keeper-of-the-open-sky',
 ];

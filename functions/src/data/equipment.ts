@@ -790,4 +790,15 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'mythic',
     familyId: 'white-buffalo-totem',
   },
+  // Endless Prairie's own Legendary Lantern (MSF-EP-007), same shape as lantern-of-still-waters -
+  // a step above its statBonuses/oilCapacity, one Lantern Ability (open-skies-renewal, healing).
+  'lantern-of-open-skies-equipped': {
+    id: 'lantern-of-open-skies-equipped',
+    slot: 'lantern',
+    statBonuses: { maxSpirit: 18, defense: 4 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 38,
+    lanternAbilityIds: ['open-skies-renewal'],
+  },
 };

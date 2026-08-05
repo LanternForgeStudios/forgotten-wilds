@@ -57,6 +57,11 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'stone-circle-valley': {
     'wind-stone-stone-circle-valley': 'wind-stone-stone-circle-valley',
   },
+  // Endless Prairie (MSQ Volume III, Chapter 6) - the Lantern of Open Skies, found in the
+  // Thunderbird Mesa dungeon's Lantern Sanctuary room (MSF-EP-007).
+  'lantern-sanctuary': {
+    'lantern-of-open-skies': 'lantern-of-open-skies',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's

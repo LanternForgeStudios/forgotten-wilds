@@ -399,6 +399,16 @@ export const ITEMS: Item[] = [
     unique: true,
   },
   {
+    id: 'lantern-of-open-skies',
+    name: 'Lantern of Open Skies',
+    description: 'A lantern found unlit in the Lantern Sanctuary, its glass etched with a spiral wind-pattern.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.lantern-of-open-skies',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
     id: 'croc-hide',
     name: 'Croc Hide',
     description: 'A strip of leathery hide from a bayou marsh crocodile.',

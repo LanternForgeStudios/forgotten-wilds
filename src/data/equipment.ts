@@ -1010,4 +1010,16 @@ export const EQUIPMENT: EquipmentItem[] = [
     tier: 'mythic',
     familyId: 'white-buffalo-totem',
   },
+  {
+    id: 'lantern-of-open-skies-equipped',
+    name: 'Lantern of Open Skies',
+    description: 'A legendary lantern recovered from the Thunderbird Mesa Lantern Sanctuary, its light steady even in the highest wind.',
+    slot: 'lantern',
+    iconAssetId: 'icon.equipment.lantern-of-open-skies-equipped',
+    statBonuses: { maxSpirit: 18, defense: 4 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 38,
+    lanternAbilityIds: ['open-skies-renewal'],
+  },
 ];

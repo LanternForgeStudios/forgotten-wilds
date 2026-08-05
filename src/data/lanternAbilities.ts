@@ -39,4 +39,12 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
     description:
       "The Lantern of Still Waters settles the current around you - incoming blows land as gently as ripples for a moment.",
   },
+  {
+    id: 'open-skies-renewal',
+    name: 'Open Skies Renewal',
+    category: 'healing',
+    oilCost: 12,
+    description:
+      'The Lantern of Open Skies breathes clean mountain wind through you, carrying off the worst of your wounds.',
+  },
 ];

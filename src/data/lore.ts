@@ -109,4 +109,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The second hide continues where the first ends: the same painted figure, years later, setting a controlled burn ahead of a wolf pack to save a stranded herd. Elder Koda has a name for what the hide calls this Keeper - Windwalker - but no record of what became of them after.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-keeper-talon-greywind',
+    title: 'Keeper Talon Greywind',
+    body: 'A history carved into the Lantern Sanctuary\'s own walls: Talon Greywind was the last Lantern Keeper to tend Thunderbird Mesa before it fell silent, keeping watch alongside the Great Thunderbird itself rather than over it. Greywind left this lantern lit and waiting - the same way Elise Duvall once left hers beneath the Deep Current.',
+    unlockedAt: 0,
+  },
 ];

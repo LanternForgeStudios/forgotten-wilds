@@ -112,6 +112,10 @@ add("sprites/enemies/great-thunderbird-idle.svg", 256, 256, "THUNDERBIRD", "#7a5
 add("icons/thunderbird-feather.svg", 64, 64, "FTHR", "#9a7cc0", "#5a3888")
 add("icons/elder-buffalo-totem.svg", 64, 64, "TOTEM", "#c8c0b0", "#78705f")
 
+# --- Chapter 6: Wings of the First Promise (Phase 4 - Lantern of Open Skies) ---
+add("icons/lantern-of-open-skies.svg", 64, 64, "LANTERN", "#e8d888", "#a08830", font_size=9)
+add("icons/lantern-of-open-skies-equipped.svg", 64, 64, "LANTERN", "#f0e0a0", "#b09840", font_size=9)
+
 
 if __name__ == "__main__":
     write_all()
