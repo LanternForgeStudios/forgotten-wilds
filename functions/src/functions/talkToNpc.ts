@@ -40,6 +40,19 @@ const NPC_LOCATIONS: Record<string, string> = {
   'blacksmith-toussaint': 'mirehaven-blacksmith',
   'armorer-delphine': 'mirehaven-armory',
   'herbalist-noelle': 'mirehaven-herbalist',
+  // Endless Prairie (MSQ Volume III, Chapters 5-6) - these were missing entirely, which meant
+  // every talkToNpc call for any of them threw "Unknown NPC" server-side even though the client
+  // opened the dialogue box anyway (setActiveNpc happens before the callTalkToNpc promise
+  // resolves, and the failure is only console.error'd) - quest talkToNpc objectives for this
+  // whole region silently never completed.
+  'chief-aiyana-whitefeather': 'highwind-crossing-chiefs-lodge',
+  'elder-koda-running-elk': 'highwind-crossing-spirit-lodge',
+  'scout-niska': 'highwind-crossing',
+  'prairie-spirit': 'sacred-hills',
+  'innkeeper-hattie': 'highwind-crossing-inn',
+  'storekeeper-wyatt': 'highwind-crossing-general-store',
+  'blacksmith-garrett': 'highwind-crossing-blacksmith',
+  'armorer-ruth': 'highwind-crossing-armory',
 };
 const KNOWN_NPC_IDS = new Set(Object.keys(NPC_LOCATIONS));
 
