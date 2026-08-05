@@ -642,3 +642,53 @@ both new Skills target the same family with two different ailments instead.
 
 Archivist Elowen's and Cedar Spirit's gameplayHook.questIds were extended to include both new quest
 ids, same as every prior region's own side-quest NPCs.
+
+## Shattered Desert (MSQ Volume V, Chapter 9)
+
+No side quest was pre-designed for this region in this document either - written fresh during
+Chapter 9's own build, matching Winter Counts/The Heartwood Recordings' shape exactly.
+
+### The Desert Relics
+
+**The First Relic** / **The Second Relic**
+
+Quest Giver
+
+Desert Ranger Tomas Vega (recover -> deliver) - the design doc names him as a Primary NPC with no
+main-MSQ giver role of his own, so this side quest gives him one, mirroring how Forest Warden Rowan
+Hart's own scout role paired with a main-MSQ quest instead. Translated/appraised by Scholar Nia
+Solis, mirroring Elder Koda Running Elk's/the Cedar Spirit's own translator role.
+
+Story Beats
+
+Two carved relics, marked with matching star-patterns, are found hidden in Sunfire Dunes and Crimson
+Canyons - the same astronomer civilization's handiwork Scholar Nia has been piecing together from
+the Relic Museum's other holdings. Read together, the two relics record the same patch of night sky
+twice, decades apart - and the second chart is missing a star the first one recorded, with no
+explanation Nia can offer. A small, concrete instance of the same "something was removed" pattern the
+MSQ's own Guardian Memory Fragments have been building toward since Whispering Pines.
+
+Rewards
+
+- The First Relic: grants the Skill **Canyon Wildfire** (Spirit Attack, Medium Spirit Damage, chance
+  to inflict Burn - effective against dustDevils, genuinely vulnerable to Burn).
+- The Second Relic: grants the Skill **Desert Night's Chill** (Spirit Attack, Medium Spirit Damage,
+  chance to inflict Freeze - effective against dustDevils, genuinely vulnerable to Freeze).
+
+Both quests also grant a Lore entry (desert-relic-i / desert-relic-ii).
+
+Implementation Notes
+
+Mirrors The Heartwood Recordings chain exactly (collect-item -> giver NPC -> translator NPC ->
+grantSkillId + grantLoreId reward shape, zero new engine code), gated behind Chapter 9's own finale
+(the-path-of-the-astronomers) rather than Chapter 10's, the same sequencing every prior region's own
+side quest used. Item ids: desert-relic-i (from Sunfire Dunes, refId desert-relic-i-cache) and
+desert-relic-ii (from Crimson Canyons, refId desert-relic-ii-cache) - both new key items, wired
+alongside the 3 Star Fragments in the same WORLD_ITEMS pass rather than as a separate later addition.
+
+Shattered Desert only has one enemy family this chapter (dustDevils, vulnerable to Burn/Freeze/
+Poison besides its own Blind), so both new Skills target the same family with two different ailments,
+same shape as The Heartwood Recordings.
+
+Desert Ranger Tomas Vega's and Scholar Nia Solis's gameplayHook.questIds were extended to include
+both new quest ids, same as every prior region's own side-quest NPCs.

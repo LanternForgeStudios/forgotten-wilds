@@ -1145,8 +1145,24 @@ export const NPCS: Npc[] = [
       { speaker: 'Scholar Nia Solis', text: "Every shelf in this museum is a fragment of the same missing civilization - astronomers, as far as I can tell, who watched something happen in the sky and wrote it all down somewhere I haven't found yet." },
       { speaker: 'Scholar Nia Solis', text: "The Forgotten Observatory has started waking up, Keeper. Lights where there haven't been lights in longer than Red Mesa has existed. That's not nothing." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-path-of-the-astronomers', 'echoes-in-the-sand'] },
+    gameplayHook: {
+      type: 'questGiver',
+      questIds: ['the-second-relic', 'the-first-relic', 'the-path-of-the-astronomers', 'echoes-in-the-sand'],
+    },
     dialogueVariants: [
+      {
+        questId: 'the-second-relic',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "Two relics, both bearing the same star-pattern as everything else in this museum. Whoever the astronomers were, they marked their belongings the same way across generations." },
+          { speaker: 'Scholar Nia Solis', text: "Tomas has a good eye for finding what the sand hasn't finished swallowing yet. I'll be cataloguing these for weeks." },
+        ],
+      },
+      {
+        questId: 'the-first-relic',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "A relic this well-preserved, buried this shallow - someone wanted it found eventually, just not soon. I don't know what to make of that yet." },
+        ],
+      },
       {
         questId: 'the-path-of-the-astronomers',
         lines: [

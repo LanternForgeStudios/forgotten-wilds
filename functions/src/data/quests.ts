@@ -680,6 +680,31 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 80, gold: 40, regionalReputation: 45, grantLoreId: 'lore-forgotten-observatory-approach' },
   },
+
+  // --- Shattered Desert Side Quest (fresh, docs/Mytherra-SQ_breakdown.md had no pre-designed
+  // entry for this region): The Desert Relics - same 2-hidden-key-item, giver -> translator, 2
+  // quest-taught-Skills-+-Lore shape as every prior region's own side quest, gated behind Chapter
+  // 9's own finale. ---
+  'the-first-relic': {
+    id: 'the-first-relic',
+    prerequisiteQuestId: 'the-path-of-the-astronomers',
+    objectives: [
+      { id: 'get-desert-relic-i', type: 'collectItem', targetId: 'desert-relic-i', requiredCount: 1 },
+      { id: 'talk-tomas-relic-i', type: 'talkToNpc', targetId: 'desert-ranger-tomas-vega', requiredCount: 1 },
+      { id: 'talk-nia-relic-i', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'canyon-wildfire', grantLoreId: 'desert-relic-i' },
+  },
+  'the-second-relic': {
+    id: 'the-second-relic',
+    prerequisiteQuestId: 'the-first-relic',
+    objectives: [
+      { id: 'get-desert-relic-ii', type: 'collectItem', targetId: 'desert-relic-ii', requiredCount: 1 },
+      { id: 'talk-tomas-relic-ii', type: 'talkToNpc', targetId: 'desert-ranger-tomas-vega', requiredCount: 1 },
+      { id: 'talk-nia-relic-ii', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'desert-nights-chill', grantLoreId: 'desert-relic-ii' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -740,4 +765,6 @@ export const QUEST_ORDER = [
   'echoes-in-the-sand',
   'fragments-of-the-sky',
   'the-path-of-the-astronomers',
+  'the-first-relic',
+  'the-second-relic',
 ];

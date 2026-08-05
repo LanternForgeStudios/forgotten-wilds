@@ -198,6 +198,29 @@ export const SKILLS: Skill[] = [
     effectiveAgainstFamilies: ['silentEchoes'],
     inflictsAilmentId: 'freeze',
   },
+  // Shattered Desert side quest ("The Desert Relics") player-usable Specialty Attacks
+  {
+    id: 'canyon-wildfire',
+    name: 'Canyon Wildfire',
+    description: 'A restored Lantern Keeper technique, read from the first Desert Relic - a controlled burn against whatever the desert throws at you.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['dustDevils'],
+    inflictsAilmentId: 'burn',
+  },
+  {
+    id: 'desert-nights-chill',
+    name: "Desert Night's Chill",
+    description: 'A restored Lantern Keeper technique, read from the second Desert Relic - the cold that follows every scorching desert day.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['dustDevils'],
+    inflictsAilmentId: 'freeze',
+  },
   // Whispering Pines (MSQ Volume IV, Chapter 8) enemy signature move + Cedar Giant boss moves
   {
     id: 'root-snare',

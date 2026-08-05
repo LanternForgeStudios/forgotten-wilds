@@ -260,6 +260,33 @@ export const SKILLS: Record<string, Skill> = {
     inflictAilmentChance: 0.3,
   },
 
+  // --- Shattered Desert side quest ("The Desert Relics") player-usable Specialty Attacks ---
+  // Only one enemy family exists this chapter (dustDevils), so both skills target it, inflicting
+  // the two ailments it's actually vulnerable to besides Blind (its own) - Burn and Freeze,
+  // matching the desert's own "day scorches, night freezes" extremes.
+  'canyon-wildfire': {
+    id: 'canyon-wildfire',
+    name: 'Canyon Wildfire',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['dustDevils'],
+    inflictsAilmentId: 'burn',
+    inflictAilmentChance: 0.3,
+  },
+  'desert-nights-chill': {
+    id: 'desert-nights-chill',
+    name: "Desert Night's Chill",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['dustDevils'],
+    inflictsAilmentId: 'freeze',
+    inflictAilmentChance: 0.3,
+  },
+
   // --- Whispering Pines (MSQ Volume IV, Chapter 8) enemy signature move ---
   // rootWraiths (root-wraith/elder-root-wraith) - a grasping tangle of roots, Stun (silentEchoes
   // already claimed Poison in this region, and Prairie's own two chapters claimed Silence/Blind).

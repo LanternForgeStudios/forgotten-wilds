@@ -929,4 +929,34 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 80, gold: 40, regionalReputation: 45, grantLoreId: 'lore-forgotten-observatory-approach' },
   },
+
+  // --- Shattered Desert Side Quest: The Desert Relics ---
+  {
+    id: 'the-first-relic',
+    name: 'The First Relic',
+    giverNpcId: 'desert-ranger-tomas-vega',
+    description: 'Recover a carved relic, half-buried in Sunfire Dunes.',
+    category: 'side',
+    prerequisiteQuestId: 'the-path-of-the-astronomers',
+    objectives: [
+      { id: 'get-desert-relic-i', type: 'collectItem', description: 'Recover the first Desert Relic from Sunfire Dunes.', targetId: 'desert-relic-i', requiredCount: 1 },
+      { id: 'talk-tomas-relic-i', type: 'talkToNpc', description: 'Bring the relic to Desert Ranger Tomas Vega.', targetId: 'desert-ranger-tomas-vega', requiredCount: 1 },
+      { id: 'talk-nia-relic-i', type: 'talkToNpc', description: 'Have Scholar Nia Solis examine the relic.', targetId: 'scholar-nia-solis', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'canyon-wildfire', grantLoreId: 'desert-relic-i' },
+  },
+  {
+    id: 'the-second-relic',
+    name: 'The Second Relic',
+    giverNpcId: 'desert-ranger-tomas-vega',
+    description: 'Recover a second relic, wedged into a ledge in Crimson Canyons.',
+    category: 'side',
+    prerequisiteQuestId: 'the-first-relic',
+    objectives: [
+      { id: 'get-desert-relic-ii', type: 'collectItem', description: 'Recover the second Desert Relic from Crimson Canyons.', targetId: 'desert-relic-ii', requiredCount: 1 },
+      { id: 'talk-tomas-relic-ii', type: 'talkToNpc', description: 'Bring the relic to Desert Ranger Tomas Vega.', targetId: 'desert-ranger-tomas-vega', requiredCount: 1 },
+      { id: 'talk-nia-relic-ii', type: 'talkToNpc', description: 'Have Scholar Nia Solis examine the relic.', targetId: 'scholar-nia-solis', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'desert-nights-chill', grantLoreId: 'desert-relic-ii' },
+  },
 ];

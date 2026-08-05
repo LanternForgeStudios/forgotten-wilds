@@ -169,4 +169,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "Scholar Nia Solis, cataloguing the first clear view of the Observatory from its own approach: a structure too regular to be natural, half-swallowed by sand, and - impossibly, after however many centuries - showing lights in windows that shouldn't still have glass in them. Whatever the astronomers who built this were watching for, something inside it has started watching back.",
     unlockedAt: 0,
   },
+  {
+    id: 'desert-relic-i',
+    title: 'The First Desert Relic',
+    body: "Scholar Nia Solis, reading the star-pattern carved into the relic's surface: a record of a single night's sky, mapped in more detail than any surviving astronomy this side of the mountains. Whoever made this wasn't guessing at the stars. They were measuring them.",
+    unlockedAt: 0,
+  },
+  {
+    id: 'desert-relic-ii',
+    title: 'The Second Desert Relic',
+    body: "The second relic continues the pattern of the first: the same night's sky, mapped again decades later, with one star missing from the second chart that was present in the first. Scholar Nia Solis has no explanation for a star that simply stops being recorded.",
+    unlockedAt: 0,
+  },
 ];
