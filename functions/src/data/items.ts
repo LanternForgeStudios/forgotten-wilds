@@ -259,6 +259,7 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'heartwood-recording-ii': { id: 'heartwood-recording-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'gnarled-root-fiber': { id: 'gnarled-root-fiber', category: 'materials', usableInCombat: false, tier: 'common' },
   'ancient-heartwood-relic': { id: 'ancient-heartwood-relic', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
+  'archive-fragments': { id: 'archive-fragments', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
 };
 
 export const SHOP_PRICES: Record<string, number> = {

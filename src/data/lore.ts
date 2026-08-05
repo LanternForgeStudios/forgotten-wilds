@@ -145,4 +145,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The second root-knot continues the first: the warning names no one directly, but describes someone who moved through every region, erasing the same kind of history everywhere they went - the Stone Circles, the Bayou archives, the Great Tree Library itself. Not a single theft. A campaign.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-archive-fragments',
+    title: 'The Inner Archive',
+    body: "Archivist Elowen, sorting what the Inner Archive still holds: an archive within the archive, older than the Great Tree Library above it, and just as deliberately picked over. Whoever emptied Mytherra's libraries knew this room existed. They just never finished the job here.",
+    unlockedAt: 0,
+  },
 ];

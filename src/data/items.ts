@@ -615,6 +615,16 @@ export const ITEMS: Item[] = [
     unique: true,
   },
   {
+    id: 'archive-fragments',
+    name: 'Archive Fragments',
+    description: 'A handful of surviving pages from the Inner Archive, root-stained and brittle, but still legible.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.archive-fragments',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
     id: 'ancient-heartwood-relic',
     name: 'Ancient Heartwood Relic',
     description: "A fragment of the Cedar Giant's own hollowed core, still faintly warm with old spirit-light.",

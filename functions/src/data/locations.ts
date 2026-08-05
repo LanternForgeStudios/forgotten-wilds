@@ -83,6 +83,10 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'ancient-cedar-shrine': {
     'heartwood-recording-ii-cache': 'heartwood-recording-ii',
   },
+  // Whispering Pines (MSQ Volume IV, Chapter 8) - the Archive Fragments (MSF-WP-006).
+  'inner-archive': {
+    'archive-fragments': 'archive-fragments',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's

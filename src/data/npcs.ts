@@ -920,9 +920,22 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['the-lost-library', 'heartwood-sanctuary', 'the-first-recording', 'the-second-recording'],
+      questIds: [
+        'beneath-the-roots',
+        'the-lost-library',
+        'heartwood-sanctuary',
+        'the-first-recording',
+        'the-second-recording',
+      ],
     },
     dialogueVariants: [
+      {
+        questId: 'beneath-the-roots',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "An Inner Archive, buried beneath the Sanctuary itself - and half of what's left has already crumbled to root and dust." },
+          { speaker: 'Archivist Elowen', text: "What survives is still more than I've had in decades. I'll be reading these fragments long after you've moved on, Keeper." },
+        ],
+      },
       {
         questId: 'the-second-recording',
         lines: [

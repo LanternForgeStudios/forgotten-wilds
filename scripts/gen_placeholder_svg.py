@@ -191,6 +191,7 @@ add("sprites/enemies/elder-root-wraith-idle.svg", 128, 128, "WRAITH", "#7a6244",
 add("sprites/enemies/cedar-giant-idle.svg", 256, 256, "CEDAR GIANT", "#4a6a3a", "#243a1c", font_size=22)
 add("icons/gnarled-root-fiber.svg", 64, 64, "FIBER", "#8a6a44", "#4a3220")
 add("icons/ancient-heartwood-relic.svg", 64, 64, "RELIC", "#9a70c0", "#5a3880")
+add("icons/archive-fragments.svg", 64, 64, "PAGES", "#c8b888", "#8a7038")
 
 
 if __name__ == "__main__":

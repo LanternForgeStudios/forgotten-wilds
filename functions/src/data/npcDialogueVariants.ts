@@ -63,6 +63,7 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   // Whispering Pines (MSQ Volume IV, Chapter 7)
   'elder-rowan-birch': ['heartwood-sanctuary', 'into-the-ancient-forest'],
   'archivist-elowen': [
+    'beneath-the-roots',
     'the-second-recording',
     'the-first-recording',
     'heartwood-sanctuary',

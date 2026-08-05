@@ -779,4 +779,20 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'silver-rivers-chill', grantLoreId: 'heartwood-recording-ii' },
   },
+
+  // --- Whispering Pines (MSQ Volume IV), Chapter 8: Echoes of the First Keepers ---
+  {
+    id: 'beneath-the-roots',
+    name: 'Beneath the Roots',
+    giverNpcId: 'archivist-elowen',
+    description: 'Explore the deepest sections of Heartwood Sanctuary and recover what survives of its archive.',
+    category: 'main',
+    prerequisiteQuestId: 'heartwood-sanctuary',
+    objectives: [
+      { id: 'reach-root-caverns', type: 'reachLocation', description: 'Explore the Root Caverns.', targetId: 'root-caverns', requiredCount: 1 },
+      { id: 'get-archive-fragments', type: 'collectItem', description: 'Recover the surviving Archive Fragments.', targetId: 'archive-fragments', requiredCount: 1 },
+      { id: 'reach-heartwood-lantern-sanctuary', type: 'reachLocation', description: 'Discover the Lantern Sanctuary.', targetId: 'heartwood-lantern-sanctuary', requiredCount: 1 },
+    ],
+    reward: { xp: 45, gold: 25, grantLoreId: 'lore-archive-fragments' },
+  },
 ];

@@ -579,6 +579,22 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'silver-rivers-chill', grantLoreId: 'heartwood-recording-ii' },
   },
+
+  // --- Whispering Pines (MSQ Volume IV), Chapter 8: Echoes of the First Keepers ---
+  // Kebab-case id mapping: MSF-WP-006 beneath-the-roots, MSF-WP-007 the-keeper-beneath-the-cedar,
+  // MSF-WP-008 the-cedar-giant, MSF-WP-009 the-missing-pages. Gated behind Chapter 7's own true
+  // finale, same "latest quest safely completed before this location is needed" rule as every
+  // prior dungeon hand-off.
+  'beneath-the-roots': {
+    id: 'beneath-the-roots',
+    prerequisiteQuestId: 'heartwood-sanctuary',
+    objectives: [
+      { id: 'reach-root-caverns', type: 'reachLocation', targetId: 'root-caverns', requiredCount: 1 },
+      { id: 'get-archive-fragments', type: 'collectItem', targetId: 'archive-fragments', requiredCount: 1 },
+      { id: 'reach-heartwood-lantern-sanctuary', type: 'reachLocation', targetId: 'heartwood-lantern-sanctuary', requiredCount: 1 },
+    ],
+    reward: { xp: 45, gold: 25, grantLoreId: 'lore-archive-fragments' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -631,4 +647,5 @@ export const QUEST_ORDER = [
   'heartwood-sanctuary',
   'the-first-recording',
   'the-second-recording',
+  'beneath-the-roots',
 ];
