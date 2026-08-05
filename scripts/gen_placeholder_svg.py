@@ -181,6 +181,10 @@ add("icons/woven-cedar-charm.svg", 64, 64, "CHARM", "#5aa090", "#2c5048")
 add("icons/elders-cedar-charm.svg", 64, 64, "CHARM", "#5aa090", "#2c5048")
 add("icons/young-cedar-totem.svg", 64, 64, "TOTEM", "#c8c0a0", "#78705a")
 
+# Side quest key-item icon (Phase 3b) - shared for both Heartwood Recordings, matching the
+# spirit-seed/wind-stone precedent (same collectible concept, 2 different hidden caches).
+add("icons/heartwood-recording.svg", 64, 64, "ROOT", "#9a7c50", "#5a4020")
+
 
 if __name__ == "__main__":
     write_all()

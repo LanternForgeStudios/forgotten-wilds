@@ -592,3 +592,53 @@ quest-taught Skill.
 Chief Aiyana Whitefeather's and Elder Koda Running Elk's gameplayHook.questIds were extended to
 include both new quest ids (same data-model-consistency reasoning as Mayor Celeste Broussard's own
 change above).
+
+## Whispering Pines (MSQ Volume IV, Chapter 7)
+
+No side quest was pre-designed for this region in this document - written fresh during Chapter 7's
+own build, matching the Winter Counts' shape exactly.
+
+### The Heartwood Recordings
+
+**The First Recording** / **The Second Recording**
+
+Quest Giver
+
+Archivist Elowen (recover -> deliver), translated by the Cedar Spirit - mirrors Chief Aiyana/Elder
+Koda Running Elk's own giver/translator split.
+
+Story Beats
+
+Two root-knots grown in an unnatural, deliberate pattern are found hidden along Mistwood Path and
+near the Ancient Cedar Shrine - not written records like the Lost Library's own missing volumes, but
+something the forest itself preserved. Archivist Elowen can't read them; the Cedar Spirit can. Read
+together, the two recordings describe a warning: someone moved through every region erasing the same
+kind of history everywhere they went - not a single theft, a campaign, tying Whispering Pines' own
+"vanished centuries" thread back to the Stone Circles' rewritten First Promise and the Bayou's own
+gaps.
+
+Rewards
+
+- The First Recording: grants the Skill **Elderwood Ember** (Spirit Attack, Medium Spirit Damage,
+  chance to inflict Burn - effective against silentEchoes, genuinely vulnerable to Burn).
+- The Second Recording: grants the Skill **Silver River's Chill** (Spirit Attack, Medium Spirit
+  Damage, chance to inflict Freeze - effective against silentEchoes, genuinely vulnerable to
+  Freeze).
+
+Both quests also grant a Lore entry (heartwood-recording-i / heartwood-recording-ii).
+
+Implementation Notes
+
+Mirrors the Winter Counts chain exactly (collect-item -> giver NPC -> translator NPC ->
+grantSkillId + grantLoreId reward shape, zero new engine code), gated behind Chapter 7's own finale
+(heartwood-sanctuary) rather than Chapter 8's, the same way Winter Counts gated behind Chapter 5's
+own finale rather than Chapter 6's. Item ids: heartwood-recording-i (from Mistwood Path, refId
+heartwood-recording-i-cache) and heartwood-recording-ii (from the Ancient Cedar Shrine, refId
+heartwood-recording-ii-cache) - both new key items.
+
+Whispering Pines only has one enemy family this chapter (silentEchoes, vulnerable to Burn/Freeze/
+Blind besides its own Poison), so unlike Winter Counts' two-family split (one Skill per family),
+both new Skills target the same family with two different ailments instead.
+
+Archivist Elowen's and Cedar Spirit's gameplayHook.questIds were extended to include both new quest
+ids, same as every prior region's own side-quest NPCs.

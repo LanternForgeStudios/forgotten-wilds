@@ -255,6 +255,8 @@ export const ITEMS: Record<string, ItemDefinition> = {
   },
   'lost-library-records': { id: 'lost-library-records', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'withered-echo-moss': { id: 'withered-echo-moss', category: 'materials', usableInCombat: false, tier: 'common' },
+  'heartwood-recording-i': { id: 'heartwood-recording-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'heartwood-recording-ii': { id: 'heartwood-recording-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
 };
 
 export const SHOP_PRICES: Record<string, number> = {

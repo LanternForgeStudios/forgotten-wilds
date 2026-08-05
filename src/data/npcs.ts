@@ -918,8 +918,24 @@ export const NPCS: Npc[] = [
       { speaker: 'Archivist Elowen', text: "Every shelf in this library is carved straight into the living cedar. I've spent thirty years reading by root-light and I still haven't reached the oldest volumes." },
       { speaker: 'Archivist Elowen', text: "The records here go back further than anywhere else in Mytherra - and then, abruptly, they stop. Centuries just... end, mid-sentence, before anyone thought to explain why." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-lost-library', 'heartwood-sanctuary'] },
+    gameplayHook: {
+      type: 'questGiver',
+      questIds: ['the-lost-library', 'heartwood-sanctuary', 'the-first-recording', 'the-second-recording'],
+    },
     dialogueVariants: [
+      {
+        questId: 'the-second-recording',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "Two root-knots, growing a message across who knows how many decades. Whoever shaped them understood patience I can barely imagine." },
+          { speaker: 'Archivist Elowen', text: "The Cedar Spirit read further into it than I ever could have alone. I'll be adding both to the archive - properly catalogued this time." },
+        ],
+      },
+      {
+        questId: 'the-first-recording',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "A message grown into living wood, not written on a page - I've never seen anything like it. The Cedar Spirit understood it before I finished describing the shape." },
+        ],
+      },
       {
         questId: 'heartwood-sanctuary',
         lines: [
@@ -987,8 +1003,23 @@ export const NPCS: Npc[] = [
       { speaker: 'Cedar Spirit', text: '...small light, walking where the roots have grown thin. I have not spoken to anyone in longer than this forest can easily remember.' },
       { speaker: 'Cedar Spirit', text: 'My own seed withered long ago, and I have been waiting since - not patiently, if I am honest. Three seeds remain scattered where the forest once carried them. Find them, and I can grow again.' },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['seeds-of-the-ancient-cedar'] },
+    gameplayHook: {
+      type: 'questGiver',
+      questIds: ['seeds-of-the-ancient-cedar', 'the-first-recording', 'the-second-recording'],
+    },
     dialogueVariants: [
+      {
+        questId: 'the-second-recording',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'Two knots, one message: a warning, grown slowly enough that whoever planted it never expected to see it read. I am glad, at least, that someone finally has.' },
+        ],
+      },
+      {
+        questId: 'the-first-recording',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'Root speaks slower than voice, but it does not forget. This knot remembers something Archivist Elowen\'s books never recorded at all.' },
+        ],
+      },
       {
         questId: 'seeds-of-the-ancient-cedar',
         lines: [

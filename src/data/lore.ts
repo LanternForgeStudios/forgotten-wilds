@@ -133,4 +133,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The gate mechanism answers to Lantern-light alone, the same design as Summit Temple's own wind mechanism half a continent away - built by people who never met, working from the same forgotten principles. Whatever waits past it, the old Lantern Keepers meant for it to stay sealed to everyone except one of their own.",
     unlockedAt: 0,
   },
+  {
+    id: 'heartwood-recording-i',
+    title: 'The First Heartwood Recording',
+    body: "The Cedar Spirit, reading the root-knot's pattern: a warning, grown slowly enough that it was clearly meant to outlast whoever planted it. Something was coming for the forest's own memory, long before Archivist Elowen ever noticed the library's missing shelves.",
+    unlockedAt: 0,
+  },
+  {
+    id: 'heartwood-recording-ii',
+    title: 'The Second Heartwood Recording',
+    body: "The second root-knot continues the first: the warning names no one directly, but describes someone who moved through every region, erasing the same kind of history everywhere they went - the Stone Circles, the Bayou archives, the Great Tree Library itself. Not a single theft. A campaign.",
+    unlockedAt: 0,
+  },
 ];

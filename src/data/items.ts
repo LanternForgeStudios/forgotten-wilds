@@ -585,6 +585,26 @@ export const ITEMS: Item[] = [
     tier: 'rare',
     unique: true,
   },
+  {
+    id: 'heartwood-recording-i',
+    name: 'Heartwood Recording I',
+    description: "A knot of cedar root, grown in a pattern that isn't natural - a message, if you know how to listen for it.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.heartwood-recording',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'heartwood-recording-ii',
+    name: 'Heartwood Recording II',
+    description: 'A second root-knot, its pattern continuing where the first one stopped.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.heartwood-recording',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

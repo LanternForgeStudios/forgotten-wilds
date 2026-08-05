@@ -175,6 +175,29 @@ export const SKILLS: Skill[] = [
     spiritCost: 0,
     inflictsAilmentId: 'blind',
   },
+  // Whispering Pines side quest ("The Heartwood Recordings") player-usable Specialty Attacks
+  {
+    id: 'elderwood-ember',
+    name: 'Elderwood Ember',
+    description: 'A restored Lantern Keeper technique, read from the first Heartwood Recording - a controlled burn against what has forgotten it was ever a tree.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['silentEchoes'],
+    inflictsAilmentId: 'burn',
+  },
+  {
+    id: 'silver-rivers-chill',
+    name: "Silver River's Chill",
+    description: 'A restored Lantern Keeper technique, read from the second Heartwood Recording - the cold of a river that never fully thaws.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['silentEchoes'],
+    inflictsAilmentId: 'freeze',
+  },
   // Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move
   {
     id: 'echo-spore-burst',

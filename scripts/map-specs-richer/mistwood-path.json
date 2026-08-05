@@ -52,6 +52,8 @@
     { "type": "transition", "x": 63, "y": 20, "refId": "elder-forest", "targetSpawnId": "from-mistwood-path" },
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
+    { "type": "interactable", "x": 20, "y": 30, "refId": "heartwood-recording-i-cache" },
+
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-mistwood-path-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-mistwood-path-2" },
     { "type": "interactable", "x": 54, "y": 32, "refId": "chest-mistwood-path-3" }

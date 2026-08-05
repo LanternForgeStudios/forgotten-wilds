@@ -749,4 +749,34 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 70, gold: 35, regionalReputation: 40, grantLoreId: 'lore-heartwood-sanctuary-gate' },
   },
+
+  // --- Whispering Pines Side Quest: The Heartwood Recordings ---
+  {
+    id: 'the-first-recording',
+    name: 'The First Recording',
+    giverNpcId: 'archivist-elowen',
+    description: 'Recover a root-knot grown in an unnatural pattern, hidden along Mistwood Path.',
+    category: 'side',
+    prerequisiteQuestId: 'heartwood-sanctuary',
+    objectives: [
+      { id: 'get-heartwood-recording-i', type: 'collectItem', description: 'Recover the first Heartwood Recording from Mistwood Path.', targetId: 'heartwood-recording-i', requiredCount: 1 },
+      { id: 'talk-elowen-recording-i', type: 'talkToNpc', description: 'Bring the recording to Archivist Elowen.', targetId: 'archivist-elowen', requiredCount: 1 },
+      { id: 'talk-cedar-spirit-recording-i', type: 'talkToNpc', description: 'Have the Cedar Spirit interpret the recording.', targetId: 'cedar-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'elderwood-ember', grantLoreId: 'heartwood-recording-i' },
+  },
+  {
+    id: 'the-second-recording',
+    name: 'The Second Recording',
+    giverNpcId: 'archivist-elowen',
+    description: 'Recover a second root-knot, hidden near the Ancient Cedar Shrine.',
+    category: 'side',
+    prerequisiteQuestId: 'the-first-recording',
+    objectives: [
+      { id: 'get-heartwood-recording-ii', type: 'collectItem', description: 'Recover the second Heartwood Recording from the Ancient Cedar Shrine.', targetId: 'heartwood-recording-ii', requiredCount: 1 },
+      { id: 'talk-elowen-recording-ii', type: 'talkToNpc', description: 'Bring the recording to Archivist Elowen.', targetId: 'archivist-elowen', requiredCount: 1 },
+      { id: 'talk-cedar-spirit-recording-ii', type: 'talkToNpc', description: 'Have the Cedar Spirit interpret the recording.', targetId: 'cedar-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'silver-rivers-chill', grantLoreId: 'heartwood-recording-ii' },
+  },
 ];

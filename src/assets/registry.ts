@@ -4329,6 +4329,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
   },
   {
+    id: 'icon.item.heartwood-recording',
+    category: 'icon',
+    intendedUse: 'Item icon for heartwood-recording-i/ii (Whispering Pines side quest "The Heartwood Recordings") - shared since both are the same collectible concept, 2 different hidden caches. Placeholder pending PixelLab quota.',
+    filePath: 'icons/heartwood-recording.svg',
+    dimensions: { width: 64, height: 64 },
+    status: 'placeholder',
+    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+  },
+  {
     id: 'icon.item.lost-library-records',
     category: 'icon',
     intendedUse: 'Item icon for lost-library-records (MSF-WP-004) - placeholder pending PixelLab quota',

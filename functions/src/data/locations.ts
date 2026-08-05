@@ -74,6 +74,15 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
     'spirit-seed-heartwood-approach': 'spirit-seed-heartwood-approach',
     'lost-library-records': 'lost-library-records',
   },
+  // Whispering Pines side quest (docs/Mytherra-SQ_breakdown.md wasn't pre-populated for this
+  // region - "The Heartwood Recordings" written fresh, same "Winter Counts" shape) - 2 hidden
+  // caches, one per part.
+  'mistwood-path': {
+    'heartwood-recording-i-cache': 'heartwood-recording-i',
+  },
+  'ancient-cedar-shrine': {
+    'heartwood-recording-ii-cache': 'heartwood-recording-ii',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's

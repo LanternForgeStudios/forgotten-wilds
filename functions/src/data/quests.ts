@@ -554,6 +554,31 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 70, gold: 35, regionalReputation: 40, grantLoreId: 'lore-heartwood-sanctuary-gate' },
   },
+
+  // --- Whispering Pines Side Quest (fresh, docs/Mytherra-SQ_breakdown.md had no pre-designed
+  // entry for this region): The Heartwood Recordings - same 2-hidden-key-item, giver -> translator,
+  // 2 quest-taught-Skills-+-Lore shape as Endless Prairie's own Winter Counts, gated behind Chapter
+  // 7's own finale the same way Winter Counts gated behind Chapter 5's. ---
+  'the-first-recording': {
+    id: 'the-first-recording',
+    prerequisiteQuestId: 'heartwood-sanctuary',
+    objectives: [
+      { id: 'get-heartwood-recording-i', type: 'collectItem', targetId: 'heartwood-recording-i', requiredCount: 1 },
+      { id: 'talk-elowen-recording-i', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
+      { id: 'talk-cedar-spirit-recording-i', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'elderwood-ember', grantLoreId: 'heartwood-recording-i' },
+  },
+  'the-second-recording': {
+    id: 'the-second-recording',
+    prerequisiteQuestId: 'the-first-recording',
+    objectives: [
+      { id: 'get-heartwood-recording-ii', type: 'collectItem', targetId: 'heartwood-recording-ii', requiredCount: 1 },
+      { id: 'talk-elowen-recording-ii', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
+      { id: 'talk-cedar-spirit-recording-ii', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'silver-rivers-chill', grantLoreId: 'heartwood-recording-ii' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -604,4 +629,6 @@ export const QUEST_ORDER = [
   'seeds-of-the-ancient-cedar',
   'the-lost-library',
   'heartwood-sanctuary',
+  'the-first-recording',
+  'the-second-recording',
 ];

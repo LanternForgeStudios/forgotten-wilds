@@ -54,6 +54,7 @@
 
     { "type": "interactable", "x": 30, "y": 20, "refId": "cedar-shrine-heart" },
     { "type": "npc", "x": 28, "y": 20, "refId": "cedar-spirit", "wanderRadius": 2 },
+    { "type": "interactable", "x": 45, "y": 25, "refId": "heartwood-recording-ii-cache" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-ancient-cedar-shrine-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-ancient-cedar-shrine-2" },

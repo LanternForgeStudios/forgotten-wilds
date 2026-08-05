@@ -234,6 +234,32 @@ export const SKILLS: Record<string, Skill> = {
     power: 20,
     spiritCost: 0,
   },
+  // --- Whispering Pines side quest ("The Heartwood Recordings") player-usable Specialty Attacks ---
+  // Only one enemy family exists this chapter (silentEchoes), so both skills target it, inflicting
+  // the two ailments it's actually vulnerable to besides Poison (its own) - Burn and Freeze.
+  'elderwood-ember': {
+    id: 'elderwood-ember',
+    name: 'Elderwood Ember',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['silentEchoes'],
+    inflictsAilmentId: 'burn',
+    inflictAilmentChance: 0.3,
+  },
+  'silver-rivers-chill': {
+    id: 'silver-rivers-chill',
+    name: "Silver River's Chill",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['silentEchoes'],
+    inflictsAilmentId: 'freeze',
+    inflictAilmentChance: 0.3,
+  },
+
   // --- Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move ---
   // silentEchoes (forest-echo/corrupted-echo) - a burst of toxic spores, Poison (Prairie already
   // claimed Silence/Stun/Blind across its own two chapters, so this is Whispering Pines' own).
