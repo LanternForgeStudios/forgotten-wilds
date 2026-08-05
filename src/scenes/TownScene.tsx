@@ -79,6 +79,14 @@ const BUILDING_MARKERS: Record<string, { label: string; spriteAssetId: string }>
   'cedarwatch-general-store': { label: 'General Store', spriteAssetId: 'structure.cedarwatch-general-store' },
   'cedarwatch-blacksmith': { label: 'The Forge', spriteAssetId: 'structure.cedarwatch-blacksmith' },
   'cedarwatch-armory': { label: 'The Armory', spriteAssetId: 'structure.cedarwatch-armory' },
+  // Shattered Desert (MSQ Volume V) - added at the same time the town itself was built, same
+  // discipline as Whispering Pines above (a gap that took a user bug report to find for Prairie).
+  'red-mesa-elders-hall': { label: "The Elder's Hall", spriteAssetId: 'structure.red-mesa-elders-hall' },
+  'red-mesa-relic-museum': { label: 'The Relic Museum', spriteAssetId: 'structure.red-mesa-relic-museum' },
+  'red-mesa-inn': { label: 'The Inn', spriteAssetId: 'structure.red-mesa-inn' },
+  'red-mesa-general-store': { label: 'General Store', spriteAssetId: 'structure.red-mesa-general-store' },
+  'red-mesa-blacksmith': { label: 'The Forge', spriteAssetId: 'structure.red-mesa-blacksmith' },
+  'red-mesa-armory': { label: 'The Armory', spriteAssetId: 'structure.red-mesa-armory' },
 };
 
 /** Shrine interactables on the open town map (currently just Ash Hallow's Town Shrine) - handled

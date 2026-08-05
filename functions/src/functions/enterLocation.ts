@@ -50,6 +50,9 @@ const LOCATION_GATES: Record<string, string> = {
   // 3 rooms (inner-archive/heartwood-lantern-sanctuary/guardian-grove) are reached by physically
   // walking the chained transitions from here, same single-gate dungeon precedent as Summit Temple.
   'root-caverns': 'heartwood-sanctuary',
+  // Shattered Desert (MSQ Volume V) - same single-gate-per-region-entry-point model, gated on
+  // Volume IV's own true finale.
+  'red-mesa': 'the-missing-pages',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -121,6 +124,19 @@ const KNOWN_LOCATION_IDS = new Set([
   'inner-archive',
   'heartwood-lantern-sanctuary',
   'guardian-grove',
+  // Shattered Desert (MSQ Volume V, Chapter 9).
+  'red-mesa',
+  'sunfire-dunes',
+  'crimson-canyons',
+  'painted-mesas',
+  'celestial-oasis',
+  'forgotten-observatory-approach',
+  'red-mesa-elders-hall',
+  'red-mesa-relic-museum',
+  'red-mesa-inn',
+  'red-mesa-general-store',
+  'red-mesa-blacksmith',
+  'red-mesa-armory',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

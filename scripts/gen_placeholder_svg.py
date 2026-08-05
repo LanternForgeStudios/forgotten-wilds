@@ -222,6 +222,12 @@ add("sprites/structures/cedarwatch-inn.svg", 144, 144, "INN", "#4a6a3a", "#243a1
 add("sprites/structures/cedarwatch-general-store.svg", 144, 144, "SHOP", "#4a6a3a", "#243a1c")
 add("sprites/structures/cedarwatch-blacksmith.svg", 144, 144, "FORGE", "#4a6a3a", "#243a1c")
 add("sprites/structures/cedarwatch-armory.svg", 144, 144, "ARMORY", "#4a6a3a", "#243a1c", font_size=18)
+add("sprites/structures/red-mesa-elders-hall.svg", 144, 144, "LODGE", "#a8623a", "#5a2c18")
+add("sprites/structures/red-mesa-relic-museum.svg", 144, 144, "MUSEUM", "#a8623a", "#5a2c18", font_size=18)
+add("sprites/structures/red-mesa-inn.svg", 144, 144, "INN", "#a8623a", "#5a2c18")
+add("sprites/structures/red-mesa-general-store.svg", 144, 144, "SHOP", "#a8623a", "#5a2c18")
+add("sprites/structures/red-mesa-blacksmith.svg", 144, 144, "FORGE", "#a8623a", "#5a2c18")
+add("sprites/structures/red-mesa-armory.svg", 144, 144, "ARMORY", "#a8623a", "#5a2c18", font_size=18)
 
 
 if __name__ == "__main__":

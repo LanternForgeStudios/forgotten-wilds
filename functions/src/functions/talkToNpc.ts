@@ -63,6 +63,16 @@ const NPC_LOCATIONS: Record<string, string> = {
   'storekeeper-byron': 'cedarwatch-general-store',
   'blacksmith-dara': 'cedarwatch-blacksmith',
   'armorer-fenn': 'cedarwatch-armory',
+  // Shattered Desert (MSQ Volume V, Chapter 9) - added at the same time the NPCs themselves were
+  // authored, same discipline as Whispering Pines above.
+  'elder-santiago-ortega': 'red-mesa-elders-hall',
+  'scholar-nia-solis': 'red-mesa-relic-museum',
+  'desert-ranger-tomas-vega': 'red-mesa',
+  'sand-spirit': 'celestial-oasis',
+  'innkeeper-rosa': 'red-mesa-inn',
+  'storekeeper-mateo': 'red-mesa-general-store',
+  'blacksmith-esteban': 'red-mesa-blacksmith',
+  'armorer-carmen': 'red-mesa-armory',
 };
 const KNOWN_NPC_IDS = new Set(Object.keys(NPC_LOCATIONS));
 

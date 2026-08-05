@@ -1,0 +1,61 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.overworld-terrain",
+      "name": "overworld-terrain",
+      "image": "overworld-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.overworld-decor2",
+      "name": "overworld-decor2",
+      "image": "overworld-decor2.png",
+      "imageWidth": 64,
+      "imageHeight": 48,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 40, "y": 12, "tileId": { "tileset": 1, "id": 2 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 16,
+          "seed": 53,
+          "avoid": [
+            { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 40, "y": 12 },
+            { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-sunfire-dunes" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "sunfire-dunes", "targetSpawnId": "from-crimson-canyons" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-painted-mesas" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "painted-mesas", "targetSpawnId": "from-crimson-canyons" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "interactable", "x": 40, "y": 12, "refId": "star-fragment-crimson-canyons" },
+    { "type": "interactable", "x": 45, "y": 25, "refId": "desert-relic-ii-cache" },
+
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-crimson-canyons-1" },
+    { "type": "interactable", "x": 52, "y": 10, "refId": "chest-crimson-canyons-2" },
+    { "type": "interactable", "x": 54, "y": 32, "refId": "chest-crimson-canyons-3" }
+  ]
+}

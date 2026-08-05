@@ -1,0 +1,71 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.town-terrain",
+      "name": "town-terrain",
+      "image": "town-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.overworld-decor2",
+      "name": "overworld-decor2",
+      "image": "overworld-decor2.png",
+      "imageWidth": 64,
+      "imageHeight": 48,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 20, "tileId": { "tileset": 1, "id": 4 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 10,
+          "seed": 51,
+          "avoid": [
+            { "x": 30, "y": 22 }, { "x": 63, "y": 20 },
+            { "x": 20, "y": 14 }, { "x": 44, "y": 14 },
+            { "x": 20, "y": 26 }, { "x": 44, "y": 26 },
+            { "x": 30, "y": 8 }, { "x": 30, "y": 30 },
+            { "x": 12, "y": 20 }, { "x": 30, "y": 20 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 30, "y": 22, "refId": "default" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-sunfire-dunes" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "sunfire-dunes", "targetSpawnId": "from-red-mesa" },
+
+    { "type": "npc", "x": 30, "y": 20, "refId": "desert-ranger-tomas-vega", "wanderRadius": 4 },
+
+    { "type": "spawnPoint", "x": 20, "y": 14, "refId": "from-red-mesa-elders-hall" },
+    { "type": "transition", "x": 20, "y": 14, "refId": "red-mesa-elders-hall", "targetSpawnId": "from-red-mesa", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 44, "y": 14, "refId": "from-red-mesa-relic-museum" },
+    { "type": "transition", "x": 44, "y": 14, "refId": "red-mesa-relic-museum", "targetSpawnId": "from-red-mesa", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 20, "y": 26, "refId": "from-red-mesa-inn" },
+    { "type": "transition", "x": 20, "y": 26, "refId": "red-mesa-inn", "targetSpawnId": "from-red-mesa", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 44, "y": 26, "refId": "from-red-mesa-general-store" },
+    { "type": "transition", "x": 44, "y": 26, "refId": "red-mesa-general-store", "targetSpawnId": "from-red-mesa", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 30, "y": 8, "refId": "from-red-mesa-blacksmith" },
+    { "type": "transition", "x": 30, "y": 8, "refId": "red-mesa-blacksmith", "targetSpawnId": "from-red-mesa", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 12, "y": 20, "refId": "from-red-mesa-armory" },
+    { "type": "transition", "x": 12, "y": 20, "refId": "red-mesa-armory", "targetSpawnId": "from-red-mesa" }
+  ]
+}

@@ -45,6 +45,12 @@ export const LOCATION_HOME_TOWN: Record<string, string> = {
   'inner-archive': 'cedarwatch',
   'heartwood-lantern-sanctuary': 'cedarwatch',
   'guardian-grove': 'cedarwatch',
+  // Shattered Desert (MSQ Volume V, Chapter 9).
+  'sunfire-dunes': 'red-mesa',
+  'crimson-canyons': 'red-mesa',
+  'painted-mesas': 'red-mesa',
+  'celestial-oasis': 'red-mesa',
+  'forgotten-observatory-approach': 'red-mesa',
 };
 
 /** Resolves the home town for any location id - falls back to Ash Hallow for an unmapped id
