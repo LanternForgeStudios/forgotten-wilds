@@ -469,6 +469,113 @@ whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, an
 
 ---
 
+## Endless Prairie (Volume III, Chapter 5) - outstanding placeholders
+
+**Status (2026-08-04): PixelLab ran out of generation quota mid-build (23/2000 left, not even
+enough for one portrait) and won't refresh for a few days.** Rather than block, every item below
+shipped as a procedurally-generated SVG placeholder (`scripts/gen_placeholder_svg.py` - colored
+gradient panel + short label, `status: 'placeholder'` in the registry, zero PixelLab cost) so
+content buildout could keep moving. This section is the backlog: swap each placeholder for real art
+whenever quota is available again, using the generation prompts below (same "Simple flat-shaded
+fantasy game icon of..." / character-description conventions as every other section in this doc).
+None of this content is player-reachable yet (Highwind Crossing has no incoming transition from the
+rest of the world), so there's no urgency - do it whenever convenient.
+
+4 NPCs (Chief Aiyana, Elder Koda, Niska, Prairie Spirit) already have **real** PixelLab overworld
+sprites (idle-only; see `feedback_region_build_workflow` memory on Niska's walk-cycle frame-count
+mismatch) - only their portraits are still placeholders. The other 4 (the shop NPCs) have no real
+art at all yet, sprite or portrait.
+
+### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
+
+| Character | Role | Generation prompt |
+|---|---|---|
+| Chief Aiyana Whitefeather | Chief of Highwind Crossing | Weathered woman with quiet authority, traditional feathered headdress, richly patterned leather regalia, composed confident expression, plains-chief bearing. |
+| Elder Koda Running Elk | Keeper of the Prairie's Memory | Elderly figure, long grey hair, deerskin robes with woven geometric patterns, surrounded faintly by carved-stone motifs, thoughtful patient expression. |
+| Niska | Prairie Scout | Young lean scout, practical leather riding gear, bow at her back, alert weather-worn eyes, windswept hair. |
+| Prairie Spirit | Guardian spirit of Sacred Hills | Ethereal wind-woven spirit, pale golden-white flowing form like windblown grass given shape, faintly glowing, ancient watchful presence. |
+| Innkeeper Hattie | The Highwind Inn | Warm middle-aged woman, apron over practical prairie clothing, welcoming tired smile, holding a cloth or mug. |
+| Storekeeper Wyatt | Highwind Crossing's General Store | Practical older man, simple travel-worn vest, standing before shelves of trail goods, easy trader's smile. |
+| Blacksmith Garrett | The Highwind Forge | Broad-shouldered forge-scarred man, leather apron, soot-streaked forearms, confident stance near an anvil. |
+| Armorer Ruth | The Highwind Armory | Sturdy practical woman, inspecting a piece of buffalo-hide armor, calloused hands, focused expression. |
+
+### NPC overworld sprites (4 shop NPCs only - 72×96, transparent background, full-body idle pose)
+
+Same character description as the matching portrait above, full-body standing pose instead of
+head-and-shoulders. Chief Aiyana/Elder Koda/Niska/Prairie Spirit don't need this - real idle sprites
+already exist (`sprite.npc.chief-aiyana-whitefeather` etc.).
+
+| Character | Generation prompt |
+|---|---|
+| Innkeeper Hattie | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Storekeeper Wyatt | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Blacksmith Garrett | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Armorer Ruth | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+
+### Enemy battle sprites (4 regular/elite pairs - 128×128, transparent background, front-facing battle stance)
+
+Same `create_character` (quadruped/humanoid template as appropriate) + `animate_character`
+fight-stance-idle pipeline as every other region's enemies - see the Enemies section above.
+
+| Enemy | Family | Generation prompt |
+|---|---|---|
+| Wind Wisp | windSpirits | Small ethereal wind spirit, pale cyan-white swirling wispy form like a visible gust given shape, faint glow, drifting motion. |
+| Storm Wisp | windSpirits | Larger, more turbulent wind spirit, deeper blue-grey coloring with faint crackling energy at its edges, more aggressive posture. |
+| Prairie Wolf | prairieWolves | Lean tan-grey prairie wolf, alert pack-hunter stance, wind-blown fur, sharp eyes. |
+| Dire Prairie Wolf | prairieWolves | Larger, more scarred prairie wolf, darker fur, imposing pack-leader stance. |
+
+### Equipment icons (18 - generate 128×128, final 64×64, across 6 families x 3 tiers)
+
+Prairie Spear is a straight palette-swap of the already-real `ashwood-spear` weapon-layer sheet
+(see the "Equipment weapon-layer sprites" section above) - **once its icon exists**, no new
+hand-positioning is needed at all, just `scripts/palette_swap_equipment_layer.py`. The other 5
+families each need a new founder (icon + 8-direction prop sheet together, per the equipment-layer
+workflow in `feedback_region_build_workflow` memory) before any layer art can start.
+
+| Equipment | Final Size | Generation prompt |
+|---|---|---|
+| Weathered Prairie Spear *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a long ashwood spear, its shaft wrapped in sun-bleached prairie grass cord, centered, transparent background. |
+| Bound Prairie Spear *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a rider-forged spear, fire-hardened head bound with braided rawhide, centered, transparent background. |
+| Windrider's Spear *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a balanced throwing spear feathered like a hawk's wing near the grip, centered, transparent background. |
+| Worn Buffalo Hide *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a well-worn buffalo hide coat, tanned soft, centered, transparent background. |
+| Banded Buffalo Hide *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a buffalo hide coat reinforced with banded leather across the shoulders, centered, transparent background. |
+| Chieftain's Buffalo Hide *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a ceremonial buffalo hide coat with fringed detail and a chief's mark, centered, transparent background. |
+| Worn Rider's Chaps *(common)* | 64×64 | Simple flat-shaded fantasy game icon of weathered leather riding chaps, centered, transparent background. |
+| Banded Rider's Chaps *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of rider's chaps reinforced with banded leather at the knee, centered, transparent background. |
+| Windborn Rider's Chaps *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of light rider's chaps with wind-swept fringe trim, centered, transparent background. |
+| Worn Wind Boots *(common)* | 64×64 | Simple flat-shaded fantasy game icon of soft-soled, broken-in prairie walking boots, centered, transparent background. |
+| Swift Wind Boots *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of lightweight boots cut for speed with wind-swept lacing, centered, transparent background. |
+| Windrunner Boots *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of sleek boots with a faint pale wind-motif etched into the leather, centered, transparent background. |
+| Worn Rider Gloves *(common)* | 64×64 | Simple flat-shaded fantasy game icon of sturdy cracked leather riding gloves, centered, transparent background. |
+| Reinforced Rider Gloves *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of riding gloves reinforced across the knuckles, centered, transparent background. |
+| Warden Rider Gloves *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of ceremonial gloves marked with a chief's sigil, faint pale warding glow, centered, transparent background. |
+| Feather Sky Charm *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a single hawk feather bound with sinew on a cord, centered, transparent background. |
+| Woven Sky Charm *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a small woven charm of feathers and prairie grass, centered, transparent background. |
+| Skywalker's Charm *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of an ornate feather-and-bead charm with a faint pale-blue glow, centered, transparent background. |
+
+### Item icons (5 - generate 128×128, final 64×64: materials, key items)
+
+| Item | Final Size | Generation prompt |
+|---|---|---|
+| Wisp Feather *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a single feather-shaped wisp of condensed pale-blue wind, faintly glowing, centered, transparent background. |
+| Prairie Wolf Pelt *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a folded grey-tan wolf pelt, centered, transparent background. |
+| Winter Count Hide I *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a rolled painted hide with faded pictographs, centered, transparent background. |
+| Winter Count Hide II *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a second rolled painted hide with faded pictographs, tied with a slightly different cord than the first, centered, transparent background. |
+| Guardian Memory Fragment III *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of an angular purple crystal shard (faceted gem shape, not round) holding a faint ghostly glowing memory-image, centered, transparent background. |
+
+### Landmark markers (2 - generate ~128×128, final 144×144)
+
+Currently reusing Bayou's `structure.landmark-drowned-ledger-cache`/`-bogwater-almanac-cache`
+markers as a closer-fit temporary stand-in than the generic `structure.shrine-dormant` fallback -
+swap for bespoke art rather than leaving the reuse permanent.
+
+| Landmark | Generation prompt |
+|---|---|
+| Winter Count Hide I cache | A painted hide bundle half-buried in tall golden prairie grass, faint edge of pictograph visible, centered, transparent background. |
+| Winter Count Hide II cache | A second painted hide bundle tucked into a low grassy hollow, tied with rawhide cord, centered, transparent background. |
+
+---
+
 ## Things Claude can't generate itself (need external production)
 
 Everything above this line is producible in-house via the pixellab MCP server (characters, objects,
