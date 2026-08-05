@@ -1766,6 +1766,31 @@ World Flags
 endless_prairie_complete
 guardian_memory_3_viewed
 whispering_pines_unlocked
+
+Implementation Notes (Chapter 6, shipped): Chapter 6 is complete - MSF-EP-006 through MSF-EP-009
+all shipped as `temple-above-the-clouds`, `keeper-of-the-open-sky`, `the-great-thunderbird`, and
+`the-first-promise-remembered`, gated behind Chapter 5's true finale (`climbing-thunderbird-mesa`),
+not the Winter Counts side quest. "Witness Guardian Memory III" reuses the `stone-circle-carvings`
+shrine a second time (same shrine, sequential quest reuse), the same pattern
+`mother-cypress-shrine` used across three Crimson Bayou quests.
+
+**Fragment-numbering correction**: this doc's "Guardian Memory Fragment III" reward is MSF-EP-009's
+alone - Chapter 5's own MSF-EP-005 ("Climbing Thunderbird Mesa") has no fragment reward listed
+anywhere in this doc, but shipped granting an item called `guardian-memory-fragment-3` anyway (an
+authoring mistake made before this discrepancy was caught). Since nothing was player-reachable at
+the time, the practical fix was to leave that already-deployed item as-is rather than rename live
+content, and have this quest's *actual* "Guardian Memory Fragment III" grant `guardian-memory-
+fragment-4` instead. The in-game item numbering is now one ahead of this doc's own roman-numeral
+count from this point in the story onward - a cosmetic drift, not a story error (the fragment
+granted here is still, narratively, the third Guardian Memory the player witnesses).
+
+**White Buffalo Totem** (this doc's own Region 3 equipment table) was missed entirely during
+Chapter 5's equipment pass - every other shipped region got its own Totem family, Prairie didn't.
+Fixed retroactively as this chapter's own Phase 0: Rare tier (`white-buffalo-totem`) added to a
+Chapter 5 field-map chest, Mythic (`elder-buffalo-totem`) as the Great Thunderbird's own lootTable
+chance drop, Legendary (`thunderbird-totem`) as MSF-EP-008's guaranteed reward - completing the
+family the same three-tier shape Crimson Bayou's Cypress Spirits totem family used.
+
 Volume III Completion Summary
 
 By the end of the Endless Prairie, the player has:

@@ -674,9 +674,17 @@ export const NPCS: Npc[] = [
         'temple-above-the-clouds',
         'keeper-of-the-open-sky',
         'the-great-thunderbird',
+        'the-first-promise-remembered',
       ],
     },
     dialogueVariants: [
+      {
+        questId: 'the-first-promise-remembered',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "The First Promise. Equals, not master and servant - and someone went to a great deal of trouble to make sure nobody remembered it that way." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "I don't know who rewrote that history, Keeper. But you've just proven it can be un-rewritten. That matters more than I can easily say." },
+        ],
+      },
       {
         questId: 'the-great-thunderbird',
         lines: [
@@ -740,9 +748,16 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['the-stone-circles', 'the-first-winter-count', 'the-second-winter-count'],
+      questIds: ['the-stone-circles', 'the-first-winter-count', 'the-second-winter-count', 'the-first-promise-remembered'],
     },
     dialogueVariants: [
+      {
+        questId: 'the-first-promise-remembered',
+        lines: [
+          { speaker: 'Elder Koda Running Elk', text: "Guardian Memory III. I've spent my whole life reading half of what those stones say. You just showed me the other half." },
+          { speaker: 'Elder Koda Running Elk', text: "Equals, sealed together, willingly - and somebody buried that on purpose. I don't know who. I intend to find out." },
+        ],
+      },
       {
         questId: 'the-second-winter-count',
         lines: [

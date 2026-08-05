@@ -524,6 +524,16 @@ export const ITEMS: Item[] = [
     tier: 'legendary',
     unique: true,
   },
+  {
+    id: 'guardian-memory-fragment-4',
+    name: 'Guardian Memory Fragment IV',
+    description: 'The fullest memory yet: the First Promise united people and Guardians, the sealing ritual was performed together, willingly - and the record of it was deliberately rewritten afterward.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.guardian-memory-fragment-4',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

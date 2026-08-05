@@ -4138,6 +4138,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
   },
   {
+    id: 'icon.item.guardian-memory-fragment-4',
+    category: 'icon',
+    intendedUse: 'Item icon for guardian-memory-fragment-4 (Chapter 6/Volume III finale reward) - placeholder pending PixelLab quota',
+    filePath: 'icons/guardian-memory-fragment-4.svg',
+    dimensions: { width: 64, height: 64 },
+    status: 'placeholder',
+    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+  },
+  {
     id: 'icon.item.guardian-memory-fragment-1',
     category: 'icon',
     intendedUse: 'Item icon for guardian-memory-fragment-1',

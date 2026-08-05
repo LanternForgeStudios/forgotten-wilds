@@ -636,4 +636,17 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 260, gold: 140, itemIds: ['thunderbird-totem'] },
   },
+  {
+    id: 'the-first-promise-remembered',
+    name: 'The First Promise Remembered',
+    giverNpcId: 'chief-aiyana-whitefeather',
+    description: 'Return to Highwind Crossing and witness the third Guardian Memory at the Stone Circles.',
+    category: 'main',
+    prerequisiteQuestId: 'the-great-thunderbird',
+    objectives: [
+      { id: 'talk-aiyana-final', type: 'talkToNpc', description: 'Report to Chief Aiyana Whitefeather.', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
+      { id: 'witness-stone-circles', type: 'interactWithShrine', description: 'Return to the Stone Circles and witness Guardian Memory III.', targetId: 'stone-circle-carvings', requiredCount: 1 },
+    ],
+    reward: { xp: 80, gold: 40, itemIds: ['guardian-memory-fragment-4'], regionalReputation: 60, grantLoreId: 'lore-guardian-memory-iii' },
+  },
 ];

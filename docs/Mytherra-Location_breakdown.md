@@ -219,11 +219,24 @@ within them - `Buffalo Herd` and `Stone Rings` in particular are the literal in-
 refIds now (`spirit-herd-plains`/`stone-circle-valley` respectively), not separate locations.
 `Thunderbird Mesa Approach` is a 6th field map, added beyond this doc's own list, serving as
 Chapter 5's closing destination (MSF-EP-005) and the physical hand-off point to Chapter 6's
-Thunderbird Mesa dungeon (this doc's own Main Dungeon section above, not yet built). Town building
-list: `Trading Post`/`Stable` weren't built as their own interiors for Chapter 5 (no NPC/mechanic
-needed one yet) - `Spirit Lodge` and a `Chief's Lodge` (this doc didn't name a leader's building;
-added to house Chief Aiyana Whitefeather, matching every other region's leader-gets-a-hall
-convention) cover the recurring cast instead.
+Thunderbird Mesa dungeon. Town building list: `Trading Post`/`Stable` weren't built as their own
+interiors for Chapter 5 (no NPC/mechanic needed one yet) - `Spirit Lodge` and a `Chief's Lodge`
+(this doc didn't name a leader's building; added to house Chief Aiyana Whitefeather, matching every
+other region's leader-gets-a-hall convention) cover the recurring cast instead.
+
+Implementation Notes (Chapter 6, shipped): Thunderbird Mesa is now built - 5 chained `Location`
+entries (`kind: 'dungeon'`), one per `Mytherra-MSQ_breakdown.md`'s own Chapter 6 "Primary Maps"
+(Summit Temple, Sky Bridge, Storm Galleries, Lantern Sanctuary, Guardian Peak), linked by
+transition/spawnPoint pairs the same way field maps already chain. This doc's own "Sections" list
+above (Canyon Path, Sky Bridge, Storm Cavern, Summit Temple) disagreed with the MSQ doc's 5-room
+list the same way Chapter 5's Location doc/MSQ doc disagreed - resolved the same way: the MSQ doc's
+Primary Maps became the real shipped rooms. "Canyon Path" is effectively covered by
+Thunderbird Mesa Approach (Chapter 5's own field map, already serving as the approach); "Storm
+Cavern" became "Storm Galleries." No precedent existed anywhere in this codebase for a
+multi-room dungeon before this (both Iron Mountains' Hollow Rail Mine and Crimson Bayou's Temple of
+the Deep Current are a single map/Location each) - the chaining machinery itself is fully generic,
+just applied to a dungeon interior for the first time. Reuses `tileset.tiny-dungeon` (same generic
+interior tileset as both prior dungeons) rather than commissioning new "sky temple" art.
 
 4. Whispering Pines
 Primary Town

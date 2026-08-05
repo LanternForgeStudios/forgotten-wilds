@@ -473,6 +473,18 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 260, gold: 140, itemIds: ['thunderbird-totem'] },
   },
+  // Chapter 6 + Volume III finale. "Witness Guardian Memory III" reuses stone-circle-carvings a
+  // second time (same shrine, sequential quest reuse) - mother-cypress-shrine's own 3x-reused
+  // precedent in Bayou (investigate -> restore -> witness).
+  'the-first-promise-remembered': {
+    id: 'the-first-promise-remembered',
+    prerequisiteQuestId: 'the-great-thunderbird',
+    objectives: [
+      { id: 'talk-aiyana-final', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
+      { id: 'witness-stone-circles', type: 'interactWithShrine', targetId: 'stone-circle-carvings', requiredCount: 1 },
+    ],
+    reward: { xp: 80, gold: 40, itemIds: ['guardian-memory-fragment-4'], regionalReputation: 60, grantLoreId: 'lore-guardian-memory-iii' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -517,4 +529,5 @@ export const QUEST_ORDER = [
   'temple-above-the-clouds',
   'keeper-of-the-open-sky',
   'the-great-thunderbird',
+  'the-first-promise-remembered',
 ];

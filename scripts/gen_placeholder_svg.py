@@ -119,6 +119,9 @@ add("icons/lantern-of-open-skies-equipped.svg", 64, 64, "LANTERN", "#f0e0a0", "#
 # --- Chapter 6: Wings of the First Promise (Phase 5 - Thunderbird Totem, Legendary) ---
 add("icons/thunderbird-totem.svg", 64, 64, "TOTEM", "#a888d8", "#5a3888")
 
+# --- Chapter 6: Wings of the First Promise (Phase 6 - finale) ---
+add("icons/guardian-memory-fragment-4.svg", 64, 64, "FRAG 4", "#9a70c0", "#5a3880", font_size=10)
+
 
 if __name__ == "__main__":
     write_all()

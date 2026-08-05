@@ -115,4 +115,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: 'A history carved into the Lantern Sanctuary\'s own walls: Talon Greywind was the last Lantern Keeper to tend Thunderbird Mesa before it fell silent, keeping watch alongside the Great Thunderbird itself rather than over it. Greywind left this lantern lit and waiting - the same way Elise Duvall once left hers beneath the Deep Current.',
     unlockedAt: 0,
   },
+  {
+    id: 'lore-guardian-memory-iii',
+    title: 'Guardian Memory III: The First Promise',
+    body: "The Great Thunderbird's own memory, witnessed at the Stone Circles: the First Promise united Lantern Keepers and Guardian Spirits as equals, and the sealing ritual that followed the Great Silence was performed together, willingly - not one side binding the other. Every account since describes it differently. The historical record wasn't lost. It was rewritten, on purpose, by someone who is never named.",
+    unlockedAt: 0,
+  },
 ];

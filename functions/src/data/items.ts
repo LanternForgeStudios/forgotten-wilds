@@ -231,6 +231,18 @@ export const ITEMS: Record<string, ItemDefinition> = {
     tier: 'legendary',
     unique: true,
   },
+  // Endless Prairie (MSQ Volume III), Chapter 6/Volume III finale reward. Per
+  // docs/Mytherra-MSQ_breakdown.md's Implementation Notes, this is the doc's actual "Guardian
+  // Memory Fragment III" (MSF-EP-009) - guardian-memory-fragment-3 above already shipped as
+  // Chapter 5's own finale reward before that numbering mismatch was caught, so this one continues
+  // the sequence as -4 instead of renaming already-deployed content.
+  'guardian-memory-fragment-4': {
+    id: 'guardian-memory-fragment-4',
+    category: 'keyItem',
+    usableInCombat: false,
+    tier: 'legendary',
+    unique: true,
+  },
 };
 
 export const SHOP_PRICES: Record<string, number> = {
