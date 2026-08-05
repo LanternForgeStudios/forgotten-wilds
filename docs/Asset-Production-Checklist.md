@@ -750,6 +750,124 @@ tracked as a placeholder gap, the tiles are real, just generic.
 
 ---
 
+## Town building-facade markers (18 - generate 144×144, painted building illustration)
+
+`TownScene.tsx`'s `BUILDING_MARKERS` lookup only ever had Ash Hallow + Mirehaven entries - every
+building in Highwind Crossing, Cedarwatch, and Red Mesa rendered as the generic pulsing
+`structure.exit-marker` instead of its own facade until this pass added SVG placeholders (same
+convention as everything else in this file, not Mirehaven's own PixelLab-generated ones - still out
+of quota). Same 144×144 target size as `structure.mirehaven-town-hall` and siblings; generation
+prompt style matches that section's own "Simple flat-shaded... painted building facade" convention,
+adapted per region.
+
+| Building | Region | Generation prompt |
+|---|---|---|
+| Chief's Lodge | Highwind Crossing | Small plains-town chief's lodge, weathered wood and buffalo-hide accents, prairie architecture, painted building facade. |
+| Spirit Lodge | Highwind Crossing | Small ceremonial lodge, hide-covered frame, prairie architecture, painted building facade. |
+| The Inn | Highwind Crossing | Cozy prairie inn, wide porch, weathered wood, painted building facade. |
+| General Store | Highwind Crossing | Small prairie general-store building, covered porch with goods on display, painted building facade. |
+| The Forge | Highwind Crossing | Prairie blacksmith forge, stone chimney and forge smoke, painted building facade. |
+| The Armory | Highwind Crossing | Prairie armory building, buffalo-hide armor racks visible outside, painted building facade. |
+| Elder's Lodge | Cedarwatch | Cedar-forest council hall, built into or beside a giant cedar trunk, painted building facade. |
+| Great Tree Library | Cedarwatch | A library built into a hollowed giant cedar, root-and-canopy architecture, painted building facade. |
+| The Inn | Cedarwatch | Timber forest inn built around a living cedar trunk, painted building facade. |
+| General Store | Cedarwatch | Small forest-town general store, covered porch, painted building facade. |
+| The Forge | Cedarwatch | Forest blacksmith forge, open-walled among the trees, painted building facade. |
+| The Armory | Cedarwatch | Forest armory, bark-plated armor racks visible outside, painted building facade. |
+| The Elder's Hall | Red Mesa | A council chamber carved directly into red canyon cliff-rock, painted building facade. |
+| The Relic Museum | Red Mesa | A small museum building carved into canyon rock, pottery and star-charts visible through a window, painted building facade. |
+| The Inn | Red Mesa | A desert inn carved cool into cliff rock, hanging lanterns, painted building facade. |
+| General Store | Red Mesa | A small desert general store, covered porch against the sun, painted building facade. |
+| The Forge | Red Mesa | A desert blacksmith forge cut into canyon rock, painted building facade. |
+| The Armory | Red Mesa | A desert armory, sun-worn leather and plate racks visible outside, painted building facade. |
+
+---
+
+## Whispering Pines, Chapter 9: Beneath Forgotten Stars - outstanding placeholders
+
+**Status (2026-08-05): same PixelLab quota outage as every prior chapter, still not refreshed.**
+Every asset below shipped as a procedurally-generated SVG placeholder. All 6 of Chapter 9's field/
+town maps reuse `tileset.overworld-terrain`/`overworld-decor2`/`overworld-water` and
+`tileset.town-terrain` (not `tileset.cliff`/`tileset.beach`, both already flagged "provenance
+unconfirmed" elsewhere in this file, not safe to wire into real content) - not tracked as a
+placeholder gap the way character art is, the tiles are real, just generic and not desert-themed. A
+genuine desert/canyon terrain pass (red-rock ground variants, mesa-band decor, sand-dune overhang
+tiles) would be a real visual upgrade later.
+
+### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
+
+| Character | Role | Generation prompt |
+|---|---|---|
+| Elder Santiago Ortega | Elder of Red Mesa | Weathered older man with quiet authority, desert-worn clothing, silver-streaked hair, composed confident expression, canyon-town elder bearing. |
+| Scholar Nia Solis | Keeper of the Relic Museum | Middle-aged scholar, sun-browned skin, dust-smudged fingers, robes with star-pattern trim, curious focused expression, surrounded faintly by pottery shelving. |
+| Tomas Vega | Desert Ranger | Lean weathered ranger, wide-brimmed hat, practical desert gear, alert sun-narrowed eyes. |
+| Sand Spirit | Voice of the Celestial Oasis | Ethereal spirit woven from pale sand and starlight, shifting golden-white form, faintly glowing, ancient watchful presence. |
+| Rosa | The Red Mesa Inn | Warm heavyset woman, apron over practical desert clothing, welcoming tired smile. |
+| Mateo | Red Mesa's General Store | Practical middle-aged man, sun-worn vest, standing before shelves of trail goods, easy trader's smile. |
+| Esteban | The Red Mesa Forge | Broad-shouldered forge-scarred man, leather apron, soot-streaked forearms, confident stance near an anvil. |
+| Carmen | The Red Mesa Armory | Sturdy practical woman, inspecting a piece of sun-worn leather armor, calloused hands, focused expression. |
+
+### NPC overworld sprites (8 - 72×96, transparent background, full-body idle pose)
+
+No Chapter 9 NPC has real PixelLab art yet, sprite or portrait.
+
+| Character | Generation prompt |
+|---|---|
+| Elder Santiago Ortega | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Scholar Nia Solis | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Tomas Vega | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Sand Spirit | Full-body version of its portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Rosa | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Mateo | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Esteban | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Carmen | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+
+### Enemy battle sprites (1 regular/elite pair - 128×128, transparent background, front-facing battle stance)
+
+| Enemy | Family | Generation prompt |
+|---|---|---|
+| Dust Devil | dustDevils | A whirl of sand loosely held into a hostile shape, faint glinting sandglass fragments embedded in its form, restless motion. |
+| Sandstorm Devil | dustDevils | A larger, denser whirlwind of sand, deeper ochre-red coloring, aggressive swirling posture, sand fully obscuring what might be a face. |
+
+### Equipment icons (19 - generate 128×128, final 64×64, across 6 families x 3 tiers + 1 totem)
+
+Sunblade is a straight palette-swap of the already-real Sword-type weapon-layer founder (see the
+"Equipment weapon-layer sprites" section above) - once its icon exists, no new hand-positioning is
+needed, just `scripts/palette_swap_equipment_layer.py`. The other 5 families each need a new
+founder before any layer art can start.
+
+| Equipment | Final Size | Generation prompt |
+|---|---|---|
+| Weathered Sunblade *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a single-edged desert blade, sun-treated metal, centered, transparent background. |
+| Bound Sunblade *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a sunblade with a sand-worn leather grip, centered, transparent background. |
+| Solaris Blade *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a blade with a faint heat-shimmer along its edge, centered, transparent background. |
+| Worn Nomad Robes *(common)* | 64×64 | Simple flat-shaded fantasy game icon of loose sand-colored desert robes, centered, transparent background. |
+| Banded Nomad Robes *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of nomad robes reinforced with banded leather, centered, transparent background. |
+| Starwoven Nomad Robes *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of ceremonial robes stitched with a faint glowing star-pattern, centered, transparent background. |
+| Worn Nomad Leggings *(common)* | 64×64 | Simple flat-shaded fantasy game icon of loose desert leggings, centered, transparent background. |
+| Banded Nomad Leggings *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of nomad leggings banded at the knee, centered, transparent background. |
+| Starwoven Nomad Leggings *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of leggings stitched with a matching star-pattern, centered, transparent background. |
+| Worn Sand Boots *(common)* | 64×64 | Simple flat-shaded fantasy game icon of soft-soled sand-colored dune boots, centered, transparent background. |
+| Swift Sand Boots *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of lightweight sand boots cut for speed, centered, transparent background. |
+| Sunrunner Boots *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of sleek boots etched with a faint pale sun-motif, centered, transparent background. |
+| Worn Dune Wraps *(common)* | 64×64 | Simple flat-shaded fantasy game icon of cloth hand-wraps for desert travel, centered, transparent background. |
+| Woven Dune Wraps *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of densely woven dune wraps, centered, transparent background. |
+| Ranger's Dune Wraps *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of dune wraps marked with a ranger's sigil, faint pale warding glow, centered, transparent background. |
+| Sunworn Star Charm *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a sun-bleached bone disc etched with a single star, on a cord, centered, transparent background. |
+| Banded Star Charm *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a star charm bound in braided cord, centered, transparent background. |
+| Astral Star Charm *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of an ornate charm inlaid with glowing crystal fragments, centered, transparent background. |
+| Sunstone Totem *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a small carved totem inlaid with sun-warmed stone, centered, transparent background. |
+
+### Item icons (3 - generate 128×128, final 64×64: materials, key items)
+
+| Item | Final Size | Generation prompt |
+|---|---|---|
+| Sandglass Shard *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a shard of sun-fused glass, centered, transparent background. |
+| Star Fragment *(key item, shared across 3 locations)* | 64×64 | Simple flat-shaded fantasy game icon of a glinting crystal shard that catches starlight, centered, transparent background. |
+| Desert Relic *(key item, shared across 2 locations)* | 64×64 | Simple flat-shaded fantasy game icon of a carved pottery shard marked with a star-pattern, centered, transparent background. |
+
+---
+
 ## Things Claude can't generate itself (need external production)
 
 Everything above this line is producible in-house via the pixellab MCP server (characters, objects,

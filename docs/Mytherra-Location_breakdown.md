@@ -346,6 +346,22 @@ Boss:
 
 The Canyon Giant
 
+Implementation Notes (Chapter 9, shipped): same doc-drift pattern as every prior region - this
+section's "Overworld Areas" (Sunfire Dunes with Oasis/Buried Ruins/Sandstorm Pass; Crimson Canyons
+with Rope Bridges/Cliff Trails/Hidden Tomb; Painted Mesas with Spirit Stones/Ancient Road/Crystal
+Cavern) disagreed with `Mytherra-MSQ_breakdown.md`'s own 6 Chapter 9 Primary Maps (Red Mesa, Sunfire
+Dunes, Crimson Canyons, Painted Mesas, Celestial Oasis, Forgotten Observatory Approach) - notably
+this doc's "Oasis" (a sub-area of Sunfire Dunes) became the MSQ doc's own standalone "Celestial
+Oasis" Primary Map instead, the same way Sacred Hills/Ancient Cedar Shrine became their own Primary
+Maps in earlier regions rather than staying landmarks. Resolved the same way as always: the MSQ
+doc's Primary Maps became the real shipped `Location` entries; this doc's sub-area names weren't
+built as separate landmarks this pass. Town building list: `Observatory` and `Caravan Office`
+weren't built as their own interiors (Desert Ranger Tomas Vega wanders Red Mesa's town square
+instead, matching Scout Niska/Forest Warden Rowan Hart's own precedent; the "Observatory" building
+name refers to the Forgotten Observatory dungeon itself, not a separate Red Mesa structure) -
+`The Elder's Hall`/`Relic Museum` cover the recurring cast, matching every other region's leader/
+historian-gets-a-hall convention.
+
 6. Frozen Frontier
 Primary Town
 Frosthaven
