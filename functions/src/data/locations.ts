@@ -70,6 +70,8 @@ export const KNOWN_SHRINES: Record<string, Set<string>> = {
   'hollow-rail-mine': new Set(['mine-shrine']),
   'cypress-marsh': new Set(['mother-cypress-shrine']),
   'stone-circle-valley': new Set(['stone-circle-carvings']),
+  // Endless Prairie (MSQ Volume III, Chapter 6) - Summit Temple's own restoration beat (MSF-EP-006).
+  'summit-temple': new Set(['ancient-wind-mechanism']),
 };
 
 /** Which parent map's location each landmark lives within - visitLandmark.ts's own lookup, used to

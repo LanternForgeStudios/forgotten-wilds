@@ -60,6 +60,7 @@ const BOSS_TRIGGERS: Record<string, { prerequisiteQuestId: string; approachLabel
 /** Shrine-kind interactables (interactWithShrine.ts), keyed by refId. */
 const SHRINE_INTERACTABLES: Record<string, { message: string }> = {
   'mine-shrine': { message: 'A shrine carved into the rock, coated in soot. Something in it still resists the corruption around it.' },
+  'ancient-wind-mechanism': { message: 'A ring of stone vanes and gears, long since seized up. Something here still wants to turn.' },
 };
 
 /** World-item ("fragment"-kind) interactables (collectWorldItem.ts) - refId is always the same as

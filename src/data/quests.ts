@@ -594,4 +594,20 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'prairie-wildfire', grantLoreId: 'winter-count-ii' },
   },
+
+  // --- Endless Prairie (MSQ Volume III), Chapter 6: Wings of the First Promise ---
+  {
+    id: 'temple-above-the-clouds',
+    name: 'Temple Above the Clouds',
+    giverNpcId: 'chief-aiyana-whitefeather',
+    description: "Climb into Summit Temple, restore its ancient wind mechanisms, and press on toward the Sky Bridge.",
+    category: 'main',
+    prerequisiteQuestId: 'climbing-thunderbird-mesa',
+    objectives: [
+      { id: 'reach-summit-temple', type: 'reachLocation', description: 'Explore Summit Temple.', targetId: 'summit-temple', requiredCount: 1 },
+      { id: 'restore-wind-mechanism', type: 'interactWithShrine', description: 'Restore the ancient wind mechanism.', targetId: 'ancient-wind-mechanism', requiredCount: 1 },
+      { id: 'reach-sky-bridge', type: 'reachLocation', description: 'Reach the Sky Bridge.', targetId: 'sky-bridge', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 20 },
+  },
 ];

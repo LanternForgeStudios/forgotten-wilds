@@ -43,6 +43,7 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   'blacksmith-toussaint': ['seeds-of-memory'],
   // Endless Prairie (MSQ Volume III, Chapter 5)
   'chief-aiyana-whitefeather': [
+    'temple-above-the-clouds',
     'the-second-winter-count',
     'the-first-winter-count',
     'climbing-thunderbird-mesa',

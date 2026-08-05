@@ -439,6 +439,22 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'prairie-wildfire', grantLoreId: 'winter-count-ii' },
   },
+
+  // --- Endless Prairie (MSQ Volume III), Chapter 6: Wings of the First Promise ---
+  // Kebab-case id mapping: MSF-EP-006 temple-above-the-clouds, MSF-EP-007
+  // keeper-of-the-open-sky, MSF-EP-008 the-great-thunderbird, MSF-EP-009
+  // the-first-promise-remembered. Gated behind Chapter 5's true finale
+  // (climbing-thunderbird-mesa), not the Winter Counts side quest.
+  'temple-above-the-clouds': {
+    id: 'temple-above-the-clouds',
+    prerequisiteQuestId: 'climbing-thunderbird-mesa',
+    objectives: [
+      { id: 'reach-summit-temple', type: 'reachLocation', targetId: 'summit-temple', requiredCount: 1 },
+      { id: 'restore-wind-mechanism', type: 'interactWithShrine', targetId: 'ancient-wind-mechanism', requiredCount: 1 },
+      { id: 'reach-sky-bridge', type: 'reachLocation', targetId: 'sky-bridge', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 20 },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -480,4 +496,5 @@ export const QUEST_ORDER = [
   'climbing-thunderbird-mesa',
   'the-first-winter-count',
   'the-second-winter-count',
+  'temple-above-the-clouds',
 ];

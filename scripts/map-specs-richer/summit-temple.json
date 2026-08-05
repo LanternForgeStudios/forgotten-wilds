@@ -34,6 +34,7 @@
     { "type": "spawnPoint", "x": 30, "y": 10, "refId": "from-sky-bridge" },
     { "type": "transition", "x": 31, "y": 10, "refId": "sky-bridge", "targetSpawnId": "from-summit-temple" },
 
-    { "type": "interactable", "x": 16, "y": 4, "refId": "chest-summit-temple-1" }
+    { "type": "interactable", "x": 16, "y": 4, "refId": "chest-summit-temple-1" },
+    { "type": "interactable", "x": 16, "y": 15, "refId": "ancient-wind-mechanism" }
   ]
 }

@@ -666,9 +666,22 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['across-open-skies', 'climbing-thunderbird-mesa', 'the-first-winter-count', 'the-second-winter-count'],
+      questIds: [
+        'across-open-skies',
+        'climbing-thunderbird-mesa',
+        'the-first-winter-count',
+        'the-second-winter-count',
+        'temple-above-the-clouds',
+      ],
     },
     dialogueVariants: [
+      {
+        questId: 'temple-above-the-clouds',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "The wind mechanisms answered you. My grandmother used to say the temple was built to listen for something - I never once heard it listening back." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "Whatever's further up that mesa, Keeper, it's been waiting a long time. Go carefully." },
+        ],
+      },
       {
         questId: 'the-second-winter-count',
         lines: [
