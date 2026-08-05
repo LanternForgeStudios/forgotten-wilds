@@ -1022,4 +1022,15 @@ export const EQUIPMENT: EquipmentItem[] = [
     oilCapacity: 38,
     lanternAbilityIds: ['open-skies-renewal'],
   },
+  {
+    id: 'thunderbird-totem',
+    name: 'Thunderbird Totem',
+    description: 'A totem carved in the Great Thunderbird\'s own likeness, wings spread, granted only to those it judges worthy.',
+    slot: 'spiritTotem',
+    iconAssetId: 'icon.equipment.thunderbird-totem',
+    statBonuses: { maxSpirit: 22, maxHp: 12, defense: 7 },
+    tier: 'legendary',
+    unique: true,
+    familyId: 'white-buffalo-totem',
+  },
 ];

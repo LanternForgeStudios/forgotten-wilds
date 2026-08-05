@@ -623,4 +623,17 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 50, gold: 0, itemIds: ['lantern-of-open-skies-equipped'], grantLoreId: 'lore-keeper-talon-greywind' },
   },
+  {
+    id: 'the-great-thunderbird',
+    name: 'The Great Thunderbird',
+    giverNpcId: 'chief-aiyana-whitefeather',
+    description: "Reach Guardian Peak and confront the Great Thunderbird itself.",
+    category: 'main',
+    prerequisiteQuestId: 'keeper-of-the-open-sky',
+    objectives: [
+      { id: 'reach-guardian-peak', type: 'reachLocation', description: 'Reach Guardian Peak.', targetId: 'guardian-peak', requiredCount: 1 },
+      { id: 'defeat-great-thunderbird', type: 'defeatBoss', description: 'Defeat the Great Thunderbird.', targetId: 'great-thunderbird', requiredCount: 1 },
+    ],
+    reward: { xp: 260, gold: 140, itemIds: ['thunderbird-totem'] },
+  },
 ];

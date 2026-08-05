@@ -673,9 +673,17 @@ export const NPCS: Npc[] = [
         'the-second-winter-count',
         'temple-above-the-clouds',
         'keeper-of-the-open-sky',
+        'the-great-thunderbird',
       ],
     },
     dialogueVariants: [
+      {
+        questId: 'the-great-thunderbird',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "The Great Thunderbird, answered and at rest. Guardian Peak has kept its watch a long time - I didn't expect to see it end in my lifetime." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "The totem it left you carries real weight, Keeper. Wear it knowing what it cost to earn." },
+        ],
+      },
       {
         questId: 'keeper-of-the-open-sky',
         lines: [

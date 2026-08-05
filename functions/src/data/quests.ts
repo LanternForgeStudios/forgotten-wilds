@@ -464,6 +464,15 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 50, gold: 0, itemIds: ['lantern-of-open-skies-equipped'], grantLoreId: 'lore-keeper-talon-greywind' },
   },
+  'the-great-thunderbird': {
+    id: 'the-great-thunderbird',
+    prerequisiteQuestId: 'keeper-of-the-open-sky',
+    objectives: [
+      { id: 'reach-guardian-peak', type: 'reachLocation', targetId: 'guardian-peak', requiredCount: 1 },
+      { id: 'defeat-great-thunderbird', type: 'defeatBoss', targetId: 'great-thunderbird', requiredCount: 1 },
+    ],
+    reward: { xp: 260, gold: 140, itemIds: ['thunderbird-totem'] },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -507,4 +516,5 @@ export const QUEST_ORDER = [
   'the-second-winter-count',
   'temple-above-the-clouds',
   'keeper-of-the-open-sky',
+  'the-great-thunderbird',
 ];

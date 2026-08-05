@@ -116,6 +116,9 @@ add("icons/elder-buffalo-totem.svg", 64, 64, "TOTEM", "#c8c0b0", "#78705f")
 add("icons/lantern-of-open-skies.svg", 64, 64, "LANTERN", "#e8d888", "#a08830", font_size=9)
 add("icons/lantern-of-open-skies-equipped.svg", 64, 64, "LANTERN", "#f0e0a0", "#b09840", font_size=9)
 
+# --- Chapter 6: Wings of the First Promise (Phase 5 - Thunderbird Totem, Legendary) ---
+add("icons/thunderbird-totem.svg", 64, 64, "TOTEM", "#a888d8", "#5a3888")
+
 
 if __name__ == "__main__":
     write_all()

@@ -801,4 +801,14 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     oilCapacity: 38,
     lanternAbilityIds: ['open-skies-renewal'],
   },
+  // White Buffalo Totem family's Legendary cap - a guaranteed reward from the boss-defeat quest
+  // itself (MSF-EP-008), same pattern as mother-cypress-totem.
+  'thunderbird-totem': {
+    id: 'thunderbird-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxSpirit: 22, maxHp: 12, defense: 7 },
+    tier: 'legendary',
+    unique: true,
+    familyId: 'white-buffalo-totem',
+  },
 };

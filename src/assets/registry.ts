@@ -4129,6 +4129,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
   },
   {
+    id: 'icon.equipment.thunderbird-totem',
+    category: 'icon',
+    intendedUse: 'Equipment icon for thunderbird-totem (White Buffalo Totem family Legendary cap, MSF-EP-008 reward) - placeholder pending PixelLab quota',
+    filePath: 'icons/thunderbird-totem.svg',
+    dimensions: { width: 64, height: 64 },
+    status: 'placeholder',
+    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+  },
+  {
     id: 'icon.item.guardian-memory-fragment-1',
     category: 'icon',
     intendedUse: 'Item icon for guardian-memory-fragment-1',
