@@ -63,6 +63,22 @@ const BUILDING_MARKERS: Record<string, { label: string; spriteAssetId: string }>
   'mirehaven-blacksmith': { label: "Toussaint's Forge", spriteAssetId: 'structure.mirehaven-blacksmith' },
   'mirehaven-armory': { label: "Delphine's Armory", spriteAssetId: 'structure.mirehaven-armory' },
   'mirehaven-herbalist': { label: 'Herbalist', spriteAssetId: 'structure.mirehaven-herbalist' },
+  // Endless Prairie (MSQ Volume III) - every entrance rendered as the generic exit marker until
+  // this pass added placeholder facade art (SVG, not PixelLab-generated - see
+  // structure.highwind-crossing-chiefs-lodge's registry note for why).
+  'highwind-crossing-chiefs-lodge': { label: "Chief's Lodge", spriteAssetId: 'structure.highwind-crossing-chiefs-lodge' },
+  'highwind-crossing-spirit-lodge': { label: 'Spirit Lodge', spriteAssetId: 'structure.highwind-crossing-spirit-lodge' },
+  'highwind-crossing-inn': { label: 'The Inn', spriteAssetId: 'structure.highwind-crossing-inn' },
+  'highwind-crossing-general-store': { label: 'General Store', spriteAssetId: 'structure.highwind-crossing-general-store' },
+  'highwind-crossing-blacksmith': { label: 'The Forge', spriteAssetId: 'structure.highwind-crossing-blacksmith' },
+  'highwind-crossing-armory': { label: 'The Armory', spriteAssetId: 'structure.highwind-crossing-armory' },
+  // Whispering Pines (MSQ Volume IV) - same placeholder-facade treatment.
+  'cedarwatch-elders-lodge': { label: "Elder's Lodge", spriteAssetId: 'structure.cedarwatch-elders-lodge' },
+  'cedarwatch-great-tree-library': { label: 'Great Tree Library', spriteAssetId: 'structure.cedarwatch-great-tree-library' },
+  'cedarwatch-inn': { label: 'The Inn', spriteAssetId: 'structure.cedarwatch-inn' },
+  'cedarwatch-general-store': { label: 'General Store', spriteAssetId: 'structure.cedarwatch-general-store' },
+  'cedarwatch-blacksmith': { label: 'The Forge', spriteAssetId: 'structure.cedarwatch-blacksmith' },
+  'cedarwatch-armory': { label: 'The Armory', spriteAssetId: 'structure.cedarwatch-armory' },
 };
 
 /** Shrine interactables on the open town map (currently just Ash Hallow's Town Shrine) - handled

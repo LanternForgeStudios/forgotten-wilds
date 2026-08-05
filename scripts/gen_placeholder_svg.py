@@ -205,6 +205,24 @@ add("icons/cedar-giant-totem.svg", 64, 64, "TOTEM", "#a8d888", "#4a7830")
 add("icons/guardian-memory-fragment-5.svg", 64, 64, "FRAG 5", "#9a70c0", "#5a3880", font_size=10)
 add("icons/celestial-star-map.svg", 64, 64, "MAP", "#7a8ac0", "#3a4470")
 
+# --- Town structure (building-facade marker) placeholders ---
+# BUILDING_MARKERS in TownScene.tsx only had Ash Hallow + Mirehaven entries - every Highwind
+# Crossing and Cedarwatch building fell through to the generic pulsing structure.exit-marker
+# instead of a facade. Same 144x144 dimension convention as every real/placeholder structure.*
+# icon (see structure.mirehaven-town-hall's own note), colored per-region.
+add("sprites/structures/highwind-crossing-chiefs-lodge.svg", 144, 144, "LODGE", "#6b4f2e", "#3a2c1a")
+add("sprites/structures/highwind-crossing-spirit-lodge.svg", 144, 144, "SPIRIT", "#6b4f2e", "#3a2c1a")
+add("sprites/structures/highwind-crossing-inn.svg", 144, 144, "INN", "#6b4f2e", "#3a2c1a")
+add("sprites/structures/highwind-crossing-general-store.svg", 144, 144, "SHOP", "#6b4f2e", "#3a2c1a")
+add("sprites/structures/highwind-crossing-blacksmith.svg", 144, 144, "FORGE", "#6b4f2e", "#3a2c1a")
+add("sprites/structures/highwind-crossing-armory.svg", 144, 144, "ARMORY", "#6b4f2e", "#3a2c1a", font_size=18)
+add("sprites/structures/cedarwatch-elders-lodge.svg", 144, 144, "LODGE", "#4a6a3a", "#243a1c")
+add("sprites/structures/cedarwatch-great-tree-library.svg", 144, 144, "LIBRARY", "#4a6a3a", "#243a1c", font_size=18)
+add("sprites/structures/cedarwatch-inn.svg", 144, 144, "INN", "#4a6a3a", "#243a1c")
+add("sprites/structures/cedarwatch-general-store.svg", 144, 144, "SHOP", "#4a6a3a", "#243a1c")
+add("sprites/structures/cedarwatch-blacksmith.svg", 144, 144, "FORGE", "#4a6a3a", "#243a1c")
+add("sprites/structures/cedarwatch-armory.svg", 144, 144, "ARMORY", "#4a6a3a", "#243a1c", font_size=18)
+
 
 if __name__ == "__main__":
     write_all()
