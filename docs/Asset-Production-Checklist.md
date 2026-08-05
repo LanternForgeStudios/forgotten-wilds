@@ -713,6 +713,43 @@ founder before any layer art can start.
 
 ---
 
+## Whispering Pines, Chapter 8: Echoes of the First Keepers - outstanding placeholders
+
+**Status (2026-08-05): same PixelLab quota outage as every prior chapter, still not refreshed.**
+No new NPCs this chapter (Archivist Elowen and Elder Rowan Birch reprise their Chapter 7 roles), so
+this list is shorter - 3 enemy sprites, 4 equipment icons, 5 item icons. All 4 of Heartwood
+Sanctuary's dungeon rooms reuse `tileset.tiny-dungeon`, same as every dungeon before it - not
+tracked as a placeholder gap, the tiles are real, just generic.
+
+### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss)
+
+| Enemy | Family | Generation prompt |
+|---|---|---|
+| Root Wraith | rootWraiths | A knot of gnarled root grown into a rough humanoid shape, motionless until disturbed, pale fungus glinting between the fibers. |
+| Elder Root Wraith | rootWraiths | A larger, denser root-wraith, bark-armored joints, more visibly aggressive stance. |
+| Cedar Giant *(boss, 256×256)* | boss | A massive Guardian shaped from an ancient cedar grown wild, moss-draped limbs thick as trunks, a faint spirit-light glowing deep within a hollow in its chest - imposing but not malevolent, a watcher left too long unrelieved. |
+
+### Equipment icons (4 - generate 128×128, final 64×64)
+
+| Equipment | Final Size | Generation prompt |
+|---|---|---|
+| Elder Cedar Totem *(mythic)* | 64×64 | Simple flat-shaded fantasy game icon of a larger carved totem marked with deep growth-rings, centered, transparent background. |
+| Cedar Giant Totem *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a totem carved in the Cedar Giant's own hulking likeness, centered, transparent background. |
+| Lantern of Ancient Roots *(found-item form)* | 64×64 | Simple flat-shaded fantasy game icon of an unlit brass lantern etched with an interlocking root-pattern, centered, transparent background. |
+| Lantern of Ancient Roots *(equipped, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a lit legendary lantern, glass etched with a root-pattern, faint pale-green glow, centered, transparent background. |
+
+### Item icons (5 - generate 128×128, final 64×64)
+
+| Item | Final Size | Generation prompt |
+|---|---|---|
+| Gnarled Root Fiber *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a tough, woody root fiber, centered, transparent background. |
+| Archive Fragments *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a small bundle of aged, root-stained pages, centered, transparent background. |
+| Ancient Heartwood Relic *(key item, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a glowing wood fragment, faint spirit-light within, centered, transparent background. |
+| Guardian Memory Fragment V *(key item, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of an angular purple crystal shard (faceted gem shape, not round) holding a faint ghostly glowing memory-image, centered, transparent background. |
+| Celestial Star Map *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a rolled star chart with faint constellation markings, centered, transparent background. |
+
+---
+
 ## Things Claude can't generate itself (need external production)
 
 Everything above this line is producible in-house via the pixellab MCP server (characters, objects,
