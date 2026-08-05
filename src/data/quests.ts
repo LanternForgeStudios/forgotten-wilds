@@ -826,4 +826,23 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 300, gold: 160, itemIds: ['cedar-giant-totem'] },
   },
+  {
+    id: 'the-missing-pages',
+    name: 'The Missing Pages',
+    giverNpcId: 'elder-rowan-birch',
+    description: 'Return to Cedarwatch and witness the fourth Guardian Memory at the Ancient Cedar Shrine.',
+    category: 'main',
+    prerequisiteQuestId: 'the-cedar-giant',
+    objectives: [
+      { id: 'talk-elder-final', type: 'talkToNpc', description: 'Report to Elder Rowan Birch.', targetId: 'elder-rowan-birch', requiredCount: 1 },
+      { id: 'witness-cedar-shrine', type: 'interactWithShrine', description: 'Return to the Ancient Cedar Shrine and witness Guardian Memory IV.', targetId: 'cedar-shrine-heart', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 90,
+      gold: 45,
+      itemIds: ['guardian-memory-fragment-5', 'celestial-star-map'],
+      regionalReputation: 65,
+      grantLoreId: 'lore-guardian-memory-iv',
+    },
+  },
 ];

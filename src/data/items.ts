@@ -644,6 +644,26 @@ export const ITEMS: Item[] = [
     tier: 'legendary',
     unique: true,
   },
+  {
+    id: 'guardian-memory-fragment-5',
+    name: 'Guardian Memory Fragment V',
+    description: "The clearest memory yet: the histories of the Great Silence weren't merely lost - they were carefully, deliberately emptied, page by page, region by region, by someone who was never caught and never named.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.guardian-memory-fragment-5',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
+  {
+    id: 'celestial-star-map',
+    name: 'Celestial Star Map',
+    description: 'A surviving star chart, its markings pointing toward an observatory somewhere in the Shattered Desert.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.celestial-star-map',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

@@ -892,9 +892,16 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['the-cedar-giant', 'into-the-ancient-forest', 'heartwood-sanctuary'],
+      questIds: ['the-missing-pages', 'the-cedar-giant', 'into-the-ancient-forest', 'heartwood-sanctuary'],
     },
     dialogueVariants: [
+      {
+        questId: 'the-missing-pages',
+        lines: [
+          { speaker: 'Elder Rowan Birch', text: "Deliberately emptied, not lost. I've spent my whole life assuming the gaps in our history were accidents of time. I don't get to assume that anymore." },
+          { speaker: 'Elder Rowan Birch', text: "A star map, pointing toward the Shattered Desert. Wherever this leads, Keeper, Cedarwatch will still be here when you're ready to follow it." },
+        ],
+      },
       {
         questId: 'the-cedar-giant',
         lines: [

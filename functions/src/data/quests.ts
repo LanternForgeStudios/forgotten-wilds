@@ -618,6 +618,21 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 300, gold: 160, itemIds: ['cedar-giant-totem'] },
   },
+  'the-missing-pages': {
+    id: 'the-missing-pages',
+    prerequisiteQuestId: 'the-cedar-giant',
+    objectives: [
+      { id: 'talk-elder-final', type: 'talkToNpc', targetId: 'elder-rowan-birch', requiredCount: 1 },
+      { id: 'witness-cedar-shrine', type: 'interactWithShrine', targetId: 'cedar-shrine-heart', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 90,
+      gold: 45,
+      itemIds: ['guardian-memory-fragment-5', 'celestial-star-map'],
+      regionalReputation: 65,
+      grantLoreId: 'lore-guardian-memory-iv',
+    },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -673,4 +688,5 @@ export const QUEST_ORDER = [
   'beneath-the-roots',
   'the-keeper-beneath-the-cedar',
   'the-cedar-giant',
+  'the-missing-pages',
 ];

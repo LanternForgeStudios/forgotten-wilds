@@ -281,6 +281,28 @@ Boss:
 
 Ancient Cedar Guardian
 
+Implementation Notes (Chapter 7, shipped): same doc-drift pattern as every prior region - this
+section's "Overworld Areas" (Elder Forest with Fallen Giant/Moss Valley/Hidden Grove; Mistwood with
+Mist Bridge/Ancient Cedar/Spirit Pools; Silver River with Rapids/Fishing Camp/Water Shrine) disagreed
+with `Mytherra-MSQ_breakdown.md`'s own 6 Chapter 7 Primary Maps (Cedarwatch, Mistwood Path, Elder
+Forest, Silver River, Ancient Cedar Shrine, Heartwood Approach). Resolved the same way: the MSQ doc's
+Primary Maps became the real shipped `Location` entries; this doc's sub-area names (Mist Bridge,
+Fallen Giant, Water Shrine, etc.) were not built as separate landmarks this pass - none of Chapter
+7's own quests needed one individually. Town building list: `Woodworker`/`Ranger Lodge` weren't built
+as their own interiors (Forest Warden Rowan Hart wanders Cedarwatch's town square instead, matching
+Scout Niska's own precedent in Highwind Crossing) - `Elder's Lodge`/`Great Tree Library` cover the
+recurring cast, matching every other region's leader/historian-gets-a-hall convention.
+
+Implementation Notes (Chapter 8, shipped): Heartwood Sanctuary is now built - 4 chained `Location`
+entries (`kind: 'dungeon'`), one per `Mytherra-MSQ_breakdown.md`'s own Chapter 8 Primary Maps (Root
+Caverns, Inner Archive, Lantern Sanctuary, Guardian Grove), linked the same way Thunderbird Mesa's 5
+rooms chain. This doc's own "Sections" (Root Tunnels, Spirit Garden, Ancient Canopy, Sacred Core) and
+boss name ("Ancient Cedar Guardian") disagreed with the MSQ doc the same way Chapter 6's Location
+doc/MSQ doc disagreed - resolved the same way: the MSQ doc's Primary Maps and its own boss name
+("Cedar Giant") won. The Lantern Sanctuary room is `heartwood-lantern-sanctuary` in code (not the
+plain `lantern-sanctuary` id), since Thunderbird Mesa's own Chapter 6 room already owns that id.
+Reuses `tileset.tiny-dungeon`, same as every dungeon before it.
+
 5. Shattered Desert
 Primary Town
 Red Mesa

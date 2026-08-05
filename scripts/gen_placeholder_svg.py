@@ -201,6 +201,10 @@ add("icons/lantern-of-ancient-roots-equipped.svg", 64, 64, "LANTERN", "#b8e898",
 add("icons/elder-cedar-totem.svg", 64, 64, "TOTEM", "#c8c0a0", "#78705a")
 add("icons/cedar-giant-totem.svg", 64, 64, "TOTEM", "#a8d888", "#4a7830")
 
+# Chapter 8 finale (Phase 6).
+add("icons/guardian-memory-fragment-5.svg", 64, 64, "FRAG 5", "#9a70c0", "#5a3880", font_size=10)
+add("icons/celestial-star-map.svg", 64, 64, "MAP", "#7a8ac0", "#3a4470")
+
 
 if __name__ == "__main__":
     write_all()

@@ -157,4 +157,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "A history read from the Lantern Sanctuary's own root-walls by Archivist Elowen: Aldric Thorne was the last Lantern Keeper to tend Heartwood Sanctuary before the Cedar Giant was left to keep its own long watch, unrelieved. Thorne left this lantern lit and waiting - the same way Talon Greywind once left one on Thunderbird Mesa, and Elise Duvall left hers beneath the Deep Current. A pattern, not a coincidence: every legendary lantern in Mytherra was left behind by someone who expected to come back.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-guardian-memory-iv',
+    title: 'Guardian Memory IV: The Missing Pages',
+    body: "The Cedar Giant's own memory, witnessed at the Ancient Cedar Shrine: the histories of the Great Silence were not lost to fire, flood, or time. They were removed - carefully, deliberately, region by region, by someone who understood exactly what they were erasing and exactly how to keep from being caught doing it. A surviving star map, recovered from the Sanctuary, points toward an observatory somewhere in the Shattered Desert. Whoever did this left a trail. It just leads somewhere the Lantern Keepers have never thought to look.",
+    unlockedAt: 0,
+  },
 ];
