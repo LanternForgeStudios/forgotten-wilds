@@ -29,7 +29,7 @@ export interface Recipe {
 // that drops it shares the same ailment/flavor role as the pool's original material) - not every
 // pool needs an alternate from every region, and a material with no natural fit anywhere is still
 // a perfectly valid item on its own (sellable, or reserved for a future recipe).
-const WITHERED_BRAMBLE_OR = ['withered-bramble', 'bog-ash']; // both inflict/cure Poison (hag-withering-hex)
+const WITHERED_BRAMBLE_OR = ['withered-bramble', 'bog-ash', 'withered-echo-moss']; // all inflict/cure Poison (hag-withering-hex, echo-spore-burst)
 const MOTH_DUST_OR = ['moth-dust']; // no Bayou material shares moth-dust's HP-restoring role
 const MOTH_DUST_OR_EYE_DROPS = ['moth-dust', 'rougarou-claw']; // both tied to Blind (rougarou-feral-rend)
 const SILVER_DROPLET_OR = ['silver-droplet']; // no Bayou material shares this one's Freeze/Spirit role

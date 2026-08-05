@@ -4,7 +4,7 @@ import type { Recipe } from '@/types';
 
 // Alternate-material pools - kept in sync by hand with the identical constants in
 // functions/src/data/recipes.ts (see that file's own comment for the pairing rationale).
-const WITHERED_BRAMBLE_OR = ['withered-bramble', 'bog-ash'];
+const WITHERED_BRAMBLE_OR = ['withered-bramble', 'bog-ash', 'withered-echo-moss'];
 const MOTH_DUST_OR = ['moth-dust'];
 const MOTH_DUST_OR_EYE_DROPS = ['moth-dust', 'rougarou-claw'];
 const SILVER_DROPLET_OR = ['silver-droplet'];
