@@ -62,6 +62,18 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'lantern-sanctuary': {
     'lantern-of-open-skies': 'lantern-of-open-skies',
   },
+  // Whispering Pines (MSQ Volume IV, Chapter 7) - the 3 Spirit Seed fragments (MSF-WP-003) plus
+  // the Lost Library's recovered records (MSF-WP-004).
+  'elder-forest': {
+    'spirit-seed-elder-forest': 'spirit-seed-elder-forest',
+  },
+  'silver-river': {
+    'spirit-seed-silver-river': 'spirit-seed-silver-river',
+  },
+  'heartwood-approach': {
+    'spirit-seed-heartwood-approach': 'spirit-seed-heartwood-approach',
+    'lost-library-records': 'lost-library-records',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's
@@ -77,6 +89,12 @@ export const KNOWN_SHRINES: Record<string, Set<string>> = {
   'stone-circle-valley': new Set(['stone-circle-carvings']),
   // Endless Prairie (MSQ Volume III, Chapter 6) - Summit Temple's own restoration beat (MSF-EP-006).
   'summit-temple': new Set(['ancient-wind-mechanism']),
+  // Whispering Pines (MSQ Volume IV, Chapter 7) - the Ancient Cedar Shrine's own investigate
+  // (MSF-WP-002) then restore (MSF-WP-003) beats share this same refId, matching the established
+  // shrine-reuse-across-sequential-quests pattern (Mother Cypress Shrine, Stone Circle Carvings).
+  'ancient-cedar-shrine': new Set(['cedar-shrine-heart']),
+  // Heartwood Sanctuary's outer gate mechanism (MSF-WP-005) - foreshadows Chapter 8's dungeon.
+  'heartwood-approach': new Set(['heartwood-sanctuary-gate']),
 };
 
 /** Which parent map's location each landmark lives within - visitLandmark.ts's own lookup, used to

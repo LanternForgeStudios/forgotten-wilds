@@ -243,6 +243,17 @@ export const ITEMS: Record<string, ItemDefinition> = {
     tier: 'legendary',
     unique: true,
   },
+  // Whispering Pines (MSQ Volume IV, Chapter 7).
+  'spirit-seed-elder-forest': { id: 'spirit-seed-elder-forest', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'spirit-seed-silver-river': { id: 'spirit-seed-silver-river', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'spirit-seed-heartwood-approach': {
+    id: 'spirit-seed-heartwood-approach',
+    category: 'keyItem',
+    usableInCombat: false,
+    tier: 'rare',
+    unique: true,
+  },
+  'lost-library-records': { id: 'lost-library-records', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
 };
 
 export const SHOP_PRICES: Record<string, number> = {

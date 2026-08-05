@@ -122,6 +122,37 @@ add("icons/thunderbird-totem.svg", 64, 64, "TOTEM", "#a888d8", "#5a3888")
 # --- Chapter 6: Wings of the First Promise (Phase 6 - finale) ---
 add("icons/guardian-memory-fragment-4.svg", 64, 64, "FRAG 4", "#9a70c0", "#5a3880", font_size=10)
 
+# --- Whispering Pines (MSQ Volume IV, Chapter 7): The Silent Forest - blocked on PixelLab quota,
+# same placeholder-first workflow as Endless Prairie above. Forest-green palette (vs. Prairie's
+# browns) to keep regions visually distinct even as flat placeholder panels. ---
+
+# The 4 recurring NPCs (Phase 2) - no PixelLab character generated at all yet.
+add("sprites/characters/elder-rowan-birch-idle.svg", 72, 96, "BIRCH", "#4a6a3a", "#243a1c")
+add("sprites/characters/archivist-elowen-idle.svg", 72, 96, "ELOWEN", "#4a6a3a", "#243a1c", font_size=9)
+add("sprites/characters/forest-warden-rowan-hart-idle.svg", 72, 96, "HART", "#4a6a3a", "#243a1c")
+add("sprites/characters/cedar-spirit-idle.svg", 72, 96, "CEDAR", "#4a6a3a", "#243a1c")
+
+# The 4 Cedarwatch shop NPCs (Phase 2).
+add("sprites/characters/innkeeper-marge-idle.svg", 72, 96, "INN", "#4a6a3a", "#243a1c")
+add("sprites/characters/storekeeper-byron-idle.svg", 72, 96, "SHOP", "#4a6a3a", "#243a1c")
+add("sprites/characters/blacksmith-dara-idle.svg", 72, 96, "SMITH", "#4a6a3a", "#243a1c")
+add("sprites/characters/armorer-fenn-idle.svg", 72, 96, "ARMOR", "#4a6a3a", "#243a1c")
+
+# All 8 Chapter 7 NPC portraits (Phase 2).
+add("portraits/elder-rowan-birch.svg", 512, 512, "BIRCH", "#5a7a4a", "#2c4020")
+add("portraits/archivist-elowen.svg", 512, 512, "ELOWEN", "#5a7a4a", "#2c4020")
+add("portraits/forest-warden-rowan-hart.svg", 512, 512, "HART", "#5a7a4a", "#2c4020")
+add("portraits/cedar-spirit.svg", 512, 512, "SPIRIT", "#5a7a4a", "#2c4020")
+add("portraits/innkeeper-marge.svg", 512, 512, "MARGE", "#5a7a4a", "#2c4020")
+add("portraits/storekeeper-byron.svg", 512, 512, "BYRON", "#5a7a4a", "#2c4020")
+add("portraits/blacksmith-dara.svg", 512, 512, "DARA", "#5a7a4a", "#2c4020")
+add("portraits/armorer-fenn.svg", 512, 512, "FENN", "#5a7a4a", "#2c4020")
+
+# Quest key-item icons (Phase 3) - one shared icon for all 3 Spirit Seeds, matching the
+# wind-stone-* precedent (same collectible, 3 different field-map locations).
+add("icons/spirit-seed.svg", 64, 64, "SEED", "#7ac888", "#2a5a30")
+add("icons/lost-library-records.svg", 64, 64, "RECS", "#c8b888", "#8a7038")
+
 
 if __name__ == "__main__":
     write_all()

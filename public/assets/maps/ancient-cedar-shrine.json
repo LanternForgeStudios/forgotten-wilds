@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 10,
+  "nextobjectid": 11,
   "layers": [
     {
       "id": 1,
@@ -5286,6 +5286,29 @@
         {
           "id": 7,
           "name": "",
+          "type": "npc",
+          "x": 448,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "cedar-spirit"
+            },
+            {
+              "name": "wanderRadius",
+              "type": "int",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "",
           "type": "interactable",
           "x": 160,
           "y": 128,
@@ -5302,7 +5325,7 @@
           ]
         },
         {
-          "id": 8,
+          "id": 9,
           "name": "",
           "type": "interactable",
           "x": 832,
@@ -5320,7 +5343,7 @@
           ]
         },
         {
-          "id": 9,
+          "id": 10,
           "name": "",
           "type": "interactable",
           "x": 864,

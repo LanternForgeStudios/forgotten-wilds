@@ -877,4 +877,177 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: { type: 'shop', shopId: 'ruth-armory' },
   },
+
+  // --- Whispering Pines (MSQ Volume IV), Chapter 7: The Silent Forest ---
+  {
+    id: 'elder-rowan-birch',
+    name: 'Elder Rowan Birch',
+    title: 'Elder of Cedarwatch',
+    spriteAssetId: 'sprite.npc.elder-rowan-birch',
+    portraitAssetId: 'portrait.elder-rowan-birch',
+    locationId: 'cedarwatch-elders-lodge',
+    dialogue: [
+      { speaker: 'Elder Rowan Birch', text: "Cedarwatch is older than it looks, Keeper. This forest was here before the mountains had names, and we've kept watch over it about as long." },
+      { speaker: 'Elder Rowan Birch', text: "Elias Rowan's letters mentioned you might come this way eventually. He always did have a habit of writing to people years before they'd need to read it." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['into-the-ancient-forest', 'heartwood-sanctuary'] },
+    dialogueVariants: [
+      {
+        questId: 'heartwood-sanctuary',
+        lines: [
+          { speaker: 'Elder Rowan Birch', text: "The Sanctuary gate, standing open after all this time. I never thought I'd live to see it." },
+          { speaker: 'Elder Rowan Birch', text: "Whatever Elowen finds in there, Keeper, bring it back safely. Some of what this forest forgot, it forgot for a reason - but I'd still rather know than not." },
+        ],
+      },
+      {
+        questId: 'into-the-ancient-forest',
+        lines: [
+          { speaker: 'Elder Rowan Birch', text: "Cedarwatch is yours to walk as you please, Keeper. Archivist Elowen keeps the Great Tree Library, if the old records interest you - and I suspect they will." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'archivist-elowen',
+    name: 'Archivist Elowen',
+    title: 'Keeper of the Great Tree Library',
+    spriteAssetId: 'sprite.npc.archivist-elowen',
+    portraitAssetId: 'portrait.archivist-elowen',
+    locationId: 'cedarwatch-great-tree-library',
+    dialogue: [
+      { speaker: 'Archivist Elowen', text: "Every shelf in this library is carved straight into the living cedar. I've spent thirty years reading by root-light and I still haven't reached the oldest volumes." },
+      { speaker: 'Archivist Elowen', text: "The records here go back further than anywhere else in Mytherra - and then, abruptly, they stop. Centuries just... end, mid-sentence, before anyone thought to explain why." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['the-lost-library', 'heartwood-sanctuary'] },
+    dialogueVariants: [
+      {
+        questId: 'heartwood-sanctuary',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "The gate mechanism answered to Lantern-light, same as everything else the old Keepers built. Whatever's past it, it was meant for someone like you to open, not to stay sealed forever." },
+          { speaker: 'Archivist Elowen', text: "I'll be cataloguing what you brought back for months. Go carefully, Keeper - I have a feeling the Sanctuary itself is going to need you more than my shelves do." },
+        ],
+      },
+      {
+        questId: 'the-lost-library',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "Hundreds of volumes, Keeper. Not damaged, not burned - simply absent, their shelf-marks left behind like teeth pulled clean from a jaw." },
+          { speaker: 'Archivist Elowen', text: "Someone did this on purpose, and did it carefully. I don't know what frightens me more: that they succeeded, or that we're only now noticing." },
+        ],
+      },
+      {
+        questId: 'seeds-of-the-ancient-cedar',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "The shrine restored, and the forest already answering it. I've read a hundred accounts of what a Guardian's blessing looks like. None of them prepared me for actually seeing one." },
+        ],
+      },
+      {
+        questId: 'the-forest-has-fallen-silent',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "The Ancient Cedar Shrine, found at last. There are references to it in our oldest ledgers, always in passing, like whoever wrote them assumed everyone already knew where it was." },
+        ],
+      },
+      {
+        questId: 'into-the-ancient-forest',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "Lantern Keepers used to study here for years before they were sent anywhere else. I don't know when that stopped, exactly. Another gap in the record, same as all the others." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'forest-warden-rowan-hart',
+    name: 'Rowan Hart',
+    title: 'Forest Warden',
+    spriteAssetId: 'sprite.npc.forest-warden-rowan-hart',
+    portraitAssetId: 'portrait.forest-warden-rowan-hart',
+    locationId: 'cedarwatch',
+    dialogue: [
+      { speaker: 'Rowan Hart', text: "Elder Forest's gone quiet the last few months - not peaceful-quiet, wrong-quiet. Birds don't nest there anymore. I don't like it." },
+      { speaker: 'Rowan Hart', text: "Something's stirring the deep parts of the woods. If you're looking for a place to start, Mistwood Path will take you there faster than anywhere else." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['the-forest-has-fallen-silent'] },
+    dialogueVariants: [
+      {
+        questId: 'the-forest-has-fallen-silent',
+        lines: [
+          { speaker: 'Rowan Hart', text: "A shrine, buried that deep in Elder Forest, and none of us ever found it. I've walked those woods my whole life and it still finds ways to surprise me." },
+          { speaker: 'Rowan Hart', text: "Elder Rowan Birch will want to hear about the Cedar Spirit directly from you, Keeper. This isn't secondhand news." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'cedar-spirit',
+    name: 'Cedar Spirit',
+    title: 'Voice of the Ancient Cedar',
+    spriteAssetId: 'sprite.npc.cedar-spirit',
+    portraitAssetId: 'portrait.cedar-spirit',
+    locationId: 'ancient-cedar-shrine',
+    dialogue: [
+      { speaker: 'Cedar Spirit', text: '...small light, walking where the roots have grown thin. I have not spoken to anyone in longer than this forest can easily remember.' },
+      { speaker: 'Cedar Spirit', text: 'My own seed withered long ago, and I have been waiting since - not patiently, if I am honest. Three seeds remain scattered where the forest once carried them. Find them, and I can grow again.' },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['seeds-of-the-ancient-cedar'] },
+    dialogueVariants: [
+      {
+        questId: 'seeds-of-the-ancient-cedar',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'Root, and root, and root again - the forest reaching back through me, further than I could reach alone. I had forgotten what it felt like to be whole.' },
+          { speaker: 'Cedar Spirit', text: 'What was hidden opens now. Whatever you find further in, Keeper, know that this shrine will remember what you did here, long after I am withered again.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'innkeeper-marge',
+    name: 'Marge',
+    title: 'Innkeeper',
+    spriteAssetId: 'sprite.npc.innkeeper-marge',
+    portraitAssetId: 'portrait.innkeeper-marge',
+    locationId: 'cedarwatch-inn',
+    dialogue: [
+      { speaker: 'Marge', text: "Built this place into the hollow of an old cedar stump, would you believe it. Warmest inn in Mytherra, if I do say so myself - the wood holds the heat all night." },
+      { speaker: 'Marge', text: 'Rest up, Keeper. The forest keeps its own hours, and they rarely match anyone else\'s.' },
+    ],
+    gameplayHook: { type: 'inn', innId: 'marge-inn' },
+  },
+  {
+    id: 'storekeeper-byron',
+    name: 'Byron',
+    title: 'General Store Owner',
+    spriteAssetId: 'sprite.npc.storekeeper-byron',
+    portraitAssetId: 'portrait.storekeeper-byron',
+    locationId: 'cedarwatch-general-store',
+    dialogue: [
+      { speaker: 'Byron', text: "Half my stock comes from the forest itself - the other half, I trade for with whoever's brave enough to make the trip out here." },
+      { speaker: 'Byron', text: 'Lantern oil, antidotes, the usual. Ask if something specific catches your eye.' },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'byron-general-store' },
+  },
+  {
+    id: 'blacksmith-dara',
+    name: 'Dara',
+    title: 'Blacksmith',
+    spriteAssetId: 'sprite.npc.blacksmith-dara',
+    portraitAssetId: 'portrait.blacksmith-dara',
+    locationId: 'cedarwatch-blacksmith',
+    dialogue: [
+      { speaker: 'Dara', text: "Cedarwood shafts, iron heads - lighter than mountain steel, but they hold an edge fine in this damp. You learn to work with what the forest gives you out here." },
+      { speaker: 'Dara', text: "Staves, mostly. Something about this forest makes a walking length of cedar into more of a weapon than you'd expect. Take a look." },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'dara-forge' },
+  },
+  {
+    id: 'armorer-fenn',
+    name: 'Fenn',
+    title: 'Armorer',
+    spriteAssetId: 'sprite.npc.armorer-fenn',
+    portraitAssetId: 'portrait.armorer-fenn',
+    locationId: 'cedarwatch-armory',
+    dialogue: [
+      { speaker: 'Fenn', text: "Bark-weave holds up better than leather in this climate - breathes when it needs to, sheds water when it doesn't. Learned that the hard way, more than once." },
+      { speaker: 'Fenn', text: 'Wraps, boots, gloves, all cut for walking soft ground without a sound. Have a look.' },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'fenn-armory' },
+  },
 ];

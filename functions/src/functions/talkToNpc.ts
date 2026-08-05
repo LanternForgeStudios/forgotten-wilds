@@ -53,6 +53,16 @@ const NPC_LOCATIONS: Record<string, string> = {
   'storekeeper-wyatt': 'highwind-crossing-general-store',
   'blacksmith-garrett': 'highwind-crossing-blacksmith',
   'armorer-ruth': 'highwind-crossing-armory',
+  // Whispering Pines (MSQ Volume IV, Chapter 7) - added at the same time the NPCs themselves were
+  // authored this time, learning from the Endless Prairie gap above.
+  'elder-rowan-birch': 'cedarwatch-elders-lodge',
+  'archivist-elowen': 'cedarwatch-great-tree-library',
+  'forest-warden-rowan-hart': 'cedarwatch',
+  'cedar-spirit': 'ancient-cedar-shrine',
+  'innkeeper-marge': 'cedarwatch-inn',
+  'storekeeper-byron': 'cedarwatch-general-store',
+  'blacksmith-dara': 'cedarwatch-blacksmith',
+  'armorer-fenn': 'cedarwatch-armory',
 };
 const KNOWN_NPC_IDS = new Set(Object.keys(NPC_LOCATIONS));
 

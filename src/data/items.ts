@@ -534,6 +534,48 @@ export const ITEMS: Item[] = [
     tier: 'legendary',
     unique: true,
   },
+
+  // --- Whispering Pines (MSQ Volume IV), Chapter 7: The Silent Forest ---
+  {
+    id: 'spirit-seed-elder-forest',
+    name: 'Spirit Seed (Elder Forest)',
+    description: "A seed that glows faintly with cedar-green light, one of three needed to restore the Ancient Cedar Shrine's withered heart.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.spirit-seed',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'spirit-seed-silver-river',
+    name: 'Spirit Seed (Silver River)',
+    description: 'A second glowing seed, recovered from the mossy banks of the Silver River.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.spirit-seed',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'spirit-seed-heartwood-approach',
+    name: 'Spirit Seed (Heartwood Approach)',
+    description: 'A third glowing seed, found where the forest thins near Heartwood Approach - the last one the shrine needs.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.spirit-seed',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'lost-library-records',
+    name: 'Lost Library Records',
+    description: 'A bundle of surviving pages from a buried Lantern Keeper archive - a fraction of what once filled the shelves, the rest gone missing centuries ago.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.lost-library-records',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

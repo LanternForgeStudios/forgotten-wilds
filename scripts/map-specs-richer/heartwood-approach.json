@@ -52,6 +52,7 @@
 
     { "type": "interactable", "x": 20, "y": 8, "refId": "spirit-seed-heartwood-approach" },
     { "type": "interactable", "x": 28, "y": 22, "refId": "lost-library-records" },
+    { "type": "interactable", "x": 24, "y": 14, "refId": "heartwood-sanctuary-gate" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-heartwood-approach-1" }
   ]
