@@ -229,6 +229,25 @@ add("sprites/structures/red-mesa-general-store.svg", 144, 144, "SHOP", "#a8623a"
 add("sprites/structures/red-mesa-blacksmith.svg", 144, 144, "FORGE", "#a8623a", "#5a2c18")
 add("sprites/structures/red-mesa-armory.svg", 144, 144, "ARMORY", "#a8623a", "#5a2c18", font_size=18)
 
+# --- Shattered Desert (MSQ Volume V, Chapter 9) NPCs - blocked on PixelLab quota. ---
+add("sprites/characters/elder-santiago-ortega-idle.svg", 72, 96, "SANTIAGO", "#a8623a", "#5a2c18", font_size=9)
+add("sprites/characters/scholar-nia-solis-idle.svg", 72, 96, "NIA", "#a8623a", "#5a2c18")
+add("sprites/characters/desert-ranger-tomas-vega-idle.svg", 72, 96, "TOMAS", "#a8623a", "#5a2c18")
+add("sprites/characters/sand-spirit-idle.svg", 72, 96, "SPIRIT", "#a8623a", "#5a2c18")
+add("sprites/characters/innkeeper-rosa-idle.svg", 72, 96, "INN", "#a8623a", "#5a2c18")
+add("sprites/characters/storekeeper-mateo-idle.svg", 72, 96, "SHOP", "#a8623a", "#5a2c18")
+add("sprites/characters/blacksmith-esteban-idle.svg", 72, 96, "SMITH", "#a8623a", "#5a2c18")
+add("sprites/characters/armorer-carmen-idle.svg", 72, 96, "ARMOR", "#a8623a", "#5a2c18")
+
+add("portraits/elder-santiago-ortega.svg", 512, 512, "SANTIAGO", "#b8794a", "#6a3a20")
+add("portraits/scholar-nia-solis.svg", 512, 512, "NIA", "#b8794a", "#6a3a20")
+add("portraits/desert-ranger-tomas-vega.svg", 512, 512, "TOMAS", "#b8794a", "#6a3a20")
+add("portraits/sand-spirit.svg", 512, 512, "SPIRIT", "#b8794a", "#6a3a20")
+add("portraits/innkeeper-rosa.svg", 512, 512, "ROSA", "#b8794a", "#6a3a20")
+add("portraits/storekeeper-mateo.svg", 512, 512, "MATEO", "#b8794a", "#6a3a20")
+add("portraits/blacksmith-esteban.svg", 512, 512, "ESTEBAN", "#b8794a", "#6a3a20")
+add("portraits/armorer-carmen.svg", 512, 512, "CARMEN", "#b8794a", "#6a3a20")
+
 
 if __name__ == "__main__":
     write_all()

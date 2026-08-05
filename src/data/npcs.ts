@@ -1111,4 +1111,156 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: { type: 'shop', shopId: 'fenn-armory' },
   },
+
+  // --- Shattered Desert (MSQ Volume V), Chapter 9: Beneath Forgotten Stars ---
+  {
+    id: 'elder-santiago-ortega',
+    name: 'Elder Santiago Ortega',
+    title: 'Elder of Red Mesa',
+    spriteAssetId: 'sprite.npc.elder-santiago-ortega',
+    portraitAssetId: 'portrait.elder-santiago-ortega',
+    locationId: 'red-mesa-elders-hall',
+    dialogue: [
+      { speaker: 'Elder Santiago Ortega', text: "Red Mesa's been carved into this canyon for longer than anyone can properly date. The rock remembers more than the records do." },
+      { speaker: 'Elder Santiago Ortega', text: "Elias Rowan's letters reached us same as everywhere else, eventually. He wrote that a Keeper would come looking for the Observatory. Took him at his word." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['the-desert-calls'] },
+    dialogueVariants: [
+      {
+        questId: 'the-desert-calls',
+        lines: [
+          { speaker: 'Elder Santiago Ortega', text: "Red Mesa is yours to walk as you please, Keeper. Scholar Nia keeps the Relic Museum, if the old stories are what brought you this far." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'scholar-nia-solis',
+    name: 'Scholar Nia Solis',
+    title: 'Keeper of the Relic Museum',
+    spriteAssetId: 'sprite.npc.scholar-nia-solis',
+    portraitAssetId: 'portrait.scholar-nia-solis',
+    locationId: 'red-mesa-relic-museum',
+    dialogue: [
+      { speaker: 'Scholar Nia Solis', text: "Every shelf in this museum is a fragment of the same missing civilization - astronomers, as far as I can tell, who watched something happen in the sky and wrote it all down somewhere I haven't found yet." },
+      { speaker: 'Scholar Nia Solis', text: "The Forgotten Observatory has started waking up, Keeper. Lights where there haven't been lights in longer than Red Mesa has existed. That's not nothing." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['the-path-of-the-astronomers', 'echoes-in-the-sand'] },
+    dialogueVariants: [
+      {
+        questId: 'the-path-of-the-astronomers',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "The Observatory mechanisms answered to Lantern-light, same as every other mechanism you've described from the regions before this one. That can't be coincidence anymore." },
+          { speaker: 'Scholar Nia Solis', text: "Whatever's in the Inner Observatory, Keeper, it's waited under Painted Mesas for longer than anyone alive can account for. Go carefully." },
+        ],
+      },
+      {
+        questId: 'echoes-in-the-sand',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "A Star Crystal, fractured at the Celestial Oasis shrine. The Sand Spirit will know more about restoring it than any book on my shelves." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'desert-ranger-tomas-vega',
+    name: 'Tomas Vega',
+    title: 'Desert Ranger',
+    spriteAssetId: 'sprite.npc.desert-ranger-tomas-vega',
+    portraitAssetId: 'portrait.desert-ranger-tomas-vega',
+    locationId: 'red-mesa',
+    dialogue: [
+      { speaker: 'Tomas Vega', text: "Stick to the marked trails and the dunes won't swallow anything of yours. Wander off them at midday and you're gambling with the heat, same as anyone." },
+      { speaker: 'Tomas Vega', text: "Sandstorms have been rougher than usual lately, further out past Painted Mesas. I've tracked worse, but not by much." },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['the-first-relic', 'the-second-relic'] },
+    dialogueVariants: [
+      {
+        questId: 'the-second-relic',
+        lines: [
+          { speaker: 'Tomas Vega', text: "Two relics, both worth more to Nia than to any collector. Glad you found them before the sand did." },
+        ],
+      },
+      {
+        questId: 'the-first-relic',
+        lines: [
+          { speaker: 'Tomas Vega', text: "Found in Sunfire Dunes, of all places. I've walked that ground a hundred times and never once looked down." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'sand-spirit',
+    name: 'Sand Spirit',
+    title: 'Voice of the Celestial Oasis',
+    spriteAssetId: 'sprite.npc.sand-spirit',
+    portraitAssetId: 'portrait.sand-spirit',
+    locationId: 'celestial-oasis',
+    dialogue: [
+      { speaker: 'Sand Spirit', text: '...another small light, drawn to water in a place built entirely out of thirst. The wind carried word of you before you arrived.' },
+      { speaker: 'Sand Spirit', text: 'My own Star Crystal cracked long ago, and the stars have looked dimmer for it ever since. Three fragments remain, scattered where the wind eventually carries everything. Find them, and the sky remembers itself.' },
+    ],
+    gameplayHook: { type: 'questGiver', questIds: ['fragments-of-the-sky'] },
+    dialogueVariants: [
+      {
+        questId: 'fragments-of-the-sky',
+        lines: [
+          { speaker: 'Sand Spirit', text: 'Whole again, and the stars sharper for it already. I had forgotten how much of the sky I was supposed to be able to see.' },
+          { speaker: 'Sand Spirit', text: 'The old roads are opening now, Keeper. Whatever you find at the Observatory, know that this oasis will remember what you did here.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'innkeeper-rosa',
+    name: 'Rosa',
+    title: 'Innkeeper',
+    spriteAssetId: 'sprite.npc.innkeeper-rosa',
+    portraitAssetId: 'portrait.innkeeper-rosa',
+    locationId: 'red-mesa-inn',
+    dialogue: [
+      { speaker: 'Rosa', text: "Carved this place cool on purpose - the canyon rock holds the night chill clean through the hottest part of the day." },
+      { speaker: 'Rosa', text: 'Rest up, Keeper. The desert keeps its own hours, and none of them are forgiving.' },
+    ],
+    gameplayHook: { type: 'inn', innId: 'rosa-inn' },
+  },
+  {
+    id: 'storekeeper-mateo',
+    name: 'Mateo',
+    title: 'General Store Owner',
+    spriteAssetId: 'sprite.npc.storekeeper-mateo',
+    portraitAssetId: 'portrait.storekeeper-mateo',
+    locationId: 'red-mesa-general-store',
+    dialogue: [
+      { speaker: 'Mateo', text: "Caravans come through Red Mesa when the sandstorms allow it, so stock's a gamble more often than I'd like." },
+      { speaker: 'Mateo', text: 'Lantern oil, antidotes, the usual desert essentials. Ask if you need something particular.' },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'mateo-general-store' },
+  },
+  {
+    id: 'blacksmith-esteban',
+    name: 'Esteban',
+    title: 'Blacksmith',
+    spriteAssetId: 'sprite.npc.blacksmith-esteban',
+    portraitAssetId: 'portrait.blacksmith-esteban',
+    locationId: 'red-mesa-blacksmith',
+    dialogue: [
+      { speaker: 'Esteban', text: "Steel that can't take the day-to-night swing out here cracks within a season. Learned to temper for extremes, not for comfort." },
+      { speaker: 'Esteban', text: "Blades, mostly - quick and clean matters more than heavy when the heat saps your strength by midday. Take a look at the racks." },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'esteban-forge' },
+  },
+  {
+    id: 'armorer-carmen',
+    name: 'Carmen',
+    title: 'Armorer',
+    spriteAssetId: 'sprite.npc.armorer-carmen',
+    portraitAssetId: 'portrait.armorer-carmen',
+    locationId: 'red-mesa-armory',
+    dialogue: [
+      { speaker: 'Carmen', text: "Sun-worn leather breathes better than anything shipped in from the mountains. You'll thank me the first time you're walking at midday." },
+      { speaker: 'Carmen', text: 'Robes, wraps, boots, gloves - all cut loose for the heat. Have a look.' },
+    ],
+    gameplayHook: { type: 'shop', shopId: 'carmen-armory' },
+  },
 ];
