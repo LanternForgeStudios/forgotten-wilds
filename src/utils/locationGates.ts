@@ -23,6 +23,11 @@ export const LOCATION_GATES: Record<string, string> = {
   'murkwater-trails': 'the-mountain-remembers',
   'hidden-river-landing': 'the-mountain-remembers',
   'temple-of-the-deep-current': 'beneath-still-waters',
+  // Endless Prairie (MSQ Volume III) - was missing entirely until Chapter 6's build found the gap
+  // (see functions/src/functions/enterLocation.ts's matching comment for detail).
+  'highwind-crossing': 'the-waters-remember',
+  'thunderbird-mesa-approach': 'the-stone-circles',
+  'summit-temple': 'climbing-thunderbird-mesa',
 };
 
 /** Returns a player-facing message if `locationId` is gated and not yet unlocked, or null if it's

@@ -28,6 +28,21 @@ const LOCATION_GATES: Record<string, string> = {
   // src/utils/locationGates.ts's own comment documents (into-the-deep-current's own first
   // objective is reaching this location, so gating on it directly would be circular).
   'temple-of-the-deep-current': 'beneath-still-waters',
+  // Endless Prairie (MSQ Volume III) - same single-gate-per-region-entry-point model as Crimson
+  // Bayou above, gated on Bayou's own finale. Was missing entirely until Chapter 6's build found
+  // it - Chapter 5 shipped without ever adding Prairie to this file, a real gap (not yet visible
+  // since nothing links Highwind Crossing into the reachable world yet).
+  'highwind-crossing': 'the-waters-remember',
+  // Chapter 6's dungeon hand-off, same "latest quest safely completed before this location is
+  // needed" rule - climbing-thunderbird-mesa's own first objective is reaching
+  // thunderbird-mesa-approach, so gating on it directly would be circular; the-stone-circles is
+  // the quest immediately before it.
+  'thunderbird-mesa-approach': 'the-stone-circles',
+  // Thunderbird Mesa dungeon entrance - gated on Chapter 5's true finale. The other 4 rooms
+  // (sky-bridge/storm-galleries/lantern-sanctuary/guardian-peak) are reached by physically walking
+  // the chained transitions from here, matching temple-of-the-deep-current's own single-gate
+  // dungeon precedent - no separate gate needed per room.
+  'summit-temple': 'climbing-thunderbird-mesa',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -58,6 +73,29 @@ const KNOWN_LOCATION_IDS = new Set([
   'mirehaven-armory',
   'mirehaven-herbalist',
   'temple-of-the-deep-current',
+  // Endless Prairie (MSQ Volume III) - all 13 Chapter 5 locations, missing until Chapter 6's build
+  // found the gap (see LOCATION_GATES comment above).
+  'highwind-crossing',
+  'golden-prairie',
+  'spirit-herd-plains',
+  'sacred-hills',
+  'stone-circle-valley',
+  'thunderbird-mesa-approach',
+  'highwind-crossing-chiefs-lodge',
+  'highwind-crossing-spirit-lodge',
+  'highwind-crossing-inn',
+  'highwind-crossing-general-store',
+  'highwind-crossing-blacksmith',
+  'highwind-crossing-armory',
+  // stone-circle-carvings deliberately absent - a shrine-kind landmark reached via
+  // interactWithShrine.ts, which never calls enterLocation or changes currentLocationId, same as
+  // mother-cypress-shrine's own precedent above (also absent from this set).
+  // Chapter 6's Thunderbird Mesa dungeon (5 chained rooms).
+  'summit-temple',
+  'sky-bridge',
+  'storm-galleries',
+  'lantern-sanctuary',
+  'guardian-peak',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {
