@@ -633,6 +633,53 @@ export const QUESTS: Record<string, QuestDef> = {
       grantLoreId: 'lore-guardian-memory-iv',
     },
   },
+
+  // --- Shattered Desert (MSQ Volume V), Chapter 9: Beneath Forgotten Stars ---
+  // Kebab-case id mapping: MSF-SD-001 the-desert-calls, MSF-SD-002 echoes-in-the-sand, MSF-SD-003
+  // fragments-of-the-sky, MSF-SD-004 the-path-of-the-astronomers. Gated behind Volume IV's own
+  // true finale, matching every prior volume hand-off.
+  'the-desert-calls': {
+    id: 'the-desert-calls',
+    prerequisiteQuestId: 'the-missing-pages',
+    objectives: [
+      { id: 'reach-red-mesa', type: 'reachLocation', targetId: 'red-mesa', requiredCount: 1 },
+      { id: 'talk-elder-santiago', type: 'talkToNpc', targetId: 'elder-santiago-ortega', requiredCount: 1 },
+      { id: 'talk-scholar-nia', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+    ],
+    reward: { xp: 30, gold: 20 },
+  },
+  'echoes-in-the-sand': {
+    id: 'echoes-in-the-sand',
+    prerequisiteQuestId: 'the-desert-calls',
+    objectives: [
+      { id: 'talk-nia-start', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+      { id: 'reach-sunfire-dunes', type: 'reachLocation', targetId: 'sunfire-dunes', requiredCount: 1 },
+      { id: 'reach-crimson-canyons', type: 'reachLocation', targetId: 'crimson-canyons', requiredCount: 1 },
+      { id: 'reach-celestial-oasis', type: 'reachLocation', targetId: 'celestial-oasis', requiredCount: 1 },
+      { id: 'discover-star-crystal-shrine', type: 'interactWithShrine', targetId: 'star-crystal-shrine', requiredCount: 1 },
+    ],
+    reward: { xp: 25, gold: 15 },
+  },
+  'fragments-of-the-sky': {
+    id: 'fragments-of-the-sky',
+    prerequisiteQuestId: 'echoes-in-the-sand',
+    objectives: [
+      { id: 'get-star-fragment-sunfire-dunes', type: 'collectItem', targetId: 'star-fragment-sunfire-dunes', requiredCount: 1 },
+      { id: 'get-star-fragment-crimson-canyons', type: 'collectItem', targetId: 'star-fragment-crimson-canyons', requiredCount: 1 },
+      { id: 'get-star-fragment-painted-mesas', type: 'collectItem', targetId: 'star-fragment-painted-mesas', requiredCount: 1 },
+      { id: 'restore-star-crystal-shrine', type: 'interactWithShrine', targetId: 'star-crystal-shrine', requiredCount: 1 },
+    ],
+    reward: { xp: 60, gold: 30, spiritEssence: 15 },
+  },
+  'the-path-of-the-astronomers': {
+    id: 'the-path-of-the-astronomers',
+    prerequisiteQuestId: 'fragments-of-the-sky',
+    objectives: [
+      { id: 'talk-nia-final', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+      { id: 'reach-forgotten-observatory-approach', type: 'reachLocation', targetId: 'forgotten-observatory-approach', requiredCount: 1 },
+    ],
+    reward: { xp: 80, gold: 40, regionalReputation: 45, grantLoreId: 'lore-forgotten-observatory-approach' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -689,4 +736,8 @@ export const QUEST_ORDER = [
   'the-keeper-beneath-the-cedar',
   'the-cedar-giant',
   'the-missing-pages',
+  'the-desert-calls',
+  'echoes-in-the-sand',
+  'fragments-of-the-sky',
+  'the-path-of-the-astronomers',
 ];

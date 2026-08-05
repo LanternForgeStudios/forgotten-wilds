@@ -163,4 +163,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The Cedar Giant's own memory, witnessed at the Ancient Cedar Shrine: the histories of the Great Silence were not lost to fire, flood, or time. They were removed - carefully, deliberately, region by region, by someone who understood exactly what they were erasing and exactly how to keep from being caught doing it. A surviving star map, recovered from the Sanctuary, points toward an observatory somewhere in the Shattered Desert. Whoever did this left a trail. It just leads somewhere the Lantern Keepers have never thought to look.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-forgotten-observatory-approach',
+    title: 'The Forgotten Observatory',
+    body: "Scholar Nia Solis, cataloguing the first clear view of the Observatory from its own approach: a structure too regular to be natural, half-swallowed by sand, and - impossibly, after however many centuries - showing lights in windows that shouldn't still have glass in them. Whatever the astronomers who built this were watching for, something inside it has started watching back.",
+    unlockedAt: 0,
+  },
 ];

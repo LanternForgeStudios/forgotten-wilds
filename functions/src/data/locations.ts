@@ -91,6 +91,19 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'heartwood-lantern-sanctuary': {
     'lantern-of-ancient-roots': 'lantern-of-ancient-roots',
   },
+  // Shattered Desert (MSQ Volume V, Chapter 9) - the 3 Star Fragments (MSF-SD-003), plus the 2
+  // hidden Desert Relics for the region's own side quest.
+  'sunfire-dunes': {
+    'star-fragment-sunfire-dunes': 'star-fragment-sunfire-dunes',
+    'desert-relic-i-cache': 'desert-relic-i',
+  },
+  'crimson-canyons': {
+    'star-fragment-crimson-canyons': 'star-fragment-crimson-canyons',
+    'desert-relic-ii-cache': 'desert-relic-ii',
+  },
+  'painted-mesas': {
+    'star-fragment-painted-mesas': 'star-fragment-painted-mesas',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's
@@ -112,6 +125,9 @@ export const KNOWN_SHRINES: Record<string, Set<string>> = {
   'ancient-cedar-shrine': new Set(['cedar-shrine-heart']),
   // Heartwood Sanctuary's outer gate mechanism (MSF-WP-005) - foreshadows Chapter 8's dungeon.
   'heartwood-approach': new Set(['heartwood-sanctuary-gate']),
+  // Celestial Oasis's own Desert Shrine - discover (MSF-SD-002) then restore (MSF-SD-003) beats
+  // share this same refId, matching the established shrine-reuse-across-sequential-quests pattern.
+  'celestial-oasis': new Set(['star-crystal-shrine']),
 };
 
 /** Which parent map's location each landmark lives within - visitLandmark.ts's own lookup, used to

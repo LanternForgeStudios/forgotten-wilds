@@ -248,6 +248,10 @@ add("portraits/storekeeper-mateo.svg", 512, 512, "MATEO", "#b8794a", "#6a3a20")
 add("portraits/blacksmith-esteban.svg", 512, 512, "ESTEBAN", "#b8794a", "#6a3a20")
 add("portraits/armorer-carmen.svg", 512, 512, "CARMEN", "#b8794a", "#6a3a20")
 
+# Quest key-item icons (Phase 3) - shared icons for the 3 Star Fragments and 2 Desert Relics.
+add("icons/star-fragment.svg", 64, 64, "STAR", "#7a8ac0", "#3a4470")
+add("icons/desert-relic.svg", 64, 64, "RELIC", "#c8a868", "#8a6838")
+
 
 if __name__ == "__main__":
     write_all()
