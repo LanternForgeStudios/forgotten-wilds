@@ -198,6 +198,35 @@ export const SKILLS: Skill[] = [
     effectiveAgainstFamilies: ['silentEchoes'],
     inflictsAilmentId: 'freeze',
   },
+  // Whispering Pines (MSQ Volume IV, Chapter 8) enemy signature move + Cedar Giant boss moves
+  {
+    id: 'root-snare',
+    name: 'Root Snare',
+    description: 'A grasping tangle of roots erupting underfoot, fast enough to catch the unwary flat-footed.',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 16,
+    spiritCost: 0,
+    inflictsAilmentId: 'stun',
+  },
+  {
+    id: 'cedar-giant-root-slam',
+    name: 'Root Slam',
+    description: "A single blow from a limb thick as a fallen trunk, enough to crack stone.",
+    kind: 'skill',
+    damageType: 'physical',
+    power: 21,
+    spiritCost: 0,
+  },
+  {
+    id: 'cedar-giant-heartwood-judgment',
+    name: "Heartwood's Judgment",
+    description: 'A pulse of ancient spirit-light from deep within the Giant\'s hollowed core.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 25,
+    spiritCost: 0,
+  },
   // Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move
   {
     id: 'echo-spore-burst',

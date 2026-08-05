@@ -55,6 +55,11 @@ const BOSS_TRIGGERS: Record<string, { prerequisiteQuestId: string; approachLabel
     approachLabel: 'something vast, wreathed in storm-light, watching from the open sky',
     blockedMessage: 'Something vast stirs against the sky ahead — but the way feels barred to you, for now.',
   },
+  'cedar-giant': {
+    prerequisiteQuestId: 'the-keeper-beneath-the-cedar',
+    approachLabel: 'a shape too large and too still to be a tree, watching from the dark',
+    blockedMessage: 'Something ancient and unmoving waits in the grove ahead — but the way feels barred to you, for now.',
+  },
 };
 
 /** Shrine-kind interactables (interactWithShrine.ts), keyed by refId. */

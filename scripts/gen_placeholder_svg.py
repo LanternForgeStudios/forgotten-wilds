@@ -185,6 +185,13 @@ add("icons/young-cedar-totem.svg", 64, 64, "TOTEM", "#c8c0a0", "#78705a")
 # spirit-seed/wind-stone precedent (same collectible concept, 2 different hidden caches).
 add("icons/heartwood-recording.svg", 64, 64, "ROOT", "#9a7c50", "#5a4020")
 
+# --- Chapter 8: Echoes of the First Keepers (rootWraiths family + Cedar Giant boss) ---
+add("sprites/enemies/root-wraith-idle.svg", 128, 128, "WRAITH", "#6a5438", "#382c1c", font_size=14)
+add("sprites/enemies/elder-root-wraith-idle.svg", 128, 128, "WRAITH", "#7a6244", "#402c1c", font_size=14)
+add("sprites/enemies/cedar-giant-idle.svg", 256, 256, "CEDAR GIANT", "#4a6a3a", "#243a1c", font_size=22)
+add("icons/gnarled-root-fiber.svg", 64, 64, "FIBER", "#8a6a44", "#4a3220")
+add("icons/ancient-heartwood-relic.svg", 64, 64, "RELIC", "#9a70c0", "#5a3880")
+
 
 if __name__ == "__main__":
     write_all()

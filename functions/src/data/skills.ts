@@ -260,6 +260,37 @@ export const SKILLS: Record<string, Skill> = {
     inflictAilmentChance: 0.3,
   },
 
+  // --- Whispering Pines (MSQ Volume IV, Chapter 8) enemy signature move ---
+  // rootWraiths (root-wraith/elder-root-wraith) - a grasping tangle of roots, Stun (silentEchoes
+  // already claimed Poison in this region, and Prairie's own two chapters claimed Silence/Blind).
+  'root-snare': {
+    id: 'root-snare',
+    name: 'Root Snare',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 16,
+    spiritCost: 0,
+    inflictsAilmentId: 'stun',
+    inflictAilmentChance: 0.25,
+  },
+  // Cedar Giant boss moves (MSF-WP-008).
+  'cedar-giant-root-slam': {
+    id: 'cedar-giant-root-slam',
+    name: 'Root Slam',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 21,
+    spiritCost: 0,
+  },
+  'cedar-giant-heartwood-judgment': {
+    id: 'cedar-giant-heartwood-judgment',
+    name: "Heartwood's Judgment",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 25,
+    spiritCost: 0,
+  },
+
   // --- Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move ---
   // silentEchoes (forest-echo/corrupted-echo) - a burst of toxic spores, Poison (Prairie already
   // claimed Silence/Stun/Blind across its own two chapters, so this is Whispering Pines' own).

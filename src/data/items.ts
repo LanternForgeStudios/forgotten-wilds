@@ -586,6 +586,15 @@ export const ITEMS: Item[] = [
     unique: true,
   },
   {
+    id: 'gnarled-root-fiber',
+    name: 'Gnarled Root Fiber',
+    description: 'A tough, woody fiber stripped from a root-wraith, still faintly warm to the touch.',
+    category: 'materials',
+    iconAssetId: 'icon.item.gnarled-root-fiber',
+    stackable: true,
+    tier: 'common',
+  },
+  {
     id: 'heartwood-recording-i',
     name: 'Heartwood Recording I',
     description: "A knot of cedar root, grown in a pattern that isn't natural - a message, if you know how to listen for it.",
@@ -603,6 +612,16 @@ export const ITEMS: Item[] = [
     iconAssetId: 'icon.item.heartwood-recording',
     stackable: false,
     tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'ancient-heartwood-relic',
+    name: 'Ancient Heartwood Relic',
+    description: "A fragment of the Cedar Giant's own hollowed core, still faintly warm with old spirit-light.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.ancient-heartwood-relic',
+    stackable: false,
+    tier: 'legendary',
     unique: true,
   },
 ];

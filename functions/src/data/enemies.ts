@@ -35,6 +35,7 @@ export interface EnemyDefinition {
     | 'prairieWolves'
     | 'stormAvians'
     | 'silentEchoes'
+    | 'rootWraiths'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
@@ -693,6 +694,67 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'antidote', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
   },
+
+  // --- Whispering Pines (MSQ Volume IV, Chapter 8) enemies ---
+  // rootWraiths (root-wraith/elder-root-wraith) - the roots guarding Heartwood Sanctuary's depths.
+  // root-snare inflicts Stun - excluded from vulnerableAilments (immune to what it deals out),
+  // matching every prior family's own exclusion pattern.
+  'root-wraith': {
+    id: 'root-wraith',
+    name: 'Root Wraith',
+    family: 'rootWraiths',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'physical',
+    vulnerableAilments: ['burn', 'freeze', 'poison'],
+    stats: { maxHp: 58, attack: 17, defense: 12, speed: 12 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'root-snare', weight: 2 },
+    ],
+    xpReward: 32,
+    goldReward: 17,
+    lootTable: [{ itemId: 'gnarled-root-fiber', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+  },
+  'elder-root-wraith': {
+    id: 'elder-root-wraith',
+    name: 'Elder Root Wraith',
+    family: 'rootWraiths',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'physical',
+    vulnerableAilments: ['burn', 'freeze', 'poison'],
+    stats: { maxHp: 86, attack: 20, defense: 15, speed: 15 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'root-snare', weight: 3 },
+    ],
+    xpReward: 44,
+    goldReward: 24,
+    lootTable: [{ itemId: 'gnarled-root-fiber', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+  },
+  // Boss stat block for MSF-WP-008 "The Cedar Giant". Gated behind MSF-WP-007 (recovering the
+  // Lantern of Ancient Roots) - see BOSS_REQUIRED_LOCATION (startEncounter.ts) and
+  // BOSS_REGION_LOCATIONS below.
+  'cedar-giant': {
+    id: 'cedar-giant',
+    name: 'Cedar Giant',
+    family: 'boss',
+    tier: 'boss',
+    isBoss: true,
+    weaknessDamageType: 'spirit',
+    prerequisiteQuestId: 'the-keeper-beneath-the-cedar',
+    vulnerableAilments: ['freeze', 'burn'],
+    stats: { maxHp: 250, attack: 21, defense: 14, speed: 14 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'cedar-giant-root-slam', weight: 2 },
+      { skillId: 'cedar-giant-heartwood-judgment', weight: 2, unlocksAtHpFraction: 0.5 },
+    ],
+    xpReward: 280,
+    goldReward: 150,
+    lootTable: [{ itemId: 'ancient-heartwood-relic', chance: 1, minQuantity: 1, maxQuantity: 1 }],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -798,6 +860,21 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
     { enemyId: 'corrupted-echo', weight: 2 },
     { enemyId: 'forest-echo', weight: 2 },
   ],
+  // Whispering Pines (MSQ Volume IV, Chapter 8) - Heartwood Sanctuary dungeon rooms, matching each
+  // room's own encounterTable in src/data/locations.ts exactly.
+  'root-caverns': [
+    { enemyId: 'root-wraith', weight: 3 },
+    { enemyId: 'elder-root-wraith', weight: 1 },
+  ],
+  'inner-archive': [
+    { enemyId: 'root-wraith', weight: 2 },
+    { enemyId: 'elder-root-wraith', weight: 2 },
+  ],
+  'heartwood-lantern-sanctuary': [{ enemyId: 'elder-root-wraith', weight: 1 }],
+  'guardian-grove': [
+    { enemyId: 'elder-root-wraith', weight: 2 },
+    { enemyId: 'corrupted-echo', weight: 1 },
+  ],
 };
 
 /** Which locations a boss's optional "adds" (0-3 additional enemies that can join the fight) may
@@ -814,4 +891,5 @@ export const BOSS_REGION_LOCATIONS: Record<string, string[]> = {
     'temple-of-the-deep-current',
   ],
   'great-thunderbird': ['sky-bridge', 'storm-galleries', 'lantern-sanctuary', 'guardian-peak'],
+  'cedar-giant': ['root-caverns', 'inner-archive', 'heartwood-lantern-sanctuary', 'guardian-grove'],
 };

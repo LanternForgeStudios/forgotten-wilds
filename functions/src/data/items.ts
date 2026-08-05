@@ -257,6 +257,8 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'withered-echo-moss': { id: 'withered-echo-moss', category: 'materials', usableInCombat: false, tier: 'common' },
   'heartwood-recording-i': { id: 'heartwood-recording-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'heartwood-recording-ii': { id: 'heartwood-recording-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'gnarled-root-fiber': { id: 'gnarled-root-fiber', category: 'materials', usableInCombat: false, tier: 'common' },
+  'ancient-heartwood-relic': { id: 'ancient-heartwood-relic', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
 };
 
 export const SHOP_PRICES: Record<string, number> = {

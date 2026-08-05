@@ -22,6 +22,7 @@ const BOSS_REQUIRED_LOCATION: Record<string, string> = {
   'coalbound-warden': 'hollow-rail-mine',
   'ancient-serpent-guardian': 'temple-of-the-deep-current',
   'great-thunderbird': 'guardian-peak',
+  'cedar-giant': 'guardian-grove',
 };
 
 export const startEncounter = onCall<StartEncounterRequest>(async (request) => {

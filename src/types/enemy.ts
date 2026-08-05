@@ -40,6 +40,7 @@ export interface Enemy {
     | 'prairieWolves'
     | 'stormAvians'
     | 'silentEchoes'
+    | 'rootWraiths'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
