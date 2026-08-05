@@ -1,0 +1,71 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.town-terrain",
+      "name": "town-terrain",
+      "image": "town-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.overworld-decor2",
+      "name": "overworld-decor2",
+      "image": "overworld-decor2.png",
+      "imageWidth": 64,
+      "imageHeight": 48,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 20, "tileId": { "tileset": 1, "id": 4 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 10,
+          "seed": 41,
+          "avoid": [
+            { "x": 30, "y": 22 }, { "x": 63, "y": 20 },
+            { "x": 20, "y": 14 }, { "x": 44, "y": 14 },
+            { "x": 20, "y": 26 }, { "x": 44, "y": 26 },
+            { "x": 30, "y": 8 }, { "x": 30, "y": 30 },
+            { "x": 12, "y": 20 }, { "x": 30, "y": 20 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 30, "y": 22, "refId": "default" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-mistwood-path" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "mistwood-path", "targetSpawnId": "from-cedarwatch" },
+
+    { "type": "npc", "x": 30, "y": 20, "refId": "forest-warden-rowan-hart", "wanderRadius": 4 },
+
+    { "type": "spawnPoint", "x": 20, "y": 14, "refId": "from-cedarwatch-elders-lodge" },
+    { "type": "transition", "x": 20, "y": 14, "refId": "cedarwatch-elders-lodge", "targetSpawnId": "from-cedarwatch", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 44, "y": 14, "refId": "from-cedarwatch-great-tree-library" },
+    { "type": "transition", "x": 44, "y": 14, "refId": "cedarwatch-great-tree-library", "targetSpawnId": "from-cedarwatch", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 20, "y": 26, "refId": "from-cedarwatch-inn" },
+    { "type": "transition", "x": 20, "y": 26, "refId": "cedarwatch-inn", "targetSpawnId": "from-cedarwatch", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 44, "y": 26, "refId": "from-cedarwatch-general-store" },
+    { "type": "transition", "x": 44, "y": 26, "refId": "cedarwatch-general-store", "targetSpawnId": "from-cedarwatch", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 30, "y": 8, "refId": "from-cedarwatch-blacksmith" },
+    { "type": "transition", "x": 30, "y": 8, "refId": "cedarwatch-blacksmith", "targetSpawnId": "from-cedarwatch", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 12, "y": 20, "refId": "from-cedarwatch-armory" },
+    { "type": "transition", "x": 12, "y": 20, "refId": "cedarwatch-armory", "targetSpawnId": "from-cedarwatch" }
+  ]
+}

@@ -43,6 +43,9 @@ const LOCATION_GATES: Record<string, string> = {
   // the chained transitions from here, matching temple-of-the-deep-current's own single-gate
   // dungeon precedent - no separate gate needed per room.
   'summit-temple': 'climbing-thunderbird-mesa',
+  // Whispering Pines (MSQ Volume IV) - same single-gate-per-region-entry-point model, gated on
+  // Volume III's own true finale.
+  'cedarwatch': 'the-first-promise-remembered',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -96,6 +99,19 @@ const KNOWN_LOCATION_IDS = new Set([
   'storm-galleries',
   'lantern-sanctuary',
   'guardian-peak',
+  // Whispering Pines (MSQ Volume IV, Chapter 7).
+  'cedarwatch',
+  'mistwood-path',
+  'elder-forest',
+  'silver-river',
+  'ancient-cedar-shrine',
+  'heartwood-approach',
+  'cedarwatch-elders-lodge',
+  'cedarwatch-great-tree-library',
+  'cedarwatch-inn',
+  'cedarwatch-general-store',
+  'cedarwatch-blacksmith',
+  'cedarwatch-armory',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

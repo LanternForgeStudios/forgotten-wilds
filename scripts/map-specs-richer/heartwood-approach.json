@@ -1,0 +1,58 @@
+{
+  "width": 48,
+  "height": 32,
+  "tilesets": [
+    {
+      "assetId": "tileset.overworld-terrain",
+      "name": "overworld-terrain",
+      "image": "overworld-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.overworld-decor2",
+      "name": "overworld-decor2",
+      "image": "overworld-decor2.png",
+      "imageWidth": 64,
+      "imageHeight": 48,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 0 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 12, "y": 10, "tileId": { "tileset": 1, "id": 6 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 44, "height": 28 },
+          "tileIds": [ { "tileset": 1, "id": 6 } ],
+          "count": 8,
+          "seed": 46,
+          "avoid": [
+            { "x": 2, "y": 16 }, { "x": 44, "y": 16 }, { "x": 12, "y": 10 },
+            { "x": 20, "y": 8 }, { "x": 28, "y": 22 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 16, "refId": "from-ancient-cedar-shrine" },
+    { "type": "transition", "x": 0, "y": 16, "refId": "ancient-cedar-shrine", "targetSpawnId": "from-heartwood-approach" },
+    { "type": "spawnPoint", "x": 24, "y": 16, "refId": "default" },
+
+    { "type": "interactable", "x": 20, "y": 8, "refId": "spirit-seed-heartwood-approach" },
+    { "type": "interactable", "x": 28, "y": 22, "refId": "lost-library-records" },
+
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-heartwood-approach-1" }
+  ]
+}
