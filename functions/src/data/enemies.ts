@@ -753,7 +753,14 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     ],
     xpReward: 280,
     goldReward: 150,
-    lootTable: [{ itemId: 'ancient-heartwood-relic', chance: 1, minQuantity: 1, maxQuantity: 1 }],
+    lootTable: [
+      { itemId: 'ancient-heartwood-relic', chance: 1, minQuantity: 1, maxQuantity: 1 },
+      // Young Cedar Totem family's Mythic tier - a real, if not guaranteed, earn path (same
+      // "not every rare+ item needs a unique quest thread" reasoning as every prior boss's own
+      // chest/loot bonus). The Legendary cap (cedar-giant-totem) is this boss's quest reward
+      // instead - see MSF-WP-008.
+      { itemId: 'elder-cedar-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
+    ],
   },
 };
 

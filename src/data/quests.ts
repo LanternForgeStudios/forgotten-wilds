@@ -813,4 +813,17 @@ export const QUESTS: Quest[] = [
       grantLoreId: 'lore-keeper-aldric-thorne',
     },
   },
+  {
+    id: 'the-cedar-giant',
+    name: 'The Cedar Giant',
+    giverNpcId: 'elder-rowan-birch',
+    description: 'Reach Guardian Grove and restore the Cedar Giant to its balance.',
+    category: 'main',
+    prerequisiteQuestId: 'the-keeper-beneath-the-cedar',
+    objectives: [
+      { id: 'reach-guardian-grove', type: 'reachLocation', description: 'Reach Guardian Grove.', targetId: 'guardian-grove', requiredCount: 1 },
+      { id: 'defeat-cedar-giant', type: 'defeatBoss', description: 'Defeat the Cedar Giant.', targetId: 'cedar-giant', requiredCount: 1 },
+    ],
+    reward: { xp: 300, gold: 160, itemIds: ['cedar-giant-totem'] },
+  },
 ];

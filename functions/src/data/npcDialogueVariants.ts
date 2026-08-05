@@ -61,7 +61,7 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   'scout-niska': ['following-the-herd'],
   'prairie-spirit': ['voices-on-the-wind'],
   // Whispering Pines (MSQ Volume IV, Chapter 7)
-  'elder-rowan-birch': ['heartwood-sanctuary', 'into-the-ancient-forest'],
+  'elder-rowan-birch': ['the-cedar-giant', 'heartwood-sanctuary', 'into-the-ancient-forest'],
   'archivist-elowen': [
     'beneath-the-roots',
     'the-second-recording',

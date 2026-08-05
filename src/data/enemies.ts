@@ -728,7 +728,10 @@ export const ENEMIES: Enemy[] = [
     vulnerableAilments: ['freeze', 'burn'],
     xpReward: 280,
     goldReward: 150,
-    lootTable: [{ itemId: 'ancient-heartwood-relic', chance: 1, minQuantity: 1, maxQuantity: 1 }],
+    lootTable: [
+      { itemId: 'ancient-heartwood-relic', chance: 1, minQuantity: 1, maxQuantity: 1 },
+      { itemId: 'elder-cedar-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
+    ],
     loreBlurb: "Not a monster - a Guardian left too long without anyone to answer to, grown wild the way anything left untended eventually does.",
   },
 ];

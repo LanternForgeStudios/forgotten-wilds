@@ -967,14 +967,35 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     oilCapacity: 40,
     lanternAbilityIds: ['ancient-roots-reach'],
   },
-  // Young Cedar Totem - Rare tier only this chapter (Mythic/Legendary wait for Chapter 8's boss),
-  // built now rather than retroactively patched in later the way White Buffalo Totem's own Rare
-  // tier had to be (docs/Mytherra-Equipment_breakdown.md's Implementation Notes).
+  // Young Cedar Totem - Rare tier shipped in Chapter 7 (built then rather than retroactively
+  // patched in later the way White Buffalo Totem's own Rare tier had to be). Mythic/Legendary
+  // tiers below complete the family alongside Chapter 8's own boss content.
   'young-cedar-totem': {
     id: 'young-cedar-totem',
     slot: 'spiritTotem',
     statBonuses: { maxSpirit: 5, defense: 4 },
     tier: 'rare',
+    familyId: 'young-cedar-totem',
+  },
+  // Mythic tier - Cedar Giant's own lootTable chance drop (Chapter 8), same "not every rare+ item
+  // needs a unique quest thread" pattern as elder-buffalo-totem. The family's Legendary cap
+  // (cedar-giant-totem) is a guaranteed reward from the boss-defeat quest itself instead - see
+  // MSF-WP-008.
+  'elder-cedar-totem': {
+    id: 'elder-cedar-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxHp: 12, maxSpirit: 10, defense: 5 },
+    tier: 'mythic',
+    familyId: 'young-cedar-totem',
+  },
+  // Young Cedar Totem family's Legendary cap - a guaranteed reward from the boss-defeat quest
+  // itself (MSF-WP-008), same pattern as thunderbird-totem.
+  'cedar-giant-totem': {
+    id: 'cedar-giant-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxSpirit: 24, maxHp: 14, defense: 8 },
+    tier: 'legendary',
+    unique: true,
     familyId: 'young-cedar-totem',
   },
 };

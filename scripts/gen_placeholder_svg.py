@@ -197,6 +197,10 @@ add("icons/archive-fragments.svg", 64, 64, "PAGES", "#c8b888", "#8a7038")
 add("icons/lantern-of-ancient-roots.svg", 64, 64, "LANTERN", "#a8d888", "#4a7830", font_size=9)
 add("icons/lantern-of-ancient-roots-equipped.svg", 64, 64, "LANTERN", "#b8e898", "#5a8840", font_size=9)
 
+# Young Cedar Totem family's Mythic + Legendary tiers (Phase 5).
+add("icons/elder-cedar-totem.svg", 64, 64, "TOTEM", "#c8c0a0", "#78705a")
+add("icons/cedar-giant-totem.svg", 64, 64, "TOTEM", "#a8d888", "#4a7830")
+
 
 if __name__ == "__main__":
     write_all()

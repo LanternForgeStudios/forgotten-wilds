@@ -609,6 +609,15 @@ export const QUESTS: Record<string, QuestDef> = {
       grantLoreId: 'lore-keeper-aldric-thorne',
     },
   },
+  'the-cedar-giant': {
+    id: 'the-cedar-giant',
+    prerequisiteQuestId: 'the-keeper-beneath-the-cedar',
+    objectives: [
+      { id: 'reach-guardian-grove', type: 'reachLocation', targetId: 'guardian-grove', requiredCount: 1 },
+      { id: 'defeat-cedar-giant', type: 'defeatBoss', targetId: 'cedar-giant', requiredCount: 1 },
+    ],
+    reward: { xp: 300, gold: 160, itemIds: ['cedar-giant-totem'] },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -663,4 +672,5 @@ export const QUEST_ORDER = [
   'the-second-recording',
   'beneath-the-roots',
   'the-keeper-beneath-the-cedar',
+  'the-cedar-giant',
 ];

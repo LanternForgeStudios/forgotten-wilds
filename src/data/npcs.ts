@@ -890,8 +890,18 @@ export const NPCS: Npc[] = [
       { speaker: 'Elder Rowan Birch', text: "Cedarwatch is older than it looks, Keeper. This forest was here before the mountains had names, and we've kept watch over it about as long." },
       { speaker: 'Elder Rowan Birch', text: "Elias Rowan's letters mentioned you might come this way eventually. He always did have a habit of writing to people years before they'd need to read it." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['into-the-ancient-forest', 'heartwood-sanctuary'] },
+    gameplayHook: {
+      type: 'questGiver',
+      questIds: ['the-cedar-giant', 'into-the-ancient-forest', 'heartwood-sanctuary'],
+    },
     dialogueVariants: [
+      {
+        questId: 'the-cedar-giant',
+        lines: [
+          { speaker: 'Elder Rowan Birch', text: "The Giant, restored rather than slain. I wasn't sure that choice was even still open to us, Keeper. I'm glad it was." },
+          { speaker: 'Elder Rowan Birch', text: "Cedarwatch has slept easier under a Guardian's watch before, generations back. Perhaps it will again." },
+        ],
+      },
       {
         questId: 'heartwood-sanctuary',
         lines: [
