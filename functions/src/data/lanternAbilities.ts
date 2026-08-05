@@ -59,4 +59,14 @@ export const LANTERN_ABILITIES: Record<string, LanternAbilityDefinition> = {
     description:
       'The Lantern of Open Skies breathes clean mountain wind through you, carrying off the worst of your wounds.',
   },
+  'ancient-roots-reach': {
+    id: 'ancient-roots-reach',
+    name: "Ancient Roots' Reach",
+    category: 'offensive',
+    oilCost: 10,
+    power: 24,
+    effectiveAgainstFamilies: ['silentEchoes'],
+    description:
+      'The Lantern of Ancient Roots burns with light older than the forest\'s own corruption - especially fierce against Silent Echoes.',
+  },
 };

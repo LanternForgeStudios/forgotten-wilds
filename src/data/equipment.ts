@@ -1223,6 +1223,18 @@ export const EQUIPMENT: EquipmentItem[] = [
     ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
   },
   {
+    id: 'lantern-of-ancient-roots-equipped',
+    name: 'Lantern of Ancient Roots',
+    description: 'A legendary lantern recovered from Heartwood Sanctuary, its light steady with the patience of something that has waited a very long time.',
+    slot: 'lantern',
+    iconAssetId: 'icon.equipment.lantern-of-ancient-roots-equipped',
+    statBonuses: { maxSpirit: 20, defense: 5 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 40,
+    lanternAbilityIds: ['ancient-roots-reach'],
+  },
+  {
     id: 'young-cedar-totem',
     name: 'Young Cedar Totem',
     description: 'A sapling-totem, carved and blessed by the Cedar Spirit itself once the shrine was restored.',

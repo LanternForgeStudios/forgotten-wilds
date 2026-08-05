@@ -956,6 +956,17 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     familyId: 'cedar-charm',
     ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
   },
+  // Whispering Pines' own Legendary Lantern (MSF-WP-007), same shape as lantern-of-open-skies - a
+  // step above its statBonuses/oilCapacity, one Lantern Ability (ancient-roots-reach, offensive).
+  'lantern-of-ancient-roots-equipped': {
+    id: 'lantern-of-ancient-roots-equipped',
+    slot: 'lantern',
+    statBonuses: { maxSpirit: 20, defense: 5 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 40,
+    lanternAbilityIds: ['ancient-roots-reach'],
+  },
   // Young Cedar Totem - Rare tier only this chapter (Mythic/Legendary wait for Chapter 8's boss),
   // built now rather than retroactively patched in later the way White Buffalo Totem's own Rare
   // tier had to be (docs/Mytherra-Equipment_breakdown.md's Implementation Notes).

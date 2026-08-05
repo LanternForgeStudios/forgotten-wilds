@@ -595,6 +595,20 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 45, gold: 25, grantLoreId: 'lore-archive-fragments' },
   },
+  'the-keeper-beneath-the-cedar': {
+    id: 'the-keeper-beneath-the-cedar',
+    prerequisiteQuestId: 'beneath-the-roots',
+    objectives: [
+      { id: 'get-lantern-of-ancient-roots', type: 'collectItem', targetId: 'lantern-of-ancient-roots', requiredCount: 1 },
+      { id: 'talk-elowen-lantern', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 50,
+      gold: 0,
+      itemIds: ['lantern-of-ancient-roots-equipped'],
+      grantLoreId: 'lore-keeper-aldric-thorne',
+    },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -648,4 +662,5 @@ export const QUEST_ORDER = [
   'the-first-recording',
   'the-second-recording',
   'beneath-the-roots',
+  'the-keeper-beneath-the-cedar',
 ];

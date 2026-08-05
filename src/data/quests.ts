@@ -795,4 +795,22 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 45, gold: 25, grantLoreId: 'lore-archive-fragments' },
   },
+  {
+    id: 'the-keeper-beneath-the-cedar',
+    name: 'The Keeper Beneath the Cedar',
+    giverNpcId: 'archivist-elowen',
+    description: 'Learn the history of a forgotten Lantern Keeper and claim the legendary lantern waiting in the Sanctuary.',
+    category: 'main',
+    prerequisiteQuestId: 'beneath-the-roots',
+    objectives: [
+      { id: 'get-lantern-of-ancient-roots', type: 'collectItem', description: 'Claim the Lantern of Ancient Roots.', targetId: 'lantern-of-ancient-roots', requiredCount: 1 },
+      { id: 'talk-elowen-lantern', type: 'talkToNpc', description: 'Bring the lantern to Archivist Elowen to record its history.', targetId: 'archivist-elowen', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 50,
+      gold: 0,
+      itemIds: ['lantern-of-ancient-roots-equipped'],
+      grantLoreId: 'lore-keeper-aldric-thorne',
+    },
+  },
 ];

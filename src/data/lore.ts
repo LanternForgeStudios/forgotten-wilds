@@ -151,4 +151,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "Archivist Elowen, sorting what the Inner Archive still holds: an archive within the archive, older than the Great Tree Library above it, and just as deliberately picked over. Whoever emptied Mytherra's libraries knew this room existed. They just never finished the job here.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-keeper-aldric-thorne',
+    title: 'Keeper Aldric Thorne',
+    body: "A history read from the Lantern Sanctuary's own root-walls by Archivist Elowen: Aldric Thorne was the last Lantern Keeper to tend Heartwood Sanctuary before the Cedar Giant was left to keep its own long watch, unrelieved. Thorne left this lantern lit and waiting - the same way Talon Greywind once left one on Thunderbird Mesa, and Elise Duvall left hers beneath the Deep Current. A pattern, not a coincidence: every legendary lantern in Mytherra was left behind by someone who expected to come back.",
+    unlockedAt: 0,
+  },
 ];

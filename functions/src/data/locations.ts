@@ -83,9 +83,13 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'ancient-cedar-shrine': {
     'heartwood-recording-ii-cache': 'heartwood-recording-ii',
   },
-  // Whispering Pines (MSQ Volume IV, Chapter 8) - the Archive Fragments (MSF-WP-006).
+  // Whispering Pines (MSQ Volume IV, Chapter 8) - the Archive Fragments (MSF-WP-006) and the
+  // Lantern of Ancient Roots' found-item form (MSF-WP-007).
   'inner-archive': {
     'archive-fragments': 'archive-fragments',
+  },
+  'heartwood-lantern-sanctuary': {
+    'lantern-of-ancient-roots': 'lantern-of-ancient-roots',
   },
 };
 

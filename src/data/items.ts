@@ -625,6 +625,16 @@ export const ITEMS: Item[] = [
     unique: true,
   },
   {
+    id: 'lantern-of-ancient-roots',
+    name: 'Lantern of Ancient Roots',
+    description: 'A lantern found unlit at the heart of Heartwood Sanctuary, its glass etched with an interlocking root-pattern.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.lantern-of-ancient-roots',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
     id: 'ancient-heartwood-relic',
     name: 'Ancient Heartwood Relic',
     description: "A fragment of the Cedar Giant's own hollowed core, still faintly warm with old spirit-light.",

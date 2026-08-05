@@ -193,6 +193,10 @@ add("icons/gnarled-root-fiber.svg", 64, 64, "FIBER", "#8a6a44", "#4a3220")
 add("icons/ancient-heartwood-relic.svg", 64, 64, "RELIC", "#9a70c0", "#5a3880")
 add("icons/archive-fragments.svg", 64, 64, "PAGES", "#c8b888", "#8a7038")
 
+# Lantern of Ancient Roots (Phase 4) - found-item + equipped forms.
+add("icons/lantern-of-ancient-roots.svg", 64, 64, "LANTERN", "#a8d888", "#4a7830", font_size=9)
+add("icons/lantern-of-ancient-roots-equipped.svg", 64, 64, "LANTERN", "#b8e898", "#5a8840", font_size=9)
+
 
 if __name__ == "__main__":
     write_all()
