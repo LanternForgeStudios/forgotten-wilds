@@ -623,6 +623,96 @@ sprites, 5 equipment icons, 2 item icons, plus two art debts that aren't simple 
 
 ---
 
+## Whispering Pines, Chapter 7: The Silent Forest - outstanding placeholders
+
+**Status (2026-08-05): same PixelLab quota outage as Endless Prairie above, still not refreshed.**
+Every asset below shipped as a procedurally-generated SVG placeholder, same convention as every
+prior region's own backlog. None of this content is player-reachable yet (no transition connects
+any shipped map to Cedarwatch), so there's no urgency - do it whenever quota is available again.
+
+All 12 of Chapter 7's maps (Cedarwatch + Mistwood Path/Elder Forest/Silver River/Ancient Cedar
+Shrine/Heartwood Approach + the 6 town interiors) reuse existing real tilesets rather than
+generating new ones - `tileset.overworld-terrain`/`overworld-decor2`/`overworld-water` for the
+field maps (Cedarwatch itself uses `tileset.town-terrain`), `tileset.tiny-dungeon` for every
+interior, matching Highwind Crossing's own precedent. A forest-specific terrain/decor pass (mossy
+ground variants, root-and-canopy overhang tiles) would be a real visual upgrade later but isn't
+tracked here as a placeholder gap the way character art is - the tiles are real, just generic.
+
+### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
+
+| Character | Role | Generation prompt |
+|---|---|---|
+| Elder Rowan Birch | Elder of Cedarwatch | Elderly figure with quiet gravity, cedar-bark cloak, carved wooden staff, deep-lined weathered face, patient watchful expression, forest elder bearing. |
+| Archivist Elowen | Keeper of the Great Tree Library | Middle-aged scholar, ink-stained fingers, robes woven with leaf-pattern trim, surrounded faintly by root-carved shelving, curious focused expression. |
+| Rowan Hart | Forest Warden | Lean alert ranger, practical bark-and-leather gear, hatchet at her belt, watchful forest-green eyes, wind-tousled hair. |
+| Cedar Spirit | Voice of the Ancient Cedar | Ethereal wood-and-leaf spirit, pale green-brown form like living bark given shape, faintly glowing moss-light, ancient patient presence. |
+| Innkeeper Marge | The Cedarwatch Inn | Warm heavyset woman, apron over simple forest-town clothing, welcoming tired smile, holding a ladle or mug. |
+| Storekeeper Byron | Cedarwatch's General Store | Practical middle-aged man, patched forest-trader's vest, standing before shelves of trail goods, easy trader's smile. |
+| Blacksmith Dara | The Cedarwatch Forge | Wiry forge-scarred woman, leather apron, soot-streaked forearms, confident stance near an anvil. |
+| Armorer Fenn | The Cedarwatch Armory | Sturdy practical man, inspecting a piece of bark-weave armor, calloused hands, focused expression. |
+
+### NPC overworld sprites (8 - 72×96, transparent background, full-body idle pose)
+
+No Chapter 7 NPC has real PixelLab art yet, sprite or portrait (unlike Chapter 5's 4 headliners).
+
+| Character | Generation prompt |
+|---|---|
+| Elder Rowan Birch | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Archivist Elowen | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Rowan Hart | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Cedar Spirit | Full-body version of its portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Innkeeper Marge | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Storekeeper Byron | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Blacksmith Dara | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Armorer Fenn | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+
+### Enemy battle sprites (1 regular/elite pair - 128×128, transparent background, front-facing battle stance)
+
+| Enemy | Family | Generation prompt |
+|---|---|---|
+| Forest Echo | silentEchoes | A humanoid shape made of pale bark and moss, roughly tree-like posture, faint sickly green spore-glow at the joints, unsettling stillness. |
+| Corrupted Echo | silentEchoes | A larger, more visibly rotted bark-and-moss shape, deeper spore-glow, aggressive hunched stance, bark cracking to reveal glowing fungus beneath. |
+
+### Equipment icons (19 - generate 128×128, final 64×64, across 6 families x 3 tiers + 1 totem)
+
+Cedar Staff is a straight palette-swap of the already-real Staff-type weapon-layer founder (see the
+"Equipment weapon-layer sprites" section above) - once its icon exists, no new hand-positioning is
+needed, just `scripts/palette_swap_equipment_layer.py`. The other 5 families each need a new
+founder before any layer art can start.
+
+| Equipment | Final Size | Generation prompt |
+|---|---|---|
+| Weathered Cedar Staff *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a staff cut from a young cedar branch, still faintly fragrant, centered, transparent background. |
+| Bound Cedar Staff *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a cedar staff bound with braided root-fiber, darkened grain, centered, transparent background. |
+| Ancient Cedar Staff *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a staff cut from a massive ancient cedar branch, faint pale-green glow along the grain, centered, transparent background. |
+| Worn Bark Armor *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a coat of layered cedar bark strips, softened and stitched, centered, transparent background. |
+| Banded Bark Armor *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of bark armor reinforced with root-fiber banding, centered, transparent background. |
+| Elderwood Bark Armor *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of dense ancient bark armor with a faint pale-green inner glow, centered, transparent background. |
+| Worn Root-Woven Leggings *(common)* | 64×64 | Simple flat-shaded fantasy game icon of leggings woven from split roots, centered, transparent background. |
+| Banded Root-Woven Leggings *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of root-woven leggings banded at the knee and shin, centered, transparent background. |
+| Deep Root Leggings *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of leggings woven from unusually thick, deep-reaching roots, faint pale-green glow, centered, transparent background. |
+| Worn Root Boots *(common)* | 64×64 | Simple flat-shaded fantasy game icon of boots grown from living root-wrap, centered, transparent background. |
+| Banded Root Boots *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of root boots banded with bark-leather, centered, transparent background. |
+| Ancient Root Boots *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of ornate root boots with a faint pale-green glow at the seams, centered, transparent background. |
+| Worn Vine Gloves *(common)* | 64×64 | Simple flat-shaded fantasy game icon of gloves woven from living vine, faintly green at the fingertips, centered, transparent background. |
+| Woven Vine Gloves *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of densely woven vine gloves, centered, transparent background. |
+| Warden's Vine Gloves *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of vine gloves marked with a warden's sigil, faint pale warding glow, centered, transparent background. |
+| Carved Cedar Charm *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a plain cedar disc carved with a simple spiral, on a cord, centered, transparent background. |
+| Woven Cedar Charm *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a cedar charm bound in root-fiber with a deeper carving, centered, transparent background. |
+| Elder's Cedar Charm *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of an ornate cedar charm, spiral carving worn smooth, faint pale-green glow, centered, transparent background. |
+| Young Cedar Totem *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a small carved sapling-totem, centered, transparent background. |
+
+### Item icons (4 - generate 128×128, final 64×64: materials, key items)
+
+| Item | Final Size | Generation prompt |
+|---|---|---|
+| Withered Echo Moss *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a clump of pale, faintly warm moss, centered, transparent background. |
+| Spirit Seed *(key item, shared across 3 locations)* | 64×64 | Simple flat-shaded fantasy game icon of a small glowing cedar-green seed, centered, transparent background. |
+| Lost Library Records *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a bundle of aged, bound pages tied with cord, centered, transparent background. |
+| Heartwood Recording *(key item, shared across 2 locations)* | 64×64 | Simple flat-shaded fantasy game icon of a small knot of root grown in a deliberate, unnatural spiral pattern, centered, transparent background. |
+
+---
+
 ## Things Claude can't generate itself (need external production)
 
 Everything above this line is producible in-house via the pixellab MCP server (characters, objects,
