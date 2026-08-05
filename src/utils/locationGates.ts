@@ -29,6 +29,7 @@ export const LOCATION_GATES: Record<string, string> = {
   'thunderbird-mesa-approach': 'the-stone-circles',
   'summit-temple': 'climbing-thunderbird-mesa',
   'cedarwatch': 'the-first-promise-remembered',
+  'root-caverns': 'heartwood-sanctuary',
 };
 
 /** Returns a player-facing message if `locationId` is gated and not yet unlocked, or null if it's

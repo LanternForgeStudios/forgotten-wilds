@@ -845,4 +845,62 @@ export const LOCATIONS: Location[] = [
     fastTravel: false,
     parentLocationId: 'cedarwatch',
   },
+
+  // --- Whispering Pines (MSQ Volume IV), Chapter 8: Echoes of the First Keepers ---
+  // Heartwood Sanctuary dungeon, chained east from Heartwood Approach's own east transition,
+  // matching the Thunderbird Mesa multi-room pattern exactly. "Lantern Sanctuary" as a plain id is
+  // already taken by Thunderbird Mesa's own room, so this one is 'heartwood-lantern-sanctuary'.
+  {
+    id: 'root-caverns',
+    name: 'Root Caverns',
+    kind: 'dungeon',
+    description: 'A cavern of interlocking roots thick as tree trunks, descending below the forest floor into the dark.',
+    mapAssetId: 'map.root-caverns',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'root-wraith', weight: 3 },
+      { enemyId: 'elder-root-wraith', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'inner-archive',
+    name: 'Inner Archive',
+    kind: 'dungeon',
+    description: 'Shelves grown from living root, most of them bare - what survives here is only a fragment of what once filled this chamber.',
+    mapAssetId: 'map.inner-archive',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'root-wraith', weight: 2 },
+      { enemyId: 'elder-root-wraith', weight: 2 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'heartwood-lantern-sanctuary',
+    name: 'Lantern Sanctuary',
+    kind: 'dungeon',
+    description: 'A round root-walled chamber at the heart of the sanctuary, where a single lantern has waited, unlit, since long before Cedarwatch had a name.',
+    mapAssetId: 'map.heartwood-lantern-sanctuary',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [{ enemyId: 'elder-root-wraith', weight: 1 }],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'guardian-grove',
+    name: 'Guardian Grove',
+    kind: 'dungeon',
+    description: 'A vast open cavern lit by pale root-light, where a shape too large and too still to be a tree keeps watch.',
+    mapAssetId: 'map.guardian-grove',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'elder-root-wraith', weight: 2 },
+      { enemyId: 'corrupted-echo', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
 ];

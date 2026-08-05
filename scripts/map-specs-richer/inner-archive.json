@@ -1,0 +1,40 @@
+{
+  "width": 32,
+  "height": 20,
+  "tilesets": [
+    {
+      "assetId": "tileset.tiny-dungeon",
+      "name": "tiny-dungeon",
+      "image": "tiny-dungeon.png",
+      "imageWidth": 192,
+      "imageHeight": 176,
+      "tileSize": 16,
+      "nonWalkableIds": [0]
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 24 },
+    "border": { "tileset": 0, "id": 0 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 6, "y": 5, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 21, "y": 15, "tileId": { "tileset": 0, "id": 25 } }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 1, "y": 10, "refId": "from-root-caverns" },
+    { "type": "spawnPoint", "x": 1, "y": 10, "refId": "default" },
+    { "type": "transition", "x": 0, "y": 10, "refId": "root-caverns", "targetSpawnId": "from-inner-archive" },
+
+    { "type": "spawnPoint", "x": 30, "y": 10, "refId": "from-heartwood-lantern-sanctuary" },
+    { "type": "transition", "x": 31, "y": 10, "refId": "heartwood-lantern-sanctuary", "targetSpawnId": "from-inner-archive" },
+
+    { "type": "interactable", "x": 16, "y": 10, "refId": "archive-fragments" },
+    { "type": "interactable", "x": 16, "y": 4, "refId": "chest-inner-archive-1" }
+  ]
+}

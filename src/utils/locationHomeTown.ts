@@ -40,6 +40,11 @@ export const LOCATION_HOME_TOWN: Record<string, string> = {
   'silver-river': 'cedarwatch',
   'ancient-cedar-shrine': 'cedarwatch',
   'heartwood-approach': 'cedarwatch',
+  // Whispering Pines (MSQ Volume IV, Chapter 8) - Heartwood Sanctuary dungeon (4 chained rooms).
+  'root-caverns': 'cedarwatch',
+  'inner-archive': 'cedarwatch',
+  'heartwood-lantern-sanctuary': 'cedarwatch',
+  'guardian-grove': 'cedarwatch',
 };
 
 /** Resolves the home town for any location id - falls back to Ash Hallow for an unmapped id

@@ -1,0 +1,39 @@
+{
+  "width": 24,
+  "height": 18,
+  "tilesets": [
+    {
+      "assetId": "tileset.tiny-dungeon",
+      "name": "tiny-dungeon",
+      "image": "tiny-dungeon.png",
+      "imageWidth": 192,
+      "imageHeight": 176,
+      "tileSize": 16,
+      "nonWalkableIds": [0]
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 24 },
+    "border": { "tileset": 0, "id": 0 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 6, "y": 5, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 17, "y": 12, "tileId": { "tileset": 0, "id": 25 } }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 1, "y": 9, "refId": "from-inner-archive" },
+    { "type": "spawnPoint", "x": 1, "y": 9, "refId": "default" },
+    { "type": "transition", "x": 0, "y": 9, "refId": "inner-archive", "targetSpawnId": "from-heartwood-lantern-sanctuary" },
+
+    { "type": "spawnPoint", "x": 22, "y": 9, "refId": "from-guardian-grove" },
+    { "type": "transition", "x": 23, "y": 9, "refId": "guardian-grove", "targetSpawnId": "from-heartwood-lantern-sanctuary" },
+
+    { "type": "interactable", "x": 12, "y": 8, "refId": "lantern-of-ancient-roots" }
+  ]
+}

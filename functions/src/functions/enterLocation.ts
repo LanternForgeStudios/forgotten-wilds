@@ -46,6 +46,10 @@ const LOCATION_GATES: Record<string, string> = {
   // Whispering Pines (MSQ Volume IV) - same single-gate-per-region-entry-point model, gated on
   // Volume III's own true finale.
   'cedarwatch': 'the-first-promise-remembered',
+  // Heartwood Sanctuary dungeon entrance (Chapter 8) - gated on Chapter 7's true finale. The other
+  // 3 rooms (inner-archive/heartwood-lantern-sanctuary/guardian-grove) are reached by physically
+  // walking the chained transitions from here, same single-gate dungeon precedent as Summit Temple.
+  'root-caverns': 'heartwood-sanctuary',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -112,6 +116,11 @@ const KNOWN_LOCATION_IDS = new Set([
   'cedarwatch-general-store',
   'cedarwatch-blacksmith',
   'cedarwatch-armory',
+  // Chapter 8's Heartwood Sanctuary dungeon (4 chained rooms).
+  'root-caverns',
+  'inner-archive',
+  'heartwood-lantern-sanctuary',
+  'guardian-grove',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

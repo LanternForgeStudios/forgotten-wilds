@@ -50,6 +50,9 @@
     { "type": "transition", "x": 0, "y": 16, "refId": "ancient-cedar-shrine", "targetSpawnId": "from-heartwood-approach" },
     { "type": "spawnPoint", "x": 24, "y": 16, "refId": "default" },
 
+    { "type": "spawnPoint", "x": 45, "y": 16, "refId": "from-root-caverns" },
+    { "type": "transition", "x": 47, "y": 16, "refId": "root-caverns", "targetSpawnId": "from-heartwood-approach" },
+
     { "type": "interactable", "x": 20, "y": 8, "refId": "spirit-seed-heartwood-approach" },
     { "type": "interactable", "x": 28, "y": 22, "refId": "lost-library-records" },
     { "type": "interactable", "x": 24, "y": 14, "refId": "heartwood-sanctuary-gate" },
