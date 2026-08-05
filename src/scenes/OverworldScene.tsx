@@ -71,9 +71,8 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   'wind-stone-golden-prairie': 'fragment',
   'wind-stone-spirit-herd-plains': 'fragment',
   'wind-stone-stone-circle-valley': 'fragment',
-  // Endless Prairie side quest (The Winter Counts) - no FRAGMENT_SPRITE_ASSET_ID entry yet (see
-  // below), so these fall back to structure.shrine-dormant until Phase 7's art pass gives them
-  // their own hide-bundle marker. Blocked on PixelLab quota, not forgotten.
+  // Endless Prairie side quest (The Winter Counts) - see FRAGMENT_SPRITE_ASSET_ID below for their
+  // (temporarily reused) marker sprite.
   'winter-count-hide-i-cache': 'fragment',
   'winter-count-hide-ii-cache': 'fragment',
 };
@@ -106,6 +105,12 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'wind-stone-golden-prairie': 'structure.landmark-wind-stone',
   'wind-stone-spirit-herd-plains': 'structure.landmark-wind-stone',
   'wind-stone-stone-circle-valley': 'structure.landmark-wind-stone',
+  // Endless Prairie side quest (The Winter Counts) - no bespoke marker generated yet (PixelLab
+  // quota), temporarily reusing Bayou's own "hidden cache" markers rather than falling back to
+  // structure.shrine-dormant, since a half-buried hide bundle reads closer to a cache than a
+  // shrine. Swap for real bespoke art once quota refreshes.
+  'winter-count-hide-i-cache': 'structure.landmark-drowned-ledger-cache',
+  'winter-count-hide-ii-cache': 'structure.landmark-bogwater-almanac-cache',
 };
 
 /** Post-collection sprite override for a 'fragment'-kind interactable, shown once its item is in
