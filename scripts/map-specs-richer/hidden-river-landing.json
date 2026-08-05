@@ -59,6 +59,9 @@
 
     { "type": "interactable", "x": 12, "y": 10, "refId": "chest-hidden-river-landing-1" },
     { "type": "interactable", "x": 50, "y": 8, "refId": "chest-hidden-river-landing-2" },
-    { "type": "interactable", "x": 46, "y": 34, "refId": "chest-hidden-river-landing-3" }
+    { "type": "interactable", "x": 46, "y": 34, "refId": "chest-hidden-river-landing-3" },
+
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-highwind-crossing" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "highwind-crossing", "targetSpawnId": "from-hidden-river-landing" }
   ]
 }

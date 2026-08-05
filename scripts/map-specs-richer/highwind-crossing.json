@@ -66,6 +66,9 @@
     { "type": "spawnPoint", "x": 30, "y": 8, "refId": "from-highwind-crossing-blacksmith" },
     { "type": "transition", "x": 30, "y": 8, "refId": "highwind-crossing-blacksmith", "targetSpawnId": "from-highwind-crossing", "requiredFacing": "up" },
     { "type": "spawnPoint", "x": 12, "y": 20, "refId": "from-highwind-crossing-armory" },
-    { "type": "transition", "x": 12, "y": 20, "refId": "highwind-crossing-armory", "targetSpawnId": "from-highwind-crossing" }
+    { "type": "transition", "x": 12, "y": 20, "refId": "highwind-crossing-armory", "targetSpawnId": "from-highwind-crossing" },
+
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-hidden-river-landing" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "hidden-river-landing", "targetSpawnId": "from-highwind-crossing" }
   ]
 }

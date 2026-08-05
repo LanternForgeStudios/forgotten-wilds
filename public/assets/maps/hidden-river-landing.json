@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 11,
+  "nextobjectid": 13,
   "layers": [
     {
       "id": 1,
@@ -5357,6 +5357,47 @@
               "name": "refId",
               "type": "string",
               "value": "chest-hidden-river-landing-3"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "",
+          "type": "spawnPoint",
+          "x": 976,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-highwind-crossing"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "",
+          "type": "transition",
+          "x": 1008,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "highwind-crossing"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-hidden-river-landing"
             }
           ]
         }

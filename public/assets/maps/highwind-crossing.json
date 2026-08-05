@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 17,
+  "nextobjectid": 19,
   "layers": [
     {
       "id": 1,
@@ -5510,6 +5510,47 @@
               "name": "refId",
               "type": "string",
               "value": "highwind-crossing-armory"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-highwind-crossing"
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "name": "",
+          "type": "spawnPoint",
+          "x": 976,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-hidden-river-landing"
+            }
+          ]
+        },
+        {
+          "id": 18,
+          "name": "",
+          "type": "transition",
+          "x": 1008,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "hidden-river-landing"
             },
             {
               "name": "targetSpawnId",
