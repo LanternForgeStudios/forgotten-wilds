@@ -121,4 +121,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The Great Thunderbird's own memory, witnessed at the Stone Circles: the First Promise united Lantern Keepers and Guardian Spirits as equals, and the sealing ritual that followed the Great Silence was performed together, willingly - not one side binding the other. Every account since describes it differently. The historical record wasn't lost. It was rewritten, on purpose, by someone who is never named.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-lost-library',
+    title: 'The Lost Library',
+    body: "Archivist Elowen, cataloguing what the Heartwood Approach ruins gave up: hundreds of shelf-marks with nothing behind them, spanning centuries, all missing in the same deliberate way. Not fire, not flood, not neglect - someone catalogued this loss as carefully as the library itself was once catalogued. Whoever erased the First Promise from the Stone Circles didn't stop there.",
+    unlockedAt: 0,
+  },
+  {
+    id: 'lore-heartwood-sanctuary-gate',
+    title: "Heartwood Sanctuary's Gate",
+    body: "The gate mechanism answers to Lantern-light alone, the same design as Summit Temple's own wind mechanism half a continent away - built by people who never met, working from the same forgotten principles. Whatever waits past it, the old Lantern Keepers meant for it to stay sealed to everyone except one of their own.",
+    unlockedAt: 0,
+  },
 ];

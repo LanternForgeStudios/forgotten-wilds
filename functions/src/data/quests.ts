@@ -485,6 +485,75 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 80, gold: 40, itemIds: ['guardian-memory-fragment-4'], regionalReputation: 60, grantLoreId: 'lore-guardian-memory-iii' },
   },
+
+  // --- Whispering Pines (MSQ Volume IV), Chapter 7: The Silent Forest ---
+  // Kebab-case id mapping: MSF-WP-001 into-the-ancient-forest, MSF-WP-002
+  // the-forest-has-fallen-silent, MSF-WP-003 seeds-of-the-ancient-cedar, MSF-WP-004
+  // the-lost-library, MSF-WP-005 heartwood-sanctuary. Gated behind Volume III's own true finale,
+  // matching the-waters-remember's own role gating Volume III in.  Whispering Pines spans two
+  // chapters like Endless Prairie did (Chapter 8 - "Echoes of the First Keepers" - is the region's
+  // actual dungeon/boss), so per the established Guardian Memory Fragment convention, MSF-WP-005
+  // does NOT grant one here - that's reserved for Chapter 8's true finale (fragment-5), same
+  // intended shape as fragment-3/4's split, this time built correctly the first time.
+  'into-the-ancient-forest': {
+    id: 'into-the-ancient-forest',
+    prerequisiteQuestId: 'the-first-promise-remembered',
+    objectives: [
+      { id: 'reach-cedarwatch', type: 'reachLocation', targetId: 'cedarwatch', requiredCount: 1 },
+      { id: 'talk-elder-rowan-birch', type: 'talkToNpc', targetId: 'elder-rowan-birch', requiredCount: 1 },
+      { id: 'talk-archivist-elowen', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
+    ],
+    reward: { xp: 30, gold: 20 },
+  },
+  'the-forest-has-fallen-silent': {
+    id: 'the-forest-has-fallen-silent',
+    prerequisiteQuestId: 'into-the-ancient-forest',
+    objectives: [
+      { id: 'talk-warden-start', type: 'talkToNpc', targetId: 'forest-warden-rowan-hart', requiredCount: 1 },
+      { id: 'reach-mistwood-path', type: 'reachLocation', targetId: 'mistwood-path', requiredCount: 1 },
+      { id: 'reach-elder-forest', type: 'reachLocation', targetId: 'elder-forest', requiredCount: 1 },
+      { id: 'calm-echoes', type: 'defeatEnemies', targetId: 'corrupted-echo', requiredCount: 2 },
+      { id: 'reach-ancient-cedar-shrine', type: 'reachLocation', targetId: 'ancient-cedar-shrine', requiredCount: 1 },
+      { id: 'talk-cedar-spirit-meet', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 20, spiritEssence: 10 },
+  },
+  'seeds-of-the-ancient-cedar': {
+    id: 'seeds-of-the-ancient-cedar',
+    prerequisiteQuestId: 'the-forest-has-fallen-silent',
+    objectives: [
+      { id: 'get-spirit-seed-elder-forest', type: 'collectItem', targetId: 'spirit-seed-elder-forest', requiredCount: 1 },
+      { id: 'get-spirit-seed-silver-river', type: 'collectItem', targetId: 'spirit-seed-silver-river', requiredCount: 1 },
+      {
+        id: 'get-spirit-seed-heartwood-approach',
+        type: 'collectItem',
+        targetId: 'spirit-seed-heartwood-approach',
+        requiredCount: 1,
+      },
+      { id: 'restore-cedar-shrine', type: 'interactWithShrine', targetId: 'cedar-shrine-heart', requiredCount: 1 },
+    ],
+    reward: { xp: 60, gold: 30, spiritEssence: 15 },
+  },
+  'the-lost-library': {
+    id: 'the-lost-library',
+    prerequisiteQuestId: 'seeds-of-the-ancient-cedar',
+    objectives: [
+      { id: 'reach-heartwood-approach', type: 'reachLocation', targetId: 'heartwood-approach', requiredCount: 1 },
+      { id: 'get-lost-library-records', type: 'collectItem', targetId: 'lost-library-records', requiredCount: 1 },
+      { id: 'talk-elowen-report', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
+    ],
+    reward: { xp: 50, gold: 25, grantLoreId: 'lore-lost-library' },
+  },
+  'heartwood-sanctuary': {
+    id: 'heartwood-sanctuary',
+    prerequisiteQuestId: 'the-lost-library',
+    objectives: [
+      { id: 'talk-elowen-final', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
+      { id: 'clear-sanctuary-entrance', type: 'defeatEnemies', targetId: 'corrupted-echo', requiredCount: 2 },
+      { id: 'restore-sanctuary-gate', type: 'interactWithShrine', targetId: 'heartwood-sanctuary-gate', requiredCount: 1 },
+    ],
+    reward: { xp: 70, gold: 35, regionalReputation: 40, grantLoreId: 'lore-heartwood-sanctuary-gate' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -530,4 +599,9 @@ export const QUEST_ORDER = [
   'keeper-of-the-open-sky',
   'the-great-thunderbird',
   'the-first-promise-remembered',
+  'into-the-ancient-forest',
+  'the-forest-has-fallen-silent',
+  'seeds-of-the-ancient-cedar',
+  'the-lost-library',
+  'heartwood-sanctuary',
 ];
