@@ -574,6 +574,53 @@ swap for bespoke art rather than leaving the reuse permanent.
 | Winter Count Hide I cache | A painted hide bundle half-buried in tall golden prairie grass, faint edge of pictograph visible, centered, transparent background. |
 | Winter Count Hide II cache | A second painted hide bundle tucked into a low grassy hollow, tied with rawhide cord, centered, transparent background. |
 
+## Endless Prairie, Chapter 6: Wings of the First Promise - outstanding placeholders
+
+**Status (2026-08-04): same PixelLab quota outage as Chapter 5 above.** No new NPCs this chapter
+(Chief Aiyana and Elder Koda reprise their Chapter 5 roles), so this list is shorter - 3 enemy
+sprites, 5 equipment icons, 2 item icons, plus two art debts that aren't simple placeholders:
+
+- **`ancient-wind-mechanism`** (Summit Temple's shrine-kind interactable, MSF-EP-006) has no
+  `FRAGMENT_SPRITE_ASSET_ID`/bespoke marker at all - it falls back to the generic
+  `structure.shrine-dormant`/`-activated` sprites via `shrineSpriteAssetId()`, which is actually
+  fine long-term (every other shrine-kind interactable in this game reuses those same two generic
+  sprites - `stone-circle-carvings`, `mother-cypress-shrine`, etc. - this isn't a gap, just noting
+  it for completeness).
+- **The whole Thunderbird Mesa dungeon (5 rooms) reuses `tileset.tiny-dungeon`** (a generic
+  stone/timber interior set, same one Hollow Rail Mine and Temple of the Deep Current use) rather
+  than a "sky temple" tileset suited to Summit Temple/Sky Bridge/Storm Galleries/Lantern
+  Sanctuary/Guardian Peak's own open-air, cloud-level setting. A real generation pass here would be
+  a `create_topdown_tileset` (terrain) + `create_tiles_pro` (decor: broken stone vane, lightning-
+  scorched pillar, cloud-wisp ground fog) + `create_tiles_pro` (overhang: storm cloud canopy)
+  triplet, matching the pattern already used for Endless Prairie's own field terrain - a bigger art
+  investment than a single icon swap, worth planning as its own pass rather than squeezing into the
+  per-icon backlog below.
+
+### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss)
+
+| Enemy | Family | Generation prompt |
+|---|---|---|
+| Storm Fledgling | stormAvians | A young storm-touched bird, feathers crackling faintly with a charge it hasn't learned to hold, alert perched stance. |
+| Thunder Roc | stormAvians | A fully-grown storm-touched raptor, wings spread, capable of grounding prey with a single wingbeat. |
+| Great Thunderbird *(boss, 256×256)* | boss | A massive, ancient storm-spirit bird, wings wreathed in lightning, imposing watchful eyes, perched at the summit of a wind-scoured peak - a guardian, not a monster. |
+
+### Equipment icons (5 - generate 128×128, final 64×64)
+
+| Equipment | Final Size | Generation prompt |
+|---|---|---|
+| White Buffalo Totem *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a small carved totem in the likeness of a white buffalo, centered, transparent background. |
+| Elder Buffalo Totem *(mythic)* | 64×64 | Simple flat-shaded fantasy game icon of a larger carved totem, an ancient buffalo herd elder weathered by storms, centered, transparent background. |
+| Thunderbird Totem *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a totem carved in the Great Thunderbird's likeness, wings spread, centered, transparent background. |
+| Lantern of Open Skies *(found-item form)* | 64×64 | Simple flat-shaded fantasy game icon of an unlit brass lantern etched with a spiral wind-pattern, centered, transparent background. |
+| Lantern of Open Skies *(equipped, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a lit legendary lantern, glass etched with a spiral wind-pattern, faint pale glow, centered, transparent background. |
+
+### Item icons (2 - generate 128×128, final 64×64)
+
+| Item | Final Size | Generation prompt |
+|---|---|---|
+| Thunderbird Feather *(key item, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a single large feather crackling faintly with stormlight, centered, transparent background. |
+| Guardian Memory Fragment IV *(key item, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of an angular purple crystal shard (faceted gem shape, not round) holding a faint ghostly glowing memory-image, centered, transparent background. |
+
 ---
 
 ## Things Claude can't generate itself (need external production)
