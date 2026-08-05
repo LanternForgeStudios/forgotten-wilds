@@ -234,6 +234,19 @@ export const SKILLS: Record<string, Skill> = {
     power: 20,
     spiritCost: 0,
   },
+  // --- Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move ---
+  // silentEchoes (forest-echo/corrupted-echo) - a burst of toxic spores, Poison (Prairie already
+  // claimed Silence/Stun/Blind across its own two chapters, so this is Whispering Pines' own).
+  'echo-spore-burst': {
+    id: 'echo-spore-burst',
+    name: 'Spore Burst',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 15,
+    spiritCost: 0,
+    inflictsAilmentId: 'poison',
+    inflictAilmentChance: 0.3,
+  },
   'thunderbird-storm-judgment': {
     id: 'thunderbird-storm-judgment',
     name: "Storm's Judgment",

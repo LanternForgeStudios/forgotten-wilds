@@ -34,6 +34,7 @@ export interface EnemyDefinition {
     | 'windSpirits'
     | 'prairieWolves'
     | 'stormAvians'
+    | 'silentEchoes'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
@@ -646,6 +647,52 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'elder-buffalo-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
     ],
   },
+
+  // --- Whispering Pines (MSQ Volume IV, Chapter 7) enemies ---
+  // silentEchoes (forest-echo/corrupted-echo) - the "corrupted forest Echoes" MSF-WP-002 names.
+  // echo-spore-burst inflicts Poison - excluded from vulnerableAilments (immune to what it deals
+  // out), matching every prior family's own exclusion pattern.
+  'forest-echo': {
+    id: 'forest-echo',
+    name: 'Forest Echo',
+    family: 'silentEchoes',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'blind'],
+    stats: { maxHp: 52, attack: 15, defense: 10, speed: 13 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'echo-spore-burst', weight: 2 },
+    ],
+    xpReward: 28,
+    goldReward: 15,
+    lootTable: [
+      { itemId: 'withered-echo-moss', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      // echo-spore-burst inflicts Poison - antidote cures it.
+      { itemId: 'antidote', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  'corrupted-echo': {
+    id: 'corrupted-echo',
+    name: 'Corrupted Echo',
+    family: 'silentEchoes',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'blind'],
+    stats: { maxHp: 78, attack: 18, defense: 13, speed: 16 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'echo-spore-burst', weight: 3 },
+    ],
+    xpReward: 40,
+    goldReward: 22,
+    lootTable: [
+      { itemId: 'withered-echo-moss', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'antidote', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -731,6 +778,25 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
   'guardian-peak': [
     { enemyId: 'thunder-roc', weight: 2 },
     { enemyId: 'dire-prairie-wolf', weight: 1 },
+  ],
+  // Whispering Pines (MSQ Volume IV, Chapter 7) - matches each field map's encounterTable in
+  // src/data/locations.ts exactly.
+  'mistwood-path': [
+    { enemyId: 'forest-echo', weight: 3 },
+    { enemyId: 'corrupted-echo', weight: 1 },
+  ],
+  'elder-forest': [
+    { enemyId: 'forest-echo', weight: 2 },
+    { enemyId: 'corrupted-echo', weight: 2 },
+  ],
+  'silver-river': [
+    { enemyId: 'forest-echo', weight: 3 },
+    { enemyId: 'corrupted-echo', weight: 1 },
+  ],
+  'ancient-cedar-shrine': [{ enemyId: 'corrupted-echo', weight: 1 }],
+  'heartwood-approach': [
+    { enemyId: 'corrupted-echo', weight: 2 },
+    { enemyId: 'forest-echo', weight: 2 },
   ],
 };
 

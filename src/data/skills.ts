@@ -175,6 +175,17 @@ export const SKILLS: Skill[] = [
     spiritCost: 0,
     inflictsAilmentId: 'blind',
   },
+  // Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move
+  {
+    id: 'echo-spore-burst',
+    name: 'Spore Burst',
+    description: 'A cloud of toxic spores, released from a body that no longer quite remembers being a tree.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 15,
+    spiritCost: 0,
+    inflictsAilmentId: 'poison',
+  },
   {
     id: 'thunderbird-wing-slam',
     name: 'Wing Slam',

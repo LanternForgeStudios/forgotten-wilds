@@ -567,6 +567,15 @@ export const ITEMS: Item[] = [
     unique: true,
   },
   {
+    id: 'withered-echo-moss',
+    name: 'Withered Echo Moss',
+    description: 'A clump of pale moss, still faintly warm, stripped from a corrupted Echo.',
+    category: 'materials',
+    iconAssetId: 'icon.item.withered-echo-moss',
+    stackable: true,
+    tier: 'common',
+  },
+  {
     id: 'lost-library-records',
     name: 'Lost Library Records',
     description: 'A bundle of surviving pages from a buried Lantern Keeper archive - a fraction of what once filled the shelves, the rest gone missing centuries ago.',

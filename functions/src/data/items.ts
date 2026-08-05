@@ -254,6 +254,7 @@ export const ITEMS: Record<string, ItemDefinition> = {
     unique: true,
   },
   'lost-library-records': { id: 'lost-library-records', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'withered-echo-moss': { id: 'withered-echo-moss', category: 'materials', usableInCombat: false, tier: 'common' },
 };
 
 export const SHOP_PRICES: Record<string, number> = {

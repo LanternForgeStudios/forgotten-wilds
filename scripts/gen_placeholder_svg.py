@@ -153,6 +153,11 @@ add("portraits/armorer-fenn.svg", 512, 512, "FENN", "#5a7a4a", "#2c4020")
 add("icons/spirit-seed.svg", 64, 64, "SEED", "#7ac888", "#2a5a30")
 add("icons/lost-library-records.svg", 64, 64, "RECS", "#c8b888", "#8a7038")
 
+# Enemy battle sprites + material icon (Phase 4 - silentEchoes family).
+add("sprites/enemies/forest-echo-idle.svg", 128, 128, "ECHO", "#5a8a5a", "#284828")
+add("sprites/enemies/corrupted-echo-idle.svg", 128, 128, "ECHO", "#6a5a8a", "#302848")
+add("icons/withered-echo-moss.svg", 64, 64, "MOSS", "#7a9a5a", "#3a4c28")
+
 
 if __name__ == "__main__":
     write_all()
