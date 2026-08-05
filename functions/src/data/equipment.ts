@@ -811,4 +811,159 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     unique: true,
     familyId: 'white-buffalo-totem',
   },
+
+  // --- Whispering Pines (MSQ Volume IV, Chapter 7) canonical equipment families ---
+  // Common through Rare only, matching every prior region's own first pass - Mythic/Legendary
+  // rows (Cedar Giant Totem's higher tiers, Lantern of Ancient Roots) wait for Chapter 8.
+  // Cedar Staff is a straight palette-swap of the Staff weapon type's founder (weathered-walking-
+  // staff/ironwood-walking-staff/spiritwood-walking-staff) - identical statBonuses per tier, same
+  // flat-stat-budget-per-type rule Prairie Spear (Spear type) already established.
+  'weathered-cedar-staff': {
+    id: 'weathered-cedar-staff',
+    slot: 'weapon',
+    statBonuses: { maxSpirit: 5, attack: 4 },
+    tier: 'common',
+    familyId: 'cedar-staff',
+  },
+  'bound-cedar-staff': {
+    id: 'bound-cedar-staff',
+    slot: 'weapon',
+    statBonuses: { maxSpirit: 3, attack: 7, speed: 1 },
+    tier: 'uncommon',
+    familyId: 'cedar-staff',
+  },
+  'ancient-cedar-staff': {
+    id: 'ancient-cedar-staff',
+    slot: 'weapon',
+    statBonuses: { maxHp: 10, attack: 10, defense: 2, speed: -2 },
+    tier: 'rare',
+    familyId: 'cedar-staff',
+  },
+  // Bark Armor (chest) - a step above Buffalo Hide, leaning into Spirit/Defense per the region's
+  // own Wisdom/Nature theme (docs/Mytherra-Equipment_breakdown.md) rather than Prairie's Speed.
+  'worn-bark-armor': {
+    id: 'worn-bark-armor',
+    slot: 'chest',
+    statBonuses: { maxHp: 12, defense: 3, maxSpirit: 1 },
+    tier: 'common',
+    familyId: 'bark-armor',
+  },
+  'banded-bark-armor': {
+    id: 'banded-bark-armor',
+    slot: 'chest',
+    statBonuses: { maxHp: 17, defense: 5, maxSpirit: 3 },
+    tier: 'uncommon',
+    familyId: 'bark-armor',
+  },
+  'elderwood-bark-armor': {
+    id: 'elderwood-bark-armor',
+    slot: 'chest',
+    statBonuses: { maxHp: 22, maxSpirit: 8, defense: 8 },
+    tier: 'rare',
+    familyId: 'bark-armor',
+  },
+  // Root-Woven Leggings (legs) - matches Bark Armor's own step-above-Rider's-Chaps progression.
+  'worn-root-woven-leggings': {
+    id: 'worn-root-woven-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 7, defense: 2 },
+    tier: 'common',
+    familyId: 'root-woven-leggings',
+  },
+  'banded-root-woven-leggings': {
+    id: 'banded-root-woven-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 10, defense: 3, maxSpirit: 1 },
+    tier: 'uncommon',
+    familyId: 'root-woven-leggings',
+  },
+  'deep-root-leggings': {
+    id: 'deep-root-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 13, maxSpirit: 4, defense: 4 },
+    tier: 'rare',
+    familyId: 'root-woven-leggings',
+  },
+  // Root Boots - defense-leaning rather than Wind Boots' speed-max, matching the region's theme.
+  'worn-root-boots': {
+    id: 'worn-root-boots',
+    slot: 'boots',
+    statBonuses: { defense: 2, speed: 2 },
+    tier: 'common',
+    familyId: 'root-boots',
+  },
+  'banded-root-boots': {
+    id: 'banded-root-boots',
+    slot: 'boots',
+    statBonuses: { maxHp: 3, defense: 4, speed: 3 },
+    tier: 'uncommon',
+    familyId: 'root-boots',
+  },
+  'ancient-root-boots': {
+    id: 'ancient-root-boots',
+    slot: 'boots',
+    statBonuses: { maxSpirit: 3, defense: 6, speed: 4 },
+    tier: 'rare',
+    familyId: 'root-boots',
+  },
+  // Vine Gloves - a step above Rider Gloves. Rare cap gets a genuine Poison resistance perk, same
+  // "Rare-tier resistance to the region's own signature ailment" pattern as warden-rider-gloves'
+  // Silence resistance above - Poison is Whispering Pines' own signature threat (silentEchoes'
+  // echo-spore-burst).
+  'worn-vine-gloves': {
+    id: 'worn-vine-gloves',
+    slot: 'gloves',
+    statBonuses: { attack: 1, defense: 2 },
+    tier: 'common',
+    familyId: 'vine-gloves',
+  },
+  'woven-vine-gloves': {
+    id: 'woven-vine-gloves',
+    slot: 'gloves',
+    statBonuses: { maxHp: 5, attack: 2, defense: 4 },
+    tier: 'uncommon',
+    familyId: 'vine-gloves',
+  },
+  'warden-vine-gloves': {
+    id: 'warden-vine-gloves',
+    slot: 'gloves',
+    statBonuses: { maxHp: 8, attack: 3, defense: 6 },
+    tier: 'rare',
+    familyId: 'vine-gloves',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
+  },
+  // Cedar Charm - same Uncommon+Rare Poison-resistance split as Vine Gloves' own progression.
+  'carved-cedar-charm': {
+    id: 'carved-cedar-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 5 },
+    tier: 'common',
+    familyId: 'cedar-charm',
+  },
+  'woven-cedar-charm': {
+    id: 'woven-cedar-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 6, defense: 1 },
+    tier: 'uncommon',
+    familyId: 'cedar-charm',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.15 }],
+  },
+  'elders-cedar-charm': {
+    id: 'elders-cedar-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 9, defense: 2 },
+    tier: 'rare',
+    familyId: 'cedar-charm',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
+  },
+  // Young Cedar Totem - Rare tier only this chapter (Mythic/Legendary wait for Chapter 8's boss),
+  // built now rather than retroactively patched in later the way White Buffalo Totem's own Rare
+  // tier had to be (docs/Mytherra-Equipment_breakdown.md's Implementation Notes).
+  'young-cedar-totem': {
+    id: 'young-cedar-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxSpirit: 5, defense: 4 },
+    tier: 'rare',
+    familyId: 'young-cedar-totem',
+  },
 };

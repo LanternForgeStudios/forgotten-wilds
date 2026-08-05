@@ -158,6 +158,29 @@ add("sprites/enemies/forest-echo-idle.svg", 128, 128, "ECHO", "#5a8a5a", "#28482
 add("sprites/enemies/corrupted-echo-idle.svg", 128, 128, "ECHO", "#6a5a8a", "#302848")
 add("icons/withered-echo-moss.svg", 64, 64, "MOSS", "#7a9a5a", "#3a4c28")
 
+# Equipment icons (Phase 5) - Cedar Staff (weapon), Bark Armor (chest), Root-Woven Leggings
+# (legs), Root Boots (boots), Vine Gloves (gloves), Cedar Charm (charm), Young Cedar Totem
+# (spiritTotem). One hue per slot, matching the existing per-slot hue convention.
+add("icons/weathered-cedar-staff.svg", 64, 64, "STAFF", "#7a9a5a", "#3a4c28", font_size=9)
+add("icons/bound-cedar-staff.svg", 64, 64, "STAFF", "#7a9a5a", "#3a4c28", font_size=9)
+add("icons/ancient-cedar-staff.svg", 64, 64, "STAFF", "#7a9a5a", "#3a4c28", font_size=9)
+add("icons/worn-bark-armor.svg", 64, 64, "BARK", "#8a6a4a", "#4a3220")
+add("icons/banded-bark-armor.svg", 64, 64, "BARK", "#8a6a4a", "#4a3220")
+add("icons/elderwood-bark-armor.svg", 64, 64, "BARK", "#8a6a4a", "#4a3220")
+add("icons/worn-root-woven-leggings.svg", 64, 64, "LEGS", "#6a8a5a", "#345030")
+add("icons/banded-root-woven-leggings.svg", 64, 64, "LEGS", "#6a8a5a", "#345030")
+add("icons/deep-root-leggings.svg", 64, 64, "LEGS", "#6a8a5a", "#345030")
+add("icons/worn-root-boots.svg", 64, 64, "BOOTS", "#5a8a6a", "#2c4c38")
+add("icons/banded-root-boots.svg", 64, 64, "BOOTS", "#5a8a6a", "#2c4c38")
+add("icons/ancient-root-boots.svg", 64, 64, "BOOTS", "#5a8a6a", "#2c4c38")
+add("icons/worn-vine-gloves.svg", 64, 64, "GLOVE", "#6a9a6a", "#345c34")
+add("icons/woven-vine-gloves.svg", 64, 64, "GLOVE", "#6a9a6a", "#345c34")
+add("icons/warden-vine-gloves.svg", 64, 64, "GLOVE", "#6a9a6a", "#345c34")
+add("icons/carved-cedar-charm.svg", 64, 64, "CHARM", "#5aa090", "#2c5048")
+add("icons/woven-cedar-charm.svg", 64, 64, "CHARM", "#5aa090", "#2c5048")
+add("icons/elders-cedar-charm.svg", 64, 64, "CHARM", "#5aa090", "#2c5048")
+add("icons/young-cedar-totem.svg", 64, 64, "TOTEM", "#c8c0a0", "#78705a")
+
 
 if __name__ == "__main__":
     write_all()

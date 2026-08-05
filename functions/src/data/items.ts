@@ -358,6 +358,20 @@ export const SHOP_PRICES: Record<string, number> = {
   'swift-wind-boots': 62,
   'worn-rider-gloves': 24,
   'reinforced-rider-gloves': 54,
+  // Whispering Pines (MSQ Volume IV, Chapter 7) - Common+Uncommon shop stock only, matching the
+  // established "Rare tier is chest-found" split.
+  'weathered-cedar-staff': 32,
+  'bound-cedar-staff': 70,
+  'carved-cedar-charm': 26,
+  'woven-cedar-charm': 56,
+  'worn-bark-armor': 36,
+  'banded-bark-armor': 72,
+  'worn-root-woven-leggings': 32,
+  'banded-root-woven-leggings': 64,
+  'worn-root-boots': 30,
+  'banded-root-boots': 66,
+  'worn-vine-gloves': 26,
+  'woven-vine-gloves': 58,
 };
 
 /** Additional items a shop unlocks once a specific quest completes, layered ON TOP of its
@@ -474,6 +488,22 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'swift-wind-boots',
     'worn-rider-gloves',
     'reinforced-rider-gloves',
+  ],
+  'byron-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
+  // Common+Uncommon Cedar Staff/Cedar Charm stock, matching garrett-forge's own spear+charm
+  // pairing - Rare tier of both is chest-found instead.
+  'dara-forge': ['weathered-cedar-staff', 'bound-cedar-staff', 'carved-cedar-charm', 'woven-cedar-charm'],
+  // Common+Uncommon Bark Armor/Root-Woven Leggings/Root Boots/Vine Gloves stock, matching
+  // ruth-armory's own pattern - Rare tier of every family is chest-found instead.
+  'fenn-armory': [
+    'worn-bark-armor',
+    'banded-bark-armor',
+    'worn-root-woven-leggings',
+    'banded-root-woven-leggings',
+    'worn-root-boots',
+    'banded-root-boots',
+    'worn-vine-gloves',
+    'woven-vine-gloves',
   ],
 };
 

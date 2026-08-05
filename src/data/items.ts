@@ -674,6 +674,19 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'swift-wind-boots', price: 62, currency: 'gold' },
   { itemId: 'worn-rider-gloves', price: 24, currency: 'gold' },
   { itemId: 'reinforced-rider-gloves', price: 54, currency: 'gold' },
+  // Whispering Pines - Common+Uncommon only, matching functions/src/data/items.ts's SHOP_PRICES.
+  { itemId: 'weathered-cedar-staff', price: 32, currency: 'gold' },
+  { itemId: 'bound-cedar-staff', price: 70, currency: 'gold' },
+  { itemId: 'carved-cedar-charm', price: 26, currency: 'gold' },
+  { itemId: 'woven-cedar-charm', price: 56, currency: 'gold' },
+  { itemId: 'worn-bark-armor', price: 36, currency: 'gold' },
+  { itemId: 'banded-bark-armor', price: 72, currency: 'gold' },
+  { itemId: 'worn-root-woven-leggings', price: 32, currency: 'gold' },
+  { itemId: 'banded-root-woven-leggings', price: 64, currency: 'gold' },
+  { itemId: 'worn-root-boots', price: 30, currency: 'gold' },
+  { itemId: 'banded-root-boots', price: 66, currency: 'gold' },
+  { itemId: 'worn-vine-gloves', price: 26, currency: 'gold' },
+  { itemId: 'woven-vine-gloves', price: 58, currency: 'gold' },
 ];
 
 // Display-only grouping of SHOP_LISTINGS by which NPC/building sells it - purchaseItem.ts itself
@@ -762,6 +775,18 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'swift-wind-boots',
     'worn-rider-gloves',
     'reinforced-rider-gloves',
+  ],
+  'byron-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
+  'dara-forge': ['weathered-cedar-staff', 'bound-cedar-staff', 'carved-cedar-charm', 'woven-cedar-charm'],
+  'fenn-armory': [
+    'worn-bark-armor',
+    'banded-bark-armor',
+    'worn-root-woven-leggings',
+    'banded-root-woven-leggings',
+    'worn-root-boots',
+    'banded-root-boots',
+    'worn-vine-gloves',
+    'woven-vine-gloves',
   ],
 };
 

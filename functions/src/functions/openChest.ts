@@ -74,6 +74,34 @@ const CHESTS: Record<string, Record<string, string>> = {
   'thunderbird-mesa-approach': {
     'chest-thunderbird-mesa-approach-1': 'wisp-feather',
   },
+  // Whispering Pines (MSQ Volume IV, Chapter 7) - the 6 Rare equipment pieces plus Young Cedar
+  // Totem's Rare tier spread 1-2 per map, matching Endless Prairie's own "spread across 5 field
+  // maps" split. Materials fill every other chest slot.
+  'mistwood-path': {
+    'chest-mistwood-path-1': 'ancient-cedar-staff',
+    'chest-mistwood-path-2': 'withered-echo-moss',
+    'chest-mistwood-path-3': 'withered-echo-moss',
+  },
+  'elder-forest': {
+    'chest-elder-forest-1': 'elderwood-bark-armor',
+    'chest-elder-forest-2': 'deep-root-leggings',
+    'chest-elder-forest-3': 'withered-echo-moss',
+  },
+  'silver-river': {
+    'chest-silver-river-1': 'ancient-root-boots',
+    'chest-silver-river-2': 'warden-vine-gloves',
+    'chest-silver-river-3': 'withered-echo-moss',
+  },
+  'ancient-cedar-shrine': {
+    'chest-ancient-cedar-shrine-1': 'elders-cedar-charm',
+    // Young Cedar Totem's Rare tier - built in the same chapter that introduces the family this
+    // time, not retroactively patched in later the way White Buffalo Totem's own Rare tier was.
+    'chest-ancient-cedar-shrine-2': 'young-cedar-totem',
+    'chest-ancient-cedar-shrine-3': 'withered-echo-moss',
+  },
+  'heartwood-approach': {
+    'chest-heartwood-approach-1': 'withered-echo-moss',
+  },
 };
 
 export const openChest = onCall<OpenChestRequest>(async (request) => {
