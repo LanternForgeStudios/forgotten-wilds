@@ -825,6 +825,19 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'banded-root-boots', price: 66, currency: 'gold' },
   { itemId: 'worn-vine-gloves', price: 26, currency: 'gold' },
   { itemId: 'woven-vine-gloves', price: 58, currency: 'gold' },
+  // Shattered Desert - Common+Uncommon only, matching functions/src/data/items.ts's SHOP_PRICES.
+  { itemId: 'weathered-sunblade', price: 34, currency: 'gold' },
+  { itemId: 'bound-sunblade', price: 74, currency: 'gold' },
+  { itemId: 'sunworn-star-charm', price: 28, currency: 'gold' },
+  { itemId: 'banded-star-charm', price: 60, currency: 'gold' },
+  { itemId: 'worn-nomad-robes', price: 38, currency: 'gold' },
+  { itemId: 'banded-nomad-robes', price: 76, currency: 'gold' },
+  { itemId: 'worn-nomad-leggings', price: 34, currency: 'gold' },
+  { itemId: 'banded-nomad-leggings', price: 68, currency: 'gold' },
+  { itemId: 'worn-sand-boots', price: 32, currency: 'gold' },
+  { itemId: 'swift-sand-boots', price: 70, currency: 'gold' },
+  { itemId: 'worn-dune-wraps', price: 28, currency: 'gold' },
+  { itemId: 'woven-dune-wraps', price: 60, currency: 'gold' },
 ];
 
 // Display-only grouping of SHOP_LISTINGS by which NPC/building sells it - purchaseItem.ts itself
@@ -925,6 +938,18 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'banded-root-boots',
     'worn-vine-gloves',
     'woven-vine-gloves',
+  ],
+  'mateo-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
+  'esteban-forge': ['weathered-sunblade', 'bound-sunblade', 'sunworn-star-charm', 'banded-star-charm'],
+  'carmen-armory': [
+    'worn-nomad-robes',
+    'banded-nomad-robes',
+    'worn-nomad-leggings',
+    'banded-nomad-leggings',
+    'worn-sand-boots',
+    'swift-sand-boots',
+    'worn-dune-wraps',
+    'woven-dune-wraps',
   ],
 };
 

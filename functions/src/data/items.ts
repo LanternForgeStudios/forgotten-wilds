@@ -386,6 +386,20 @@ export const SHOP_PRICES: Record<string, number> = {
   'banded-root-boots': 66,
   'worn-vine-gloves': 26,
   'woven-vine-gloves': 58,
+  // Shattered Desert (MSQ Volume V, Chapter 9) - Common+Uncommon shop stock only, matching the
+  // established "Rare tier is chest-found" split.
+  'weathered-sunblade': 34,
+  'bound-sunblade': 74,
+  'sunworn-star-charm': 28,
+  'banded-star-charm': 60,
+  'worn-nomad-robes': 38,
+  'banded-nomad-robes': 76,
+  'worn-nomad-leggings': 34,
+  'banded-nomad-leggings': 68,
+  'worn-sand-boots': 32,
+  'swift-sand-boots': 70,
+  'worn-dune-wraps': 28,
+  'woven-dune-wraps': 60,
 };
 
 /** Additional items a shop unlocks once a specific quest completes, layered ON TOP of its
@@ -518,6 +532,22 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'banded-root-boots',
     'worn-vine-gloves',
     'woven-vine-gloves',
+  ],
+  'mateo-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'eye-drops'],
+  // Common+Uncommon Sunblade/Star Charm stock, matching dara-forge's own weapon+charm pairing -
+  // Rare tier of both is chest-found instead.
+  'esteban-forge': ['weathered-sunblade', 'bound-sunblade', 'sunworn-star-charm', 'banded-star-charm'],
+  // Common+Uncommon Nomad Robes/Nomad Leggings/Sand Boots/Dune Wraps stock, matching fenn-armory's
+  // own pattern - Rare tier of every family is chest-found instead.
+  'carmen-armory': [
+    'worn-nomad-robes',
+    'banded-nomad-robes',
+    'worn-nomad-leggings',
+    'banded-nomad-leggings',
+    'worn-sand-boots',
+    'swift-sand-boots',
+    'worn-dune-wraps',
+    'woven-dune-wraps',
   ],
 };
 

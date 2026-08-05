@@ -102,6 +102,33 @@ const CHESTS: Record<string, Record<string, string>> = {
   'heartwood-approach': {
     'chest-heartwood-approach-1': 'withered-echo-moss',
   },
+  // Shattered Desert (MSQ Volume V, Chapter 9) - the 6 Rare equipment pieces plus Sunstone
+  // Totem's Rare tier spread 1-2 per map, matching every prior region's own split. Materials fill
+  // every other chest slot.
+  'sunfire-dunes': {
+    'chest-sunfire-dunes-1': 'solaris-blade',
+    'chest-sunfire-dunes-2': 'sandglass-shard',
+    'chest-sunfire-dunes-3': 'sandglass-shard',
+  },
+  'crimson-canyons': {
+    'chest-crimson-canyons-1': 'starwoven-nomad-robes',
+    'chest-crimson-canyons-2': 'starwoven-nomad-leggings',
+    'chest-crimson-canyons-3': 'sandglass-shard',
+  },
+  'painted-mesas': {
+    'chest-painted-mesas-1': 'sunrunner-boots',
+    'chest-painted-mesas-2': 'rangers-dune-wraps',
+    'chest-painted-mesas-3': 'sandglass-shard',
+  },
+  'celestial-oasis': {
+    'chest-celestial-oasis-1': 'astral-star-charm',
+    // Sunstone Totem's Rare tier - built now rather than retroactively patched in later.
+    'chest-celestial-oasis-2': 'sunstone-totem',
+    'chest-celestial-oasis-3': 'sandglass-shard',
+  },
+  'forgotten-observatory-approach': {
+    'chest-forgotten-observatory-approach-1': 'sandglass-shard',
+  },
 };
 
 export const openChest = onCall<OpenChestRequest>(async (request) => {

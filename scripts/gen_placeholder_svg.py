@@ -257,6 +257,29 @@ add("sprites/enemies/dust-devil-idle.svg", 128, 128, "DEVIL", "#c8a868", "#8a683
 add("sprites/enemies/sandstorm-devil-idle.svg", 128, 128, "DEVIL", "#a8623a", "#5a2c18")
 add("icons/sandglass-shard.svg", 64, 64, "GLASS", "#c8d8e8", "#8098b0")
 
+# Equipment icons (Phase 5) - Sunblade (weapon), Nomad Robes (chest), Nomad Leggings (legs), Sand
+# Boots (boots), Dune Wraps (gloves), Star Charm (charm), Sunstone Totem (spiritTotem). One hue
+# per slot, matching the existing per-slot hue convention.
+add("icons/weathered-sunblade.svg", 64, 64, "BLADE", "#c8a848", "#8a6828")
+add("icons/bound-sunblade.svg", 64, 64, "BLADE", "#c8a848", "#8a6828")
+add("icons/solaris-blade.svg", 64, 64, "BLADE", "#c8a848", "#8a6828")
+add("icons/worn-nomad-robes.svg", 64, 64, "ROBES", "#b89060", "#6a5030")
+add("icons/banded-nomad-robes.svg", 64, 64, "ROBES", "#b89060", "#6a5030")
+add("icons/starwoven-nomad-robes.svg", 64, 64, "ROBES", "#b89060", "#6a5030")
+add("icons/worn-nomad-leggings.svg", 64, 64, "LEGS", "#a8804c", "#5c4426")
+add("icons/banded-nomad-leggings.svg", 64, 64, "LEGS", "#a8804c", "#5c4426")
+add("icons/starwoven-nomad-leggings.svg", 64, 64, "LEGS", "#a8804c", "#5c4426")
+add("icons/worn-sand-boots.svg", 64, 64, "BOOTS", "#9a7048", "#4c3218")
+add("icons/swift-sand-boots.svg", 64, 64, "BOOTS", "#9a7048", "#4c3218")
+add("icons/sunrunner-boots.svg", 64, 64, "BOOTS", "#9a7048", "#4c3218")
+add("icons/worn-dune-wraps.svg", 64, 64, "GLOVE", "#b09068", "#5c4830")
+add("icons/woven-dune-wraps.svg", 64, 64, "GLOVE", "#b09068", "#5c4830")
+add("icons/rangers-dune-wraps.svg", 64, 64, "GLOVE", "#b09068", "#5c4830")
+add("icons/sunworn-star-charm.svg", 64, 64, "CHARM", "#7a8ac0", "#3a4470")
+add("icons/banded-star-charm.svg", 64, 64, "CHARM", "#7a8ac0", "#3a4470")
+add("icons/astral-star-charm.svg", 64, 64, "CHARM", "#7a8ac0", "#3a4470")
+add("icons/sunstone-totem.svg", 64, 64, "TOTEM", "#c8c0a0", "#78705a")
+
 
 if __name__ == "__main__":
     write_all()

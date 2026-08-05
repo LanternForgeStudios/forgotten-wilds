@@ -998,4 +998,161 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     unique: true,
     familyId: 'young-cedar-totem',
   },
+
+  // --- Shattered Desert (MSQ Volume V, Chapter 9) canonical equipment families ---
+  // Common through Rare only, matching every prior region's own first pass - Mythic/Legendary
+  // rows (Canyon Giant Totem's higher tiers, Lantern of Forgotten Stars) wait for Chapter 10.
+  // Sunblade is a straight palette-swap of the Sword weapon type's founder (weathered-iron-sword/
+  // ironbound-sword/wardens-broadsword) - identical statBonuses per tier, same flat-stat-budget-
+  // per-type rule Prairie Spear/Cedar Staff already established.
+  'weathered-sunblade': {
+    id: 'weathered-sunblade',
+    slot: 'weapon',
+    statBonuses: { attack: 7, speed: 1 },
+    tier: 'common',
+    familyId: 'sunblade',
+  },
+  'bound-sunblade': {
+    id: 'bound-sunblade',
+    slot: 'weapon',
+    statBonuses: { attack: 9, speed: 2 },
+    tier: 'uncommon',
+    familyId: 'sunblade',
+  },
+  'solaris-blade': {
+    id: 'solaris-blade',
+    slot: 'weapon',
+    statBonuses: { attack: 13, speed: 3, defense: -1 },
+    tier: 'rare',
+    familyId: 'sunblade',
+  },
+  // Nomad Robes (chest) - a step above Bark Armor, leaning into Attack/Spirit per the region's own
+  // Truth/Sun/Stars "high-risk offense" theme (docs/Mytherra-Equipment_breakdown.md) rather than
+  // Whispering Pines' Defense-leaning split.
+  'worn-nomad-robes': {
+    id: 'worn-nomad-robes',
+    slot: 'chest',
+    statBonuses: { maxHp: 10, attack: 2, maxSpirit: 2 },
+    tier: 'common',
+    familyId: 'nomad-robes',
+  },
+  'banded-nomad-robes': {
+    id: 'banded-nomad-robes',
+    slot: 'chest',
+    statBonuses: { maxHp: 14, attack: 4, maxSpirit: 4 },
+    tier: 'uncommon',
+    familyId: 'nomad-robes',
+  },
+  'starwoven-nomad-robes': {
+    id: 'starwoven-nomad-robes',
+    slot: 'chest',
+    statBonuses: { maxHp: 18, attack: 6, maxSpirit: 8, defense: 2 },
+    tier: 'rare',
+    familyId: 'nomad-robes',
+  },
+  // Nomad Leggings (legs) - matches Nomad Robes' own attack/spirit-leaning progression.
+  'worn-nomad-leggings': {
+    id: 'worn-nomad-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 6, attack: 1 },
+    tier: 'common',
+    familyId: 'nomad-leggings',
+  },
+  'banded-nomad-leggings': {
+    id: 'banded-nomad-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 9, attack: 2, maxSpirit: 1 },
+    tier: 'uncommon',
+    familyId: 'nomad-leggings',
+  },
+  'starwoven-nomad-leggings': {
+    id: 'starwoven-nomad-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 12, attack: 3, maxSpirit: 3, defense: 1 },
+    tier: 'rare',
+    familyId: 'nomad-leggings',
+  },
+  // Sand Boots - speed-and-attack leaning rather than Root Boots' defense-lean, matching the
+  // region's own "high-risk offense" theme (go first, strike first).
+  'worn-sand-boots': {
+    id: 'worn-sand-boots',
+    slot: 'boots',
+    statBonuses: { speed: 2, attack: 1 },
+    tier: 'common',
+    familyId: 'sand-boots',
+  },
+  'swift-sand-boots': {
+    id: 'swift-sand-boots',
+    slot: 'boots',
+    statBonuses: { speed: 3, attack: 2 },
+    tier: 'uncommon',
+    familyId: 'sand-boots',
+  },
+  'sunrunner-boots': {
+    id: 'sunrunner-boots',
+    slot: 'boots',
+    statBonuses: { speed: 4, attack: 3, maxSpirit: 2 },
+    tier: 'rare',
+    familyId: 'sand-boots',
+  },
+  // Dune Wraps (gloves) - a step above Vine Gloves. Rare cap gets a genuine Blind resistance perk,
+  // same "Rare-tier resistance to the region's own signature ailment" pattern as warden-vine-gloves'
+  // Poison resistance above - Blind is Shattered Desert's own signature threat (dustDevils' own
+  // sand-blast).
+  'worn-dune-wraps': {
+    id: 'worn-dune-wraps',
+    slot: 'gloves',
+    statBonuses: { attack: 2 },
+    tier: 'common',
+    familyId: 'dune-wraps',
+  },
+  'woven-dune-wraps': {
+    id: 'woven-dune-wraps',
+    slot: 'gloves',
+    statBonuses: { maxHp: 4, attack: 4 },
+    tier: 'uncommon',
+    familyId: 'dune-wraps',
+  },
+  'rangers-dune-wraps': {
+    id: 'rangers-dune-wraps',
+    slot: 'gloves',
+    statBonuses: { maxHp: 6, attack: 6, defense: 1 },
+    tier: 'rare',
+    familyId: 'dune-wraps',
+    ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.3 }],
+  },
+  // Star Charm - same Uncommon+Rare Blind-resistance split as Dune Wraps' own progression.
+  'sunworn-star-charm': {
+    id: 'sunworn-star-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 5 },
+    tier: 'common',
+    familyId: 'star-charm',
+  },
+  'banded-star-charm': {
+    id: 'banded-star-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 6, attack: 1 },
+    tier: 'uncommon',
+    familyId: 'star-charm',
+    ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.15 }],
+  },
+  'astral-star-charm': {
+    id: 'astral-star-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 9, attack: 2 },
+    tier: 'rare',
+    familyId: 'star-charm',
+    ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.3 }],
+  },
+  // Sunstone Totem - Rare tier only this chapter (Mythic/Legendary wait for Chapter 10's boss),
+  // built now rather than retroactively patched in later the way White Buffalo Totem's own Rare
+  // tier had to be.
+  'sunstone-totem': {
+    id: 'sunstone-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxSpirit: 6, attack: 3 },
+    tier: 'rare',
+    familyId: 'sunstone-totem',
+  },
 };
