@@ -53,6 +53,9 @@
     { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-mistwood-path" },
     { "type": "transition", "x": 63, "y": 20, "refId": "mistwood-path", "targetSpawnId": "from-cedarwatch" },
 
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-thunderbird-mesa-approach" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "thunderbird-mesa-approach", "targetSpawnId": "from-cedarwatch" },
+
     { "type": "npc", "x": 30, "y": 20, "refId": "forest-warden-rowan-hart", "wanderRadius": 4 },
 
     { "type": "spawnPoint", "x": 20, "y": 14, "refId": "from-cedarwatch-elders-lodge" },

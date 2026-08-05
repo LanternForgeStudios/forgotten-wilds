@@ -52,6 +52,9 @@
     { "type": "spawnPoint", "x": 44, "y": 16, "refId": "from-summit-temple" },
     { "type": "transition", "x": 47, "y": 16, "refId": "summit-temple", "targetSpawnId": "from-thunderbird-mesa-approach" },
 
-    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-thunderbird-mesa-approach-1" }
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-thunderbird-mesa-approach-1" },
+
+    { "type": "spawnPoint", "x": 24, "y": 29, "refId": "from-cedarwatch" },
+    { "type": "transition", "x": 24, "y": 31, "refId": "cedarwatch", "targetSpawnId": "from-thunderbird-mesa-approach" }
   ]
 }
