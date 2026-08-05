@@ -318,6 +318,20 @@ export const SKILLS: Record<string, Skill> = {
     spiritCost: 0,
   },
 
+  // --- Shattered Desert (MSQ Volume V, Chapter 9) enemy signature move ---
+  // dustDevils (dust-devil/sandstorm-devil) - a blinding whirl of sand, Blind (Whispering Pines
+  // claimed Poison/Stun across its own two chapters, so this is Shattered Desert's own).
+  'sand-blast': {
+    id: 'sand-blast',
+    name: 'Sand Blast',
+    kind: 'skill',
+    damageType: 'spirit',
+    power: 16,
+    spiritCost: 0,
+    inflictsAilmentId: 'blind',
+    inflictAilmentChance: 0.3,
+  },
+
   // --- Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move ---
   // silentEchoes (forest-echo/corrupted-echo) - a burst of toxic spores, Poison (Prairie already
   // claimed Silence/Stun/Blind across its own two chapters, so this is Whispering Pines' own).

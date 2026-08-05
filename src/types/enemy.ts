@@ -41,6 +41,7 @@ export interface Enemy {
     | 'stormAvians'
     | 'silentEchoes'
     | 'rootWraiths'
+    | 'dustDevils'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;

@@ -252,6 +252,11 @@ add("portraits/armorer-carmen.svg", 512, 512, "CARMEN", "#b8794a", "#6a3a20")
 add("icons/star-fragment.svg", 64, 64, "STAR", "#7a8ac0", "#3a4470")
 add("icons/desert-relic.svg", 64, 64, "RELIC", "#c8a868", "#8a6838")
 
+# Enemy battle sprites + material icon (Phase 4 - dustDevils family).
+add("sprites/enemies/dust-devil-idle.svg", 128, 128, "DEVIL", "#c8a868", "#8a6838")
+add("sprites/enemies/sandstorm-devil-idle.svg", 128, 128, "DEVIL", "#a8623a", "#5a2c18")
+add("icons/sandglass-shard.svg", 64, 64, "GLASS", "#c8d8e8", "#8098b0")
+
 
 if __name__ == "__main__":
     write_all()

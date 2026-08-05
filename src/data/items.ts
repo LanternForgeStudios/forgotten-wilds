@@ -645,6 +645,15 @@ export const ITEMS: Item[] = [
     unique: true,
   },
   {
+    id: 'sandglass-shard',
+    name: 'Sandglass Shard',
+    description: 'A shard of sun-fused glass, stripped from a dust devil, still faintly warm.',
+    category: 'materials',
+    iconAssetId: 'icon.item.sandglass-shard',
+    stackable: true,
+    tier: 'common',
+  },
+  {
     id: 'star-fragment-sunfire-dunes',
     name: 'Star Fragment (Sunfire Dunes)',
     description: "A shard of crystal that catches starlight even at midday, one of three needed to restore the Desert Shrine's fractured Star Crystal.",

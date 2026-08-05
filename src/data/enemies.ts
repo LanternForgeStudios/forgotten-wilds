@@ -734,4 +734,52 @@ export const ENEMIES: Enemy[] = [
     ],
     loreBlurb: "Not a monster - a Guardian left too long without anyone to answer to, grown wild the way anything left untended eventually does.",
   },
+
+  // --- Shattered Desert (MSQ Volume V), Chapter 9: Beneath Forgotten Stars ---
+  {
+    id: 'dust-devil',
+    name: 'Dust Devil',
+    family: 'dustDevils',
+    tier: 'regular',
+    isBoss: false,
+    battleSpriteAssetId: 'battle.enemy.dust-devil',
+    weaknessDamageType: 'spirit',
+    stats: { maxHp: 64, attack: 18, defense: 13, speed: 16 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'sand-blast', weight: 2 },
+    ],
+    ailmentsInflicted: ['blind'],
+    vulnerableAilments: ['burn', 'freeze', 'poison'],
+    xpReward: 36,
+    goldReward: 19,
+    lootTable: [
+      { itemId: 'sandglass-shard', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'eye-drops', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
+    loreBlurb: 'A whirl of sand given just enough shape to be hostile, gone as suddenly as it appears.',
+  },
+  {
+    id: 'sandstorm-devil',
+    name: 'Sandstorm Devil',
+    family: 'dustDevils',
+    tier: 'elite',
+    isBoss: false,
+    battleSpriteAssetId: 'battle.enemy.sandstorm-devil',
+    weaknessDamageType: 'spirit',
+    stats: { maxHp: 94, attack: 21, defense: 16, speed: 19 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'sand-blast', weight: 3 },
+    ],
+    ailmentsInflicted: ['blind'],
+    vulnerableAilments: ['burn', 'freeze', 'poison'],
+    xpReward: 48,
+    goldReward: 26,
+    lootTable: [
+      { itemId: 'sandglass-shard', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'eye-drops', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
+    loreBlurb: "A full-grown dust devil, dense enough now to knock a rider from a saddle without slowing down.",
+  },
 ];

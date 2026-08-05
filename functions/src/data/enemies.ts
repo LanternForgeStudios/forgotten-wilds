@@ -36,6 +36,7 @@ export interface EnemyDefinition {
     | 'stormAvians'
     | 'silentEchoes'
     | 'rootWraiths'
+    | 'dustDevils'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
@@ -762,6 +763,52 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'elder-cedar-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
     ],
   },
+
+  // --- Shattered Desert (MSQ Volume V, Chapter 9) enemies ---
+  // dustDevils (dust-devil/sandstorm-devil) - whirling sand given a hostile shape.
+  // sand-blast inflicts Blind - excluded from vulnerableAilments (immune to what it deals out),
+  // matching every prior family's own exclusion pattern.
+  'dust-devil': {
+    id: 'dust-devil',
+    name: 'Dust Devil',
+    family: 'dustDevils',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'poison'],
+    stats: { maxHp: 64, attack: 18, defense: 13, speed: 16 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'sand-blast', weight: 2 },
+    ],
+    xpReward: 36,
+    goldReward: 19,
+    lootTable: [
+      { itemId: 'sandglass-shard', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      // sand-blast inflicts Blind - eye-drops cures it.
+      { itemId: 'eye-drops', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  'sandstorm-devil': {
+    id: 'sandstorm-devil',
+    name: 'Sandstorm Devil',
+    family: 'dustDevils',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'freeze', 'poison'],
+    stats: { maxHp: 94, attack: 21, defense: 16, speed: 19 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'sand-blast', weight: 3 },
+    ],
+    xpReward: 48,
+    goldReward: 26,
+    lootTable: [
+      { itemId: 'sandglass-shard', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'eye-drops', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -881,6 +928,25 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
   'guardian-grove': [
     { enemyId: 'elder-root-wraith', weight: 2 },
     { enemyId: 'corrupted-echo', weight: 1 },
+  ],
+  // Shattered Desert (MSQ Volume V, Chapter 9) - matches each field map's encounterTable in
+  // src/data/locations.ts exactly.
+  'sunfire-dunes': [
+    { enemyId: 'dust-devil', weight: 3 },
+    { enemyId: 'sandstorm-devil', weight: 1 },
+  ],
+  'crimson-canyons': [
+    { enemyId: 'dust-devil', weight: 2 },
+    { enemyId: 'sandstorm-devil', weight: 2 },
+  ],
+  'painted-mesas': [
+    { enemyId: 'dust-devil', weight: 2 },
+    { enemyId: 'sandstorm-devil', weight: 2 },
+  ],
+  'celestial-oasis': [{ enemyId: 'sandstorm-devil', weight: 1 }],
+  'forgotten-observatory-approach': [
+    { enemyId: 'dust-devil', weight: 2 },
+    { enemyId: 'sandstorm-devil', weight: 2 },
   ],
 };
 

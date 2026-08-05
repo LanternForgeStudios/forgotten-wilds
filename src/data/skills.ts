@@ -250,6 +250,17 @@ export const SKILLS: Skill[] = [
     power: 25,
     spiritCost: 0,
   },
+  // Shattered Desert (MSQ Volume V, Chapter 9) enemy signature move
+  {
+    id: 'sand-blast',
+    name: 'Sand Blast',
+    description: 'A sudden whirl of stinging sand, thrown wide enough to blind before the eye can track it.',
+    kind: 'skill',
+    damageType: 'spirit',
+    power: 16,
+    spiritCost: 0,
+    inflictsAilmentId: 'blind',
+  },
   // Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move
   {
     id: 'echo-spore-burst',
