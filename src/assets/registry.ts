@@ -4084,6 +4084,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
   },
   {
+    id: 'icon.equipment.white-buffalo-totem',
+    category: 'icon',
+    intendedUse: 'Equipment icon for white-buffalo-totem (Rare-tier White Buffalo Totem family, Chapter 6 Phase 0 retroactive fix) - placeholder pending PixelLab quota',
+    filePath: 'icons/white-buffalo-totem.svg',
+    dimensions: { width: 64, height: 64 },
+    status: 'placeholder',
+    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+  },
+  {
     id: 'icon.item.guardian-memory-fragment-1',
     category: 'icon',
     intendedUse: 'Item icon for guardian-memory-fragment-1',

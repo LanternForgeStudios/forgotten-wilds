@@ -990,4 +990,14 @@ export const EQUIPMENT: EquipmentItem[] = [
     familyId: 'sky-charm',
     ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.3 }],
   },
+  {
+    id: 'white-buffalo-totem',
+    name: 'White Buffalo Totem',
+    description: 'A small carved totem in the likeness of a white buffalo, said to lead the herd home through any storm.',
+    slot: 'spiritTotem',
+    iconAssetId: 'icon.equipment.white-buffalo-totem',
+    statBonuses: { speed: 5, maxSpirit: 4 },
+    tier: 'rare',
+    familyId: 'white-buffalo-totem',
+  },
 ];

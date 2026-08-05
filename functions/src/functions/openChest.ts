@@ -66,7 +66,9 @@ const CHESTS: Record<string, Record<string, string>> = {
   },
   'stone-circle-valley': {
     'chest-stone-circle-valley-1': 'skywalkers-charm',
-    'chest-stone-circle-valley-2': 'wisp-feather',
+    // White Buffalo Totem's Rare tier - retroactive Chapter 5 fix (docs/Mytherra-Equipment_
+    // breakdown.md always intended Prairie to have a Totem family; missed in the original pass).
+    'chest-stone-circle-valley-2': 'white-buffalo-totem',
     'chest-stone-circle-valley-3': 'prairie-wolf-pelt',
   },
   'thunderbird-mesa-approach': {

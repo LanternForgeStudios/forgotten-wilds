@@ -102,6 +102,9 @@ add("icons/winter-count-hide-i.svg", 64, 64, "HIDE I", "#c8a868", "#8a6838", fon
 add("icons/winter-count-hide-ii.svg", 64, 64, "HIDE II", "#c8a868", "#8a6838", font_size=9)
 add("icons/guardian-memory-fragment-3.svg", 64, 64, "FRAG 3", "#9a70c0", "#5a3880", font_size=10)
 
+# --- Chapter 6: Wings of the First Promise (retroactive Phase 0 fix) ---
+add("icons/white-buffalo-totem.svg", 64, 64, "TOTEM", "#d8d0c0", "#8a8070")
+
 
 if __name__ == "__main__":
     write_all()

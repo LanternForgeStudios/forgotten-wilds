@@ -767,4 +767,16 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     familyId: 'sky-charm',
     ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.3 }],
   },
+  // White Buffalo Totem family (docs/Mytherra-Equipment_breakdown.md) - missed during the initial
+  // Chapter 5 equipment pass (every other region got its own Totem family; Prairie didn't), added
+  // retroactively as Chapter 6's Phase 0. Rare tier here, a step above Crimson Bayou's own
+  // cypress-spirits Rare (swamp-wisp-totem: speed 4/maxSpirit 3), matching the established
+  // power-creep-by-story-position convention. Mythic/Legendary tiers come from Chapter 6's boss.
+  'white-buffalo-totem': {
+    id: 'white-buffalo-totem',
+    slot: 'spiritTotem',
+    statBonuses: { speed: 5, maxSpirit: 4 },
+    tier: 'rare',
+    familyId: 'white-buffalo-totem',
+  },
 };
