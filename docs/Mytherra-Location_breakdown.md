@@ -440,6 +440,19 @@ the dungeon interior (Ice Caves/Frozen Cathedral/Crystal Hall/Frozen Throne per 
 Winter Stag boss fight) is Chapter 12's own build, matching the exact chapter-pair split already used
 3 times (Chapters 5/6, 7/8, 9/10).
 
+Implementation Notes (Chapter 12, shipped): the dungeon's 4 "Sections" listed above (Ice Caves,
+Frozen Cathedral, Crystal Hall, Frozen Throne) don't map one-to-one onto the 5 rooms actually built,
+the same summary-not-spec gap found in every prior dungeon chapter. Shipped as 5 rooms mirroring the
+established multi-room dungeon shape: Hall of Eternal Winter (entrance, roughly this doc's "Ice
+Caves"), Lantern Sanctuary (the Keeper's lantern room - MSF-FF-005, this doc doesn't call one out
+separately, but every prior dungeon has one), Guardian Chamber (roughly this doc's "Frozen
+Cathedral"), Summit of Winter (boss room, roughly this doc's "Frozen Throne"), and Hall of Memories
+(the Complete Memory beat, MSF-FF-007 - this doc's own "Crystal Hall" is the closest analog, though
+the MSQ doc's own Chapter 12 Primary Maps list this room by its actual narrative name instead). Boss
+name matches exactly per the Chapter 11 note above ("Winter Stag" everywhere it's shipped). MSF-FF-008
+"A New Dawn" (Book One's own finale) takes place entirely at Ash Hallow, not in this dungeon - no
+new location needed there, `ash-hallow` has existed since Volume I.
+
 World Progression
 Ash Hallow
     │

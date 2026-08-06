@@ -986,6 +986,43 @@ No Chapter 11 NPC has real PixelLab art yet, sprite or portrait.
 
 ---
 
+## Frozen Frontier, Chapter 12: The Last Memory - outstanding placeholders
+
+**Status (2026-08-06): same PixelLab budget note as Chapter 11 - real generations are available
+(~22 remaining after Chapter 11's tileset) but everything below stayed SVG placeholder anyway**,
+since Chapter 12 is the game's own Book One finale and doesn't introduce a new town/NPC cast (Aurora
+Keeper Lyra and Elias Rowan both reprise existing roles) - no single asset here felt like a
+higher-leverage spend than banking the budget for whenever a real character-art pass becomes
+practical. All 5 of the Hall of Eternal Winter's dungeon rooms reuse `tileset.tiny-dungeon`, same as
+every dungeon before it - not tracked as a placeholder gap, the tiles are real, just generic.
+
+### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss)
+
+| Enemy | Family | Generation prompt |
+|---|---|---|
+| Frozen Wraith | frozenWraiths | A spectral figure half-formed from ice and old memory, faint blue-white glow, motionless until approached. |
+| Ancient Frozen Wraith | frozenWraiths | A larger, denser wraith, deeper cold radiating visibly off its form, more visibly aggressive posture. |
+| Winter Stag *(boss, 256×256)* | boss | A massive Guardian shaped from ice and old winters, antlers carved sharp as glass, a faint spirit-light glowing steady within its chest - imposing but not malevolent, the only Guardian that never once slept. |
+
+### Equipment icons (5 - generate 128×128, final 64×64)
+
+| Equipment | Final Size | Generation prompt |
+|---|---|---|
+| Elder Winter Stag Totem *(mythic)* | 64×64 | Simple flat-shaded fantasy game icon of a larger carved totem with deeper frost-etched antlers, centered, transparent background. |
+| Eternal Stag Totem *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a totem carved in the Winter Stag's own likeness, centered, transparent background. |
+| Lantern of Winter's Resolve *(found-item form)* | 64×64 | Simple flat-shaded fantasy game icon of an unlit brass lantern etched with a watching stag, centered, transparent background. |
+| Lantern of Winter's Resolve *(equipped, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a lit legendary lantern, glass etched with a stag, faint pale-blue glow, centered, transparent background. |
+
+### Item icons (2 - generate 128×128, final 64×64)
+
+| Item | Final Size | Generation prompt |
+|---|---|---|
+| Frozen Essence *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a shard of condensed cold, centered, transparent background. |
+| Winter Stag Core *(key item, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a pale ice core with a faint inner warmth, centered, transparent background. |
+| The Complete Memory *(key item, legendary, Book One finale reward)* | 64×64 | Simple flat-shaded fantasy game icon of six small glowing crystal shards arranged in a circle, unified, centered, transparent background. |
+
+---
+
 ## Things Claude can't generate itself (need external production)
 
 Everything above this line is producible in-house via the pixellab MCP server (characters, objects,
