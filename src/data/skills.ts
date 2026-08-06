@@ -250,6 +250,35 @@ export const SKILLS: Skill[] = [
     power: 25,
     spiritCost: 0,
   },
+  // Shattered Desert (MSQ Volume V, Chapter 10) enemy signature move + Canyon Giant boss moves
+  {
+    id: 'star-silence',
+    name: 'Star Silence',
+    description: 'A hushing wave of dead starlight, old enough to have forgotten how to be anything but quiet.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 16,
+    spiritCost: 0,
+    inflictsAilmentId: 'silence',
+  },
+  {
+    id: 'canyon-giant-boulder-slam',
+    name: 'Boulder Slam',
+    description: 'A single blow from a fist the size of a fallen canyon wall.',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 22,
+    spiritCost: 0,
+  },
+  {
+    id: 'canyon-giant-starfall-judgment',
+    name: 'Starfall Judgment',
+    description: 'A pulse of ancient light called down from somewhere far past the visible sky.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 26,
+    spiritCost: 0,
+  },
   // Shattered Desert (MSQ Volume V, Chapter 9) enemy signature move
   {
     id: 'sand-blast',

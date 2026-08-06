@@ -332,6 +332,37 @@ export const SKILLS: Record<string, Skill> = {
     inflictAilmentChance: 0.3,
   },
 
+  // --- Shattered Desert (MSQ Volume V, Chapter 10) enemy signature move ---
+  // celestialWisps (celestial-wisp/star-phantom) - a hushing wave of dead starlight, Silence
+  // (dustDevils already claimed Blind in this region's own Chapter 9).
+  'star-silence': {
+    id: 'star-silence',
+    name: 'Star Silence',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 16,
+    spiritCost: 0,
+    inflictsAilmentId: 'silence',
+    inflictAilmentChance: 0.3,
+  },
+  // Canyon Giant boss moves (MSF-SD-007).
+  'canyon-giant-boulder-slam': {
+    id: 'canyon-giant-boulder-slam',
+    name: 'Boulder Slam',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 22,
+    spiritCost: 0,
+  },
+  'canyon-giant-starfall-judgment': {
+    id: 'canyon-giant-starfall-judgment',
+    name: "Starfall Judgment",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 26,
+    spiritCost: 0,
+  },
+
   // --- Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move ---
   // silentEchoes (forest-echo/corrupted-echo) - a burst of toxic spores, Poison (Prairie already
   // claimed Silence/Stun/Blind across its own two chapters, so this is Whispering Pines' own).

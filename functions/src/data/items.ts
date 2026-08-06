@@ -265,6 +265,8 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'star-fragment-painted-mesas': { id: 'star-fragment-painted-mesas', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'desert-relic-i': { id: 'desert-relic-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'desert-relic-ii': { id: 'desert-relic-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'starlight-dust': { id: 'starlight-dust', category: 'materials', usableInCombat: false, tier: 'common' },
+  'canyon-giant-core': { id: 'canyon-giant-core', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'guardian-memory-fragment-5': { id: 'guardian-memory-fragment-5', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'celestial-star-map': { id: 'celestial-star-map', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'archive-fragments': { id: 'archive-fragments', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },

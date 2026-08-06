@@ -42,6 +42,7 @@ export interface Enemy {
     | 'silentEchoes'
     | 'rootWraiths'
     | 'dustDevils'
+    | 'celestialWisps'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;

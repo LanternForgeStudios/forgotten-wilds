@@ -257,6 +257,13 @@ add("sprites/enemies/dust-devil-idle.svg", 128, 128, "DEVIL", "#c8a868", "#8a683
 add("sprites/enemies/sandstorm-devil-idle.svg", 128, 128, "DEVIL", "#a8623a", "#5a2c18")
 add("icons/sandglass-shard.svg", 64, 64, "GLASS", "#c8d8e8", "#8098b0")
 
+# --- Chapter 10: The Sky Remembers (celestialWisps family + Canyon Giant boss) ---
+add("sprites/enemies/celestial-wisp-idle.svg", 128, 128, "WISP", "#8a9cd0", "#3a4470")
+add("sprites/enemies/star-phantom-idle.svg", 128, 128, "PHANTOM", "#6a7ab0", "#2a3450", font_size=13)
+add("sprites/enemies/canyon-giant-idle.svg", 256, 256, "CANYON GIANT", "#a8623a", "#5a2c18", font_size=20)
+add("icons/starlight-dust.svg", 64, 64, "DUST", "#8a9cd0", "#3a4470")
+add("icons/canyon-giant-core.svg", 64, 64, "CORE", "#9a70c0", "#5a3880")
+
 # Equipment icons (Phase 5) - Sunblade (weapon), Nomad Robes (chest), Nomad Leggings (legs), Sand
 # Boots (boots), Dune Wraps (gloves), Star Charm (charm), Sunstone Totem (spiritTotem). One hue
 # per slot, matching the existing per-slot hue convention.

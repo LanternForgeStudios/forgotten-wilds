@@ -23,6 +23,7 @@ const BOSS_REQUIRED_LOCATION: Record<string, string> = {
   'ancient-serpent-guardian': 'temple-of-the-deep-current',
   'great-thunderbird': 'guardian-peak',
   'cedar-giant': 'guardian-grove',
+  'canyon-giant': 'guardian-summit',
 };
 
 export const startEncounter = onCall<StartEncounterRequest>(async (request) => {

@@ -60,6 +60,11 @@ const BOSS_TRIGGERS: Record<string, { prerequisiteQuestId: string; approachLabel
     approachLabel: 'a shape too large and too still to be a tree, watching from the dark',
     blockedMessage: 'Something ancient and unmoving waits in the grove ahead — but the way feels barred to you, for now.',
   },
+  'canyon-giant': {
+    prerequisiteQuestId: 'lantern-of-forgotten-stars',
+    approachLabel: 'a shape carved from the canyon itself, watching from the open summit',
+    blockedMessage: 'Something vast and stone-still waits at the summit ahead — but the way feels barred to you, for now.',
+  },
 };
 
 /** Shrine-kind interactables (interactWithShrine.ts), keyed by refId. */

@@ -37,6 +37,7 @@ export interface EnemyDefinition {
     | 'silentEchoes'
     | 'rootWraiths'
     | 'dustDevils'
+    | 'celestialWisps'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
@@ -809,6 +810,81 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'eye-drops', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
   },
+
+  // --- Shattered Desert (MSQ Volume V, Chapter 10) enemies ---
+  // celestialWisps (celestial-wisp/star-phantom) - the dead light haunting the Forgotten
+  // Observatory. star-silence inflicts Silence - excluded from vulnerableAilments (immune to what
+  // it deals out), matching every prior family's own exclusion pattern.
+  'celestial-wisp': {
+    id: 'celestial-wisp',
+    name: 'Celestial Wisp',
+    family: 'celestialWisps',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'lantern',
+    vulnerableAilments: ['freeze', 'poison', 'stun'],
+    stats: { maxHp: 70, attack: 20, defense: 14, speed: 15 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'star-silence', weight: 2 },
+    ],
+    xpReward: 40,
+    goldReward: 21,
+    lootTable: [
+      { itemId: 'starlight-dust', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      // star-silence inflicts Silence - echo-herb cures it.
+      { itemId: 'echo-herb', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  'star-phantom': {
+    id: 'star-phantom',
+    name: 'Star Phantom',
+    family: 'celestialWisps',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'lantern',
+    vulnerableAilments: ['freeze', 'poison', 'stun'],
+    stats: { maxHp: 102, attack: 23, defense: 17, speed: 18 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'star-silence', weight: 3 },
+    ],
+    xpReward: 52,
+    goldReward: 28,
+    lootTable: [
+      { itemId: 'starlight-dust', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'echo-herb', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  // Boss stat block for MSF-SD-007 "The Canyon Giant". Gated behind MSF-SD-006 (recovering the
+  // Lantern of Forgotten Stars) - see BOSS_REQUIRED_LOCATION (startEncounter.ts) and
+  // BOSS_REGION_LOCATIONS below.
+  'canyon-giant': {
+    id: 'canyon-giant',
+    name: 'Canyon Giant',
+    family: 'boss',
+    tier: 'boss',
+    isBoss: true,
+    weaknessDamageType: 'spirit',
+    prerequisiteQuestId: 'lantern-of-forgotten-stars',
+    vulnerableAilments: ['freeze', 'burn'],
+    stats: { maxHp: 270, attack: 23, defense: 15, speed: 15 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'canyon-giant-boulder-slam', weight: 2 },
+      { skillId: 'canyon-giant-starfall-judgment', weight: 2, unlocksAtHpFraction: 0.5 },
+    ],
+    xpReward: 300,
+    goldReward: 160,
+    lootTable: [
+      { itemId: 'canyon-giant-core', chance: 1, minQuantity: 1, maxQuantity: 1 },
+      // Sunstone Totem family's Mythic tier - a real, if not guaranteed, earn path (same
+      // "not every rare+ item needs a unique quest thread" reasoning as every prior boss's own
+      // chest/loot bonus). The Legendary cap (canyon-giant-totem) is this boss's quest reward
+      // instead - see MSF-SD-007.
+      { itemId: 'elder-sunstone-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -948,6 +1024,25 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
     { enemyId: 'dust-devil', weight: 2 },
     { enemyId: 'sandstorm-devil', weight: 2 },
   ],
+  // Shattered Desert (MSQ Volume V, Chapter 10) - Forgotten Observatory dungeon rooms, matching
+  // each room's own encounterTable in src/data/locations.ts exactly.
+  'inner-observatory': [
+    { enemyId: 'celestial-wisp', weight: 3 },
+    { enemyId: 'star-phantom', weight: 1 },
+  ],
+  'star-chamber': [
+    { enemyId: 'celestial-wisp', weight: 2 },
+    { enemyId: 'star-phantom', weight: 2 },
+  ],
+  'star-lantern-sanctuary': [{ enemyId: 'star-phantom', weight: 1 }],
+  'canyon-depths': [
+    { enemyId: 'star-phantom', weight: 2 },
+    { enemyId: 'sandstorm-devil', weight: 1 },
+  ],
+  'guardian-summit': [
+    { enemyId: 'star-phantom', weight: 2 },
+    { enemyId: 'sandstorm-devil', weight: 1 },
+  ],
 };
 
 /** Which locations a boss's optional "adds" (0-3 additional enemies that can join the fight) may
@@ -965,4 +1060,5 @@ export const BOSS_REGION_LOCATIONS: Record<string, string[]> = {
   ],
   'great-thunderbird': ['sky-bridge', 'storm-galleries', 'lantern-sanctuary', 'guardian-peak'],
   'cedar-giant': ['root-caverns', 'inner-archive', 'heartwood-lantern-sanctuary', 'guardian-grove'],
+  'canyon-giant': ['inner-observatory', 'star-chamber', 'star-lantern-sanctuary', 'canyon-depths', 'guardian-summit'],
 };
