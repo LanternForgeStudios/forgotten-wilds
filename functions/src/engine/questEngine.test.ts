@@ -91,6 +91,44 @@ describe('advanceQuests', () => {
     expect(completions).toHaveLength(0);
     expect(quests['into-hollow-rail']).toBeUndefined();
   });
+
+  // 'frostbound-pages' is a real 3-objective chain (get-frostbound-treatise -> talk-elias-frostbound
+  // -> talk-miriam-frostbound) with requiresObjectiveIds set on both talkToNpc objectives -
+  // regression coverage for the real out-of-order-completion bug this field was added to fix (a
+  // player could previously talk to the quest-giver NPC before ever finding the item, which
+  // credited the "report back" objective immediately and let the quest complete without the
+  // player ever making the actual return trip).
+  it('does not credit a report-back objective if its required objective has not fired yet', () => {
+    const quests: Record<string, QuestProgress> = {
+      'the-mountain-remembers': { status: 'completed', objectiveCounts: {} },
+    };
+    // elias-rowan is also a-new-keeper's own talkToNpc target, so this event legitimately advances
+    // that unrelated quest too - the assertion here is specifically that frostbound-pages' own
+    // report-back objective did NOT credit, not that nothing in the whole game responded.
+    advanceQuests(quests, { type: 'talkToNpc', targetId: 'elias-rowan' });
+    expect(quests['frostbound-pages']?.objectiveCounts['talk-elias-frostbound'] ?? 0).toBe(0);
+    expect(quests['frostbound-pages']?.status ?? 'active').not.toBe('completed');
+  });
+
+  it('credits a report-back objective once its required objective is satisfied, in the same order the player actually did it', () => {
+    const quests: Record<string, QuestProgress> = {
+      'the-mountain-remembers': { status: 'completed', objectiveCounts: {} },
+    };
+    // Talking to Elias first (as in the regression test above) does nothing.
+    advanceQuests(quests, { type: 'talkToNpc', targetId: 'elias-rowan' });
+    // Finding the treatise unlocks the first report-back objective...
+    advanceQuests(quests, { type: 'collectItem', targetId: 'frostbound-treatise' });
+    expect(quests['frostbound-pages'].objectiveCounts['get-frostbound-treatise']).toBe(1);
+    // ...but talking to Miriam still doesn't credit until Elias has actually been told.
+    advanceQuests(quests, { type: 'talkToNpc', targetId: 'historian-miriam' });
+    expect(quests['frostbound-pages'].objectiveCounts['talk-miriam-frostbound'] ?? 0).toBe(0);
+    // Now the chain resolves in the real intended order.
+    advanceQuests(quests, { type: 'talkToNpc', targetId: 'elias-rowan' });
+    expect(quests['frostbound-pages'].objectiveCounts['talk-elias-frostbound']).toBe(1);
+    const completions = advanceQuests(quests, { type: 'talkToNpc', targetId: 'historian-miriam' });
+    expect(quests['frostbound-pages'].status).toBe('completed');
+    expect(completions).toEqual([{ questId: 'frostbound-pages', reward: expect.any(Object) }]);
+  });
 });
 
 describe('applyQuestRewards', () => {

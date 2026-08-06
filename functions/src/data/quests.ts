@@ -15,6 +15,17 @@ export interface QuestObjectiveDef {
   type: QuestObjectiveType;
   targetId: string;
   requiredCount: number;
+  /** Other objective ids (within this same quest) that must already be at their own
+   *  requiredCount before an incoming event is allowed to credit this objective. Optional and
+   *  opt-in - objectives with no implied sequence (e.g. "reach any of these 3 locations") should
+   *  leave this unset, since questEngine.ts's own retroactive-credit pass deliberately rewards a
+   *  player who did things out of "expected" order for those. Set this whenever an objective is a
+   *  "report back" beat that only makes narrative sense after an earlier collect/defeat/shrine
+   *  objective - without it, talking to the NPC first (before the item/kill/shrine actually
+   *  happens) silently credits the report-back objective, and the quest then completes the moment
+   *  the earlier objective finishes too, skipping the "return and report" trip entirely. See
+   *  questEngine.ts's advanceQuests/reconcileRetroactiveObjectives for the enforcement. */
+  requiresObjectiveIds?: string[];
 }
 
 export interface QuestDef {
@@ -213,8 +224,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-mountain-remembers',
     objectives: [
       { id: 'get-frostbound-treatise', type: 'collectItem', targetId: 'frostbound-treatise', requiredCount: 1 },
-      { id: 'talk-elias-frostbound', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 },
-      { id: 'talk-miriam-frostbound', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1 },
+      { id: 'talk-elias-frostbound', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1, requiresObjectiveIds: ['get-frostbound-treatise'] },
+      { id: 'talk-miriam-frostbound', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1, requiresObjectiveIds: ['talk-elias-frostbound'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'frost-lance', grantLoreId: 'forgotten-treatise-i' },
   },
@@ -223,8 +234,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'frostbound-pages',
     objectives: [
       { id: 'get-ember-codex', type: 'collectItem', targetId: 'ember-codex', requiredCount: 1 },
-      { id: 'talk-elias-embers', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 },
-      { id: 'talk-miriam-embers', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1 },
+      { id: 'talk-elias-embers', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1, requiresObjectiveIds: ['get-ember-codex'] },
+      { id: 'talk-miriam-embers', type: 'talkToNpc', targetId: 'historian-miriam', requiredCount: 1, requiresObjectiveIds: ['talk-elias-embers'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'ember-burst', grantLoreId: 'forgotten-treatise-ii' },
   },
@@ -259,7 +270,7 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'forgotten-names',
     objectives: [
       { id: 'investigate-mother-cypress', type: 'interactWithShrine', targetId: 'mother-cypress-shrine', requiredCount: 1 },
-      { id: 'talk-lucien-2', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+      { id: 'talk-lucien-2', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1, requiresObjectiveIds: ['investigate-mother-cypress'] },
     ],
     reward: { xp: 20, gold: 10 },
   },
@@ -302,7 +313,7 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'into-the-deep-current',
     objectives: [
       { id: 'get-temple-records', type: 'collectItem', targetId: 'temple-records', requiredCount: 1 },
-      { id: 'talk-lucien-temple', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+      { id: 'talk-lucien-temple', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1, requiresObjectiveIds: ['get-temple-records'] },
     ],
     reward: { xp: 30, gold: 15, grantLoreId: 'lore-temple-records' },
   },
@@ -337,8 +348,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-waters-remember',
     objectives: [
       { id: 'get-drowned-ledger', type: 'collectItem', targetId: 'drowned-ledger', requiredCount: 1 },
-      { id: 'talk-celeste-ledger', type: 'talkToNpc', targetId: 'mayor-celeste-broussard', requiredCount: 1 },
-      { id: 'talk-lucien-ledger', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+      { id: 'talk-celeste-ledger', type: 'talkToNpc', targetId: 'mayor-celeste-broussard', requiredCount: 1, requiresObjectiveIds: ['get-drowned-ledger'] },
+      { id: 'talk-lucien-ledger', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1, requiresObjectiveIds: ['talk-celeste-ledger'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'marsh-toxin', grantLoreId: 'drowned-ledger-i' },
   },
@@ -347,8 +358,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-drowned-ledger',
     objectives: [
       { id: 'get-bogwater-almanac', type: 'collectItem', targetId: 'bogwater-almanac', requiredCount: 1 },
-      { id: 'talk-celeste-almanac', type: 'talkToNpc', targetId: 'mayor-celeste-broussard', requiredCount: 1 },
-      { id: 'talk-lucien-almanac', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1 },
+      { id: 'talk-celeste-almanac', type: 'talkToNpc', targetId: 'mayor-celeste-broussard', requiredCount: 1, requiresObjectiveIds: ['get-bogwater-almanac'] },
+      { id: 'talk-lucien-almanac', type: 'talkToNpc', targetId: 'lucien-boudreaux', requiredCount: 1, requiresObjectiveIds: ['talk-celeste-almanac'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'hush-of-reeds', grantLoreId: 'drowned-ledger-ii' },
   },
@@ -391,7 +402,13 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'get-wind-stone-stone-circle-valley', type: 'collectItem', targetId: 'wind-stone-stone-circle-valley', requiredCount: 1 },
       // Sacred Hills has no separate shrine landmark - Prairie Spirit herself is the shrine's
       // living voice, so restoration is a conversation, not an interactWithShrine objective.
-      { id: 'talk-prairie-spirit-restore', type: 'talkToNpc', targetId: 'prairie-spirit', requiredCount: 1 },
+      {
+        id: 'talk-prairie-spirit-restore',
+        type: 'talkToNpc',
+        targetId: 'prairie-spirit',
+        requiredCount: 1,
+        requiresObjectiveIds: ['get-wind-stone-golden-prairie', 'get-wind-stone-spirit-herd-plains', 'get-wind-stone-stone-circle-valley'],
+      },
     ],
     reward: { xp: 60, gold: 30, spiritEssence: 15 },
   },
@@ -401,7 +418,7 @@ export const QUESTS: Record<string, QuestDef> = {
     objectives: [
       { id: 'reach-stone-circle-valley', type: 'reachLocation', targetId: 'stone-circle-valley', requiredCount: 1 },
       { id: 'investigate-carvings', type: 'interactWithShrine', targetId: 'stone-circle-carvings', requiredCount: 1 },
-      { id: 'talk-koda-report', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1 },
+      { id: 'talk-koda-report', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1, requiresObjectiveIds: ['investigate-carvings'] },
     ],
     reward: { xp: 50, gold: 25, grantLoreId: 'lore-stone-circle-carvings' },
   },
@@ -424,8 +441,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'climbing-thunderbird-mesa',
     objectives: [
       { id: 'get-winter-count-hide-i', type: 'collectItem', targetId: 'winter-count-hide-i', requiredCount: 1 },
-      { id: 'talk-aiyana-winter-count-i', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
-      { id: 'talk-koda-winter-count-i', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1 },
+      { id: 'talk-aiyana-winter-count-i', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1, requiresObjectiveIds: ['get-winter-count-hide-i'] },
+      { id: 'talk-koda-winter-count-i', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1, requiresObjectiveIds: ['talk-aiyana-winter-count-i'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'winters-memory', grantLoreId: 'winter-count-i' },
   },
@@ -434,8 +451,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-first-winter-count',
     objectives: [
       { id: 'get-winter-count-hide-ii', type: 'collectItem', targetId: 'winter-count-hide-ii', requiredCount: 1 },
-      { id: 'talk-aiyana-winter-count-ii', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1 },
-      { id: 'talk-koda-winter-count-ii', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1 },
+      { id: 'talk-aiyana-winter-count-ii', type: 'talkToNpc', targetId: 'chief-aiyana-whitefeather', requiredCount: 1, requiresObjectiveIds: ['get-winter-count-hide-ii'] },
+      { id: 'talk-koda-winter-count-ii', type: 'talkToNpc', targetId: 'elder-koda-running-elk', requiredCount: 1, requiresObjectiveIds: ['talk-aiyana-winter-count-ii'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'prairie-wildfire', grantLoreId: 'winter-count-ii' },
   },
@@ -514,7 +531,7 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'reach-elder-forest', type: 'reachLocation', targetId: 'elder-forest', requiredCount: 1 },
       { id: 'calm-echoes', type: 'defeatEnemies', targetId: 'corrupted-echo', requiredCount: 2 },
       { id: 'reach-ancient-cedar-shrine', type: 'reachLocation', targetId: 'ancient-cedar-shrine', requiredCount: 1 },
-      { id: 'talk-cedar-spirit-meet', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1 },
+      { id: 'talk-cedar-spirit-meet', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1, requiresObjectiveIds: ['reach-ancient-cedar-shrine'] },
     ],
     reward: { xp: 40, gold: 20, spiritEssence: 10 },
   },
@@ -540,7 +557,7 @@ export const QUESTS: Record<string, QuestDef> = {
     objectives: [
       { id: 'reach-heartwood-approach', type: 'reachLocation', targetId: 'heartwood-approach', requiredCount: 1 },
       { id: 'get-lost-library-records', type: 'collectItem', targetId: 'lost-library-records', requiredCount: 1 },
-      { id: 'talk-elowen-report', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
+      { id: 'talk-elowen-report', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1, requiresObjectiveIds: ['get-lost-library-records'] },
     ],
     reward: { xp: 50, gold: 25, grantLoreId: 'lore-lost-library' },
   },
@@ -564,8 +581,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'heartwood-sanctuary',
     objectives: [
       { id: 'get-heartwood-recording-i', type: 'collectItem', targetId: 'heartwood-recording-i', requiredCount: 1 },
-      { id: 'talk-elowen-recording-i', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
-      { id: 'talk-cedar-spirit-recording-i', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1 },
+      { id: 'talk-elowen-recording-i', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1, requiresObjectiveIds: ['get-heartwood-recording-i'] },
+      { id: 'talk-cedar-spirit-recording-i', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1, requiresObjectiveIds: ['talk-elowen-recording-i'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'elderwood-ember', grantLoreId: 'heartwood-recording-i' },
   },
@@ -574,8 +591,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-first-recording',
     objectives: [
       { id: 'get-heartwood-recording-ii', type: 'collectItem', targetId: 'heartwood-recording-ii', requiredCount: 1 },
-      { id: 'talk-elowen-recording-ii', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
-      { id: 'talk-cedar-spirit-recording-ii', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1 },
+      { id: 'talk-elowen-recording-ii', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1, requiresObjectiveIds: ['get-heartwood-recording-ii'] },
+      { id: 'talk-cedar-spirit-recording-ii', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1, requiresObjectiveIds: ['talk-elowen-recording-ii'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'silver-rivers-chill', grantLoreId: 'heartwood-recording-ii' },
   },
@@ -600,7 +617,7 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'beneath-the-roots',
     objectives: [
       { id: 'get-lantern-of-ancient-roots', type: 'collectItem', targetId: 'lantern-of-ancient-roots', requiredCount: 1 },
-      { id: 'talk-elowen-lantern', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1 },
+      { id: 'talk-elowen-lantern', type: 'talkToNpc', targetId: 'archivist-elowen', requiredCount: 1, requiresObjectiveIds: ['get-lantern-of-ancient-roots'] },
     ],
     reward: {
       xp: 50,
@@ -690,8 +707,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-path-of-the-astronomers',
     objectives: [
       { id: 'get-desert-relic-i', type: 'collectItem', targetId: 'desert-relic-i', requiredCount: 1 },
-      { id: 'talk-tomas-relic-i', type: 'talkToNpc', targetId: 'desert-ranger-tomas-vega', requiredCount: 1 },
-      { id: 'talk-nia-relic-i', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+      { id: 'talk-tomas-relic-i', type: 'talkToNpc', targetId: 'desert-ranger-tomas-vega', requiredCount: 1, requiresObjectiveIds: ['get-desert-relic-i'] },
+      { id: 'talk-nia-relic-i', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1, requiresObjectiveIds: ['talk-tomas-relic-i'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'canyon-wildfire', grantLoreId: 'desert-relic-i' },
   },
@@ -700,8 +717,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-first-relic',
     objectives: [
       { id: 'get-desert-relic-ii', type: 'collectItem', targetId: 'desert-relic-ii', requiredCount: 1 },
-      { id: 'talk-tomas-relic-ii', type: 'talkToNpc', targetId: 'desert-ranger-tomas-vega', requiredCount: 1 },
-      { id: 'talk-nia-relic-ii', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+      { id: 'talk-tomas-relic-ii', type: 'talkToNpc', targetId: 'desert-ranger-tomas-vega', requiredCount: 1, requiresObjectiveIds: ['get-desert-relic-ii'] },
+      { id: 'talk-nia-relic-ii', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1, requiresObjectiveIds: ['talk-tomas-relic-ii'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'desert-nights-chill', grantLoreId: 'desert-relic-ii' },
   },
@@ -725,7 +742,7 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-celestial-machine',
     objectives: [
       { id: 'get-lantern-of-forgotten-stars', type: 'collectItem', targetId: 'lantern-of-forgotten-stars', requiredCount: 1 },
-      { id: 'talk-nia-lantern', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+      { id: 'talk-nia-lantern', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1, requiresObjectiveIds: ['get-lantern-of-forgotten-stars'] },
     ],
     reward: {
       xp: 50,
@@ -816,8 +833,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'hall-of-eternal-winter',
     objectives: [
       { id: 'get-lost-scout-effects-i', type: 'collectItem', targetId: 'lost-scout-effects-i', requiredCount: 1 },
-      { id: 'talk-astrid-scout-i', type: 'talkToNpc', targetId: 'captain-astrid-frost', requiredCount: 1 },
-      { id: 'talk-lyra-scout-i', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+      { id: 'talk-astrid-scout-i', type: 'talkToNpc', targetId: 'captain-astrid-frost', requiredCount: 1, requiresObjectiveIds: ['get-lost-scout-effects-i'] },
+      { id: 'talk-lyra-scout-i', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1, requiresObjectiveIds: ['talk-astrid-scout-i'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'aurora-flare', grantLoreId: 'lost-scout-effects-i' },
   },
@@ -826,8 +843,8 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'the-first-scout',
     objectives: [
       { id: 'get-lost-scout-effects-ii', type: 'collectItem', targetId: 'lost-scout-effects-ii', requiredCount: 1 },
-      { id: 'talk-astrid-scout-ii', type: 'talkToNpc', targetId: 'captain-astrid-frost', requiredCount: 1 },
-      { id: 'talk-lyra-scout-ii', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+      { id: 'talk-astrid-scout-ii', type: 'talkToNpc', targetId: 'captain-astrid-frost', requiredCount: 1, requiresObjectiveIds: ['get-lost-scout-effects-ii'] },
+      { id: 'talk-lyra-scout-ii', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1, requiresObjectiveIds: ['talk-astrid-scout-ii'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'frostbite-shatter', grantLoreId: 'lost-scout-effects-ii' },
   },
@@ -840,7 +857,7 @@ export const QUESTS: Record<string, QuestDef> = {
     prerequisiteQuestId: 'hall-of-eternal-winter',
     objectives: [
       { id: 'get-lantern-of-winters-resolve', type: 'collectItem', targetId: 'lantern-of-winters-resolve', requiredCount: 1 },
-      { id: 'talk-lyra-lantern', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+      { id: 'talk-lyra-lantern', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1, requiresObjectiveIds: ['get-lantern-of-winters-resolve'] },
     ],
     reward: {
       xp: 50,

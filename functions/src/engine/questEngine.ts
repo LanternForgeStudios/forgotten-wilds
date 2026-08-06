@@ -90,6 +90,19 @@ function checkQuestCompletion(
   return allComplete;
 }
 
+/** Whether every objective an objective declares via `requiresObjectiveIds` is already satisfied
+ *  in `progress` - true (no gate) when the field is unset. Looks each prerequisite's own
+ *  `requiredCount` up in `def` rather than assuming 1, since a prerequisite could itself be a
+ *  multi-count objective (e.g. "collect 3 of these" before the report-back beat unlocks). */
+function objectivePrerequisitesSatisfied(def: QuestDef, objective: QuestDef['objectives'][number], progress: QuestProgress): boolean {
+  if (!objective.requiresObjectiveIds?.length) return true;
+  return objective.requiresObjectiveIds.every((prereqId) => {
+    const prereqDef = def.objectives.find((o) => o.id === prereqId);
+    if (!prereqDef) return true;
+    return (progress.objectiveCounts[prereqId] ?? 0) >= prereqDef.requiredCount;
+  });
+}
+
 /**
  * Mutates `quests` in place, advancing any active quest whose objective matches the event.
  * Returns the list of quests that became newly completed this call (for granting rewards).
@@ -103,6 +116,10 @@ export function advanceQuests(quests: Record<string, QuestProgress>, event: Ques
     const def = QUESTS[questId];
 
     const progress = quests[questId] ?? { status: 'active', objectiveCounts: {} };
+    // An objective with an implied sequence (see requiresObjectiveIds's own doc comment) simply
+    // doesn't credit this event yet if its prerequisite objective(s) haven't fired - the player
+    // has to trigger the same event again (e.g. talk to the NPC a second time) once they have.
+    if (!objectivePrerequisitesSatisfied(def, objective, progress)) continue;
     const current = progress.objectiveCounts[objective.id] ?? 0;
     progress.objectiveCounts[objective.id] = Math.min(objective.requiredCount, current + (event.amount ?? 1));
     progress.status = 'active';
@@ -166,6 +183,7 @@ function reconcileRetroactiveObjectives(save: PlayerSave): QuestCompletion[] {
       for (const o of def.objectives) {
         const current = progress.objectiveCounts[o.id] ?? 0;
         if (current >= o.requiredCount) continue;
+        if (!objectivePrerequisitesSatisfied(def, o, progress)) continue;
         let retroactiveCount: number | undefined;
         if (o.type === 'collectItem') {
           // Clamped to actual owned quantity (matching advanceQuests's own amount-aware
