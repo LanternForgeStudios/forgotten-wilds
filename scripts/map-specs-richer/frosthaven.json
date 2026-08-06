@@ -40,7 +40,7 @@
             { "x": 20, "y": 14 }, { "x": 44, "y": 14 },
             { "x": 20, "y": 26 }, { "x": 44, "y": 26 },
             { "x": 30, "y": 8 }, { "x": 30, "y": 30 },
-            { "x": 12, "y": 20 }, { "x": 30, "y": 20 }
+            { "x": 12, "y": 20 }, { "x": 30, "y": 20 }, { "x": 3, "y": 20 }
           ]
         }
       ]
@@ -52,6 +52,9 @@
     { "type": "spawnPoint", "x": 30, "y": 22, "refId": "default" },
     { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-snowveil-forest" },
     { "type": "transition", "x": 63, "y": 20, "refId": "snowveil-forest", "targetSpawnId": "from-frosthaven" },
+
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-forgotten-observatory-approach" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "forgotten-observatory-approach", "targetSpawnId": "from-frosthaven" },
 
     { "type": "npc", "x": 30, "y": 20, "refId": "captain-astrid-frost", "wanderRadius": 4 },
 

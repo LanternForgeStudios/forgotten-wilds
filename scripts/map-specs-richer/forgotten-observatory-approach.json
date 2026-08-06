@@ -37,7 +37,7 @@
           "seed": 56,
           "avoid": [
             { "x": 2, "y": 16 }, { "x": 44, "y": 16 }, { "x": 12, "y": 10 },
-            { "x": 20, "y": 8 }, { "x": 28, "y": 22 }
+            { "x": 20, "y": 8 }, { "x": 28, "y": 22 }, { "x": 24, "y": 29 }
           ]
         }
       ]
@@ -52,6 +52,9 @@
 
     { "type": "spawnPoint", "x": 45, "y": 16, "refId": "from-inner-observatory" },
     { "type": "transition", "x": 47, "y": 16, "refId": "inner-observatory", "targetSpawnId": "from-forgotten-observatory-approach" },
+
+    { "type": "spawnPoint", "x": 24, "y": 29, "refId": "from-frosthaven" },
+    { "type": "transition", "x": 24, "y": 31, "refId": "frosthaven", "targetSpawnId": "from-forgotten-observatory-approach" },
 
     { "type": "interactable", "x": 20, "y": 8, "refId": "chest-forgotten-observatory-approach-1" }
   ]
