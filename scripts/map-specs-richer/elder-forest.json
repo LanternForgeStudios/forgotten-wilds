@@ -53,6 +53,7 @@
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
     { "type": "interactable", "x": 34, "y": 24, "refId": "spirit-seed-elder-forest" },
+    { "type": "interactable", "x": 40, "y": 30, "refId": "cedar-charm-relic" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-elder-forest-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-elder-forest-2" },

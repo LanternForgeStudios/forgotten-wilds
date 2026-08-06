@@ -26,7 +26,15 @@ export type EquipmentSlot =
   | 'gloves'
   | 'charm'
   | 'lantern'
-  | 'spiritTotem';
+  | 'spiritTotem'
+  // 3 additional Charm/Totem slots each, unlocked one at a time by a side quest - see
+  // functions/src/shared-types/index.ts's matching field for the full design reasoning.
+  | 'charm2'
+  | 'charm3'
+  | 'charm4'
+  | 'spiritTotem2'
+  | 'spiritTotem3'
+  | 'spiritTotem4';
 
 export const EQUIPMENT_SLOTS: EquipmentSlot[] = [
   'weapon',
@@ -35,8 +43,14 @@ export const EQUIPMENT_SLOTS: EquipmentSlot[] = [
   'boots',
   'gloves',
   'charm',
+  'charm2',
+  'charm3',
+  'charm4',
   'lantern',
   'spiritTotem',
+  'spiritTotem2',
+  'spiritTotem3',
+  'spiritTotem4',
 ];
 
 export type SpiritRank = 'Unawakened' | 'Attuned' | 'Resonant' | 'Warden';

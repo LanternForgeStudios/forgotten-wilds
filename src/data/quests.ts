@@ -595,6 +595,40 @@ export const QUESTS: Quest[] = [
     reward: { xp: 40, gold: 25, grantSkillId: 'prairie-wildfire', grantLoreId: 'winter-count-ii' },
   },
 
+  // --- Endless Prairie's Charm/Spirit Totem slot-unlock side quests ---
+  {
+    id: 'the-skys-second-gift',
+    name: "The Sky's Second Gift",
+    giverNpcId: 'prairie-spirit',
+    description: 'The Prairie Spirit senses you are ready to carry a second Charm - but first, prove your resolve and gather what the plains require.',
+    category: 'side',
+    prerequisiteQuestId: 'the-stone-circles',
+    objectives: [
+      { id: 'defeat-prairie-wolves-charm2', type: 'defeatEnemies', description: 'Defeat 6 Prairie Wolves.', targetId: 'prairie-wolf', requiredCount: 6 },
+      { id: 'gather-wisp-feather-charm2', type: 'collectItem', description: 'Gather 2 Wisp Feathers.', targetId: 'wisp-feather', requiredCount: 2 },
+      { id: 'gather-prairie-wolf-pelt-charm2', type: 'collectItem', description: 'Gather 2 Prairie Wolf Pelts.', targetId: 'prairie-wolf-pelt', requiredCount: 2 },
+      { id: 'find-prairie-charm-relic', type: 'collectItem', description: 'Find the relic hidden in Stone Circle Valley.', targetId: 'prairie-charm-relic', requiredCount: 1 },
+      { id: 'talk-prairie-spirit-charm2', type: 'talkToNpc', description: 'Return the relic to the Prairie Spirit.', targetId: 'prairie-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 60, gold: 40, grantsEquipmentSlot: 'charm2' },
+  },
+  {
+    id: 'the-herds-enduring-bond',
+    name: "The Herd's Enduring Bond",
+    giverNpcId: 'prairie-spirit',
+    description: 'A second Spirit Totem waits to be bound - the Prairie Spirit asks for the same proof of resolve, once more.',
+    category: 'side',
+    prerequisiteQuestId: 'the-first-promise-remembered',
+    objectives: [
+      { id: 'defeat-storm-fledglings-totem2', type: 'defeatEnemies', description: 'Defeat 6 Storm Fledglings.', targetId: 'storm-fledgling', requiredCount: 6 },
+      { id: 'gather-wisp-feather-totem2', type: 'collectItem', description: 'Gather 2 Wisp Feathers.', targetId: 'wisp-feather', requiredCount: 2 },
+      { id: 'gather-prairie-wolf-pelt-totem2', type: 'collectItem', description: 'Gather 2 Prairie Wolf Pelts.', targetId: 'prairie-wolf-pelt', requiredCount: 2 },
+      { id: 'find-prairie-totem-relic', type: 'collectItem', description: 'Find the relic hidden in Golden Prairie.', targetId: 'prairie-totem-relic', requiredCount: 1 },
+      { id: 'talk-prairie-spirit-totem2', type: 'talkToNpc', description: 'Return the relic to the Prairie Spirit.', targetId: 'prairie-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 60, gold: 40, grantsEquipmentSlot: 'spiritTotem2' },
+  },
+
   // --- Endless Prairie (MSQ Volume III), Chapter 6: Wings of the First Promise ---
   {
     id: 'temple-above-the-clouds',
@@ -780,6 +814,40 @@ export const QUESTS: Quest[] = [
     reward: { xp: 40, gold: 25, grantSkillId: 'silver-rivers-chill', grantLoreId: 'heartwood-recording-ii' },
   },
 
+  // --- Whispering Pines' Charm/Spirit Totem slot-unlock side quests ---
+  {
+    id: 'the-cedars-second-ring',
+    name: "The Cedar's Second Ring",
+    giverNpcId: 'cedar-spirit',
+    description: 'The Cedar Spirit offers a second Charm binding, if you prove yourself against the forest and gather what it asks.',
+    category: 'side',
+    prerequisiteQuestId: 'heartwood-sanctuary',
+    objectives: [
+      { id: 'defeat-forest-echoes-charm3', type: 'defeatEnemies', description: 'Defeat 6 Forest Echoes.', targetId: 'forest-echo', requiredCount: 6 },
+      { id: 'gather-withered-echo-moss-charm3', type: 'collectItem', description: 'Gather 2 Withered Echo Moss.', targetId: 'withered-echo-moss', requiredCount: 2 },
+      { id: 'gather-gnarled-root-fiber-charm3', type: 'collectItem', description: 'Gather 2 Gnarled Root Fiber.', targetId: 'gnarled-root-fiber', requiredCount: 2 },
+      { id: 'find-cedar-charm-relic', type: 'collectItem', description: 'Find the relic hidden in Elder Forest.', targetId: 'cedar-charm-relic', requiredCount: 1 },
+      { id: 'talk-cedar-spirit-charm3', type: 'talkToNpc', description: 'Return the relic to the Cedar Spirit.', targetId: 'cedar-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 80, gold: 55, grantsEquipmentSlot: 'charm3' },
+  },
+  {
+    id: 'roots-that-remember',
+    name: 'Roots That Remember',
+    giverNpcId: 'cedar-spirit',
+    description: 'A third Spirit Totem waits in the roots of Silver River, if you can earn the Cedar Spirit\'s trust once more.',
+    category: 'side',
+    prerequisiteQuestId: 'the-missing-pages',
+    objectives: [
+      { id: 'defeat-root-wraiths-totem3', type: 'defeatEnemies', description: 'Defeat 6 Root Wraiths.', targetId: 'root-wraith', requiredCount: 6 },
+      { id: 'gather-withered-echo-moss-totem3', type: 'collectItem', description: 'Gather 2 Withered Echo Moss.', targetId: 'withered-echo-moss', requiredCount: 2 },
+      { id: 'gather-gnarled-root-fiber-totem3', type: 'collectItem', description: 'Gather 2 Gnarled Root Fiber.', targetId: 'gnarled-root-fiber', requiredCount: 2 },
+      { id: 'find-cedar-totem-relic', type: 'collectItem', description: 'Find the relic hidden in Silver River.', targetId: 'cedar-totem-relic', requiredCount: 1 },
+      { id: 'talk-cedar-spirit-totem3', type: 'talkToNpc', description: 'Return the relic to the Cedar Spirit.', targetId: 'cedar-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 80, gold: 55, grantsEquipmentSlot: 'spiritTotem3' },
+  },
+
   // --- Whispering Pines (MSQ Volume IV), Chapter 8: Echoes of the First Keepers ---
   {
     id: 'beneath-the-roots',
@@ -958,6 +1026,40 @@ export const QUESTS: Quest[] = [
       { id: 'talk-nia-relic-ii', type: 'talkToNpc', description: 'Have Scholar Nia Solis examine the relic.', targetId: 'scholar-nia-solis', requiredCount: 1 },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'desert-nights-chill', grantLoreId: 'desert-relic-ii' },
+  },
+
+  // --- Shattered Desert's Charm/Spirit Totem slot-unlock side quests ---
+  {
+    id: 'the-stars-second-light',
+    name: "The Star's Second Light",
+    giverNpcId: 'sand-spirit',
+    description: 'The Sand Spirit offers a fourth Charm binding, if you can prove yourself against the dunes and gather what the desert demands.',
+    category: 'side',
+    prerequisiteQuestId: 'the-path-of-the-astronomers',
+    objectives: [
+      { id: 'defeat-dust-devils-charm4', type: 'defeatEnemies', description: 'Defeat 6 Dust Devils.', targetId: 'dust-devil', requiredCount: 6 },
+      { id: 'gather-sandglass-shard-charm4', type: 'collectItem', description: 'Gather 2 Sandglass Shards.', targetId: 'sandglass-shard', requiredCount: 2 },
+      { id: 'gather-starlight-dust-charm4', type: 'collectItem', description: 'Gather 2 Starlight Dust.', targetId: 'starlight-dust', requiredCount: 2 },
+      { id: 'find-desert-charm-relic', type: 'collectItem', description: 'Find the relic hidden in Crimson Canyons.', targetId: 'desert-charm-relic', requiredCount: 1 },
+      { id: 'talk-sand-spirit-charm4', type: 'talkToNpc', description: 'Return the relic to the Sand Spirit.', targetId: 'sand-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 100, gold: 70, grantsEquipmentSlot: 'charm4' },
+  },
+  {
+    id: 'sands-that-endure',
+    name: 'Sands That Endure',
+    giverNpcId: 'sand-spirit',
+    description: 'A fourth Spirit Totem waits in the painted stone of the mesas, if the Sand Spirit judges you ready.',
+    category: 'side',
+    prerequisiteQuestId: 'the-stars-never-lied',
+    objectives: [
+      { id: 'defeat-celestial-wisps-totem4', type: 'defeatEnemies', description: 'Defeat 6 Celestial Wisps.', targetId: 'celestial-wisp', requiredCount: 6 },
+      { id: 'gather-sandglass-shard-totem4', type: 'collectItem', description: 'Gather 2 Sandglass Shards.', targetId: 'sandglass-shard', requiredCount: 2 },
+      { id: 'gather-starlight-dust-totem4', type: 'collectItem', description: 'Gather 2 Starlight Dust.', targetId: 'starlight-dust', requiredCount: 2 },
+      { id: 'find-desert-totem-relic', type: 'collectItem', description: 'Find the relic hidden in Painted Mesas.', targetId: 'desert-totem-relic', requiredCount: 1 },
+      { id: 'talk-sand-spirit-totem4', type: 'talkToNpc', description: 'Return the relic to the Sand Spirit.', targetId: 'sand-spirit', requiredCount: 1 },
+    ],
+    reward: { xp: 100, gold: 70, grantsEquipmentSlot: 'spiritTotem4' },
   },
 
   // --- Shattered Desert (MSQ Volume V), Chapter 10: The Sky Remembers ---

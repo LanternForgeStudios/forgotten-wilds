@@ -1,3 +1,5 @@
+import type { EquipmentSlot } from './stats';
+
 export type QuestObjectiveType =
   | 'talkToNpc'
   | 'defeatEnemies'
@@ -32,6 +34,9 @@ export interface QuestReward {
    *  regionalReputation (functions/src/data/quests.ts). Currently one global running total, not
    *  tracked per-region. */
   regionalReputation?: number;
+  /** Unlocks one of the 3 additional Charm/Spirit Totem slots on completion - display-only mirror
+   *  of the server's grantsEquipmentSlot (functions/src/data/quests.ts). */
+  grantsEquipmentSlot?: EquipmentSlot;
 }
 
 /** Display-only grouping for the Quest Log's tabs - not read by any server logic. */

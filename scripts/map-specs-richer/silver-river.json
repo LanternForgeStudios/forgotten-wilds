@@ -62,6 +62,7 @@
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
     { "type": "interactable", "x": 30, "y": 30, "refId": "spirit-seed-silver-river" },
+    { "type": "interactable", "x": 36, "y": 20, "refId": "cedar-totem-relic" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-silver-river-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-silver-river-2" },

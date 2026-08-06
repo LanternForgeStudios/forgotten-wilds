@@ -53,6 +53,7 @@
 
     { "type": "interactable", "x": 40, "y": 12, "refId": "star-fragment-crimson-canyons" },
     { "type": "interactable", "x": 45, "y": 25, "refId": "desert-relic-ii-cache" },
+    { "type": "interactable", "x": 34, "y": 20, "refId": "desert-charm-relic" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-crimson-canyons-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-crimson-canyons-2" },

@@ -1,14 +1,38 @@
 import { EQUIPMENT, type EquipmentDefinition, type StatBonuses } from '../data/equipment';
 import { LANTERN_OIL_UPGRADE_PER_TIER } from '../data/lanternOilUpgrades';
-import type { AilmentResistance, PlayerEquipment, PlayerSave, Stats } from '../shared-types';
+import type { AilmentResistance, EquipmentSlot, PlayerEquipment, PlayerSave, Stats } from '../shared-types';
 
 /** The full, empty equipment shape every PlayerSave should have - the single source of truth for
  *  backfillPlayerEquipment below and every other call site that used to hand-roll this same
  *  literal (endlessBattle.ts, pvpBattle.ts, resolveCombatAction.ts) before the 'armor'->'chest'
  *  rename/'legs' addition made keeping N independent copies in sync too risky. */
 export function freshPlayerEquipment(): PlayerEquipment {
-  return { weapon: null, chest: null, legs: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null };
+  return {
+    weapon: null,
+    chest: null,
+    legs: null,
+    boots: null,
+    gloves: null,
+    charm: null,
+    lantern: null,
+    spiritTotem: null,
+    charm2: null,
+    charm3: null,
+    charm4: null,
+    spiritTotem2: null,
+    spiritTotem3: null,
+    spiritTotem4: null,
+  };
 }
+
+/** The 4 slots a Charm item can occupy, and the 4 a Spirit Totem can - the 'charm'/'spiritTotem'
+ *  Cloud Functions (equipItem.ts) key off of, since an EquipmentDefinition's own `slot` field is
+ *  always just 'charm'/'spiritTotem' (items don't have 4 variants - one item can go in any of the
+ *  4 slots for its family). charm2-4/spiritTotem2-4 are locked until their own quest completes
+ *  (see equipItem.ts's SLOT_UNLOCK_QUEST_ID) - 'charm'/'spiritTotem' themselves are always
+ *  unlocked, matching every save's starting equipment shape. */
+export const CHARM_SLOTS: EquipmentSlot[] = ['charm', 'charm2', 'charm3', 'charm4'];
+export const TOTEM_SLOTS: EquipmentSlot[] = ['spiritTotem', 'spiritTotem2', 'spiritTotem3', 'spiritTotem4'];
 
 /** Backfill for a save written before the equipment system existed - player.equipment is entirely
  *  absent from the Firestore doc for these, not just empty, so any unguarded `save.player.
@@ -65,19 +89,24 @@ export function adjustStatsForBonuses(stats: Stats, bonuses: StatBonuses, sign: 
 }
 
 /** Applies itemId's stat bonuses (and lantern-oil capacity, if it's a lantern) and assigns it into
- *  its own def.slot - the shared "how to equip an item" step used both by equipItem.ts (which
- *  strips the previous occupant's bonuses first via adjustStatsForBonuses(...,-1), if any, before
- *  calling this) and questEngine.ts's autoEquip reward path (which only ever acts on an already-
- *  empty slot, so there's nothing to strip first). Centralized so the two call sites can't drift
- *  the way autoEquip's own inline `equipment[slot] = itemId` once did - it set the slot without
- *  ever applying the item's stat bonuses, so a quest-granted item showed as equipped but its
- *  bonuses were silently never added to the player's stats. */
-export function equipIntoSlot(save: PlayerSave, itemId: string, def: EquipmentDefinition): void {
+ *  `targetSlot` (defaults to def.slot) - the shared "how to equip an item" step used both by
+ *  equipItem.ts (which strips the previous occupant's bonuses first via
+ *  adjustStatsForBonuses(...,-1), if any, before calling this) and questEngine.ts's autoEquip
+ *  reward path (which only ever acts on an already-empty slot, so there's nothing to strip first,
+ *  and never needs anything but the item's own natural def.slot). Centralized so the two call
+ *  sites can't drift the way autoEquip's own inline `equipment[slot] = itemId` once did - it set
+ *  the slot without ever applying the item's stat bonuses, so a quest-granted item showed as
+ *  equipped but its bonuses were silently never added to the player's stats.
+ *
+ *  `targetSlot` only ever needs to differ from def.slot for a Charm/Spirit Totem item, which can
+ *  go into any of that family's 4 slots (see CHARM_SLOTS/TOTEM_SLOTS above) - equipItem.ts is
+ *  responsible for resolving and validating which one before calling this. */
+export function equipIntoSlot(save: PlayerSave, itemId: string, def: EquipmentDefinition, targetSlot: EquipmentSlot = def.slot): void {
   adjustStatsForBonuses(save.player.stats, def.statBonuses, 1);
   if (def.slot === 'lantern') {
     setLanternOilCapacity(save.player.stats, effectiveOilCapacity(def.oilCapacity ?? 0, itemId, save.player.lanternOilUpgrades));
   }
-  save.player.equipment[def.slot] = itemId;
+  save.player.equipment[targetSlot] = itemId;
 }
 
 /** Resolves the equipped weapon's attackAilment (see EquipmentDefinition) into the plain

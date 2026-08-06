@@ -49,6 +49,9 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'golden-prairie': {
     'wind-stone-golden-prairie': 'wind-stone-golden-prairie',
     'winter-count-hide-i-cache': 'winter-count-hide-i',
+    // Endless Prairie's Totem-slot-unlock SQ ("The Herd's Enduring Bond") - see
+    // WORLD_ITEM_QUEST_GATES in collectWorldItem.ts.
+    'prairie-totem-relic': 'prairie-totem-relic',
   },
   'spirit-herd-plains': {
     'wind-stone-spirit-herd-plains': 'wind-stone-spirit-herd-plains',
@@ -56,6 +59,8 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   },
   'stone-circle-valley': {
     'wind-stone-stone-circle-valley': 'wind-stone-stone-circle-valley',
+    // Endless Prairie's Charm-slot-unlock SQ ("The Sky's Second Gift").
+    'prairie-charm-relic': 'prairie-charm-relic',
   },
   // Endless Prairie (MSQ Volume III, Chapter 6) - the Lantern of Open Skies, found in the
   // Thunderbird Mesa dungeon's Lantern Sanctuary room (MSF-EP-007).
@@ -66,9 +71,13 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   // the Lost Library's recovered records (MSF-WP-004).
   'elder-forest': {
     'spirit-seed-elder-forest': 'spirit-seed-elder-forest',
+    // Whispering Pines' Charm-slot-unlock SQ ("The Cedar's Second Ring").
+    'cedar-charm-relic': 'cedar-charm-relic',
   },
   'silver-river': {
     'spirit-seed-silver-river': 'spirit-seed-silver-river',
+    // Whispering Pines' Totem-slot-unlock SQ ("Roots That Remember").
+    'cedar-totem-relic': 'cedar-totem-relic',
   },
   'heartwood-approach': {
     'spirit-seed-heartwood-approach': 'spirit-seed-heartwood-approach',
@@ -100,9 +109,13 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'crimson-canyons': {
     'star-fragment-crimson-canyons': 'star-fragment-crimson-canyons',
     'desert-relic-ii-cache': 'desert-relic-ii',
+    // Shattered Desert's Charm-slot-unlock SQ ("The Star's Second Light").
+    'desert-charm-relic': 'desert-charm-relic',
   },
   'painted-mesas': {
     'star-fragment-painted-mesas': 'star-fragment-painted-mesas',
+    // Shattered Desert's Totem-slot-unlock SQ ("Sands That Endure").
+    'desert-totem-relic': 'desert-totem-relic',
   },
   // Shattered Desert (MSQ Volume V, Chapter 10) - the Lantern of Forgotten Stars' found-item form
   // (MSF-SD-006).

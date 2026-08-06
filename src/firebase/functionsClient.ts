@@ -231,9 +231,12 @@ export async function callResolveCombatAction(
   return result.data;
 }
 
-export async function callEquipItem(itemId: string): Promise<void> {
-  const fn = httpsCallable<{ itemId: string }, unknown>(functions, 'equipItem');
-  await fn({ itemId });
+/** `targetSlot` only matters for a Charm/Spirit Totem item (which of its family's 4 slots to fill)
+ *  - ignored server-side for anything else, so it's always safe to pass the slot a caller already
+ *  knows it's equipping into. */
+export async function callEquipItem(itemId: string, targetSlot?: string): Promise<void> {
+  const fn = httpsCallable<{ itemId: string; targetSlot?: string }, unknown>(functions, 'equipItem');
+  await fn({ itemId, targetSlot });
 }
 
 export async function callUnequipItem(slot: string): Promise<void> {

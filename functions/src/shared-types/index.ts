@@ -17,7 +17,17 @@ export type EquipmentSlot =
   | 'gloves'
   | 'charm'
   | 'lantern'
-  | 'spiritTotem';
+  | 'spiritTotem'
+  // 3 additional Charm/Totem slots each, unlocked one at a time by a side quest's
+  // reward.grantsEquipmentSlot (see data/quests.ts and equipItem.ts's SLOT_UNLOCK_QUEST_ID) -
+  // locked until then, same "gate on quest completion, no separate persisted flag" pattern
+  // grantsStaminaUnlock already established.
+  | 'charm2'
+  | 'charm3'
+  | 'charm4'
+  | 'spiritTotem2'
+  | 'spiritTotem3'
+  | 'spiritTotem4';
 
 export interface Stats {
   hp: number;

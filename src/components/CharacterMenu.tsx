@@ -9,12 +9,13 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { callEquipItem, callUnequipItem, callUseItem, callCraftItem } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
-import { ITEMS, EQUIPMENT, RECIPES } from '@/data';
+import { ITEMS, EQUIPMENT, RECIPES, QUESTS } from '@/data';
 import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
-import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
+import { SLOT_LABELS, SLOT_FILTER_ORDER, slotFamily } from '@/utils/equipmentSlotLabels';
+import { useQuestStore } from '@/state/useQuestStore';
 import { TIER_LABELS, TIER_ORDER } from '@/utils/tier';
 import { playSound } from '@/audio/audioService';
 import styles from './CharacterMenu.module.css';
@@ -34,16 +35,17 @@ const SUBTAB_LABELS: Record<InventorySubTab, string> = {
   unique: 'Unique',
 };
 
-const SLOT_FILTER_LABELS: Record<EquipmentSlot, string> = {
-  weapon: 'Weapon',
-  chest: 'Chest',
-  legs: 'Legs',
-  boots: 'Boots',
-  gloves: 'Gloves',
-  charm: 'Charm',
-  lantern: 'Lanterns',
-  spiritTotem: 'Spirit Totem',
-};
+// Which quest's completion unlocks a given equipment slot - mirrors equipItem.ts's own
+// SLOT_UNLOCK_QUEST_ID derivation (from QUESTS' own reward.grantsEquipmentSlot, not a second
+// hand-maintained table) so this can't silently drift from the quest data that's actually
+// authoritative server-side. A slot with no entry here is always unlocked.
+const SLOT_UNLOCK_QUEST_ID: Partial<Record<EquipmentSlot, string>> = (() => {
+  const map: Partial<Record<EquipmentSlot, string>> = {};
+  for (const quest of QUESTS) {
+    if (quest.reward.grantsEquipmentSlot) map[quest.reward.grantsEquipmentSlot] = quest.id;
+  }
+  return map;
+})();
 
 // Crafting tab: recipes (RECIPES) are keyed by their output item's own id, one recipe per
 // craftable consumable - grouped by which stat the output restores (or 'cure' for an ailment-cure
@@ -129,8 +131,26 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
   const player = usePlayerStore((s) => s.player);
   const patchEquipment = usePlayerStore((s) => s.patchEquipment);
   const uid = useAuthStore((s) => s.user?.uid);
+  const questProgress = useQuestStore((s) => s.progress);
   const [busy, setBusy] = useState(false);
   useOverlayClose(onClose);
+
+  /** Whether `slot` is currently equippable - always true for a slot with no unlock quest, else
+   *  only once that quest is completed (see SLOT_UNLOCK_QUEST_ID above). */
+  function isSlotUnlocked(slot: EquipmentSlot): boolean {
+    const questId = SLOT_UNLOCK_QUEST_ID[slot];
+    return !questId || questProgress[questId]?.status === 'completed';
+  }
+
+  /** Where a one-click "Equip" from the Inventory tab should land a Charm/Spirit Totem item -
+   *  the family's first unlocked, empty slot, or its first unlocked slot at all if every unlocked
+   *  one is already full (replacing whatever's there, same as equipping over any other slot
+   *  always has). Every other item's family is just itself, so this is a no-op for them. */
+  function defaultTargetSlot(defSlot: EquipmentSlot): EquipmentSlot {
+    const unlockedFamily = slotFamily(defSlot).filter(isSlotUnlocked);
+    const empty = unlockedFamily.find((s) => !player?.equipment[s]);
+    return empty ?? unlockedFamily[0] ?? defSlot;
+  }
 
   // Every EquipmentItem def the player owns, grouped by slot, purely to drive the "Best" badge -
   // recomputed each render (inventory is small; no need for useMemo here).
@@ -152,7 +172,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
     setBusy(true);
     patchEquipment(slot, itemId); // instant feedback; resync below reconciles with the server
     try {
-      await callEquipItem(itemId);
+      await callEquipItem(itemId, slot);
       if (uid) await resyncSave(uid);
       void playSound('sfx.equip');
     } finally {
@@ -298,7 +318,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       className={`${styles.subtab} ${slotFilter === slot ? styles.subtabActive : ''}`}
                       onClick={() => setSlotFilter(slot)}
                     >
-                      {SLOT_FILTER_LABELS[slot]}
+                      {SLOT_LABELS[slot]}
                     </button>
                   ))}
                 </div>
@@ -308,7 +328,9 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                 {visible.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>Nothing here.</p>}
                 {visible.map((entry) => {
                   const { equipDef, itemDef } = entry;
-                  const isEquipped = equipDef && player?.equipment[equipDef.slot] === entry.itemId;
+                  // Family-aware: a Charm/Spirit Totem counts as "equipped" if it's sitting in ANY
+                  // of its family's 4 slots, not just the base one (see slotFamily's own comment).
+                  const isEquipped = equipDef && slotFamily(equipDef.slot).some((s) => player?.equipment[s] === entry.itemId);
                   const isUsable = isUsableEffect(itemDef?.effect);
                   const wouldHelp = player ? itemWouldHaveEffect(itemDef?.effect, player.stats) : false;
                   const isSelected = selectedItemId === entry.itemId;
@@ -343,7 +365,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                             disabled={busy}
                             onClick={(e) => {
                               e.stopPropagation();
-                              equip(entry.itemId, equipDef.slot);
+                              equip(entry.itemId, defaultTargetSlot(equipDef.slot));
                             }}
                           >
                             Equip
@@ -431,11 +453,34 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
             {EQUIPMENT_SLOTS.map((slot) => {
               const itemId = player.equipment[slot];
               const equipDef = itemId ? EQUIPMENT.find((e) => e.id === itemId) : undefined;
-              const eligible = inventory.filter((entry) => EQUIPMENT.find((e) => e.id === entry.itemId)?.slot === slot);
+              const unlocked = isSlotUnlocked(slot);
+              // A Charm/Spirit Totem item's own def.slot is always just 'charm'/'spiritTotem' (one
+              // item, any of 4 slots) - slotFamily treats every other slot as its own family of 1,
+              // so this reduces to the old exact-match check for them. Also excludes an item with
+              // no "spare" copy beyond what's already equipped in another slot of the same family -
+              // matches equipItem.ts's own ownership check, so this never offers an equip the
+              // server would just reject.
+              const eligible = unlocked
+                ? inventory.filter((entry) => {
+                    const def = EQUIPMENT.find((e) => e.id === entry.itemId);
+                    if (!def || !slotFamily(slot).includes(def.slot)) return false;
+                    const equippedElsewhere = Object.entries(player.equipment).filter(
+                      ([s, id]) => id === entry.itemId && s !== slot,
+                    ).length;
+                    return entry.quantity > equippedElsewhere;
+                  })
+                : [];
               return (
                 <div key={slot} className={styles.slotRow}>
                   <span className={styles.slotName}>{SLOT_LABELS[slot]}</span>
-                  {equipDef ? (
+                  {!unlocked ? (
+                    <span
+                      style={{ fontSize: 12, opacity: 0.6, flex: 1 }}
+                      title={`Complete "${QUESTS.find((q) => q.id === SLOT_UNLOCK_QUEST_ID[slot])?.name ?? 'the matching side quest'}" to unlock this slot.`}
+                    >
+                      Locked
+                    </span>
+                  ) : equipDef ? (
                     <>
                       <img src={getAssetUrl(equipDef.iconAssetId)} alt="" className={styles.icon} style={{ width: 32, height: 32 }} />
                       <span style={{ fontSize: 13, flex: 1 }}>
@@ -599,7 +644,14 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
             <h3 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>Equip {SLOT_LABELS[equipPickerSlot]}</h3>
             <div className={styles.grid}>
               {inventory
-                .filter((entry) => EQUIPMENT.find((e) => e.id === entry.itemId)?.slot === equipPickerSlot)
+                .filter((entry) => {
+                  const def = EQUIPMENT.find((e) => e.id === entry.itemId);
+                  if (!def || !slotFamily(equipPickerSlot).includes(def.slot)) return false;
+                  const equippedElsewhere = Object.entries(player?.equipment ?? {}).filter(
+                    ([s, id]) => id === entry.itemId && s !== equipPickerSlot,
+                  ).length;
+                  return entry.quantity > equippedElsewhere;
+                })
                 .map((entry) => {
                   const def = EQUIPMENT.find((e) => e.id === entry.itemId)!;
                   const slot = equipPickerSlot;

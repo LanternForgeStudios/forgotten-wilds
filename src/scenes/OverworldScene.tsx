@@ -77,6 +77,11 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   // (temporarily reused) marker sprite.
   'winter-count-hide-i-cache': 'fragment',
   'winter-count-hide-ii-cache': 'fragment',
+  // Endless Prairie's Charm/Totem-slot-unlock side quests (The Sky's Second Gift / The Herd's
+  // Enduring Bond) - refId equals the granted item's own id, same convention every other fragment
+  // here follows.
+  'prairie-charm-relic': 'fragment',
+  'prairie-totem-relic': 'fragment',
   // Whispering Pines (MSQ Volume IV, Chapter 7)
   'cedar-shrine-heart': 'shrine',
   'heartwood-sanctuary-gate': 'shrine',
@@ -87,6 +92,10 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   // Whispering Pines side quest (The Heartwood Recordings)
   'heartwood-recording-i-cache': 'fragment',
   'heartwood-recording-ii-cache': 'fragment',
+  // Whispering Pines' Charm/Totem-slot-unlock side quests (The Cedar's Second Ring / Roots That
+  // Remember)
+  'cedar-charm-relic': 'fragment',
+  'cedar-totem-relic': 'fragment',
   // Shattered Desert (MSQ Volume V, Chapter 9)
   'star-crystal-shrine': 'shrine',
   'star-fragment-sunfire-dunes': 'fragment',
@@ -95,6 +104,10 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   // Shattered Desert side quest (The Desert Relics)
   'desert-relic-i-cache': 'fragment',
   'desert-relic-ii-cache': 'fragment',
+  // Shattered Desert's Charm/Totem-slot-unlock side quests (The Star's Second Light / Sands That
+  // Endure)
+  'desert-charm-relic': 'fragment',
+  'desert-totem-relic': 'fragment',
   // Frozen Frontier (MSQ Volume VI, Chapter 11)
   'winter-shrine': 'shrine',
   'aurora-crystal-fragment-snowveil-forest': 'fragment',
@@ -139,6 +152,10 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   // shrine. Swap for real bespoke art once quota refreshes.
   'winter-count-hide-i-cache': 'structure.landmark-drowned-ledger-cache',
   'winter-count-hide-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  // Endless Prairie's Charm/Totem-slot-unlock side quests - no bespoke markers generated yet
+  // (PixelLab quota), reusing the region's own Wind Stone marker.
+  'prairie-charm-relic': 'structure.landmark-wind-stone',
+  'prairie-totem-relic': 'structure.landmark-wind-stone',
   // Whispering Pines (MSQ Volume IV) - no bespoke markers generated yet (PixelLab quota), reusing
   // existing thematically-close markers same as the Winter Counts above.
   'spirit-seed-elder-forest': 'structure.landmark-heart-seed',
@@ -147,12 +164,20 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'lost-library-records': 'structure.landmark-drowned-ledger-cache',
   'heartwood-recording-i-cache': 'structure.landmark-drowned-ledger-cache',
   'heartwood-recording-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  // Whispering Pines' Charm/Totem-slot-unlock side quests - reusing the region's own Spirit Seed
+  // marker.
+  'cedar-charm-relic': 'structure.landmark-heart-seed',
+  'cedar-totem-relic': 'structure.landmark-heart-seed',
   // Shattered Desert (MSQ Volume V)
   'star-fragment-sunfire-dunes': 'structure.landmark-water-glimmer',
   'star-fragment-crimson-canyons': 'structure.landmark-water-glimmer',
   'star-fragment-painted-mesas': 'structure.landmark-water-glimmer',
   'desert-relic-i-cache': 'structure.landmark-drowned-ledger-cache',
   'desert-relic-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  // Shattered Desert's Charm/Totem-slot-unlock side quests - reusing the region's own Star
+  // Fragment marker.
+  'desert-charm-relic': 'structure.landmark-water-glimmer',
+  'desert-totem-relic': 'structure.landmark-water-glimmer',
   // Frozen Frontier (MSQ Volume VI)
   'aurora-crystal-fragment-snowveil-forest': 'structure.landmark-water-glimmer',
   'aurora-crystal-fragment-glacier-pass': 'structure.landmark-water-glimmer',
@@ -192,11 +217,14 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId === 'bogwater-almanac-cache') return 'a mossy cypress hollow';
   if (refId.startsWith('wind-stone-')) return 'a stone humming faintly with wind';
   if (refId === 'winter-count-hide-i-cache' || refId === 'winter-count-hide-ii-cache') return 'a painted hide half-buried in the grass';
+  if (refId === 'prairie-charm-relic' || refId === 'prairie-totem-relic') return 'a wind-worn relic, humming with old spirit-craft';
   if (refId.startsWith('spirit-seed-')) return 'a seed pod humming faintly with spirit-light';
   if (refId === 'lost-library-records') return 'a bundle of forgotten records';
   if (refId === 'heartwood-recording-i-cache' || refId === 'heartwood-recording-ii-cache') return 'a hidden recording, tucked out of sight';
+  if (refId === 'cedar-charm-relic' || refId === 'cedar-totem-relic') return 'a cedar-carved relic, humming with old spirit-craft';
   if (refId.startsWith('star-fragment-')) return 'a shard of crystal that catches starlight';
   if (refId === 'desert-relic-i-cache' || refId === 'desert-relic-ii-cache') return 'a carved relic half-buried in the sand';
+  if (refId === 'desert-charm-relic' || refId === 'desert-totem-relic') return 'a sun-worn relic, humming with old spirit-craft';
   if (refId.startsWith('aurora-crystal-fragment-')) return 'a shard of ice holding a faint trace of aurora-light';
   if (refId === 'lost-scout-effects-i-cache' || refId === 'lost-scout-effects-ii-cache') return "a lost scout's frozen pack";
   if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';

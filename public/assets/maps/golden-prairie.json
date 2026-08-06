@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 11,
+  "nextobjectid": 12,
   "layers": [
     {
       "id": 1,
@@ -5352,6 +5352,24 @@
               "name": "refId",
               "type": "string",
               "value": "chest-golden-prairie-3"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "",
+          "type": "interactable",
+          "x": 480,
+          "y": 544,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "prairie-totem-relic"
             }
           ]
         }

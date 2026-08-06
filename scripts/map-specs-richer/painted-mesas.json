@@ -52,6 +52,7 @@
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
     { "type": "interactable", "x": 34, "y": 24, "refId": "star-fragment-painted-mesas" },
+    { "type": "interactable", "x": 44, "y": 30, "refId": "desert-totem-relic" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-painted-mesas-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-painted-mesas-2" },

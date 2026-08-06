@@ -30,6 +30,12 @@ describe('buildFreshPlayer', () => {
       charm: null,
       lantern: 'keepers-lantern',
       spiritTotem: null,
+      charm2: null,
+      charm3: null,
+      charm4: null,
+      spiritTotem2: null,
+      spiritTotem3: null,
+      spiritTotem4: null,
     });
   });
 

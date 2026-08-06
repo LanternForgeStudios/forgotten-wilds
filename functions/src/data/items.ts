@@ -182,6 +182,11 @@ export const ITEMS: Record<string, ItemDefinition> = {
   // items, collectItem targets for the-first-winter-count/the-second-winter-count.
   'winter-count-hide-i': { id: 'winter-count-hide-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'winter-count-hide-ii': { id: 'winter-count-hide-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // Endless Prairie's Charm/Totem-slot-unlock side quests ("The Sky's Second Gift" /
+  // "The Herd's Enduring Bond") - the key-artifact collectItem target each one is built around,
+  // gated behind the quest being active (see collectWorldItem.ts's WORLD_ITEM_QUEST_GATES).
+  'prairie-charm-relic': { id: 'prairie-charm-relic', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'prairie-totem-relic': { id: 'prairie-totem-relic', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   // Endless Prairie (MSQ Volume III, Chapter 6): Great Thunderbird's guaranteed boss-kill trophy,
   // same shape as ancient-serpent-scale.
   'thunderbird-feather': { id: 'thunderbird-feather', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
@@ -258,6 +263,10 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'heartwood-recording-i': { id: 'heartwood-recording-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'heartwood-recording-ii': { id: 'heartwood-recording-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'gnarled-root-fiber': { id: 'gnarled-root-fiber', category: 'materials', usableInCombat: false, tier: 'common' },
+  // Whispering Pines' Charm/Totem-slot-unlock side quests ("The Cedar's Second Ring" /
+  // "Roots That Remember") - see prairie-charm-relic's own doc comment above for the shape.
+  'cedar-charm-relic': { id: 'cedar-charm-relic', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'cedar-totem-relic': { id: 'cedar-totem-relic', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'ancient-heartwood-relic': { id: 'ancient-heartwood-relic', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'sandglass-shard': { id: 'sandglass-shard', category: 'materials', usableInCombat: false, tier: 'common' },
   'star-fragment-sunfire-dunes': { id: 'star-fragment-sunfire-dunes', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
@@ -266,6 +275,10 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'desert-relic-i': { id: 'desert-relic-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'desert-relic-ii': { id: 'desert-relic-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'starlight-dust': { id: 'starlight-dust', category: 'materials', usableInCombat: false, tier: 'common' },
+  // Shattered Desert's Charm/Totem-slot-unlock side quests ("The Star's Second Light" /
+  // "Sands That Endure") - see prairie-charm-relic's own doc comment above for the shape.
+  'desert-charm-relic': { id: 'desert-charm-relic', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'desert-totem-relic': { id: 'desert-totem-relic', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'canyon-giant-core': { id: 'canyon-giant-core', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'lantern-of-forgotten-stars': { id: 'lantern-of-forgotten-stars', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'guardian-memory-fragment-5': { id: 'guardian-memory-fragment-5', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },

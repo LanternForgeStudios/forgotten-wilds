@@ -1,5 +1,7 @@
 // Authoritative — the client's src/data/quests.ts is a display copy only.
 
+import type { EquipmentSlot } from '../shared-types';
+
 export type QuestObjectiveType =
   | 'talkToNpc'
   | 'defeatEnemies'
@@ -64,6 +66,11 @@ export interface QuestDef {
      *  per-region model is a bigger data-model change, not something to build as a side effect of
      *  one quest reward. First real usage: 'the-waters-remember' (MSF-CB-010). */
     regionalReputation?: number;
+    /** Unlocks one of the 3 additional Charm/Spirit Totem slots on completion (see
+     *  equipItem.ts's SLOT_UNLOCK_QUEST_ID) - a generic reward flag rather than a hardcoded quest
+     *  id check, the same reasoning grantsStaminaUnlock already established. Only ever one of
+     *  'charm2'/'charm3'/'charm4'/'spiritTotem2'/'spiritTotem3'/'spiritTotem4' per quest. */
+    grantsEquipmentSlot?: EquipmentSlot;
   };
 }
 
@@ -457,6 +464,51 @@ export const QUESTS: Record<string, QuestDef> = {
     reward: { xp: 40, gold: 25, grantSkillId: 'prairie-wildfire', grantLoreId: 'winter-count-ii' },
   },
 
+  // --- Endless Prairie's Charm/Spirit Totem slot-unlock side quests ---
+  // Each of the 4-slot Charm/Totem system's 6 side quests (one per Chapter 5-10, alternating
+  // Charm/Totem) follows the same 5-objective shape: defeat some of the region's own enemies,
+  // gather 2x each of the region's own 2 materials (any order, via requiresObjectiveIds leaving
+  // those 3 objectives mutually unordered), then a key-artifact collectItem that only unlocks once
+  // all 3 are done AND only actually exists in the world while this quest is active (see
+  // collectWorldItem.ts's WORLD_ITEM_QUEST_GATES), then report back. Reward grants the new slot via
+  // reward.grantsEquipmentSlot - see equipItem.ts's SLOT_UNLOCK_QUEST_ID.
+  'the-skys-second-gift': {
+    id: 'the-skys-second-gift',
+    prerequisiteQuestId: 'the-stone-circles',
+    objectives: [
+      { id: 'defeat-prairie-wolves-charm2', type: 'defeatEnemies', targetId: 'prairie-wolf', requiredCount: 6 },
+      { id: 'gather-wisp-feather-charm2', type: 'collectItem', targetId: 'wisp-feather', requiredCount: 2 },
+      { id: 'gather-prairie-wolf-pelt-charm2', type: 'collectItem', targetId: 'prairie-wolf-pelt', requiredCount: 2 },
+      {
+        id: 'find-prairie-charm-relic',
+        type: 'collectItem',
+        targetId: 'prairie-charm-relic',
+        requiredCount: 1,
+        requiresObjectiveIds: ['defeat-prairie-wolves-charm2', 'gather-wisp-feather-charm2', 'gather-prairie-wolf-pelt-charm2'],
+      },
+      { id: 'talk-prairie-spirit-charm2', type: 'talkToNpc', targetId: 'prairie-spirit', requiredCount: 1, requiresObjectiveIds: ['find-prairie-charm-relic'] },
+    ],
+    reward: { xp: 60, gold: 40, grantsEquipmentSlot: 'charm2' },
+  },
+  'the-herds-enduring-bond': {
+    id: 'the-herds-enduring-bond',
+    prerequisiteQuestId: 'the-first-promise-remembered',
+    objectives: [
+      { id: 'defeat-storm-fledglings-totem2', type: 'defeatEnemies', targetId: 'storm-fledgling', requiredCount: 6 },
+      { id: 'gather-wisp-feather-totem2', type: 'collectItem', targetId: 'wisp-feather', requiredCount: 2 },
+      { id: 'gather-prairie-wolf-pelt-totem2', type: 'collectItem', targetId: 'prairie-wolf-pelt', requiredCount: 2 },
+      {
+        id: 'find-prairie-totem-relic',
+        type: 'collectItem',
+        targetId: 'prairie-totem-relic',
+        requiredCount: 1,
+        requiresObjectiveIds: ['defeat-storm-fledglings-totem2', 'gather-wisp-feather-totem2', 'gather-prairie-wolf-pelt-totem2'],
+      },
+      { id: 'talk-prairie-spirit-totem2', type: 'talkToNpc', targetId: 'prairie-spirit', requiredCount: 1, requiresObjectiveIds: ['find-prairie-totem-relic'] },
+    ],
+    reward: { xp: 60, gold: 40, grantsEquipmentSlot: 'spiritTotem2' },
+  },
+
   // --- Endless Prairie (MSQ Volume III), Chapter 6: Wings of the First Promise ---
   // Kebab-case id mapping: MSF-EP-006 temple-above-the-clouds, MSF-EP-007
   // keeper-of-the-open-sky, MSF-EP-008 the-great-thunderbird, MSF-EP-009
@@ -597,6 +649,46 @@ export const QUESTS: Record<string, QuestDef> = {
     reward: { xp: 40, gold: 25, grantSkillId: 'silver-rivers-chill', grantLoreId: 'heartwood-recording-ii' },
   },
 
+  // --- Whispering Pines' Charm/Spirit Totem slot-unlock side quests ---
+  // Same shape as the-skys-second-gift/the-herds-enduring-bond above - see that pair's own doc
+  // comment.
+  'the-cedars-second-ring': {
+    id: 'the-cedars-second-ring',
+    prerequisiteQuestId: 'heartwood-sanctuary',
+    objectives: [
+      { id: 'defeat-forest-echoes-charm3', type: 'defeatEnemies', targetId: 'forest-echo', requiredCount: 6 },
+      { id: 'gather-withered-echo-moss-charm3', type: 'collectItem', targetId: 'withered-echo-moss', requiredCount: 2 },
+      { id: 'gather-gnarled-root-fiber-charm3', type: 'collectItem', targetId: 'gnarled-root-fiber', requiredCount: 2 },
+      {
+        id: 'find-cedar-charm-relic',
+        type: 'collectItem',
+        targetId: 'cedar-charm-relic',
+        requiredCount: 1,
+        requiresObjectiveIds: ['defeat-forest-echoes-charm3', 'gather-withered-echo-moss-charm3', 'gather-gnarled-root-fiber-charm3'],
+      },
+      { id: 'talk-cedar-spirit-charm3', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1, requiresObjectiveIds: ['find-cedar-charm-relic'] },
+    ],
+    reward: { xp: 80, gold: 55, grantsEquipmentSlot: 'charm3' },
+  },
+  'roots-that-remember': {
+    id: 'roots-that-remember',
+    prerequisiteQuestId: 'the-missing-pages',
+    objectives: [
+      { id: 'defeat-root-wraiths-totem3', type: 'defeatEnemies', targetId: 'root-wraith', requiredCount: 6 },
+      { id: 'gather-withered-echo-moss-totem3', type: 'collectItem', targetId: 'withered-echo-moss', requiredCount: 2 },
+      { id: 'gather-gnarled-root-fiber-totem3', type: 'collectItem', targetId: 'gnarled-root-fiber', requiredCount: 2 },
+      {
+        id: 'find-cedar-totem-relic',
+        type: 'collectItem',
+        targetId: 'cedar-totem-relic',
+        requiredCount: 1,
+        requiresObjectiveIds: ['defeat-root-wraiths-totem3', 'gather-withered-echo-moss-totem3', 'gather-gnarled-root-fiber-totem3'],
+      },
+      { id: 'talk-cedar-spirit-totem3', type: 'talkToNpc', targetId: 'cedar-spirit', requiredCount: 1, requiresObjectiveIds: ['find-cedar-totem-relic'] },
+    ],
+    reward: { xp: 80, gold: 55, grantsEquipmentSlot: 'spiritTotem3' },
+  },
+
   // --- Whispering Pines (MSQ Volume IV), Chapter 8: Echoes of the First Keepers ---
   // Kebab-case id mapping: MSF-WP-006 beneath-the-roots, MSF-WP-007 the-keeper-beneath-the-cedar,
   // MSF-WP-008 the-cedar-giant, MSF-WP-009 the-missing-pages. Gated behind Chapter 7's own true
@@ -721,6 +813,46 @@ export const QUESTS: Record<string, QuestDef> = {
       { id: 'talk-nia-relic-ii', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1, requiresObjectiveIds: ['talk-tomas-relic-ii'] },
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'desert-nights-chill', grantLoreId: 'desert-relic-ii' },
+  },
+
+  // --- Shattered Desert's Charm/Spirit Totem slot-unlock side quests ---
+  // Same shape as the-skys-second-gift/the-herds-enduring-bond above - see that pair's own doc
+  // comment.
+  'the-stars-second-light': {
+    id: 'the-stars-second-light',
+    prerequisiteQuestId: 'the-path-of-the-astronomers',
+    objectives: [
+      { id: 'defeat-dust-devils-charm4', type: 'defeatEnemies', targetId: 'dust-devil', requiredCount: 6 },
+      { id: 'gather-sandglass-shard-charm4', type: 'collectItem', targetId: 'sandglass-shard', requiredCount: 2 },
+      { id: 'gather-starlight-dust-charm4', type: 'collectItem', targetId: 'starlight-dust', requiredCount: 2 },
+      {
+        id: 'find-desert-charm-relic',
+        type: 'collectItem',
+        targetId: 'desert-charm-relic',
+        requiredCount: 1,
+        requiresObjectiveIds: ['defeat-dust-devils-charm4', 'gather-sandglass-shard-charm4', 'gather-starlight-dust-charm4'],
+      },
+      { id: 'talk-sand-spirit-charm4', type: 'talkToNpc', targetId: 'sand-spirit', requiredCount: 1, requiresObjectiveIds: ['find-desert-charm-relic'] },
+    ],
+    reward: { xp: 100, gold: 70, grantsEquipmentSlot: 'charm4' },
+  },
+  'sands-that-endure': {
+    id: 'sands-that-endure',
+    prerequisiteQuestId: 'the-stars-never-lied',
+    objectives: [
+      { id: 'defeat-celestial-wisps-totem4', type: 'defeatEnemies', targetId: 'celestial-wisp', requiredCount: 6 },
+      { id: 'gather-sandglass-shard-totem4', type: 'collectItem', targetId: 'sandglass-shard', requiredCount: 2 },
+      { id: 'gather-starlight-dust-totem4', type: 'collectItem', targetId: 'starlight-dust', requiredCount: 2 },
+      {
+        id: 'find-desert-totem-relic',
+        type: 'collectItem',
+        targetId: 'desert-totem-relic',
+        requiredCount: 1,
+        requiresObjectiveIds: ['defeat-celestial-wisps-totem4', 'gather-sandglass-shard-totem4', 'gather-starlight-dust-totem4'],
+      },
+      { id: 'talk-sand-spirit-totem4', type: 'talkToNpc', targetId: 'sand-spirit', requiredCount: 1, requiresObjectiveIds: ['find-desert-totem-relic'] },
+    ],
+    reward: { xp: 100, gold: 70, grantsEquipmentSlot: 'spiritTotem4' },
   },
 
   // --- Shattered Desert (MSQ Volume V), Chapter 10: The Sky Remembers ---

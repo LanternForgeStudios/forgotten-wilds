@@ -57,6 +57,7 @@
 
     { "type": "interactable", "x": 30, "y": 24, "refId": "stone-circle-carvings" },
     { "type": "interactable", "x": 46, "y": 24, "refId": "wind-stone-stone-circle-valley" },
+    { "type": "interactable", "x": 38, "y": 20, "refId": "prairie-charm-relic" },
 
     { "type": "interactable", "x": 10, "y": 10, "refId": "chest-stone-circle-valley-1" },
     { "type": "interactable", "x": 50, "y": 12, "refId": "chest-stone-circle-valley-2" },
