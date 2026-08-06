@@ -7,7 +7,7 @@ import type { Recipe } from '@/types';
 const WITHERED_BRAMBLE_OR = ['withered-bramble', 'bog-ash', 'withered-echo-moss'];
 const MOTH_DUST_OR = ['moth-dust'];
 const MOTH_DUST_OR_EYE_DROPS = ['moth-dust', 'rougarou-claw', 'sandglass-shard'];
-const SILVER_DROPLET_OR = ['silver-droplet'];
+const SILVER_DROPLET_OR = ['silver-droplet', 'frost-wolf-fang'];
 const EMBER_SHARD_OR = ['ember-shard', 'ancient-serpent-scale'];
 const WOLF_FANG_OR = ['wolf-fang', 'wisp-feather'];
 

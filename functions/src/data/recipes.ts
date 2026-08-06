@@ -32,7 +32,7 @@ export interface Recipe {
 const WITHERED_BRAMBLE_OR = ['withered-bramble', 'bog-ash', 'withered-echo-moss']; // all inflict/cure Poison (hag-withering-hex, echo-spore-burst)
 const MOTH_DUST_OR = ['moth-dust']; // no Bayou material shares moth-dust's HP-restoring role
 const MOTH_DUST_OR_EYE_DROPS = ['moth-dust', 'rougarou-claw', 'sandglass-shard']; // all tied to Blind (rougarou-feral-rend, sand-blast)
-const SILVER_DROPLET_OR = ['silver-droplet']; // no Bayou material shares this one's Freeze/Spirit role
+const SILVER_DROPLET_OR = ['silver-droplet', 'frost-wolf-fang']; // both tied to Freeze (frost-bite inflicts it, thaw-crystal cures it)
 const EMBER_SHARD_OR = ['ember-shard', 'ancient-serpent-scale']; // both a rare "precious ingredient" role, not tied to one ailment
 const WOLF_FANG_OR = ['wolf-fang', 'wisp-feather']; // both tied to Silence (echo-herb cures it; wisp-hush-gale inflicts it)
 
