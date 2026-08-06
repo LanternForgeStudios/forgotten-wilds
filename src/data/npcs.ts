@@ -1124,8 +1124,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Elder Santiago Ortega', text: "Red Mesa's been carved into this canyon for longer than anyone can properly date. The rock remembers more than the records do." },
       { speaker: 'Elder Santiago Ortega', text: "Elias Rowan's letters reached us same as everywhere else, eventually. He wrote that a Keeper would come looking for the Observatory. Took him at his word." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-desert-calls'] },
+    gameplayHook: { type: 'questGiver', questIds: ['the-canyon-giant', 'the-desert-calls'] },
     dialogueVariants: [
+      {
+        questId: 'the-canyon-giant',
+        lines: [
+          { speaker: 'Elder Santiago Ortega', text: "The Giant, restored rather than slain. I wasn't sure that choice was even still open to us, Keeper. I'm glad it was." },
+          { speaker: 'Elder Santiago Ortega', text: "Red Mesa has slept easier under a Guardian's watch before, generations back. Perhaps it will again." },
+        ],
+      },
       {
         questId: 'the-desert-calls',
         lines: [

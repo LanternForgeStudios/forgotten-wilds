@@ -993,4 +993,17 @@ export const QUESTS: Quest[] = [
       grantLoreId: 'lore-keeper-orion-vale',
     },
   },
+  {
+    id: 'the-canyon-giant',
+    name: 'The Canyon Giant',
+    giverNpcId: 'elder-santiago-ortega',
+    description: 'Reach Guardian Summit and restore the Canyon Giant to its balance.',
+    category: 'main',
+    prerequisiteQuestId: 'lantern-of-forgotten-stars',
+    objectives: [
+      { id: 'reach-guardian-summit', type: 'reachLocation', description: 'Reach Guardian Summit.', targetId: 'guardian-summit', requiredCount: 1 },
+      { id: 'defeat-canyon-giant', type: 'defeatBoss', description: 'Defeat the Canyon Giant.', targetId: 'canyon-giant', requiredCount: 1 },
+    ],
+    reward: { xp: 300, gold: 160, itemIds: ['canyon-giant-totem'] },
+  },
 ];

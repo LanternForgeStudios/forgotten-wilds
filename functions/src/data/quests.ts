@@ -734,6 +734,15 @@ export const QUESTS: Record<string, QuestDef> = {
       grantLoreId: 'lore-keeper-orion-vale',
     },
   },
+  'the-canyon-giant': {
+    id: 'the-canyon-giant',
+    prerequisiteQuestId: 'lantern-of-forgotten-stars',
+    objectives: [
+      { id: 'reach-guardian-summit', type: 'reachLocation', targetId: 'guardian-summit', requiredCount: 1 },
+      { id: 'defeat-canyon-giant', type: 'defeatBoss', targetId: 'canyon-giant', requiredCount: 1 },
+    ],
+    reward: { xp: 300, gold: 160, itemIds: ['canyon-giant-totem'] },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -798,4 +807,5 @@ export const QUEST_ORDER = [
   'the-second-relic',
   'the-celestial-machine',
   'lantern-of-forgotten-stars',
+  'the-canyon-giant',
 ];

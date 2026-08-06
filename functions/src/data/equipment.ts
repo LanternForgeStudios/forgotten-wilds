@@ -1166,4 +1166,26 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'rare',
     familyId: 'sunstone-totem',
   },
+  // Mythic tier - Canyon Giant's own lootTable chance drop (Chapter 10), same "not every rare+
+  // item needs a unique quest thread" pattern as elder-buffalo-totem/elder-cedar-totem. The
+  // family's Legendary cap (canyon-giant-totem) is a guaranteed reward from the boss-defeat quest
+  // itself instead - see MSF-SD-007.
+  'elder-sunstone-totem': {
+    id: 'elder-sunstone-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxHp: 12, maxSpirit: 11, attack: 5 },
+    tier: 'mythic',
+    familyId: 'sunstone-totem',
+  },
+  // Sunstone Totem family's Legendary cap - a guaranteed reward from the boss-defeat quest itself
+  // (MSF-SD-007), same pattern as thunderbird-totem/cedar-giant-totem. Named explicitly in the
+  // design doc's own Chapter 10 Rewards list.
+  'canyon-giant-totem': {
+    id: 'canyon-giant-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxSpirit: 25, maxHp: 15, attack: 8 },
+    tier: 'legendary',
+    unique: true,
+    familyId: 'sunstone-totem',
+  },
 };

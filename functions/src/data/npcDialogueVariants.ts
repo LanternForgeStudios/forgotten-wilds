@@ -75,7 +75,7 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   'forest-warden-rowan-hart': ['the-forest-has-fallen-silent'],
   'cedar-spirit': ['the-second-recording', 'the-first-recording', 'seeds-of-the-ancient-cedar'],
   // Shattered Desert (MSQ Volume V, Chapter 9)
-  'elder-santiago-ortega': ['the-desert-calls'],
+  'elder-santiago-ortega': ['the-canyon-giant', 'the-desert-calls'],
   'scholar-nia-solis': [
     'lantern-of-forgotten-stars',
     'the-celestial-machine',
