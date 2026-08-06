@@ -783,7 +783,7 @@ adapted per region.
 
 ---
 
-## Whispering Pines, Chapter 9: Beneath Forgotten Stars - outstanding placeholders
+## Shattered Desert, Chapter 9: Beneath Forgotten Stars - outstanding placeholders
 
 **Status (2026-08-05): same PixelLab quota outage as every prior chapter, still not refreshed.**
 Every asset below shipped as a procedurally-generated SVG placeholder. All 6 of Chapter 9's field/
@@ -865,6 +865,43 @@ founder before any layer art can start.
 | Sandglass Shard *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a shard of sun-fused glass, centered, transparent background. |
 | Star Fragment *(key item, shared across 3 locations)* | 64×64 | Simple flat-shaded fantasy game icon of a glinting crystal shard that catches starlight, centered, transparent background. |
 | Desert Relic *(key item, shared across 2 locations)* | 64×64 | Simple flat-shaded fantasy game icon of a carved pottery shard marked with a star-pattern, centered, transparent background. |
+
+---
+
+## Shattered Desert, Chapter 10: The Sky Remembers - outstanding placeholders
+
+**Status (2026-08-05): same PixelLab quota outage as every prior chapter, still not refreshed.**
+No new NPCs this chapter (Elder Santiago Ortega and Scholar Nia Solis reprise their Chapter 9
+roles), so this list is shorter - 3 enemy sprites, 3 equipment icons, 5 item icons. All 5 of the
+Forgotten Observatory's dungeon rooms (Inner Observatory, Star Chamber, Star Lantern Sanctuary,
+Canyon Depths, Guardian Summit) reuse `tileset.tiny-dungeon`, same as every dungeon before it - not
+tracked as a placeholder gap, the tiles are real, just generic.
+
+### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss)
+
+| Enemy | Family | Generation prompt |
+|---|---|---|
+| Celestial Wisp | celestialWisps | A small drifting orb of pale starlight, faint trailing motes, quietly watchful rather than aggressive. |
+| Star Phantom | celestialWisps | A larger, denser wisp, its light gone cold blue-white, a faint humanoid outline visible within the glow. |
+| Canyon Giant *(boss, 256×256)* | boss | A massive Guardian shaped from living canyon rock, cracked stone limbs veined with a faint starlight glow, ancient and weathered but not malevolent - a watcher left too long unrelieved atop the Observatory it still guards. |
+
+### Equipment icons (3 - generate 128×128, final 64×64)
+
+| Equipment | Final Size | Generation prompt |
+|---|---|---|
+| Elder Sunstone Totem *(mythic)* | 64×64 | Simple flat-shaded fantasy game icon of a larger carved totem inlaid with deeper, brighter sun-warmed stone, centered, transparent background. |
+| Canyon Giant Totem *(legendary, unique)* | 64×64 | Simple flat-shaded fantasy game icon of a totem carved in the Canyon Giant's own hulking rock-shape, centered, transparent background. |
+| Lantern of Forgotten Stars *(equipped, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a lit legendary lantern, glass etched with a constellation-pattern, faint pale starlight glow, centered, transparent background. |
+
+### Item icons (5 - generate 128×128, final 64×64)
+
+| Item | Final Size | Generation prompt |
+|---|---|---|
+| Starlight Dust *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a small pile of faintly glowing pale-blue dust, centered, transparent background. |
+| Canyon Giant Core *(key item, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a cracked stone core with a faint starlight glow within, centered, transparent background. |
+| Lantern of Forgotten Stars *(found-item form)* | 64×64 | Simple flat-shaded fantasy game icon of an unlit brass lantern etched with a constellation-pattern, centered, transparent background. |
+| Guardian Memory Fragment VI *(key item, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of an angular purple crystal shard (faceted gem shape, not round) holding a faint ghostly glowing memory-image, centered, transparent background. |
+| Frostward Star Chart *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a rolled star chart with a faint frost-blue tint along one edge, centered, transparent background. |
 
 ---
 
