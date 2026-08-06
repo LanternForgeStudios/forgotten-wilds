@@ -112,17 +112,31 @@ export const MAX_ENEMY_LEVEL = 50;
  *  damage and crowd-fight danger - untouched. */
 const ENEMY_STAT_GROWTH_PER_LEVEL = { maxHp: 5, attack: 3, defense: 2, speed: 2 };
 
-/** Bosses grow 3x as fast per level as regular/elite enemies. Applying the same rate to both
- *  (verified numerically) collapses a boss's authored stat lead (e.g. the Coalbound Warden's
- *  ~4.1x maxHp lead over a trash mob) down to a barely-there ~1.1x by level 100 - it stops
- *  feeling like a boss. This keeps a boss at a stable ~2.8-3.1x advantage across the whole
- *  1-100 player range instead. */
-const BOSS_STAT_GROWTH_MULTIPLIER = 3;
+/** Bosses grow faster per level than regular/elite enemies so their authored stat lead (e.g. the
+ *  Coalbound Warden's ~4.1x maxHp lead over a trash mob) stays meaningful at endgame instead of
+ *  collapsing toward parity. maxHp/speed keep the original flat 3x (verified numerically to hold a
+ *  stable ~2.8-3.1x maxHp advantage across the whole 1-100 player range) - a boss SHOULD have a
+ *  commanding health pool and go first.
+ *
+ *  attack/defense use their own, lower multipliers - a real balance bug found in play (2026-08):
+ *  boss level only advances at half the player's own rate (rollEnemyLevel), so at the old flat 3x
+ *  a boss's defense grew ~3 pts per PLAYER level against the player's own +1 defense/level, and its
+ *  attack grew ~4.5 pts per player level against the player's own +2 attack/level. Since
+ *  computeDamage weighs attacker.atk and defender.def equally (both x0.5), that made the player's
+ *  own damage output shrink as they leveled up - fights got harder, not easier, the longer a player
+ *  played, to the point some level-40+ boss fights were unwinnable regardless of gear. attack=2x
+ *  and defense=1.5x keep bosses clearly harder-hitting and tankier than a trash mob without ever
+ *  outpacing the player's own attack/defense growth - a representative on-level fight (see
+ *  combatEngine.test.ts's own boss-fight-length regression coverage) now lands in an ~8-15 round
+ *  "epic but not grindy" band instead of 20-50+ (or literally unwinnable) rounds. */
+const BOSS_HP_SPEED_GROWTH_MULTIPLIER = 3;
+const BOSS_ATTACK_GROWTH_MULTIPLIER = 2;
+const BOSS_DEFENSE_GROWTH_MULTIPLIER = 1.5;
 const BOSS_STAT_GROWTH_PER_LEVEL = {
-  maxHp: ENEMY_STAT_GROWTH_PER_LEVEL.maxHp * BOSS_STAT_GROWTH_MULTIPLIER,
-  attack: ENEMY_STAT_GROWTH_PER_LEVEL.attack * BOSS_STAT_GROWTH_MULTIPLIER,
-  defense: ENEMY_STAT_GROWTH_PER_LEVEL.defense * BOSS_STAT_GROWTH_MULTIPLIER,
-  speed: ENEMY_STAT_GROWTH_PER_LEVEL.speed * BOSS_STAT_GROWTH_MULTIPLIER,
+  maxHp: ENEMY_STAT_GROWTH_PER_LEVEL.maxHp * BOSS_HP_SPEED_GROWTH_MULTIPLIER,
+  attack: ENEMY_STAT_GROWTH_PER_LEVEL.attack * BOSS_ATTACK_GROWTH_MULTIPLIER,
+  defense: ENEMY_STAT_GROWTH_PER_LEVEL.defense * BOSS_DEFENSE_GROWTH_MULTIPLIER,
+  speed: ENEMY_STAT_GROWTH_PER_LEVEL.speed * BOSS_HP_SPEED_GROWTH_MULTIPLIER,
 };
 
 /** Every enemy (including bosses) rolls a level (1-50) that scales stats up, tracking

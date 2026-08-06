@@ -124,17 +124,44 @@ describe('scaledEnemyStats', () => {
     expect(scaledEnemyStats(boss, 1)).toEqual(boss.stats);
   });
 
-  it('grows a boss 3x as fast per level as a regular/elite enemy, so its authored lead persists', () => {
+  it('grows a boss faster per level than a regular/elite enemy, so its authored lead persists', () => {
     const mothling = ENEMIES.mothling;
     const boss = ENEMIES['coalbound-warden'];
     // levelsAboveOne = 24 at level 25 for both.
     const mothlingAt25 = scaledEnemyStats(mothling, 25);
     const bossAt25 = scaledEnemyStats(boss, 25);
     expect(mothlingAt25).toEqual({ maxHp: 148, attack: 79, defense: 51, speed: 57 });
-    expect(bossAt25).toEqual({ maxHp: 500, attack: 229, defense: 152, speed: 152 });
+    // maxHp/speed still grow at the flat 3x boss multiplier; attack/defense use their own lower
+    // multipliers (2x/1.5x) - see BOSS_STAT_GROWTH_PER_LEVEL's own comment for why (a real balance
+    // bug: at a flat 3x on every stat, boss defense outpaced the player's own attack growth,
+    // making the player's damage output shrink as they leveled up).
+    expect(bossAt25).toEqual({ maxHp: 500, attack: 157, defense: 80, speed: 152 });
     // The boss's authored ~5x maxHp lead (140 vs 28) should still be a comparably large multiple
     // at level 25, not collapsed toward parity the way a same-rate growth would.
     expect(bossAt25.maxHp / mothlingAt25.maxHp).toBeGreaterThan(3);
+  });
+
+  it('keeps the player\'s own damage-per-hit against a boss from shrinking as both level up together', () => {
+    // Regression test for the real bug: at the old flat 3x boss growth, boss defense (x0.5 in
+    // computeDamage) grew faster than the player's own attack (also x0.5), so a fixed-power move's
+    // damage against a boss actually DECREASED the higher level the fight happened at. Approximates
+    // "on-level" player stats the same way STAT_GROWTH_PER_LEVEL grows them (no gear, to isolate
+    // the scaling formula itself from equipment choices).
+    const boss = ENEMIES['coalbound-warden'];
+    const power = 16;
+    function playerAttackAt(playerLevel: number) {
+      return 8 + 2 * (playerLevel - 1); // STARTING_STATS.attack + STAT_GROWTH_PER_LEVEL.attack
+    }
+    function damageAgainstBossAt(playerLevel: number) {
+      const bossLevel = Math.max(1, Math.round(playerLevel / 2));
+      const bossStats = scaledEnemyStats(boss, bossLevel);
+      return power + playerAttackAt(playerLevel) * 0.5 - bossStats.defense * 0.5;
+    }
+    const damageAt20 = damageAgainstBossAt(20);
+    const damageAt60 = damageAgainstBossAt(60);
+    const damageAt100 = damageAgainstBossAt(100);
+    expect(damageAt60).toBeGreaterThanOrEqual(damageAt20);
+    expect(damageAt100).toBeGreaterThanOrEqual(damageAt60);
   });
 });
 
