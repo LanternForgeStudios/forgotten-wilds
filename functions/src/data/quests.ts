@@ -872,6 +872,15 @@ export const QUESTS: Record<string, QuestDef> = {
       grantLoreId: 'lore-the-complete-memory',
     },
   },
+  'a-new-dawn': {
+    id: 'a-new-dawn',
+    prerequisiteQuestId: 'the-complete-memory',
+    objectives: [
+      { id: 'reach-ash-hallow-finale', type: 'reachLocation', targetId: 'ash-hallow', requiredCount: 1 },
+      { id: 'talk-elias-finale', type: 'talkToNpc', targetId: 'elias-rowan', requiredCount: 1 },
+    ],
+    reward: { xp: 500, gold: 250, regionalReputation: 100, grantLoreId: 'lore-a-new-dawn' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -947,4 +956,5 @@ export const QUEST_ORDER = [
   'lantern-of-winters-resolve',
   'the-winter-stag',
   'the-complete-memory',
+  'a-new-dawn',
 ];

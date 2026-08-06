@@ -200,6 +200,12 @@ export const LORE_ENTRIES: JournalEntry[] = [
     unlockedAt: 0,
   },
   {
+    id: 'lore-a-new-dawn',
+    title: 'A New Dawn',
+    body: "The Hall of Lanterns stands restored at Ash Hallow, all seven legendary Lanterns burning together for the first time since before the Great Silence - the First Promise, Enduring Embers, Still Waters, Open Skies, Ancient Roots, Forgotten Stars, and Winter's Resolve, side by side, none of them waiting anymore. Elias Rowan records the complete account in the Journal of Legends himself, hand shaking slightly on the final line. Six Guardians restored. Six regional shrines burning again. A truth recovered that took longer to piece together than most people's whole lives. The restored Guardians begin to stir, and the lands of Mytherra slowly heal - travelers return to roads that had gone quiet, shrines glow with renewed life on their own now, and for the first time since the Silence fell, representatives from every restored region gather in Ash Hallow, together, in the same place, at the same time. Not an ending. A First Promise, renewed - and kept, this time, in the open, where everyone can see it.",
+    unlockedAt: 0,
+  },
+  {
     id: 'lore-guardian-memory-v',
     title: 'Guardian Memory V: The Stars Never Lied',
     body: "The Canyon Giant's own memory, witnessed at the Star Crystal Shrine: the Great Silence was not an accident, and it was not one side binding the other. Lantern Keepers and Guardians chose it together, deliberately, to save Mytherra from something the desert Guardian's memory circles but never names. Five memories restored now, and the player finally knows what happened. Why it was necessary is a question this desert cannot answer - only the Frozen Frontier, where the final Guardian chose to stay awake and remember everything, still can.",

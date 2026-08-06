@@ -7,6 +7,7 @@
 // completed match), most-advanced-quest first. Keep in sync by hand with src/data/npcs.ts.
 export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   'elias-rowan': [
+    'a-new-dawn',
     'embers-beneath-stone',
     'frostbound-pages',
     'the-mountain-remembers',

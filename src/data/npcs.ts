@@ -22,6 +22,7 @@ export const NPCS: Npc[] = [
     gameplayHook: {
       type: 'questGiver',
       questIds: [
+        'a-new-dawn',
         'a-new-keeper',
         'ash-hallow-tour',
         'beyond-the-lantern-light',
@@ -32,6 +33,14 @@ export const NPCS: Npc[] = [
       ],
     },
     dialogueVariants: [
+      {
+        questId: 'a-new-dawn',
+        lines: [
+          { speaker: 'Elias Rowan', text: "So. The Hollow. I spent thirty years telling myself the Guardians simply left us, and I was wrong the entire time - they stayed, in the only way that was left to them, and paid for it in being forgotten." },
+          { speaker: 'Elias Rowan', text: "Seven Lanterns, lit together, for the first time since before the Silence. I never expected to see it. I'm glad I was wrong about that too." },
+          { speaker: 'Elias Rowan', text: "The Journal of Legends has its first complete volume now, Keeper. Whatever comes next for Mytherra, it starts from the truth this time, not a kinder story we told ourselves instead." },
+        ],
+      },
       {
         questId: 'embers-beneath-stone',
         lines: [

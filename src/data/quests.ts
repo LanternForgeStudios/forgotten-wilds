@@ -1166,4 +1166,17 @@ export const QUESTS: Quest[] = [
       grantLoreId: 'lore-the-complete-memory',
     },
   },
+  {
+    id: 'a-new-dawn',
+    name: 'A New Dawn',
+    giverNpcId: 'elias-rowan',
+    description: 'Return to Ash Hallow and complete the account with Elias Rowan.',
+    category: 'main',
+    prerequisiteQuestId: 'the-complete-memory',
+    objectives: [
+      { id: 'reach-ash-hallow-finale', type: 'reachLocation', description: 'Return to Ash Hallow.', targetId: 'ash-hallow', requiredCount: 1 },
+      { id: 'talk-elias-finale', type: 'talkToNpc', description: 'Report to Elias Rowan.', targetId: 'elias-rowan', requiredCount: 1 },
+    ],
+    reward: { xp: 500, gold: 250, regionalReputation: 100, grantLoreId: 'lore-a-new-dawn' },
+  },
 ];
