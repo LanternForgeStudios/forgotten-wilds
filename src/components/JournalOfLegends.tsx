@@ -16,7 +16,8 @@ import { sellPriceFor } from '@/utils/sellPrice';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { AILMENTS, ENEMIES, ITEMS, EQUIPMENT, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
-import type { Enemy, EnemyTier, Item, EquipmentItem, ItemCategory, Quest, QuestCategory } from '@/types';
+import { regionNameFor, regionSortIndex } from '@/utils/locationRegion';
+import type { Enemy, EnemyTier, Item, EquipmentItem, ItemCategory, LocationKind, Quest, QuestCategory, QuestProgress } from '@/types';
 import styles from './CharacterMenu.module.css';
 import questStyles from './QuestLog.module.css';
 
@@ -158,11 +159,47 @@ function questMainLocationId(quest: Quest): string | undefined {
   return locationId ? mainLocationId(locationId) : undefined;
 }
 
-const QUEST_CATEGORY_TABS: { id: QuestCategory; label: string }[] = [
+const QUEST_CATEGORY_TABS: { id: QuestCategory | 'all'; label: string }[] = [
+  { id: 'all', label: 'All' },
   { id: 'main', label: 'Main Story' },
   { id: 'side', label: 'Side Quests' },
   { id: 'misc', label: 'Other' },
 ];
+
+const LOCATION_KIND_LABELS: Record<LocationKind, string> = {
+  town: 'Town',
+  overworld: 'Overworld',
+  dungeon: 'Dungeon',
+};
+
+/** Every top-level (main-area) location id currently relevant to an active quest - covers the two
+ *  objective types with an unambiguous single location (talkToNpc via the target NPC's home,
+ *  reachLocation when its targetId is a real top-level location id directly, both of which cover
+ *  the overwhelming majority of this game's quest chains). collectItem/defeatEnemies/
+ *  interactWithShrine objectives are deliberately NOT resolved here - an item or enemy isn't tied
+ *  to one specific location the way talking to someone or reaching a place is, so guessing one
+ *  would be misleading rather than just incomplete. Only an objective the player hasn't already
+ *  satisfied counts, so a quest with 2 of 3 objectives done only flags the location of what's left. */
+function activeQuestRelevantLocationIds(questProgress: Record<string, QuestProgress>): Set<string> {
+  const ids = new Set<string>();
+  for (const quest of QUESTS) {
+    if (effectiveQuestStatus(quest, questProgress) !== 'active') continue;
+    const giverLocationId = questMainLocationId(quest);
+    if (giverLocationId) ids.add(giverLocationId);
+    const counts = questProgress[quest.id]?.objectiveCounts ?? {};
+    for (const objective of quest.objectives) {
+      if ((counts[objective.id] ?? 0) >= objective.requiredCount) continue;
+      if (objective.type === 'talkToNpc') {
+        const npcLocationId = NPCS.find((n) => n.id === objective.targetId)?.locationId;
+        if (npcLocationId) ids.add(mainLocationId(npcLocationId));
+      } else if (objective.type === 'reachLocation') {
+        const loc = LOCATIONS.find((l) => l.id === objective.targetId);
+        if (loc) ids.add(mainLocationId(loc.id));
+      }
+    }
+  }
+  return ids;
+}
 
 export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const journal = useJournalStore((s) => s.journal);
@@ -172,9 +209,17 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const currentLocationId = useSceneStore((s) => s.params.locationId);
   const [tab, setTab] = useState<Tab>('quests');
   const [expandedLocations, setExpandedLocations] = useState<Set<string>>(new Set());
-  const [questCategoryTab, setQuestCategoryTab] = useState<QuestCategory>('main');
+  // Defaults to 'All' (rather than 'Main Story') so a player reopening the Journal sees every
+  // active quest at a glance instead of only the main story ones - paired with activeQuestsOnly
+  // already defaulting to true below, matching "All + Active" as the intended default view.
+  const [questCategoryTab, setQuestCategoryTab] = useState<QuestCategory | 'all'>('all');
   const [activeQuestsOnly, setActiveQuestsOnly] = useState(true);
   const [locationSearch, setLocationSearch] = useState('');
+  const [locationTypeFilter, setLocationTypeFilter] = useState<LocationKind | 'all'>('all');
+  const [activeQuestLocationsOnly, setActiveQuestLocationsOnly] = useState(false);
+  // Tracks *collapsed* location regions, same "defaults to open" convention as
+  // collapsedQuestRegions below.
+  const [collapsedLocationRegions, setCollapsedLocationRegions] = useState<Set<string>>(new Set());
   // Tracks *collapsed* quest regions rather than expanded ones, so every region defaults to open
   // on first view without needing to precompute ids.
   const [collapsedQuestRegions, setCollapsedQuestRegions] = useState<Set<string>>(new Set());
@@ -198,6 +243,15 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleLocationRegion(regionName: string) {
+    setCollapsedLocationRegions((prev) => {
+      const next = new Set(prev);
+      if (next.has(regionName)) next.delete(regionName);
+      else next.add(regionName);
       return next;
     });
   }
@@ -243,7 +297,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
 
         {tab === 'quests' &&
           (() => {
-            const questsInTab = QUESTS.filter((q) => q.category === questCategoryTab);
+            const questsInTab = questCategoryTab === 'all' ? QUESTS : QUESTS.filter((q) => q.category === questCategoryTab);
             const regionIds = Array.from(
               new Set(questsInTab.map((q) => questMainLocationId(q)).filter((id): id is string => !!id)),
             );
@@ -445,82 +499,144 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             );
           })()}
 
-        {tab === 'locations' && (
-          <div>
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder="Search locations..."
-              value={locationSearch}
-              onChange={(e) => setLocationSearch(e.target.value)}
-            />
-            {journal.locationsVisited
+        {tab === 'locations' &&
+          (() => {
+            const activeQuestLocationIds = activeQuestRelevantLocationIds(questProgress);
+            const candidates = journal.locationsVisited
               .filter((id) => !LOCATIONS.find((l) => l.id === id)?.parentLocationId)
-              .sort((a, b) => (LOCATIONS.find((l) => l.id === a)?.name ?? a).localeCompare(LOCATIONS.find((l) => l.id === b)?.name ?? b))
               .map((id) => {
                 const loc = LOCATIONS.find((l) => l.id === id);
-                const canTravel = loc?.fastTravel && id !== currentLocationId && fastTravelUnlocked;
                 const allChildren = LOCATIONS.filter(
                   (l) => l.parentLocationId === id && journal.locationsVisited.includes(l.id),
                 ).sort((a, b) => a.name.localeCompare(b.name));
                 const parentMatches = matchesLocationQuery(loc);
                 const matchingChildren = allChildren.filter(matchesLocationQuery);
-                if (locationQuery && !parentMatches && matchingChildren.length === 0) return null;
-                // A parent that only matched because a child did gets its full child list shown
-                // (not just the matching one) so the result still reads as a normal location entry;
-                // a parent that didn't match itself only shows the children that did.
-                const children = parentMatches ? allChildren : matchingChildren;
-                // Auto-expand when the only reason this location is showing at all is a matching
-                // child - otherwise the match would be hidden behind a collapsed toggle.
-                const expanded = expandedLocations.has(id) || (!!locationQuery && !parentMatches && matchingChildren.length > 0);
-                return (
-                  <div key={id}>
-                    <div
-                      className={styles.slotRow}
-                      style={{ cursor: children.length > 0 ? 'pointer' : 'default' }}
-                      onClick={() => children.length > 0 && toggleExpanded(id)}
+                return { id, loc, allChildren, parentMatches, matchingChildren };
+              })
+              .filter(({ id, loc, parentMatches, matchingChildren }) => {
+                if (locationTypeFilter !== 'all' && loc?.kind !== locationTypeFilter) return false;
+                if (activeQuestLocationsOnly && !activeQuestLocationIds.has(id)) return false;
+                // Same "matched via a child" allowance the search box always had.
+                if (locationQuery && !parentMatches && matchingChildren.length === 0) return false;
+                return true;
+              })
+              .sort((a, b) => (a.loc?.name ?? a.id).localeCompare(b.loc?.name ?? b.id));
+
+            const regionNames = Array.from(
+              new Set(candidates.map(({ id }) => regionNameFor(id)).filter((r): r is string => !!r)),
+            ).sort((a, b) => regionSortIndex(a) - regionSortIndex(b));
+
+            return (
+              <div>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder="Search locations..."
+                  value={locationSearch}
+                  onChange={(e) => setLocationSearch(e.target.value)}
+                />
+                <div className={styles.subtabs} style={{ marginBottom: 6 }}>
+                  {(['all', 'town', 'overworld', 'dungeon'] as const).map((kind) => (
+                    <button
+                      key={kind}
+                      className={`${styles.subtab} ${locationTypeFilter === kind ? styles.subtabActive : ''}`}
+                      onClick={() => setLocationTypeFilter(kind)}
                     >
-                      <span style={{ fontSize: 13, flex: 1 }}>
-                        <strong>
-                          {children.length > 0 && (expanded ? '▾ ' : '▸ ')}
-                          {loc?.name ?? id}
-                        </strong>
-                        <br />
-                        <span style={{ opacity: 0.7 }}>{loc?.description}</span>
-                      </span>
-                      {canTravel && (
-                        <button
-                          className={styles.smallButton}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            travelTo(id);
-                          }}
-                        >
-                          Travel Here
-                        </button>
-                      )}
-                      {loc?.fastTravel && id === currentLocationId && (
-                        <span style={{ fontSize: 11, opacity: 0.6 }}>You are here</span>
-                      )}
-                      {loc?.fastTravel && id !== currentLocationId && !fastTravelUnlocked && (
-                        <span style={{ fontSize: 11, opacity: 0.6 }}>Restore the Ash Hallow shrine to unlock Fast Travel</span>
-                      )}
+                      {kind === 'all' ? 'All Types' : LOCATION_KIND_LABELS[kind]}
+                    </button>
+                  ))}
+                </div>
+                <label style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginBottom: 10 }}>
+                  <input
+                    type="checkbox"
+                    checked={activeQuestLocationsOnly}
+                    onChange={(e) => setActiveQuestLocationsOnly(e.target.checked)}
+                  />
+                  Active quest locations only
+                </label>
+
+                {candidates.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No locations match those filters.</p>}
+
+                {regionNames.map((regionName) => {
+                  const regionLocations = candidates.filter(({ id }) => regionNameFor(id) === regionName);
+                  const expanded = !collapsedLocationRegions.has(regionName);
+                  return (
+                    <div key={regionName} className={questStyles.region}>
+                      <button className={questStyles.regionHeader} onClick={() => toggleLocationRegion(regionName)}>
+                        <span>
+                          {expanded ? '▾' : '▸'} {regionName}
+                        </span>
+                        <span className={questStyles.regionCount}>{regionLocations.length}</span>
+                      </button>
+                      {expanded &&
+                        regionLocations.map(({ id, loc, allChildren, parentMatches, matchingChildren }) => {
+                          const canTravel = loc?.fastTravel && id !== currentLocationId && fastTravelUnlocked;
+                          // A parent that only matched because a child did gets its full child list
+                          // shown (not just the matching one) so the result still reads as a normal
+                          // location entry; a parent that didn't match itself only shows the
+                          // children that did.
+                          const children = parentMatches ? allChildren : matchingChildren;
+                          // Auto-expand when the only reason this location is showing at all is a
+                          // matching child - otherwise the match would be hidden behind a collapsed
+                          // toggle.
+                          const expandedLoc =
+                            expandedLocations.has(id) || (!!locationQuery && !parentMatches && matchingChildren.length > 0);
+                          const isQuestRelevant = activeQuestLocationIds.has(id);
+                          return (
+                            <div key={id}>
+                              <div
+                                className={styles.slotRow}
+                                style={{ cursor: children.length > 0 ? 'pointer' : 'default' }}
+                                onClick={() => children.length > 0 && toggleExpanded(id)}
+                              >
+                                <span style={{ fontSize: 13, flex: 1 }}>
+                                  <strong>
+                                    {children.length > 0 && (expandedLoc ? '▾ ' : '▸ ')}
+                                    {loc?.name ?? id}
+                                  </strong>
+                                  {isQuestRelevant && (
+                                    <span style={{ fontSize: 10, color: 'var(--fw-accent)', marginLeft: 8 }}>● Active Quest</span>
+                                  )}
+                                  <br />
+                                  <span style={{ opacity: 0.7 }}>{loc?.description}</span>
+                                </span>
+                                {canTravel && (
+                                  <button
+                                    className={styles.smallButton}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      travelTo(id);
+                                    }}
+                                  >
+                                    Travel Here
+                                  </button>
+                                )}
+                                {loc?.fastTravel && id === currentLocationId && (
+                                  <span style={{ fontSize: 11, opacity: 0.6 }}>You are here</span>
+                                )}
+                                {loc?.fastTravel && id !== currentLocationId && !fastTravelUnlocked && (
+                                  <span style={{ fontSize: 11, opacity: 0.6 }}>Restore the Ash Hallow shrine to unlock Fast Travel</span>
+                                )}
+                              </div>
+                              {expandedLoc &&
+                                children.map((child) => (
+                                  <div key={child.id} className={styles.slotRow} style={{ paddingLeft: 24 }}>
+                                    <span style={{ fontSize: 12, flex: 1 }}>
+                                      <strong>{child.name}</strong>
+                                      <br />
+                                      <span style={{ opacity: 0.7 }}>{child.description}</span>
+                                    </span>
+                                  </div>
+                                ))}
+                            </div>
+                          );
+                        })}
                     </div>
-                    {expanded &&
-                      children.map((child) => (
-                        <div key={child.id} className={styles.slotRow} style={{ paddingLeft: 24 }}>
-                          <span style={{ fontSize: 12, flex: 1 }}>
-                            <strong>{child.name}</strong>
-                            <br />
-                            <span style={{ opacity: 0.7 }}>{child.description}</span>
-                          </span>
-                        </div>
-                      ))}
-                  </div>
-                );
-              })}
-          </div>
-        )}
+                  );
+                })}
+              </div>
+            );
+          })()}
 
         {tab === 'items' &&
           (() => {
