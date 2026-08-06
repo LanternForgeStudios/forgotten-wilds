@@ -705,6 +705,21 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'desert-nights-chill', grantLoreId: 'desert-relic-ii' },
   },
+
+  // --- Shattered Desert (MSQ Volume V), Chapter 10: The Sky Remembers ---
+  // Kebab-case id mapping: MSF-SD-005 the-celestial-machine, MSF-SD-006
+  // lantern-of-forgotten-stars, MSF-SD-007 the-canyon-giant, MSF-SD-008 the-stars-never-lied.
+  // Gated behind Chapter 9's own true finale, matching every prior dungeon hand-off.
+  'the-celestial-machine': {
+    id: 'the-celestial-machine',
+    prerequisiteQuestId: 'the-path-of-the-astronomers',
+    objectives: [
+      { id: 'reach-inner-observatory', type: 'reachLocation', targetId: 'inner-observatory', requiredCount: 1 },
+      { id: 'restore-celestial-mechanism', type: 'interactWithShrine', targetId: 'celestial-mechanism', requiredCount: 1 },
+      { id: 'reach-star-chamber', type: 'reachLocation', targetId: 'star-chamber', requiredCount: 1 },
+    ],
+    reward: { xp: 45, gold: 25 },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -767,4 +782,5 @@ export const QUEST_ORDER = [
   'the-path-of-the-astronomers',
   'the-first-relic',
   'the-second-relic',
+  'the-celestial-machine',
 ];

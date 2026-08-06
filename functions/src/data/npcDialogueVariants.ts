@@ -76,7 +76,13 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   'cedar-spirit': ['the-second-recording', 'the-first-recording', 'seeds-of-the-ancient-cedar'],
   // Shattered Desert (MSQ Volume V, Chapter 9)
   'elder-santiago-ortega': ['the-desert-calls'],
-  'scholar-nia-solis': ['the-second-relic', 'the-first-relic', 'the-path-of-the-astronomers', 'echoes-in-the-sand'],
+  'scholar-nia-solis': [
+    'the-celestial-machine',
+    'the-second-relic',
+    'the-first-relic',
+    'the-path-of-the-astronomers',
+    'echoes-in-the-sand',
+  ],
   'desert-ranger-tomas-vega': ['the-second-relic', 'the-first-relic'],
   'sand-spirit': ['fragments-of-the-sky'],
 };

@@ -959,4 +959,20 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'desert-nights-chill', grantLoreId: 'desert-relic-ii' },
   },
+
+  // --- Shattered Desert (MSQ Volume V), Chapter 10: The Sky Remembers ---
+  {
+    id: 'the-celestial-machine',
+    name: 'The Celestial Machine',
+    giverNpcId: 'scholar-nia-solis',
+    description: 'Explore the heart of the Forgotten Observatory and restore its celestial mechanisms.',
+    category: 'main',
+    prerequisiteQuestId: 'the-path-of-the-astronomers',
+    objectives: [
+      { id: 'reach-inner-observatory', type: 'reachLocation', description: 'Explore the Inner Observatory.', targetId: 'inner-observatory', requiredCount: 1 },
+      { id: 'restore-celestial-mechanism', type: 'interactWithShrine', description: "Restore the Observatory's celestial mechanism and align its star maps.", targetId: 'celestial-mechanism', requiredCount: 1 },
+      { id: 'reach-star-chamber', type: 'reachLocation', description: 'Reach the Star Chamber.', targetId: 'star-chamber', requiredCount: 1 },
+    ],
+    reward: { xp: 45, gold: 25 },
+  },
 ];

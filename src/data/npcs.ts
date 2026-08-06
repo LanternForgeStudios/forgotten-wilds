@@ -1147,9 +1147,22 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['the-second-relic', 'the-first-relic', 'the-path-of-the-astronomers', 'echoes-in-the-sand'],
+      questIds: [
+        'the-celestial-machine',
+        'the-second-relic',
+        'the-first-relic',
+        'the-path-of-the-astronomers',
+        'echoes-in-the-sand',
+      ],
     },
     dialogueVariants: [
+      {
+        questId: 'the-celestial-machine',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "The mechanisms answered to Lantern-light, same as everything else the old astronomers built. Aligned star maps, after all this time - I never expected to see it happen in my own lifetime." },
+          { speaker: 'Scholar Nia Solis', text: "Whatever's deeper in, Keeper, the Observatory clearly meant for someone like you to reach it. Go carefully." },
+        ],
+      },
       {
         questId: 'the-second-relic',
         lines: [

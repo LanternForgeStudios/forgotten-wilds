@@ -125,9 +125,12 @@ export const KNOWN_SHRINES: Record<string, Set<string>> = {
   'ancient-cedar-shrine': new Set(['cedar-shrine-heart']),
   // Heartwood Sanctuary's outer gate mechanism (MSF-WP-005) - foreshadows Chapter 8's dungeon.
   'heartwood-approach': new Set(['heartwood-sanctuary-gate']),
-  // Celestial Oasis's own Desert Shrine - discover (MSF-SD-002) then restore (MSF-SD-003) beats
-  // share this same refId, matching the established shrine-reuse-across-sequential-quests pattern.
+  // Celestial Oasis's own Desert Shrine - discover (MSF-SD-002) then restore (MSF-SD-003) then
+  // witness (MSF-SD-008) beats share this same refId, matching the established
+  // shrine-reuse-across-sequential-quests pattern.
   'celestial-oasis': new Set(['star-crystal-shrine']),
+  // Inner Observatory's own celestial mechanism (MSF-SD-005).
+  'inner-observatory': new Set(['celestial-mechanism']),
 };
 
 /** Which parent map's location each landmark lives within - visitLandmark.ts's own lookup, used to
