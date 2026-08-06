@@ -57,6 +57,9 @@
     { "type": "interactable", "x": 28, "y": 22, "refId": "lost-library-records" },
     { "type": "interactable", "x": 24, "y": 14, "refId": "heartwood-sanctuary-gate" },
 
-    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-heartwood-approach-1" }
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-heartwood-approach-1" },
+
+    { "type": "spawnPoint", "x": 24, "y": 29, "refId": "from-red-mesa" },
+    { "type": "transition", "x": 24, "y": 31, "refId": "red-mesa", "targetSpawnId": "from-heartwood-approach" }
   ]
 }

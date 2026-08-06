@@ -53,6 +53,9 @@
     { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-sunfire-dunes" },
     { "type": "transition", "x": 63, "y": 20, "refId": "sunfire-dunes", "targetSpawnId": "from-red-mesa" },
 
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-heartwood-approach" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "heartwood-approach", "targetSpawnId": "from-red-mesa" },
+
     { "type": "npc", "x": 30, "y": 20, "refId": "desert-ranger-tomas-vega", "wanderRadius": 4 },
 
     { "type": "spawnPoint", "x": 20, "y": 14, "refId": "from-red-mesa-elders-hall" },
