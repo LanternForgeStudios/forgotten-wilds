@@ -398,6 +398,39 @@ export const SKILLS: Record<string, Skill> = {
     inflictAilmentChance: 0.3,
   },
 
+  // --- Frozen Frontier (MSQ Volume VI, Chapter 12) enemy signature move ---
+  // frozenWraiths (frozen-wraith/ancient-frozen-wraith) - a grasp cold enough to lock muscles in
+  // place, Stun (frostWolves already claimed Freeze in this region's own Chapter 11).
+  'wraith-chill-grasp': {
+    id: 'wraith-chill-grasp',
+    name: "Wraith's Chill Grasp",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 15,
+    spiritCost: 0,
+    inflictsAilmentId: 'stun',
+    inflictAilmentChance: 0.25,
+  },
+  // Winter Stag boss moves (MSF-FF-006).
+  'winter-stag-frozen-charge': {
+    id: 'winter-stag-frozen-charge',
+    name: 'Frozen Charge',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 24,
+    spiritCost: 0,
+  },
+  'winter-stag-eternal-frost': {
+    id: 'winter-stag-eternal-frost',
+    name: 'Eternal Frost',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 28,
+    spiritCost: 0,
+    inflictsAilmentId: 'freeze',
+    inflictAilmentChance: 0.35,
+  },
+
   // --- Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move ---
   // silentEchoes (forest-echo/corrupted-echo) - a burst of toxic spores, Poison (Prairie already
   // claimed Silence/Stun/Blind across its own two chapters, so this is Whispering Pines' own).

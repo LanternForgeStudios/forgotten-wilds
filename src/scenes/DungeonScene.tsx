@@ -65,6 +65,11 @@ const BOSS_TRIGGERS: Record<string, { prerequisiteQuestId: string; approachLabel
     approachLabel: 'a shape carved from the canyon itself, watching from the open summit',
     blockedMessage: 'Something vast and stone-still waits at the summit ahead — but the way feels barred to you, for now.',
   },
+  'winter-stag': {
+    prerequisiteQuestId: 'lantern-of-winters-resolve',
+    approachLabel: 'a shape carved from ice itself, watching from the open summit',
+    blockedMessage: 'Something vast and frost-still waits at the summit ahead — but the way feels barred to you, for now.',
+  },
 };
 
 /** Shrine-kind interactables (interactWithShrine.ts), keyed by refId. */

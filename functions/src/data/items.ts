@@ -278,6 +278,8 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'lost-scout-effects-i': { id: 'lost-scout-effects-i', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'lost-scout-effects-ii': { id: 'lost-scout-effects-ii', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'frost-wolf-fang': { id: 'frost-wolf-fang', category: 'materials', usableInCombat: false, tier: 'common' },
+  'frozen-essence': { id: 'frozen-essence', category: 'materials', usableInCombat: false, tier: 'common' },
+  'winter-stag-core': { id: 'winter-stag-core', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'celestial-star-map': { id: 'celestial-star-map', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'archive-fragments': { id: 'archive-fragments', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'lantern-of-ancient-roots': { id: 'lantern-of-ancient-roots', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },

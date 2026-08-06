@@ -296,6 +296,13 @@ add("icons/starlight-dust.svg", 64, 64, "DUST", "#8a9cd0", "#3a4470")
 add("sprites/enemies/frost-wolf-idle.svg", 128, 128, "WOLF", "#7a95a8", "#2a3a48")
 add("sprites/enemies/alpha-frost-wolf-idle.svg", 128, 128, "ALPHA", "#5a7a90", "#1a2a38")
 add("icons/frost-wolf-fang.svg", 64, 64, "FANG", "#c8d8e8", "#8098b0")
+
+# --- Chapter 12: The Last Memory (frozenWraiths family + Winter Stag boss) ---
+add("sprites/enemies/frozen-wraith-idle.svg", 128, 128, "WRAITH", "#8aa8c0", "#3a5570", font_size=13)
+add("sprites/enemies/ancient-frozen-wraith-idle.svg", 128, 128, "ANCIENT", "#6a8aa8", "#2a4560", font_size=11)
+add("sprites/enemies/winter-stag-idle.svg", 256, 256, "WINTER STAG", "#c8d8e8", "#5a7a90", font_size=18)
+add("icons/frozen-essence.svg", 64, 64, "ESSENCE", "#8aa8c0", "#3a5570", font_size=9)
+add("icons/winter-stag-core.svg", 64, 64, "CORE", "#c8d8e8", "#5a7a90")
 add("icons/canyon-giant-core.svg", 64, 64, "CORE", "#9a70c0", "#5a3880")
 
 # Lantern of Forgotten Stars (Phase 4) - found-item + equipped forms.

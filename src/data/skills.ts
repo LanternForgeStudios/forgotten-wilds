@@ -312,6 +312,36 @@ export const SKILLS: Skill[] = [
     spiritCost: 0,
     inflictsAilmentId: 'freeze',
   },
+  // Frozen Frontier (MSQ Volume VI, Chapter 12) enemy signature move + Winter Stag boss moves
+  {
+    id: 'wraith-chill-grasp',
+    name: "Wraith's Chill Grasp",
+    description: 'A grasp cold enough to lock muscle and breath in place, if only for a moment.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 15,
+    spiritCost: 0,
+    inflictsAilmentId: 'stun',
+  },
+  {
+    id: 'winter-stag-frozen-charge',
+    name: 'Frozen Charge',
+    description: 'A single charge from a creature carved out of glacier and old winters.',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 24,
+    spiritCost: 0,
+  },
+  {
+    id: 'winter-stag-eternal-frost',
+    name: 'Eternal Frost',
+    description: 'A cold that has never once broken, called down all at once.',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 28,
+    spiritCost: 0,
+    inflictsAilmentId: 'freeze',
+  },
   // Shattered Desert (MSQ Volume V, Chapter 9) enemy signature move
   {
     id: 'sand-blast',

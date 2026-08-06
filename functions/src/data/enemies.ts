@@ -39,6 +39,7 @@ export interface EnemyDefinition {
     | 'dustDevils'
     | 'celestialWisps'
     | 'frostWolves'
+    | 'frozenWraiths'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
@@ -932,6 +933,77 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'thaw-crystal', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
   },
+
+  // --- Frozen Frontier (MSQ Volume VI, Chapter 12) enemies ---
+  // frozenWraiths (frozen-wraith/ancient-frozen-wraith) - the spectral echoes haunting the Hall of
+  // Eternal Winter. wraith-chill-grasp inflicts Stun - excluded from vulnerableAilments (immune to
+  // what it deals out), matching every prior family's own exclusion pattern. Stun has no cure item
+  // (auto-expires after 1 turn), so no cure-drop chance in either lootTable.
+  'frozen-wraith': {
+    id: 'frozen-wraith',
+    name: 'Frozen Wraith',
+    family: 'frozenWraiths',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'lantern',
+    vulnerableAilments: ['burn', 'poison', 'freeze'],
+    stats: { maxHp: 76, attack: 21, defense: 16, speed: 17 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'wraith-chill-grasp', weight: 2 },
+    ],
+    xpReward: 42,
+    goldReward: 22,
+    lootTable: [{ itemId: 'frozen-essence', chance: 0.4, minQuantity: 1, maxQuantity: 2 }],
+  },
+  'ancient-frozen-wraith': {
+    id: 'ancient-frozen-wraith',
+    name: 'Ancient Frozen Wraith',
+    family: 'frozenWraiths',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'lantern',
+    vulnerableAilments: ['burn', 'poison', 'freeze'],
+    stats: { maxHp: 110, attack: 24, defense: 19, speed: 20 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'wraith-chill-grasp', weight: 3 },
+    ],
+    xpReward: 55,
+    goldReward: 29,
+    lootTable: [{ itemId: 'frozen-essence', chance: 0.5, minQuantity: 1, maxQuantity: 3 }],
+  },
+  // Boss stat block for MSF-FF-006 "The Winter Stag". Gated behind MSF-FF-005 (recovering the
+  // Lantern of Winter's Resolve) - see BOSS_REQUIRED_LOCATION (startEncounter.ts) and
+  // BOSS_REGION_LOCATIONS below. The final regular boss before Book One's own finale - stats sit
+  // above Canyon Giant's, matching the region-to-region power creep every prior boss followed.
+  'winter-stag': {
+    id: 'winter-stag',
+    name: 'Winter Stag',
+    family: 'boss',
+    tier: 'boss',
+    isBoss: true,
+    weaknessDamageType: 'spirit',
+    prerequisiteQuestId: 'lantern-of-winters-resolve',
+    vulnerableAilments: ['burn', 'poison', 'stun'],
+    stats: { maxHp: 340, attack: 27, defense: 19, speed: 18 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'winter-stag-frozen-charge', weight: 2 },
+      { skillId: 'winter-stag-eternal-frost', weight: 2, unlocksAtHpFraction: 0.5 },
+    ],
+    xpReward: 360,
+    goldReward: 190,
+    lootTable: [
+      { itemId: 'winter-stag-core', chance: 1, minQuantity: 1, maxQuantity: 1 },
+      // Winter Stag Totem family's Mythic tier - a real, if not guaranteed, earn path (same
+      // "not every rare+ item needs a unique quest thread" reasoning as every prior boss's own
+      // chest/loot bonus). The Legendary cap (eternal-stag-totem, a fresh name since the family's
+      // own Rare tier already claimed "Winter Stag Totem") is this boss's quest reward instead -
+      // see MSF-FF-006.
+      { itemId: 'elder-winter-stag-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -1109,6 +1181,21 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
     { enemyId: 'frost-wolf', weight: 2 },
     { enemyId: 'alpha-frost-wolf', weight: 2 },
   ],
+  // Frozen Frontier (MSQ Volume VI, Chapter 12) - Hall of Eternal Winter dungeon rooms, matching
+  // each room's own encounterTable in src/data/locations.ts exactly.
+  'hall-of-eternal-winter': [
+    { enemyId: 'frozen-wraith', weight: 3 },
+    { enemyId: 'ancient-frozen-wraith', weight: 1 },
+  ],
+  'winter-lantern-sanctuary': [{ enemyId: 'ancient-frozen-wraith', weight: 1 }],
+  'guardian-chamber': [
+    { enemyId: 'frozen-wraith', weight: 2 },
+    { enemyId: 'ancient-frozen-wraith', weight: 2 },
+  ],
+  'summit-of-winter': [
+    { enemyId: 'ancient-frozen-wraith', weight: 2 },
+    { enemyId: 'frozen-wraith', weight: 1 },
+  ],
 };
 
 /** Which locations a boss's optional "adds" (0-3 additional enemies that can join the fight) may
@@ -1127,4 +1214,5 @@ export const BOSS_REGION_LOCATIONS: Record<string, string[]> = {
   'great-thunderbird': ['sky-bridge', 'storm-galleries', 'lantern-sanctuary', 'guardian-peak'],
   'cedar-giant': ['root-caverns', 'inner-archive', 'heartwood-lantern-sanctuary', 'guardian-grove'],
   'canyon-giant': ['inner-observatory', 'star-chamber', 'star-lantern-sanctuary', 'canyon-depths', 'guardian-summit'],
+  'winter-stag': ['hall-of-eternal-winter', 'winter-lantern-sanctuary', 'guardian-chamber', 'summit-of-winter', 'hall-of-memories'],
 };

@@ -835,6 +835,25 @@ export const ITEMS: Item[] = [
     stackable: true,
     tier: 'common',
   },
+  {
+    id: 'frozen-essence',
+    name: 'Frozen Essence',
+    description: 'A shard of condensed cold, left behind by a wraith unmade.',
+    category: 'materials',
+    iconAssetId: 'icon.item.frozen-essence',
+    stackable: true,
+    tier: 'common',
+  },
+  {
+    id: 'winter-stag-core',
+    name: 'Winter Stag Core',
+    description: 'A core of pale ice, still faintly warm from whatever kept it beating this long.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.winter-stag-core',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.
