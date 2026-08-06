@@ -38,6 +38,7 @@ export interface EnemyDefinition {
     | 'rootWraiths'
     | 'dustDevils'
     | 'celestialWisps'
+    | 'frostWolves'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;
@@ -203,7 +204,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     xpReward: 13,
     goldReward: 7,
     lootTable: [
-      { itemId: 'wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'frost-wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       // ridge-ambush inflicts Silence - echo-herb cures it.
       { itemId: 'echo-herb', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
@@ -224,7 +225,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     xpReward: 21,
     goldReward: 12,
     lootTable: [
-      { itemId: 'wolf-fang', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'frost-wolf-fang', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
       { itemId: 'echo-herb', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
     ],
   },
@@ -885,6 +886,52 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
       { itemId: 'elder-sunstone-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
     ],
   },
+
+  // --- Frozen Frontier (MSQ Volume VI, Chapter 11) enemies ---
+  // frostWolves (frost-wolf/alpha-frost-wolf) - the pack stalking Frosthaven's own missing scouts.
+  // frost-bite inflicts Freeze - excluded from vulnerableAilments (immune to what it deals out),
+  // matching every prior family's own exclusion pattern.
+  'frost-wolf': {
+    id: 'frost-wolf',
+    name: 'Frost Wolf',
+    family: 'frostWolves',
+    tier: 'regular',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'poison', 'stun'],
+    stats: { maxHp: 68, attack: 19, defense: 14, speed: 18 },
+    moves: [
+      { skillId: 'attack', weight: 2 },
+      { skillId: 'frost-bite', weight: 2 },
+    ],
+    xpReward: 38,
+    goldReward: 20,
+    lootTable: [
+      { itemId: 'frost-wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      // frost-bite inflicts Freeze - thaw-crystal cures it.
+      { itemId: 'thaw-crystal', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
+  'alpha-frost-wolf': {
+    id: 'alpha-frost-wolf',
+    name: 'Alpha Frost Wolf',
+    family: 'frostWolves',
+    tier: 'elite',
+    isBoss: false,
+    weaknessDamageType: 'spirit',
+    vulnerableAilments: ['burn', 'poison', 'stun'],
+    stats: { maxHp: 98, attack: 22, defense: 17, speed: 21 },
+    moves: [
+      { skillId: 'attack', weight: 1 },
+      { skillId: 'frost-bite', weight: 3 },
+    ],
+    xpReward: 50,
+    goldReward: 27,
+    lootTable: [
+      { itemId: 'frost-wolf-fang', chance: 0.5, minQuantity: 1, maxQuantity: 3 },
+      { itemId: 'thaw-crystal', chance: 0.18, minQuantity: 1, maxQuantity: 1 },
+    ],
+  },
 };
 
 export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number }[]> = {
@@ -1042,6 +1089,25 @@ export const ENCOUNTER_TABLES: Record<string, { enemyId: string; weight: number 
   'guardian-summit': [
     { enemyId: 'star-phantom', weight: 2 },
     { enemyId: 'sandstorm-devil', weight: 1 },
+  ],
+  // Frozen Frontier (MSQ Volume VI, Chapter 11) - matches each field map's encounterTable in
+  // src/data/locations.ts exactly.
+  'snowveil-forest': [
+    { enemyId: 'frost-wolf', weight: 3 },
+    { enemyId: 'alpha-frost-wolf', weight: 1 },
+  ],
+  'frozen-river': [
+    { enemyId: 'frost-wolf', weight: 2 },
+    { enemyId: 'alpha-frost-wolf', weight: 2 },
+  ],
+  'glacier-pass': [
+    { enemyId: 'frost-wolf', weight: 2 },
+    { enemyId: 'alpha-frost-wolf', weight: 2 },
+  ],
+  'aurora-basin': [{ enemyId: 'alpha-frost-wolf', weight: 1 }],
+  'hall-of-eternal-winter-approach': [
+    { enemyId: 'frost-wolf', weight: 2 },
+    { enemyId: 'alpha-frost-wolf', weight: 2 },
   ],
 };
 

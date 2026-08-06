@@ -385,6 +385,19 @@ export const SKILLS: Record<string, Skill> = {
     spiritCost: 0,
   },
 
+  // --- Frozen Frontier (MSQ Volume VI, Chapter 11) enemy signature move ---
+  // frostWolves (frost-wolf/alpha-frost-wolf) - a snapping bite laced with cold, Freeze.
+  'frost-bite': {
+    id: 'frost-bite',
+    name: 'Frost Bite',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 16,
+    spiritCost: 0,
+    inflictsAilmentId: 'freeze',
+    inflictAilmentChance: 0.3,
+  },
+
   // --- Whispering Pines (MSQ Volume IV, Chapter 7) enemy signature move ---
   // silentEchoes (forest-echo/corrupted-echo) - a burst of toxic spores, Poison (Prairie already
   // claimed Silence/Stun/Blind across its own two chapters, so this is Whispering Pines' own).

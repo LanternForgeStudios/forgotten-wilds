@@ -43,6 +43,7 @@ export interface Enemy {
     | 'rootWraiths'
     | 'dustDevils'
     | 'celestialWisps'
+    | 'frostWolves'
     | 'boss';
   tier: EnemyTier;
   isBoss: boolean;

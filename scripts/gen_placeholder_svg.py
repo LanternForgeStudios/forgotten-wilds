@@ -291,6 +291,11 @@ add("sprites/enemies/celestial-wisp-idle.svg", 128, 128, "WISP", "#8a9cd0", "#3a
 add("sprites/enemies/star-phantom-idle.svg", 128, 128, "PHANTOM", "#6a7ab0", "#2a3450", font_size=13)
 add("sprites/enemies/canyon-giant-idle.svg", 256, 256, "CANYON GIANT", "#a8623a", "#5a2c18", font_size=20)
 add("icons/starlight-dust.svg", 64, 64, "DUST", "#8a9cd0", "#3a4470")
+
+# --- Chapter 11: Into the Endless Winter (frostWolves family) ---
+add("sprites/enemies/frost-wolf-idle.svg", 128, 128, "WOLF", "#7a95a8", "#2a3a48")
+add("sprites/enemies/alpha-frost-wolf-idle.svg", 128, 128, "ALPHA", "#5a7a90", "#1a2a38")
+add("icons/frost-wolf-fang.svg", 64, 64, "FANG", "#c8d8e8", "#8098b0")
 add("icons/canyon-giant-core.svg", 64, 64, "CORE", "#9a70c0", "#5a3880")
 
 # Lantern of Forgotten Stars (Phase 4) - found-item + equipped forms.

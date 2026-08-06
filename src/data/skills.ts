@@ -301,6 +301,17 @@ export const SKILLS: Skill[] = [
     power: 26,
     spiritCost: 0,
   },
+  // Frozen Frontier (MSQ Volume VI, Chapter 11) enemy signature move
+  {
+    id: 'frost-bite',
+    name: 'Frost Bite',
+    description: 'A snapping bite that leaves the cold behind long after the teeth are gone.',
+    kind: 'skill',
+    damageType: 'physical',
+    power: 16,
+    spiritCost: 0,
+    inflictsAilmentId: 'freeze',
+  },
   // Shattered Desert (MSQ Volume V, Chapter 9) enemy signature move
   {
     id: 'sand-blast',

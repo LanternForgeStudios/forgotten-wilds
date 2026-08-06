@@ -826,6 +826,15 @@ export const ITEMS: Item[] = [
     tier: 'rare',
     unique: true,
   },
+  {
+    id: 'frost-wolf-fang',
+    name: 'Frost Wolf Fang',
+    description: 'A sharp, ice-cold fang, stripped from a frost wolf.',
+    category: 'materials',
+    iconAssetId: 'icon.item.frost-wolf-fang',
+    stackable: true,
+    tier: 'common',
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.
