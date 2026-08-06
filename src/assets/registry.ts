@@ -4393,6 +4393,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'placeholder',
     notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
   },
+  {
+    id: 'icon.item.lost-scout-effects',
+    category: 'icon',
+    intendedUse: 'Item icon for lost-scout-effects-i/ii (Frozen Frontier side quest) - shared since both are the same collectible concept, 2 different hidden caches. Placeholder pending PixelLab quota.',
+    filePath: 'icons/lost-scout-effects.svg',
+    dimensions: { width: 64, height: 64 },
+    status: 'placeholder',
+    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+  },
   // Shattered Desert (MSQ Volume V, Chapter 9) equipment icons - Sunblade/Nomad Robes/Nomad
   // Leggings/Sand Boots/Dune Wraps/Star Charm families plus Sunstone Totem.
   {

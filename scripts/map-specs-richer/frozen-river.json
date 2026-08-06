@@ -51,6 +51,8 @@
     { "type": "transition", "x": 63, "y": 20, "refId": "glacier-pass", "targetSpawnId": "from-frozen-river" },
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
+    { "type": "interactable", "x": 20, "y": 30, "refId": "lost-scout-effects-i-cache" },
+
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-frozen-river-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-frozen-river-2" },
     { "type": "interactable", "x": 54, "y": 32, "refId": "chest-frozen-river-3" }

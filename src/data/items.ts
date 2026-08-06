@@ -806,6 +806,26 @@ export const ITEMS: Item[] = [
     tier: 'rare',
     unique: true,
   },
+  {
+    id: 'lost-scout-effects-i',
+    name: "A Lost Scout's Effects",
+    description: 'A frozen pack, half-buried at the edge of Frozen River - a compass, a ration tin, and a half-written letter that never got finished.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.lost-scout-effects',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'lost-scout-effects-ii',
+    name: "A Second Scout's Effects",
+    description: 'A second frozen pack, wedged into a crevasse in Glacier Pass - its owner made it further than the first, but not far enough.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.lost-scout-effects',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

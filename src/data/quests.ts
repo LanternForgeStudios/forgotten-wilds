@@ -1085,4 +1085,34 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 80, gold: 40, regionalReputation: 45, grantLoreId: 'lore-hall-of-eternal-winter-approach' },
   },
+
+  // --- Frozen Frontier Side Quest: The Missing Scouts ---
+  {
+    id: 'the-first-scout',
+    name: 'The First Scout',
+    giverNpcId: 'captain-astrid-frost',
+    description: "Recover a lost scout's effects, frozen at the edge of Frozen River.",
+    category: 'side',
+    prerequisiteQuestId: 'hall-of-eternal-winter',
+    objectives: [
+      { id: 'get-lost-scout-effects-i', type: 'collectItem', description: "Recover the lost scout's effects from Frozen River.", targetId: 'lost-scout-effects-i', requiredCount: 1 },
+      { id: 'talk-astrid-scout-i', type: 'talkToNpc', description: 'Bring the effects to Captain Astrid Frost.', targetId: 'captain-astrid-frost', requiredCount: 1 },
+      { id: 'talk-lyra-scout-i', type: 'talkToNpc', description: 'Have Aurora Keeper Lyra examine the effects.', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'aurora-flare', grantLoreId: 'lost-scout-effects-i' },
+  },
+  {
+    id: 'the-second-scout',
+    name: 'The Second Scout',
+    giverNpcId: 'captain-astrid-frost',
+    description: "Recover a second scout's effects, wedged into a crevasse in Glacier Pass.",
+    category: 'side',
+    prerequisiteQuestId: 'the-first-scout',
+    objectives: [
+      { id: 'get-lost-scout-effects-ii', type: 'collectItem', description: "Recover the second scout's effects from Glacier Pass.", targetId: 'lost-scout-effects-ii', requiredCount: 1 },
+      { id: 'talk-astrid-scout-ii', type: 'talkToNpc', description: 'Bring the effects to Captain Astrid Frost.', targetId: 'captain-astrid-frost', requiredCount: 1 },
+      { id: 'talk-lyra-scout-ii', type: 'talkToNpc', description: 'Have Aurora Keeper Lyra examine the effects.', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'frostbite-shatter', grantLoreId: 'lost-scout-effects-ii' },
+  },
 ];

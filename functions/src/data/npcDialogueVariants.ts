@@ -88,7 +88,7 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   'sand-spirit': ['fragments-of-the-sky'],
   // Frozen Frontier (MSQ Volume VI, Chapter 11)
   'elder-henrik': ['northbound'],
-  'captain-astrid-frost': ['frozen-echoes'],
-  'aurora-keeper-lyra': ['hall-of-eternal-winter'],
+  'captain-astrid-frost': ['the-second-scout', 'the-first-scout', 'frozen-echoes'],
+  'aurora-keeper-lyra': ['the-second-scout', 'the-first-scout', 'hall-of-eternal-winter'],
   'winter-spirit': ['light-within-the-ice'],
 };

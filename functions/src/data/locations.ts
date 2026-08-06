@@ -113,8 +113,12 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'snowveil-forest': {
     'aurora-crystal-fragment-snowveil-forest': 'aurora-crystal-fragment-snowveil-forest',
   },
+  'frozen-river': {
+    'lost-scout-effects-i-cache': 'lost-scout-effects-i',
+  },
   'glacier-pass': {
     'aurora-crystal-fragment-glacier-pass': 'aurora-crystal-fragment-glacier-pass',
+    'lost-scout-effects-ii-cache': 'lost-scout-effects-ii',
   },
   'aurora-basin': {
     'aurora-crystal-fragment-aurora-basin': 'aurora-crystal-fragment-aurora-basin',

@@ -37,7 +37,7 @@
           "seed": 64,
           "avoid": [
             { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 30, "y": 20 },
-            { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 }
+            { "x": 40, "y": 30 }, { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 }
           ]
         }
       ]
@@ -52,6 +52,7 @@
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
 
     { "type": "interactable", "x": 30, "y": 20, "refId": "aurora-crystal-fragment-glacier-pass" },
+    { "type": "interactable", "x": 40, "y": 30, "refId": "lost-scout-effects-ii-cache" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-glacier-pass-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-glacier-pass-2" },

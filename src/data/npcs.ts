@@ -1349,8 +1349,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Captain Astrid Frost', text: "Every scouting party I've sent past Snowveil in the last season has come back short a member, or hasn't come back at all. I've stopped sending them out alone." },
       { speaker: 'Captain Astrid Frost', text: "Whatever's spreading out there, it isn't ordinary cold. Ordinary cold doesn't leave a trail this deliberate." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['frozen-echoes'] },
+    gameplayHook: { type: 'questGiver', questIds: ['the-second-scout', 'the-first-scout', 'frozen-echoes'] },
     dialogueVariants: [
+      {
+        questId: 'the-second-scout',
+        lines: [
+          { speaker: 'Captain Astrid Frost', text: "Both of them, then. I'll write the letters home myself - they deserve better than a report filed by someone who never met them." },
+          { speaker: 'Captain Astrid Frost', text: "Whatever's out past Aurora Basin, it's patient. That's worse than hostile, in my experience. Watch yourself." },
+        ],
+      },
+      {
+        questId: 'the-first-scout',
+        lines: [
+          { speaker: 'Captain Astrid Frost', text: "So that's what happened to the first one. Frozen River - close enough that I keep thinking I should have found them myself." },
+          { speaker: 'Captain Astrid Frost', text: "There's a second scout still unaccounted for, further out past Glacier Pass. If you find anything, I want to know." },
+        ],
+      },
       {
         questId: 'frozen-echoes',
         lines: [
@@ -1371,8 +1385,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Aurora Keeper Lyra', text: "The aurora hasn't burned right in longer than my own memory reaches. I keep this chapel lit anyway, on the chance it remembers how, someday." },
       { speaker: 'Aurora Keeper Lyra', text: "There's a Lantern Sanctuary somewhere past the Hall of Eternal Winter, if the old records are honest. The last one left in Mytherra, as far as anyone's found." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['hall-of-eternal-winter'] },
+    gameplayHook: { type: 'questGiver', questIds: ['the-second-scout', 'the-first-scout', 'hall-of-eternal-winter'] },
     dialogueVariants: [
+      {
+        questId: 'the-second-scout',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "This one fought longer than the first - an injured leg, dragged the whole way to Glacier Pass. Whatever it is, it doesn't kill quickly. It waits for exhaustion to do the work." },
+          { speaker: 'Aurora Keeper Lyra', text: 'I will keep both of their names, Keeper. Someone should, even if the Hall of Memories never has room for them.' },
+        ],
+      },
+      {
+        questId: 'the-first-scout',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "A letter, unfinished. I won't read you the last line - Astrid should hear it first, if she wants to." },
+          { speaker: 'Aurora Keeper Lyra', text: 'Whatever took them, it left this behind on purpose. That is not the behavior of an ordinary cold.' },
+        ],
+      },
       {
         questId: 'hall-of-eternal-winter',
         lines: [

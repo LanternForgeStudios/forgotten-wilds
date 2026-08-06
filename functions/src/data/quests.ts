@@ -805,6 +805,32 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 80, gold: 40, regionalReputation: 45, grantLoreId: 'lore-hall-of-eternal-winter-approach' },
   },
+
+  // --- Frozen Frontier Side Quest (fresh, docs/Mytherra-SQ_breakdown.md had no pre-designed entry
+  // for this region): The Missing Scouts - same 2-hidden-key-item, giver -> translator, 2
+  // quest-taught-Skills-+-Lore shape as every prior region's own side quest, gated behind Chapter
+  // 11's own finale. Ties directly into Captain Astrid Frost's own arrival-quest dialogue about
+  // scouts who never came back. ---
+  'the-first-scout': {
+    id: 'the-first-scout',
+    prerequisiteQuestId: 'hall-of-eternal-winter',
+    objectives: [
+      { id: 'get-lost-scout-effects-i', type: 'collectItem', targetId: 'lost-scout-effects-i', requiredCount: 1 },
+      { id: 'talk-astrid-scout-i', type: 'talkToNpc', targetId: 'captain-astrid-frost', requiredCount: 1 },
+      { id: 'talk-lyra-scout-i', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'aurora-flare', grantLoreId: 'lost-scout-effects-i' },
+  },
+  'the-second-scout': {
+    id: 'the-second-scout',
+    prerequisiteQuestId: 'the-first-scout',
+    objectives: [
+      { id: 'get-lost-scout-effects-ii', type: 'collectItem', targetId: 'lost-scout-effects-ii', requiredCount: 1 },
+      { id: 'talk-astrid-scout-ii', type: 'talkToNpc', targetId: 'captain-astrid-frost', requiredCount: 1 },
+      { id: 'talk-lyra-scout-ii', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+    ],
+    reward: { xp: 40, gold: 25, grantSkillId: 'frostbite-shatter', grantLoreId: 'lost-scout-effects-ii' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -875,4 +901,6 @@ export const QUEST_ORDER = [
   'frozen-echoes',
   'light-within-the-ice',
   'hall-of-eternal-winter',
+  'the-first-scout',
+  'the-second-scout',
 ];

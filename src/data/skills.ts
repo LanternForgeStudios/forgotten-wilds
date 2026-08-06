@@ -221,6 +221,28 @@ export const SKILLS: Skill[] = [
     effectiveAgainstFamilies: ['dustDevils'],
     inflictsAilmentId: 'freeze',
   },
+  {
+    id: 'aurora-flare',
+    name: 'Aurora Flare',
+    description: "A technique pieced together from a lost scout's own field notes - a burst of aurora-warmth against the ice.",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['frostWolves'],
+    inflictsAilmentId: 'burn',
+  },
+  {
+    id: 'frostbite-shatter',
+    name: 'Frostbite Shatter',
+    description: "A second technique from a second scout's notes - a concussive shard of ice, tuned to shatter on contact rather than pierce.",
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['frostWolves'],
+    inflictsAilmentId: 'stun',
+  },
   // Whispering Pines (MSQ Volume IV, Chapter 8) enemy signature move + Cedar Giant boss moves
   {
     id: 'root-snare',

@@ -199,4 +199,16 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "Aurora Keeper Lyra, reading the frost-etched inscription over the doorway: a sanctuary built for a Guardian who volunteered to remain awake through the whole of the Great Silence, so that someone, someday, would not have to piece the truth back together from fragments. Every other lantern in Mytherra was left lit and waiting. This one, the records suggest, was never allowed to go out at all.",
     unlockedAt: 0,
   },
+  {
+    id: 'lost-scout-effects-i',
+    title: "A Lost Scout's Effects",
+    body: "Aurora Keeper Lyra, reading what the cold preserved: a half-written letter home, cut off mid-sentence. The scout had made it as far as Frozen River before whatever took the others found them too - close enough to Frosthaven that Captain Astrid has spent every night since wondering if she could have reached them in time.",
+    unlockedAt: 0,
+  },
+  {
+    id: 'lost-scout-effects-ii',
+    title: "A Second Scout's Effects",
+    body: 'Aurora Keeper Lyra, examining the second pack: this one made it to Glacier Pass, further than the first, dragging an injured leg by the state of the compass strap. Whatever is out past Aurora Basin, it does not seem to be hunting - it seems to be waiting, and it is patient enough to let exhaustion do the work for it.',
+    unlockedAt: 0,
+  },
 ];

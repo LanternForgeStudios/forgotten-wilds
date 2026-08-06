@@ -286,6 +286,28 @@ export const SKILLS: Record<string, Skill> = {
     inflictsAilmentId: 'freeze',
     inflictAilmentChance: 0.3,
   },
+  'aurora-flare': {
+    id: 'aurora-flare',
+    name: 'Aurora Flare',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['frostWolves'],
+    inflictsAilmentId: 'burn',
+    inflictAilmentChance: 0.3,
+  },
+  'frostbite-shatter': {
+    id: 'frostbite-shatter',
+    name: 'Frostbite Shatter',
+    kind: 'spiritArt',
+    damageType: 'spirit',
+    power: 20,
+    spiritCost: 12,
+    effectiveAgainstFamilies: ['frostWolves'],
+    inflictsAilmentId: 'stun',
+    inflictAilmentChance: 0.3,
+  },
 
   // --- Whispering Pines (MSQ Volume IV, Chapter 8) enemy signature move ---
   // rootWraiths (root-wraith/elder-root-wraith) - a grasping tangle of roots, Stun (silentEchoes
