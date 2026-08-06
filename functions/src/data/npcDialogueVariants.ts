@@ -77,6 +77,7 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   // Shattered Desert (MSQ Volume V, Chapter 9)
   'elder-santiago-ortega': ['the-desert-calls'],
   'scholar-nia-solis': [
+    'lantern-of-forgotten-stars',
     'the-celestial-machine',
     'the-second-relic',
     'the-first-relic',

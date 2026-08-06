@@ -264,6 +264,10 @@ add("sprites/enemies/canyon-giant-idle.svg", 256, 256, "CANYON GIANT", "#a8623a"
 add("icons/starlight-dust.svg", 64, 64, "DUST", "#8a9cd0", "#3a4470")
 add("icons/canyon-giant-core.svg", 64, 64, "CORE", "#9a70c0", "#5a3880")
 
+# Lantern of Forgotten Stars (Phase 4) - found-item + equipped forms.
+add("icons/lantern-of-forgotten-stars.svg", 64, 64, "LANTERN", "#8a9cd0", "#3a4470", font_size=9)
+add("icons/lantern-of-forgotten-stars-equipped.svg", 64, 64, "LANTERN", "#9aacd8", "#4a5480", font_size=9)
+
 # Equipment icons (Phase 5) - Sunblade (weapon), Nomad Robes (chest), Nomad Leggings (legs), Sand
 # Boots (boots), Dune Wraps (gloves), Star Charm (charm), Sunstone Totem (spiritTotem). One hue
 # per slot, matching the existing per-slot hue convention.

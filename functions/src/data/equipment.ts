@@ -1145,6 +1145,17 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     familyId: 'star-charm',
     ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.3 }],
   },
+  // Shattered Desert's own Legendary Lantern (MSF-SD-006), same shape as lantern-of-ancient-roots
+  // - a step above its statBonuses/oilCapacity, one Lantern Ability (astral-ward, defensive).
+  'lantern-of-forgotten-stars-equipped': {
+    id: 'lantern-of-forgotten-stars-equipped',
+    slot: 'lantern',
+    statBonuses: { maxSpirit: 22, defense: 6 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 42,
+    lanternAbilityIds: ['astral-ward'],
+  },
   // Sunstone Totem - Rare tier only this chapter (Mythic/Legendary wait for Chapter 10's boss),
   // built now rather than retroactively patched in later the way White Buffalo Totem's own Rare
   // tier had to be.

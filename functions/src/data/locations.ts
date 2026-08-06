@@ -104,6 +104,11 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'painted-mesas': {
     'star-fragment-painted-mesas': 'star-fragment-painted-mesas',
   },
+  // Shattered Desert (MSQ Volume V, Chapter 10) - the Lantern of Forgotten Stars' found-item form
+  // (MSF-SD-006).
+  'star-lantern-sanctuary': {
+    'lantern-of-forgotten-stars': 'lantern-of-forgotten-stars',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's

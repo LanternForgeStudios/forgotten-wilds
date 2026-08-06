@@ -1148,6 +1148,7 @@ export const NPCS: Npc[] = [
     gameplayHook: {
       type: 'questGiver',
       questIds: [
+        'lantern-of-forgotten-stars',
         'the-celestial-machine',
         'the-second-relic',
         'the-first-relic',
@@ -1156,6 +1157,13 @@ export const NPCS: Npc[] = [
       ],
     },
     dialogueVariants: [
+      {
+        questId: 'lantern-of-forgotten-stars',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "Keeper Orion Vale. A history read from the Lantern Sanctuary's own walls - the last Lantern Keeper to tend this Observatory before it fell silent, waiting for someone to come finish what they started." },
+          { speaker: 'Scholar Nia Solis', text: "Whatever's past the Lantern Sanctuary, Keeper, you won't be walking in unlit." },
+        ],
+      },
       {
         questId: 'the-celestial-machine',
         lines: [

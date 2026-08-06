@@ -1451,6 +1451,18 @@ export const EQUIPMENT: EquipmentItem[] = [
     ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.3 }],
   },
   {
+    id: 'lantern-of-forgotten-stars-equipped',
+    name: 'Lantern of Forgotten Stars',
+    description: 'A legendary lantern recovered from the Forgotten Observatory, its light steady with the patience of stars that burned out long ago.',
+    slot: 'lantern',
+    iconAssetId: 'icon.equipment.lantern-of-forgotten-stars-equipped',
+    statBonuses: { maxSpirit: 22, defense: 6 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 42,
+    lanternAbilityIds: ['astral-ward'],
+  },
+  {
     id: 'sunstone-totem',
     name: 'Sunstone Totem',
     description: 'A small carved totem inlaid with sun-warmed stone, blessed at the Desert Shrine once its Star Crystal was restored.',

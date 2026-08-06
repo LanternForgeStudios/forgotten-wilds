@@ -181,4 +181,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The second relic continues the pattern of the first: the same night's sky, mapped again decades later, with one star missing from the second chart that was present in the first. Scholar Nia Solis has no explanation for a star that simply stops being recorded.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-keeper-orion-vale',
+    title: 'Keeper Orion Vale',
+    body: "A history read from the Lantern Sanctuary's own walls by Scholar Nia Solis: Orion Vale was the last Lantern Keeper to tend the Forgotten Observatory before the Canyon Giant was left to keep its own long watch, unrelieved. Vale left this lantern lit and waiting - the same pattern as Aldric Thorne beneath Heartwood Sanctuary, Talon Greywind on Thunderbird Mesa, and Elise Duvall beneath the Deep Current. Four lanterns, four Keepers, four regions - all left behind by someone who expected to come back and never did.",
+    unlockedAt: 0,
+  },
 ];

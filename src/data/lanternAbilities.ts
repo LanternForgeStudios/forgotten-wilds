@@ -55,4 +55,12 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
     description:
       'The Lantern of Ancient Roots burns with light older than the forest\'s own corruption - especially fierce against Silent Echoes.',
   },
+  {
+    id: 'astral-ward',
+    name: 'Astral Ward',
+    category: 'defensive',
+    oilCost: 12,
+    description:
+      'The Lantern of Forgotten Stars wraps you in a thin veil of dead starlight - incoming blows land as if from somewhere much farther away.',
+  },
 ];

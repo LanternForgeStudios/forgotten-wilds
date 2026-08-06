@@ -723,6 +723,16 @@ export const ITEMS: Item[] = [
     unique: true,
   },
   {
+    id: 'lantern-of-forgotten-stars',
+    name: 'Lantern of Forgotten Stars',
+    description: 'A lantern found unlit at the heart of the Forgotten Observatory, its glass etched with a spray of constellations no longer in the sky.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.lantern-of-forgotten-stars',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
     id: 'guardian-memory-fragment-5',
     name: 'Guardian Memory Fragment V',
     description: "The clearest memory yet: the histories of the Great Silence weren't merely lost - they were carefully, deliberately emptied, page by page, region by region, by someone who was never caught and never named.",

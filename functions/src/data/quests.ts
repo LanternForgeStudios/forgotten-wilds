@@ -720,6 +720,20 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 45, gold: 25 },
   },
+  'lantern-of-forgotten-stars': {
+    id: 'lantern-of-forgotten-stars',
+    prerequisiteQuestId: 'the-celestial-machine',
+    objectives: [
+      { id: 'get-lantern-of-forgotten-stars', type: 'collectItem', targetId: 'lantern-of-forgotten-stars', requiredCount: 1 },
+      { id: 'talk-nia-lantern', type: 'talkToNpc', targetId: 'scholar-nia-solis', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 50,
+      gold: 0,
+      itemIds: ['lantern-of-forgotten-stars-equipped'],
+      grantLoreId: 'lore-keeper-orion-vale',
+    },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -783,4 +797,5 @@ export const QUEST_ORDER = [
   'the-first-relic',
   'the-second-relic',
   'the-celestial-machine',
+  'lantern-of-forgotten-stars',
 ];

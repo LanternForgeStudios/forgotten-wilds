@@ -975,4 +975,22 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 45, gold: 25 },
   },
+  {
+    id: 'lantern-of-forgotten-stars',
+    name: 'Lantern of Forgotten Stars',
+    giverNpcId: 'scholar-nia-solis',
+    description: 'Learn the history of a forgotten Lantern Keeper and claim the legendary lantern waiting in the Observatory.',
+    category: 'main',
+    prerequisiteQuestId: 'the-celestial-machine',
+    objectives: [
+      { id: 'get-lantern-of-forgotten-stars', type: 'collectItem', description: 'Claim the Lantern of Forgotten Stars.', targetId: 'lantern-of-forgotten-stars', requiredCount: 1 },
+      { id: 'talk-nia-lantern', type: 'talkToNpc', description: 'Bring the lantern to Scholar Nia Solis to record its history.', targetId: 'scholar-nia-solis', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 50,
+      gold: 0,
+      itemIds: ['lantern-of-forgotten-stars-equipped'],
+      grantLoreId: 'lore-keeper-orion-vale',
+    },
+  },
 ];
