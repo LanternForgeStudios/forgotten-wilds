@@ -129,6 +129,32 @@ const CHESTS: Record<string, Record<string, string>> = {
   'forgotten-observatory-approach': {
     'chest-forgotten-observatory-approach-1': 'sandglass-shard',
   },
+  // Frozen Frontier (MSQ Volume VI, Chapter 11) - Rare-tier equipment distributed across field-map
+  // chests, matching the established Common+Uncommon-shop/Rare-chest split.
+  'snowveil-forest': {
+    'chest-snowveil-forest-1': 'glacier-forged-pike',
+    'chest-snowveil-forest-2': 'auroraweave-coat',
+    'chest-snowveil-forest-3': 'frost-wolf-fang',
+  },
+  'frozen-river': {
+    'chest-frozen-river-1': 'auroraweave-leggings',
+    'chest-frozen-river-2': 'frostwardens-boots',
+    'chest-frozen-river-3': 'frost-wolf-fang',
+  },
+  'glacier-pass': {
+    'chest-glacier-pass-1': 'frostwardens-gloves',
+    'chest-glacier-pass-2': 'radiant-aurora-charm',
+    'chest-glacier-pass-3': 'frost-wolf-fang',
+  },
+  'aurora-basin': {
+    'chest-aurora-basin-1': 'winter-stag-totem',
+    'chest-aurora-basin-2': 'frost-wolf-fang',
+  },
+  'hall-of-eternal-winter-approach': {
+    'chest-hall-of-eternal-winter-approach-1': 'frost-wolf-fang',
+    'chest-hall-of-eternal-winter-approach-2': 'frost-wolf-fang',
+    'chest-hall-of-eternal-winter-approach-3': 'frost-wolf-fang',
+  },
 };
 
 export const openChest = onCall<OpenChestRequest>(async (request) => {

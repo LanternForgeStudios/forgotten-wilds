@@ -412,6 +412,20 @@ export const SHOP_PRICES: Record<string, number> = {
   'swift-sand-boots': 70,
   'worn-dune-wraps': 28,
   'woven-dune-wraps': 60,
+  // Frozen Frontier (MSQ Volume VI, Chapter 11) - Common+Uncommon shop stock only, matching the
+  // established "Rare tier is chest-found" split.
+  'worn-frost-pike': 38,
+  'bound-frost-pike': 80,
+  'faded-aurora-charm': 30,
+  'banded-aurora-charm': 64,
+  'worn-winter-coat': 40,
+  'lined-winter-coat': 80,
+  'worn-winter-leggings': 36,
+  'lined-winter-leggings': 72,
+  'worn-glacier-boots': 34,
+  'crampon-glacier-boots': 74,
+  'worn-fur-gloves': 30,
+  'lined-fur-gloves': 64,
 };
 
 /** Additional items a shop unlocks once a specific quest completes, layered ON TOP of its
@@ -560,6 +574,22 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'swift-sand-boots',
     'worn-dune-wraps',
     'woven-dune-wraps',
+  ],
+  'bjorn-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'thaw-crystal'],
+  // Common+Uncommon Frost Pike/Aurora Charm stock, matching esteban-forge's own weapon+charm
+  // pairing - Rare tier of both is chest-found instead.
+  'sigrid-forge': ['worn-frost-pike', 'bound-frost-pike', 'faded-aurora-charm', 'banded-aurora-charm'],
+  // Common+Uncommon Winter Coat/Winter Leggings/Glacier Boots/Fur Gloves stock, matching
+  // carmen-armory's own pattern - Rare tier of every family is chest-found instead.
+  'magnus-armory': [
+    'worn-winter-coat',
+    'lined-winter-coat',
+    'worn-winter-leggings',
+    'lined-winter-leggings',
+    'worn-glacier-boots',
+    'crampon-glacier-boots',
+    'worn-fur-gloves',
+    'lined-fur-gloves',
   ],
 };
 

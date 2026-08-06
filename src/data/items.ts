@@ -950,6 +950,19 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'swift-sand-boots', price: 70, currency: 'gold' },
   { itemId: 'worn-dune-wraps', price: 28, currency: 'gold' },
   { itemId: 'woven-dune-wraps', price: 60, currency: 'gold' },
+  // Frozen Frontier - Common+Uncommon only, matching functions/src/data/items.ts's SHOP_PRICES.
+  { itemId: 'worn-frost-pike', price: 38, currency: 'gold' },
+  { itemId: 'bound-frost-pike', price: 80, currency: 'gold' },
+  { itemId: 'faded-aurora-charm', price: 30, currency: 'gold' },
+  { itemId: 'banded-aurora-charm', price: 64, currency: 'gold' },
+  { itemId: 'worn-winter-coat', price: 40, currency: 'gold' },
+  { itemId: 'lined-winter-coat', price: 80, currency: 'gold' },
+  { itemId: 'worn-winter-leggings', price: 36, currency: 'gold' },
+  { itemId: 'lined-winter-leggings', price: 72, currency: 'gold' },
+  { itemId: 'worn-glacier-boots', price: 34, currency: 'gold' },
+  { itemId: 'crampon-glacier-boots', price: 74, currency: 'gold' },
+  { itemId: 'worn-fur-gloves', price: 30, currency: 'gold' },
+  { itemId: 'lined-fur-gloves', price: 64, currency: 'gold' },
 ];
 
 // Display-only grouping of SHOP_LISTINGS by which NPC/building sells it - purchaseItem.ts itself
@@ -967,6 +980,9 @@ export const SHOP_TITLES: Record<string, string> = {
   'wyatt-general-store': "Highwind Crossing's General Store",
   'garrett-forge': 'The Highwind Forge',
   'ruth-armory': 'The Highwind Armory',
+  'bjorn-general-store': "Frosthaven's General Store",
+  'sigrid-forge': 'The Frosthaven Forge',
+  'magnus-armory': 'The Frosthaven Armory',
 };
 
 export const SHOP_CATALOGS: Record<string, string[]> = {
@@ -1062,6 +1078,18 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'swift-sand-boots',
     'worn-dune-wraps',
     'woven-dune-wraps',
+  ],
+  'bjorn-general-store': ['keepers-lantern', 'lantern-oil', 'antidote', 'thaw-crystal'],
+  'sigrid-forge': ['worn-frost-pike', 'bound-frost-pike', 'faded-aurora-charm', 'banded-aurora-charm'],
+  'magnus-armory': [
+    'worn-winter-coat',
+    'lined-winter-coat',
+    'worn-winter-leggings',
+    'lined-winter-leggings',
+    'worn-glacier-boots',
+    'crampon-glacier-boots',
+    'worn-fur-gloves',
+    'lined-fur-gloves',
   ],
 };
 

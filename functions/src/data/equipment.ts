@@ -1188,4 +1188,155 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     unique: true,
     familyId: 'sunstone-totem',
   },
+
+  // --- Frozen Frontier (MSQ Volume VI, Chapter 11) equipment ---
+  // Frost Pike (weapon, Spear type) - the flat cross-region weapon-type stat budget, confirmed
+  // identical across every Spear family so far (prairie-spear, reed-spear) - not touched again here.
+  'worn-frost-pike': {
+    id: 'worn-frost-pike',
+    slot: 'weapon',
+    statBonuses: { attack: 5, maxHp: 4 },
+    tier: 'common',
+    familyId: 'frost-pike',
+  },
+  'bound-frost-pike': {
+    id: 'bound-frost-pike',
+    slot: 'weapon',
+    statBonuses: { attack: 8, maxHp: 6, speed: 1 },
+    tier: 'uncommon',
+    familyId: 'frost-pike',
+  },
+  'glacier-forged-pike': {
+    id: 'glacier-forged-pike',
+    slot: 'weapon',
+    statBonuses: { attack: 12, maxHp: 10, defense: 1 },
+    tier: 'rare',
+    familyId: 'frost-pike',
+  },
+  // Winter Coat (chest) - Health/Defense leaning, matching the region's own "Health, Defense,
+  // Counterattacks" theme rather than Nomad Robes' attack/spirit lean.
+  'worn-winter-coat': {
+    id: 'worn-winter-coat',
+    slot: 'chest',
+    statBonuses: { maxHp: 12, defense: 2 },
+    tier: 'common',
+    familyId: 'winter-coat',
+  },
+  'lined-winter-coat': {
+    id: 'lined-winter-coat',
+    slot: 'chest',
+    statBonuses: { maxHp: 16, defense: 4 },
+    tier: 'uncommon',
+    familyId: 'winter-coat',
+  },
+  'auroraweave-coat': {
+    id: 'auroraweave-coat',
+    slot: 'chest',
+    statBonuses: { maxHp: 20, defense: 6, attack: 2 },
+    tier: 'rare',
+    familyId: 'winter-coat',
+  },
+  // Winter Leggings (legs) - matches Winter Coat's own Health/Defense lean, smaller numbers.
+  'worn-winter-leggings': {
+    id: 'worn-winter-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 8, defense: 1 },
+    tier: 'common',
+    familyId: 'winter-leggings',
+  },
+  'lined-winter-leggings': {
+    id: 'lined-winter-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 11, defense: 2 },
+    tier: 'uncommon',
+    familyId: 'winter-leggings',
+  },
+  'auroraweave-leggings': {
+    id: 'auroraweave-leggings',
+    slot: 'legs',
+    statBonuses: { maxHp: 14, defense: 4, attack: 1 },
+    tier: 'rare',
+    familyId: 'winter-leggings',
+  },
+  // Glacier Boots - defense-and-speed leaning rather than Sand Boots' speed-and-attack lean,
+  // matching the region's own Counterattacks theme.
+  'worn-glacier-boots': {
+    id: 'worn-glacier-boots',
+    slot: 'boots',
+    statBonuses: { defense: 2, speed: 1 },
+    tier: 'common',
+    familyId: 'glacier-boots',
+  },
+  'crampon-glacier-boots': {
+    id: 'crampon-glacier-boots',
+    slot: 'boots',
+    statBonuses: { defense: 3, speed: 2 },
+    tier: 'uncommon',
+    familyId: 'glacier-boots',
+  },
+  'frostwardens-boots': {
+    id: 'frostwardens-boots',
+    slot: 'boots',
+    statBonuses: { defense: 4, speed: 3, maxHp: 3 },
+    tier: 'rare',
+    familyId: 'glacier-boots',
+  },
+  // Fur Gloves - a step above Dune Wraps. Rare cap gets a genuine Freeze resistance perk, matching
+  // Dune Wraps' own Blind-resistance-on-rare precedent.
+  'worn-fur-gloves': {
+    id: 'worn-fur-gloves',
+    slot: 'gloves',
+    statBonuses: { attack: 2, defense: 1 },
+    tier: 'common',
+    familyId: 'fur-gloves',
+  },
+  'lined-fur-gloves': {
+    id: 'lined-fur-gloves',
+    slot: 'gloves',
+    statBonuses: { attack: 3, defense: 2, maxHp: 3 },
+    tier: 'uncommon',
+    familyId: 'fur-gloves',
+  },
+  'frostwardens-gloves': {
+    id: 'frostwardens-gloves',
+    slot: 'gloves',
+    statBonuses: { attack: 4, defense: 3, maxHp: 5 },
+    tier: 'rare',
+    familyId: 'fur-gloves',
+    ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.3 }],
+  },
+  // Aurora Charm - matches Star Charm's own progressive ailment-resistance-on-uncommon+rare shape.
+  'faded-aurora-charm': {
+    id: 'faded-aurora-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 5, defense: 1 },
+    tier: 'common',
+    familyId: 'aurora-charm',
+  },
+  'banded-aurora-charm': {
+    id: 'banded-aurora-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 7, defense: 2 },
+    tier: 'uncommon',
+    familyId: 'aurora-charm',
+    ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.15 }],
+  },
+  'radiant-aurora-charm': {
+    id: 'radiant-aurora-charm',
+    slot: 'charm',
+    statBonuses: { maxSpirit: 10, defense: 3 },
+    tier: 'rare',
+    familyId: 'aurora-charm',
+    ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.3 }],
+  },
+  // Winter Stag Totem - Rare tier only this chapter (Mythic/Legendary wait for Chapter 12's boss),
+  // built now rather than retroactively patched in later, matching every prior region's own totem
+  // discipline.
+  'winter-stag-totem': {
+    id: 'winter-stag-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxHp: 10, maxSpirit: 6, defense: 1 },
+    tier: 'rare',
+    familyId: 'winter-stag-totem',
+  },
 };

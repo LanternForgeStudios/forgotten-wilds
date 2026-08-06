@@ -329,6 +329,27 @@ add("icons/banded-star-charm.svg", 64, 64, "CHARM", "#7a8ac0", "#3a4470")
 add("icons/astral-star-charm.svg", 64, 64, "CHARM", "#7a8ac0", "#3a4470")
 add("icons/sunstone-totem.svg", 64, 64, "TOTEM", "#c8c0a0", "#78705a")
 
+# --- Frozen Frontier (MSQ Volume VI, Chapter 11) equipment icons ---
+add("icons/worn-frost-pike.svg", 64, 64, "PIKE", "#7a95a8", "#2a3a48")
+add("icons/bound-frost-pike.svg", 64, 64, "PIKE", "#7a95a8", "#2a3a48")
+add("icons/glacier-forged-pike.svg", 64, 64, "PIKE", "#7a95a8", "#2a3a48")
+add("icons/worn-winter-coat.svg", 64, 64, "COAT", "#8ba0b8", "#3a4a58")
+add("icons/lined-winter-coat.svg", 64, 64, "COAT", "#8ba0b8", "#3a4a58")
+add("icons/auroraweave-coat.svg", 64, 64, "COAT", "#8ba0b8", "#3a4a58")
+add("icons/worn-winter-leggings.svg", 64, 64, "LEGS", "#8ba0b8", "#3a4a58")
+add("icons/lined-winter-leggings.svg", 64, 64, "LEGS", "#8ba0b8", "#3a4a58")
+add("icons/auroraweave-leggings.svg", 64, 64, "LEGS", "#8ba0b8", "#3a4a58")
+add("icons/worn-glacier-boots.svg", 64, 64, "BOOT", "#8ba0b8", "#3a4a58")
+add("icons/crampon-glacier-boots.svg", 64, 64, "BOOT", "#8ba0b8", "#3a4a58")
+add("icons/frostwardens-boots.svg", 64, 64, "BOOT", "#8ba0b8", "#3a4a58")
+add("icons/worn-fur-gloves.svg", 64, 64, "GLOVE", "#b09068", "#5c4830")
+add("icons/lined-fur-gloves.svg", 64, 64, "GLOVE", "#b09068", "#5c4830")
+add("icons/frostwardens-gloves.svg", 64, 64, "GLOVE", "#b09068", "#5c4830")
+add("icons/faded-aurora-charm.svg", 64, 64, "CHARM", "#6ab0d0", "#2a5070")
+add("icons/banded-aurora-charm.svg", 64, 64, "CHARM", "#6ab0d0", "#2a5070")
+add("icons/radiant-aurora-charm.svg", 64, 64, "CHARM", "#6ab0d0", "#2a5070")
+add("icons/winter-stag-totem.svg", 64, 64, "TOTEM", "#c8d8e8", "#5a7a90")
+
 
 if __name__ == "__main__":
     write_all()
