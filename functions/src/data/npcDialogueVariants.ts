@@ -86,4 +86,9 @@ export const NPC_DIALOGUE_VARIANT_QUEST_IDS: Record<string, string[]> = {
   ],
   'desert-ranger-tomas-vega': ['the-second-relic', 'the-first-relic'],
   'sand-spirit': ['fragments-of-the-sky'],
+  // Frozen Frontier (MSQ Volume VI, Chapter 11)
+  'elder-henrik': ['northbound'],
+  'captain-astrid-frost': ['frozen-echoes'],
+  'aurora-keeper-lyra': ['hall-of-eternal-winter'],
+  'winter-spirit': ['light-within-the-ice'],
 };

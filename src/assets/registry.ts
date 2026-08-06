@@ -4376,6 +4376,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
   },
   {
+    id: 'icon.item.aurora-crystal-fragment',
+    category: 'icon',
+    intendedUse: 'Item icon for the 3 aurora-crystal-fragment-* item ids (Frozen Frontier, Chapter 11) - shared since all 3 are the same collectible, just placed in 3 different field maps. Placeholder pending PixelLab quota.',
+    filePath: 'icons/aurora-crystal-fragment.svg',
+    dimensions: { width: 64, height: 64 },
+    status: 'placeholder',
+    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+  },
+  {
     id: 'icon.item.desert-relic',
     category: 'icon',
     intendedUse: 'Item icon for desert-relic-i/ii (Shattered Desert side quest) - shared since both are the same collectible concept, 2 different hidden caches. Placeholder pending PixelLab quota.',

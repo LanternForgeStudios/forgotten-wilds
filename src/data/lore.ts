@@ -193,4 +193,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "The Canyon Giant's own memory, witnessed at the Star Crystal Shrine: the Great Silence was not an accident, and it was not one side binding the other. Lantern Keepers and Guardians chose it together, deliberately, to save Mytherra from something the desert Guardian's memory circles but never names. Five memories restored now, and the player finally knows what happened. Why it was necessary is a question this desert cannot answer - only the Frozen Frontier, where the final Guardian chose to stay awake and remember everything, still can.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-hall-of-eternal-winter-approach',
+    title: 'The Hall of Eternal Winter',
+    body: "Aurora Keeper Lyra, reading the frost-etched inscription over the doorway: a sanctuary built for a Guardian who volunteered to remain awake through the whole of the Great Silence, so that someone, someday, would not have to piece the truth back together from fragments. Every other lantern in Mytherra was left lit and waiting. This one, the records suggest, was never allowed to go out at all.",
+    unlockedAt: 0,
+  },
 ];

@@ -758,6 +758,53 @@ export const QUESTS: Record<string, QuestDef> = {
       grantLoreId: 'lore-guardian-memory-v',
     },
   },
+
+  // --- Frozen Frontier (MSQ Volume VI), Chapter 11: Into the Endless Winter ---
+  // Kebab-case id mapping: MSF-FF-001 northbound, MSF-FF-002 frozen-echoes, MSF-FF-003
+  // light-within-the-ice, MSF-FF-004 hall-of-eternal-winter. Gated behind Volume V's own true
+  // finale.
+  'northbound': {
+    id: 'northbound',
+    prerequisiteQuestId: 'the-stars-never-lied',
+    objectives: [
+      { id: 'reach-frosthaven', type: 'reachLocation', targetId: 'frosthaven', requiredCount: 1 },
+      { id: 'talk-astrid-arrival', type: 'talkToNpc', targetId: 'captain-astrid-frost', requiredCount: 1 },
+      { id: 'talk-henrik-arrival', type: 'talkToNpc', targetId: 'elder-henrik', requiredCount: 1 },
+    ],
+    reward: { xp: 30, gold: 20 },
+  },
+  'frozen-echoes': {
+    id: 'frozen-echoes',
+    prerequisiteQuestId: 'northbound',
+    objectives: [
+      { id: 'talk-astrid-start', type: 'talkToNpc', targetId: 'captain-astrid-frost', requiredCount: 1 },
+      { id: 'reach-snowveil-forest', type: 'reachLocation', targetId: 'snowveil-forest', requiredCount: 1 },
+      { id: 'reach-frozen-river', type: 'reachLocation', targetId: 'frozen-river', requiredCount: 1 },
+      { id: 'reach-aurora-basin', type: 'reachLocation', targetId: 'aurora-basin', requiredCount: 1 },
+      { id: 'discover-winter-shrine', type: 'interactWithShrine', targetId: 'winter-shrine', requiredCount: 1 },
+    ],
+    reward: { xp: 25, gold: 15 },
+  },
+  'light-within-the-ice': {
+    id: 'light-within-the-ice',
+    prerequisiteQuestId: 'frozen-echoes',
+    objectives: [
+      { id: 'get-aurora-crystal-fragment-snowveil-forest', type: 'collectItem', targetId: 'aurora-crystal-fragment-snowveil-forest', requiredCount: 1 },
+      { id: 'get-aurora-crystal-fragment-glacier-pass', type: 'collectItem', targetId: 'aurora-crystal-fragment-glacier-pass', requiredCount: 1 },
+      { id: 'get-aurora-crystal-fragment-aurora-basin', type: 'collectItem', targetId: 'aurora-crystal-fragment-aurora-basin', requiredCount: 1 },
+      { id: 'restore-winter-shrine', type: 'interactWithShrine', targetId: 'winter-shrine', requiredCount: 1 },
+    ],
+    reward: { xp: 60, gold: 30, spiritEssence: 15 },
+  },
+  'hall-of-eternal-winter': {
+    id: 'hall-of-eternal-winter',
+    prerequisiteQuestId: 'light-within-the-ice',
+    objectives: [
+      { id: 'talk-lyra-final', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+      { id: 'reach-hall-of-eternal-winter-approach', type: 'reachLocation', targetId: 'hall-of-eternal-winter-approach', requiredCount: 1 },
+    ],
+    reward: { xp: 80, gold: 40, regionalReputation: 45, grantLoreId: 'lore-hall-of-eternal-winter-approach' },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -824,4 +871,8 @@ export const QUEST_ORDER = [
   'lantern-of-forgotten-stars',
   'the-canyon-giant',
   'the-stars-never-lied',
+  'northbound',
+  'frozen-echoes',
+  'light-within-the-ice',
+  'hall-of-eternal-winter',
 ];

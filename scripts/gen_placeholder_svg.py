@@ -277,6 +277,7 @@ add("portraits/armorer-magnus.svg", 512, 512, "MAGNUS", "#6a8aaa", "#3a4a62")
 
 # Quest key-item icons (Phase 3) - shared icons for the 3 Star Fragments and 2 Desert Relics.
 add("icons/star-fragment.svg", 64, 64, "STAR", "#7a8ac0", "#3a4470")
+add("icons/aurora-crystal-fragment.svg", 64, 64, "AURORA", "#6ab0d0", "#2a5070", font_size=9)
 add("icons/desert-relic.svg", 64, 64, "RELIC", "#c8a868", "#8a6838")
 
 # Enemy battle sprites + material icon (Phase 4 - dustDevils family).

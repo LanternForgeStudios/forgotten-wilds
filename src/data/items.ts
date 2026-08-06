@@ -774,6 +774,38 @@ export const ITEMS: Item[] = [
     tier: 'rare',
     unique: true,
   },
+
+  // --- Frozen Frontier (MSQ Volume VI), Chapter 11: Into the Endless Winter ---
+  {
+    id: 'aurora-crystal-fragment-snowveil-forest',
+    name: 'Aurora Crystal Fragment (Snowveil Forest)',
+    description: "A shard of ice that holds a faint trace of aurora-light, one of three needed to thaw the Winter Shrine's frozen Aurora Crystal.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.aurora-crystal-fragment',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'aurora-crystal-fragment-glacier-pass',
+    name: 'Aurora Crystal Fragment (Glacier Pass)',
+    description: "A shard of ice that holds a faint trace of aurora-light, one of three needed to thaw the Winter Shrine's frozen Aurora Crystal.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.aurora-crystal-fragment',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
+  {
+    id: 'aurora-crystal-fragment-aurora-basin',
+    name: 'Aurora Crystal Fragment (Aurora Basin)',
+    description: "A shard of ice that holds a faint trace of aurora-light, one of three needed to thaw the Winter Shrine's frozen Aurora Crystal.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.aurora-crystal-fragment',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

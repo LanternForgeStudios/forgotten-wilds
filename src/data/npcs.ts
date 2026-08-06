@@ -1328,6 +1328,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Elder Henrik', text: "Elias Rowan's letter reached us same as it reached every other region, in the end. He wrote that whoever came looking for the last Lantern should be trusted. I intend to hold him to that." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['northbound'] },
+    dialogueVariants: [
+      {
+        questId: 'northbound',
+        lines: [
+          { speaker: 'Elder Henrik', text: "Astrid's already told you the trouble, I expect. Whatever's out past Snowveil, Frosthaven has needed someone willing to walk toward it, not away." },
+          { speaker: 'Elder Henrik', text: "Go carefully, Keeper. This winter has outlasted every one before it for a reason nobody here has managed to name yet." },
+        ],
+      },
+    ],
   },
   {
     id: 'captain-astrid-frost',
@@ -1341,6 +1350,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Captain Astrid Frost', text: "Whatever's spreading out there, it isn't ordinary cold. Ordinary cold doesn't leave a trail this deliberate." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['frozen-echoes'] },
+    dialogueVariants: [
+      {
+        questId: 'frozen-echoes',
+        lines: [
+          { speaker: 'Captain Astrid Frost', text: "A shrine, buried under all that snow at Aurora Basin. Dormant, near as I could tell, but dormant isn't the same as harmless." },
+          { speaker: 'Captain Astrid Frost', text: "Whatever's wrong with the Aurora Crystal, it's tied to whatever's been taking my scouts. I'd stake my rank on it." },
+        ],
+      },
+    ],
   },
   {
     id: 'aurora-keeper-lyra',
@@ -1354,6 +1372,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Aurora Keeper Lyra', text: "There's a Lantern Sanctuary somewhere past the Hall of Eternal Winter, if the old records are honest. The last one left in Mytherra, as far as anyone's found." },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['hall-of-eternal-winter'] },
+    dialogueVariants: [
+      {
+        questId: 'hall-of-eternal-winter',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "The aurora is thin, but it's there. First real light this chapel has seen in longer than I've kept it." },
+          { speaker: 'Aurora Keeper Lyra', text: "The Hall of Eternal Winter is past Glacier Pass, through Aurora Basin now that the shrine's restored the way. Whatever's inside has been waiting the longest of anything in Mytherra." },
+        ],
+      },
+    ],
   },
   {
     id: 'winter-spirit',
@@ -1367,6 +1394,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Winter Spirit', text: 'My own Aurora Crystal froze solid the same season the sky went dark. Three fragments would thaw it, if you could find them - Snowveil, Glacier Pass, and here, buried under all this waiting.' },
     ],
     gameplayHook: { type: 'questGiver', questIds: ['light-within-the-ice'] },
+    dialogueVariants: [
+      {
+        questId: 'light-within-the-ice',
+        lines: [
+          { speaker: 'Winter Spirit', text: 'Whole again, and warmer for it - the first warmth this basin has felt since the sky went dark. I had forgotten what it was to not be cold.' },
+          { speaker: 'Winter Spirit', text: 'The road north is open now, Keeper. Whatever waits in the Hall of Eternal Winter, it has been waiting for you specifically, longer than either of us can properly account for.' },
+        ],
+      },
+    ],
   },
   {
     id: 'innkeeper-greta',

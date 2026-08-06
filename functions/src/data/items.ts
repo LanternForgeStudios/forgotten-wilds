@@ -271,6 +271,10 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'guardian-memory-fragment-5': { id: 'guardian-memory-fragment-5', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'guardian-memory-fragment-6': { id: 'guardian-memory-fragment-6', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'frostward-star-chart': { id: 'frostward-star-chart', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  // Frozen Frontier (MSQ Volume VI, Chapter 11).
+  'aurora-crystal-fragment-snowveil-forest': { id: 'aurora-crystal-fragment-snowveil-forest', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'aurora-crystal-fragment-glacier-pass': { id: 'aurora-crystal-fragment-glacier-pass', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'aurora-crystal-fragment-aurora-basin': { id: 'aurora-crystal-fragment-aurora-basin', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'celestial-star-map': { id: 'celestial-star-map', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'archive-fragments': { id: 'archive-fragments', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'lantern-of-ancient-roots': { id: 'lantern-of-ancient-roots', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
