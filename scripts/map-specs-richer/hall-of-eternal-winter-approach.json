@@ -36,7 +36,7 @@
           "count": 12,
           "seed": 66,
           "avoid": [
-            { "x": 2, "y": 20 }, { "x": 30, "y": 20 },
+            { "x": 2, "y": 20 }, { "x": 30, "y": 20 }, { "x": 62, "y": 20 },
             { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 }
           ]
         }
@@ -48,6 +48,9 @@
     { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-aurora-basin" },
     { "type": "transition", "x": 0, "y": 20, "refId": "aurora-basin", "targetSpawnId": "from-hall-of-eternal-winter-approach" },
     { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-hall-of-eternal-winter" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "hall-of-eternal-winter", "targetSpawnId": "from-hall-of-eternal-winter-approach" },
 
     { "type": "interactable", "x": 10, "y": 8, "refId": "chest-hall-of-eternal-winter-approach-1" },
     { "type": "interactable", "x": 52, "y": 10, "refId": "chest-hall-of-eternal-winter-approach-2" },

@@ -1284,4 +1284,74 @@ export const LOCATIONS: Location[] = [
     fastTravel: false,
     parentLocationId: 'frosthaven',
   },
+
+  // --- Frozen Frontier (MSQ Volume VI), Chapter 12: The Last Memory ---
+  // Hall of Eternal Winter dungeon, chained east from Hall of Eternal Winter Approach's own east
+  // transition, matching the Thunderbird Mesa/Heartwood Sanctuary/Forgotten Observatory 5-room
+  // pattern exactly. "Lantern Sanctuary" as a plain id is already taken (Thunderbird Mesa), so
+  // this one is 'winter-lantern-sanctuary', matching heartwood-/star- before it.
+  {
+    id: 'hall-of-eternal-winter',
+    name: 'Hall of Eternal Winter',
+    kind: 'dungeon',
+    description: 'A vast frozen hall, its columns rimed thick with frost that has never once thawed.',
+    mapAssetId: 'map.hall-of-eternal-winter',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'frozen-wraith', weight: 3 },
+      { enemyId: 'ancient-frozen-wraith', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'winter-lantern-sanctuary',
+    name: 'Lantern Sanctuary',
+    kind: 'dungeon',
+    description: 'A round chamber deep in the Hall, where a single lantern has waited, unlit, since before Frosthaven had a name.',
+    mapAssetId: 'map.winter-lantern-sanctuary',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [{ enemyId: 'ancient-frozen-wraith', weight: 1 }],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'guardian-chamber',
+    name: 'Guardian Chamber',
+    kind: 'dungeon',
+    description: 'A wide chamber lined with carved likenesses of every Guardian that came before this one, all facing the same direction.',
+    mapAssetId: 'map.guardian-chamber',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'frozen-wraith', weight: 2 },
+      { enemyId: 'ancient-frozen-wraith', weight: 2 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'summit-of-winter',
+    name: 'Summit of Winter',
+    kind: 'dungeon',
+    description: 'An open platform at the Hall\'s highest point, where a shape carved from ice itself has kept a watch that never once relieved.',
+    mapAssetId: 'map.summit-of-winter',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'ancient-frozen-wraith', weight: 2 },
+      { enemyId: 'frozen-wraith', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'hall-of-memories',
+    name: 'Hall of Memories',
+    kind: 'dungeon',
+    description: 'A quiet chamber past the Summit, its walls lined with six empty alcoves, each shaped to hold something that was never returned - until now.',
+    mapAssetId: 'map.hall-of-memories',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [],
+    npcIds: [],
+    fastTravel: true,
+  },
 ];

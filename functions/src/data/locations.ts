@@ -123,6 +123,11 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'aurora-basin': {
     'aurora-crystal-fragment-aurora-basin': 'aurora-crystal-fragment-aurora-basin',
   },
+  // Frozen Frontier (MSQ Volume VI, Chapter 12) - the Lantern of Winter's Resolve's found-item form
+  // (MSF-FF-005).
+  'winter-lantern-sanctuary': {
+    'lantern-of-winters-resolve': 'lantern-of-winters-resolve',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's
@@ -153,6 +158,8 @@ export const KNOWN_SHRINES: Record<string, Set<string>> = {
   // Aurora Basin's own Winter Shrine - discover (MSF-FF-002) then restore (MSF-FF-003) beats share
   // this same refId, matching the established shrine-reuse-across-sequential-quests pattern.
   'aurora-basin': new Set(['winter-shrine']),
+  // Hall of Memories' own memory-altar - the Complete Memory beat (MSF-FF-007).
+  'hall-of-memories': new Set(['memory-altar']),
 };
 
 /** Which parent map's location each landmark lives within - visitLandmark.ts's own lookup, used to

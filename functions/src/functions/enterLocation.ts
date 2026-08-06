@@ -60,6 +60,11 @@ const LOCATION_GATES: Record<string, string> = {
   // Frozen Frontier (MSQ Volume VI) - same single-gate-per-region-entry-point model, gated on
   // Volume V's own true finale.
   'frosthaven': 'the-stars-never-lied',
+  // Hall of Eternal Winter dungeon entrance (Chapter 12) - gated on Chapter 11's true finale. The
+  // other 4 rooms (winter-lantern-sanctuary/guardian-chamber/summit-of-winter/hall-of-memories) are
+  // reached by physically walking the chained transitions from here, same single-gate dungeon
+  // precedent.
+  'hall-of-eternal-winter': 'hall-of-eternal-winter',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -163,6 +168,12 @@ const KNOWN_LOCATION_IDS = new Set([
   'frosthaven-general-store',
   'frosthaven-blacksmith',
   'frosthaven-armory',
+  // Chapter 12's Hall of Eternal Winter dungeon (5 chained rooms).
+  'hall-of-eternal-winter',
+  'winter-lantern-sanctuary',
+  'guardian-chamber',
+  'summit-of-winter',
+  'hall-of-memories',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

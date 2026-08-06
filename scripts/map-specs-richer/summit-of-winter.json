@@ -1,0 +1,40 @@
+{
+  "width": 28,
+  "height": 20,
+  "tilesets": [
+    {
+      "assetId": "tileset.tiny-dungeon",
+      "name": "tiny-dungeon",
+      "image": "tiny-dungeon.png",
+      "imageWidth": 192,
+      "imageHeight": 176,
+      "tileSize": 16,
+      "nonWalkableIds": [0]
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 24 },
+    "border": { "tileset": 0, "id": 0 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 6, "y": 4, "tileId": { "tileset": 0, "id": 25 } },
+        { "x": 21, "y": 15, "tileId": { "tileset": 0, "id": 25 } }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 1, "y": 10, "refId": "from-guardian-chamber" },
+    { "type": "spawnPoint", "x": 1, "y": 10, "refId": "default" },
+    { "type": "transition", "x": 0, "y": 10, "refId": "guardian-chamber", "targetSpawnId": "from-summit-of-winter" },
+
+    { "type": "spawnPoint", "x": 26, "y": 10, "refId": "from-hall-of-memories" },
+    { "type": "transition", "x": 27, "y": 10, "refId": "hall-of-memories", "targetSpawnId": "from-summit-of-winter" },
+
+    { "type": "interactable", "x": 14, "y": 10, "refId": "winter-stag" },
+    { "type": "interactable", "x": 6, "y": 15, "refId": "chest-summit-of-winter-1" }
+  ]
+}

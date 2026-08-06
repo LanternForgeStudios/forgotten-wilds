@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 7,
+  "nextobjectid": 9,
   "layers": [
     {
       "id": 1,
@@ -5227,6 +5227,47 @@
         {
           "id": 4,
           "name": "",
+          "type": "spawnPoint",
+          "x": 976,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-hall-of-eternal-winter"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "",
+          "type": "transition",
+          "x": 1008,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "hall-of-eternal-winter"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-hall-of-eternal-winter-approach"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "",
           "type": "interactable",
           "x": 160,
           "y": 128,
@@ -5243,7 +5284,7 @@
           ]
         },
         {
-          "id": 5,
+          "id": 7,
           "name": "",
           "type": "interactable",
           "x": 832,
@@ -5261,7 +5302,7 @@
           ]
         },
         {
-          "id": 6,
+          "id": 8,
           "name": "",
           "type": "interactable",
           "x": 864,

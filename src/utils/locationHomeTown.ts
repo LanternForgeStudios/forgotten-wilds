@@ -63,6 +63,11 @@ export const LOCATION_HOME_TOWN: Record<string, string> = {
   'glacier-pass': 'frosthaven',
   'aurora-basin': 'frosthaven',
   'hall-of-eternal-winter-approach': 'frosthaven',
+  'hall-of-eternal-winter': 'frosthaven',
+  'winter-lantern-sanctuary': 'frosthaven',
+  'guardian-chamber': 'frosthaven',
+  'summit-of-winter': 'frosthaven',
+  'hall-of-memories': 'frosthaven',
 };
 
 /** Resolves the home town for any location id - falls back to Ash Hallow for an unmapped id
