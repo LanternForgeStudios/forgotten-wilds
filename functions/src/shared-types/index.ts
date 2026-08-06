@@ -220,6 +220,22 @@ export interface CombatSession {
   startedAt: number;
   expiresAt: number;
   playerAilments: ActiveAilment[];
+  /** Set once the player uses a non-offensive (defensive/healing) Lantern Ability this round - a
+   *  category of action deliberately designed to NOT end the player's turn (see resolveRound's own
+   *  "does this action consume the round" branch), so the enemies never get a free extra attack out
+   *  of a heal/ward. Still only one Lantern Ability per round regardless of category - this flag is
+   *  what enforces that once the round-ending side effect can no longer do it implicitly. Reset to
+   *  false the moment a round actually completes (the enemy phase ran). Undefined on any session
+   *  created before this field existed - treated as false, matching every other optional
+   *  backfill-on-read field in this file. */
+  lanternUsedThisRound?: boolean;
+  /** Set alongside lanternUsedThisRound when the non-turn-ending Lantern Ability that triggered it
+   *  was itself defensive (category 'defensive', e.g. a Ward) - carries the "defending" damage-half
+   *  bonus forward to whatever action actually ends the round, since that later action might not be
+   *  `defend` itself (see RoundInput.carriedPlayerDefending). A non-offensive-but-not-defensive
+   *  ability (a pure heal) sets lanternUsedThisRound without this, correctly granting no bonus.
+   *  Cleared the moment a round actually completes, same lifecycle as lanternUsedThisRound. */
+  defendingBonusPending?: boolean;
 }
 
 // --- Social: friend search/requests/blocking/DMs. All server-authoritative - clients only ever
@@ -454,6 +470,18 @@ export interface PartyBattleParticipantStats {
    *  (see equipmentEngine.ts's computeAilmentResistances). [] whenever nothing equipped grants
    *  one. */
   ailmentResistances: AilmentResistance[];
+  /** Set once this participant uses a non-offensive (defensive/healing) Lantern Ability on their
+   *  turn - mirrors CombatSession.lanternUsedThisRound's own doc comment (same "doesn't end the
+   *  turn, but still only one per round" rule), just per-participant instead of per-session since
+   *  party/PvP turns are already resolved one player at a time (see partyCombatEngine.ts's own top
+   *  comment). Cleared back to false once this participant's turn actually completes (i.e. a
+   *  turn-ending action follows). Undefined on a participantStats entry created before this field
+   *  existed - treated as false, matching every other optional backfill-on-read field in this file. */
+  lanternUsedThisRound?: boolean;
+  /** Set alongside lanternUsedThisRound when that non-turn-ending Lantern Ability was itself
+   *  defensive - mirrors CombatSession.defendingBonusPending's own doc comment, carrying the
+   *  damage-halving bonus forward to whichever action actually ends this participant's turn. */
+  defendingBonusPending?: boolean;
 }
 
 export interface PartyBattleEnemyState {

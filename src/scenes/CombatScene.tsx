@@ -84,6 +84,11 @@ export function CombatScene() {
     entries: { enemyIndex: number; ailmentIds: string[] }[];
     key: number;
   }>({ entries: [], key: 0 });
+  // Mirrors CombatSession.lanternUsedThisRound - true once a non-offensive (defensive/healing)
+  // Lantern Ability has been used as a non-turn-ending sub-action this round (see act() below),
+  // disabling the Lantern Ability button(s) until a real round-ending action clears it back to
+  // false, matching the "still only one Lantern Ability per round" server-side rule.
+  const [lanternUsedThisRound, setLanternUsedThisRound] = useState(false);
   const [selectedAilmentId, setSelectedAilmentId] = useState<string | null>(null);
   const [showSkillMenu, setShowSkillMenu] = useState(false);
   // None of this scene's own overlays (ailment popup, skill menu, item menu) closed on Escape
@@ -182,6 +187,7 @@ export function CombatScene() {
         void playMusic(res.enemies.some((e) => e.isBoss) ? 'music.combat-boss' : 'music.combat');
         setTargetIndex(res.enemies[0]?.index ?? null);
         setPlayerAilments(res.playerAilments);
+        setLanternUsedThisRound(false);
         patchStats({ hp: res.playerHp, maxHp: res.playerMaxHp, spirit: res.playerSpirit });
         const intro =
           res.enemies.length > 1
@@ -292,6 +298,7 @@ export function CombatScene() {
         patchStats({ hp: res.playerHp, spirit: res.playerSpirit, lanternOil: res.playerLanternOil });
       }
       setTray([]);
+      setLanternUsedThisRound(!res.turnConsumed);
 
       // Matches BattleScene.playIncomingHits' own schedule (PRE_ENEMY_ATTACK_DELAY_MS before the
       // first attacker, then INCOMING_HIT_STAGGER_MS between each subsequent one unless Fast
@@ -752,8 +759,14 @@ export function CombatScene() {
             <button
               key={ability.id}
               className={styles.actionButton}
-              disabled={!canAct || (player?.stats.lanternOil ?? 0) < ability.oilCost || isLanternDisabled}
-              title={isLanternDisabled ? 'Frozen - the Lantern specialty is disabled.' : undefined}
+              disabled={!canAct || (player?.stats.lanternOil ?? 0) < ability.oilCost || isLanternDisabled || lanternUsedThisRound}
+              title={
+                isLanternDisabled
+                  ? 'Frozen - the Lantern specialty is disabled.'
+                  : lanternUsedThisRound
+                    ? 'Already used your Lantern this round.'
+                    : undefined
+              }
               onClick={() => act('lanternAbility', { abilityId: ability.id })}
             >
               {ability.name} ({ability.oilCost} Oil)

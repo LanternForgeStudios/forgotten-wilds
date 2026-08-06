@@ -161,6 +161,11 @@ export interface EnemyHitResult {
 export interface ResolveCombatActionResponse {
   log: string[];
   phase: 'continue' | 'victory' | 'defeat' | 'fled';
+  /** False only for a non-offensive (defensive/healing) Lantern Ability - the enemies never got a
+   *  turn this call, so the client should keep the action menu in "still your turn" mode (Lantern
+   *  Ability itself disabled until the round actually ends) instead of treating this like any other
+   *  resolved round. True for every other action. */
+  turnConsumed: boolean;
   playerHp: number;
   playerMaxHp: number;
   playerSpirit: number;

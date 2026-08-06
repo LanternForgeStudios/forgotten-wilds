@@ -585,8 +585,14 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                     <button
                       key={ability.id}
                       className={styles.smallButton}
-                      disabled={busy || isLanternDisabled || me.lanternOil < ability.oilCost}
-                      title={isLanternDisabled ? 'Frozen - the Lantern specialty is blocked.' : undefined}
+                      disabled={busy || isLanternDisabled || me.lanternOil < ability.oilCost || !!me.lanternUsedThisRound}
+                      title={
+                        isLanternDisabled
+                          ? 'Frozen - the Lantern specialty is blocked.'
+                          : me.lanternUsedThisRound
+                            ? 'Already used your Lantern this round.'
+                            : undefined
+                      }
                       onClick={() => submitLanternAbility(ability.id)}
                     >
                       {ability.name} ({ability.oilCost} Oil)

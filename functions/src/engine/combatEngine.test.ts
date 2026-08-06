@@ -471,6 +471,73 @@ describe('resolveRound', () => {
     expect(result.playerLanternOil).toBeLessThan(20);
   });
 
+  it('a healing/defensive lantern ability does not consume the turn - no enemy attack lands', () => {
+    // steadfast-ember (healing) and still-waters-calm (defensive) both leave turnConsumed false
+    // and, since resolveCombatAction.ts never runs the enemy phase in that case, the player should
+    // take zero damage from this single resolveRound call - even with the enemy guaranteed to act
+    // first (speed -999), because the early-return in resolveRound skips the enemy loop entirely.
+    for (const abilityId of ['steadfast-ember', 'still-waters-calm']) {
+      const result = resolveRound({
+        action: { type: 'lanternAbility', abilityId },
+        playerStats: stats({ speed: -999, hp: 10 }),
+        inventory: [],
+        playerAilments: [],
+        ailmentResistances: [],
+        enemies: soloEnemies(),
+      });
+      expect(result.turnConsumed).toBe(false);
+      expect(result.enemyHits).toHaveLength(0);
+      expect(result.damageTakenByPlayer).toBe(0);
+    }
+  });
+
+  it('every other action type consumes the turn', () => {
+    for (const action of [
+      { type: 'attack' as const },
+      { type: 'skill' as const },
+      { type: 'defend' as const },
+      { type: 'lanternAbility' as const, abilityId: 'lantern-flame' }, // offensive
+    ]) {
+      const result = resolveRound({
+        action,
+        playerStats: stats({ speed: 999 }),
+        inventory: [],
+        playerAilments: [],
+        ailmentResistances: [],
+        enemies: soloEnemies(),
+      });
+      expect(result.turnConsumed).toBe(true);
+    }
+  });
+
+  it('carriedPlayerDefending halves the enemy hit even when the ending action is not Defend', () => {
+    // Mirrors the real flow: a defensive lantern ability resolves first (turnConsumed: false, not
+    // tested here), then the player's next action - e.g. plain Attack - ends the round.
+    // resolveCombatAction.ts passes CombatSession.defendingBonusPending through as
+    // carriedPlayerDefending so that ending action still gets the halving bonus.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const carried = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      playerAilments: [],
+      ailmentResistances: [],
+      enemies: soloEnemies(),
+      carriedPlayerDefending: true,
+    });
+    const notCarried = resolveRound({
+      action: { type: 'attack' },
+      playerStats: stats({ speed: -999, hp: 999, maxHp: 999 }),
+      inventory: [],
+      playerAilments: [],
+      ailmentResistances: [],
+      enemies: soloEnemies(),
+    });
+    vi.restoreAllMocks();
+    expect(999 - carried.playerHp).toBeLessThan(999 - notCarried.playerHp);
+    expect(carried.turnConsumed).toBe(true);
+  });
+
   it('using Lantern Oil (the item) restores lantern oil', () => {
     const result = resolveRound({
       action: { type: 'item', itemIds: ['lantern-oil'] },

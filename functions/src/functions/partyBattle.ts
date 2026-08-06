@@ -82,6 +82,12 @@ function validatePartyBattleAction(action: CombatAction, stats: PartyBattleParti
     if (disabler) {
       throw new HttpsError('failed-precondition', `You are ${AILMENTS[disabler.ailmentId].name} and cannot use the Lantern specialty.`);
     }
+    // Non-offensive Lantern Abilities don't end the turn (see resolvePartyPlayerTurn's/
+    // resolvePvpTurn's turnConsumed doc comments), but the "one Lantern Ability per round" cap
+    // still applies - mirrors resolveCombatAction.ts's identical session.lanternUsedThisRound check.
+    if (stats.lanternUsedThisRound) {
+      throw new HttpsError('failed-precondition', 'You have already used your Lantern this round.');
+    }
     const lanternDef = stats.lanternId ? EQUIPMENT[stats.lanternId] : undefined;
     const abilityId = action.abilityId;
     const ability = abilityId ? LANTERN_ABILITIES[abilityId] : undefined;
@@ -413,6 +419,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         inventory: activeSave.inventory,
         ailments: activeStats.ailments,
         attackAilment: activeStats.attackAilment ?? undefined,
+        carriedDefending: !!activeStats.defendingBonusPending,
       },
       battle.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp, ailments: e.ailments ?? [] })),
     );
@@ -430,8 +437,31 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
       lanternOil: turnResult.lanternOil,
       ailments: turnResult.ailments,
       defending: turnResult.defending,
+      lanternUsedThisRound: !turnResult.turnConsumed,
+      defendingBonusPending: !turnResult.turnConsumed && resolvedAction.type === 'lanternAbility' && usedAbilityId
+        ? LANTERN_ABILITIES[usedAbilityId]?.category === 'defensive'
+        : false,
     };
     const nextEnemies = battle.enemies.map((e, i) => ({ ...e, hp: turnResult.enemyHp[i], ailments: turnResult.enemyAilments[i] }));
+
+    if (!turnResult.turnConsumed) {
+      // Non-offensive Lantern Ability sub-action (see resolvePartyPlayerTurn's own turnConsumed
+      // doc comment) - this same participant acts again, so currentTurnIndex deliberately does NOT
+      // advance and the enemy phase never runs this call.
+      if (turnResult.itemConsumedIds.length > 0) {
+        activeSave.updatedAt = now;
+        tx.set(activeUserRef, activeSave);
+      }
+      tx.update(battleRef, {
+        participantStats: nextParticipantStats,
+        enemies: nextEnemies,
+        turnDeadlineAt: now + TURN_TIMEOUT_MS,
+        lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, hits: turnResult.hits, ...skillSfxFields(usedSkillId, usedAbilityId) },
+        updatedAt: now,
+      });
+      return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };
+    }
+
     const nextTurnIndex = battle.currentTurnIndex + 1;
     const roundComplete = nextTurnIndex >= battle.turnOrder.length;
 
@@ -605,6 +635,7 @@ async function resolvePvpBattleTurn(
       inventory: activeSave.inventory,
       ailments: activeStats.ailments,
       attackAilment: activeStats.attackAilment ?? undefined,
+      carriedDefending: !!activeStats.defendingBonusPending,
     },
     {
       hp: opponentStats.hp,
@@ -628,9 +659,31 @@ async function resolvePvpBattleTurn(
       lanternOil: turnResult.lanternOil,
       ailments: turnResult.ailments,
       defending: turnResult.defending,
+      lanternUsedThisRound: !turnResult.turnConsumed,
+      defendingBonusPending: !turnResult.turnConsumed && resolvedAction.type === 'lanternAbility' && usedAbilityId
+        ? LANTERN_ABILITIES[usedAbilityId]?.category === 'defensive'
+        : false,
     },
     [opponentUid]: { ...opponentStats, hp: turnResult.defenderHp, ailments: turnResult.defenderAilments },
   };
+
+  if (!turnResult.turnConsumed) {
+    // Non-offensive Lantern Ability sub-action (see PvpTurnResult.turnConsumed's own doc comment)
+    // - this same participant acts again, so currentTurnIndex/round deliberately don't advance and
+    // a match can never end from this branch (a non-offensive ability never touches the opponent
+    // or forfeits).
+    if (turnResult.itemConsumedIds.length > 0) {
+      activeSave.updatedAt = now;
+      tx.set(activeUserRef, activeSave);
+    }
+    tx.update(battleRef, {
+      participantStats: nextParticipantStats,
+      turnDeadlineAt: now + TURN_TIMEOUT_MS,
+      lastTurnResult: { round: battle.round, log: turnResult.log, resolvedAt: now, pvpHit: turnResult.hit, ...skillSfxFields(usedSkillId, usedAbilityId) },
+      updatedAt: now,
+    });
+    return { resolved: true, status: 'active' as const, phase: 'playerTurn' as const };
+  }
 
   const matchOver = turnResult.forfeited || turnResult.defenderHp <= 0;
   if (matchOver) {

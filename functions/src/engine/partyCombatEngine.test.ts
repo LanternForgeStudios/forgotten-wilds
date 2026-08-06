@@ -107,6 +107,41 @@ describe('resolvePartyPlayerTurn', () => {
     expect(result.lanternOil).toBe(10); // 20 - steadfast-ember's 10 oil cost
   });
 
+  it('turnConsumed is false only for a non-offensive (healing/defensive) lanternAbility, and true for everything else, including a stunned turn', () => {
+    expect(resolvePartyPlayerTurn(player('p1', { action: { type: 'lanternAbility', abilityId: 'steadfast-ember' } }), [mothling()]).turnConsumed).toBe(
+      false,
+    );
+    expect(resolvePartyPlayerTurn(player('p1', { action: { type: 'lanternAbility', abilityId: 'still-waters-calm' } }), [mothling()]).turnConsumed).toBe(
+      false,
+    );
+    expect(resolvePartyPlayerTurn(player('p1', { action: { type: 'lanternAbility', abilityId: 'lantern-flame' } }), [mothling()]).turnConsumed).toBe(
+      true,
+    );
+    expect(resolvePartyPlayerTurn(player('p1', { action: { type: 'attack' } }), [mothling()]).turnConsumed).toBe(true);
+    expect(resolvePartyPlayerTurn(player('p1', { action: { type: 'defend' } }), [mothling()]).turnConsumed).toBe(true);
+    // A stunned participant's submitted lanternAbility never actually resolves - their turn still ends.
+    expect(
+      resolvePartyPlayerTurn(
+        player('p1', { action: { type: 'lanternAbility', abilityId: 'steadfast-ember' }, ailments: [{ ailmentId: 'stun' }] }),
+        [mothling()],
+      ).turnConsumed,
+    ).toBe(true);
+  });
+
+  it('carriedDefending halves the enemy phase hit even when this turn is not itself Defend', () => {
+    const defending: PartyEnemyPhasePlayerState = {
+      uid: 'p1',
+      name: 'Alys',
+      hp: 999,
+      maxHp: 999,
+      defense: 5,
+      ailments: [],
+      defending: resolvePartyPlayerTurn(player('p1', { action: { type: 'attack' }, carriedDefending: true }), [mothling()]).defending,
+      ailmentResistances: [],
+    };
+    expect(defending.defending).toBe(true);
+  });
+
   it("a Skill's ailment roll lands on an enemy vulnerable to it (frost-lance -> Freeze on a coal-spirit)", () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.3 inflict chance
     const coalSpirit = ENEMIES['coal-spirit'];
@@ -307,6 +342,20 @@ describe('resolvePvpTurn', () => {
     expect(result.defenderHp).toBe(opponent().hp);
     expect(result.hit).toBeNull();
     expect(result.lanternOil).toBe(10); // 20 - steadfast-ember's 10 oil cost
+  });
+
+  it('turnConsumed is false only for a non-offensive lanternAbility, true otherwise (attack/defend/flee/offensive ability)', () => {
+    expect(resolvePvpTurn(player('p1', { action: { type: 'lanternAbility', abilityId: 'steadfast-ember' } }), opponent()).turnConsumed).toBe(false);
+    expect(resolvePvpTurn(player('p1', { action: { type: 'lanternAbility', abilityId: 'still-waters-calm' } }), opponent()).turnConsumed).toBe(false);
+    expect(resolvePvpTurn(player('p1', { action: { type: 'lanternAbility', abilityId: 'lantern-flame' } }), opponent()).turnConsumed).toBe(true);
+    expect(resolvePvpTurn(player('p1', { action: { type: 'attack' } }), opponent()).turnConsumed).toBe(true);
+    expect(resolvePvpTurn(player('p1', { action: { type: 'defend' } }), opponent()).turnConsumed).toBe(true);
+    expect(resolvePvpTurn(player('p1', { action: { type: 'flee' } }), opponent()).turnConsumed).toBe(true);
+  });
+
+  it('carriedDefending sets defending true even on a turn that is not itself Defend', () => {
+    const result = resolvePvpTurn(player('p1', { action: { type: 'attack' }, carriedDefending: true }), opponent({ hp: 1000, maxHp: 1000 }));
+    expect(result.defending).toBe(true);
   });
 
   it('a stunned player skips their action entirely but still takes ailment tick damage', () => {

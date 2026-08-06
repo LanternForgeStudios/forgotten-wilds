@@ -126,7 +126,14 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         throw new HttpsError('failed-precondition', 'Not enough Spirit for that.');
       }
     }
+    let usedAbility: (typeof LANTERN_ABILITIES)[string] | undefined;
     if (action.type === 'lanternAbility') {
+      // Non-offensive Lantern Abilities don't end the turn (see resolveRound's early-return
+      // branch), but the "one Lantern Ability per round" cap still applies - without this check a
+      // player could chain unlimited heals/wards in a single round since the round never advances.
+      if (session.lanternUsedThisRound) {
+        throw new HttpsError('failed-precondition', 'You have already used your Lantern this round.');
+      }
       const lanternId = save.player.equipment.lantern;
       const lanternDef = lanternId ? EQUIPMENT[lanternId] : undefined;
       const abilityId = action.abilityId;
@@ -137,6 +144,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       if (save.player.stats.lanternOil < ability.oilCost) {
         throw new HttpsError('failed-precondition', 'Not enough Lantern Oil for that.');
       }
+      usedAbility = ability;
     }
 
     const result = resolveRound({
@@ -147,6 +155,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       playerAilments,
       attackAilment: resolveWeaponAttackAilment(save.player.equipment.weapon),
       ailmentResistances: computeAilmentResistances(save.player.equipment),
+      carriedPlayerDefending: !!session.defendingBonusPending,
     });
 
     save.player.stats.hp = result.playerHp;
@@ -234,8 +243,25 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     tx.set(userRef, save);
 
     const updatedEnemies = session.enemies.map((e, i) => ({ ...e, hp: result.enemyHp[i], ailments: result.enemyAilments[i] }));
-    if (result.phase === 'continue') {
-      tx.update(sessionRef, { enemies: updatedEnemies, round: session.round + 1, playerAilments: result.playerAilments });
+    if (result.phase === 'continue' && !result.turnConsumed) {
+      // The non-turn-ending sub-action path (see resolveRound's own doc) - the round does NOT
+      // advance, enemies never acted, and the "one Lantern Ability per round" cap latches on so a
+      // second lanternAbility call this same round is rejected above. defendingBonusPending carries
+      // the Defend-style damage halving forward to whatever action actually ends the round.
+      tx.update(sessionRef, {
+        enemies: updatedEnemies,
+        playerAilments: result.playerAilments,
+        lanternUsedThisRound: true,
+        defendingBonusPending: usedAbility?.category === 'defensive',
+      });
+    } else if (result.phase === 'continue') {
+      tx.update(sessionRef, {
+        enemies: updatedEnemies,
+        round: session.round + 1,
+        playerAilments: result.playerAilments,
+        lanternUsedThisRound: false,
+        defendingBonusPending: false,
+      });
     } else {
       // All active ailments are dropped once combat ends (see ActiveAilment's doc comment) -
       // nothing carries over to exploration, regardless of what result.playerAilments says.
@@ -245,6 +271,10 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     return {
       log: result.log,
       phase: result.phase,
+      // False only for the non-turn-ending Lantern Ability sub-action - tells the client to keep
+      // showing the action menu (Attack/Skill/Items/Defend/Flee, minus Lantern Ability) instead of
+      // playing out an enemy-turn animation, since no enemy actually acted this call.
+      turnConsumed: result.turnConsumed,
       playerHp: save.player.stats.hp,
       playerMaxHp: save.player.stats.maxHp,
       playerSpirit: save.player.stats.spirit,

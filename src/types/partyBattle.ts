@@ -39,6 +39,13 @@ export interface PartyBattleParticipantStats {
   /** Snapshotted the same way - see shared-types/index.ts's matching comment. Stubbed: always []
    *  today. */
   ailmentResistances: AilmentResistance[];
+  /** See shared-types/index.ts's matching comment - true once this participant has used a
+   *  non-offensive (defensive/healing) Lantern Ability this round, disabling further Lantern
+   *  Ability use until a round-ending action clears it back to false. */
+  lanternUsedThisRound?: boolean;
+  /** See shared-types/index.ts's matching comment - carries a defensive Lantern Ability's
+   *  damage-halving bonus forward to whichever action actually ends this participant's turn. */
+  defendingBonusPending?: boolean;
 }
 
 export interface PartyBattleEnemyState {

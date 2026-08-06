@@ -205,6 +205,12 @@ export interface RoundInput {
    *  computeAilmentResistances) - reduces the chance of an enemy's own move afflicting the player.
    *  [] whenever the player has nothing equipped that grants a resistance. */
   ailmentResistances: AilmentResistance[];
+  /** True when a defensive Lantern Ability was used earlier THIS round, as a non-turn-ending
+   *  sub-action (see the early-return branch below) - carries that action's own damage-halving
+   *  bonus forward onto whichever action actually ends the round, since the enemies never got a
+   *  turn during the sub-action itself. Set by resolveCombatAction.ts from
+   *  CombatSession.defendingBonusPending; always false/undefined for the sub-action's own call. */
+  carriedPlayerDefending?: boolean;
 }
 
 export type RoundOutcomePhase = 'continue' | 'victory' | 'defeat' | 'fled';
@@ -276,6 +282,11 @@ export interface RoundResult {
   /** Same as playerAilments, per enemy (same order/indices as enemyHp) - persisted onto
    *  CombatSession.enemies[i].ailments. */
   enemyAilments: ActiveAilment[][];
+  /** False only for a non-offensive (defensive/healing) Lantern Ability - the one action type that
+   *  deliberately does NOT end the player's turn (see the early-return branch below), so the
+   *  enemies never got a turn this call and CombatSession.round should NOT advance. True for every
+   *  other action, including an offensive Lantern Ability. */
+  turnConsumed: boolean;
 }
 
 /** Groups a (possibly duplicate-laden) list of item ids into counts per id, capped at 3 total uses
@@ -353,7 +364,14 @@ export function resolveRound(input: RoundInput): RoundResult {
     action.type === 'lanternAbility' &&
     !!action.abilityId &&
     LANTERN_ABILITIES[action.abilityId]?.category === 'defensive';
-  const playerDefending = action.type === 'defend' || isDefensiveLanternAbility;
+  // Healing shares the same "doesn't end your turn" treatment as defensive (see the early-return
+  // branch below) - grouped together here since both are the "non-offensive" Lantern Ability
+  // categories, but only 'defensive' actually halves incoming damage.
+  const isNonOffensiveLanternAbility =
+    action.type === 'lanternAbility' &&
+    !!action.abilityId &&
+    LANTERN_ABILITIES[action.abilityId]?.category !== 'offensive';
+  const playerDefending = action.type === 'defend' || isDefensiveLanternAbility || !!input.carriedPlayerDefending;
 
   const enemyHp = input.enemies.map((e) => e.hp);
   const enemyDefs = input.enemies.map((e) => ENEMIES[e.enemyId]);
@@ -716,6 +734,34 @@ export function resolveRound(input: RoundInput): RoundResult {
     // out to be.
     consumeItems(action.itemIds ?? []);
 
+    // A non-offensive Lantern Ability (healing or defensive) deliberately does NOT end the turn -
+    // see CombatSession.lanternUsedThisRound's own doc comment for why. Applies the ability's
+    // effect and its own end-of-turn ailment tick (matching AilmentEffect's "dealt at the end of
+    // the afflicted character's own turn" contract), then returns immediately WITHOUT ever
+    // reaching the enemy turn-order loop below - ailment durations are deliberately left
+    // undecremented too, since a full round (the unit they're timed against) hasn't elapsed. The
+    // caller (resolveCombatAction.ts) is responsible for not advancing CombatSession.round and for
+    // re-presenting the action menu instead of playing out an enemy phase.
+    if (isNonOffensiveLanternAbility) {
+      playerTurn();
+      applyAilmentTickDamage();
+      return {
+        log,
+        playerHp,
+        playerSpirit,
+        playerLanternOil,
+        enemyHp,
+        phase: playerHp <= 0 ? 'defeat' : 'continue',
+        itemConsumedIds,
+        hits,
+        enemyHits,
+        damageTakenByPlayer,
+        playerAilments: ailments,
+        enemyAilments,
+        turnConsumed: false,
+      };
+    }
+
     if (action.type === 'flee') {
       const alive = aliveIndices();
       const avgSpeed = alive.length ? alive.reduce((sum, i) => sum + enemyStats[i].speed, 0) / alive.length : 0;
@@ -741,6 +787,7 @@ export function resolveRound(input: RoundInput): RoundResult {
           damageTakenByPlayer,
           playerAilments: ailments,
           enemyAilments,
+          turnConsumed: true,
         };
       }
       log.push('You try to flee, but there is no opening! Every foe still standing gets a free hit.');
@@ -816,6 +863,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     damageTakenByPlayer,
     playerAilments: remainingAilments,
     enemyAilments: remainingEnemyAilments,
+    turnConsumed: true,
   };
 }
 

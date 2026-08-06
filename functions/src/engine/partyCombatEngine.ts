@@ -50,6 +50,12 @@ export interface PartyPlayerInput {
    *  equipmentEngine.ts's resolveWeaponAttackAilment) - mirrors RoundInput.attackAilment's solo
    *  equivalent. Stubbed: always undefined today. */
   attackAilment?: { id: string; chance: number };
+  /** True when this participant used a defensive Lantern Ability earlier THIS turn, as a
+   *  non-turn-ending sub-action (see the early-return branch below) - mirrors
+   *  RoundInput.carriedPlayerDefending's own doc comment. Set by the caller
+   *  (partyBattle.ts's submitPartyBattleAction) from PartyBattleParticipantStats.defendingBonusPending;
+   *  always false/undefined for the sub-action's own call. */
+  carriedDefending?: boolean;
 }
 
 export interface PartyCombatHitResult {
@@ -89,6 +95,10 @@ export interface PartyPlayerTurnResult {
    *  action alone, the same "up front, not mid-resolution" reasoning solo combat's own
    *  playerDefending has, just per-player instead of per-round. */
   defending: boolean;
+  /** False only for a non-offensive (defensive/healing) Lantern Ability - mirrors
+   *  combatEngine.ts's RoundResult.turnConsumed. False means the caller (partyBattle.ts) must NOT
+   *  advance currentTurnIndex/trigger the enemy phase - this same participant acts again. */
+  turnConsumed: boolean;
 }
 
 /** Resolves exactly one player's turn (item use, then their primary action) against the given
@@ -130,7 +140,11 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
     player.action.type === 'lanternAbility' &&
     !!player.action.abilityId &&
     LANTERN_ABILITIES[player.action.abilityId]?.category === 'defensive';
-  const defending = player.action.type === 'defend' || player.action.type === 'flee' || isDefensiveLanternAbility;
+  const isNonOffensiveLanternAbility =
+    player.action.type === 'lanternAbility' &&
+    !!player.action.abilityId &&
+    LANTERN_ABILITIES[player.action.abilityId]?.category !== 'offensive';
+  const defending = player.action.type === 'defend' || player.action.type === 'flee' || isDefensiveLanternAbility || !!player.carriedDefending;
 
   function damageEnemy(i: number, dmg: number, verb: string): boolean {
     const before = enemyHp[i];
@@ -279,7 +293,25 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
   ailments = expireAilments(ailments, inflictedThisTurn);
   const remainingEnemyAilments = enemyAilments.map((list, i) => expireAilments(list, inflictedThisTurnByEnemy[i]));
 
-  return { log, enemyHp, enemyAilments: remainingEnemyAilments, hits, hp, spirit, lanternOil, ailments, itemConsumedIds, defending };
+  // Unlike combatEngine.ts's resolveRound, this function never runs an "enemy turn" itself (see
+  // resolvePartyEnemyPhase, called separately once every party member has gone) - so a
+  // non-offensive Lantern Ability needs no early-return branch here, just this flag telling the
+  // caller not to advance currentTurnIndex/trigger the enemy phase for this participant.
+  return {
+    log,
+    enemyHp,
+    enemyAilments: remainingEnemyAilments,
+    hits,
+    hp,
+    spirit,
+    lanternOil,
+    ailments,
+    itemConsumedIds,
+    defending,
+    // A stunned participant's turn always ends (nothing was actually cast, see the isStunned
+    // branch above) - only an actually-resolved non-offensive Lantern Ability leaves the turn open.
+    turnConsumed: isStunned(player.ailments) || !isNonOffensiveLanternAbility,
+  };
 }
 
 export interface PvpDefenderInput {
@@ -334,6 +366,9 @@ export interface PvpTurnResult {
    *  (where individual flee has no defined meaning - see resolvePartyPlayerTurn's 'flee' case),
    *  forfeiting here has a real, immediate effect: the match ends in the opponent's favor. */
   forfeited: boolean;
+  /** See PartyPlayerTurnResult.turnConsumed's own doc comment - same rule, just for a PvP duel's
+   *  single opponent instead of a shared enemy board. */
+  turnConsumed: boolean;
 }
 
 /** Resolves exactly one player's turn in a 1-on-1 PvP duel against the given live opponent (hp/
@@ -358,7 +393,11 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
     player.action.type === 'lanternAbility' &&
     !!player.action.abilityId &&
     LANTERN_ABILITIES[player.action.abilityId]?.category === 'defensive';
-  const defending = player.action.type === 'defend' || isDefensiveLanternAbility;
+  const isNonOffensiveLanternAbility =
+    player.action.type === 'lanternAbility' &&
+    !!player.action.abilityId &&
+    LANTERN_ABILITIES[player.action.abilityId]?.category !== 'offensive';
+  const defending = player.action.type === 'defend' || isDefensiveLanternAbility || !!player.carriedDefending;
   let forfeited = false;
   let defenderHp = defender.hp;
   let hit: PvpHitResult | null = null;
@@ -493,7 +532,20 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
   ailments = expireAilments(ailments, inflictedThisTurn);
   defenderAilments = expireAilments(defenderAilments, inflictedThisTurnByDefender);
 
-  return { log, hp, spirit, lanternOil, ailments, itemConsumedIds, defending, defenderHp, defenderAilments, hit, forfeited };
+  return {
+    log,
+    hp,
+    spirit,
+    lanternOil,
+    ailments,
+    itemConsumedIds,
+    defending,
+    defenderHp,
+    defenderAilments,
+    hit,
+    forfeited,
+    turnConsumed: isStunned(player.ailments) || !isNonOffensiveLanternAbility,
+  };
 }
 
 export interface PartyEnemyHitResult {
