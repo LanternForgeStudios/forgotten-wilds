@@ -194,6 +194,12 @@ export const LORE_ENTRIES: JournalEntry[] = [
     unlockedAt: 0,
   },
   {
+    id: 'lore-the-complete-memory',
+    title: 'The Complete Memory',
+    body: "Six fragments placed in six empty alcoves, and for the first time, a single unbroken memory instead of six broken ones: the Guardians foresaw an ancient force with no gentler name than the one they gave it - the Hollow, a corruption that unmakes memory and identity and, left unchecked, would have unmade the First Promise itself. It could not be destroyed. It could only be contained. To imprison it, the Guardians withdrew from the world entirely, and the Lantern Keepers who loved them agreed to erase every record of how and why, so that no one, ever again, would be tempted to undo the seal out of grief or good intentions. Balance faltered without them. Old myths curdled into monsters. Generations grew up believing the Guardians had simply abandoned Mytherra, because that was a kinder story to be angry at than the true one. The Great Silence was never an abandonment. It was the single largest act of preservation anyone in this world ever chose to make - and every one of them chose it together, on purpose, knowing exactly what it would cost the people who came after.",
+    unlockedAt: 0,
+  },
+  {
     id: 'lore-guardian-memory-v',
     title: 'Guardian Memory V: The Stars Never Lied',
     body: "The Canyon Giant's own memory, witnessed at the Star Crystal Shrine: the Great Silence was not an accident, and it was not one side binding the other. Lantern Keepers and Guardians chose it together, deliberately, to save Mytherra from something the desert Guardian's memory circles but never names. Five memories restored now, and the player finally knows what happened. Why it was necessary is a question this desert cannot answer - only the Frozen Frontier, where the final Guardian chose to stay awake and remember everything, still can.",

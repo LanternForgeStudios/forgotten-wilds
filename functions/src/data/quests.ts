@@ -858,6 +858,20 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 360, gold: 190, itemIds: ['eternal-stag-totem'] },
   },
+  'the-complete-memory': {
+    id: 'the-complete-memory',
+    prerequisiteQuestId: 'the-winter-stag',
+    objectives: [
+      { id: 'reach-hall-of-memories', type: 'reachLocation', targetId: 'hall-of-memories', requiredCount: 1 },
+      { id: 'witness-memory-altar', type: 'interactWithShrine', targetId: 'memory-altar', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 200,
+      gold: 100,
+      itemIds: ['guardian-memory-complete'],
+      grantLoreId: 'lore-the-complete-memory',
+    },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -932,4 +946,5 @@ export const QUEST_ORDER = [
   'the-second-scout',
   'lantern-of-winters-resolve',
   'the-winter-stag',
+  'the-complete-memory',
 ];

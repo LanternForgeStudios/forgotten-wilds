@@ -303,6 +303,7 @@ add("sprites/enemies/ancient-frozen-wraith-idle.svg", 128, 128, "ANCIENT", "#6a8
 add("sprites/enemies/winter-stag-idle.svg", 256, 256, "WINTER STAG", "#c8d8e8", "#5a7a90", font_size=18)
 add("icons/frozen-essence.svg", 64, 64, "ESSENCE", "#8aa8c0", "#3a5570", font_size=9)
 add("icons/winter-stag-core.svg", 64, 64, "CORE", "#c8d8e8", "#5a7a90")
+add("icons/guardian-memory-complete.svg", 64, 64, "MEMORY", "#9a70c0", "#5a3880", font_size=9)
 add("icons/canyon-giant-core.svg", 64, 64, "CORE", "#9a70c0", "#5a3880")
 
 # Lantern of Forgotten Stars (Phase 4) - found-item + equipped forms.

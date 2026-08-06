@@ -281,6 +281,7 @@ export const ITEMS: Record<string, ItemDefinition> = {
   'frozen-essence': { id: 'frozen-essence', category: 'materials', usableInCombat: false, tier: 'common' },
   'winter-stag-core': { id: 'winter-stag-core', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'lantern-of-winters-resolve': { id: 'lantern-of-winters-resolve', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
+  'guardian-memory-complete': { id: 'guardian-memory-complete', category: 'keyItem', usableInCombat: false, tier: 'legendary', unique: true },
   'celestial-star-map': { id: 'celestial-star-map', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'archive-fragments': { id: 'archive-fragments', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },
   'lantern-of-ancient-roots': { id: 'lantern-of-ancient-roots', category: 'keyItem', usableInCombat: false, tier: 'rare', unique: true },

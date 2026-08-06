@@ -1148,4 +1148,22 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 360, gold: 190, itemIds: ['eternal-stag-totem'] },
   },
+  {
+    id: 'the-complete-memory',
+    name: 'The Complete Memory',
+    giverNpcId: 'aurora-keeper-lyra',
+    description: 'Place all six Guardian Memory Fragments in the Hall of Memories and witness the complete vision.',
+    category: 'main',
+    prerequisiteQuestId: 'the-winter-stag',
+    objectives: [
+      { id: 'reach-hall-of-memories', type: 'reachLocation', description: 'Reach the Hall of Memories.', targetId: 'hall-of-memories', requiredCount: 1 },
+      { id: 'witness-memory-altar', type: 'interactWithShrine', description: 'Place the six Guardian Memory Fragments and witness the complete memory.', targetId: 'memory-altar', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 200,
+      gold: 100,
+      itemIds: ['guardian-memory-complete'],
+      grantLoreId: 'lore-the-complete-memory',
+    },
+  },
 ];

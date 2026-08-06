@@ -1385,8 +1385,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Aurora Keeper Lyra', text: "The aurora hasn't burned right in longer than my own memory reaches. I keep this chapel lit anyway, on the chance it remembers how, someday." },
       { speaker: 'Aurora Keeper Lyra', text: "There's a Lantern Sanctuary somewhere past the Hall of Eternal Winter, if the old records are honest. The last one left in Mytherra, as far as anyone's found." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-winter-stag', 'lantern-of-winters-resolve', 'the-second-scout', 'the-first-scout', 'hall-of-eternal-winter'] },
+    gameplayHook: { type: 'questGiver', questIds: ['the-complete-memory', 'the-winter-stag', 'lantern-of-winters-resolve', 'the-second-scout', 'the-first-scout', 'hall-of-eternal-winter'] },
     dialogueVariants: [
+      {
+        questId: 'the-complete-memory',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "The Hollow. I read the word in your face before you said it, Keeper - none of us were ready to hear it named, even after everything." },
+          { speaker: 'Aurora Keeper Lyra', text: "Every region restored, every memory recovered, and the truth turns out to be worse and better than anything anyone guessed. Worse, because it was real. Better, because they chose it - all of them, together, on purpose." },
+        ],
+      },
       {
         questId: 'the-winter-stag',
         lines: [

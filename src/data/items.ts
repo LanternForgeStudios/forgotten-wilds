@@ -864,6 +864,16 @@ export const ITEMS: Item[] = [
     tier: 'rare',
     unique: true,
   },
+  {
+    id: 'guardian-memory-complete',
+    name: 'The Complete Memory',
+    description: 'Six fragments, finally whole: the Great Silence was not an abandonment. It was an act of preservation, against a force with no other name than the one the Guardians gave it - the Hollow.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.guardian-memory-complete',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

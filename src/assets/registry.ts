@@ -4394,6 +4394,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
   },
   {
+    id: 'icon.item.guardian-memory-complete',
+    category: 'icon',
+    intendedUse: 'Item icon for guardian-memory-complete (MSF-FF-007 reward, the assembled six-fragment vision) - placeholder pending PixelLab quota',
+    filePath: 'icons/guardian-memory-complete.svg',
+    dimensions: { width: 64, height: 64 },
+    status: 'placeholder',
+    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+  },
+  {
     id: 'icon.item.star-fragment',
     category: 'icon',
     intendedUse: 'Item icon for the 3 star-fragment-* item ids (Shattered Desert, Chapter 9) - shared since all 3 are the same collectible, just placed in 3 different field maps. Placeholder pending PixelLab quota.',
