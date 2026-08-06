@@ -38,6 +38,10 @@ export interface Player {
    *  which naturally means "eligible immediately" (see data/dailyChest.ts's
    *  CHEST_CLAIM_INTERVAL_MS) without a separate first-claim special case. */
   lastChestClaimedAt: number;
+  /** Permanent gold-bought Lantern Oil capacity upgrade tier per lantern equipment id (see
+   *  data/lanternOilUpgrades.ts) - 0/absent means never upgraded. See
+   *  functions/src/shared-types/index.ts's matching field for the full design reasoning. */
+  lanternOilUpgrades: Record<string, number>;
 }
 
 export interface PlayerSave {

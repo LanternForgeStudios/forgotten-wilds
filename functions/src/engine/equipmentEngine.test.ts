@@ -3,6 +3,7 @@ import {
   adjustStatsForBonuses,
   backfillPlayerEquipment,
   computeAilmentResistances,
+  effectiveOilCapacity,
   equipIntoSlot,
   resolveWeaponAttackAilment,
   setLanternOilCapacity,
@@ -90,6 +91,33 @@ describe('equipIntoSlot', () => {
     expect(s.player.equipment.lantern).toBe('keepers-lantern');
     expect(s.player.stats.maxLanternOil).toBe(30);
   });
+
+  it('adds a purchased Lantern Oil upgrade tier on top of the base oilCapacity when equipping', () => {
+    const s = save();
+    s.player.lanternOilUpgrades = { 'keepers-lantern': 3 };
+    equipIntoSlot(s, 'keepers-lantern', lanternDef);
+    // 30 base + 3 tiers x 15/tier = 75
+    expect(s.player.stats.maxLanternOil).toBe(75);
+  });
+
+  it('never applies an upgrade tier bought for a DIFFERENT lantern id', () => {
+    const s = save();
+    s.player.lanternOilUpgrades = { 'some-other-lantern': 10 };
+    equipIntoSlot(s, 'keepers-lantern', lanternDef);
+    expect(s.player.stats.maxLanternOil).toBe(30);
+  });
+});
+
+describe('effectiveOilCapacity', () => {
+  it('adds upgrades[lanternId] * 15 on top of the base capacity', () => {
+    expect(effectiveOilCapacity(30, 'keepers-lantern', { 'keepers-lantern': 5 })).toBe(105);
+  });
+
+  it('is just the base capacity when there is no upgrade entry for this lantern', () => {
+    expect(effectiveOilCapacity(30, 'keepers-lantern', { 'another-lantern': 5 })).toBe(30);
+    expect(effectiveOilCapacity(30, 'keepers-lantern', {})).toBe(30);
+    expect(effectiveOilCapacity(30, 'keepers-lantern', undefined)).toBe(30);
+  });
 });
 
 describe('backfillPlayerEquipment', () => {
@@ -162,6 +190,17 @@ describe('backfillPlayerEquipment', () => {
     backfillPlayerEquipment(save);
     expect(save.player.equipment.legs).toBe(null);
     expect(save.player.equipment.chest).toBe('travelers-cloak');
+  });
+
+  it('backfills a missing lanternOilUpgrades map on a save that predates it, leaves an existing one untouched', () => {
+    const fresh = { player: {} } as unknown as PlayerSave;
+    backfillPlayerEquipment(fresh);
+    expect(fresh.player.lanternOilUpgrades).toEqual({});
+
+    const upgrades = { 'keepers-lantern': 4 };
+    const existing = { player: { lanternOilUpgrades: upgrades } } as unknown as PlayerSave;
+    backfillPlayerEquipment(existing);
+    expect(existing.player.lanternOilUpgrades).toBe(upgrades);
   });
 });
 

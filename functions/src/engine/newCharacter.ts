@@ -35,6 +35,7 @@ export function buildFreshPlayer(
     gender,
     appearance,
     lastChestClaimedAt: 0,
+    lanternOilUpgrades: {},
   };
 }
 

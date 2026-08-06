@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Panel } from '@/components/common/Panel';
 import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
 import { MessageOverlay } from '@/components/exploration/MessageOverlay';
 import { MobileHud } from '@/components/exploration/MobileHud';
@@ -23,6 +24,8 @@ import { useExplorationDash } from '@/hooks/useExplorationDash';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
+import { useInventoryStore } from '@/state/useInventoryStore';
+import { useJournalStore } from '@/state/useJournalStore';
 import { useSceneStore } from '@/state/useSceneStore';
 import { callTalkToNpc, callInteractWithShrine, callSendFriendRequest, type QuestRewardSummary } from '@/firebase/functionsClient';
 import { RewardPopup } from '@/components/RewardPopup';
@@ -35,10 +38,12 @@ import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
+import { eligibleLanternUpgrades } from '@/utils/lanternOilUpgradeEligibility';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { playMusic, playSound } from '@/audio/audioService';
 import styles from './TownScene.module.css';
+import menuStyles from '@/components/CharacterMenu.module.css';
 
 const PRESENCE_STALE_AFTER_MS = 60_000;
 
@@ -126,6 +131,12 @@ export function TownScene() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [activeShopId, setActiveShopId] = useState<string | undefined>();
+  const [shopInitialTab, setShopInitialTab] = useState<'buy' | 'sell' | 'upgrade'>('buy');
+  // Set to a shopId when that shop offers a Lantern Oil upgrade the player is eligible for -
+  // presents a "Buy/Sell vs Upgrade Lantern" choice before Shop itself opens, instead of always
+  // going straight to Buy/Sell. Every shop with nothing eligible skips this and behaves exactly as
+  // it did before this feature existed (see handleDialogueClose below).
+  const [shopActionChoice, setShopActionChoice] = useState<string | null>(null);
   const [innOpen, setInnOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const [worldChatOpen, setWorldChatOpen] = useState(false);
@@ -152,6 +163,8 @@ export function TownScene() {
   const equipment = usePlayerStore((s) => s.player?.equipment);
   const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const questProgress = useQuestStore((s) => s.progress);
+  const inventory = useInventoryStore((s) => s.items);
+  const bossesDefeated = useJournalStore((s) => s.journal.bossesDefeated);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const isMobile = useIsMobile();
@@ -167,7 +180,8 @@ export function TownScene() {
     journalOpen ||
     worldChatOpen ||
     message !== null ||
-    rewardPopup !== null;
+    rewardPopup !== null ||
+    shopActionChoice !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
@@ -188,11 +202,24 @@ export function TownScene() {
     const hook = activeNpc?.gameplayHook;
     setActiveNpc(null);
     if (hook?.type === 'shop') {
-      setActiveShopId(hook.shopId);
-      setShopOpen(true);
+      if (eligibleLanternUpgrades(hook.shopId, inventory, equipment, bossesDefeated).length > 0) {
+        setShopActionChoice(hook.shopId);
+      } else {
+        setActiveShopId(hook.shopId);
+        setShopInitialTab('buy');
+        setShopOpen(true);
+      }
     } else if (hook?.type === 'inn') {
       setInnOpen(true);
     }
+  }
+
+  function chooseShopAction(tab: 'buy' | 'sell' | 'upgrade') {
+    if (!shopActionChoice) return;
+    setActiveShopId(shopActionChoice);
+    setShopInitialTab(tab);
+    setShopOpen(true);
+    setShopActionChoice(null);
   }
 
   function attemptInteract() {
@@ -276,8 +303,9 @@ export function TownScene() {
   useEffect(() => {
     function handleInteract(e: KeyboardEvent) {
       if (isTypingTarget(e)) return;
-      if (e.key === 'Escape' && (rewardPopup || message)) {
-        if (rewardPopup) setRewardPopup(null);
+      if (e.key === 'Escape' && (shopActionChoice || rewardPopup || message)) {
+        if (shopActionChoice) setShopActionChoice(null);
+        else if (rewardPopup) setRewardPopup(null);
         else setMessage(null);
         return;
       }
@@ -303,6 +331,7 @@ export function TownScene() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeNpc,
+    shopActionChoice,
     rewardPopup,
     message,
     menuOpen,
@@ -453,7 +482,22 @@ export function TownScene() {
         <RewardPopup title={rewardPopup.title} subtitle={rewardPopup.subtitle} lines={rewardPopup.lines} onClose={() => setRewardPopup(null)} />
       )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
-      {shopOpen && <Shop shopId={activeShopId ?? ''} onClose={() => setShopOpen(false)} />}
+      {shopOpen && <Shop shopId={activeShopId ?? ''} initialTab={shopInitialTab} onClose={() => setShopOpen(false)} />}
+      {shopActionChoice && (
+        <div className={menuStyles.overlay} onClick={() => setShopActionChoice(null)}>
+          <Panel style={{ width: 'min(320px, 90vw)', textAlign: 'center' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 14px', color: 'var(--fw-accent)' }}>What would you like to do?</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <button className={menuStyles.smallButton} onClick={() => chooseShopAction('buy')}>
+                Buy/Sell
+              </button>
+              <button className={menuStyles.smallButton} onClick={() => chooseShopAction('upgrade')}>
+                Upgrade Lantern
+              </button>
+            </div>
+          </Panel>
+        </div>
+      )}
       {innOpen && <Inn onClose={() => setInnOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
       {worldChatOpen && <WorldChat onClose={() => setWorldChatOpen(false)} />}

@@ -94,6 +94,15 @@ export interface Player {
    *  claimDailyChest.ts), which naturally means "eligible immediately" against
    *  data/dailyChest.ts's CHEST_CLAIM_INTERVAL_MS with no separate first-claim special case. */
   lastChestClaimedAt: number;
+  /** Permanent gold-bought Lantern Oil capacity upgrade tier per lantern equipment id (see
+   *  data/lanternOilUpgrades.ts) - 0/absent means never upgraded. Keyed by lanternId (not slot)
+   *  specifically so it survives swapping to a different lantern and back, unlike maxLanternOil
+   *  itself (see equipmentEngine.ts's setLanternOilCapacity, a full-replace model since only one
+   *  lantern is ever equipped at a time). Defaults to {} for a fresh character (newCharacter.ts)
+   *  and is backfilled the same centralized way `equipment` itself is (see
+   *  equipmentEngine.ts's backfillPlayerEquipment) - every one of this field's own read call sites
+   *  already calls that first. */
+  lanternOilUpgrades: Record<string, number>;
 }
 
 export interface InventoryItem {

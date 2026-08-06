@@ -24,6 +24,24 @@ const SHOP_LOCATIONS: Record<string, string> = {
   'noelle-herbalist': 'mirehaven-herbalist',
   'toussaint-forge': 'mirehaven-blacksmith',
   'delphine-armory': 'mirehaven-armory',
+  // Endless Prairie, Whispering Pines, Shattered Desert, and Frozen Frontier's own shops were
+  // missing from this table entirely - every purchaseItem call for any of them threw "You are not
+  // at that location" unconditionally (SHOP_LOCATIONS[shopId] was undefined, and
+  // currentLocationId !== undefined is always true), regardless of where the player actually
+  // stood. Confirmed against talkToNpc.ts's own NPC_LOCATIONS table, the same source of truth
+  // every sibling shopkeeper/location mapping in this codebase already uses.
+  'wyatt-general-store': 'highwind-crossing-general-store',
+  'garrett-forge': 'highwind-crossing-blacksmith',
+  'ruth-armory': 'highwind-crossing-armory',
+  'byron-general-store': 'cedarwatch-general-store',
+  'dara-forge': 'cedarwatch-blacksmith',
+  'fenn-armory': 'cedarwatch-armory',
+  'mateo-general-store': 'red-mesa-general-store',
+  'esteban-forge': 'red-mesa-blacksmith',
+  'carmen-armory': 'red-mesa-armory',
+  'bjorn-general-store': 'frosthaven-general-store',
+  'sigrid-forge': 'frosthaven-blacksmith',
+  'magnus-armory': 'frosthaven-armory',
 };
 
 export const purchaseItem = onCall<PurchaseItemRequest>(async (request) => {

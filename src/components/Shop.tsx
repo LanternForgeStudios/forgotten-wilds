@@ -7,14 +7,25 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useQuestStore } from '@/state/useQuestStore';
-import { callPurchaseItem, callSellItem } from '@/firebase/functionsClient';
+import { useJournalStore } from '@/state/useJournalStore';
+import { callPurchaseItem, callSellItem, callUpgradeLanternOil } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useToastStore } from '@/state/useToastStore';
 import { sellPriceFor } from '@/utils/sellPrice';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
-import { SHOP_LISTINGS, SHOP_TITLES, effectiveShopCatalog, ITEMS, EQUIPMENT } from '@/data';
+import {
+  SHOP_LISTINGS,
+  SHOP_TITLES,
+  effectiveShopCatalog,
+  ITEMS,
+  EQUIPMENT,
+  LANTERN_OIL_UPGRADE_MAX_TIER,
+  LANTERN_OIL_UPGRADE_PRICES,
+  LANTERN_OIL_UPGRADE_PER_TIER,
+} from '@/data';
+import { eligibleLanternUpgrades } from '@/utils/lanternOilUpgradeEligibility';
 import { playSound } from '@/audio/audioService';
 import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './CharacterMenu.module.css';
@@ -22,6 +33,10 @@ import styles from './CharacterMenu.module.css';
 interface ShopProps {
   shopId: string;
   onClose: () => void;
+  /** Which tab to open on - defaults to 'buy'. Lets a caller (TownScene's shop dialogue branch)
+   *  send the player straight to the Upgrade tab when that's what they asked for, instead of
+   *  always landing on Buy first. */
+  initialTab?: 'buy' | 'sell' | 'upgrade';
 }
 
 function defFor(itemId: string) {
@@ -53,12 +68,13 @@ interface PendingSale {
   unitPrice: number;
 }
 
-export function Shop({ shopId, onClose }: ShopProps) {
-  const [tab, setTab] = useState<'buy' | 'sell'>('buy');
+export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
+  const [tab, setTab] = useState<'buy' | 'sell' | 'upgrade'>(initialTab);
   const player = usePlayerStore((s) => s.player);
   const inventory = useInventoryStore((s) => s.items);
   const uid = useAuthStore((s) => s.user?.uid);
   const questProgress = useQuestStore((s) => s.progress);
+  const bossesDefeated = useJournalStore((s) => s.journal.bossesDefeated);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -114,6 +130,23 @@ export function Shop({ shopId, onClose }: ShopProps) {
     }
   }
 
+  async function upgrade(lanternId: string) {
+    if (busy) return;
+    setBusy(lanternId);
+    setError(null);
+    try {
+      const res = await callUpgradeLanternOil(lanternId);
+      if (uid) await resyncSave(uid);
+      pushToast(`${itemNameFor(lanternId)} upgraded to tier ${res.newTier}/${LANTERN_OIL_UPGRADE_MAX_TIER} (max Oil now ${res.maxLanternOil}).`);
+      void playSound('sfx.purchase');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not upgrade that lantern.');
+      void playSound('sfx.ui-error');
+    } finally {
+      setBusy(null);
+    }
+  }
+
   const completedQuestIds = new Set(Object.keys(questProgress).filter((id) => questProgress[id]?.status === 'completed'));
   const catalog = effectiveShopCatalog(shopId, completedQuestIds);
   const listings = SHOP_LISTINGS.filter((l) => catalog.includes(l.itemId));
@@ -121,6 +154,14 @@ export function Shop({ shopId, onClose }: ShopProps) {
   const selectedOwnedQuantity = selectedItemId
     ? (inventory.find((i) => i.itemId === selectedItemId)?.quantity ?? 0)
     : 0;
+
+  // The "Upgrade" tab only appears at all once this is non-empty, so a shop with nothing eligible
+  // stays exactly as it was before this feature existed.
+  const upgradeableLanterns = eligibleLanternUpgrades(shopId, inventory, player?.equipment, bossesDefeated);
+
+  function itemNameFor(itemId: string): string {
+    return EQUIPMENT.find((e) => e.id === itemId)?.name ?? itemId;
+  }
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -142,6 +183,14 @@ export function Shop({ shopId, onClose }: ShopProps) {
           >
             Sell
           </button>
+          {upgradeableLanterns.length > 0 && (
+            <button
+              className={`${styles.tab} ${tab === 'upgrade' ? styles.tabActive : ''}`}
+              onClick={() => setTab('upgrade')}
+            >
+              Upgrade Lantern
+            </button>
+          )}
         </div>
 
         {tab === 'buy' && (
@@ -307,6 +356,38 @@ export function Shop({ shopId, onClose }: ShopProps) {
             </div>
           );
         })()}
+
+        {tab === 'upgrade' && (
+          <div className={styles.grid}>
+            {upgradeableLanterns.map((lanternId) => {
+              const def = EQUIPMENT.find((e) => e.id === lanternId);
+              const currentTier = player?.lanternOilUpgrades?.[lanternId] ?? 0;
+              const maxed = currentTier >= LANTERN_OIL_UPGRADE_MAX_TIER;
+              const nextPrice = maxed ? null : LANTERN_OIL_UPGRADE_PRICES[currentTier];
+              const canAfford = nextPrice !== null && (player?.gold ?? 0) >= nextPrice;
+              const isBusy = busy === lanternId;
+              const currentBonus = currentTier * LANTERN_OIL_UPGRADE_PER_TIER;
+              return (
+                <div key={lanternId} className={styles.itemCard}>
+                  {def?.iconAssetId && <img src={getAssetUrl(def.iconAssetId)} alt="" className={styles.icon} />}
+                  <span className={styles.itemName}>{def?.name ?? lanternId}</span>
+                  {def?.tier && <TierBadge tier={def.tier} />}
+                  <span style={{ fontSize: 11, opacity: 0.8 }}>
+                    Tier {currentTier}/{LANTERN_OIL_UPGRADE_MAX_TIER} (+{currentBonus} Oil)
+                  </span>
+                  <span style={{ fontSize: 11, opacity: 0.8 }}>{maxed ? 'Fully upgraded' : `Next tier: ${nextPrice}g`}</span>
+                  <button
+                    className={styles.smallButton}
+                    disabled={!!busy || maxed || !canAfford}
+                    onClick={() => upgrade(lanternId)}
+                  >
+                    {isBusy ? 'Upgrading…' : maxed ? 'Maxed' : 'Upgrade'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {error && (
           <p style={{ color: 'var(--fw-danger)', fontSize: 13 }}>{error}</p>

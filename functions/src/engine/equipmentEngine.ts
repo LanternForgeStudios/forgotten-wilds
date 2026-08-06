@@ -1,4 +1,5 @@
 import { EQUIPMENT, type EquipmentDefinition, type StatBonuses } from '../data/equipment';
+import { LANTERN_OIL_UPGRADE_PER_TIER } from '../data/lanternOilUpgrades';
 import type { AilmentResistance, PlayerEquipment, PlayerSave, Stats } from '../shared-types';
 
 /** The full, empty equipment shape every PlayerSave should have - the single source of truth for
@@ -23,19 +24,31 @@ export function freshPlayerEquipment(): PlayerEquipment {
 export function backfillPlayerEquipment(save: PlayerSave): void {
   if (!save.player.equipment) {
     save.player.equipment = freshPlayerEquipment();
-    return;
+  } else {
+    // Migrates a save written before the 'armor'->'chest' rename - the old key would otherwise sit
+    // orphaned (nothing reads it anymore) and silently drop whatever the player had equipped there.
+    const legacy = save.player.equipment as PlayerEquipment & { armor?: string | null };
+    if (legacy.armor !== undefined && legacy.chest === undefined) {
+      legacy.chest = legacy.armor;
+      delete legacy.armor;
+    }
+    // Backfills the new 'legs' slot for any save (old or freshly migrated above) that predates it.
+    if (legacy.legs === undefined) {
+      legacy.legs = null;
+    }
   }
-  // Migrates a save written before the 'armor'->'chest' rename - the old key would otherwise sit
-  // orphaned (nothing reads it anymore) and silently drop whatever the player had equipped there.
-  const legacy = save.player.equipment as PlayerEquipment & { armor?: string | null };
-  if (legacy.armor !== undefined && legacy.chest === undefined) {
-    legacy.chest = legacy.armor;
-    delete legacy.armor;
-  }
-  // Backfills the new 'legs' slot for any save (old or freshly migrated above) that predates it.
-  if (legacy.legs === undefined) {
-    legacy.legs = null;
-  }
+  // Backfill for a save written before Lantern Oil upgrades existed - see PlayerSave's own doc
+  // comment on lanternOilUpgrades. Centralized here (not a per-call-site one-liner, unlike
+  // knownSkillIds' scattered pattern) since every equip/unequip/upgrade call site already calls
+  // this function first.
+  if (!save.player.lanternOilUpgrades) save.player.lanternOilUpgrades = {};
+}
+
+/** A lantern's real max Oil capacity: its authored base oilCapacity plus whatever permanent
+ *  upgrade tier the player has bought for THIS SPECIFIC lantern id (see
+ *  data/lanternOilUpgrades.ts) - independent of which lantern happens to be equipped right now. */
+export function effectiveOilCapacity(baseOilCapacity: number, lanternId: string, upgrades: Record<string, number> | undefined): number {
+  return baseOilCapacity + (upgrades?.[lanternId] ?? 0) * LANTERN_OIL_UPGRADE_PER_TIER;
 }
 
 /** Mutates stats in place, applying (sign=1) or removing (sign=-1) an item's bonuses, clamping current
@@ -61,7 +74,9 @@ export function adjustStatsForBonuses(stats: Stats, bonuses: StatBonuses, sign: 
  *  bonuses were silently never added to the player's stats. */
 export function equipIntoSlot(save: PlayerSave, itemId: string, def: EquipmentDefinition): void {
   adjustStatsForBonuses(save.player.stats, def.statBonuses, 1);
-  if (def.slot === 'lantern') setLanternOilCapacity(save.player.stats, def.oilCapacity ?? 0);
+  if (def.slot === 'lantern') {
+    setLanternOilCapacity(save.player.stats, effectiveOilCapacity(def.oilCapacity ?? 0, itemId, save.player.lanternOilUpgrades));
+  }
   save.player.equipment[def.slot] = itemId;
 }
 

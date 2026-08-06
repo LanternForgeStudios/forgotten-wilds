@@ -17,6 +17,7 @@ import { ITEMS } from '../data/items';
 import { SKILLS } from '../data/skills';
 import { EQUIPMENT } from '../data/equipment';
 import { LANTERN_ABILITIES } from '../data/lanternAbilities';
+import { LANTERN_OIL_UPGRADE_GATES } from '../data/lanternOilUpgrades';
 import { AILMENTS } from '../data/ailments';
 import { homeTownFor } from '../data/locationHomeTown';
 import type { CombatAction, CombatSession, PlayerSave } from '../shared-types';
@@ -173,6 +174,9 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       grantedSkillIds: string[];
       leveledUp: boolean;
       restore: VictoryRestore | null;
+      /** Region names whose Lantern Oil upgrade just unlocked (a boss gating one was defeated for
+       *  the first time this fight) - [] on every other victory. See data/lanternOilUpgrades.ts. */
+      lanternOilUpgradeRegions: string[];
     } | null =
       null;
 
@@ -204,6 +208,11 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       for (const id of enemyIds) countByEnemyId.set(id, (countByEnemyId.get(id) ?? 0) + 1);
 
       const questEvents: { type: 'defeatEnemies' | 'defeatBoss'; targetId: string; amount?: number }[] = [];
+      // Region names to notify the player about (via rewards.lanternOilUpgradeRegions below) -
+      // populated only for a boss defeated for the VERY FIRST time this fight, and only when that
+      // boss actually gates a Lantern Oil upgrade (see data/lanternOilUpgrades.ts). Iron Mountains'
+      // two lanterns share one boss/region, so this is deduped by region name, not by lanternId.
+      const newlyUnlockedLanternRegions = new Set<string>();
       for (const [enemyId, count] of countByEnemyId) {
         const enemy = ENEMIES[enemyId];
         if (!save.journal.creaturesDiscovered.includes(enemyId)) {
@@ -211,6 +220,9 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         }
         if (enemy.isBoss && !save.journal.bossesDefeated.includes(enemyId)) {
           save.journal.bossesDefeated.push(enemyId);
+          for (const gate of Object.values(LANTERN_OIL_UPGRADE_GATES)) {
+            if (gate.bossId === enemyId) newlyUnlockedLanternRegions.add(gate.regionName);
+          }
         }
         questEvents.push({ type: 'defeatEnemies', targetId: enemyId, amount: count });
         if (enemy.isBoss) questEvents.push({ type: 'defeatBoss', targetId: enemyId });
@@ -239,6 +251,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         grantedSkillIds: questRewards.grantedSkillIds,
         leveledUp: save.player.level > levelBefore,
         restore,
+        lanternOilUpgradeRegions: [...newlyUnlockedLanternRegions],
       };
     } else if (result.phase === 'defeat') {
       // Soft respawn at the inn - no punishing penalty, per design decision in the plan. Sent back

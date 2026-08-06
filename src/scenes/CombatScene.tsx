@@ -891,7 +891,15 @@ export function CombatScene() {
               <>
                 <h2 style={{ color: 'var(--fw-accent)' }}>Victory!</h2>
                 <div className={styles.rewardList}>
-                  {buildRewardLines({ xp: rewards?.xp, gold: rewards?.gold, itemIds: rewards?.itemIds, skillIds: rewards?.grantedSkillIds }).map(
+                  {buildRewardLines({
+                    xp: rewards?.xp,
+                    gold: rewards?.gold,
+                    itemIds: rewards?.itemIds,
+                    skillIds: rewards?.grantedSkillIds,
+                    notices: rewards?.lanternOilUpgradeRegions.map(
+                      (region) => `Lantern Oil Upgrades Unlocked - ${region} General Store`,
+                    ),
+                  }).map(
                     (line) => (
                       <div key={line.key} className={styles.rewardRow}>
                         {line.icon && <img src={getAssetUrl(line.icon)} alt="" className={styles.rewardIcon} />}

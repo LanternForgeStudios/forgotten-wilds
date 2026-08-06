@@ -18,6 +18,9 @@ export interface RewardLineInput {
    *  equipment/currency/ailments have registry.ts icons today), so these render as a plain
    *  "New Specialty: X" line with no image. */
   skillIds?: string[];
+  /** Ready-to-display, already-worded lines with no numeric reward behind them (e.g. "Lantern Oil
+   *  Upgrades Unlocked - Iron Mountains General Store") - rendered last, plain text, no icon. */
+  notices?: string[];
 }
 
 /** Builds the {key, icon?, label} line list a RewardPopup renders, from whatever mix of xp/gold/
@@ -43,5 +46,6 @@ export function buildRewardLines(input: RewardLineInput): RewardLine[] {
     const skill = SKILLS.find((s) => s.id === skillId);
     lines.push({ key: `skill-${skillId}`, label: `New Specialty: ${skill?.name ?? skillId}` });
   }
+  (input.notices ?? []).forEach((notice, i) => lines.push({ key: `notice-${i}`, label: notice }));
   return lines;
 }

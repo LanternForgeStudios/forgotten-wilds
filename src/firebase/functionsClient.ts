@@ -201,6 +201,9 @@ export interface ResolveCombatActionResponse {
     grantedSkillIds: string[];
     leveledUp: boolean;
     restore: { stat: 'hp' | 'spirit' | 'lanternOil'; amount: number } | null;
+    /** Region names whose Lantern Oil upgrade just unlocked - a boss gating one (see
+     *  data/lanternOilUpgrades.ts) was defeated for the first time this fight. [] otherwise. */
+    lanternOilUpgradeRegions: string[];
   } | null;
   playerLevel: number;
   playerGold: number;
@@ -241,6 +244,17 @@ export async function callUnequipItem(slot: string): Promise<void> {
 export async function callPurchaseItem(itemId: string, shopId: string): Promise<void> {
   const fn = httpsCallable<{ itemId: string; shopId: string }, unknown>(functions, 'purchaseItem');
   await fn({ itemId, shopId });
+}
+
+export async function callUpgradeLanternOil(
+  lanternId: string,
+): Promise<{ gold: number; newTier: number; maxLanternOil: number; nextPrice: number | null }> {
+  const fn = httpsCallable<{ lanternId: string }, { gold: number; newTier: number; maxLanternOil: number; nextPrice: number | null }>(
+    functions,
+    'upgradeLanternOil',
+  );
+  const result = await fn({ lanternId });
+  return result.data;
 }
 
 export async function callRestAtInn(): Promise<void> {
