@@ -12,11 +12,12 @@ import { subscribeToMyActivePartyBattle } from '@/firebase/partyBattleService';
 import { callSendFriendRequest, callClaimDailyChest, type DailyChestRewards } from '@/firebase/functionsClient';
 import { CharacterStats } from './CharacterStats';
 import { UserProfile } from './UserProfile';
-import { ChestRewardReveal } from './ChestRewardReveal';
+import { RewardPopup } from './RewardPopup';
 import { ActiveBattleOverlay } from './ActiveBattleOverlay';
 import { XP_THRESHOLDS, LOCATIONS, CHEST_CLAIM_INTERVAL_MS, ELITE_CHEST_LEVEL_THRESHOLD } from '@/data';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { PRESENCE_STALE_AFTER_MS } from '@/utils/presence';
+import { buildRewardLines } from '@/utils/rewardLines';
 import { resyncSave } from '@/state/hydrate';
 import { playSound } from '@/audio/audioService';
 import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc } from '@/types';
@@ -369,7 +370,16 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
       {statsOpen && <CharacterStats onClose={() => setStatsOpen(false)} />}
       {profileOpen && <UserProfile onClose={() => setProfileOpen(false)} />}
       {chestResult && (
-        <ChestRewardReveal tier={chestResult.tier} rewards={chestResult.rewards} onClose={() => setChestResult(null)} />
+        <RewardPopup
+          title="You found..."
+          subtitle={`${chestResult.tier === 'elite' ? 'Elite' : 'Standard'} Chest`}
+          lines={buildRewardLines({
+            gold: chestResult.rewards.gold,
+            premiumCurrency: chestResult.rewards.premiumCurrency,
+            itemIds: chestResult.rewards.itemIds,
+          })}
+          onClose={() => setChestResult(null)}
+        />
       )}
       {activeBattleId && <ActiveBattleOverlay battleId={activeBattleId} onClose={() => setActiveBattleId(null)} />}
     </div>

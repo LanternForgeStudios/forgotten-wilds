@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { advanceQuests, applyQuestRewards, isEmptyQuestRewardSummary } from '../engine/questEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { BASE_STAMINA_ON_UNLOCK, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
 import { KNOWN_SHRINES } from '../data/locations';
@@ -40,7 +40,7 @@ export const interactWithShrine = onCall<InteractWithShrineRequest>(async (reque
     const shrineCompletions = advanceQuests(save.quests, { type: 'interactWithShrine', targetId: refId });
     const discoveryCompletions = advanceQuests(save.quests, { type: 'reachLocation', targetId: refId });
     const completions = [...shrineCompletions, ...discoveryCompletions];
-    applyQuestRewards(save, completions);
+    const questRewards = applyQuestRewards(save, completions);
 
     const completedIds = completions.map((c) => c.questId);
     // Data-driven via QuestDef.reward.grantsStaminaUnlock rather than a hardcoded quest id, so any
@@ -58,6 +58,10 @@ export const interactWithShrine = onCall<InteractWithShrineRequest>(async (reque
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
-    return { questsCompleted: completedIds, unlockedStamina };
+    return {
+      questsCompleted: completedIds,
+      unlockedStamina,
+      questRewards: isEmptyQuestRewardSummary(questRewards) ? null : questRewards,
+    };
   });
 });

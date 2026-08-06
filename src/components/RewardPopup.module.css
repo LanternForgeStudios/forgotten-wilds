@@ -54,7 +54,7 @@
   animation: panelReveal 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
-.tierLabel {
+.subtitle {
   margin: 4px 0 0;
   font-size: 12px;
   text-transform: uppercase;

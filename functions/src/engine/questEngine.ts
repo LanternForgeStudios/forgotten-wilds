@@ -44,6 +44,50 @@ export interface QuestCompletion {
   reward: QuestDef['reward'];
 }
 
+/** What a call to applyQuestRewards actually granted, aggregated across every quest it completed
+ *  this call (a direct completion plus anything reconcileRetroactiveObjectives also swept up) -
+ *  returned so callers (the Cloud Functions in functions/src/functions/) can surface it to the
+ *  client for the shared reward-acknowledgment popup (see RewardPopup.tsx), instead of a quest's
+ *  item/skill grant landing in the save with zero UI feedback. itemIds/grantedSkillIds/
+ *  grantedLoreIds only ever contain what was ACTUALLY granted (a unique item already owned, or a
+ *  skill/lore already known, is correctly omitted - see grantCompletionRewards). */
+export interface QuestRewardSummary {
+  questIds: string[];
+  xp: number;
+  gold: number;
+  itemIds: string[];
+  grantedSkillIds: string[];
+  grantedLoreIds: string[];
+}
+
+function emptyQuestRewardSummary(): QuestRewardSummary {
+  return { questIds: [], xp: 0, gold: 0, itemIds: [], grantedSkillIds: [], grantedLoreIds: [] };
+}
+
+function mergeQuestRewardSummaries(a: QuestRewardSummary, b: QuestRewardSummary): QuestRewardSummary {
+  return {
+    questIds: [...a.questIds, ...b.questIds],
+    xp: a.xp + b.xp,
+    gold: a.gold + b.gold,
+    itemIds: [...a.itemIds, ...b.itemIds],
+    grantedSkillIds: [...a.grantedSkillIds, ...b.grantedSkillIds],
+    grantedLoreIds: [...a.grantedLoreIds, ...b.grantedLoreIds],
+  };
+}
+
+/** True when a summary has nothing worth popping a reward acknowledgment up for - callers use this
+ *  to send `null` instead of an all-zero summary object. */
+export function isEmptyQuestRewardSummary(summary: QuestRewardSummary): boolean {
+  return (
+    summary.questIds.length === 0 &&
+    summary.xp === 0 &&
+    summary.gold === 0 &&
+    summary.itemIds.length === 0 &&
+    summary.grantedSkillIds.length === 0 &&
+    summary.grantedLoreIds.length === 0
+  );
+}
+
 /** Every quest's objectives, indexed by `${type}:${targetId}` - lets advanceQuests jump straight
  *  to the (usually 0-2) quests that could possibly care about a given event instead of scanning
  *  every quest in the game and re-`.find()`-ing its objectives on every single combat/NPC/quest
@@ -131,16 +175,21 @@ export function advanceQuests(quests: Record<string, QuestProgress>, event: Ques
   return completions;
 }
 
-function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]): void {
-  for (const { reward } of completions) {
+function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]): QuestRewardSummary {
+  const summary = emptyQuestRewardSummary();
+  for (const { questId, reward } of completions) {
+    summary.questIds.push(questId);
+    summary.xp += reward.xp;
+    summary.gold += reward.gold;
     save.player.xp += reward.xp;
     save.player.gold += reward.gold;
     save.player.spiritEssence += reward.spiritEssence ?? 0;
     save.player.regionalReputation += reward.regionalReputation ?? 0;
     for (const itemId of reward.itemIds ?? []) {
       // A unique reward item already owned some other way is skipped, not an error - the quest
-      // still completes and its xp/gold still land.
-      grantItem(save, itemId);
+      // still completes and its xp/gold still land. grantItem's own return value (true only when
+      // it actually landed in the inventory) is what keeps a skipped unique out of the summary too.
+      if (grantItem(save, itemId)) summary.itemIds.push(itemId);
       // Only fills an empty slot - never swaps out gear the player already equipped some other way.
       const equipDef = reward.autoEquip ? EQUIPMENT[itemId] : undefined;
       if (equipDef && !save.player.equipment[equipDef.slot]) {
@@ -152,11 +201,14 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
     // other way).
     if (reward.grantSkillId && !save.player.knownSkillIds.includes(reward.grantSkillId)) {
       save.player.knownSkillIds.push(reward.grantSkillId);
+      summary.grantedSkillIds.push(reward.grantSkillId);
     }
     if (reward.grantLoreId && !save.journal.loreUnlocked.includes(reward.grantLoreId)) {
       save.journal.loreUnlocked.push(reward.grantLoreId);
+      summary.grantedLoreIds.push(reward.grantLoreId);
     }
   }
+  return summary;
 }
 
 /** Auto-credits any active quest's collectItem/reachLocation objective the player already
@@ -216,8 +268,15 @@ function reconcileRetroactiveObjectives(save: PlayerSave): QuestCompletion[] {
  *  already-satisfiable objectives (see reconcileRetroactiveObjectives) every time, since a quest
  *  can sit active for a while (nothing tracks "just unlocked") before the player does anything
  *  that would otherwise notice it's already done. */
-export function applyQuestRewards(save: PlayerSave, completions: QuestCompletion[]): void {
-  grantCompletionRewards(save, completions);
-  grantCompletionRewards(save, reconcileRetroactiveObjectives(save));
+export function applyQuestRewards(save: PlayerSave, completions: QuestCompletion[]): QuestRewardSummary {
+  // Backfill for a save written before knownSkillIds existed - same one-line pattern
+  // resolveCombatAction.ts already uses (see that file's own comment for the full "bare INTERNAL
+  // error" story). Centralized here rather than at each of this function's 6 call sites, since a
+  // grantSkillId reward reachable from ANY of them (not just combat) would otherwise crash the
+  // moment an old save completed one - confirmed live by this file's own test suite.
+  if (!save.player.knownSkillIds) save.player.knownSkillIds = ['keepers-strike'];
+  const direct = grantCompletionRewards(save, completions);
+  const retroactive = grantCompletionRewards(save, reconcileRetroactiveObjectives(save));
   applyLevelUp(save);
+  return mergeQuestRewardSummaries(direct, retroactive);
 }

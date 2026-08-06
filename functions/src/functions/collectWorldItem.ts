@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { advanceQuests, applyQuestRewards, isEmptyQuestRewardSummary } from '../engine/questEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { grantItem } from '../engine/inventoryEngine';
 import { WORLD_ITEMS } from '../data/locations';
@@ -50,10 +50,15 @@ export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) 
     // reachable well before its own prerequisite quest) would otherwise never see the event again,
     // permanently soft-locking it once the fast path above starts short-circuiting.
     const completions = advanceQuests(save.quests, { type: 'collectItem', targetId: itemId });
-    applyQuestRewards(save, completions);
+    const questRewards = applyQuestRewards(save, completions);
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
-    return { alreadyCollected: alreadyHave, questsCompleted: completions.map((c) => c.questId), itemId };
+    return {
+      alreadyCollected: alreadyHave,
+      questsCompleted: completions.map((c) => c.questId),
+      itemId,
+      questRewards: isEmptyQuestRewardSummary(questRewards) ? null : questRewards,
+    };
   });
 });

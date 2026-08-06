@@ -31,10 +31,12 @@ import {
   callCollectWorldItem,
   callInteractWithShrine,
   callTalkToNpc,
+  type QuestRewardSummary,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { LOCATIONS, NPCS } from '@/data';
-import { itemDisplayName } from '@/utils/itemName';
+import { RewardPopup } from '@/components/RewardPopup';
+import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { isTypingTarget } from '@/utils/keyboard';
@@ -227,12 +229,28 @@ export function OverworldScene() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // Shared reward-acknowledgment popup (see RewardPopup.tsx) - shown for chest opens/world-item
+  // pickups (always) and for a quest completed by a talk/enter/visit/shrine event (only when it
+  // actually granted something, since most of those events complete no quest at all).
+  const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
+  function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
+    if (!questRewards) return;
+    setRewardPopup({
+      title: 'Quest Complete!',
+      lines: buildRewardLines({
+        xp: questRewards.xp,
+        gold: questRewards.gold,
+        itemIds: questRewards.itemIds,
+        skillIds: questRewards.grantedSkillIds,
+      }),
+    });
+  }
   const isMobile = useIsMobile();
   const battleOverlayOpen = useBattleOverlayStore((s) => s.isOpen);
   const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const otherOverlaysOpen = activeNpc !== null || menuOpen || journalOpen || message !== null;
+  const otherOverlaysOpen = activeNpc !== null || menuOpen || journalOpen || message !== null || rewardPopup !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
   const { pending, run } = usePendingAction();
@@ -243,12 +261,19 @@ export function OverworldScene() {
       run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          const name = itemDisplayName(res.itemId);
-          setMessage(
-            res.alreadyCollected
-              ? "There's nothing left to find here."
-              : `You recover ${name}. It feels like part of something larger.`,
-          );
+          if (res.alreadyCollected) {
+            setMessage("There's nothing left to find here.");
+            return;
+          }
+          setRewardPopup({
+            title: 'You found...',
+            lines: buildRewardLines({
+              itemIds: [res.itemId],
+              xp: res.questRewards?.xp,
+              gold: res.questRewards?.gold,
+              skillIds: res.questRewards?.grantedSkillIds,
+            }),
+          });
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
       return;
@@ -258,11 +283,13 @@ export function OverworldScene() {
       run(() => callVisitLandmark(refId), 'Investigating...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          setMessage(
-            res.alreadyVisited
-              ? `You've already explored ${landmarkName}.`
-              : `You find ${landmarkName}. Perhaps it will mean something, in time.`,
-          );
+          if (res.alreadyVisited) {
+            setMessage(`You've already explored ${landmarkName}.`);
+          } else if (res.questRewards) {
+            showQuestRewardPopup(res.questRewards);
+          } else {
+            setMessage(`You find ${landmarkName}. Perhaps it will mean something, in time.`);
+          }
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'You cannot linger here.'));
     }
@@ -300,8 +327,9 @@ export function OverworldScene() {
         setActiveNpc(npc);
         void playSound('sfx.npc-talk');
         run(() => callTalkToNpc(npc.id), 'Talking...')
-          ?.then(async () => {
+          ?.then(async (res) => {
             if (uid) await resyncSave(uid);
+            showQuestRewardPopup(res.questRewards);
           })
           .catch((err) => console.error('talkToNpc failed', err));
       }
@@ -316,13 +344,12 @@ export function OverworldScene() {
       run(() => callOpenChest(locationId, chestId), 'Opening chest...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          if (!res.alreadyOpened) void playSound('sfx.chest-open');
-          const name = itemDisplayName(res.itemId);
-          setMessage(
-            res.alreadyOpened
-              ? 'You already emptied this chest.'
-              : `You open the chest and find ${name}!`,
-          );
+          if (res.alreadyOpened) {
+            setMessage('You already emptied this chest.');
+            return;
+          }
+          void playSound('sfx.chest-open');
+          setRewardPopup({ title: 'You found...', subtitle: 'Chest', lines: buildRewardLines({ itemIds: [res.itemId] }) });
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The chest will not open.'));
       return;
@@ -338,6 +365,8 @@ export function OverworldScene() {
             setMessage(
               `The shrine at ${landmarkName} kindles fully alight once more. You feel the trail's strength answer you - Stamina is yours to command now.`,
             );
+          } else if (res.questRewards) {
+            showQuestRewardPopup(res.questRewards);
           } else {
             setMessage(`You have found ${landmarkName}. A shrine stands here, long neglected.`);
           }
@@ -350,12 +379,19 @@ export function OverworldScene() {
       run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          const name = itemDisplayName(res.itemId);
-          setMessage(
-            res.alreadyCollected
-              ? "There's nothing left to find here."
-              : `You recover ${name}. It feels like part of something larger.`,
-          );
+          if (res.alreadyCollected) {
+            setMessage("There's nothing left to find here.");
+            return;
+          }
+          setRewardPopup({
+            title: 'You found...',
+            lines: buildRewardLines({
+              itemIds: [res.itemId],
+              xp: res.questRewards?.xp,
+              gold: res.questRewards?.gold,
+              skillIds: res.questRewards?.grantedSkillIds,
+            }),
+          });
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
       return;
@@ -370,7 +406,8 @@ export function OverworldScene() {
     function handleKey(e: KeyboardEvent) {
       if (isTypingTarget(e)) return;
       if (e.key === 'Escape') {
-        if (activeNpc) setActiveNpc(null);
+        if (rewardPopup) setRewardPopup(null);
+        else if (activeNpc) setActiveNpc(null);
         else if (message) setMessage(null);
         else if (menuOpen) setMenuOpen(false);
         else if (journalOpen) setJournalOpen(false);
@@ -383,7 +420,7 @@ export function OverworldScene() {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeNpc, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
+  }, [rewardPopup, activeNpc, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
   // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
@@ -509,6 +546,9 @@ export function OverworldScene() {
         />
       )}
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
+      {rewardPopup && (
+        <RewardPopup title={rewardPopup.title} subtitle={rewardPopup.subtitle} lines={rewardPopup.lines} onClose={() => setRewardPopup(null)} />
+      )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
       {mapOpen && (

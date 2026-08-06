@@ -142,6 +142,38 @@ describe('applyQuestRewards', () => {
     expect(save.inventory).toEqual([{ itemId: 'healing-poultice', quantity: 1 }]);
   });
 
+  it('returns a summary of what was actually granted, for the client reward popup', () => {
+    // Also a regression test for a real bug: a save with no knownSkillIds at all (predating that
+    // field) crashed with a bare INTERNAL error on any grantSkillId reward reached outside combat
+    // (talkToNpc/collectWorldItem/etc never backfilled it themselves) - see applyQuestRewards's own
+    // backfill comment. emptySave() deliberately omits knownSkillIds to exercise that path.
+    const save = emptySave();
+    const summary = applyQuestRewards(save, [
+      { questId: 'a-new-keeper', reward: { xp: 10, gold: 20, itemIds: ['healing-poultice'], grantSkillId: 'frost-lance', grantLoreId: 'lore-great-silence' } },
+    ]);
+    expect(summary).toEqual({
+      questIds: ['a-new-keeper'],
+      xp: 10,
+      gold: 20,
+      itemIds: ['healing-poultice'],
+      grantedSkillIds: ['frost-lance'],
+      grantedLoreIds: ['lore-great-silence'],
+    });
+  });
+
+  it('omits an already-known skill/lore from the summary, even though the quest still completes', () => {
+    const save = emptySave({
+      player: { ...emptySave().player, knownSkillIds: ['frost-lance'] },
+      journal: { creaturesDiscovered: [], locationsVisited: [], loreUnlocked: ['lore-great-silence'], bossesDefeated: [], itemsDiscovered: [] },
+    });
+    const summary = applyQuestRewards(save, [
+      { questId: 'a-new-keeper', reward: { xp: 0, gold: 0, grantSkillId: 'frost-lance', grantLoreId: 'lore-great-silence' } },
+    ]);
+    expect(summary.questIds).toEqual(['a-new-keeper']);
+    expect(summary.grantedSkillIds).toEqual([]);
+    expect(summary.grantedLoreIds).toEqual([]);
+  });
+
   it('adds regionalReputation to the save, additively across multiple completions', () => {
     const save = emptySave();
     applyQuestRewards(save, [

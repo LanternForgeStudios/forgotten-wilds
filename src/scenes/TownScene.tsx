@@ -24,7 +24,9 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useSceneStore } from '@/state/useSceneStore';
-import { callTalkToNpc, callInteractWithShrine, callSendFriendRequest } from '@/firebase/functionsClient';
+import { callTalkToNpc, callInteractWithShrine, callSendFriendRequest, type QuestRewardSummary } from '@/firebase/functionsClient';
+import { RewardPopup } from '@/components/RewardPopup';
+import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS } from '@/data';
@@ -128,6 +130,20 @@ export function TownScene() {
   const [journalOpen, setJournalOpen] = useState(false);
   const [worldChatOpen, setWorldChatOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // Shared reward-acknowledgment popup (see RewardPopup.tsx and OverworldScene.tsx's identical use).
+  const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
+  function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
+    if (!questRewards) return;
+    setRewardPopup({
+      title: 'Quest Complete!',
+      lines: buildRewardLines({
+        xp: questRewards.xp,
+        gold: questRewards.gold,
+        itemIds: questRewards.itemIds,
+        skillIds: questRewards.grantedSkillIds,
+      }),
+    });
+  }
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
@@ -144,7 +160,14 @@ export function TownScene() {
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const otherOverlaysOpen =
-    activeNpc !== null || menuOpen || shopOpen || innOpen || journalOpen || worldChatOpen || message !== null;
+    activeNpc !== null ||
+    menuOpen ||
+    shopOpen ||
+    innOpen ||
+    journalOpen ||
+    worldChatOpen ||
+    message !== null ||
+    rewardPopup !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
@@ -187,8 +210,9 @@ export function TownScene() {
         setActiveNpc(npc);
         void playSound('sfx.npc-talk');
         run(() => callTalkToNpc(npc.id), 'Talking...')
-          ?.then(async () => {
+          ?.then(async (res) => {
             if (uid) await resyncSave(uid);
+            showQuestRewardPopup(res.questRewards);
           })
           .catch((err) => console.error('talkToNpc failed', err));
       }
@@ -237,11 +261,13 @@ export function TownScene() {
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           void playSound('sfx.shrine');
-          setMessage(
-            res.unlockedStamina
-              ? 'The shrine kindles fully alight once more. You feel the trail\'s strength answer you - Stamina is yours to command now.'
-              : 'A small stone shrine, half-forgotten. Something here still remembers being tended.',
-          );
+          if (res.unlockedStamina) {
+            setMessage('The shrine kindles fully alight once more. You feel the trail\'s strength answer you - Stamina is yours to command now.');
+          } else if (res.questRewards) {
+            showQuestRewardPopup(res.questRewards);
+          } else {
+            setMessage('A small stone shrine, half-forgotten. Something here still remembers being tended.');
+          }
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
     }
@@ -250,8 +276,9 @@ export function TownScene() {
   useEffect(() => {
     function handleInteract(e: KeyboardEvent) {
       if (isTypingTarget(e)) return;
-      if (e.key === 'Escape' && message) {
-        setMessage(null);
+      if (e.key === 'Escape' && (rewardPopup || message)) {
+        if (rewardPopup) setRewardPopup(null);
+        else setMessage(null);
         return;
       }
       if (e.key === 'i' || e.key === 'I') {
@@ -276,6 +303,7 @@ export function TownScene() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeNpc,
+    rewardPopup,
     message,
     menuOpen,
     shopOpen,
@@ -421,6 +449,9 @@ export function TownScene() {
         />
       )}
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
+      {rewardPopup && (
+        <RewardPopup title={rewardPopup.title} subtitle={rewardPopup.subtitle} lines={rewardPopup.lines} onClose={() => setRewardPopup(null)} />
+      )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {shopOpen && <Shop shopId={activeShopId ?? ''} onClose={() => setShopOpen(false)} />}
       {innOpen && <Inn onClose={() => setInnOpen(false)} />}

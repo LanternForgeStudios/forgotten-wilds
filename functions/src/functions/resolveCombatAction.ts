@@ -166,7 +166,14 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       removeItem(save, itemId, count);
     }
 
-    let rewards: { xp: number; gold: number; itemIds: string[]; leveledUp: boolean; restore: VictoryRestore | null } | null =
+    let rewards: {
+      xp: number;
+      gold: number;
+      itemIds: string[];
+      grantedSkillIds: string[];
+      leveledUp: boolean;
+      restore: VictoryRestore | null;
+    } | null =
       null;
 
     if (result.phase === 'victory') {
@@ -209,7 +216,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         if (enemy.isBoss) questEvents.push({ type: 'defeatBoss', targetId: enemyId });
       }
       const completions = questEvents.flatMap((event) => advanceQuests(save.quests, event));
-      applyQuestRewards(save, completions);
+      const questRewards = applyQuestRewards(save, completions);
 
       // Rolled after applyLevelUp so a fresh level's higher maxHp/maxSpirit is what a restore (if
       // any) is a percentage of, and after the level-up's own stat growth is already applied.
@@ -224,9 +231,12 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       }
 
       rewards = {
-        xp: reward.xp,
-        gold: reward.gold,
-        itemIds: grantedItemIds,
+        // A quest completed by this very fight (e.g. "defeat 3 mothlings") pays out in the same
+        // victory screen rather than a second, separately-timed popup - see questRewards above.
+        xp: reward.xp + questRewards.xp,
+        gold: reward.gold + questRewards.gold,
+        itemIds: [...grantedItemIds, ...questRewards.itemIds],
+        grantedSkillIds: questRewards.grantedSkillIds,
         leveledUp: save.player.level > levelBefore,
         restore,
       };

@@ -25,13 +25,14 @@ import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { isTypingTarget } from '@/utils/keyboard';
-import { itemDisplayName } from '@/utils/itemName';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
-import { callCollectWorldItem, callOpenChest, callInteractWithShrine } from '@/firebase/functionsClient';
+import { callCollectWorldItem, callOpenChest, callInteractWithShrine, type QuestRewardSummary } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { playMusic, playSound } from '@/audio/audioService';
+import { RewardPopup } from '@/components/RewardPopup';
+import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import styles from './TownScene.module.css';
 
 /** Which boss a boss-trigger interactable refId starts, keyed by refId (always the same as the
@@ -179,6 +180,20 @@ export function DungeonScene() {
   const [message, setMessage] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
+  // Shared reward-acknowledgment popup (see RewardPopup.tsx and OverworldScene.tsx's identical use).
+  const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
+  function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
+    if (!questRewards) return;
+    setRewardPopup({
+      title: 'Quest Complete!',
+      lines: buildRewardLines({
+        xp: questRewards.xp,
+        gold: questRewards.gold,
+        itemIds: questRewards.itemIds,
+        skillIds: questRewards.grantedSkillIds,
+      }),
+    });
+  }
   const isMobile = useIsMobile();
   const battleOverlayOpen = useBattleOverlayStore((s) => s.isOpen);
   const hudBarHeight = useHudBarHeight();
@@ -189,7 +204,7 @@ export function DungeonScene() {
   const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const otherOverlaysOpen = message !== null || menuOpen || journalOpen;
+  const otherOverlaysOpen = message !== null || menuOpen || journalOpen || rewardPopup !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, facingDelta, attemptMove, movementState } = useLocationExploration({
@@ -224,7 +239,20 @@ export function DungeonScene() {
       run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          setMessage(res.alreadyCollected ? worldItem.alreadyMessage : worldItem.foundMessage);
+          if (res.alreadyCollected) {
+            setMessage(worldItem.alreadyMessage);
+            return;
+          }
+          setRewardPopup({
+            title: 'You found...',
+            subtitle: worldItem.label,
+            lines: buildRewardLines({
+              itemIds: [res.itemId],
+              xp: res.questRewards?.xp,
+              gold: res.questRewards?.gold,
+              skillIds: res.questRewards?.grantedSkillIds,
+            }),
+          });
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'It will not budge.'));
     } else if (bossTrigger && obj?.refId) {
@@ -243,10 +271,11 @@ export function DungeonScene() {
     } else if (shrine && obj?.refId) {
       const refId = obj.refId;
       run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
-        ?.then(async () => {
+        ?.then(async (res) => {
           if (uid) await resyncSave(uid);
           void playSound('sfx.shrine');
-          setMessage(shrine.message);
+          if (res.questRewards) showQuestRewardPopup(res.questRewards);
+          else setMessage(shrine.message);
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
     } else if (obj?.refId?.startsWith('chest-')) {
@@ -254,13 +283,12 @@ export function DungeonScene() {
       run(() => callOpenChest(locationId, chestId), 'Opening chest...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
-          if (!res.alreadyOpened) void playSound('sfx.chest-open');
-          const name = itemDisplayName(res.itemId);
-          setMessage(
-            res.alreadyOpened
-              ? 'You already emptied this chest.'
-              : `You open the chest and find ${name}!`,
-          );
+          if (res.alreadyOpened) {
+            setMessage('You already emptied this chest.');
+            return;
+          }
+          void playSound('sfx.chest-open');
+          setRewardPopup({ title: 'You found...', subtitle: 'Chest', lines: buildRewardLines({ itemIds: [res.itemId] }) });
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The chest will not open.'));
     } else if (obj?.refId) {
@@ -274,7 +302,8 @@ export function DungeonScene() {
     function handleInteract(e: KeyboardEvent) {
       if (isTypingTarget(e)) return;
       if (e.key === 'Escape') {
-        if (message) setMessage(null);
+        if (rewardPopup) setRewardPopup(null);
+        else if (message) setMessage(null);
         else if (menuOpen) setMenuOpen(false);
         else if (journalOpen) setJournalOpen(false);
         return;
@@ -293,7 +322,7 @@ export function DungeonScene() {
     window.addEventListener('keydown', handleInteract);
     return () => window.removeEventListener('keydown', handleInteract);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
+  }, [rewardPopup, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
   // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
@@ -417,6 +446,9 @@ export function DungeonScene() {
         </p>
       )}
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
+      {rewardPopup && (
+        <RewardPopup title={rewardPopup.title} subtitle={rewardPopup.subtitle} lines={rewardPopup.lines} onClose={() => setRewardPopup(null)} />
+      )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
       {mapOpen && (

@@ -77,25 +77,44 @@ export async function callStartEncounter(locationId: string, bossId?: string): P
   return result.data;
 }
 
-export async function callTalkToNpc(npcId: string): Promise<{ questsCompleted: string[] }> {
-  const fn = httpsCallable<{ npcId: string }, { questsCompleted: string[] }>(functions, 'talkToNpc');
+/** What a call actually granted via a quest that completed as a side effect of it - null when
+ *  nothing completed a quest or the completed quest(s) granted nothing worth a popup for (see
+ *  functions/src/engine/questEngine.ts's isEmptyQuestRewardSummary). Drives the shared
+ *  RewardPopup/buildRewardLines for the "quest reward" moment, the same acknowledgment popup a
+ *  chest open or world-item pickup uses. */
+export interface QuestRewardSummary {
+  questIds: string[];
+  xp: number;
+  gold: number;
+  itemIds: string[];
+  grantedSkillIds: string[];
+  grantedLoreIds: string[];
+}
+
+export async function callTalkToNpc(npcId: string): Promise<{ questsCompleted: string[]; questRewards: QuestRewardSummary | null }> {
+  const fn = httpsCallable<{ npcId: string }, { questsCompleted: string[]; questRewards: QuestRewardSummary | null }>(functions, 'talkToNpc');
   const result = await fn({ npcId });
   return result.data;
 }
 
-export async function callEnterLocation(locationId: string): Promise<{ questsCompleted: string[] }> {
-  const fn = httpsCallable<{ locationId: string }, { questsCompleted: string[] }>(functions, 'enterLocation');
+export async function callEnterLocation(
+  locationId: string,
+): Promise<{ questsCompleted: string[]; questRewards: QuestRewardSummary | null }> {
+  const fn = httpsCallable<{ locationId: string }, { questsCompleted: string[]; questRewards: QuestRewardSummary | null }>(
+    functions,
+    'enterLocation',
+  );
   const result = await fn({ locationId });
   return result.data;
 }
 
 export async function callVisitLandmark(
   landmarkId: string,
-): Promise<{ alreadyVisited: boolean; questsCompleted: string[] }> {
-  const fn = httpsCallable<{ landmarkId: string }, { alreadyVisited: boolean; questsCompleted: string[] }>(
-    functions,
-    'visitLandmark',
-  );
+): Promise<{ alreadyVisited: boolean; questsCompleted: string[]; questRewards: QuestRewardSummary | null }> {
+  const fn = httpsCallable<
+    { landmarkId: string },
+    { alreadyVisited: boolean; questsCompleted: string[]; questRewards: QuestRewardSummary | null }
+  >(functions, 'visitLandmark');
   const result = await fn({ landmarkId });
   return result.data;
 }
@@ -103,10 +122,10 @@ export async function callVisitLandmark(
 export async function callCollectWorldItem(
   locationId: string,
   refId: string,
-): Promise<{ alreadyCollected: boolean; questsCompleted: string[]; itemId: string }> {
+): Promise<{ alreadyCollected: boolean; questsCompleted: string[]; itemId: string; questRewards: QuestRewardSummary | null }> {
   const fn = httpsCallable<
     { locationId: string; refId: string },
-    { alreadyCollected: boolean; questsCompleted: string[]; itemId: string }
+    { alreadyCollected: boolean; questsCompleted: string[]; itemId: string; questRewards: QuestRewardSummary | null }
   >(functions, 'collectWorldItem');
   const result = await fn({ locationId, refId });
   return result.data;
@@ -177,6 +196,9 @@ export interface ResolveCombatActionResponse {
     xp: number;
     gold: number;
     itemIds: string[];
+    /** Specialty Attack ids learned this fight - from a quest (e.g. "defeat 3 mothlings") that
+     *  completed as a side effect of this victory. [] when nothing was learned. */
+    grantedSkillIds: string[];
     leveledUp: boolean;
     restore: { stat: 'hp' | 'spirit' | 'lanternOil'; amount: number } | null;
   } | null;
@@ -242,10 +264,10 @@ export async function callUseItem(itemId: string): Promise<UseItemResponse> {
 export async function callInteractWithShrine(
   locationId: string,
   refId: string,
-): Promise<{ questsCompleted: string[]; unlockedStamina: boolean }> {
+): Promise<{ questsCompleted: string[]; unlockedStamina: boolean; questRewards: QuestRewardSummary | null }> {
   const fn = httpsCallable<
     { locationId: string; refId: string },
-    { questsCompleted: string[]; unlockedStamina: boolean }
+    { questsCompleted: string[]; unlockedStamina: boolean; questRewards: QuestRewardSummary | null }
   >(functions, 'interactWithShrine');
   const result = await fn({ locationId, refId });
   return result.data;

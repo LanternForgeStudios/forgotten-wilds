@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { advanceQuests, applyQuestRewards, currentNpcDialogueVariantKey } from '../engine/questEngine';
+import { advanceQuests, applyQuestRewards, currentNpcDialogueVariantKey, isEmptyQuestRewardSummary } from '../engine/questEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
 
@@ -117,10 +117,13 @@ export const talkToNpc = onCall<TalkToNpcRequest>(async (request) => {
     save.seenNpcDialogueVariant = { ...(save.seenNpcDialogueVariant ?? {}), [npcId]: shownVariantKey };
 
     const completions = advanceQuests(save.quests, { type: 'talkToNpc', targetId: npcId });
-    applyQuestRewards(save, completions);
+    const questRewards = applyQuestRewards(save, completions);
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
-    return { questsCompleted: completions.map((c) => c.questId) };
+    return {
+      questsCompleted: completions.map((c) => c.questId),
+      questRewards: isEmptyQuestRewardSummary(questRewards) ? null : questRewards,
+    };
   });
 });

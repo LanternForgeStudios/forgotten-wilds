@@ -26,7 +26,8 @@ import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
 import { TIER_ORDER } from '@/utils/tier';
-import { itemDisplayName, itemIconAssetId, groupRewardItemIds } from '@/utils/itemName';
+import { itemDisplayName } from '@/utils/itemName';
+import { buildRewardLines } from '@/utils/rewardLines';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { homeTownFor } from '@/utils/locationHomeTown';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
@@ -890,26 +891,14 @@ export function CombatScene() {
               <>
                 <h2 style={{ color: 'var(--fw-accent)' }}>Victory!</h2>
                 <div className={styles.rewardList}>
-                  <div className={styles.rewardRow}>
-                    <span>{rewards?.xp ?? 0} XP</span>
-                  </div>
-                  <div className={styles.rewardRow}>
-                    <img src={getAssetUrl('icon.currency.gold')} alt="" className={styles.rewardIcon} />
-                    <span>{rewards?.gold ?? 0} Gold</span>
-                  </div>
-                  {rewards?.itemIds.length
-                    ? groupRewardItemIds(rewards.itemIds).map(({ itemId, count }) => (
-                        <div key={itemId} className={styles.rewardRow}>
-                          {itemIconAssetId(itemId) && (
-                            <img src={getAssetUrl(itemIconAssetId(itemId)!)} alt="" className={styles.rewardIcon} />
-                          )}
-                          <span>
-                            {itemDisplayName(itemId)}
-                            {count > 1 ? ` x${count}` : ''}
-                          </span>
-                        </div>
-                      ))
-                    : null}
+                  {buildRewardLines({ xp: rewards?.xp, gold: rewards?.gold, itemIds: rewards?.itemIds, skillIds: rewards?.grantedSkillIds }).map(
+                    (line) => (
+                      <div key={line.key} className={styles.rewardRow}>
+                        {line.icon && <img src={getAssetUrl(line.icon)} alt="" className={styles.rewardIcon} />}
+                        <span>{line.label}</span>
+                      </div>
+                    ),
+                  )}
                 </div>
                 {rewards?.leveledUp && <p style={{ color: 'var(--fw-accent)' }}>Level up!</p>}
                 {rewards?.restore && (

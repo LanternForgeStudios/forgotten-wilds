@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { advanceQuests, applyQuestRewards } from '../engine/questEngine';
+import { advanceQuests, applyQuestRewards, isEmptyQuestRewardSummary } from '../engine/questEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { LANDMARK_PARENT_LOCATION } from '../data/locations';
 import type { PlayerSave } from '../shared-types';
@@ -44,10 +44,14 @@ export const visitLandmark = onCall<VisitLandmarkRequest>(async (request) => {
     }
 
     const completions = advanceQuests(save.quests, { type: 'reachLocation', targetId: landmarkId });
-    applyQuestRewards(save, completions);
+    const questRewards = applyQuestRewards(save, completions);
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
-    return { alreadyVisited, questsCompleted: completions.map((c) => c.questId) };
+    return {
+      alreadyVisited,
+      questsCompleted: completions.map((c) => c.questId),
+      questRewards: isEmptyQuestRewardSummary(questRewards) ? null : questRewards,
+    };
   });
 });
