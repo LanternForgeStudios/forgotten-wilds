@@ -1140,7 +1140,7 @@ export const LOCATIONS: Location[] = [
     mapAssetId: 'map.frosthaven',
     battleBackgroundAssetId: 'battle-bg.forest',
     encounterTable: [],
-    npcIds: [],
+    npcIds: ['captain-astrid-frost'],
     fastTravel: true,
   },
   {

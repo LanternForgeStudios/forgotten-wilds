@@ -256,6 +256,25 @@ add("portraits/storekeeper-mateo.svg", 512, 512, "MATEO", "#b8794a", "#6a3a20")
 add("portraits/blacksmith-esteban.svg", 512, 512, "ESTEBAN", "#b8794a", "#6a3a20")
 add("portraits/armorer-carmen.svg", 512, 512, "CARMEN", "#b8794a", "#6a3a20")
 
+# --- Frozen Frontier (MSQ Volume VI, Chapter 11) NPCs - blocked on PixelLab quota. ---
+add("sprites/characters/elder-henrik-idle.svg", 72, 96, "HENRIK", "#5a7a9a", "#2a3a52", font_size=9)
+add("sprites/characters/captain-astrid-frost-idle.svg", 72, 96, "ASTRID", "#5a7a9a", "#2a3a52", font_size=9)
+add("sprites/characters/aurora-keeper-lyra-idle.svg", 72, 96, "LYRA", "#5a7a9a", "#2a3a52")
+add("sprites/characters/winter-spirit-idle.svg", 72, 96, "SPIRIT", "#5a7a9a", "#2a3a52")
+add("sprites/characters/innkeeper-greta-idle.svg", 72, 96, "INN", "#5a7a9a", "#2a3a52")
+add("sprites/characters/storekeeper-bjorn-idle.svg", 72, 96, "SHOP", "#5a7a9a", "#2a3a52")
+add("sprites/characters/blacksmith-sigrid-idle.svg", 72, 96, "SMITH", "#5a7a9a", "#2a3a52")
+add("sprites/characters/armorer-magnus-idle.svg", 72, 96, "ARMOR", "#5a7a9a", "#2a3a52")
+
+add("portraits/elder-henrik.svg", 512, 512, "HENRIK", "#6a8aaa", "#3a4a62")
+add("portraits/captain-astrid-frost.svg", 512, 512, "ASTRID", "#6a8aaa", "#3a4a62")
+add("portraits/aurora-keeper-lyra.svg", 512, 512, "LYRA", "#6a8aaa", "#3a4a62")
+add("portraits/winter-spirit.svg", 512, 512, "SPIRIT", "#6a8aaa", "#3a4a62")
+add("portraits/innkeeper-greta.svg", 512, 512, "GRETA", "#6a8aaa", "#3a4a62")
+add("portraits/storekeeper-bjorn.svg", 512, 512, "BJORN", "#6a8aaa", "#3a4a62")
+add("portraits/blacksmith-sigrid.svg", 512, 512, "SIGRID", "#6a8aaa", "#3a4a62")
+add("portraits/armorer-magnus.svg", 512, 512, "MAGNUS", "#6a8aaa", "#3a4a62")
+
 # Quest key-item icons (Phase 3) - shared icons for the 3 Star Fragments and 2 Desert Relics.
 add("icons/star-fragment.svg", 64, 64, "STAR", "#7a8ac0", "#3a4470")
 add("icons/desert-relic.svg", 64, 64, "RELIC", "#c8a868", "#8a6838")

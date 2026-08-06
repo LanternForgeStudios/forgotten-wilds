@@ -73,6 +73,16 @@ const NPC_LOCATIONS: Record<string, string> = {
   'storekeeper-mateo': 'red-mesa-general-store',
   'blacksmith-esteban': 'red-mesa-blacksmith',
   'armorer-carmen': 'red-mesa-armory',
+  // Frozen Frontier (MSQ Volume VI, Chapter 11) - added at the same time the NPCs themselves were
+  // authored, same discipline as every region since Whispering Pines.
+  'elder-henrik': 'frosthaven-explorer-headquarters',
+  'captain-astrid-frost': 'frosthaven',
+  'aurora-keeper-lyra': 'frosthaven-ice-chapel',
+  'winter-spirit': 'aurora-basin',
+  'innkeeper-greta': 'frosthaven-inn',
+  'storekeeper-bjorn': 'frosthaven-general-store',
+  'blacksmith-sigrid': 'frosthaven-blacksmith',
+  'armorer-magnus': 'frosthaven-armory',
 };
 const KNOWN_NPC_IDS = new Set(Object.keys(NPC_LOCATIONS));
 
