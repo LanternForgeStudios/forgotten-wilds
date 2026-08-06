@@ -1352,4 +1352,24 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     oilCapacity: 45,
     lanternAbilityIds: ['resolve-renewed'],
   },
+  // Mythic tier - Winter Stag's own lootTable chance drop (Chapter 12).
+  'elder-winter-stag-totem': {
+    id: 'elder-winter-stag-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxHp: 15, maxSpirit: 12, defense: 3 },
+    tier: 'mythic',
+    familyId: 'winter-stag-totem',
+  },
+  // Winter Stag Totem family's Legendary cap - a guaranteed reward from the boss-defeat quest
+  // itself (MSF-FF-006), same pattern as thunderbird-totem/cedar-giant-totem/canyon-giant-totem.
+  // Named "Eternal Stag Totem" rather than reusing "Winter Stag Totem" - that name is already the
+  // family's own Rare tier (shipped Chapter 11).
+  'eternal-stag-totem': {
+    id: 'eternal-stag-totem',
+    slot: 'spiritTotem',
+    statBonuses: { maxSpirit: 28, maxHp: 18, defense: 5 },
+    tier: 'legendary',
+    unique: true,
+    familyId: 'winter-stag-totem',
+  },
 };

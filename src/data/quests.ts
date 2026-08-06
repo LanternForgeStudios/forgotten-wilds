@@ -1135,4 +1135,17 @@ export const QUESTS: Quest[] = [
       grantLoreId: 'lore-keeper-eira-winterborn',
     },
   },
+  {
+    id: 'the-winter-stag',
+    name: 'The Winter Stag',
+    giverNpcId: 'aurora-keeper-lyra',
+    description: 'Reach the Summit of Winter and restore the Winter Stag to its balance.',
+    category: 'main',
+    prerequisiteQuestId: 'lantern-of-winters-resolve',
+    objectives: [
+      { id: 'reach-summit-of-winter', type: 'reachLocation', description: 'Reach the Summit of Winter.', targetId: 'summit-of-winter', requiredCount: 1 },
+      { id: 'defeat-winter-stag', type: 'defeatBoss', description: 'Defeat the Winter Stag.', targetId: 'winter-stag', requiredCount: 1 },
+    ],
+    reward: { xp: 360, gold: 190, itemIds: ['eternal-stag-totem'] },
+  },
 ];

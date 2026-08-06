@@ -849,6 +849,15 @@ export const QUESTS: Record<string, QuestDef> = {
       grantLoreId: 'lore-keeper-eira-winterborn',
     },
   },
+  'the-winter-stag': {
+    id: 'the-winter-stag',
+    prerequisiteQuestId: 'lantern-of-winters-resolve',
+    objectives: [
+      { id: 'reach-summit-of-winter', type: 'reachLocation', targetId: 'summit-of-winter', requiredCount: 1 },
+      { id: 'defeat-winter-stag', type: 'defeatBoss', targetId: 'winter-stag', requiredCount: 1 },
+    ],
+    reward: { xp: 360, gold: 190, itemIds: ['eternal-stag-totem'] },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -922,4 +931,5 @@ export const QUEST_ORDER = [
   'the-first-scout',
   'the-second-scout',
   'lantern-of-winters-resolve',
+  'the-winter-stag',
 ];

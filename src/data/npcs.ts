@@ -1385,8 +1385,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Aurora Keeper Lyra', text: "The aurora hasn't burned right in longer than my own memory reaches. I keep this chapel lit anyway, on the chance it remembers how, someday." },
       { speaker: 'Aurora Keeper Lyra', text: "There's a Lantern Sanctuary somewhere past the Hall of Eternal Winter, if the old records are honest. The last one left in Mytherra, as far as anyone's found." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['lantern-of-winters-resolve', 'the-second-scout', 'the-first-scout', 'hall-of-eternal-winter'] },
+    gameplayHook: { type: 'questGiver', questIds: ['the-winter-stag', 'lantern-of-winters-resolve', 'the-second-scout', 'the-first-scout', 'hall-of-eternal-winter'] },
     dialogueVariants: [
+      {
+        questId: 'the-winter-stag',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "Restored, not slain. I wasn't certain that was still possible for a Guardian that never even entered the Silence to begin with." },
+          { speaker: 'Aurora Keeper Lyra', text: "Six regions restored now, Keeper. Only the Hall of Memories left - and whatever answer is actually waiting there." },
+        ],
+      },
       {
         questId: 'lantern-of-winters-resolve',
         lines: [
