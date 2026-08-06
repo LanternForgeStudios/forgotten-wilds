@@ -1,0 +1,71 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.town-terrain",
+      "name": "town-terrain",
+      "image": "town-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.overworld-decor2",
+      "name": "overworld-decor2",
+      "image": "overworld-decor2.png",
+      "imageWidth": 64,
+      "imageHeight": 48,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 20, "tileId": { "tileset": 1, "id": 4 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 10,
+          "seed": 61,
+          "avoid": [
+            { "x": 30, "y": 22 }, { "x": 63, "y": 20 },
+            { "x": 20, "y": 14 }, { "x": 44, "y": 14 },
+            { "x": 20, "y": 26 }, { "x": 44, "y": 26 },
+            { "x": 30, "y": 8 }, { "x": 30, "y": 30 },
+            { "x": 12, "y": 20 }, { "x": 30, "y": 20 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "collisions": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 30, "y": 22, "refId": "default" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-snowveil-forest" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "snowveil-forest", "targetSpawnId": "from-frosthaven" },
+
+    { "type": "npc", "x": 30, "y": 20, "refId": "captain-astrid-frost", "wanderRadius": 4 },
+
+    { "type": "spawnPoint", "x": 20, "y": 14, "refId": "from-frosthaven-explorer-headquarters" },
+    { "type": "transition", "x": 20, "y": 14, "refId": "frosthaven-explorer-headquarters", "targetSpawnId": "from-frosthaven", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 44, "y": 14, "refId": "from-frosthaven-ice-chapel" },
+    { "type": "transition", "x": 44, "y": 14, "refId": "frosthaven-ice-chapel", "targetSpawnId": "from-frosthaven", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 20, "y": 26, "refId": "from-frosthaven-inn" },
+    { "type": "transition", "x": 20, "y": 26, "refId": "frosthaven-inn", "targetSpawnId": "from-frosthaven", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 44, "y": 26, "refId": "from-frosthaven-general-store" },
+    { "type": "transition", "x": 44, "y": 26, "refId": "frosthaven-general-store", "targetSpawnId": "from-frosthaven", "requiredFacing": "down" },
+    { "type": "spawnPoint", "x": 30, "y": 8, "refId": "from-frosthaven-blacksmith" },
+    { "type": "transition", "x": 30, "y": 8, "refId": "frosthaven-blacksmith", "targetSpawnId": "from-frosthaven", "requiredFacing": "up" },
+    { "type": "spawnPoint", "x": 12, "y": 20, "refId": "from-frosthaven-armory" },
+    { "type": "transition", "x": 12, "y": 20, "refId": "frosthaven-armory", "targetSpawnId": "from-frosthaven" }
+  ]
+}

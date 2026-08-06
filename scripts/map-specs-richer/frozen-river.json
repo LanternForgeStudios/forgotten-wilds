@@ -1,0 +1,58 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.frosthaven-terrain",
+      "name": "frosthaven-terrain",
+      "image": "frosthaven-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.overworld-decor2",
+      "name": "overworld-decor2",
+      "image": "overworld-decor2.png",
+      "imageWidth": 64,
+      "imageHeight": 48,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 20, "tileId": { "tileset": 1, "id": 4 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 12,
+          "seed": 63,
+          "avoid": [
+            { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 30, "y": 20 },
+            { "x": 20, "y": 30 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-snowveil-forest" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "snowveil-forest", "targetSpawnId": "from-frozen-river" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-glacier-pass" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "glacier-pass", "targetSpawnId": "from-frozen-river" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-frozen-river-1" },
+    { "type": "interactable", "x": 52, "y": 10, "refId": "chest-frozen-river-2" },
+    { "type": "interactable", "x": 54, "y": 32, "refId": "chest-frozen-river-3" }
+  ]
+}

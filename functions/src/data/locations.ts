@@ -109,6 +109,16 @@ export const WORLD_ITEMS: Record<string, Record<string, string>> = {
   'star-lantern-sanctuary': {
     'lantern-of-forgotten-stars': 'lantern-of-forgotten-stars',
   },
+  // Frozen Frontier (MSQ Volume VI, Chapter 11) - the 3 Aurora Crystal Fragments (MSF-FF-003).
+  'snowveil-forest': {
+    'aurora-crystal-fragment-snowveil-forest': 'aurora-crystal-fragment-snowveil-forest',
+  },
+  'glacier-pass': {
+    'aurora-crystal-fragment-glacier-pass': 'aurora-crystal-fragment-glacier-pass',
+  },
+  'aurora-basin': {
+    'aurora-crystal-fragment-aurora-basin': 'aurora-crystal-fragment-aurora-basin',
+  },
 };
 
 /** Server-side source of truth for which shrine interactables actually exist - interactWithShrine.ts's
@@ -136,6 +146,9 @@ export const KNOWN_SHRINES: Record<string, Set<string>> = {
   'celestial-oasis': new Set(['star-crystal-shrine']),
   // Inner Observatory's own celestial mechanism (MSF-SD-005).
   'inner-observatory': new Set(['celestial-mechanism']),
+  // Aurora Basin's own Winter Shrine - discover (MSF-FF-002) then restore (MSF-FF-003) beats share
+  // this same refId, matching the established shrine-reuse-across-sequential-quests pattern.
+  'aurora-basin': new Set(['winter-shrine']),
 };
 
 /** Which parent map's location each landmark lives within - visitLandmark.ts's own lookup, used to

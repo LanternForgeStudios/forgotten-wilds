@@ -27,7 +27,7 @@ import type {
  *  endlessBattleEngine.ts) - this set exists purely to gate *where a party can form*. Every
  *  region's own main town square goes here (not building interiors - forming a party from inside
  *  a shop isn't a scenario worth supporting) - add the next one when the next region ships. */
-const TOWN_LOCATION_IDS = new Set(['ash-hallow', 'mirehaven', 'highwind-crossing', 'cedarwatch', 'red-mesa']);
+const TOWN_LOCATION_IDS = new Set(['ash-hallow', 'mirehaven', 'highwind-crossing', 'cedarwatch', 'red-mesa', 'frosthaven']);
 
 /** A non-terminal battle with no activity for this long is treated as abandoned (e.g. every
  *  participant's tab closed before the run ever reached a real end) rather than permanently

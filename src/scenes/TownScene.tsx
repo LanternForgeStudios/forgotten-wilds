@@ -87,6 +87,15 @@ const BUILDING_MARKERS: Record<string, { label: string; spriteAssetId: string }>
   'red-mesa-general-store': { label: 'General Store', spriteAssetId: 'structure.red-mesa-general-store' },
   'red-mesa-blacksmith': { label: 'The Forge', spriteAssetId: 'structure.red-mesa-blacksmith' },
   'red-mesa-armory': { label: 'The Armory', spriteAssetId: 'structure.red-mesa-armory' },
+  // Frozen Frontier (MSQ Volume VI) - added at the same time the town itself was built, closing
+  // the BUILDING_MARKERS-gap pattern before it could recur a 4th time (see feedback_region_build_
+  // workflow memory's grep-based allowlist check).
+  'frosthaven-explorer-headquarters': { label: 'Explorer Headquarters', spriteAssetId: 'structure.frosthaven-explorer-headquarters' },
+  'frosthaven-ice-chapel': { label: 'The Ice Chapel', spriteAssetId: 'structure.frosthaven-ice-chapel' },
+  'frosthaven-inn': { label: 'The Inn', spriteAssetId: 'structure.frosthaven-inn' },
+  'frosthaven-general-store': { label: 'General Store', spriteAssetId: 'structure.frosthaven-general-store' },
+  'frosthaven-blacksmith': { label: 'The Forge', spriteAssetId: 'structure.frosthaven-blacksmith' },
+  'frosthaven-armory': { label: 'The Armory', spriteAssetId: 'structure.frosthaven-armory' },
 };
 
 /** Shrine interactables on the open town map (currently just Ash Hallow's Town Shrine) - handled

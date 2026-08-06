@@ -1,0 +1,56 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.frosthaven-terrain",
+      "name": "frosthaven-terrain",
+      "image": "frosthaven-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.overworld-decor2",
+      "name": "overworld-decor2",
+      "image": "overworld-decor2.png",
+      "imageWidth": 64,
+      "imageHeight": 48,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 20, "tileId": { "tileset": 1, "id": 4 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 12,
+          "seed": 66,
+          "avoid": [
+            { "x": 2, "y": 20 }, { "x": 30, "y": 20 },
+            { "x": 10, "y": 8 }, { "x": 52, "y": 10 }, { "x": 54, "y": 32 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-aurora-basin" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "aurora-basin", "targetSpawnId": "from-hall-of-eternal-winter-approach" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-hall-of-eternal-winter-approach-1" },
+    { "type": "interactable", "x": 52, "y": 10, "refId": "chest-hall-of-eternal-winter-approach-2" },
+    { "type": "interactable", "x": 54, "y": 32, "refId": "chest-hall-of-eternal-winter-approach-3" }
+  ]
+}

@@ -32,6 +32,7 @@ export const LOCATION_GATES: Record<string, string> = {
   'root-caverns': 'heartwood-sanctuary',
   'red-mesa': 'the-missing-pages',
   'inner-observatory': 'the-path-of-the-astronomers',
+  'frosthaven': 'the-stars-never-lied',
 };
 
 /** Returns a player-facing message if `locationId` is gated and not yet unlocked, or null if it's

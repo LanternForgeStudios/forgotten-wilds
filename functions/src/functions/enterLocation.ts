@@ -57,6 +57,9 @@ const LOCATION_GATES: Record<string, string> = {
   // other 4 rooms (star-chamber/star-lantern-sanctuary/canyon-depths/guardian-summit) are reached
   // by physically walking the chained transitions from here, same single-gate dungeon precedent.
   'inner-observatory': 'the-path-of-the-astronomers',
+  // Frozen Frontier (MSQ Volume VI) - same single-gate-per-region-entry-point model, gated on
+  // Volume V's own true finale.
+  'frosthaven': 'the-stars-never-lied',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -147,6 +150,19 @@ const KNOWN_LOCATION_IDS = new Set([
   'star-lantern-sanctuary',
   'canyon-depths',
   'guardian-summit',
+  // Frozen Frontier (MSQ Volume VI, Chapter 11).
+  'frosthaven',
+  'snowveil-forest',
+  'frozen-river',
+  'glacier-pass',
+  'aurora-basin',
+  'hall-of-eternal-winter-approach',
+  'frosthaven-explorer-headquarters',
+  'frosthaven-ice-chapel',
+  'frosthaven-inn',
+  'frosthaven-general-store',
+  'frosthaven-blacksmith',
+  'frosthaven-armory',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

@@ -56,6 +56,12 @@ export const LOCATION_HOME_TOWN: Record<string, string> = {
   'star-lantern-sanctuary': 'red-mesa',
   'canyon-depths': 'red-mesa',
   'guardian-summit': 'red-mesa',
+  // Frozen Frontier (MSQ Volume VI, Chapter 11).
+  'snowveil-forest': 'frosthaven',
+  'frozen-river': 'frosthaven',
+  'glacier-pass': 'frosthaven',
+  'aurora-basin': 'frosthaven',
+  'hall-of-eternal-winter-approach': 'frosthaven',
 };
 
 /** Resolves the home town for any location id - falls back to Ash Hallow for an unmapped id. */

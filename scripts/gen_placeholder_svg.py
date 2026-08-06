@@ -230,6 +230,12 @@ add("sprites/structures/red-mesa-inn.svg", 144, 144, "INN", "#a8623a", "#5a2c18"
 add("sprites/structures/red-mesa-general-store.svg", 144, 144, "SHOP", "#a8623a", "#5a2c18")
 add("sprites/structures/red-mesa-blacksmith.svg", 144, 144, "FORGE", "#a8623a", "#5a2c18")
 add("sprites/structures/red-mesa-armory.svg", 144, 144, "ARMORY", "#a8623a", "#5a2c18", font_size=18)
+add("sprites/structures/frosthaven-explorer-headquarters.svg", 144, 144, "LODGE", "#5a7a9a", "#2a3a52")
+add("sprites/structures/frosthaven-ice-chapel.svg", 144, 144, "CHAPEL", "#5a7a9a", "#2a3a52", font_size=18)
+add("sprites/structures/frosthaven-inn.svg", 144, 144, "INN", "#5a7a9a", "#2a3a52")
+add("sprites/structures/frosthaven-general-store.svg", 144, 144, "SHOP", "#5a7a9a", "#2a3a52")
+add("sprites/structures/frosthaven-blacksmith.svg", 144, 144, "FORGE", "#5a7a9a", "#2a3a52")
+add("sprites/structures/frosthaven-armory.svg", 144, 144, "ARMORY", "#5a7a9a", "#2a3a52", font_size=18)
 
 # --- Shattered Desert (MSQ Volume V, Chapter 9) NPCs - blocked on PixelLab quota. ---
 add("sprites/characters/elder-santiago-ortega-idle.svg", 72, 96, "SANTIAGO", "#a8623a", "#5a2c18", font_size=9)

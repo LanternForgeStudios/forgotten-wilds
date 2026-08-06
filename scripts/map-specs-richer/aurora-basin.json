@@ -1,0 +1,61 @@
+{
+  "width": 64,
+  "height": 40,
+  "tilesets": [
+    {
+      "assetId": "tileset.frosthaven-terrain",
+      "name": "frosthaven-terrain",
+      "image": "frosthaven-terrain.png",
+      "imageWidth": 64,
+      "imageHeight": 64,
+      "tileSize": 16,
+      "nonWalkableIds": []
+    },
+    {
+      "assetId": "tileset.overworld-decor2",
+      "name": "overworld-decor2",
+      "image": "overworld-decor2.png",
+      "imageWidth": 64,
+      "imageHeight": 48,
+      "tileSize": 16
+    }
+  ],
+  "ground": {
+    "fill": { "tileset": 0, "id": 12 }
+  },
+  "decorations": [
+    {
+      "name": "decorations-1",
+      "tiles": [
+        { "x": 30, "y": 20, "tileId": { "tileset": 1, "id": 4 } }
+      ],
+      "scatter": [
+        {
+          "region": { "x": 2, "y": 2, "width": 60, "height": 36 },
+          "tileIds": [ { "tileset": 1, "id": 0 }, { "tileset": 1, "id": 2 } ],
+          "count": 10,
+          "seed": 65,
+          "avoid": [
+            { "x": 2, "y": 20 }, { "x": 62, "y": 20 }, { "x": 30, "y": 20 },
+            { "x": 40, "y": 20 }, { "x": 30, "y": 26 }, { "x": 10, "y": 8 }, { "x": 52, "y": 10 }
+          ]
+        }
+      ]
+    }
+  ],
+  "overhang": [],
+  "objects": [
+    { "type": "spawnPoint", "x": 3, "y": 20, "refId": "from-glacier-pass" },
+    { "type": "transition", "x": 0, "y": 20, "refId": "glacier-pass", "targetSpawnId": "from-aurora-basin" },
+    { "type": "spawnPoint", "x": 61, "y": 20, "refId": "from-hall-of-eternal-winter-approach" },
+    { "type": "transition", "x": 63, "y": 20, "refId": "hall-of-eternal-winter-approach", "targetSpawnId": "from-aurora-basin" },
+    { "type": "spawnPoint", "x": 30, "y": 20, "refId": "default" },
+
+    { "type": "npc", "x": 40, "y": 20, "refId": "winter-spirit", "wanderRadius": 3 },
+    { "type": "interactable", "x": 30, "y": 20, "refId": "winter-shrine" },
+    { "type": "interactable", "x": 30, "y": 26, "refId": "aurora-crystal-fragment-aurora-basin" },
+
+    { "type": "interactable", "x": 10, "y": 8, "refId": "chest-aurora-basin-1" },
+    { "type": "interactable", "x": 52, "y": 10, "refId": "chest-aurora-basin-2" }
+  ]
+}
