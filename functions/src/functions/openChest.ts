@@ -155,6 +155,26 @@ const CHESTS: Record<string, Record<string, string>> = {
     'chest-hall-of-eternal-winter-approach-2': 'frost-wolf-fang',
     'chest-hall-of-eternal-winter-approach-3': 'frost-wolf-fang',
   },
+  // --- Dungeon interior chests, added retroactively: every dungeon room from Chapter 6 onward had
+  // a chest placed on its map spec but was never given a CHESTS entry, so opening any of these threw
+  // "There is no chest here." instead of granting anything - a real production bug (see the
+  // 2026-08 quest/chest wiring audit). Filled with that chapter's own region-specific material
+  // (matching the established "materials fill dungeon chests" convention) rather than inventing a
+  // new equipment assignment that might collide with a future quest-reward design.
+  'summit-temple': { 'chest-summit-temple-1': 'wisp-feather' },
+  'sky-bridge': { 'chest-sky-bridge-1': 'wisp-feather' },
+  'storm-galleries': { 'chest-storm-galleries-1': 'wisp-feather' },
+  'guardian-peak': { 'chest-guardian-peak-1': 'wisp-feather' },
+  'root-caverns': { 'chest-root-caverns-1': 'withered-echo-moss' },
+  'inner-archive': { 'chest-inner-archive-1': 'withered-echo-moss' },
+  'guardian-grove': { 'chest-guardian-grove-1': 'withered-echo-moss' },
+  'inner-observatory': { 'chest-inner-observatory-1': 'starlight-dust' },
+  'star-chamber': { 'chest-star-chamber-1': 'starlight-dust' },
+  'canyon-depths': { 'chest-canyon-depths-1': 'starlight-dust' },
+  'guardian-summit': { 'chest-guardian-summit-1': 'starlight-dust' },
+  'hall-of-eternal-winter': { 'chest-hall-of-eternal-winter-1': 'frozen-essence' },
+  'guardian-chamber': { 'chest-guardian-chamber-1': 'frozen-essence' },
+  'summit-of-winter': { 'chest-summit-of-winter-1': 'frozen-essence' },
 };
 
 export const openChest = onCall<OpenChestRequest>(async (request) => {

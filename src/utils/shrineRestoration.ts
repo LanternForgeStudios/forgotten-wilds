@@ -14,6 +14,15 @@ export const SHRINE_RESTORED_QUEST: Record<string, string> = {
   'mother-cypress-shrine': 'seeds-of-memory',
   'stone-circle-carvings': 'the-stone-circles',
   'ancient-wind-mechanism': 'temple-above-the-clouds',
+  // Whispering Pines (MSQ Volume IV)
+  'cedar-shrine-heart': 'seeds-of-the-ancient-cedar',
+  'heartwood-sanctuary-gate': 'heartwood-sanctuary',
+  // Shattered Desert (MSQ Volume V)
+  'star-crystal-shrine': 'fragments-of-the-sky',
+  'celestial-mechanism': 'the-celestial-machine',
+  // Frozen Frontier (MSQ Volume VI)
+  'winter-shrine': 'light-within-the-ice',
+  'memory-altar': 'the-complete-memory',
 };
 
 /** Sprite asset id for a shrine's current lit/dormant state, given its refId and the player's

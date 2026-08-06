@@ -76,6 +76,8 @@ const BOSS_TRIGGERS: Record<string, { prerequisiteQuestId: string; approachLabel
 const SHRINE_INTERACTABLES: Record<string, { message: string }> = {
   'mine-shrine': { message: 'A shrine carved into the rock, coated in soot. Something in it still resists the corruption around it.' },
   'ancient-wind-mechanism': { message: 'A ring of stone vanes and gears, long since seized up. Something here still wants to turn.' },
+  'celestial-mechanism': { message: 'A ring of brass instruments, seized with age. Something here still answers to Lantern-light.' },
+  'memory-altar': { message: 'Six empty alcoves, each shaped to hold something that was never returned - until now.' },
 };
 
 /** World-item ("fragment"-kind) interactables (collectWorldItem.ts) - refId is always the same as
@@ -110,6 +112,34 @@ const WORLD_ITEM_INTERACTABLES: Record<
   'lantern-of-open-skies': {
     label: 'Lantern Sanctuary',
     foundMessage: 'A second legendary lantern, unlit and waiting, its glass etched with a spiral wind-pattern. You lift it free.',
+    alreadyMessage: "There's nothing left here — you already claimed the lantern.",
+    dormantSpriteAssetId: 'structure.lantern-relic-dormant',
+    collectedSpriteAssetId: 'structure.lantern-relic-collected',
+  },
+  'archive-fragments': {
+    label: 'Archive Fragments',
+    foundMessage: 'You gather a bundle of root-stained pages, still legible beneath the damage.',
+    alreadyMessage: "There's nothing left here — you already recovered the fragments.",
+    dormantSpriteAssetId: 'structure.temple-records-dormant',
+    collectedSpriteAssetId: 'structure.temple-records-collected',
+  },
+  'lantern-of-ancient-roots': {
+    label: 'Lantern Sanctuary',
+    foundMessage: 'A legendary lantern rests here, unlit, its glass etched with an interlocking root-pattern. You lift it free.',
+    alreadyMessage: "There's nothing left here — you already claimed the lantern.",
+    dormantSpriteAssetId: 'structure.lantern-relic-dormant',
+    collectedSpriteAssetId: 'structure.lantern-relic-collected',
+  },
+  'lantern-of-forgotten-stars': {
+    label: 'Lantern Sanctuary',
+    foundMessage: 'A legendary lantern rests here, unlit, its glass etched with a constellation-pattern. You lift it free.',
+    alreadyMessage: "There's nothing left here — you already claimed the lantern.",
+    dormantSpriteAssetId: 'structure.lantern-relic-dormant',
+    collectedSpriteAssetId: 'structure.lantern-relic-collected',
+  },
+  'lantern-of-winters-resolve': {
+    label: 'Lantern Sanctuary',
+    foundMessage: 'The final legendary lantern rests here, unlit, its glass etched with a watching stag. You lift it free.',
     alreadyMessage: "There's nothing left here — you already claimed the lantern.",
     dormantSpriteAssetId: 'structure.lantern-relic-dormant',
     collectedSpriteAssetId: 'structure.lantern-relic-collected',

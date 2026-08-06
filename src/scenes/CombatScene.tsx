@@ -31,7 +31,7 @@ import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { homeTownFor } from '@/utils/locationHomeTown';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
-import { battleStartCutscene, DEFEAT_CUTSCENE } from '@/data/cutscenes';
+import { battleStartCutscene, buildDefeatCutscene } from '@/data/cutscenes';
 import { getAssetUrl } from '@/assets/assetManager';
 import { playMusic, playSound } from '@/audio/audioService';
 import styles from './CombatScene.module.css';
@@ -474,7 +474,7 @@ export function CombatScene() {
         spawnY: preserveSpawn ? params.spawnY : undefined,
       });
     if (wasDefeat) {
-      useCutsceneStore.getState().play({ ...DEFEAT_CUTSCENE, entryEffect: 'wake-up', onComplete: goToExploration });
+      useCutsceneStore.getState().play({ ...buildDefeatCutscene(targetLocation?.name ?? 'town'), entryEffect: 'wake-up', onComplete: goToExploration });
     } else {
       goToExploration();
     }
@@ -909,7 +909,7 @@ export function CombatScene() {
             {phase === 'defeat' && (
               <>
                 <h2 style={{ color: 'var(--fw-danger)' }}>You were overwhelmed...</h2>
-                <p>You wake back in Ash Hallow, shaken but alive.</p>
+                <p>You wake back in {LOCATIONS.find((l) => l.id === homeTownFor(locationId))?.name ?? 'town'}, shaken but alive.</p>
               </>
             )}
             {phase === 'fled' && <h2>You escaped.</h2>}

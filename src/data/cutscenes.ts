@@ -30,17 +30,21 @@ export const WELCOME_BACK_CUTSCENE = {
   ],
 };
 
-/** Shown when the player clicks Continue off a defeat overlay, before returning to Ash Hallow -
- *  see CombatScene.tsx's returnToExploration(). */
-export const DEFEAT_CUTSCENE = {
-  backgroundAssetId: 'background.defeat-cutscene',
-  lines: [
-    'Darkness - the ache of a hundred small hurts, and the weight of a hand on your shoulder.',
-    '"Easy now," a voice says. "You\'re safe. We found you on the trail and brought you back."',
-    "Firelight, and the smell of woodsmoke. Ash Hallow's Inn, and a bed that hasn't stopped being warm.",
-    "You'll need more than luck to walk that road again. Rest first.",
-  ],
-};
+/** Shown when the player clicks Continue off a defeat overlay, before returning to their region's
+ *  own home town (not always Ash Hallow - see homeTownFor/CombatScene.tsx's returnToExploration()).
+ *  A function rather than a flat const so the inn line names whichever town the player is actually
+ *  being sent back to. */
+export function buildDefeatCutscene(townName: string) {
+  return {
+    backgroundAssetId: 'background.defeat-cutscene',
+    lines: [
+      'Darkness - the ache of a hundred small hurts, and the weight of a hand on your shoulder.',
+      '"Easy now," a voice says. "You\'re safe. We found you on the trail and brought you back."',
+      `Firelight, and the smell of woodsmoke. ${townName}'s Inn, and a bed that hasn't stopped being warm.`,
+      "You'll need more than luck to walk that road again. Rest first.",
+    ],
+  };
+}
 
 interface QuestCutscene {
   backgroundAssetId: string;

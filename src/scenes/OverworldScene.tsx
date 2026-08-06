@@ -75,6 +75,32 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   // (temporarily reused) marker sprite.
   'winter-count-hide-i-cache': 'fragment',
   'winter-count-hide-ii-cache': 'fragment',
+  // Whispering Pines (MSQ Volume IV, Chapter 7)
+  'cedar-shrine-heart': 'shrine',
+  'heartwood-sanctuary-gate': 'shrine',
+  'spirit-seed-elder-forest': 'fragment',
+  'spirit-seed-silver-river': 'fragment',
+  'spirit-seed-heartwood-approach': 'fragment',
+  'lost-library-records': 'fragment',
+  // Whispering Pines side quest (The Heartwood Recordings)
+  'heartwood-recording-i-cache': 'fragment',
+  'heartwood-recording-ii-cache': 'fragment',
+  // Shattered Desert (MSQ Volume V, Chapter 9)
+  'star-crystal-shrine': 'shrine',
+  'star-fragment-sunfire-dunes': 'fragment',
+  'star-fragment-crimson-canyons': 'fragment',
+  'star-fragment-painted-mesas': 'fragment',
+  // Shattered Desert side quest (The Desert Relics)
+  'desert-relic-i-cache': 'fragment',
+  'desert-relic-ii-cache': 'fragment',
+  // Frozen Frontier (MSQ Volume VI, Chapter 11)
+  'winter-shrine': 'shrine',
+  'aurora-crystal-fragment-snowveil-forest': 'fragment',
+  'aurora-crystal-fragment-glacier-pass': 'fragment',
+  'aurora-crystal-fragment-aurora-basin': 'fragment',
+  // Frozen Frontier side quest (The Missing Scouts)
+  'lost-scout-effects-i-cache': 'fragment',
+  'lost-scout-effects-ii-cache': 'fragment',
 };
 /** Which Cloud Function a walk-in `zone` landmark fires the instant the player's tile enters it -
  *  no Interact needed. Hunter's Camp and Spirit Grove (the clearing, not its shrine) are pure
@@ -111,6 +137,26 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   // shrine. Swap for real bespoke art once quota refreshes.
   'winter-count-hide-i-cache': 'structure.landmark-drowned-ledger-cache',
   'winter-count-hide-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  // Whispering Pines (MSQ Volume IV) - no bespoke markers generated yet (PixelLab quota), reusing
+  // existing thematically-close markers same as the Winter Counts above.
+  'spirit-seed-elder-forest': 'structure.landmark-heart-seed',
+  'spirit-seed-silver-river': 'structure.landmark-heart-seed',
+  'spirit-seed-heartwood-approach': 'structure.landmark-heart-seed',
+  'lost-library-records': 'structure.landmark-drowned-ledger-cache',
+  'heartwood-recording-i-cache': 'structure.landmark-drowned-ledger-cache',
+  'heartwood-recording-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  // Shattered Desert (MSQ Volume V)
+  'star-fragment-sunfire-dunes': 'structure.landmark-water-glimmer',
+  'star-fragment-crimson-canyons': 'structure.landmark-water-glimmer',
+  'star-fragment-painted-mesas': 'structure.landmark-water-glimmer',
+  'desert-relic-i-cache': 'structure.landmark-drowned-ledger-cache',
+  'desert-relic-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  // Frozen Frontier (MSQ Volume VI)
+  'aurora-crystal-fragment-snowveil-forest': 'structure.landmark-water-glimmer',
+  'aurora-crystal-fragment-glacier-pass': 'structure.landmark-water-glimmer',
+  'aurora-crystal-fragment-aurora-basin': 'structure.landmark-water-glimmer',
+  'lost-scout-effects-i-cache': 'structure.landmark-drowned-ledger-cache',
+  'lost-scout-effects-ii-cache': 'structure.landmark-bogwater-almanac-cache',
 };
 
 /** Post-collection sprite override for a 'fragment'-kind interactable, shown once its item is in
@@ -144,6 +190,13 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (refId === 'bogwater-almanac-cache') return 'a mossy cypress hollow';
   if (refId.startsWith('wind-stone-')) return 'a stone humming faintly with wind';
   if (refId === 'winter-count-hide-i-cache' || refId === 'winter-count-hide-ii-cache') return 'a painted hide half-buried in the grass';
+  if (refId.startsWith('spirit-seed-')) return 'a seed pod humming faintly with spirit-light';
+  if (refId === 'lost-library-records') return 'a bundle of forgotten records';
+  if (refId === 'heartwood-recording-i-cache' || refId === 'heartwood-recording-ii-cache') return 'a hidden recording, tucked out of sight';
+  if (refId.startsWith('star-fragment-')) return 'a shard of crystal that catches starlight';
+  if (refId === 'desert-relic-i-cache' || refId === 'desert-relic-ii-cache') return 'a carved relic half-buried in the sand';
+  if (refId.startsWith('aurora-crystal-fragment-')) return 'a shard of ice holding a faint trace of aurora-light';
+  if (refId === 'lost-scout-effects-i-cache' || refId === 'lost-scout-effects-ii-cache') return "a lost scout's frozen pack";
   if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';
   const landmark = LOCATIONS.find((l) => l.id === refId);
   if (landmark) return landmark.name;
