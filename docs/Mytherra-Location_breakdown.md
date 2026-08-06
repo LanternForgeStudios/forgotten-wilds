@@ -416,6 +416,30 @@ Boss:
 
 The Wendigo King
 
+Implementation Notes (Chapter 11, shipped): same doc-drift pattern as every prior region - this
+section's "Overworld Areas" (12 named sub-areas: Snowveil Forest, Frozen Creek, Wolf Den, Aurora
+Clearing, Glacier Pass, Ice Bridge, Frozen Falls, Avalanche Trail, White Tundra, Mammoth Graveyard,
+Spirit Stones, Northern Lights Plateau) disagreed with `Mytherra-MSQ_breakdown.md`'s own 6 Chapter 11
+Primary Maps (Frosthaven, Snowveil Forest, Frozen River, Glacier Pass, Aurora Basin, Hall of Eternal
+Winter Approach) - notably this doc's "Frozen Creek" became the MSQ doc's own "Frozen River" and
+this doc's "Aurora Clearing" became the MSQ doc's own "Aurora Basin," the same rename pattern seen
+in every prior region. Resolved the same way as always: the MSQ doc's Primary Maps became the real
+shipped `Location` entries; this doc's other 9 sub-area names (Wolf Den, Ice Bridge, Frozen Falls,
+Avalanche Trail, White Tundra, Mammoth Graveyard, Spirit Stones, Northern Lights Plateau) weren't
+built as separate landmarks this pass, though "Wolf Den" informed the Frost Wolves enemy family's
+own flavor. Town building list: `Hunter Lodge` wasn't built as its own interior - Captain Astrid
+Frost wanders Frosthaven's town square instead, matching Scout Niska/Forest Warden Rowan Hart/Desert
+Ranger Tomas Vega's own precedent. `Explorer Headquarters`/`Ice Chapel` cover the recurring cast,
+matching every other region's leader/historian-gets-a-hall convention. This doc's own boss name
+("The Wendigo King") differs from the MSQ doc's ("Winter Stag") - the MSQ doc's name wins per the
+standing rule, and it carries real narrative weight there (the only Guardian holding the complete,
+unbroken memory of the Great Silence) that "Wendigo King" doesn't reflect, so this is treated as a
+straightforward stale-name fix rather than a deliberate rename requiring its own note. Chapter 11's
+own MSF-FF-004 ends at the Hall of Eternal Winter's own approach map, not inside the dungeon itself -
+the dungeon interior (Ice Caves/Frozen Cathedral/Crystal Hall/Frozen Throne per this doc, plus the
+Winter Stag boss fight) is Chapter 12's own build, matching the exact chapter-pair split already used
+3 times (Chapters 5/6, 7/8, 9/10).
+
 World Progression
 Ash Hallow
     │

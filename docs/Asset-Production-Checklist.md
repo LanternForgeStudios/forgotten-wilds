@@ -905,6 +905,87 @@ tracked as a placeholder gap, the tiles are real, just generic.
 
 ---
 
+## Frozen Frontier, Chapter 11: Into the Endless Winter - outstanding placeholders
+
+**Status (2026-08-05): the PixelLab quota check for this chapter turned up 23 real generations
+available (not the exhausted quota every prior chapter assumed).** Spent 1 of them on a real
+`tileset.frosthaven-terrain` (a genuine snow/ice Wang autotile set for the region's 5 field maps) -
+the first time this session a brand-new real tileset was generated instead of reusing an existing
+one, since none of the vetted tilesets (grass/desert/marsh) have a snow palette. Frosthaven's own
+town ground still reuses `tileset.town-terrain`, matching every prior region's town. Everything
+below - all 8 NPCs, both enemy sprites, all 19 equipment icons, all 3 item icons - stayed SVG
+placeholder, banking the remaining ~22 generations for Chapter 12's dungeon/boss/Lantern of Winter's
+Resolve.
+
+### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
+
+| Character | Role | Generation prompt |
+|---|---|---|
+| Elder Henrik | Elder of Frosthaven | Weathered older man with quiet authority, heavy fur-lined coat, silver beard, composed frontier-elder bearing. |
+| Captain Astrid Frost | Frontier Captain | Lean alert woman, practical cold-weather gear, scar across one eyebrow, watchful expression. |
+| Aurora Keeper Lyra | Keeper of the Ice Chapel | Middle-aged keeper, pale robes trimmed in faint blue, calm patient expression, faint aurora-glow reflected in her eyes. |
+| Winter Spirit | Voice of Aurora Basin | Ethereal spirit woven from pale frost and dim aurora-light, shifting blue-white form, faintly glowing, ancient watchful presence. |
+| Greta | The Frosthaven Inn | Warm heavyset woman, thick wool sweater, welcoming tired smile. |
+| Bjorn | Frosthaven's General Store | Practical middle-aged man, fur-trimmed vest, standing before shelves of frontier goods, easy trader's smile. |
+| Sigrid | The Frosthaven Forge | Broad-shouldered forge-scarred woman, leather apron, soot-streaked forearms, confident stance near an anvil. |
+| Magnus | The Frosthaven Armory | Sturdy practical man, inspecting a piece of fur-lined armor, calloused hands, focused expression. |
+
+### NPC overworld sprites (8 - 72×96, transparent background, full-body idle pose)
+
+No Chapter 11 NPC has real PixelLab art yet, sprite or portrait.
+
+| Character | Generation prompt |
+|---|---|
+| Elder Henrik | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Captain Astrid Frost | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Aurora Keeper Lyra | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Winter Spirit | Full-body version of its portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Greta | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Bjorn | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Sigrid | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Magnus | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+
+### Enemy battle sprites (2 - 128×128, transparent background, front-facing battle stance)
+
+| Enemy | Family | Generation prompt |
+|---|---|---|
+| Frost Wolf | frostWolves | A lean wolf with a frost-pale coat, faint icy breath, restless watchful stance. |
+| Alpha Frost Wolf | frostWolves | A larger, denser-coated wolf, deeper blue-grey fur, more visibly aggressive stance, ice crystals clinging to its ruff. |
+
+### Equipment icons (19 - generate 128×128, final 64×64, across 6 families x 3 tiers + 1 totem)
+
+| Equipment | Final Size | Generation prompt |
+|---|---|---|
+| Worn Frost Pike *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a long pike with a frost-worn wooden haft, centered, transparent background. |
+| Bound Frost Pike *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a frost pike with a leather-bound grip, centered, transparent background. |
+| Glacier-Forged Pike *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a pike with a faint blue icy sheen along its edge, centered, transparent background. |
+| Worn Winter Coat *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a heavy patched winter coat, centered, transparent background. |
+| Lined Winter Coat *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a winter coat with visible fur lining at the collar, centered, transparent background. |
+| Auroraweave Coat *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a ceremonial coat stitched with a faint glowing aurora-pattern, centered, transparent background. |
+| Worn Winter Leggings *(common)* | 64×64 | Simple flat-shaded fantasy game icon of heavy lined winter leggings, centered, transparent background. |
+| Lined Winter Leggings *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of winter leggings double-lined at the knee, centered, transparent background. |
+| Auroraweave Leggings *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of leggings stitched with a matching faint aurora-pattern, centered, transparent background. |
+| Worn Glacier Boots *(common)* | 64×64 | Simple flat-shaded fantasy game icon of sturdy ice-worn boots, centered, transparent background. |
+| Crampon Glacier Boots *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of glacier boots fitted with small iron crampons, centered, transparent background. |
+| Frostwarden's Boots *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of reinforced boots etched with a faint pale frost-motif, centered, transparent background. |
+| Worn Fur Gloves *(common)* | 64×64 | Simple flat-shaded fantasy game icon of thick fur hand-gloves, centered, transparent background. |
+| Lined Fur Gloves *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of fur gloves double-lined at the knuckle, centered, transparent background. |
+| Frostwarden's Gloves *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of gloves marked with a warden's sigil, faint pale frost-warding glow, centered, transparent background. |
+| Faded Aurora Charm *(common)* | 64×64 | Simple flat-shaded fantasy game icon of a small bone disc etched with a faded aurora-pattern, on a cord, centered, transparent background. |
+| Banded Aurora Charm *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of an aurora charm bound in braided cord, centered, transparent background. |
+| Radiant Aurora Charm *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of an ornate charm inlaid with a genuinely glowing sliver of aurora-light, centered, transparent background. |
+| Winter Stag Totem *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a small carved totem in the shape of a stag with frost-etched antlers, centered, transparent background. |
+
+### Item icons (3 - generate 128×128, final 64×64: materials, key items)
+
+| Item | Final Size | Generation prompt |
+|---|---|---|
+| Frost Wolf Fang *(material)* | 64×64 | Simple flat-shaded fantasy game icon of a sharp, ice-cold fang, centered, transparent background. |
+| Aurora Crystal Fragment *(key item, shared across 3 locations)* | 64×64 | Simple flat-shaded fantasy game icon of a shard of ice holding a faint trace of aurora-light, centered, transparent background. |
+| A Lost Scout's Effects *(key item, shared across 2 locations)* | 64×64 | Simple flat-shaded fantasy game icon of a frozen travel pack, centered, transparent background. |
+
+---
+
 ## Things Claude can't generate itself (need external production)
 
 Everything above this line is producible in-house via the pixellab MCP server (characters, objects,
