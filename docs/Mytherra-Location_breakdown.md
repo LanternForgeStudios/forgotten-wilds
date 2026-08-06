@@ -362,6 +362,17 @@ name refers to the Forgotten Observatory dungeon itself, not a separate Red Mesa
 `The Elder's Hall`/`Relic Museum` cover the recurring cast, matching every other region's leader/
 historian-gets-a-hall convention.
 
+Implementation Notes (Chapter 10, shipped): the dungeon's 4 "Sections" listed above (Astral
+Library, Star Chamber, Celestial Engine, Summit) don't map one-to-one onto the 5 rooms actually
+built - this doc's own list is a summary, not a room-by-room spec, the same gap found in every
+prior dungeon chapter (Root Caverns, Guardian Grove, etc.). Shipped as 5 rooms mirroring Chapter
+6's own Great Thunderbird dungeon shape: Inner Observatory (entry, roughly this doc's "Astral
+Library"), Star Chamber (name matches directly), Star Lantern Sanctuary (the Keeper's lantern
+room - this doc doesn't call one out separately, but every prior dungeon has one), Canyon Depths
+(roughly this doc's "Celestial Engine"), and Guardian Summit (boss room, this doc's "Summit").
+Boss name matches exactly ("The Canyon Giant" here, `canyon-giant` as the shipped id/display name
+"Canyon Giant").
+
 6. Frozen Frontier
 Primary Town
 Frosthaven

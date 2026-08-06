@@ -743,6 +743,21 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 300, gold: 160, itemIds: ['canyon-giant-totem'] },
   },
+  'the-stars-never-lied': {
+    id: 'the-stars-never-lied',
+    prerequisiteQuestId: 'the-canyon-giant',
+    objectives: [
+      { id: 'talk-santiago-final', type: 'talkToNpc', targetId: 'elder-santiago-ortega', requiredCount: 1 },
+      { id: 'witness-star-crystal-shrine', type: 'interactWithShrine', targetId: 'star-crystal-shrine', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 90,
+      gold: 45,
+      itemIds: ['guardian-memory-fragment-6', 'frostward-star-chart'],
+      regionalReputation: 65,
+      grantLoreId: 'lore-guardian-memory-v',
+    },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -808,4 +823,5 @@ export const QUEST_ORDER = [
   'the-celestial-machine',
   'lantern-of-forgotten-stars',
   'the-canyon-giant',
+  'the-stars-never-lied',
 ];

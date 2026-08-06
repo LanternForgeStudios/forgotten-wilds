@@ -1124,8 +1124,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Elder Santiago Ortega', text: "Red Mesa's been carved into this canyon for longer than anyone can properly date. The rock remembers more than the records do." },
       { speaker: 'Elder Santiago Ortega', text: "Elias Rowan's letters reached us same as everywhere else, eventually. He wrote that a Keeper would come looking for the Observatory. Took him at his word." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-canyon-giant', 'the-desert-calls'] },
+    gameplayHook: { type: 'questGiver', questIds: ['the-stars-never-lied', 'the-canyon-giant', 'the-desert-calls'] },
     dialogueVariants: [
+      {
+        questId: 'the-stars-never-lied',
+        lines: [
+          { speaker: 'Elder Santiago Ortega', text: "Five memories now, Keeper, and the shape of it is finally clear: the Great Silence wasn't done to the Guardians. It was chosen, by Keepers and Guardians together, to save this world from something none of them wrote down." },
+          { speaker: 'Elder Santiago Ortega', text: "The Observatory's own charts point north, past every road Red Mesa has ever mapped. The Frozen Frontier, Keeper. That's where the last of it is waiting." },
+        ],
+      },
       {
         questId: 'the-canyon-giant',
         lines: [

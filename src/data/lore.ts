@@ -187,4 +187,10 @@ export const LORE_ENTRIES: JournalEntry[] = [
     body: "A history read from the Lantern Sanctuary's own walls by Scholar Nia Solis: Orion Vale was the last Lantern Keeper to tend the Forgotten Observatory before the Canyon Giant was left to keep its own long watch, unrelieved. Vale left this lantern lit and waiting - the same pattern as Aldric Thorne beneath Heartwood Sanctuary, Talon Greywind on Thunderbird Mesa, and Elise Duvall beneath the Deep Current. Four lanterns, four Keepers, four regions - all left behind by someone who expected to come back and never did.",
     unlockedAt: 0,
   },
+  {
+    id: 'lore-guardian-memory-v',
+    title: 'Guardian Memory V: The Stars Never Lied',
+    body: "The Canyon Giant's own memory, witnessed at the Star Crystal Shrine: the Great Silence was not an accident, and it was not one side binding the other. Lantern Keepers and Guardians chose it together, deliberately, to save Mytherra from something the desert Guardian's memory circles but never names. Five memories restored now, and the player finally knows what happened. Why it was necessary is a question this desert cannot answer - only the Frozen Frontier, where the final Guardian chose to stay awake and remember everything, still can.",
+    unlockedAt: 0,
+  },
 ];

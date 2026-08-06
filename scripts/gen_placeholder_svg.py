@@ -204,6 +204,8 @@ add("icons/cedar-giant-totem.svg", 64, 64, "TOTEM", "#a8d888", "#4a7830")
 # Chapter 8 finale (Phase 6).
 add("icons/guardian-memory-fragment-5.svg", 64, 64, "FRAG 5", "#9a70c0", "#5a3880", font_size=10)
 add("icons/celestial-star-map.svg", 64, 64, "MAP", "#7a8ac0", "#3a4470")
+add("icons/guardian-memory-fragment-6.svg", 64, 64, "FRAG 6", "#9a70c0", "#5a3880", font_size=10)
+add("icons/frostward-star-chart.svg", 64, 64, "CHART", "#7ab0d0", "#2a5070", font_size=9)
 
 # --- Town structure (building-facade marker) placeholders ---
 # BUILDING_MARKERS in TownScene.tsx only had Ash Hallow + Mirehaven entries - every Highwind

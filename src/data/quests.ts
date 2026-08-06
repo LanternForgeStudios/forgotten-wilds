@@ -1006,4 +1006,23 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 300, gold: 160, itemIds: ['canyon-giant-totem'] },
   },
+  {
+    id: 'the-stars-never-lied',
+    name: 'The Stars Never Lied',
+    giverNpcId: 'elder-santiago-ortega',
+    description: 'Return to Red Mesa and witness the fifth Guardian Memory at the Star Crystal Shrine.',
+    category: 'main',
+    prerequisiteQuestId: 'the-canyon-giant',
+    objectives: [
+      { id: 'talk-santiago-final', type: 'talkToNpc', description: 'Report to Elder Santiago Ortega.', targetId: 'elder-santiago-ortega', requiredCount: 1 },
+      { id: 'witness-star-crystal-shrine', type: 'interactWithShrine', description: 'Return to the Star Crystal Shrine and witness Guardian Memory V.', targetId: 'star-crystal-shrine', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 90,
+      gold: 45,
+      itemIds: ['guardian-memory-fragment-6', 'frostward-star-chart'],
+      regionalReputation: 65,
+      grantLoreId: 'lore-guardian-memory-v',
+    },
+  },
 ];

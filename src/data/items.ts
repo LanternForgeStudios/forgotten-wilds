@@ -752,6 +752,28 @@ export const ITEMS: Item[] = [
     tier: 'rare',
     unique: true,
   },
+
+  // --- Shattered Desert (MSQ Volume V), Chapter 10 finale: The Stars Never Lied ---
+  {
+    id: 'guardian-memory-fragment-6',
+    name: 'Guardian Memory Fragment VI',
+    description: 'The clearest memory of all: the Great Silence was no accident, but a deliberate act the Lantern Keepers and Guardians chose together, to save Mytherra from something the desert Guardian never names.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.guardian-memory-fragment-6',
+    stackable: false,
+    tier: 'legendary',
+    unique: true,
+  },
+  {
+    id: 'frostward-star-chart',
+    name: 'Frostward Star Chart',
+    description: "A chart from the Forgotten Observatory's own archive, its final unmarked line pointing north, past every known road, toward the Frozen Frontier.",
+    category: 'keyItem',
+    iconAssetId: 'icon.item.frostward-star-chart',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.
