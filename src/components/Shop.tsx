@@ -308,51 +308,62 @@ export function Shop({ shopId, onClose }: ShopProps) {
           );
         })()}
 
-        {selectedDef && (
-          <div className={styles.detailPanel}>
-            <div className={styles.detailHeader}>
-              {'iconAssetId' in selectedDef && selectedDef.iconAssetId && (
-                <img src={getAssetUrl(selectedDef.iconAssetId)} alt="" className={styles.detailIcon} />
-              )}
-              <div>
-                <p className={styles.detailName}>
-                  {selectedDef.name} <TierBadge tier={selectedDef.tier} style={{ marginLeft: 6 }} />
-                </p>
-                <p className={styles.detailMeta}>
-                  {'slot' in selectedDef ? SLOT_LABELS[selectedDef.slot] : 'category' in selectedDef ? selectedDef.category : ''}
-                  {selectedOwnedQuantity > 0 && ` · You own x${selectedOwnedQuantity}`}
-                  {selectedDef.unique && ' · Unique (cannot be lost, sold, or traded)'}
-                </p>
-              </div>
-            </div>
-            <p className={styles.detailDescription}>{selectedDef.description}</p>
-            {'statBonuses' in selectedDef && formatStatBonuses(selectedDef.statBonuses) && (
-              <p className={styles.detailStats}>{formatStatBonuses(selectedDef.statBonuses)}</p>
-            )}
-            {'ailmentResistance' in selectedDef && formatAilmentResistance(selectedDef.ailmentResistance) && (
-              <p className={styles.detailStats}>{formatAilmentResistance(selectedDef.ailmentResistance)}</p>
-            )}
-            {'effect' in selectedDef && selectedDef.effect && (
-              <p className={styles.detailStats}>
-                {selectedDef.effect.healHpPercent
-                  ? `Restores ${Math.round(selectedDef.effect.healHpPercent * 100)}% HP  `
-                  : ''}
-                {selectedDef.effect.healSpiritPercent
-                  ? `Restores ${Math.round(selectedDef.effect.healSpiritPercent * 100)}% Spirit  `
-                  : ''}
-                {selectedDef.effect.restoreOilPercent
-                  ? `Restores ${Math.round(selectedDef.effect.restoreOilPercent * 100)}% Lantern Oil  `
-                  : ''}
-              </p>
-            )}
-          </div>
-        )}
-
         {error && (
           <p style={{ color: 'var(--fw-danger)', fontSize: 13 }}>{error}</p>
         )}
         <p className={styles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
+
+      {selectedDef && (
+        <div
+          className={styles.detailOverlay}
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedItemId(null);
+          }}
+        >
+          <Panel className={styles.detailPopupPanel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <OverlayCloseButton onClick={() => setSelectedItemId(null)} />
+            <div className={styles.detailPanel}>
+              <div className={styles.detailHeader}>
+                {'iconAssetId' in selectedDef && selectedDef.iconAssetId && (
+                  <img src={getAssetUrl(selectedDef.iconAssetId)} alt="" className={styles.detailIcon} />
+                )}
+                <div>
+                  <p className={styles.detailName}>
+                    {selectedDef.name} <TierBadge tier={selectedDef.tier} style={{ marginLeft: 6 }} />
+                  </p>
+                  <p className={styles.detailMeta}>
+                    {'slot' in selectedDef ? SLOT_LABELS[selectedDef.slot] : 'category' in selectedDef ? selectedDef.category : ''}
+                    {selectedOwnedQuantity > 0 && ` · You own x${selectedOwnedQuantity}`}
+                    {selectedDef.unique && ' · Unique (cannot be lost, sold, or traded)'}
+                  </p>
+                </div>
+              </div>
+              <p className={styles.detailDescription}>{selectedDef.description}</p>
+              {'statBonuses' in selectedDef && formatStatBonuses(selectedDef.statBonuses) && (
+                <p className={styles.detailStats}>{formatStatBonuses(selectedDef.statBonuses)}</p>
+              )}
+              {'ailmentResistance' in selectedDef && formatAilmentResistance(selectedDef.ailmentResistance) && (
+                <p className={styles.detailStats}>{formatAilmentResistance(selectedDef.ailmentResistance)}</p>
+              )}
+              {'effect' in selectedDef && selectedDef.effect && (
+                <p className={styles.detailStats}>
+                  {selectedDef.effect.healHpPercent
+                    ? `Restores ${Math.round(selectedDef.effect.healHpPercent * 100)}% HP  `
+                    : ''}
+                  {selectedDef.effect.healSpiritPercent
+                    ? `Restores ${Math.round(selectedDef.effect.healSpiritPercent * 100)}% Spirit  `
+                    : ''}
+                  {selectedDef.effect.restoreOilPercent
+                    ? `Restores ${Math.round(selectedDef.effect.restoreOilPercent * 100)}% Lantern Oil  `
+                    : ''}
+                </p>
+              )}
+            </div>
+          </Panel>
+        </div>
+      )}
 
       {pendingSale && (
         <div
