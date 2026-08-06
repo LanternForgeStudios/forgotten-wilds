@@ -854,6 +854,16 @@ export const ITEMS: Item[] = [
     tier: 'legendary',
     unique: true,
   },
+  {
+    id: 'lantern-of-winters-resolve',
+    name: "Lantern of Winter's Resolve",
+    description: 'An unlit brass lantern etched with a stag standing watch, left waiting since before Frosthaven had a name.',
+    category: 'keyItem',
+    iconAssetId: 'icon.item.lantern-of-winters-resolve',
+    stackable: false,
+    tier: 'rare',
+    unique: true,
+  },
 ];
 
 // Display copy only — functions/src/data/items.ts's SHOP_PRICES is authoritative for purchaseItem.

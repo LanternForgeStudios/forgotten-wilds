@@ -63,4 +63,12 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
     description:
       'The Lantern of Forgotten Stars wraps you in a thin veil of dead starlight - incoming blows land as if from somewhere much farther away.',
   },
+  {
+    id: 'resolve-renewed',
+    name: 'Resolve Renewed',
+    category: 'healing',
+    oilCost: 14,
+    description:
+      "The Lantern of Winter's Resolve remembers what it means to endure - draw on it to steady yourself and recover HP, the same warmth every Keeper before you once carried.",
+  },
 ];

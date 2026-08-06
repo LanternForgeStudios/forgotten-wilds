@@ -1385,8 +1385,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Aurora Keeper Lyra', text: "The aurora hasn't burned right in longer than my own memory reaches. I keep this chapel lit anyway, on the chance it remembers how, someday." },
       { speaker: 'Aurora Keeper Lyra', text: "There's a Lantern Sanctuary somewhere past the Hall of Eternal Winter, if the old records are honest. The last one left in Mytherra, as far as anyone's found." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-second-scout', 'the-first-scout', 'hall-of-eternal-winter'] },
+    gameplayHook: { type: 'questGiver', questIds: ['lantern-of-winters-resolve', 'the-second-scout', 'the-first-scout', 'hall-of-eternal-winter'] },
     dialogueVariants: [
+      {
+        questId: 'lantern-of-winters-resolve',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "Eira Winterborn. The last Keeper to tend this Hall, and the only one of the seven whose lantern waited for a Guardian that never once needed it lit." },
+          { speaker: 'Aurora Keeper Lyra', text: "Six lanterns recovered now, Keeper - counting the one already accounted for at Ash Hallow. One region left to restore. One truth left to learn." },
+        ],
+      },
       {
         questId: 'the-second-scout',
         lines: [

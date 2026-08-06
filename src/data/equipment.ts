@@ -1688,4 +1688,16 @@ export const EQUIPMENT: EquipmentItem[] = [
     tier: 'rare',
     familyId: 'winter-stag-totem',
   },
+  {
+    id: 'lantern-of-winters-resolve-equipped',
+    name: "Lantern of Winter's Resolve",
+    description: 'A lit legendary lantern, glass etched with a watching stag, a faint pale-blue glow that never once flickers.',
+    slot: 'lantern',
+    iconAssetId: 'icon.equipment.lantern-of-winters-resolve-equipped',
+    statBonuses: { maxSpirit: 25, defense: 7 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 45,
+    lanternAbilityIds: ['resolve-renewed'],
+  },
 ];

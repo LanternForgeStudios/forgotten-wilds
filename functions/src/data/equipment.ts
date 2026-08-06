@@ -1339,4 +1339,17 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'rare',
     familyId: 'winter-stag-totem',
   },
+
+  // --- Frozen Frontier (MSQ Volume VI, Chapter 12) equipment ---
+  // The 7th and final Legendary Lantern (MSF-FF-005) - Healing category, balancing the tally
+  // (offensive x2, healing x2, defensive x2 before this one).
+  'lantern-of-winters-resolve-equipped': {
+    id: 'lantern-of-winters-resolve-equipped',
+    slot: 'lantern',
+    statBonuses: { maxSpirit: 25, defense: 7 },
+    tier: 'legendary',
+    unique: true,
+    oilCapacity: 45,
+    lanternAbilityIds: ['resolve-renewed'],
+  },
 };

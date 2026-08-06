@@ -308,6 +308,8 @@ add("icons/canyon-giant-core.svg", 64, 64, "CORE", "#9a70c0", "#5a3880")
 # Lantern of Forgotten Stars (Phase 4) - found-item + equipped forms.
 add("icons/lantern-of-forgotten-stars.svg", 64, 64, "LANTERN", "#8a9cd0", "#3a4470", font_size=9)
 add("icons/lantern-of-forgotten-stars-equipped.svg", 64, 64, "LANTERN", "#9aacd8", "#4a5480", font_size=9)
+add("icons/lantern-of-winters-resolve.svg", 64, 64, "LANTERN", "#8ab0d0", "#3a5a80", font_size=9)
+add("icons/lantern-of-winters-resolve-equipped.svg", 64, 64, "LANTERN", "#9ac0d8", "#4a6a90", font_size=9)
 
 # Sunstone Totem family's Mythic + Legendary tiers (Phase 5).
 add("icons/elder-sunstone-totem.svg", 64, 64, "TOTEM", "#c8c0a0", "#78705a")

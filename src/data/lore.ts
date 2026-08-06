@@ -188,6 +188,12 @@ export const LORE_ENTRIES: JournalEntry[] = [
     unlockedAt: 0,
   },
   {
+    id: 'lore-keeper-eira-winterborn',
+    title: 'Keeper Eira Winterborn',
+    body: "A history read from the Lantern Sanctuary's own walls, deep in the Hall of Eternal Winter: Eira Winterborn was the last Lantern Keeper to tend the Frozen Frontier, and the only one of the seven whose lantern was left lit for a Guardian who never once needed it. The Winter Stag never entered the Great Silence - it stayed awake, on watch, the whole time. Winterborn's lantern waited anyway, out of habit or hope, the same as Orion Vale's, Aldric Thorne's, Talon Greywind's, and Elise Duvall's before it. Five lanterns recovered now, and one more already accounted for at Ash Hallow. Only the truth itself is still missing.",
+    unlockedAt: 0,
+  },
+  {
     id: 'lore-guardian-memory-v',
     title: 'Guardian Memory V: The Stars Never Lied',
     body: "The Canyon Giant's own memory, witnessed at the Star Crystal Shrine: the Great Silence was not an accident, and it was not one side binding the other. Lantern Keepers and Guardians chose it together, deliberately, to save Mytherra from something the desert Guardian's memory circles but never names. Five memories restored now, and the player finally knows what happened. Why it was necessary is a question this desert cannot answer - only the Frozen Frontier, where the final Guardian chose to stay awake and remember everything, still can.",

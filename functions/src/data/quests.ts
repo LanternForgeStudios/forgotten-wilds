@@ -831,6 +831,24 @@ export const QUESTS: Record<string, QuestDef> = {
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'frostbite-shatter', grantLoreId: 'lost-scout-effects-ii' },
   },
+
+  // --- Frozen Frontier (MSQ Volume VI), Chapter 12: The Last Memory ---
+  // Kebab-case id mapping: MSF-FF-005 lantern-of-winters-resolve, MSF-FF-006 the-winter-stag,
+  // MSF-FF-007 the-complete-memory, MSF-FF-008 a-new-dawn. Gated behind Chapter 11's own finale.
+  'lantern-of-winters-resolve': {
+    id: 'lantern-of-winters-resolve',
+    prerequisiteQuestId: 'hall-of-eternal-winter',
+    objectives: [
+      { id: 'get-lantern-of-winters-resolve', type: 'collectItem', targetId: 'lantern-of-winters-resolve', requiredCount: 1 },
+      { id: 'talk-lyra-lantern', type: 'talkToNpc', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 50,
+      gold: 0,
+      itemIds: ['lantern-of-winters-resolve-equipped'],
+      grantLoreId: 'lore-keeper-eira-winterborn',
+    },
+  },
 };
 
 /** Ordered so UI/engine code can walk the chain; matches the MSQ's own quest order. */
@@ -903,4 +921,5 @@ export const QUEST_ORDER = [
   'hall-of-eternal-winter',
   'the-first-scout',
   'the-second-scout',
+  'lantern-of-winters-resolve',
 ];

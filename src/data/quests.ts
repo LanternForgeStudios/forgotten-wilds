@@ -1115,4 +1115,24 @@ export const QUESTS: Quest[] = [
     ],
     reward: { xp: 40, gold: 25, grantSkillId: 'frostbite-shatter', grantLoreId: 'lost-scout-effects-ii' },
   },
+
+  // --- Frozen Frontier (MSQ Volume VI), Chapter 12: The Last Memory ---
+  {
+    id: 'lantern-of-winters-resolve',
+    name: "Lantern of Winter's Resolve",
+    giverNpcId: 'aurora-keeper-lyra',
+    description: 'Learn the history of a forgotten Lantern Keeper and claim the final legendary lantern waiting in the Hall of Eternal Winter.',
+    category: 'main',
+    prerequisiteQuestId: 'hall-of-eternal-winter',
+    objectives: [
+      { id: 'get-lantern-of-winters-resolve', type: 'collectItem', description: "Recover the Lantern of Winter's Resolve.", targetId: 'lantern-of-winters-resolve', requiredCount: 1 },
+      { id: 'talk-lyra-lantern', type: 'talkToNpc', description: 'Bring the lantern to Aurora Keeper Lyra.', targetId: 'aurora-keeper-lyra', requiredCount: 1 },
+    ],
+    reward: {
+      xp: 50,
+      gold: 0,
+      itemIds: ['lantern-of-winters-resolve-equipped'],
+      grantLoreId: 'lore-keeper-eira-winterborn',
+    },
+  },
 ];
