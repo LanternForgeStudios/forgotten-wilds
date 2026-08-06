@@ -50,6 +50,12 @@ export const LOCATION_HOME_TOWN: Record<string, string> = {
   'painted-mesas': 'red-mesa',
   'celestial-oasis': 'red-mesa',
   'forgotten-observatory-approach': 'red-mesa',
+  // Shattered Desert (MSQ Volume V, Chapter 10) - Forgotten Observatory dungeon (5 chained rooms).
+  'inner-observatory': 'red-mesa',
+  'star-chamber': 'red-mesa',
+  'star-lantern-sanctuary': 'red-mesa',
+  'canyon-depths': 'red-mesa',
+  'guardian-summit': 'red-mesa',
 };
 
 /** Resolves the home town for any location id - falls back to Ash Hallow for an unmapped id. */

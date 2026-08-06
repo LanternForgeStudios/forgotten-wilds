@@ -53,6 +53,10 @@ const LOCATION_GATES: Record<string, string> = {
   // Shattered Desert (MSQ Volume V) - same single-gate-per-region-entry-point model, gated on
   // Volume IV's own true finale.
   'red-mesa': 'the-missing-pages',
+  // Forgotten Observatory dungeon entrance (Chapter 10) - gated on Chapter 9's true finale. The
+  // other 4 rooms (star-chamber/star-lantern-sanctuary/canyon-depths/guardian-summit) are reached
+  // by physically walking the chained transitions from here, same single-gate dungeon precedent.
+  'inner-observatory': 'the-path-of-the-astronomers',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
@@ -137,6 +141,12 @@ const KNOWN_LOCATION_IDS = new Set([
   'red-mesa-general-store',
   'red-mesa-blacksmith',
   'red-mesa-armory',
+  // Chapter 10's Forgotten Observatory dungeon (5 chained rooms).
+  'inner-observatory',
+  'star-chamber',
+  'star-lantern-sanctuary',
+  'canyon-depths',
+  'guardian-summit',
 ]);
 
 export const enterLocation = onCall<EnterLocationRequest>(async (request) => {

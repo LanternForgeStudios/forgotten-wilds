@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 4,
-  "nextobjectid": 5,
+  "nextobjectid": 7,
   "layers": [
     {
       "id": 1,
@@ -3178,6 +3178,47 @@
         },
         {
           "id": 4,
+          "name": "",
+          "type": "spawnPoint",
+          "x": 720,
+          "y": 256,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "from-inner-observatory"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "",
+          "type": "transition",
+          "x": 752,
+          "y": 256,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "inner-observatory"
+            },
+            {
+              "name": "targetSpawnId",
+              "type": "string",
+              "value": "from-forgotten-observatory-approach"
+            }
+          ]
+        },
+        {
+          "id": 6,
           "name": "",
           "type": "interactable",
           "x": 320,

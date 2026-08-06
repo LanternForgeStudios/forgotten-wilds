@@ -1057,4 +1057,77 @@ export const LOCATIONS: Location[] = [
     fastTravel: false,
     parentLocationId: 'red-mesa',
   },
+
+  // --- Shattered Desert (MSQ Volume V), Chapter 10: The Sky Remembers ---
+  // Forgotten Observatory dungeon, chained east from Forgotten Observatory Approach's own east
+  // transition, matching the Thunderbird Mesa/Heartwood Sanctuary multi-room pattern exactly.
+  // "Lantern Sanctuary" as a plain id is already taken (Thunderbird Mesa) and
+  // "heartwood-lantern-sanctuary" (Heartwood Sanctuary), so this one is 'star-lantern-sanctuary'.
+  {
+    id: 'inner-observatory',
+    name: 'Inner Observatory',
+    kind: 'dungeon',
+    description: 'A vast circular chamber ringed with dead brass instruments, dust-caked dials still pointed at a sky no one has read in centuries.',
+    mapAssetId: 'map.inner-observatory',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'celestial-wisp', weight: 3 },
+      { enemyId: 'star-phantom', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'star-chamber',
+    name: 'Star Chamber',
+    kind: 'dungeon',
+    description: 'A domed room whose ceiling still holds a faint painted map of a sky that no longer quite matches the one outside.',
+    mapAssetId: 'map.star-chamber',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'celestial-wisp', weight: 2 },
+      { enemyId: 'star-phantom', weight: 2 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'star-lantern-sanctuary',
+    name: 'Lantern Sanctuary',
+    kind: 'dungeon',
+    description: 'A round chamber at the heart of the Observatory, where a single lantern has waited, unlit, since before Red Mesa had a name.',
+    mapAssetId: 'map.star-lantern-sanctuary',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [{ enemyId: 'star-phantom', weight: 1 }],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'canyon-depths',
+    name: 'Canyon Depths',
+    kind: 'dungeon',
+    description: 'A crevice deep enough that the sky above narrows to a thin bright line, the air cool and still.',
+    mapAssetId: 'map.canyon-depths',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'star-phantom', weight: 2 },
+      { enemyId: 'sandstorm-devil', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
+  {
+    id: 'guardian-summit',
+    name: 'Guardian Summit',
+    kind: 'dungeon',
+    description: 'A wide stone platform open to the sky, where a shape carved from the canyon itself keeps a watch no one relieved.',
+    mapAssetId: 'map.guardian-summit',
+    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    encounterTable: [
+      { enemyId: 'star-phantom', weight: 2 },
+      { enemyId: 'sandstorm-devil', weight: 1 },
+    ],
+    npcIds: [],
+    fastTravel: true,
+  },
 ];

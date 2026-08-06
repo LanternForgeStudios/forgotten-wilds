@@ -50,6 +50,9 @@
     { "type": "transition", "x": 0, "y": 16, "refId": "celestial-oasis", "targetSpawnId": "from-forgotten-observatory-approach" },
     { "type": "spawnPoint", "x": 24, "y": 16, "refId": "default" },
 
+    { "type": "spawnPoint", "x": 45, "y": 16, "refId": "from-inner-observatory" },
+    { "type": "transition", "x": 47, "y": 16, "refId": "inner-observatory", "targetSpawnId": "from-forgotten-observatory-approach" },
+
     { "type": "interactable", "x": 20, "y": 8, "refId": "chest-forgotten-observatory-approach-1" }
   ]
 }
