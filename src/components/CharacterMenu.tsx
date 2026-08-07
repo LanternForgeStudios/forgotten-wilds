@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Panel } from './common/Panel';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { TierBadge } from './common/TierBadge';
+import { BestBadge } from './common/BestBadge';
 import { getAssetUrl } from '@/assets/assetManager';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -82,30 +83,6 @@ function subTabOf(entry: ResolvedItem): InventorySubTab {
   if (entry.itemDef?.category === 'consumable') return 'consumable';
   if (entry.itemDef?.category === 'materials') return 'materials';
   return 'keyItem'; // keyItem + lanternUpgrade + anything else non-equip, non-potion
-}
-
-/** Marks an equipment card/row as the strongest the player owns for its slot (see
- *  equipmentScore) - shown regardless of whether that item is currently equipped, so it reads
- *  the same in the Inventory tab's Equipment view, the Equipment tab's slot rows, and the equip
- *  picker overlay. */
-function BestBadge() {
-  return (
-    <span
-      style={{
-        fontSize: 9,
-        fontWeight: 'bold',
-        color: 'var(--fw-accent)',
-        border: '1px solid var(--fw-accent)',
-        borderRadius: 3,
-        padding: '1px 4px',
-        textTransform: 'uppercase',
-        letterSpacing: 0.3,
-      }}
-      title="The strongest item you own for this slot"
-    >
-      ★ Best
-    </span>
-  );
 }
 
 /** Shown next to a currently-equipped item that isn't the strongest one owned - the Equipment

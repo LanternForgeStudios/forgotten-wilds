@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Panel } from './common/Panel';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { TierBadge } from './common/TierBadge';
+import { BestBadge } from './common/BestBadge';
 import { getAssetUrl } from '@/assets/assetManager';
+import { equipmentScore } from '@/utils/equipmentScore';
+import { slotFamily } from '@/utils/equipmentSlotLabels';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -27,7 +30,7 @@ import {
 } from '@/data';
 import { eligibleLanternUpgrades } from '@/utils/lanternOilUpgradeEligibility';
 import { playSound } from '@/audio/audioService';
-import type { EquipmentSlot, ItemCategory } from '@/types';
+import type { EquipmentItem, EquipmentSlot, ItemCategory, PlayerEquipment } from '@/types';
 import styles from './CharacterMenu.module.css';
 
 interface ShopProps {
@@ -41,6 +44,23 @@ interface ShopProps {
 
 function defFor(itemId: string) {
   return ITEMS.find((i) => i.id === itemId) ?? EQUIPMENT.find((e) => e.id === itemId);
+}
+
+/** Whether buying `def` would be a genuine upgrade over what's currently equipped in its slot
+ *  family (see slotFamily - a Charm/Spirit Totem has up to 4 possible homes, everything else just
+ *  1). "Upgrade" means either an empty/unfilled slot in that family, or beating the WEAKEST
+ *  currently-equipped item there (so buying it and replacing that one would help) - reuses
+ *  equipmentScore, the same tier-then-stats ranking CharacterMenu's own "Best" badge is built on. */
+function isEquipmentUpgrade(def: EquipmentItem, equipment: PlayerEquipment | undefined): boolean {
+  const family = slotFamily(def.slot);
+  const equippedScores = family
+    .map((slot) => equipment?.[slot])
+    .filter((id): id is string => !!id)
+    .map((id) => EQUIPMENT.find((e) => e.id === id))
+    .filter((d): d is EquipmentItem => !!d)
+    .map(equipmentScore);
+  if (equippedScores.length < family.length) return true; // at least one empty slot in the family
+  return equipmentScore(def) > Math.min(...equippedScores);
 }
 
 /** Filter dimension for the Sell tab: every real ItemCategory, plus a synthesized 'equipment'
@@ -212,6 +232,9 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
                   {iconAssetId && <img src={getAssetUrl(iconAssetId)} alt="" className={styles.icon} />}
                   <span className={styles.itemName}>{name}</span>
                   {def?.tier && <TierBadge tier={def.tier} />}
+                  {def && 'slot' in def && isEquipmentUpgrade(def, player?.equipment) && (
+                    <BestBadge title="Better than what you have equipped in this slot" />
+                  )}
                   <span style={{ fontSize: 11, opacity: 0.8 }}>{listing.price}g</span>
                   <button
                     className={styles.smallButton}
