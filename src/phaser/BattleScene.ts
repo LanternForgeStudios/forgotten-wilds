@@ -32,6 +32,11 @@ const AILMENT_FX_ASSET: Record<string, string> = {
   poison: 'fx.poison-cloud',
   burn: 'fx.ember',
   freeze: 'fx.ice-shard',
+  // Was missing entirely (unlike stun/silence, which are deliberately excluded - see this
+  // constant's own comment) - Blind never got a burst of its own, silently falling through the
+  // `.filter((id): id is string => !!id)` below. fx.dark-energy was already a real, registered FX
+  // pack asset, just never wired to anything - a natural fit for "your vision is obscured."
+  blind: 'fx.dark-energy',
 };
 // Generic "something landed" impact FX, keyed by the attack's damage type - bursts on the target's
 // own sprite for every landed (non-missed) outgoing hit (player -> enemy in solo/Endless Battle,

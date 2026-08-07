@@ -20,6 +20,7 @@ import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemDisplayName, itemIconAssetId, groupRewardItemIds } from '@/utils/itemName';
+import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
 import { TIER_ORDER } from '@/utils/tier';
 import type { PartyBattleSession, PartyCombatHitResult, PartyEnemyHitResult } from '@/types';
@@ -566,7 +567,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                     <button
                       className={styles.smallButton}
                       disabled={busy || isSilenced || me.spirit < (knownSkills[0]?.spiritCost ?? 0)}
-                      title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
+                      title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : knownSkills[0] ? describeSkill(knownSkills[0]) : undefined}
                       onClick={() => submitSkill(knownSkills[0]?.id ?? 'keepers-strike')}
                     >
                       {knownSkills[0]?.name ?? "Keeper's Strike"} ({knownSkills[0]?.spiritCost ?? 0} SP)
@@ -591,10 +592,13 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                           ? 'Frozen - the Lantern specialty is blocked.'
                           : me.lanternUsedThisRound
                             ? 'Already used your Lantern this round.'
-                            : undefined
+                            : describeLanternAbility(ability)
                       }
                       onClick={() => submitLanternAbility(ability.id)}
                     >
+                      {lanternDef?.iconAssetId && (
+                        <img src={getAssetUrl(lanternDef.iconAssetId)} alt="" style={{ width: 16, height: 16, imageRendering: 'pixelated', verticalAlign: 'middle', marginRight: 3 }} />
+                      )}
                       {ability.name} ({ability.oilCost} Oil)
                     </button>
                   ))}
@@ -660,6 +664,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                   key={skill.id}
                   className={styles.smallButton}
                   disabled={me.spirit < skill.spiritCost}
+                  title={describeSkill(skill)}
                   onClick={() => submitSkill(skill.id)}
                 >
                   {skill.name} ({skill.spiritCost} SP)
@@ -694,10 +699,19 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                     key={i.itemId}
                     className={cureAilmentId && wouldHelp ? `${styles.rowHeader} ${styles.itemRowCureReady}` : styles.rowHeader}
                   >
-                    <span className={styles.rowName}>
-                      {itemDisplayName(i.itemId)} x{i.quantity}
-                      {queued > 0 ? ` (queued ${queued})` : ''}
-                      {!wouldHelp && (cureAilmentId ? ' (not needed)' : ' (full)')}
+                    <span className={styles.rowName} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      {itemIconAssetId(i.itemId) && (
+                        <img
+                          src={getAssetUrl(itemIconAssetId(i.itemId)!)}
+                          alt=""
+                          style={{ width: 18, height: 18, imageRendering: 'pixelated', flexShrink: 0 }}
+                        />
+                      )}
+                      <span>
+                        {itemDisplayName(i.itemId)} x{i.quantity}
+                        {queued > 0 ? ` (queued ${queued})` : ''}
+                        {!wouldHelp && (cureAilmentId ? ' (not needed)' : ' (full)')}
+                      </span>
                     </span>
                     <button
                       className={styles.smallButton}

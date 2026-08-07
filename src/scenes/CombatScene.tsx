@@ -26,7 +26,8 @@ import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
 import { TIER_ORDER } from '@/utils/tier';
-import { itemDisplayName } from '@/utils/itemName';
+import { itemDisplayName, itemIconAssetId } from '@/utils/itemName';
+import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { buildRewardLines } from '@/utils/rewardLines';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { homeTownFor } from '@/utils/locationHomeTown';
@@ -519,7 +520,8 @@ export function CombatScene() {
   // Attack's identity follows whatever's in the weapon slot - "Fists" when nothing is equipped,
   // matching the same pattern lantern abilities use for the lantern slot.
   const weaponId = player?.equipment.weapon;
-  const weaponName = weaponId ? EQUIPMENT.find((e) => e.id === weaponId)?.name ?? 'Attack' : 'Fists';
+  const weaponDef = weaponId ? EQUIPMENT.find((e) => e.id === weaponId) : undefined;
+  const weaponName = weaponId ? (weaponDef?.name ?? 'Attack') : 'Fists';
 
   // A fresh/pre-Phase-3 save might not have knownSkillIds hydrated yet (see the server's own
   // backfill in resolveCombatAction.ts) - default to the one Specialty Attack every player has
@@ -628,20 +630,24 @@ export function CombatScene() {
           <Panel style={{ width: 'min(360px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <OverlayCloseButton onClick={() => setShowSkillMenu(false)} />
             <h3 style={{ margin: '0 0 10px', color: 'var(--fw-accent)' }}>Select Spirit Ability</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {knownSkills.map((skill) => (
-                <button
-                  key={skill.id}
-                  type="button"
-                  className={styles.actionButton}
-                  disabled={(player?.stats.spirit ?? 0) < skill.spiritCost}
-                  onClick={() => {
-                    setShowSkillMenu(false);
-                    act('skill', { skillId: skill.id });
-                  }}
-                >
-                  {skill.name} ({skill.spiritCost} SP)
-                </button>
+                <div key={skill.id}>
+                  <button
+                    type="button"
+                    className={styles.actionButton}
+                    style={{ width: '100%' }}
+                    disabled={(player?.stats.spirit ?? 0) < skill.spiritCost}
+                    title={describeSkill(skill)}
+                    onClick={() => {
+                      setShowSkillMenu(false);
+                      act('skill', { skillId: skill.id });
+                    }}
+                  >
+                    {skill.name} ({skill.spiritCost} SP)
+                  </button>
+                  <p style={{ fontSize: 11, opacity: 0.75, margin: '4px 2px 0' }}>{describeSkill(skill)}</p>
+                </div>
               ))}
             </div>
           </Panel>
@@ -735,13 +741,16 @@ export function CombatScene() {
             </button>
           )}
           <button className={styles.actionButton} disabled={!canAct} onClick={() => act('attack')}>
+            {weaponDef?.iconAssetId && (
+              <img src={getAssetUrl(weaponDef.iconAssetId)} alt="" style={{ width: 20, height: 20, imageRendering: 'pixelated', verticalAlign: 'middle', marginRight: 4 }} />
+            )}
             {weaponName}
           </button>
           {knownSkills.length <= 1 ? (
             <button
               className={styles.actionButton}
               disabled={!canAct || (player?.stats.spirit ?? 0) < (knownSkills[0]?.spiritCost ?? 0) || isSilenced}
-              title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : undefined}
+              title={isSilenced ? 'Silenced - Specialty Attacks are blocked.' : knownSkills[0] ? describeSkill(knownSkills[0]) : undefined}
               onClick={() => act('skill', { skillId: knownSkills[0]?.id })}
             >
               {knownSkills[0]?.name ?? "Keeper's Strike"} ({knownSkills[0]?.spiritCost ?? 0} SP)
@@ -766,10 +775,13 @@ export function CombatScene() {
                   ? 'Frozen - the Lantern specialty is disabled.'
                   : lanternUsedThisRound
                     ? 'Already used your Lantern this round.'
-                    : undefined
+                    : describeLanternAbility(ability)
               }
               onClick={() => act('lanternAbility', { abilityId: ability.id })}
             >
+              {lanternDef?.iconAssetId && (
+                <img src={getAssetUrl(lanternDef.iconAssetId)} alt="" style={{ width: 20, height: 20, imageRendering: 'pixelated', verticalAlign: 'middle', marginRight: 4 }} />
+              )}
               {ability.name} ({ability.oilCost} Oil)
             </button>
           ))}
@@ -834,10 +846,19 @@ export function CombatScene() {
                             key={i.itemId}
                             className={cureAilmentId && wouldHelp ? `${styles.itemRow} ${styles.itemRowCureReady}` : styles.itemRow}
                           >
-                            <span>
-                              {itemDisplayName(i.itemId)} x{i.quantity}
-                              {queued > 0 && ` — queued: ${queued}`}
-                              {!wouldHelp && (cureAilmentId ? ' (Not needed)' : ' (Full)')}
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              {itemIconAssetId(i.itemId) && (
+                                <img
+                                  src={getAssetUrl(itemIconAssetId(i.itemId)!)}
+                                  alt=""
+                                  style={{ width: 20, height: 20, imageRendering: 'pixelated', flexShrink: 0 }}
+                                />
+                              )}
+                              <span>
+                                {itemDisplayName(i.itemId)} x{i.quantity}
+                                {queued > 0 && ` — queued: ${queued}`}
+                                {!wouldHelp && (cureAilmentId ? ' (Not needed)' : ' (Full)')}
+                              </span>
                             </span>
                             <div style={{ display: 'flex', gap: 4 }}>
                               <button
