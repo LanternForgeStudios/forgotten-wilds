@@ -6947,11 +6947,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'battle.enemy.dire-prairie-wolf',
     category: 'enemy',
-    intendedUse: 'Battle sprite for dire-prairie-wolf - also reused as its overworld field-encounter icon - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/dire-prairie-wolf-idle.svg',
-    dimensions: { width: 128, height: 128 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for dire-prairie-wolf - also reused as its overworld field-encounter icon - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',
+    filePath: 'sprites/enemies/dire-prairie-wolf-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'Generated via pixellab MCP (create_character standard mode, 96px quadruped/dog template, side view + animate_character idle template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Originals archived at public/assets/sprites/enemies/original/dire-prairie-wolf/.',
   },
   // Chapter 6 (Wings of the First Promise) enemies - none generated yet (PixelLab quota).
   {
