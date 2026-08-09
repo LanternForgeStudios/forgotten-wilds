@@ -5,7 +5,7 @@ import { TierBadge } from './common/TierBadge';
 import { BestBadge } from './common/BestBadge';
 import { getAssetUrl } from '@/assets/assetManager';
 import { equipmentScore } from '@/utils/equipmentScore';
-import { slotFamily } from '@/utils/equipmentSlotLabels';
+import { slotFamily, isSlotUnlocked } from '@/utils/equipmentSlotLabels';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -30,7 +30,7 @@ import {
 } from '@/data';
 import { eligibleLanternUpgrades } from '@/utils/lanternOilUpgradeEligibility';
 import { playSound } from '@/audio/audioService';
-import type { EquipmentItem, EquipmentSlot, ItemCategory, PlayerEquipment } from '@/types';
+import type { EquipmentItem, EquipmentSlot, ItemCategory, PlayerEquipment, QuestProgress } from '@/types';
 import styles from './CharacterMenu.module.css';
 
 interface ShopProps {
@@ -48,18 +48,26 @@ function defFor(itemId: string) {
 
 /** Whether buying `def` would be a genuine upgrade over what's currently equipped in its slot
  *  family (see slotFamily - a Charm/Spirit Totem has up to 4 possible homes, everything else just
- *  1). "Upgrade" means either an empty/unfilled slot in that family, or beating the WEAKEST
+ *  1). "Upgrade" means either an empty UNLOCKED slot in that family, or beating the WEAKEST
  *  currently-equipped item there (so buying it and replacing that one would help) - reuses
- *  equipmentScore, the same tier-then-stats ranking CharacterMenu's own "Best" badge is built on. */
-function isEquipmentUpgrade(def: EquipmentItem, equipment: PlayerEquipment | undefined): boolean {
-  const family = slotFamily(def.slot);
+ *  equipmentScore, the same tier-then-stats ranking CharacterMenu's own "Best" badge is built on.
+ *  Locked charm2-4/spiritTotem2-4 slots (not yet unlocked via their own side quest) are excluded
+ *  from the family entirely - an empty locked slot can never actually receive this purchase, so
+ *  counting it as an "open" slot made every item in the family look like an upgrade. */
+function isEquipmentUpgrade(
+  def: EquipmentItem,
+  equipment: PlayerEquipment | undefined,
+  questProgress: Record<string, QuestProgress>,
+): boolean {
+  const family = slotFamily(def.slot).filter((slot) => isSlotUnlocked(slot, questProgress));
+  if (family.length === 0) return false; // every slot in the family is still locked
   const equippedScores = family
     .map((slot) => equipment?.[slot])
     .filter((id): id is string => !!id)
     .map((id) => EQUIPMENT.find((e) => e.id === id))
     .filter((d): d is EquipmentItem => !!d)
     .map(equipmentScore);
-  if (equippedScores.length < family.length) return true; // at least one empty slot in the family
+  if (equippedScores.length < family.length) return true; // at least one unlocked, empty slot
   return equipmentScore(def) > Math.min(...equippedScores);
 }
 
@@ -232,7 +240,7 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
                   {iconAssetId && <img src={getAssetUrl(iconAssetId)} alt="" className={styles.icon} />}
                   <span className={styles.itemName}>{name}</span>
                   {def?.tier && <TierBadge tier={def.tier} />}
-                  {def && 'slot' in def && isEquipmentUpgrade(def, player?.equipment) && (
+                  {def && 'slot' in def && isEquipmentUpgrade(def, player?.equipment, questProgress) && (
                     <BestBadge title="Better than what you have equipped in this slot" />
                   )}
                   <span style={{ fontSize: 11, opacity: 0.8 }}>{listing.price}g</span>

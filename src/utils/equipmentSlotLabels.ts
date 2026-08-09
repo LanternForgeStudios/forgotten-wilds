@@ -1,4 +1,5 @@
-import type { EquipmentSlot } from '@/types';
+import { QUESTS } from '@/data';
+import type { EquipmentSlot, QuestProgress } from '@/types';
 
 /** Display label per equipment slot - was hand-copied identically in CharacterMenu.tsx,
  *  CharacterStats.tsx, and Shop.tsx; consolidated here so a 4th copy (TradeOfferPanel.tsx) wasn't
@@ -40,4 +41,26 @@ export function slotFamily(slot: EquipmentSlot): EquipmentSlot[] {
   if (CHARM_SLOTS.includes(slot)) return CHARM_SLOTS;
   if (TOTEM_SLOTS.includes(slot)) return TOTEM_SLOTS;
   return [slot];
+}
+
+/** Which quest's completion unlocks a given equipment slot - derived from QUESTS' own
+ *  reward.grantsEquipmentSlot field rather than a second hand-maintained table, mirroring
+ *  functions/src/functions/equipItem.ts's own SLOT_UNLOCK_QUEST_ID derivation server-side, so this
+ *  can't silently drift from the quest data that's actually authoritative. A slot with no entry
+ *  here is always unlocked. Originally local to CharacterMenu.tsx; consolidated here so Shop.tsx's
+ *  own "is this a genuine upgrade" check (isEquipmentUpgrade) can share it instead of treating a
+ *  locked, empty charm2-4/spiritTotem2-4 slot as an open upgrade opportunity. */
+export const SLOT_UNLOCK_QUEST_ID: Partial<Record<EquipmentSlot, string>> = (() => {
+  const map: Partial<Record<EquipmentSlot, string>> = {};
+  for (const quest of QUESTS) {
+    if (quest.reward.grantsEquipmentSlot) map[quest.reward.grantsEquipmentSlot] = quest.id;
+  }
+  return map;
+})();
+
+/** Whether `slot` is currently equippable - always true for a slot with no unlock quest, else only
+ *  once that quest is completed. */
+export function isSlotUnlocked(slot: EquipmentSlot, questProgress: Record<string, QuestProgress>): boolean {
+  const questId = SLOT_UNLOCK_QUEST_ID[slot];
+  return !questId || questProgress[questId]?.status === 'completed';
 }

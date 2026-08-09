@@ -15,7 +15,7 @@ import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
-import { SLOT_LABELS, SLOT_FILTER_ORDER, slotFamily } from '@/utils/equipmentSlotLabels';
+import { SLOT_LABELS, SLOT_FILTER_ORDER, slotFamily, isSlotUnlocked, SLOT_UNLOCK_QUEST_ID } from '@/utils/equipmentSlotLabels';
 import { useQuestStore } from '@/state/useQuestStore';
 import { TIER_LABELS, TIER_ORDER } from '@/utils/tier';
 import { playSound } from '@/audio/audioService';
@@ -35,18 +35,6 @@ const SUBTAB_LABELS: Record<InventorySubTab, string> = {
   keyItem: 'Key Items',
   unique: 'Unique',
 };
-
-// Which quest's completion unlocks a given equipment slot - mirrors equipItem.ts's own
-// SLOT_UNLOCK_QUEST_ID derivation (from QUESTS' own reward.grantsEquipmentSlot, not a second
-// hand-maintained table) so this can't silently drift from the quest data that's actually
-// authoritative server-side. A slot with no entry here is always unlocked.
-const SLOT_UNLOCK_QUEST_ID: Partial<Record<EquipmentSlot, string>> = (() => {
-  const map: Partial<Record<EquipmentSlot, string>> = {};
-  for (const quest of QUESTS) {
-    if (quest.reward.grantsEquipmentSlot) map[quest.reward.grantsEquipmentSlot] = quest.id;
-  }
-  return map;
-})();
 
 // Crafting tab: recipes (RECIPES) are keyed by their output item's own id, one recipe per
 // craftable consumable - grouped by which stat the output restores (or 'cure' for an ailment-cure
@@ -112,19 +100,12 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
   const [busy, setBusy] = useState(false);
   useOverlayClose(onClose);
 
-  /** Whether `slot` is currently equippable - always true for a slot with no unlock quest, else
-   *  only once that quest is completed (see SLOT_UNLOCK_QUEST_ID above). */
-  function isSlotUnlocked(slot: EquipmentSlot): boolean {
-    const questId = SLOT_UNLOCK_QUEST_ID[slot];
-    return !questId || questProgress[questId]?.status === 'completed';
-  }
-
   /** Where a one-click "Equip" from the Inventory tab should land a Charm/Spirit Totem item -
    *  the family's first unlocked, empty slot, or its first unlocked slot at all if every unlocked
    *  one is already full (replacing whatever's there, same as equipping over any other slot
    *  always has). Every other item's family is just itself, so this is a no-op for them. */
   function defaultTargetSlot(defSlot: EquipmentSlot): EquipmentSlot {
-    const unlockedFamily = slotFamily(defSlot).filter(isSlotUnlocked);
+    const unlockedFamily = slotFamily(defSlot).filter((s) => isSlotUnlocked(s, questProgress));
     const empty = unlockedFamily.find((s) => !player?.equipment[s]);
     return empty ?? unlockedFamily[0] ?? defSlot;
   }
@@ -430,7 +411,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
             {EQUIPMENT_SLOTS.map((slot) => {
               const itemId = player.equipment[slot];
               const equipDef = itemId ? EQUIPMENT.find((e) => e.id === itemId) : undefined;
-              const unlocked = isSlotUnlocked(slot);
+              const unlocked = isSlotUnlocked(slot, questProgress);
               // A Charm/Spirit Totem item's own def.slot is always just 'charm'/'spiritTotem' (one
               // item, any of 4 slots) - slotFamily treats every other slot as its own family of 1,
               // so this reduces to the old exact-match check for them. Also excludes an item with
