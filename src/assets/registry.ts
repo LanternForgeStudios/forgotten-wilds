@@ -7544,6 +7544,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("crumbling ruined stone watchtower, wind-worn broken battlements, ivy and moss", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/watchtower-ruin-source.png.',
   },
   {
+    id: 'structure.landmark-watchtower-collected',
+    category: 'structure',
+    intendedUse:
+      "Post-collection state for fallen-watchtower (grants wind-fragment) - shown once the player has collected wind-fragment, part of the 2026-08-09 found/unfound retrofit (every fragment landmark now distinguishes collected from not, matching structure.chest-open's own precedent).",
+    filePath: 'sprites/structures/landmark-watchtower-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
+  },
+  {
     id: 'structure.landmark-frost-cache',
     category: 'structure',
     intendedUse:
@@ -7555,6 +7566,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("weathered wooden cache box wrapped in old rope, rimed with frost and icicles, tucked among wet rocks", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/frost-cache-source.png.',
   },
   {
+    id: 'structure.landmark-frost-cache-collected',
+    category: 'structure',
+    intendedUse:
+      'Post-collection state for frostbound-treatise-cache (grants frostbound-treatise) - part of the 2026-08-09 found/unfound retrofit.',
+    filePath: 'sprites/structures/landmark-frost-cache-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
+  },
+  {
     id: 'structure.landmark-tunnel-entrance',
     category: 'structure',
     intendedUse:
@@ -7564,6 +7586,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated: create_map_object ("small overlooked mine tunnel entrance, dark opening braced with old wooden planks, overgrown and neglected", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/tunnel-entrance-source.png.',
+  },
+  {
+    id: 'structure.landmark-tunnel-entrance-collected',
+    category: 'structure',
+    intendedUse:
+      'Post-collection state for ember-codex-tunnel (grants ember-codex) - part of the 2026-08-09 found/unfound retrofit.',
+    filePath: 'sprites/structures/landmark-tunnel-entrance-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
     id: 'structure.landmark-heart-seed',
@@ -7599,6 +7632,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("half-buried wooden cache box wedged among marsh reeds and mud, waterlogged and swollen, bound with old rope, swamp water dripping off the lid", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/drowned-ledger-cache-source.png.',
   },
   {
+    id: 'structure.landmark-drowned-ledger-cache-collected',
+    category: 'structure',
+    intendedUse:
+      'Post-collection state for drowned-ledger-cache and its reused-marker siblings (lost-library-records, heartwood-recording-i-cache, desert-relic-i-cache, lost-scout-effects-i-cache) - part of the 2026-08-09 found/unfound retrofit.',
+    filePath: 'sprites/structures/landmark-drowned-ledger-cache-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
+  },
+  {
     id: 'structure.landmark-bogwater-almanac-cache',
     category: 'structure',
     intendedUse:
@@ -7608,6 +7652,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated: create_map_object ("mossy hollow at the base of a cypress tree, half-sunk in bog water, an old leather-bound book just visible tucked inside among the roots", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/bogwater-almanac-cache-source.png.',
+  },
+  {
+    id: 'structure.landmark-bogwater-almanac-cache-collected',
+    category: 'structure',
+    intendedUse:
+      'Post-collection state for bogwater-almanac-cache and its reused-marker siblings (heartwood-recording-ii-cache, desert-relic-ii-cache, lost-scout-effects-ii-cache) - part of the 2026-08-09 found/unfound retrofit.',
+    filePath: 'sprites/structures/landmark-bogwater-almanac-cache-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
     id: 'structure.landmark-winter-count-hide-i-cache',
@@ -7621,6 +7676,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("a painted hide bundle half-buried in tall golden prairie grass, faint edge of pictograph visible", 128x128, high top-down, medium shading, single color outline), resized to 144x144 with LANCZOS. 128x128 original archived at public/assets/sprites/structures/original/landmark-winter-count-hide-i-cache.png.',
   },
   {
+    id: 'structure.landmark-winter-count-hide-i-cache-collected',
+    category: 'structure',
+    intendedUse: 'Post-collection state for winter-count-hide-i-cache - part of the 2026-08-09 found/unfound retrofit.',
+    filePath: 'sprites/structures/landmark-winter-count-hide-i-cache-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
+  },
+  {
     id: 'structure.landmark-winter-count-hide-ii-cache',
     category: 'structure',
     intendedUse:
@@ -7630,6 +7695,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated: create_map_object ("a second painted hide bundle tucked into a low grassy hollow, tied with rawhide cord", 128x128, high top-down, medium shading, single color outline), resized to 144x144 with LANCZOS. 128x128 original archived at public/assets/sprites/structures/original/landmark-winter-count-hide-ii-cache.png.',
+  },
+  {
+    id: 'structure.landmark-winter-count-hide-ii-cache-collected',
+    category: 'structure',
+    intendedUse: 'Post-collection state for winter-count-hide-ii-cache - part of the 2026-08-09 found/unfound retrofit.',
+    filePath: 'sprites/structures/landmark-winter-count-hide-ii-cache-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
     id: 'structure.landmark-wind-stone',
@@ -7643,6 +7718,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("a smooth grey standing stone carved with spiral wind-mark glyphs, faint pale-blue magical light glowing from within the carvings, ancient prairie relic, no other objects", 128x128, high top-down, medium shading, selective outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/wind-stone-source.png.',
   },
   {
+    id: 'structure.landmark-wind-stone-collected',
+    category: 'structure',
+    intendedUse:
+      "Post-collection state for the 3 Wind Stone fragment interactables and their reused-marker siblings (prairie-charm-relic, prairie-totem-relic) - part of the 2026-08-09 found/unfound retrofit.",
+    filePath: 'sprites/structures/landmark-wind-stone-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
+  },
+  {
     id: 'structure.landmark-water-glimmer',
     category: 'structure',
     intendedUse:
@@ -7653,6 +7739,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'pixellab MCP-generated: create_map_object ("small circular forest pool of clear water surrounded by smooth wet stones and reeds, a faint glowing turquoise magical shard glimmering just beneath the surface", 128x128, high top-down, medium shading, single color outline, high detail) + animate_object (v3 mode, "the magical shard glimmering and pulsing softly beneath the water, gentle rippling reflections", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/water-glimmer-glow/.',
+  },
+  {
+    id: 'structure.landmark-water-glimmer-collected',
+    category: 'structure',
+    intendedUse:
+      "Post-collection state for water-fragment and its reused-marker siblings (star-fragment-*, aurora-crystal-fragment-*) - part of the 2026-08-09 found/unfound retrofit.",
+    filePath: 'sprites/structures/landmark-water-glimmer-collected.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
     id: 'structure.decor-fireplace',

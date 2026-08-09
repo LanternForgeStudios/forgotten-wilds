@@ -39,6 +39,34 @@ STATIC = {
     "drowned-ledger-cache-source.png": "landmark-drowned-ledger-cache",
     "bogwater-almanac-cache-source.png": "landmark-bogwater-almanac-cache",
     "wind-stone-source.png": "landmark-wind-stone",
+    # Found/unfound retrofit (2026-08-09) - "collected/empty" states for markers that previously
+    # showed the same sprite forever regardless of collection status.
+    "watchtower-collected-source.png": "landmark-watchtower-collected",
+    "frost-cache-collected-source.png": "landmark-frost-cache-collected",
+    "tunnel-entrance-collected-source.png": "landmark-tunnel-entrance-collected",
+    "drowned-ledger-cache-collected-source.png": "landmark-drowned-ledger-cache-collected",
+    "bogwater-almanac-cache-collected-source.png": "landmark-bogwater-almanac-cache-collected",
+    "winter-count-hide-i-cache-collected-source.png": "landmark-winter-count-hide-i-cache-collected",
+    "winter-count-hide-ii-cache-collected-source.png": "landmark-winter-count-hide-ii-cache-collected",
+    "wind-stone-collected-source.png": "landmark-wind-stone-collected",
+    "water-glimmer-collected-source.png": "landmark-water-glimmer-collected",
+}
+
+# Found/unfound retrofit (2026-08-09) - markers whose "unfound" state is being upgraded from a
+# single static image to an animated idle-glow loop, same generic frameSize'd single-row mechanism
+# as landmark-water-glimmer below (no new game code needed, just a registry entry with frameSize
+# set). slug -> staging animation folder name under art-staging/structures/.
+ANIMATED = {
+    "landmark-water-glimmer-glow": "water-glimmer-glow",
+    "landmark-watchtower-glow": "watchtower-glow",
+    "landmark-frost-cache-glow": "frost-cache-glow",
+    "landmark-tunnel-entrance-glow": "tunnel-entrance-glow",
+    "landmark-heart-seed-glow": "heart-seed-glow",
+    "landmark-drowned-ledger-cache-glow": "drowned-ledger-cache-glow",
+    "landmark-bogwater-almanac-cache-glow": "bogwater-almanac-cache-glow",
+    "landmark-winter-count-hide-i-cache-glow": "winter-count-hide-i-cache-glow",
+    "landmark-winter-count-hide-ii-cache-glow": "winter-count-hide-ii-cache-glow",
+    "landmark-wind-stone-glow": "wind-stone-glow",
 }
 
 
@@ -77,9 +105,12 @@ for fname, slug in STATIC.items():
     shutil.copy2(src_path, os.path.join(ORIGINALS_ROOT, fname))
     os.remove(src_path)
 
-# --- Water glimmer: animated glow loop ---
-anim_dir = os.path.join(STAGING, "water-glimmer-glow")
-if os.path.isdir(anim_dir):
+# --- Animated glow loops (water-glimmer + the 2026-08-09 found/unfound retrofit batch) ---
+for slug, folder in ANIMATED.items():
+    anim_dir = os.path.join(STAGING, folder)
+    if not os.path.isdir(anim_dir):
+        print(f"skipping {slug}: {anim_dir} not found")
+        continue
     frame_files = sorted(f for f in os.listdir(anim_dir) if f.startswith("frame_") and f.endswith(".png"))
     frames = []
     for fname in frame_files:
@@ -91,15 +122,13 @@ if os.path.isdir(anim_dir):
     for i, frame in enumerate(frames):
         sheet.paste(frame, (i * TARGET_SIZE[0], 0))
 
-    out_path = os.path.join(OUT_DIR, "landmark-water-glimmer-glow.png")
+    out_path = os.path.join(OUT_DIR, f"{slug}.png")
     sheet.save(out_path, format="PNG", optimize=True)
-    print(f"landmark-water-glimmer: {len(frames)} frames -> {sheet.width}x{sheet.height} -> {out_path}")
+    print(f"{slug}: {len(frames)} frames -> {sheet.width}x{sheet.height} -> {out_path}")
 
-    archive_dir = os.path.join(ORIGINALS_ROOT, "water-glimmer-glow")
+    archive_dir = os.path.join(ORIGINALS_ROOT, folder)
     if not os.path.exists(archive_dir):
         shutil.copytree(anim_dir, archive_dir)
     shutil.rmtree(anim_dir)
-else:
-    print(f"skipping landmark-water-glimmer: {anim_dir} not found")
 
 print("done")
