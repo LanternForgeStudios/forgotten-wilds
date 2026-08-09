@@ -826,14 +826,15 @@ anachronistic, matching this project's established "close enough after a retry" 
 
 ## Shattered Desert, Chapter 9: Beneath Forgotten Stars - outstanding placeholders
 
-**Status (2026-08-05): same PixelLab quota outage as every prior chapter, still not refreshed.**
-Every asset below shipped as a procedurally-generated SVG placeholder. All 6 of Chapter 9's field/
-town maps reuse `tileset.overworld-terrain`/`overworld-decor2`/`overworld-water` and
-`tileset.town-terrain` (not `tileset.cliff`/`tileset.beach`, both already flagged "provenance
-unconfirmed" elsewhere in this file, not safe to wire into real content) - not tracked as a
-placeholder gap the way character art is, the tiles are real, just generic and not desert-themed. A
-genuine desert/canyon terrain pass (red-rock ground variants, mesa-band decor, sand-dune overhang
-tiles) would be a real visual upgrade later.
+**Status (2026-08-09): all 30 icons + all 8 NPC portraits done, real PixelLab art.** NPC overworld
+sprites in progress (`create_character` size=128 + `animate_character` breathing-idle, south only,
+per the Whispering Pines sizing lesson - see that region's status note). Enemy sprites not yet
+started. All 6 of Chapter 9's field/town maps reuse `tileset.overworld-terrain`/`overworld-decor2`/
+`overworld-water` and `tileset.town-terrain` (not `tileset.cliff`/`tileset.beach`, both already
+flagged "provenance unconfirmed" elsewhere in this file, not safe to wire into real content) - not
+tracked as a placeholder gap the way character art is, the tiles are real, just generic and not
+desert-themed. A genuine desert/canyon terrain pass (red-rock ground variants, mesa-band decor,
+sand-dune overhang tiles) would be a real visual upgrade later.
 
 ### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
 
@@ -911,12 +912,13 @@ founder before any layer art can start.
 
 ## Shattered Desert, Chapter 10: The Sky Remembers - outstanding placeholders
 
-**Status (2026-08-05): same PixelLab quota outage as every prior chapter, still not refreshed.**
-No new NPCs this chapter (Elder Santiago Ortega and Scholar Nia Solis reprise their Chapter 9
-roles), so this list is shorter - 3 enemy sprites, 3 equipment icons, 5 item icons. All 5 of the
-Forgotten Observatory's dungeon rooms (Inner Observatory, Star Chamber, Star Lantern Sanctuary,
-Canyon Depths, Guardian Summit) reuse `tileset.tiny-dungeon`, same as every dungeon before it - not
-tracked as a placeholder gap, the tiles are real, just generic.
+**Status (2026-08-09): all 3 equipment icons + all 5 item icons done, real PixelLab art (shipped as
+part of the same 30-icon Chapter 9+10 batch).** No new NPCs this chapter (Elder Santiago Ortega and
+Scholar Nia Solis reprise their Chapter 9 roles). 3 enemy sprites (Celestial Wisp, Star Phantom,
+Canyon Giant boss) not yet started. All 5 of the Forgotten Observatory's dungeon rooms (Inner
+Observatory, Star Chamber, Star Lantern Sanctuary, Canyon Depths, Guardian Summit) reuse
+`tileset.tiny-dungeon`, same as every dungeon before it - not tracked as a placeholder gap, the
+tiles are real, just generic.
 
 ### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss)
 
