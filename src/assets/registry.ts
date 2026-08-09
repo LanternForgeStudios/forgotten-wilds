@@ -6958,11 +6958,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'battle.enemy.storm-fledgling',
     category: 'enemy',
-    intendedUse: 'Battle sprite for storm-fledgling - also reused as its overworld field-encounter icon - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/storm-fledgling-idle.svg',
-    dimensions: { width: 128, height: 128 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for storm-fledgling - also reused as its overworld field-encounter icon - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',
+    filePath: 'sprites/enemies/storm-fledgling-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'Generated via pixellab MCP (create_character standard mode, 96px quadruped/cat template as a bird proxy, side view + animate_character idle template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Originals archived at public/assets/sprites/enemies/original/storm-fledgling/.',
   },
   {
     id: 'battle.enemy.thunder-roc',

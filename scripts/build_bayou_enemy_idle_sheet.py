@@ -139,6 +139,9 @@ ENEMIES = {
     "storm-wisp": ("storm-wisp", (128, 128)),
     "prairie-wolf": ("prairie-wolf", (128, 128)),
     "dire-prairie-wolf": ("dire-prairie-wolf", (128, 128)),
+    "storm-fledgling": ("storm-fledgling", (128, 128)),
+    "thunder-roc": ("thunder-roc", (128, 128)),
+    "great-thunderbird": ("great-thunderbird", (256, 256)),
 }
 
 if __name__ == "__main__":
