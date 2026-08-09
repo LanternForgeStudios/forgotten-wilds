@@ -142,6 +142,12 @@ ENEMIES = {
     "storm-fledgling": ("storm-fledgling", (128, 128)),
     "thunder-roc": ("thunder-roc", (128, 128)),
     "great-thunderbird": ("great-thunderbird", (256, 256)),
+    # Whispering Pines (Volume IV, Chapters 7-8)
+    "forest-echo": ("forest-echo", (128, 128)),
+    "corrupted-echo": ("corrupted-echo", (128, 128)),
+    "root-wraith": ("root-wraith", (128, 128)),
+    "elder-root-wraith": ("elder-root-wraith", (128, 128)),
+    "cedar-giant": ("cedar-giant", (256, 256)),
 }
 
 if __name__ == "__main__":

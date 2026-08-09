@@ -622,12 +622,12 @@ outstanding:
 
 ---
 
-## Whispering Pines, Chapter 7: The Silent Forest - outstanding placeholders
+## Whispering Pines, Chapter 7: The Silent Forest - all real art done
 
-**Status (2026-08-09): equipment/item icons (23) and the field-terrain tileset are done; NPC
-portraits (8), NPC overworld sprites (8), and the 1 enemy pair are still outstanding placeholders.**
-None of this content is player-reachable yet (no transition connects any shipped map to
-Cedarwatch), so there's no urgency on the rest - do it whenever convenient.
+**Status (2026-08-09): all real art done** - NPC portraits (8), NPC overworld sprites (8), the enemy
+pair (2), equipment/item icons (23), and the field-terrain tileset. None of this content is
+player-reachable yet (no transition connects any shipped map to Cedarwatch), so no urgency on
+linking it in.
 
 **Field terrain (2026-08-09): real forest tileset generated and wired in.** All 5 outdoor Chapter 7
 field maps (Mistwood Path, Elder Forest, Silver River, Ancient Cedar Shrine, Heartwood Approach)
@@ -659,9 +659,11 @@ not tracked as a gap, those tiles are real, just generic.
 | Blacksmith Dara | The Cedarwatch Forge | Wiry forge-scarred woman, leather apron, soot-streaked forearms, confident stance near an anvil. |
 | Armorer Fenn | The Cedarwatch Armory | Sturdy practical man, inspecting a piece of bark-weave armor, calloused hands, focused expression. |
 
-### NPC overworld sprites (8 - 72×96, transparent background, full-body idle pose)
+### NPC overworld sprites (8 - 72×96, transparent background, full-body idle pose) - all 8 done
 
-No Chapter 7 NPC has real PixelLab art yet, sprite or portrait (unlike Chapter 5's 4 headliners).
+**Status (2026-08-09): all 8 done**, via `create_character` (humanoid, size 48) + `animate_character`
+(breathing-idle template, south only) + `scripts/build_bayou_npc_idle_sheet.py`. All landed cleanly
+on the first attempt.
 
 | Character | Generation prompt |
 |---|---|
@@ -674,7 +676,10 @@ No Chapter 7 NPC has real PixelLab art yet, sprite or portrait (unlike Chapter 5
 | Blacksmith Dara | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
 | Armorer Fenn | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
 
-### Enemy battle sprites (1 regular/elite pair - 128×128, transparent background, front-facing battle stance)
+### Enemy battle sprites (1 regular/elite pair - 128×128, transparent background, front-facing battle stance) - both done
+
+**Status (2026-08-09): both done**, via `create_character` (humanoid, size 48) + `animate_character`
+(fight-stance-idle-8-frames template, south only) + `scripts/build_bayou_enemy_idle_sheet.py`.
 
 | Enemy | Family | Generation prompt |
 |---|---|---|
@@ -727,15 +732,19 @@ The other 5 families each still need a new founder before any layer art can star
 
 ---
 
-## Whispering Pines, Chapter 8: Echoes of the First Keepers - outstanding placeholders
+## Whispering Pines, Chapter 8: Echoes of the First Keepers - all real art done
 
-**Status (2026-08-05): same PixelLab quota outage as every prior chapter, still not refreshed.**
-No new NPCs this chapter (Archivist Elowen and Elder Rowan Birch reprise their Chapter 7 roles), so
-this list is shorter - 3 enemy sprites, 4 equipment icons, 5 item icons. All 4 of Heartwood
-Sanctuary's dungeon rooms reuse `tileset.tiny-dungeon`, same as every dungeon before it - not
-tracked as a placeholder gap, the tiles are real, just generic.
+**Status (2026-08-09): all real art done** - 3 enemy sprites (including the Cedar Giant boss), 4
+equipment icons, 5 item icons. No new NPCs this chapter (Archivist Elowen and Elder Rowan Birch
+reprise their Chapter 7 roles). All 4 of Heartwood Sanctuary's dungeon rooms reuse
+`tileset.tiny-dungeon`, same as every dungeon before it - not tracked as a placeholder gap, the
+tiles are real, just generic.
 
-### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss)
+### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss) - all 3 done
+
+**Status (2026-08-09): all 3 done**, via `create_character` (humanoid; regular/elite at size 48, the
+Cedar Giant boss at size 128 + high detail, matching great-thunderbird's own boss-tier precedent) +
+`animate_character` (fight-stance-idle-8-frames, south only) + `scripts/build_bayou_enemy_idle_sheet.py`.
 
 | Enemy | Family | Generation prompt |
 |---|---|---|
