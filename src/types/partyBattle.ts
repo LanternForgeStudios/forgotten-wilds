@@ -28,6 +28,9 @@ export interface PartyBattleParticipantStats {
    *  doesn't need a live per-turn read the way item ownership does. */
   knownSkillIds: string[];
   lanternId: string | null;
+  /** The Lantern Oil upgrade tier bought for that lantern - see functions/src/shared-types/
+   *  index.ts's mirror of this field for the full doc comment. */
+  lanternOilTier: number;
   gender: 'male' | 'female';
   appearance: 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
   /** Snapshotted the same way - see shared-types/index.ts's matching comment. Used for battle log

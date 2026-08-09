@@ -511,7 +511,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
                           ? 'Frozen - the Lantern specialty is blocked.'
                           : me.lanternUsedThisRound
                             ? 'Already used your Lantern this round.'
-                            : describeLanternAbility(ability)
+                            : describeLanternAbility(ability, me.lanternOilTier)
                       }
                       onClick={() => submit({ type: 'lanternAbility', abilityId: ability.id })}
                     >

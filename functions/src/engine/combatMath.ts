@@ -164,3 +164,34 @@ export function applyAilmentResistance(chance: number, ailmentId: string, resist
 export function rollInitiative(speed: number): number {
   return speed + (1 + Math.floor(Math.random() * 6));
 }
+
+/** +2% offensive power / healing percentage per Lantern Oil upgrade tier the player has bought for
+ *  THIS SPECIFIC lantern (see data/lanternOilUpgrades.ts) - caps at +50% at the max tier (25), so a
+ *  fully-upgraded lantern's own ability is meaningfully stronger, not just its oil capacity.
+ *  Defensive abilities are deliberately NOT scaled here - their damage-halving is a fixed 50%
+ *  mechanic shared with bare-handed Defend (see combatEngine.ts's own comment on
+ *  isDefensiveLanternAbility), and LanternAbilityDefinition.damageReductionRounds, despite its
+ *  name, was never actually consumed as a multi-round duration anywhere in either engine - the
+ *  halving is a single hardcoded `dmg / 2` applied to the current round only. Scaling that shared
+ *  multiplier per-lantern-tier would need real persistent multi-round state (no such mechanism
+ *  exists in this codebase today) to do properly, especially for party/PvP combat where a
+ *  participant's defending status crosses Cloud Function invocation boundaries - out of scope for
+ *  this pass. */
+export const LANTERN_ABILITY_POWER_SCALE_PER_TIER = 0.02;
+
+export interface ScaledLanternAbility {
+  power: number;
+  healHpPercent: number;
+}
+
+/** Applies the oil-tier scaling above to a lantern ability's raw power/healHpPercent - the single
+ *  place both combatEngine.ts and partyCombatEngine.ts compute a lantern ability's actual
+ *  in-combat numbers, so they can't drift on the formula. `oilTier` is the tier bought for the
+ *  specific lantern granting this ability (0 for an unupgraded or never-upgraded lantern). */
+export function scaleLanternAbility(ability: { power?: number; healHpPercent?: number }, oilTier: number): ScaledLanternAbility {
+  const multiplier = 1 + oilTier * LANTERN_ABILITY_POWER_SCALE_PER_TIER;
+  return {
+    power: Math.round((ability.power ?? 0) * multiplier),
+    healHpPercent: (ability.healHpPercent ?? 0) * multiplier,
+  };
+}

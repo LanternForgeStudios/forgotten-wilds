@@ -14,7 +14,10 @@ import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { TIER_LABELS, TIER_COLORS } from '@/utils/tier';
 import { sellPriceFor } from '@/utils/sellPrice';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
+import { StatBonusesText, AilmentResistanceText } from '@/components/common/StatBonusText';
+import { LanternAbilitiesText } from '@/components/common/LanternAbilitiesText';
 import { useInventoryStore } from '@/state/useInventoryStore';
+import { usePlayerStore } from '@/state/usePlayerStore';
 import { AILMENTS, ENEMIES, ITEMS, EQUIPMENT, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
 import { regionNameFor, regionSortIndex } from '@/utils/locationRegion';
 import type { Enemy, EnemyTier, Item, EquipmentItem, ItemCategory, LocationKind, Quest, QuestCategory, QuestProgress } from '@/types';
@@ -234,6 +237,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   const [itemsCategoryFilter, setItemsCategoryFilter] = useState<ItemCategory | 'all'>('all');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const inventory = useInventoryStore((s) => s.items);
+  const player = usePlayerStore((s) => s.player);
   const hiddenQuestIds = useMapPreferencesStore((s) => s.hiddenQuestIds);
   const toggleQuestOnMap = useMapPreferencesStore((s) => s.toggle);
   useOverlayClose(onClose);
@@ -899,10 +903,8 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
           if (entry.item?.effect?.restoreOilPercent)
             uses.push(`Restores ${Math.round(entry.item.effect.restoreOilPercent * 100)}% Lantern Oil`);
           if (entry.item?.effect?.reviveOnDefeat) uses.push('Revives on defeat');
-          const ailmentResistanceText = entry.equipment ? formatAilmentResistance(entry.equipment.ailmentResistance) : undefined;
-          const statBonusText = entry.equipment
-            ? [formatStatBonuses(entry.equipment.statBonuses), ailmentResistanceText].filter(Boolean).join('  ·  ')
-            : undefined;
+          const hasStatBonuses = entry.equipment ? !!formatStatBonuses(entry.equipment.statBonuses) : false;
+          const hasAilmentResistance = entry.equipment ? !!formatAilmentResistance(entry.equipment.ailmentResistance) : false;
           return (
             <div
               className={styles.overlay}
@@ -933,12 +935,25 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   <strong>{entry.equipment ? 'Bonuses' : 'Used For'}</strong>
                 </p>
                 <p className={questStyles.objective}>
-                  {entry.equipment
-                    ? (statBonusText ?? 'No stat bonuses.')
-                    : uses.length > 0
-                      ? uses.join(', ')
-                      : 'No usable effect - a keepsake or crafting material.'}
+                  {entry.equipment ? (
+                    hasStatBonuses || hasAilmentResistance ? (
+                      <>
+                        <StatBonusesText bonuses={entry.equipment.statBonuses} />
+                        {hasStatBonuses && hasAilmentResistance && <span style={{ opacity: 0.6 }}>{'  ·  '}</span>}
+                        <AilmentResistanceText resistances={entry.equipment.ailmentResistance} />
+                      </>
+                    ) : (
+                      'No stat bonuses.'
+                    )
+                  ) : uses.length > 0 ? (
+                    uses.join(', ')
+                  ) : (
+                    'No usable effect - a keepsake or crafting material.'
+                  )}
                 </p>
+                {entry.equipment?.lanternAbilityIds && (
+                  <LanternAbilitiesText equipDef={entry.equipment} oilTier={player?.lanternOilUpgrades?.[entry.equipment.id] ?? 0} />
+                )}
 
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Sale Price</strong>

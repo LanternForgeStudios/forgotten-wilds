@@ -491,6 +491,11 @@ export interface PartyBattleParticipantStats {
    *  and to know which sprite to render them as in PvP (gender/appearance). */
   knownSkillIds: string[];
   lanternId: string | null;
+  /** Snapshotted the same way as lanternId above - the Lantern Oil upgrade tier bought for that
+   *  specific lantern (see data/lanternOilUpgrades.ts), used to scale that lantern's own Lantern
+   *  Ability (see engine/combatMath.ts's scaleLanternAbility). 0 for an unupgraded lantern or none
+   *  equipped. */
+  lanternOilTier: number;
   gender: 'male' | 'female';
   appearance: 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
   /** Snapshotted the same way as knownSkillIds/lanternId/gender above - character display name

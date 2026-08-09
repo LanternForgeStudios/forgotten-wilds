@@ -7,6 +7,7 @@ import { useNow } from '@/hooks/useNow';
 import { EQUIPMENT, STARTING_STATS, STAT_GROWTH_PER_LEVEL, XP_THRESHOLDS } from '@/data';
 import { EQUIPMENT_SLOTS } from '@/types';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
+import { StatBonusesText, AilmentResistanceText } from '@/components/common/StatBonusText';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
 import styles from './CharacterStats.module.css';
@@ -158,10 +159,16 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
                   <span className={styles.slotItemName}>
                     {def.name}
                     {formatStatBonuses(def.statBonuses) && (
-                      <span className={styles.slotBonus}> {formatStatBonuses(def.statBonuses)}</span>
+                      <span className={styles.slotBonus}>
+                        {' '}
+                        <StatBonusesText bonuses={def.statBonuses} />
+                      </span>
                     )}
                     {formatAilmentResistance(def.ailmentResistance) && (
-                      <span className={styles.slotBonus}> {formatAilmentResistance(def.ailmentResistance)}</span>
+                      <span className={styles.slotBonus}>
+                        {' '}
+                        <AilmentResistanceText resistances={def.ailmentResistance} />
+                      </span>
                     )}
                   </span>
                 </>

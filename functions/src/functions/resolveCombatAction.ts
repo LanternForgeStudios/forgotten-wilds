@@ -157,6 +157,9 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       attackAilment: resolveWeaponAttackAilment(save.player.equipment.weapon),
       ailmentResistances: computeAilmentResistances(save.player.equipment),
       carriedPlayerDefending: !!session.defendingBonusPending,
+      lanternOilTier: save.player.equipment.lantern
+        ? (save.player.lanternOilUpgrades?.[save.player.equipment.lantern] ?? 0)
+        : 0,
     });
 
     save.player.stats.hp = result.playerHp;

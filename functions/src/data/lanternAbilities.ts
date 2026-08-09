@@ -15,10 +15,13 @@ export interface LanternAbilityDefinition {
   /** offensive only */
   power?: number;
   effectiveAgainstFamilies?: string[];
-  /** healing only */
-  healHp?: number;
+  /** healing only - fraction of maxHp restored (0-1), same convention as ItemEffect.healHpPercent.
+   *  Scaled up further by the equipped lantern's own Oil upgrade tier - see engine/combatMath.ts's
+   *  scaleLanternAbility. */
+  healHpPercent?: number;
   /** defensive only - halves incoming damage for this many of the enemies' turns this round,
-   *  same mechanic as Defend but from the lantern rather than bracing bare-handed. */
+   *  same mechanic as Defend but from the lantern rather than bracing bare-handed. Also scaled up
+   *  by oil tier (+1 round per 5 tiers) - see scaleLanternAbility. */
   damageReductionRounds?: number;
 }
 
@@ -37,7 +40,7 @@ export const LANTERN_ABILITIES: Record<string, LanternAbilityDefinition> = {
     name: 'Steadfast Ember',
     category: 'healing',
     oilCost: 10,
-    healHp: 25,
+    healHpPercent: 0.2,
     description:
       "The Miner's Lost Lantern burns with a warmth that outlasted its owner - draw on it to steady yourself and recover HP.",
   },
@@ -55,7 +58,7 @@ export const LANTERN_ABILITIES: Record<string, LanternAbilityDefinition> = {
     name: 'Open Skies Renewal',
     category: 'healing',
     oilCost: 12,
-    healHp: 35,
+    healHpPercent: 0.25,
     description:
       'The Lantern of Open Skies breathes clean mountain wind through you, carrying off the worst of your wounds.',
   },
@@ -83,7 +86,7 @@ export const LANTERN_ABILITIES: Record<string, LanternAbilityDefinition> = {
     name: 'Resolve Renewed',
     category: 'healing',
     oilCost: 14,
-    healHp: 40,
+    healHpPercent: 0.3,
     description:
       "The Lantern of Winter's Resolve remembers what it means to endure - draw on it to steady yourself and recover HP, the same warmth every Keeper before you once carried.",
   },

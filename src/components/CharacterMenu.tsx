@@ -13,6 +13,8 @@ import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { ITEMS, EQUIPMENT, RECIPES, QUESTS } from '@/data';
 import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
+import { StatBonusesText, AilmentResistanceText } from '@/components/common/StatBonusText';
+import { LanternAbilitiesText } from '@/components/common/LanternAbilitiesText';
 import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
 import { SLOT_LABELS, SLOT_FILTER_ORDER, slotFamily, isSlotUnlocked, SLOT_UNLOCK_QUEST_ID } from '@/utils/equipmentSlotLabels';
@@ -307,13 +309,13 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                           <>
                             <span style={{ fontSize: 11, color: 'var(--fw-spirit)' }}>Equipped</span>
                             {formatStatBonuses(equipDef.statBonuses) && (
-                              <span style={{ fontSize: 10, color: 'var(--fw-spirit)', opacity: 0.85 }}>
-                                {formatStatBonuses(equipDef.statBonuses)}
+                              <span style={{ fontSize: 10, opacity: 0.85 }}>
+                                <StatBonusesText bonuses={equipDef.statBonuses} />
                               </span>
                             )}
                             {formatAilmentResistance(equipDef.ailmentResistance) && (
-                              <span style={{ fontSize: 10, color: 'var(--fw-spirit)', opacity: 0.85 }}>
-                                {formatAilmentResistance(equipDef.ailmentResistance)}
+                              <span style={{ fontSize: 10, opacity: 0.85 }}>
+                                <AilmentResistanceText resistances={equipDef.ailmentResistance} />
                               </span>
                             )}
                           </>
@@ -379,10 +381,20 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       </div>
                       <p className={styles.detailDescription}>{selected.description}</p>
                       {selected.equipDef && formatStatBonuses(selected.equipDef.statBonuses) && (
-                        <p className={styles.detailStats}>{formatStatBonuses(selected.equipDef.statBonuses)}</p>
+                        <p className={styles.detailStats}>
+                          <StatBonusesText bonuses={selected.equipDef.statBonuses} />
+                        </p>
                       )}
                       {selected.equipDef && formatAilmentResistance(selected.equipDef.ailmentResistance) && (
-                        <p className={styles.detailStats}>{formatAilmentResistance(selected.equipDef.ailmentResistance)}</p>
+                        <p className={styles.detailStats}>
+                          <AilmentResistanceText resistances={selected.equipDef.ailmentResistance} />
+                        </p>
+                      )}
+                      {selected.equipDef?.lanternAbilityIds && (
+                        <LanternAbilitiesText
+                          equipDef={selected.equipDef}
+                          oilTier={player?.lanternOilUpgrades?.[selected.equipDef.id] ?? 0}
+                        />
                       )}
                       {selected.itemDef?.effect && (
                         <p className={styles.detailStats}>
@@ -444,13 +456,13 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       <span style={{ fontSize: 13, flex: 1 }}>
                         {equipDef.name}
                         {formatStatBonuses(equipDef.statBonuses) && (
-                          <span style={{ fontSize: 11, color: 'var(--fw-spirit)', marginLeft: 8 }}>
-                            {formatStatBonuses(equipDef.statBonuses)}
+                          <span style={{ fontSize: 11, marginLeft: 8 }}>
+                            <StatBonusesText bonuses={equipDef.statBonuses} />
                           </span>
                         )}
                         {formatAilmentResistance(equipDef.ailmentResistance) && (
-                          <span style={{ fontSize: 11, color: 'var(--fw-spirit)', marginLeft: 8 }}>
-                            {formatAilmentResistance(equipDef.ailmentResistance)}
+                          <span style={{ fontSize: 11, marginLeft: 8 }}>
+                            <AilmentResistanceText resistances={equipDef.ailmentResistance} />
                           </span>
                         )}
                         <span style={{ marginLeft: 8 }}>
@@ -630,10 +642,14 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       </span>
                       <p style={{ fontSize: 11, opacity: 0.85, margin: 0, textAlign: 'center' }}>{def.description}</p>
                       {formatStatBonuses(def.statBonuses) && (
-                        <span style={{ fontSize: 10, color: 'var(--fw-spirit)' }}>{formatStatBonuses(def.statBonuses)}</span>
+                        <span style={{ fontSize: 10 }}>
+                          <StatBonusesText bonuses={def.statBonuses} />
+                        </span>
                       )}
                       {formatAilmentResistance(def.ailmentResistance) && (
-                        <span style={{ fontSize: 10, color: 'var(--fw-spirit)' }}>{formatAilmentResistance(def.ailmentResistance)}</span>
+                        <span style={{ fontSize: 10 }}>
+                          <AilmentResistanceText resistances={def.ailmentResistance} />
+                        </span>
                       )}
                     </div>
                   );

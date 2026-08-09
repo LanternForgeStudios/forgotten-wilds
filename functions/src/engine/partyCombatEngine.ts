@@ -34,6 +34,7 @@ import {
   inflictAilment,
   isStunned,
   pickEnemyMove,
+  scaleLanternAbility,
 } from './combatMath';
 import type { AilmentResistance, ActiveAilment, CombatAction, Stats } from '../shared-types';
 
@@ -56,6 +57,10 @@ export interface PartyPlayerInput {
    *  (partyBattle.ts's submitPartyBattleAction) from PartyBattleParticipantStats.defendingBonusPending;
    *  always false/undefined for the sub-action's own call. */
   carriedDefending?: boolean;
+  /** The Lantern Oil upgrade tier bought for whichever lantern this participant has equipped -
+   *  mirrors RoundInput.lanternOilTier's own doc comment. 0 for an unupgraded lantern or none
+   *  equipped. */
+  lanternOilTier?: number;
 }
 
 export interface PartyCombatHitResult {
@@ -270,16 +275,18 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
         const ability = player.action.abilityId ? LANTERN_ABILITIES[player.action.abilityId] : undefined;
         if (!ability) break;
         lanternOil = Math.max(0, lanternOil - ability.oilCost);
+        const scaled = scaleLanternAbility(ability, player.lanternOilTier ?? 0);
         if (ability.category === 'offensive') {
           resolveOffensiveHits(
-            ability.power ?? 0,
+            scaled.power,
             `${ability.name} sears`,
             (i) => (ability.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1) * weaknessMultiplier(enemyDefs[i], 'lantern'),
             'lantern',
           );
         } else if (ability.category === 'healing') {
-          const healed = Math.min(player.stats.maxHp - hp, ability.healHp ?? 0);
-          hp = Math.min(player.stats.maxHp, hp + (ability.healHp ?? 0));
+          const healAmount = Math.round(player.stats.maxHp * scaled.healHpPercent);
+          const healed = Math.min(player.stats.maxHp - hp, healAmount);
+          hp = Math.min(player.stats.maxHp, hp + healAmount);
           log.push(`${ability.name} draws on the lantern's warmth, restoring ${healed} HP.`);
         } else {
           log.push(`${ability.name} wraps ${player.name} in the lantern's glow, ready to blunt the next blow.`);
@@ -511,14 +518,16 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
         const ability = player.action.abilityId ? LANTERN_ABILITIES[player.action.abilityId] : undefined;
         if (!ability) break;
         lanternOil = Math.max(0, lanternOil - ability.oilCost);
+        const scaled = scaleLanternAbility(ability, player.lanternOilTier ?? 0);
         if (ability.category === 'offensive') {
           // No family-effectiveness/weakness bonus here, unlike resolvePartyPlayerTurn's version -
           // those are enemy-def concepts (family, weaknessDamageType) that don't exist for a
           // player opponent.
-          resolveOffensiveHit(ability.power ?? 0, `${ability.name} sears`, 'lantern');
+          resolveOffensiveHit(scaled.power, `${ability.name} sears`, 'lantern');
         } else if (ability.category === 'healing') {
-          const healed = Math.min(player.stats.maxHp - hp, ability.healHp ?? 0);
-          hp = Math.min(player.stats.maxHp, hp + (ability.healHp ?? 0));
+          const healAmount = Math.round(player.stats.maxHp * scaled.healHpPercent);
+          const healed = Math.min(player.stats.maxHp - hp, healAmount);
+          hp = Math.min(player.stats.maxHp, hp + healAmount);
           log.push(`${ability.name} draws on the lantern's warmth, restoring ${healed} HP.`);
         } else {
           log.push(`${ability.name} wraps you in the lantern's glow, ready to blunt the next blow.`);

@@ -535,6 +535,7 @@ export function CombatScene() {
   // the options here change with it, same as any other equipment-driven capability.
   const lanternId = player?.equipment.lantern;
   const lanternDef = lanternId ? EQUIPMENT.find((e) => e.id === lanternId) : undefined;
+  const lanternOilTier = lanternId ? (player?.lanternOilUpgrades[lanternId] ?? 0) : 0;
   const lanternAbilities = (lanternDef?.lanternAbilityIds ?? [])
     .map((id) => LANTERN_ABILITIES.find((a) => a.id === id))
     .filter((a): a is NonNullable<typeof a> => !!a);
@@ -775,7 +776,7 @@ export function CombatScene() {
                   ? 'Frozen - the Lantern specialty is disabled.'
                   : lanternUsedThisRound
                     ? 'Already used your Lantern this round.'
-                    : describeLanternAbility(ability)
+                    : describeLanternAbility(ability, lanternOilTier)
               }
               onClick={() => act('lanternAbility', { abilityId: ability.id })}
             >

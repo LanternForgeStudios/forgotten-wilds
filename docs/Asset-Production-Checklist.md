@@ -471,22 +471,21 @@ whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, an
 
 ## Endless Prairie (Volume III, Chapter 5) - outstanding placeholders
 
-**Status (2026-08-04): PixelLab ran out of generation quota mid-build (23/2000 left, not even
-enough for one portrait) and won't refresh for a few days.** Rather than block, every item below
-shipped as a procedurally-generated SVG placeholder (`scripts/gen_placeholder_svg.py` - colored
-gradient panel + short label, `status: 'placeholder'` in the registry, zero PixelLab cost) so
-content buildout could keep moving. This section is the backlog: swap each placeholder for real art
-whenever quota is available again, using the generation prompts below (same "Simple flat-shaded
-fantasy game icon of..." / character-description conventions as every other section in this doc).
-None of this content is player-reachable yet (Highwind Crossing has no incoming transition from the
-rest of the world), so there's no urgency - do it whenever convenient.
+**Status (2026-08-09): PixelLab quota renewed (subscription refreshed, ~1568 generations
+available).** Resuming the real-art pass region by region, same build order as originally shipped.
+**All 8 NPC portraits below are now done** (generated via `create_image_pixflux`, 400x400 painted
+background, resized via `scripts/resize_portraits.py`). NPC overworld sprites, enemy sprites,
+equipment/item icons, and the 2 landmark markers below are still outstanding - swap each using the
+generation prompts below, same "Simple flat-shaded fantasy game icon of..." / character-description
+conventions as every other section in this doc. None of this content is player-reachable yet
+(Highwind Crossing has no incoming transition from the rest of the world), so there's no urgency.
 
 4 NPCs (Chief Aiyana, Elder Koda, Niska, Prairie Spirit) already have **real** PixelLab overworld
 sprites (idle-only; see `feedback_region_build_workflow` memory on Niska's walk-cycle frame-count
-mismatch) - only their portraits are still placeholders. The other 4 (the shop NPCs) have no real
-art at all yet, sprite or portrait.
+mismatch) - their portraits are now real too (see above). The other 4 (the shop NPCs) still have no
+real overworld sprite yet, only a real portrait now.
 
-### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
+### NPC portraits (8 - 512×512, painted background, head-and-shoulders) - all 8 done
 
 | Character | Role | Generation prompt |
 |---|---|---|

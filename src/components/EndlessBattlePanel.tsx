@@ -592,7 +592,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
                           ? 'Frozen - the Lantern specialty is blocked.'
                           : me.lanternUsedThisRound
                             ? 'Already used your Lantern this round.'
-                            : describeLanternAbility(ability)
+                            : describeLanternAbility(ability, me.lanternOilTier)
                       }
                       onClick={() => submitLanternAbility(ability.id)}
                     >

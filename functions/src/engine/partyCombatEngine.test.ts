@@ -101,7 +101,7 @@ describe('resolvePartyPlayerTurn', () => {
       player('p1', { action: { type: 'lanternAbility', abilityId: 'steadfast-ember' }, stats: stats({ hp: 20, maxHp: 60, lanternOil: 20 }) }),
       [mothling({ hp: 1000 })],
     );
-    expect(result.hp).toBe(45); // 20 + steadfast-ember's 25 healHp
+    expect(result.hp).toBe(32); // 20 + round(60 * steadfast-ember's 20% healHpPercent) = 20 + 12
     expect(result.enemyHp[0]).toBe(1000);
     expect(result.hits).toHaveLength(0);
     expect(result.lanternOil).toBe(10); // 20 - steadfast-ember's 10 oil cost
@@ -338,7 +338,7 @@ describe('resolvePvpTurn', () => {
       player('p1', { action: { type: 'lanternAbility', abilityId: 'steadfast-ember' }, stats: stats({ hp: 20, maxHp: 60, lanternOil: 20 }) }),
       opponent(),
     );
-    expect(result.hp).toBe(45); // 20 + steadfast-ember's 25 healHp
+    expect(result.hp).toBe(32); // 20 + round(60 * steadfast-ember's 20% healHpPercent) = 20 + 12
     expect(result.defenderHp).toBe(opponent().hp);
     expect(result.hit).toBeNull();
     expect(result.lanternOil).toBe(10); // 20 - steadfast-ember's 10 oil cost

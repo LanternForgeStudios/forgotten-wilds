@@ -17,6 +17,8 @@ import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useToastStore } from '@/state/useToastStore';
 import { sellPriceFor } from '@/utils/sellPrice';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
+import { StatBonusesText, AilmentResistanceText } from '@/components/common/StatBonusText';
+import { LanternAbilitiesText } from '@/components/common/LanternAbilitiesText';
 import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
 import {
   SHOP_LISTINGS,
@@ -454,10 +456,17 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
               </div>
               <p className={styles.detailDescription}>{selectedDef.description}</p>
               {'statBonuses' in selectedDef && formatStatBonuses(selectedDef.statBonuses) && (
-                <p className={styles.detailStats}>{formatStatBonuses(selectedDef.statBonuses)}</p>
+                <p className={styles.detailStats}>
+                  <StatBonusesText bonuses={selectedDef.statBonuses} />
+                </p>
               )}
               {'ailmentResistance' in selectedDef && formatAilmentResistance(selectedDef.ailmentResistance) && (
-                <p className={styles.detailStats}>{formatAilmentResistance(selectedDef.ailmentResistance)}</p>
+                <p className={styles.detailStats}>
+                  <AilmentResistanceText resistances={selectedDef.ailmentResistance} />
+                </p>
+              )}
+              {'lanternAbilityIds' in selectedDef && (
+                <LanternAbilitiesText equipDef={selectedDef} oilTier={player?.lanternOilUpgrades?.[selectedDef.id] ?? 0} />
               )}
               {'effect' in selectedDef && selectedDef.effect && (
                 <p className={styles.detailStats}>

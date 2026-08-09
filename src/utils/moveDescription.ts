@@ -22,10 +22,27 @@ export function describeSkill(skill: Skill): string {
   return parts.join(' ');
 }
 
+/** +2% offensive power / healing percentage per Lantern Oil upgrade tier - display-only mirror of
+ *  functions/src/engine/combatMath.ts's LANTERN_ABILITY_POWER_SCALE_PER_TIER, kept in sync by hand
+ *  per the client/server data-split convention. */
+const LANTERN_ABILITY_POWER_SCALE_PER_TIER = 0.02;
+
 /** Same idea as describeSkill, for a Lantern Ability - category already distinguishes offense from
- *  defense/healing, but the authored description alone doesn't say so explicitly. */
-export function describeLanternAbility(ability: LanternAbility): string {
-  const categoryLabel =
-    ability.category === 'offensive' ? 'Offense - deals damage.' : ability.category === 'defensive' ? 'Defense - halves incoming damage this round.' : 'Healing - restores HP.';
+ *  defense/healing, but the authored description alone doesn't say so explicitly. Includes the
+ *  actual numbers (power, or % HP restored) scaled by `oilTier` (the upgrade tier bought for the
+ *  lantern granting this ability - see data/lanternOilUpgrades.ts), so the displayed value matches
+ *  what combat will actually do, not just the unscaled base. */
+export function describeLanternAbility(ability: LanternAbility, oilTier = 0): string {
+  const multiplier = 1 + oilTier * LANTERN_ABILITY_POWER_SCALE_PER_TIER;
+  let categoryLabel: string;
+  if (ability.category === 'offensive') {
+    const power = Math.round((ability.power ?? 0) * multiplier);
+    categoryLabel = `Offense - deals damage (power ${power}).`;
+  } else if (ability.category === 'defensive') {
+    categoryLabel = 'Defense - halves incoming damage this round.';
+  } else {
+    const percent = Math.round((ability.healHpPercent ?? 0) * multiplier * 100);
+    categoryLabel = `Healing - restores ${percent}% HP.`;
+  }
   return `${ability.description} ${categoryLabel}`;
 }

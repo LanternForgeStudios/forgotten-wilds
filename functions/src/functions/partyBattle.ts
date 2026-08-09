@@ -211,6 +211,7 @@ export function fullyRestoredParticipantStats(save: PlayerSave): PartyBattlePart
     defending: false,
     knownSkillIds: save.player.knownSkillIds,
     lanternId: save.player.equipment.lantern ?? null,
+    lanternOilTier: save.player.equipment.lantern ? (save.player.lanternOilUpgrades[save.player.equipment.lantern] ?? 0) : 0,
     // Backfill for a save written before the skin picker existed - same fallback
     // resetPlayerProgress.ts already uses for the identical reason. Missing here meant this whole
     // object (embedded in participantStats, written via tx.set) carried an explicit `undefined`
@@ -420,6 +421,7 @@ export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(as
         ailments: activeStats.ailments,
         attackAilment: activeStats.attackAilment ?? undefined,
         carriedDefending: !!activeStats.defendingBonusPending,
+        lanternOilTier: activeStats.lanternOilTier,
       },
       battle.enemies.map((e) => ({ enemyId: e.enemyId, level: e.level, hp: e.hp, ailments: e.ailments ?? [] })),
     );
@@ -636,6 +638,7 @@ async function resolvePvpBattleTurn(
       ailments: activeStats.ailments,
       attackAilment: activeStats.attackAilment ?? undefined,
       carriedDefending: !!activeStats.defendingBonusPending,
+      lanternOilTier: activeStats.lanternOilTier,
     },
     {
       hp: opponentStats.hp,

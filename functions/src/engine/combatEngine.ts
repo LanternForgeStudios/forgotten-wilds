@@ -11,6 +11,7 @@ import {
   blindMissChance,
   computeDamage,
   pickEnemyMove,
+  scaleLanternAbility,
   weightedPick,
 } from './combatMath';
 import type { AilmentResistance, CombatAction, Stats, ActiveAilment } from '../shared-types';
@@ -211,6 +212,11 @@ export interface RoundInput {
    *  turn during the sub-action itself. Set by resolveCombatAction.ts from
    *  CombatSession.defendingBonusPending; always false/undefined for the sub-action's own call. */
   carriedPlayerDefending?: boolean;
+  /** The Lantern Oil upgrade tier bought for whichever lantern is currently equipped (see
+   *  data/lanternOilUpgrades.ts) - 0 for an unupgraded lantern or no lantern equipped. Only
+   *  consumed by the 'lanternAbility' action (see combatMath.ts's scaleLanternAbility); resolved
+   *  by the caller from save.player.lanternOilUpgrades[equippedLanternId], not looked up here. */
+  lanternOilTier?: number;
 }
 
 export type RoundOutcomePhase = 'continue' | 'victory' | 'defeat' | 'fled';
@@ -679,9 +685,10 @@ export function resolveRound(input: RoundInput): RoundResult {
         const ability = action.abilityId ? LANTERN_ABILITIES[action.abilityId] : undefined;
         if (!ability) break;
         playerLanternOil = Math.max(0, playerLanternOil - ability.oilCost);
+        const scaled = scaleLanternAbility(ability, input.lanternOilTier ?? 0);
         if (ability.category === 'offensive') {
           resolveOffensiveHits(
-            ability.power ?? 0,
+            scaled.power,
             `${ability.name} sears`,
             (i) =>
               (ability.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1) *
@@ -689,8 +696,9 @@ export function resolveRound(input: RoundInput): RoundResult {
             'lantern',
           );
         } else if (ability.category === 'healing') {
-          const healed = Math.min(input.playerStats.maxHp - playerHp, ability.healHp ?? 0);
-          playerHp = Math.min(input.playerStats.maxHp, playerHp + (ability.healHp ?? 0));
+          const healAmount = Math.round(input.playerStats.maxHp * scaled.healHpPercent);
+          const healed = Math.min(input.playerStats.maxHp - playerHp, healAmount);
+          playerHp = Math.min(input.playerStats.maxHp, playerHp + healAmount);
           log.push(`${ability.name} draws on the lantern's warmth, restoring ${healed} HP.`);
         } else {
           log.push(`${ability.name} wraps you in the lantern's glow, ready to blunt the next blow.`);
