@@ -1787,6 +1787,78 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: "Same palette-swap pipeline as the male sheet, recolored from sprite.equipment.weathered-iron-sword-female - see that entry's notes.",
   },
   {
+    id: 'sprite.equipment.weathered-sunblade',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - weathered-sunblade (Shattered Desert Sunblade family, common), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/weathered-sunblade-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.weathered-iron-sword's corrected (hand-touched-up) sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.weathered-sunblade-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - weathered-sunblade (Shattered Desert Sunblade family, common), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/weathered-sunblade-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.weathered-iron-sword's corrected (hand-touched-up) sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.bound-sunblade',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - bound-sunblade (Shattered Desert Sunblade family, uncommon), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/bound-sunblade-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.weathered-iron-sword's corrected (hand-touched-up) sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.bound-sunblade-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - bound-sunblade (Shattered Desert Sunblade family, uncommon), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/bound-sunblade-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.weathered-iron-sword's corrected (hand-touched-up) sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.solaris-blade',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - solaris-blade (Shattered Desert Sunblade family, rare), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/solaris-blade-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.weathered-iron-sword's corrected (hand-touched-up) sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.solaris-blade-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - solaris-blade (Shattered Desert Sunblade family, rare), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/solaris-blade-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.weathered-iron-sword's corrected (hand-touched-up) sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
     id: 'sprite.equipment.wardens-broadsword',
     category: 'character',
     intendedUse:
@@ -6588,74 +6660,98 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.elder-santiago-ortega',
     category: 'character',
-    intendedUse: 'Overworld sprite for elder-santiago-ortega - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/elder-santiago-ortega-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for elder-santiago-ortega - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/elder-santiago-ortega-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/elder-santiago-ortega/.',
   },
   {
     id: 'sprite.npc.scholar-nia-solis',
     category: 'character',
-    intendedUse: 'Overworld sprite for scholar-nia-solis - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/scholar-nia-solis-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for scholar-nia-solis - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/scholar-nia-solis-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/scholar-nia-solis/.',
   },
   {
     id: 'sprite.npc.desert-ranger-tomas-vega',
     category: 'character',
-    intendedUse: 'Overworld sprite for desert-ranger-tomas-vega - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/desert-ranger-tomas-vega-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for desert-ranger-tomas-vega - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/desert-ranger-tomas-vega-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/desert-ranger-tomas-vega/.',
   },
   {
     id: 'sprite.npc.sand-spirit',
     category: 'character',
-    intendedUse: 'Overworld sprite for sand-spirit - placeholder pending PixelLab quota. Wanders the Celestial Oasis (wanderRadius).',
-    filePath: 'sprites/characters/sand-spirit-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for sand-spirit - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/sand-spirit-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/sand-spirit/.',
   },
   {
     id: 'sprite.npc.innkeeper-rosa',
     category: 'character',
-    intendedUse: 'Overworld sprite for innkeeper-rosa - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/innkeeper-rosa-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for innkeeper-rosa - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/innkeeper-rosa-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/innkeeper-rosa/.',
   },
   {
     id: 'sprite.npc.storekeeper-mateo',
     category: 'character',
-    intendedUse: 'Overworld sprite for storekeeper-mateo - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/storekeeper-mateo-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for storekeeper-mateo - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/storekeeper-mateo-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/storekeeper-mateo/.',
   },
   {
     id: 'sprite.npc.blacksmith-esteban',
     category: 'character',
-    intendedUse: 'Overworld sprite for blacksmith-esteban - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/blacksmith-esteban-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for blacksmith-esteban - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/blacksmith-esteban-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/blacksmith-esteban/.',
   },
   {
     id: 'sprite.npc.armorer-carmen',
     category: 'character',
-    intendedUse: 'Overworld sprite for armorer-carmen - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/armorer-carmen-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for armorer-carmen - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/armorer-carmen-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/armorer-carmen/.',
   },
   {
     id: 'sprite.npc.elder-henrik',
