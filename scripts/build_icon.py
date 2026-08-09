@@ -156,6 +156,12 @@ ICONS = {
     "feather-sky-charm": (64, 64),
     "woven-sky-charm": (64, 64),
     "skywalkers-charm": (64, 64),
+    "white-buffalo-totem": (64, 64),
+    "elder-buffalo-totem": (64, 64),
+    "thunderbird-feather": (64, 64),
+    "thunderbird-totem": (64, 64),
+    "lantern-of-open-skies": (64, 64),
+    "lantern-of-open-skies-equipped": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")
