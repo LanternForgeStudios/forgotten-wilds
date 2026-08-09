@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { APOTHECARY_SHOPS } from '../data/apothecaryShops';
 import { generateApothecaryQuest, rollApothecaryReward } from '../engine/apothecaryQuestEngine';
 import { grantItem, removeItem } from '../engine/inventoryEngine';
+import { applyLevelUp } from '../engine/levelingEngine';
 import type { ApothecaryQuest, PlayerSave } from '../shared-types';
 
 interface ApothecaryShopRequest {
@@ -82,16 +83,18 @@ export const turnInApothecaryQuest = onCall<ApothecaryShopRequest>(async (reques
     removeItem(save, quest.materialId, quest.requiredCount);
     delete save.apothecaryQuests[shopId];
 
-    const reward = rollApothecaryReward();
+    const reward = rollApothecaryReward(quest.materialId, quest.requiredCount);
     save.player.gold += reward.gold;
+    save.player.xp += reward.xp;
     const grantedItemIds: string[] = [];
     for (const itemId of reward.itemIds) {
       if (grantItem(save, itemId)) grantedItemIds.push(itemId);
     }
+    applyLevelUp(save);
 
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 
-    return { gold: reward.gold, itemIds: grantedItemIds, playerGold: save.player.gold };
+    return { gold: reward.gold, xp: reward.xp, itemIds: grantedItemIds, playerGold: save.player.gold };
   });
 });

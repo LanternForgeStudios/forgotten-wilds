@@ -1,8 +1,19 @@
 import { ITEMS } from '../data/items';
+import { sellPriceFor } from './pricingEngine';
 import type { ApothecaryQuest } from '../shared-types';
 
 const REQUIRED_COUNT_RANGE: [number, number] = [3, 6];
-const REWARD_GOLD_RANGE: [number, number] = [15, 35];
+/** Gold bonus rolled on top of the sell-value floor (see rollApothecaryReward) - the floor alone
+ *  already beats selling the materials outright, this is the extra "thanks for the help" upside. */
+const REWARD_GOLD_BONUS_RANGE: [number, number] = [5, 15];
+/** Turning the materials in must never pay worse than just selling them would have - otherwise
+ *  there's no reason to ever bother with the quest over the shop's own Sell tab. 0.6 leaves room
+ *  for the XP + bonus-item chance below to be the quest's actual selling point over a flat sale. */
+const REWARD_GOLD_SELL_VALUE_FLOOR_PCT = 0.6;
+/** XP scales with how many materials the request demanded, roughly on par with 1-2 common-enemy
+ *  kills per unit (see data/enemies.ts's own xpReward values for this region's tier) - a modest
+ *  supplement, not a grind-replacing XP farm. */
+const REWARD_XP_PER_MATERIAL_RANGE: [number, number] = [4, 7];
 /** Chance the turn-in also grants a bonus item on top of gold - kept modest (a "thanks for the
  *  help" bonus, not a real loot roll) since this quest is infinitely repeatable. */
 const REWARD_ITEM_CHANCE = 0.7;
@@ -37,16 +48,23 @@ export function generateApothecaryQuest(materialIds: string[]): ApothecaryQuest 
 
 export interface ApothecaryReward {
   gold: number;
+  xp: number;
   itemIds: string[];
 }
 
-/** Rolls the turn-in reward - always some gold, a chance at one bonus common item. */
-export function rollApothecaryReward(): ApothecaryReward {
-  const gold = randomInt(REWARD_GOLD_RANGE[0], REWARD_GOLD_RANGE[1]);
+/** Rolls the turn-in reward for having handed over `requiredCount` of `materialId` - gold is
+ *  floored at REWARD_GOLD_SELL_VALUE_FLOOR_PCT of what selling that many of the material outright
+ *  would have paid (plus a small bonus roll), XP scales with requiredCount, and there's a chance
+ *  at one bonus common item on top. */
+export function rollApothecaryReward(materialId: string, requiredCount: number): ApothecaryReward {
+  const sellValue = (sellPriceFor(materialId) ?? 0) * requiredCount;
+  const floor = Math.ceil(sellValue * REWARD_GOLD_SELL_VALUE_FLOOR_PCT);
+  const gold = floor + randomInt(REWARD_GOLD_BONUS_RANGE[0], REWARD_GOLD_BONUS_RANGE[1]);
+  const xp = requiredCount * randomInt(REWARD_XP_PER_MATERIAL_RANGE[0], REWARD_XP_PER_MATERIAL_RANGE[1]);
   const itemIds: string[] = [];
   if (Math.random() < REWARD_ITEM_CHANCE) {
     const bonus = pickRandom(REWARD_ITEM_POOL);
     if (bonus) itemIds.push(bonus);
   }
-  return { gold, itemIds };
+  return { gold, xp, itemIds };
 }

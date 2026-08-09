@@ -32,7 +32,7 @@ export function ApothecaryRestockPanel({ shopId, onClose }: ApothecaryRestockPan
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [reward, setReward] = useState<{ gold: number; itemIds: string[] } | null>(null);
+  const [reward, setReward] = useState<{ gold: number; xp: number; itemIds: string[] } | null>(null);
   useOverlayClose(onClose);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export function ApothecaryRestockPanel({ shopId, onClose }: ApothecaryRestockPan
       const res = await callTurnInApothecaryQuest(shopId);
       if (uid) await resyncSave(uid);
       void playSound('sfx.quest-completed');
-      setReward({ gold: res.gold, itemIds: res.itemIds });
+      setReward({ gold: res.gold, xp: res.xp, itemIds: res.itemIds });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not turn in the materials.');
       void playSound('sfx.ui-error');
@@ -104,7 +104,7 @@ export function ApothecaryRestockPanel({ shopId, onClose }: ApothecaryRestockPan
       {reward && (
         <RewardPopup
           title="Restocked!"
-          lines={buildRewardLines({ gold: reward.gold, itemIds: reward.itemIds })}
+          lines={buildRewardLines({ gold: reward.gold, xp: reward.xp, itemIds: reward.itemIds })}
           onClose={() => {
             setReward(null);
             onClose();

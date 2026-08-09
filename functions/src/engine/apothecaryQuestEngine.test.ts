@@ -26,23 +26,42 @@ describe('generateApothecaryQuest', () => {
 describe('rollApothecaryReward', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('always grants gold in [15, 35]', () => {
+  // 'moth-dust' has no SHOP_PRICES entry and is tier 'common', so sellPriceFor falls back to the
+  // flat common tier value (15g) - deterministic, so the floor math below is exact.
+  const MATERIAL_SELL_PRICE = 15;
+
+  it('never pays less than 60% of what selling the materials would have', () => {
+    for (const requiredCount of [3, 4, 5, 6]) {
+      const floor = Math.ceil(MATERIAL_SELL_PRICE * requiredCount * 0.6);
+      for (let i = 0; i < 20; i++) {
+        const reward = rollApothecaryReward('moth-dust', requiredCount);
+        expect(reward.gold).toBeGreaterThanOrEqual(floor);
+      }
+    }
+  });
+
+  it('grants xp that scales with requiredCount', () => {
     for (let i = 0; i < 20; i++) {
-      const reward = rollApothecaryReward();
-      expect(reward.gold).toBeGreaterThanOrEqual(15);
-      expect(reward.gold).toBeLessThanOrEqual(35);
+      const reward = rollApothecaryReward('moth-dust', 3);
+      expect(reward.xp).toBeGreaterThanOrEqual(3 * 4);
+      expect(reward.xp).toBeLessThanOrEqual(3 * 7);
+    }
+    for (let i = 0; i < 20; i++) {
+      const reward = rollApothecaryReward('moth-dust', 6);
+      expect(reward.xp).toBeGreaterThanOrEqual(6 * 4);
+      expect(reward.xp).toBeLessThanOrEqual(6 * 7);
     }
   });
 
   it('grants a bonus item when the roll succeeds', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0); // < REWARD_ITEM_CHANCE, and picks pool[0]
-    const reward = rollApothecaryReward();
+    const reward = rollApothecaryReward('moth-dust', 3);
     expect(reward.itemIds).toHaveLength(1);
   });
 
   it('grants no bonus item when the roll misses', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.999); // >= REWARD_ITEM_CHANCE (0.7)
-    const reward = rollApothecaryReward();
+    const reward = rollApothecaryReward('moth-dust', 3);
     expect(reward.itemIds).toHaveLength(0);
   });
 });

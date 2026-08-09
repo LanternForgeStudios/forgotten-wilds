@@ -271,8 +271,8 @@ export async function callRequestApothecaryQuest(shopId: string): Promise<{ ques
 
 export async function callTurnInApothecaryQuest(
   shopId: string,
-): Promise<{ gold: number; itemIds: string[]; playerGold: number }> {
-  const fn = httpsCallable<{ shopId: string }, { gold: number; itemIds: string[]; playerGold: number }>(
+): Promise<{ gold: number; xp: number; itemIds: string[]; playerGold: number }> {
+  const fn = httpsCallable<{ shopId: string }, { gold: number; xp: number; itemIds: string[]; playerGold: number }>(
     functions,
     'turnInApothecaryQuest',
   );
