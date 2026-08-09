@@ -6968,11 +6968,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'battle.enemy.thunder-roc',
     category: 'enemy',
-    intendedUse: 'Battle sprite for thunder-roc - also reused as its overworld field-encounter icon - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/thunder-roc-idle.svg',
-    dimensions: { width: 128, height: 128 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for thunder-roc - also reused as its overworld field-encounter icon - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',
+    filePath: 'sprites/enemies/thunder-roc-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes: "Generated via pixellab MCP (create_character standard mode, 96px quadruped/cat template as a bird proxy, side view + animate_character idle template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Originals archived at public/assets/sprites/enemies/original/thunder-roc/. First attempt read as a bat (wide membrane wings) rather than a bird of prey - re-prompted with explicit 'NOT a bat, feathers only' language, which fixed it.",
   },
   // Whispering Pines (MSQ Volume IV, Chapter 7) enemies - silentEchoes family.
   {
