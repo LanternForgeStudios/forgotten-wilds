@@ -643,7 +643,10 @@ earlier attempt. Cedarwatch itself still uses `tileset.town-terrain`, and every 
 6 town interiors still uses `tileset.tiny-dungeon`, matching Highwind Crossing's own precedent -
 not tracked as a gap, those tiles are real, just generic.
 
-### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
+### NPC portraits (8 - 512×512, painted background, head-and-shoulders) - all 8 done
+
+**Status (2026-08-09): all 8 done**, via `create_image_pixflux` (400x400, detailed shading) +
+`scripts/resize_portraits.py`. All landed cleanly on the first attempt.
 
 | Character | Role | Generation prompt |
 |---|---|---|
