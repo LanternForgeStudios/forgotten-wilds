@@ -7117,11 +7117,12 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'battle.enemy.great-thunderbird',
     category: 'enemy',
-    intendedUse: 'Battle sprite for great-thunderbird (Chapter 6 boss) - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/great-thunderbird-idle.svg',
-    dimensions: { width: 256, height: 256 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (256x256, animated idle sheet, matching every other boss\'s scale) once quota refreshes.',
+    intendedUse: 'Battle sprite for great-thunderbird (Chapter 6 boss) - front-facing "fight stance" idle animation (single row x 8 frames of 256x256)',
+    filePath: 'sprites/enemies/great-thunderbird-idle.png',
+    dimensions: { width: 2048, height: 256 },
+    frameSize: { width: 256, height: 256 },
+    status: 'final',
+    notes: 'Generated via pixellab MCP (create_character standard mode, 128px quadruped/cat template as a bird proxy, side view, high detail + animate_character idle template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Originals archived at public/assets/sprites/enemies/original/great-thunderbird/.',
   },
 
   {

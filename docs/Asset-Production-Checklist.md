@@ -469,21 +469,20 @@ whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, an
 
 ---
 
-## Endless Prairie (Volume III, Chapter 5) - outstanding placeholders
+## Endless Prairie (Volume III, Chapter 5) - all real art done
 
 **Status (2026-08-09): PixelLab quota renewed (subscription refreshed, ~1568 generations
-available).** Resuming the real-art pass region by region, same build order as originally shipped.
-**All 8 NPC portraits, all 18 equipment icons, all 5 item icons, and both landmark markers below
-are now done.** Only NPC overworld sprites (4 shop NPCs) and enemy sprites (4, plus Chapter 6's own
-3) remain outstanding - those need the more involved create_character+animate_character pipeline
-rather than a single create_map_object call, so they're next. None of this content is
-player-reachable yet (Highwind Crossing has no incoming transition from the rest of the world), so
-there's no urgency.
-
-4 NPCs (Chief Aiyana, Elder Koda, Niska, Prairie Spirit) already have **real** PixelLab overworld
-sprites (idle-only; see `feedback_region_build_workflow` memory on Niska's walk-cycle frame-count
-mismatch) - their portraits are now real too (see above). The other 4 (the shop NPCs) still have no
-real overworld sprite yet, only a real portrait now.
+available).** Every placeholder for this region (both chapters) has now been replaced with real
+art: all 8 NPC portraits, all 8 NPC overworld sprites, all 7 enemy battle sprites (4 Chapter 5 +
+3 Chapter 6 including the Great Thunderbird boss), all equipment/item icons, and both landmark
+markers. NPC sprites used pixellab's create_character (96px humanoid/quadruped) +
+animate_character (breathing-idle for NPCs, idle/fight-stance-idle-8-frames for enemies), auto-
+cropped via `scripts/build_bayou_npc_idle_sheet.py`/`build_bayou_enemy_idle_sheet.py`. Two
+re-prompts were needed along the way: Windrider's Spear (an equipment icon) first came back as a
+bare feather rather than a spear, and Thunder Roc first came back as a bat rather than a bird of
+prey - both fixed by making the "must read as X, not Y" instruction explicit. None of this content
+is player-reachable yet (Highwind Crossing has no incoming transition from the rest of the world),
+so this was done ahead of when it's actually needed.
 
 ### NPC portraits (8 - 512×512, painted background, head-and-shoulders) - all 8 done
 
@@ -498,7 +497,7 @@ real overworld sprite yet, only a real portrait now.
 | Blacksmith Garrett | The Highwind Forge | Broad-shouldered forge-scarred man, leather apron, soot-streaked forearms, confident stance near an anvil. |
 | Armorer Ruth | The Highwind Armory | Sturdy practical woman, inspecting a piece of buffalo-hide armor, calloused hands, focused expression. |
 
-### NPC overworld sprites (4 shop NPCs only - 72×96, transparent background, full-body idle pose)
+### NPC overworld sprites (4 shop NPCs only - 72×96, transparent background, full-body idle pose) - all 4 done
 
 Same character description as the matching portrait above, full-body standing pose instead of
 head-and-shoulders. Chief Aiyana/Elder Koda/Niska/Prairie Spirit don't need this - real idle sprites
@@ -511,7 +510,7 @@ already exist (`sprite.npc.chief-aiyana-whitefeather` etc.).
 | Blacksmith Garrett | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
 | Armorer Ruth | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
 
-### Enemy battle sprites (4 regular/elite pairs - 128×128, transparent background, front-facing battle stance)
+### Enemy battle sprites (4 regular/elite pairs - 128×128, transparent background, front-facing battle stance) - all 4 done
 
 Same `create_character` (quadruped/humanoid template as appropriate) + `animate_character`
 fight-stance-idle pipeline as every other region's enemies - see the Enemies section above.
@@ -575,9 +574,10 @@ the earlier temporary reuse of Bayou's `structure.landmark-drowned-ledger-cache`
 
 ## Endless Prairie, Chapter 6: Wings of the First Promise - outstanding placeholders
 
-**Status (2026-08-04): same PixelLab quota outage as Chapter 5 above.** No new NPCs this chapter
-(Chief Aiyana and Elder Koda reprise their Chapter 5 roles), so this list is shorter - 3 enemy
-sprites, 5 equipment icons, 2 item icons, plus two art debts that aren't simple placeholders:
+**Status (2026-08-09): all real art done** - 3 enemy sprites (including the Great Thunderbird
+boss), 5 equipment icons, 2 item icons. No new NPCs this chapter (Chief Aiyana and Elder Koda
+reprise their Chapter 5 roles). Two art debts below aren't simple placeholders and remain
+outstanding:
 
 - **`ancient-wind-mechanism`** (Summit Temple's shrine-kind interactable, MSF-EP-006) has no
   `FRAGMENT_SPRITE_ASSET_ID`/bespoke marker at all - it falls back to the generic
@@ -595,7 +595,7 @@ sprites, 5 equipment icons, 2 item icons, plus two art debts that aren't simple 
   investment than a single icon swap, worth planning as its own pass rather than squeezing into the
   per-icon backlog below.
 
-### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss)
+### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss) - all 3 done
 
 | Enemy | Family | Generation prompt |
 |---|---|---|
