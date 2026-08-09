@@ -3,9 +3,9 @@
   "height": 40,
   "tilesets": [
     {
-      "assetId": "tileset.overworld-terrain",
-      "name": "overworld-terrain",
-      "image": "overworld-terrain.png",
+      "assetId": "tileset.whispering-pines-terrain",
+      "name": "whispering-pines-terrain",
+      "image": "whispering-pines-terrain.png",
       "imageWidth": 64,
       "imageHeight": 64,
       "tileSize": 16,

@@ -5287,6 +5287,24 @@
           "id": 7,
           "name": "",
           "type": "interactable",
+          "x": 640,
+          "y": 480,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "refId",
+              "type": "string",
+              "value": "cedar-charm-relic"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "",
+          "type": "interactable",
           "x": 160,
           "y": 128,
           "width": 0,
@@ -5302,7 +5320,7 @@
           ]
         },
         {
-          "id": 8,
+          "id": 9,
           "name": "",
           "type": "interactable",
           "x": 832,
@@ -5320,7 +5338,7 @@
           ]
         },
         {
-          "id": 9,
+          "id": 10,
           "name": "",
           "type": "interactable",
           "x": 864,
@@ -5336,24 +5354,6 @@
               "value": "chest-elder-forest-3"
             }
           ]
-        },
-        {
-          "id": 10,
-          "name": "",
-          "type": "interactable",
-          "x": 640,
-          "y": 480,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "properties": [
-            {
-              "name": "refId",
-              "type": "string",
-              "value": "cedar-charm-relic"
-            }
-          ]
         }
       ],
       "opacity": 1,
@@ -5365,8 +5365,8 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "name": "overworld-terrain",
-      "image": "../../../public/assets/tilesets/overworld-terrain.png",
+      "name": "whispering-pines-terrain",
+      "image": "../../../public/assets/tilesets/whispering-pines-terrain.png",
       "imagewidth": 64,
       "imageheight": 64,
       "tilewidth": 16,
@@ -5379,7 +5379,7 @@
         {
           "name": "tilesetAssetId",
           "type": "string",
-          "value": "tileset.overworld-terrain"
+          "value": "tileset.whispering-pines-terrain"
         }
       ]
     },
@@ -5408,7 +5408,7 @@
     {
       "name": "tilesetAssetId",
       "type": "string",
-      "value": "tileset.overworld-terrain"
+      "value": "tileset.whispering-pines-terrain"
     }
   ]
 }

@@ -624,18 +624,24 @@ outstanding:
 
 ## Whispering Pines, Chapter 7: The Silent Forest - outstanding placeholders
 
-**Status (2026-08-05): same PixelLab quota outage as Endless Prairie above, still not refreshed.**
-Every asset below shipped as a procedurally-generated SVG placeholder, same convention as every
-prior region's own backlog. None of this content is player-reachable yet (no transition connects
-any shipped map to Cedarwatch), so there's no urgency - do it whenever quota is available again.
+**Status (2026-08-09): equipment/item icons (23) and the field-terrain tileset are done; NPC
+portraits (8), NPC overworld sprites (8), and the 1 enemy pair are still outstanding placeholders.**
+None of this content is player-reachable yet (no transition connects any shipped map to
+Cedarwatch), so there's no urgency on the rest - do it whenever convenient.
 
-All 12 of Chapter 7's maps (Cedarwatch + Mistwood Path/Elder Forest/Silver River/Ancient Cedar
-Shrine/Heartwood Approach + the 6 town interiors) reuse existing real tilesets rather than
-generating new ones - `tileset.overworld-terrain`/`overworld-decor2`/`overworld-water` for the
-field maps (Cedarwatch itself uses `tileset.town-terrain`), `tileset.tiny-dungeon` for every
-interior, matching Highwind Crossing's own precedent. A forest-specific terrain/decor pass (mossy
-ground variants, root-and-canopy overhang tiles) would be a real visual upgrade later but isn't
-tracked here as a placeholder gap the way character art is - the tiles are real, just generic.
+**Field terrain (2026-08-09): real forest tileset generated and wired in.** All 5 outdoor Chapter 7
+field maps (Mistwood Path, Elder Forest, Silver River, Ancient Cedar Shrine, Heartwood Approach)
+now use `tileset.whispering-pines-terrain` (a real mossy-ground/dirt-path Wang autotile, via
+`create_topdown_tileset`) in place of the generic `tileset.overworld-terrain` they shipped with -
+same numeric fill/transition tile ids as every other region's terrain set (grid position is a fixed
+convention of this project's tileset pipeline, not per-generation), so the swap in each map's
+`scripts/map-specs-richer/*.json` spec + `genMapRicher.mjs` regenerate needed no id remapping.
+Decor/overhang tilesets were deliberately NOT generated for this pass - `scripts/build_tilesets.py`
+documents why: `create_tiles_pro` decor output bakes an opaque non-matching background into each
+tile, producing a visible mismatched rectangle over real terrain, a known failure mode from an
+earlier attempt. Cedarwatch itself still uses `tileset.town-terrain`, and every one of Chapter 7's
+6 town interiors still uses `tileset.tiny-dungeon`, matching Highwind Crossing's own precedent -
+not tracked as a gap, those tiles are real, just generic.
 
 ### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
 
@@ -672,12 +678,16 @@ No Chapter 7 NPC has real PixelLab art yet, sprite or portrait (unlike Chapter 5
 | Forest Echo | silentEchoes | A humanoid shape made of pale bark and moss, roughly tree-like posture, faint sickly green spore-glow at the joints, unsettling stillness. |
 | Corrupted Echo | silentEchoes | A larger, more visibly rotted bark-and-moss shape, deeper spore-glow, aggressive hunched stance, bark cracking to reveal glowing fungus beneath. |
 
-### Equipment icons (19 - generate 128×128, final 64×64, across 6 families x 3 tiers + 1 totem)
+### Equipment icons (19 - generate 128×128, final 64×64, across 6 families x 3 tiers + 1 totem) - all 19 done
 
-Cedar Staff is a straight palette-swap of the already-real Staff-type weapon-layer founder (see the
-"Equipment weapon-layer sprites" section above) - once its icon exists, no new hand-positioning is
-needed, just `scripts/palette_swap_equipment_layer.py`. The other 5 families each need a new
-founder before any layer art can start.
+**Status (2026-08-09): all 19 done**, via `create_map_object` (128x128) + `scripts/build_icon.py`.
+`banded-root-woven-leggings` needed one re-prompt - the first attempt rendered as boots rather than
+leggings, fixed by adding explicit "a leg garment, NOT boots or footwear" language.
+
+Cedar Staff's icon is real now, but the *equipment weapon-layer sprite* (the on-character render)
+is still a straight palette-swap opportunity, not yet done - see the "Equipment weapon-layer
+sprites" section above for that separate piece of work, `scripts/palette_swap_equipment_layer.py`.
+The other 5 families each still need a new founder before any layer art can start.
 
 | Equipment | Final Size | Generation prompt |
 |---|---|---|
@@ -701,7 +711,9 @@ founder before any layer art can start.
 | Elder's Cedar Charm *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of an ornate cedar charm, spiral carving worn smooth, faint pale-green glow, centered, transparent background. |
 | Young Cedar Totem *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of a small carved sapling-totem, centered, transparent background. |
 
-### Item icons (4 - generate 128×128, final 64×64: materials, key items)
+### Item icons (4 - generate 128×128, final 64×64: materials, key items) - all 4 done
+
+**Status (2026-08-09): all 4 done**, via `create_map_object` (128x128) + `scripts/build_icon.py`.
 
 | Item | Final Size | Generation prompt |
 |---|---|---|
@@ -728,7 +740,13 @@ tracked as a placeholder gap, the tiles are real, just generic.
 | Elder Root Wraith | rootWraiths | A larger, denser root-wraith, bark-armored joints, more visibly aggressive stance. |
 | Cedar Giant *(boss, 256×256)* | boss | A massive Guardian shaped from an ancient cedar grown wild, moss-draped limbs thick as trunks, a faint spirit-light glowing deep within a hollow in its chest - imposing but not malevolent, a watcher left too long unrelieved. |
 
-### Equipment icons (4 - generate 128×128, final 64×64)
+### Equipment icons (4 - generate 128×128, final 64×64) - all 4 done
+
+**Status (2026-08-09): all 4 done**, via `create_map_object` (128x128) + `scripts/build_icon.py`.
+Note the two "Lantern of Ancient Roots" rows below ended up registered as one equipment icon
+(`icon.equipment.lantern-of-ancient-roots-equipped`) plus one item icon
+(`icon.item.lantern-of-ancient-roots`, the found-item form) rather than two equipment icons - a
+registry categorization detail, not a missing asset.
 
 | Equipment | Final Size | Generation prompt |
 |---|---|---|
@@ -737,7 +755,12 @@ tracked as a placeholder gap, the tiles are real, just generic.
 | Lantern of Ancient Roots *(found-item form)* | 64×64 | Simple flat-shaded fantasy game icon of an unlit brass lantern etched with an interlocking root-pattern, centered, transparent background. |
 | Lantern of Ancient Roots *(equipped, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a lit legendary lantern, glass etched with a root-pattern, faint pale-green glow, centered, transparent background. |
 
-### Item icons (5 - generate 128×128, final 64×64)
+### Item icons (5 - generate 128×128, final 64×64) - all 5 done
+
+**Status (2026-08-09): all 5 done**, via `create_map_object` (128x128) + `scripts/build_icon.py`.
+Guardian Memory Fragment V used the "angular crystal shard (faceted gem shape, not round)" wording
+that guardian-memory-fragment-1 needed a re-prompt to reach - landed correctly on the first attempt
+here.
 
 | Item | Final Size | Generation prompt |
 |---|---|---|

@@ -5347,8 +5347,8 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "name": "overworld-terrain",
-      "image": "../../../public/assets/tilesets/overworld-terrain.png",
+      "name": "whispering-pines-terrain",
+      "image": "../../../public/assets/tilesets/whispering-pines-terrain.png",
       "imagewidth": 64,
       "imageheight": 64,
       "tilewidth": 16,
@@ -5361,7 +5361,7 @@
         {
           "name": "tilesetAssetId",
           "type": "string",
-          "value": "tileset.overworld-terrain"
+          "value": "tileset.whispering-pines-terrain"
         }
       ]
     },
@@ -5390,7 +5390,7 @@
     {
       "name": "tilesetAssetId",
       "type": "string",
-      "value": "tileset.overworld-terrain"
+      "value": "tileset.whispering-pines-terrain"
     }
   ]
 }
