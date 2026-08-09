@@ -132,6 +132,13 @@ ENEMIES = {
     "rougarou-stalker": ("Rougarou_Stalker", (128, 128)),
     "alpha-rougarou": ("Alpha_Rougarou", (128, 128)),
     "ancient-serpent-guardian": ("Ancient_Serpent_Guardian", (256, 256)),
+    # Endless Prairie (Volume III) - generated directly via pixellab MCP (create_character +
+    # animate_character), downloaded straight into the expected folder shape rather than staged
+    # from a pixellab.ai website export, so staged_folder == slug for all of these.
+    "wind-wisp": ("wind-wisp", (128, 128)),
+    "storm-wisp": ("storm-wisp", (128, 128)),
+    "prairie-wolf": ("prairie-wolf", (128, 128)),
+    "dire-prairie-wolf": ("dire-prairie-wolf", (128, 128)),
 }
 
 if __name__ == "__main__":
