@@ -183,17 +183,18 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'lost-scout-effects-ii-cache': 'structure.landmark-bogwater-almanac-cache',
 };
 
-/** Post-collection sprite override for a 'fragment'-kind interactable, shown once its item is in
- *  the player's inventory (collectWorldItem.ts grants it once and never removes it, so presence in
+/** Post-collection sprite for a 'fragment'-kind interactable, shown once its item is in the
+ *  player's inventory (collectWorldItem.ts grants it once and never removes it, so presence in
  *  inventory IS the "collected" flag - same convention DungeonScene.tsx's isWorldItemCollected
- *  uses). Only entries here get a distinct collected look; anything absent keeps showing its normal
- *  FRAGMENT_SPRITE_ASSET_ID forever (matches every fragment before the Heart Seeds, which never had
- *  this problem called out). */
-const FRAGMENT_COLLECTED_SPRITE_ASSET_ID: Record<string, string> = {
-  'heart-seed-cypress': 'structure.landmark-heart-seed-collected',
-  'heart-seed-murkwater': 'structure.landmark-heart-seed-collected',
-  'heart-seed-river': 'structure.landmark-heart-seed-collected',
-};
+ *  uses). Derived from FRAGMENT_SPRITE_ASSET_ID rather than a second hand-maintained table - every
+ *  entry there now has a matching '<id>-collected' registry asset (the 2026-08-09 found/unfound
+ *  retrofit: every fragment landmark distinguishes collected from not, matching
+ *  structure.chest-open's own precedent), so a future new fragment refId can't silently ship with
+ *  no collected sprite wired the way every fragment before the Heart Seeds once did. */
+function fragmentCollectedSpriteAssetId(refId: string): string | undefined {
+  const unfoundId = FRAGMENT_SPRITE_ASSET_ID[refId];
+  return unfoundId ? `${unfoundId}-collected` : undefined;
+}
 
 /** Purely decorative, non-gated interactable - no Cloud Function call, falls through to
  *  attemptInteract's generic "you find X" flavor branch at the bottom (labelForInteractable
@@ -486,8 +487,8 @@ export function OverworldScene() {
             ? shrineSpriteAssetId(o.refId!, questProgress)
             : isGlowingMushroom(o.refId!)
               ? 'structure.decor-glowing-mushroom'
-              : inventory.some((i) => i.itemId === o.refId) && FRAGMENT_COLLECTED_SPRITE_ASSET_ID[o.refId!]
-                ? FRAGMENT_COLLECTED_SPRITE_ASSET_ID[o.refId!]
+              : inventory.some((i) => i.itemId === o.refId)
+                ? (fragmentCollectedSpriteAssetId(o.refId!) ?? FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant')
                 : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');
         return {
           id: o.refId!,
