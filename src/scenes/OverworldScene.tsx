@@ -215,8 +215,12 @@ function isGlowingMushroom(refId: string): boolean {
 
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
-function labelForInteractable(refId: string, openedChests: string[]): string {
+function labelForInteractable(refId: string, openedChests: string[], inventory: { itemId: string }[]): string {
   if (refId.startsWith('chest-')) return openedChests.includes(refId) ? 'Empty Chest' : 'Chest';
+  // A fragment-kind refId IS its own granted itemId (collectWorldItem.ts) - once it's in the
+  // player's inventory the flavor text below (describing something still hidden/waiting) is no
+  // longer accurate, same staleness the sprite swap above already fixes for the visual.
+  if (inventory.some((i) => i.itemId === refId)) return 'Already Collected';
   if (refId === 'water-fragment') return 'a faint glimmer in the pool';
   if (refId === 'frostbound-treatise-cache') return 'a hidden cache behind the falls';
   if (refId === 'ember-codex-tunnel') return 'an overlooked maintenance tunnel';
@@ -432,7 +436,7 @@ export function OverworldScene() {
       return;
     }
     if (obj?.refId) {
-      const label = labelForInteractable(obj.refId, openedChests);
+      const label = labelForInteractable(obj.refId, openedChests, inventory);
       setMessage(`You find ${label.startsWith('Empty') ? 'an ' + label.toLowerCase() : 'a ' + label.toLowerCase()}. Perhaps it will mean something, in time.`);
     }
   }
@@ -504,7 +508,7 @@ export function OverworldScene() {
           x: o.x,
           y: o.y,
           spriteAssetId,
-          label: labelForInteractable(o.refId!, openedChests),
+          label: labelForInteractable(o.refId!, openedChests, inventory),
         };
       });
 
