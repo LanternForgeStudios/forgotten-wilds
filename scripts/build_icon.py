@@ -139,6 +139,23 @@ ICONS = {
     "winter-count-hide-i": (64, 64),
     "winter-count-hide-ii": (64, 64),
     "guardian-memory-fragment-4": (64, 64),
+    "weathered-prairie-spear": (64, 64),
+    "bound-prairie-spear": (64, 64),
+    "windriders-spear": (64, 64),
+    "worn-buffalo-hide": (64, 64),
+    "banded-buffalo-hide": (64, 64),
+    "worn-riders-chaps": (64, 64),
+    "banded-riders-chaps": (64, 64),
+    "windborn-riders-chaps": (64, 64),
+    "worn-wind-boots": (64, 64),
+    "swift-wind-boots": (64, 64),
+    "windrunner-boots": (64, 64),
+    "worn-rider-gloves": (64, 64),
+    "reinforced-rider-gloves": (64, 64),
+    "warden-rider-gloves": (64, 64),
+    "feather-sky-charm": (64, 64),
+    "woven-sky-charm": (64, 64),
+    "skywalkers-charm": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")
