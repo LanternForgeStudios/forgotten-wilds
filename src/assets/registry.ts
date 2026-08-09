@@ -7533,17 +7533,6 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object base ("a weathered stone shrine with a small altar, glowing with warm golden spirit-light, activated", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the spirit-light glow pulsating and flickering warmly", 9 frames). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_shrine_states.py. 128x128 originals archived at public/assets/sprites/structures/original/shrine-activated-glow/.',
   },
   {
-    id: 'structure.landmark-watchtower',
-    category: 'structure',
-    intendedUse:
-      "Marker for Ironwood Trail's Fallen Watchtower point interactable (grants wind-fragment) - was incorrectly falling back to structure.shrine-dormant/activated (OverworldScene.tsx's interactableEntities mapping had no per-refId sprite for non-chest/non-shrine 'fragment' landmarks, only a blanket shrine-shaped default), which read as an unlit shrine even after the fragment had already been collected.",
-    filePath: 'sprites/structures/landmark-watchtower.png',
-    dimensions: { width: 144, height: 144 },
-    status: 'final',
-    notes:
-      'pixellab MCP-generated: create_map_object ("crumbling ruined stone watchtower, wind-worn broken battlements, ivy and moss", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/watchtower-ruin-source.png.',
-  },
-  {
     id: 'structure.landmark-watchtower-collected',
     category: 'structure',
     intendedUse:
@@ -7555,15 +7544,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
-    id: 'structure.landmark-frost-cache',
+    id: 'structure.landmark-watchtower-glow',
     category: 'structure',
     intendedUse:
-      'Marker for Whisper Falls\' "a hidden cache behind the falls" point interactable (grants frostbound-treatise) - same shrine-fallback mismatch as structure.landmark-watchtower.',
-    filePath: 'sprites/structures/landmark-frost-cache.png',
-    dimensions: { width: 144, height: 144 },
+      'Animated unfound state for fallen-watchtower (grants wind-fragment) - part of the 2026-08-09 found/unfound retrofit ("make the unfound version animated, so the player knows there is something exploring or waiting to be interacted with"). Replaces the static structure.landmark-watchtower as the marker shown before collection.',
+    filePath: 'sprites/structures/landmark-watchtower-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'pixellab MCP-generated: create_map_object ("weathered wooden cache box wrapped in old rope, rimed with frost and icicles, tucked among wet rocks", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/frost-cache-source.png.',
+      'pixellab MCP-generated: create_map_object ("crumbling ruined stone watchtower, wind-worn broken battlements, ivy and moss, a faint magical pale-wind-colored glow pulsing from within the ruins", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the magical glow within the ruined tower gently pulsing and flickering", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/watchtower-glow/.',
   },
   {
     id: 'structure.landmark-frost-cache-collected',
@@ -7577,15 +7567,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
-    id: 'structure.landmark-tunnel-entrance',
+    id: 'structure.landmark-frost-cache-glow',
     category: 'structure',
     intendedUse:
-      'Marker for Raven Ridge\'s "an overlooked maintenance tunnel" point interactable (grants ember-codex) - same shrine-fallback mismatch as structure.landmark-watchtower.',
-    filePath: 'sprites/structures/landmark-tunnel-entrance.png',
-    dimensions: { width: 144, height: 144 },
+      'Animated unfound state for frostbound-treatise-cache (grants frostbound-treatise) - part of the 2026-08-09 found/unfound retrofit. Replaces the static structure.landmark-frost-cache as the marker shown before collection.',
+    filePath: 'sprites/structures/landmark-frost-cache-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'pixellab MCP-generated: create_map_object ("small overlooked mine tunnel entrance, dark opening braced with old wooden planks, overgrown and neglected", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/tunnel-entrance-source.png.',
+      'pixellab MCP-generated: create_map_object ("weathered wooden cache box wrapped in old rope, rimed with frost and icicles, tucked among wet rocks, a faint blue magical glow escaping the seams of the box", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the frost-blue magical glow pulsing softly from within the seams of the cache, gentle shimmer", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/frost-cache-glow/.',
   },
   {
     id: 'structure.landmark-tunnel-entrance-collected',
@@ -7599,15 +7590,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
-    id: 'structure.landmark-heart-seed',
+    id: 'structure.landmark-tunnel-entrance-glow',
     category: 'structure',
     intendedUse:
-      "Marker for Crimson Bayou's 3 Heart Seed fragment interactables (heart-seed-cypress/heart-seed-murkwater/heart-seed-river, one per Chapter 3 field map) - shared by all 3 refIds since they're the same collectible, just placed in 3 different locations.",
-    filePath: 'sprites/structures/landmark-heart-seed.png',
-    dimensions: { width: 144, height: 144 },
+      'Animated unfound state for ember-codex-tunnel (grants ember-codex) - part of the 2026-08-09 found/unfound retrofit. Replaces the static structure.landmark-tunnel-entrance as the marker shown before collection.',
+    filePath: 'sprites/structures/landmark-tunnel-entrance-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'pixellab MCP-generated: create_map_object ("a glowing seed pod nestled among mossy cypress roots, soft golden-green magical light, ancient nature relic", 200x200, high top-down, medium shading, selective outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 200x200 original archived at public/assets/sprites/structures/original/heart-seed-source.png.',
+      'pixellab MCP-generated: create_map_object ("small overlooked mine tunnel entrance, dark opening braced with old wooden planks, overgrown and neglected, a faint warm amber magical glow flickering from deep within the tunnel", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the warm amber magical glow deep in the tunnel flickering and pulsing gently", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/tunnel-entrance-glow/.',
   },
   {
     id: 'structure.landmark-heart-seed-collected',
@@ -7621,15 +7613,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("empty mossy hollow among cypress roots where a seed pod once rested, faint dim residual glow, dormant nature relic, no glowing light", 200x200, high top-down, medium shading, selective outline). Same crop/resize pipeline as structure.landmark-heart-seed. Build script: scripts/build_landmark_objects.py. 200x200 original archived at public/assets/sprites/structures/original/heart-seed-collected-source.png.',
   },
   {
-    id: 'structure.landmark-drowned-ledger-cache',
+    id: 'structure.landmark-heart-seed-glow',
     category: 'structure',
     intendedUse:
-      'Marker for Murkwater Trails\' "a hidden cache in the reeds" point interactable (grants drowned-ledger, The Drowned Ledgers side quest) - same shrine-fallback mismatch as structure.landmark-watchtower.',
-    filePath: 'sprites/structures/landmark-drowned-ledger-cache.png',
-    dimensions: { width: 144, height: 144 },
+      "Animated unfound state for the 3 Heart Seed fragment interactables - part of the 2026-08-09 found/unfound retrofit. Replaces the static structure.landmark-heart-seed as the marker shown before collection, shared by all 3 refIds same as the static version.",
+    filePath: 'sprites/structures/landmark-heart-seed-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'pixellab MCP-generated: create_map_object ("half-buried wooden cache box wedged among marsh reeds and mud, waterlogged and swollen, bound with old rope, swamp water dripping off the lid", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/drowned-ledger-cache-source.png.',
+      'pixellab MCP-generated: create_map_object ("a glowing seed pod nestled among mossy cypress roots, soft golden-green magical light, ancient nature relic", 200x200, high top-down, medium shading, selective outline) + animate_object (v3 mode, "the golden-green magical light pulsing and gently glimmering around the seed pod", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 200x200 originals archived at public/assets/sprites/structures/original/heart-seed-glow/.',
   },
   {
     id: 'structure.landmark-drowned-ledger-cache-collected',
@@ -7643,15 +7636,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
-    id: 'structure.landmark-bogwater-almanac-cache',
+    id: 'structure.landmark-drowned-ledger-cache-glow',
     category: 'structure',
     intendedUse:
-      'Marker for Cypress Marsh\'s "a mossy cypress hollow" point interactable (grants bogwater-almanac, The Drowned Ledgers side quest, second tier) - same shrine-fallback mismatch as structure.landmark-watchtower.',
-    filePath: 'sprites/structures/landmark-bogwater-almanac-cache.png',
-    dimensions: { width: 144, height: 144 },
+      'Animated unfound state for drowned-ledger-cache and its reused-marker siblings (lost-library-records, heartwood-recording-i-cache, desert-relic-i-cache, lost-scout-effects-i-cache) - part of the 2026-08-09 found/unfound retrofit. Replaces the static structure.landmark-drowned-ledger-cache as the marker shown before collection.',
+    filePath: 'sprites/structures/landmark-drowned-ledger-cache-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'pixellab MCP-generated: create_map_object ("mossy hollow at the base of a cypress tree, half-sunk in bog water, an old leather-bound book just visible tucked inside among the roots", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/bogwater-almanac-cache-source.png.',
+      'pixellab MCP-generated: create_map_object ("half-buried wooden cache box wedged among marsh reeds and mud, waterlogged and swollen, bound with old rope, a faint magical glow seeping from the seams of the lid", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the faint magical glow seeping from the cache seams pulsing softly", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/drowned-ledger-cache-glow/.',
   },
   {
     id: 'structure.landmark-bogwater-almanac-cache-collected',
@@ -7665,15 +7659,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
-    id: 'structure.landmark-winter-count-hide-i-cache',
+    id: 'structure.landmark-bogwater-almanac-cache-glow',
     category: 'structure',
     intendedUse:
-      'Marker for Endless Prairie\'s "a painted hide half-buried in the grass" point interactable (grants winter-count-hide-i, The Winter Counts side quest) - previously reused structure.landmark-drowned-ledger-cache as a temporary stand-in.',
-    filePath: 'sprites/structures/landmark-winter-count-hide-i-cache.png',
-    dimensions: { width: 144, height: 144 },
+      'Animated unfound state for bogwater-almanac-cache and its reused-marker siblings (heartwood-recording-ii-cache, desert-relic-ii-cache, lost-scout-effects-ii-cache) - part of the 2026-08-09 found/unfound retrofit. Replaces the static structure.landmark-bogwater-almanac-cache as the marker shown before collection.',
+    filePath: 'sprites/structures/landmark-bogwater-almanac-cache-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'pixellab MCP-generated: create_map_object ("a painted hide bundle half-buried in tall golden prairie grass, faint edge of pictograph visible", 128x128, high top-down, medium shading, single color outline), resized to 144x144 with LANCZOS. 128x128 original archived at public/assets/sprites/structures/original/landmark-winter-count-hide-i-cache.png.',
+      'pixellab MCP-generated: create_map_object ("mossy hollow at the base of a cypress tree, half-sunk in bog water, an old leather-bound book tucked inside among the roots glowing faintly with soft magical light", 128x128, high top-down, basic shading, single color outline) + animate_object (v3 mode, "the faint magical glow around the hidden book pulsing softly", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/bogwater-almanac-cache-glow/.',
   },
   {
     id: 'structure.landmark-winter-count-hide-i-cache-collected',
@@ -7686,15 +7681,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
-    id: 'structure.landmark-winter-count-hide-ii-cache',
+    id: 'structure.landmark-winter-count-hide-i-cache-glow',
     category: 'structure',
     intendedUse:
-      'Marker for Endless Prairie\'s second "a painted hide half-buried in the grass" point interactable (grants winter-count-hide-ii, The Winter Counts side quest) - previously reused structure.landmark-bogwater-almanac-cache as a temporary stand-in.',
-    filePath: 'sprites/structures/landmark-winter-count-hide-ii-cache.png',
-    dimensions: { width: 144, height: 144 },
+      'Animated unfound state for winter-count-hide-i-cache - part of the 2026-08-09 found/unfound retrofit. Replaces the static structure.landmark-winter-count-hide-i-cache as the marker shown before collection.',
+    filePath: 'sprites/structures/landmark-winter-count-hide-i-cache-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'pixellab MCP-generated: create_map_object ("a second painted hide bundle tucked into a low grassy hollow, tied with rawhide cord", 128x128, high top-down, medium shading, single color outline), resized to 144x144 with LANCZOS. 128x128 original archived at public/assets/sprites/structures/original/landmark-winter-count-hide-ii-cache.png.',
+      'pixellab MCP-generated: create_map_object ("a rolled tanned animal hide bundle with painted pictograph symbols on its leather surface, half-buried in tall golden prairie grass, NOT a wooden barrel or log - soft tan leather texture with visible painted markings, a faint warm magical glow glowing from within the rolled hide", 128x128, high top-down, medium shading, single color outline; first attempt without the "NOT a barrel or log" clarifier rendered as a wooden barrel, fixed on retry) + animate_object (v3 mode, "the faint magical glow around the pictograph hide pulsing softly", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/winter-count-hide-i-cache-glow/.',
   },
   {
     id: 'structure.landmark-winter-count-hide-ii-cache-collected',
@@ -7707,15 +7703,16 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
-    id: 'structure.landmark-wind-stone',
+    id: 'structure.landmark-winter-count-hide-ii-cache-glow',
     category: 'structure',
     intendedUse:
-      "Marker for Endless Prairie's 3 Wind Stone fragment interactables (wind-stone-golden-prairie/wind-stone-spirit-herd-plains/wind-stone-stone-circle-valley, one per Chapter 5 field map) - shared by all 3 refIds since they're the same collectible, just placed in 3 different locations.",
-    filePath: 'sprites/structures/landmark-wind-stone.png',
-    dimensions: { width: 144, height: 144 },
+      'Animated unfound state for winter-count-hide-ii-cache - part of the 2026-08-09 found/unfound retrofit. Replaces the static structure.landmark-winter-count-hide-ii-cache as the marker shown before collection.',
+    filePath: 'sprites/structures/landmark-winter-count-hide-ii-cache-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
     status: 'final',
     notes:
-      'pixellab MCP-generated: create_map_object ("a smooth grey standing stone carved with spiral wind-mark glyphs, faint pale-blue magical light glowing from within the carvings, ancient prairie relic, no other objects", 128x128, high top-down, medium shading, selective outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/wind-stone-source.png.',
+      'pixellab MCP-generated: create_map_object ("a second rolled tanned animal hide bundle with painted pictograph symbols on its leather surface, tucked into a low grassy hollow, tied with rawhide cord - NOT a wooden barrel or log, soft tan leather texture with visible painted markings, a faint warm magical glow glowing from within the rolled hide", 128x128, high top-down, medium shading, single color outline) + animate_object (v3 mode, "the faint magical glow around the hide bundle pulsing softly", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/winter-count-hide-ii-cache-glow/.',
   },
   {
     id: 'structure.landmark-wind-stone-collected',
@@ -7727,6 +7724,18 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes:
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
+  },
+  {
+    id: 'structure.landmark-wind-stone-glow',
+    category: 'structure',
+    intendedUse:
+      "Animated unfound state for the 3 Wind Stone fragment interactables and their reused-marker siblings (prairie-charm-relic, prairie-totem-relic) - part of the 2026-08-09 found/unfound retrofit. Replaces the static structure.landmark-wind-stone as the marker shown before collection.",
+    filePath: 'sprites/structures/landmark-wind-stone-glow.png',
+    dimensions: { width: 1296, height: 144 },
+    frameSize: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("a smooth grey standing stone carved with spiral wind-mark glyphs, faint pale-blue magical light glowing from within the carvings, ancient prairie relic, no other objects", 128x128, high top-down, medium shading, selective outline) + animate_object (v3 mode, "the pale-blue magical light in the carved glyphs pulsing and glowing gently", 8 frames -> 9 stored). Each frame cropped to its own square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 originals archived at public/assets/sprites/structures/original/wind-stone-glow/.',
   },
   {
     id: 'structure.landmark-water-glimmer',

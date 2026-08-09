@@ -128,49 +128,53 @@ const ZONE_LANDMARK_KIND: Record<string, 'visitOnly' | 'fragment'> = {
 
 /** Sprite for each 'fragment'-kind point interactable - these are NOT shrines (no lit/dormant
  *  restoration state), so each needs its own bespoke marker rather than falling back to the shrine
- *  sprite. This is the marker shown BEFORE collection; see FRAGMENT_COLLECTED_SPRITE_ASSET_ID for
- *  any of these that also have a distinct after-collection look. */
+ *  sprite. This is the marker shown BEFORE collection - as of the 2026-08-09 found/unfound
+ *  retrofit every one of these is now animated ("make the unfound version animated, so the player
+ *  knows there is something exploring or waiting to be interacted with"), either via a dedicated
+ *  '-glow' registry id or, for water-glimmer (built earlier as its own animated-from-the-start
+ *  asset), the base id itself. See FRAGMENT_COLLECTED_SPRITE_ASSET_ID below for the matching
+ *  after-collection look. */
 const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
-  'fallen-watchtower': 'structure.landmark-watchtower',
+  'fallen-watchtower': 'structure.landmark-watchtower-glow',
   'water-fragment': 'structure.landmark-water-glimmer',
-  'frostbound-treatise-cache': 'structure.landmark-frost-cache',
-  'ember-codex-tunnel': 'structure.landmark-tunnel-entrance',
+  'frostbound-treatise-cache': 'structure.landmark-frost-cache-glow',
+  'ember-codex-tunnel': 'structure.landmark-tunnel-entrance-glow',
   // Crimson Bayou (MSQ Volume II) - all 3 Heart Seed fragments share one marker sprite
-  'heart-seed-cypress': 'structure.landmark-heart-seed',
-  'heart-seed-murkwater': 'structure.landmark-heart-seed',
-  'heart-seed-river': 'structure.landmark-heart-seed',
+  'heart-seed-cypress': 'structure.landmark-heart-seed-glow',
+  'heart-seed-murkwater': 'structure.landmark-heart-seed-glow',
+  'heart-seed-river': 'structure.landmark-heart-seed-glow',
   // Crimson Bayou side quest (The Drowned Ledgers) - each has its own bespoke marker
-  'drowned-ledger-cache': 'structure.landmark-drowned-ledger-cache',
-  'bogwater-almanac-cache': 'structure.landmark-bogwater-almanac-cache',
+  'drowned-ledger-cache': 'structure.landmark-drowned-ledger-cache-glow',
+  'bogwater-almanac-cache': 'structure.landmark-bogwater-almanac-cache-glow',
   // Endless Prairie (MSQ Volume III) - all 3 Wind Stone fragments share one marker sprite.
-  'wind-stone-golden-prairie': 'structure.landmark-wind-stone',
-  'wind-stone-spirit-herd-plains': 'structure.landmark-wind-stone',
-  'wind-stone-stone-circle-valley': 'structure.landmark-wind-stone',
+  'wind-stone-golden-prairie': 'structure.landmark-wind-stone-glow',
+  'wind-stone-spirit-herd-plains': 'structure.landmark-wind-stone-glow',
+  'wind-stone-stone-circle-valley': 'structure.landmark-wind-stone-glow',
   // Endless Prairie side quest (The Winter Counts) - real bespoke markers.
-  'winter-count-hide-i-cache': 'structure.landmark-winter-count-hide-i-cache',
-  'winter-count-hide-ii-cache': 'structure.landmark-winter-count-hide-ii-cache',
+  'winter-count-hide-i-cache': 'structure.landmark-winter-count-hide-i-cache-glow',
+  'winter-count-hide-ii-cache': 'structure.landmark-winter-count-hide-ii-cache-glow',
   // Endless Prairie's Charm/Totem-slot-unlock side quests - no bespoke markers generated yet
   // (PixelLab quota), reusing the region's own Wind Stone marker.
-  'prairie-charm-relic': 'structure.landmark-wind-stone',
-  'prairie-totem-relic': 'structure.landmark-wind-stone',
+  'prairie-charm-relic': 'structure.landmark-wind-stone-glow',
+  'prairie-totem-relic': 'structure.landmark-wind-stone-glow',
   // Whispering Pines (MSQ Volume IV) - no bespoke markers generated yet (PixelLab quota), reusing
   // existing thematically-close markers same as the Winter Counts above.
-  'spirit-seed-elder-forest': 'structure.landmark-heart-seed',
-  'spirit-seed-silver-river': 'structure.landmark-heart-seed',
-  'spirit-seed-heartwood-approach': 'structure.landmark-heart-seed',
-  'lost-library-records': 'structure.landmark-drowned-ledger-cache',
-  'heartwood-recording-i-cache': 'structure.landmark-drowned-ledger-cache',
-  'heartwood-recording-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  'spirit-seed-elder-forest': 'structure.landmark-heart-seed-glow',
+  'spirit-seed-silver-river': 'structure.landmark-heart-seed-glow',
+  'spirit-seed-heartwood-approach': 'structure.landmark-heart-seed-glow',
+  'lost-library-records': 'structure.landmark-drowned-ledger-cache-glow',
+  'heartwood-recording-i-cache': 'structure.landmark-drowned-ledger-cache-glow',
+  'heartwood-recording-ii-cache': 'structure.landmark-bogwater-almanac-cache-glow',
   // Whispering Pines' Charm/Totem-slot-unlock side quests - reusing the region's own Spirit Seed
   // marker.
-  'cedar-charm-relic': 'structure.landmark-heart-seed',
-  'cedar-totem-relic': 'structure.landmark-heart-seed',
+  'cedar-charm-relic': 'structure.landmark-heart-seed-glow',
+  'cedar-totem-relic': 'structure.landmark-heart-seed-glow',
   // Shattered Desert (MSQ Volume V)
   'star-fragment-sunfire-dunes': 'structure.landmark-water-glimmer',
   'star-fragment-crimson-canyons': 'structure.landmark-water-glimmer',
   'star-fragment-painted-mesas': 'structure.landmark-water-glimmer',
-  'desert-relic-i-cache': 'structure.landmark-drowned-ledger-cache',
-  'desert-relic-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  'desert-relic-i-cache': 'structure.landmark-drowned-ledger-cache-glow',
+  'desert-relic-ii-cache': 'structure.landmark-bogwater-almanac-cache-glow',
   // Shattered Desert's Charm/Totem-slot-unlock side quests - reusing the region's own Star
   // Fragment marker.
   'desert-charm-relic': 'structure.landmark-water-glimmer',
@@ -179,21 +183,26 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'aurora-crystal-fragment-snowveil-forest': 'structure.landmark-water-glimmer',
   'aurora-crystal-fragment-glacier-pass': 'structure.landmark-water-glimmer',
   'aurora-crystal-fragment-aurora-basin': 'structure.landmark-water-glimmer',
-  'lost-scout-effects-i-cache': 'structure.landmark-drowned-ledger-cache',
-  'lost-scout-effects-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  'lost-scout-effects-i-cache': 'structure.landmark-drowned-ledger-cache-glow',
+  'lost-scout-effects-ii-cache': 'structure.landmark-bogwater-almanac-cache-glow',
 };
 
 /** Post-collection sprite for a 'fragment'-kind interactable, shown once its item is in the
  *  player's inventory (collectWorldItem.ts grants it once and never removes it, so presence in
  *  inventory IS the "collected" flag - same convention DungeonScene.tsx's isWorldItemCollected
  *  uses). Derived from FRAGMENT_SPRITE_ASSET_ID rather than a second hand-maintained table - every
- *  entry there now has a matching '<id>-collected' registry asset (the 2026-08-09 found/unfound
- *  retrofit: every fragment landmark distinguishes collected from not, matching
- *  structure.chest-open's own precedent), so a future new fragment refId can't silently ship with
- *  no collected sprite wired the way every fragment before the Heart Seeds once did. */
+ *  entry there now has a matching '<base-id>-collected' registry asset (the 2026-08-09
+ *  found/unfound retrofit), so a future new fragment refId can't silently ship with no collected
+ *  sprite wired the way every fragment before the Heart Seeds once did. Strips a trailing '-glow'
+ *  first since the unfound id is the *animated* variant (e.g. 'landmark-watchtower-glow') while
+ *  the collected id is named off the base marker (e.g. 'landmark-watchtower-collected') - water-
+ *  glimmer's unfound id has no '-glow' suffix (it was built animated-from-the-start under its base
+ *  id), so it passes through unchanged. */
 function fragmentCollectedSpriteAssetId(refId: string): string | undefined {
   const unfoundId = FRAGMENT_SPRITE_ASSET_ID[refId];
-  return unfoundId ? `${unfoundId}-collected` : undefined;
+  if (!unfoundId) return undefined;
+  const baseId = unfoundId.endsWith('-glow') ? unfoundId.slice(0, -'-glow'.length) : unfoundId;
+  return `${baseId}-collected`;
 }
 
 /** Purely decorative, non-gated interactable - no Cloud Function call, falls through to
