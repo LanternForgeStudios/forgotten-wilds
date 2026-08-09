@@ -749,15 +749,22 @@ tracked as a placeholder gap, the tiles are real, just generic.
 
 ---
 
-## Town building-facade markers (18 - generate 144×144, painted building illustration)
+## Town building-facade markers (18 - generate 144×144, painted building illustration) - all 18 done
 
 `TownScene.tsx`'s `BUILDING_MARKERS` lookup only ever had Ash Hallow + Mirehaven entries - every
 building in Highwind Crossing, Cedarwatch, and Red Mesa rendered as the generic pulsing
-`structure.exit-marker` instead of its own facade until this pass added SVG placeholders (same
-convention as everything else in this file, not Mirehaven's own PixelLab-generated ones - still out
-of quota). Same 144×144 target size as `structure.mirehaven-town-hall` and siblings; generation
-prompt style matches that section's own "Simple flat-shaded... painted building facade" convention,
-adapted per region.
+`structure.exit-marker` instead of its own facade until SVG placeholders (then real PixelLab art,
+all 18 now `status: 'final'`) filled in every entry. Same 144×144 target size as
+`structure.mirehaven-town-hall` and siblings; generation prompt style matches that section's own
+"Simple flat-shaded... painted building facade" convention, adapted per region.
+
+**Status (2026-08-09): all 18 done.** Highwind Crossing's 6 shipped earlier in this pass; Cedarwatch's
+6 + Red Mesa's 6 were the last outstanding placeholders, generated via `create_map_object` (300x300)
++ `scripts/build_mirehaven_building_placeholders.py`'s flood-fill background removal. The Red Mesa
+Armory needed one re-prompt (first attempt rendered a character holding what read as a pistol - an
+anachronism for this fantasy setting; the retry dropped the anachronism, though it still shows armored
+guard figures rather than an empty scene - accepted as thematically consistent and no longer
+anachronistic, matching this project's established "close enough after a retry" precedent).
 
 | Building | Region | Generation prompt |
 |---|---|---|

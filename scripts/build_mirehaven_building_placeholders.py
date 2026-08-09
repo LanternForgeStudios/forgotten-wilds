@@ -39,6 +39,18 @@ SLUGS = [
     "highwind-crossing-general-store",
     "highwind-crossing-blacksmith",
     "highwind-crossing-armory",
+    "cedarwatch-elders-lodge",
+    "cedarwatch-great-tree-library",
+    "cedarwatch-inn",
+    "cedarwatch-general-store",
+    "cedarwatch-blacksmith",
+    "cedarwatch-armory",
+    "red-mesa-elders-hall",
+    "red-mesa-relic-museum",
+    "red-mesa-inn",
+    "red-mesa-general-store",
+    "red-mesa-blacksmith",
+    "red-mesa-armory",
 ]
 
 TARGET_SIZE = (144, 144)
