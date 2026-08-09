@@ -43,7 +43,7 @@ export function buildFreshPlayer(
  *  equipped by default, since equip/unequip never grant or destroy items) and initial journal. */
 export function buildFreshSaveContent(): Pick<
   PlayerSave,
-  'inventory' | 'quests' | 'journal' | 'openedChests' | 'seenNpcDialogueVariant' | 'lastReviewedSocialAt'
+  'inventory' | 'quests' | 'journal' | 'openedChests' | 'seenNpcDialogueVariant' | 'lastReviewedSocialAt' | 'apothecaryQuests'
 > {
   return {
     inventory: [
@@ -65,5 +65,6 @@ export function buildFreshSaveContent(): Pick<
     openedChests: [],
     seenNpcDialogueVariant: {},
     lastReviewedSocialAt: 0,
+    apothecaryQuests: {},
   };
 }

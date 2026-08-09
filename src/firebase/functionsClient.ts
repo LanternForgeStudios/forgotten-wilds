@@ -260,6 +260,26 @@ export async function callUpgradeLanternOil(
   return result.data;
 }
 
+export async function callRequestApothecaryQuest(shopId: string): Promise<{ quest: { materialId: string; requiredCount: number } }> {
+  const fn = httpsCallable<{ shopId: string }, { quest: { materialId: string; requiredCount: number } }>(
+    functions,
+    'requestApothecaryQuest',
+  );
+  const result = await fn({ shopId });
+  return result.data;
+}
+
+export async function callTurnInApothecaryQuest(
+  shopId: string,
+): Promise<{ gold: number; itemIds: string[]; playerGold: number }> {
+  const fn = httpsCallable<{ shopId: string }, { gold: number; itemIds: string[]; playerGold: number }>(
+    functions,
+    'turnInApothecaryQuest',
+  );
+  const result = await fn({ shopId });
+  return result.data;
+}
+
 export async function callRestAtInn(): Promise<void> {
   const fn = httpsCallable(functions, 'restAtInn');
   await fn({});

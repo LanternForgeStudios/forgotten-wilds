@@ -44,6 +44,13 @@ export interface Player {
   lanternOilUpgrades: Record<string, number>;
 }
 
+/** One dynamically-generated Apothecary/Herbalist "restock" request - see PlayerSave's own
+ *  apothecaryQuests doc comment. */
+export interface ApothecaryQuest {
+  materialId: string;
+  requiredCount: number;
+}
+
 export interface PlayerSave {
   displayName: string;
   createdAt: number;
@@ -61,5 +68,8 @@ export interface PlayerSave {
   /** Timestamp (ms) of the last time the player opened the Friends tab of their User Profile -
    *  drives the "new social activity" indicator next to their name in PlayerHUD. */
   lastReviewedSocialAt: number;
+  /** One active dynamically-generated restock request per Apothecary/Herbalist shopId - see
+   *  functions/src/shared-types/index.ts's matching field for the full design reasoning. */
+  apothecaryQuests: Record<string, ApothecaryQuest>;
   updatedAt: number;
 }

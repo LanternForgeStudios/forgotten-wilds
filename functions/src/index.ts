@@ -11,6 +11,7 @@ export { visitLandmark } from './functions/visitLandmark';
 export { collectWorldItem } from './functions/collectWorldItem';
 export { equipItem, unequipItem } from './functions/equipItem';
 export { upgradeLanternOil } from './functions/upgradeLanternOil';
+export { requestApothecaryQuest, turnInApothecaryQuest } from './functions/apothecaryQuest';
 export { purchaseItem } from './functions/purchaseItem';
 export { restAtInn } from './functions/restAtInn';
 export { useItem } from './functions/useItem';

@@ -8,6 +8,7 @@ import { DialogueBox } from '@/components/DialogueBox';
 import { PlayerHUD } from '@/components/PlayerHUD';
 import { CharacterMenu } from '@/components/CharacterMenu';
 import { Shop } from '@/components/Shop';
+import { ApothecaryRestockPanel } from '@/components/ApothecaryRestockPanel';
 import { Inn } from '@/components/Inn';
 import { JournalOfLegends } from '@/components/JournalOfLegends';
 import { WorldChat } from '@/components/WorldChat';
@@ -32,7 +33,7 @@ import { RewardPopup } from '@/components/RewardPopup';
 import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
-import { NPCS } from '@/data';
+import { NPCS, APOTHECARY_SHOP_IDS } from '@/data';
 import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
@@ -132,11 +133,15 @@ export function TownScene() {
   const [shopOpen, setShopOpen] = useState(false);
   const [activeShopId, setActiveShopId] = useState<string | undefined>();
   const [shopInitialTab, setShopInitialTab] = useState<'buy' | 'sell' | 'upgrade'>('buy');
-  // Set to a shopId when that shop offers a Lantern Oil upgrade the player is eligible for -
-  // presents a "Buy/Sell vs Upgrade Lantern" choice before Shop itself opens, instead of always
-  // going straight to Buy/Sell. Every shop with nothing eligible skips this and behaves exactly as
-  // it did before this feature existed (see handleDialogueClose below).
+  // Set to a shopId when that shop offers a Lantern Oil upgrade the player is eligible for, or is
+  // an Apothecary/Herbalist - presents a "Buy/Sell vs Upgrade Lantern vs Restock Supplies" choice
+  // (whichever options actually apply) before Shop/ApothecaryRestockPanel opens, instead of always
+  // going straight to Buy/Sell. Every other shop skips this and behaves exactly as it did before
+  // either feature existed (see handleDialogueClose below).
   const [shopActionChoice, setShopActionChoice] = useState<string | null>(null);
+  // Set to an Apothecary/Herbalist shopId when the player picks "Restock Supplies" from the choice
+  // above - opens ApothecaryRestockPanel instead of Shop.
+  const [activeApothecaryShopId, setActiveApothecaryShopId] = useState<string | null>(null);
   const [innOpen, setInnOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const [worldChatOpen, setWorldChatOpen] = useState(false);
@@ -181,7 +186,8 @@ export function TownScene() {
     worldChatOpen ||
     message !== null ||
     rewardPopup !== null ||
-    shopActionChoice !== null;
+    shopActionChoice !== null ||
+    activeApothecaryShopId !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
@@ -202,7 +208,8 @@ export function TownScene() {
     const hook = activeNpc?.gameplayHook;
     setActiveNpc(null);
     if (hook?.type === 'shop') {
-      if (eligibleLanternUpgrades(hook.shopId, inventory, equipment, bossesDefeated).length > 0) {
+      const hasLanternUpgrade = eligibleLanternUpgrades(hook.shopId, inventory, equipment, bossesDefeated).length > 0;
+      if (hasLanternUpgrade || APOTHECARY_SHOP_IDS.includes(hook.shopId)) {
         setShopActionChoice(hook.shopId);
       } else {
         setActiveShopId(hook.shopId);
@@ -214,11 +221,15 @@ export function TownScene() {
     }
   }
 
-  function chooseShopAction(tab: 'buy' | 'sell' | 'upgrade') {
+  function chooseShopAction(tab: 'buy' | 'sell' | 'upgrade' | 'restock') {
     if (!shopActionChoice) return;
-    setActiveShopId(shopActionChoice);
-    setShopInitialTab(tab);
-    setShopOpen(true);
+    if (tab === 'restock') {
+      setActiveApothecaryShopId(shopActionChoice);
+    } else {
+      setActiveShopId(shopActionChoice);
+      setShopInitialTab(tab);
+      setShopOpen(true);
+    }
     setShopActionChoice(null);
   }
 
@@ -491,12 +502,22 @@ export function TownScene() {
               <button className={menuStyles.smallButton} onClick={() => chooseShopAction('buy')}>
                 Buy/Sell
               </button>
-              <button className={menuStyles.smallButton} onClick={() => chooseShopAction('upgrade')}>
-                Upgrade Lantern
-              </button>
+              {eligibleLanternUpgrades(shopActionChoice, inventory, equipment, bossesDefeated).length > 0 && (
+                <button className={menuStyles.smallButton} onClick={() => chooseShopAction('upgrade')}>
+                  Upgrade Lantern
+                </button>
+              )}
+              {APOTHECARY_SHOP_IDS.includes(shopActionChoice) && (
+                <button className={menuStyles.smallButton} onClick={() => chooseShopAction('restock')}>
+                  Restock Supplies
+                </button>
+              )}
             </div>
           </Panel>
         </div>
+      )}
+      {activeApothecaryShopId && (
+        <ApothecaryRestockPanel shopId={activeApothecaryShopId} onClose={() => setActiveApothecaryShopId(null)} />
       )}
       {innOpen && <Inn onClose={() => setInnOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}

@@ -12,3 +12,4 @@ export * from './leveling';
 export * from './recipes';
 export * from './dailyChest';
 export * from './lanternOilUpgrades';
+export * from './apothecaryShops';

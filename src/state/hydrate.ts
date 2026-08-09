@@ -23,7 +23,7 @@ export function hydrateAllStores(save: PlayerSave): void {
   useJournalStore.getState().hydrate({ ...save.journal, itemsDiscovered: save.journal.itemsDiscovered ?? [] });
   useWorldStateStore
     .getState()
-    .hydrate(save.openedChests ?? [], save.seenNpcDialogueVariant ?? {}, save.lastReviewedSocialAt ?? 0);
+    .hydrate(save.openedChests ?? [], save.seenNpcDialogueVariant ?? {}, save.lastReviewedSocialAt ?? 0, save.apothecaryQuests ?? {});
 }
 
 /** Compares quest progress before/after a resync and pushes a toast for anything that changed -

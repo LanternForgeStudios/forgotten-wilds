@@ -141,6 +141,13 @@ export interface JournalState {
   itemsDiscovered: string[];
 }
 
+/** One dynamically-generated Apothecary/Herbalist "restock" request - see PlayerSave's own
+ *  apothecaryQuests doc comment. */
+export interface ApothecaryQuest {
+  materialId: string;
+  requiredCount: number;
+}
+
 export interface PlayerSave {
   displayName: string;
   createdAt: number;
@@ -161,6 +168,15 @@ export interface PlayerSave {
    *  friend request or direct message newer than this counts as unreviewed). 0 for a fresh
    *  character, so any pre-existing activity would show as new. */
   lastReviewedSocialAt: number;
+  /** One active dynamically-generated "collect N materials, turn in for a random reward" quest
+   *  per Apothecary/Herbalist shopId (see data/apothecaryShops.ts) - absent/missing entry for a
+   *  shop means no active request there, requestApothecaryQuest.ts generates one on demand.
+   *  Repeatable: turnInApothecaryQuest.ts deletes the entry on completion so a new one can be
+   *  requested. Deliberately NOT modeled through the QuestDef/QuestProgress system (functions/src/
+   *  data/quests.ts) - that machinery is for authored, non-random, non-repeating content; this is
+   *  randomly generated and infinitely repeatable, a different enough shape to warrant its own
+   *  small record rather than forcing it through requiresObjectiveIds/prerequisiteQuestId. */
+  apothecaryQuests: Record<string, ApothecaryQuest>;
   updatedAt: number;
 }
 
