@@ -146,12 +146,9 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'wind-stone-golden-prairie': 'structure.landmark-wind-stone',
   'wind-stone-spirit-herd-plains': 'structure.landmark-wind-stone',
   'wind-stone-stone-circle-valley': 'structure.landmark-wind-stone',
-  // Endless Prairie side quest (The Winter Counts) - no bespoke marker generated yet (PixelLab
-  // quota), temporarily reusing Bayou's own "hidden cache" markers rather than falling back to
-  // structure.shrine-dormant, since a half-buried hide bundle reads closer to a cache than a
-  // shrine. Swap for real bespoke art once quota refreshes.
-  'winter-count-hide-i-cache': 'structure.landmark-drowned-ledger-cache',
-  'winter-count-hide-ii-cache': 'structure.landmark-bogwater-almanac-cache',
+  // Endless Prairie side quest (The Winter Counts) - real bespoke markers.
+  'winter-count-hide-i-cache': 'structure.landmark-winter-count-hide-i-cache',
+  'winter-count-hide-ii-cache': 'structure.landmark-winter-count-hide-ii-cache',
   // Endless Prairie's Charm/Totem-slot-unlock side quests - no bespoke markers generated yet
   // (PixelLab quota), reusing the region's own Wind Stone marker.
   'prairie-charm-relic': 'structure.landmark-wind-stone',

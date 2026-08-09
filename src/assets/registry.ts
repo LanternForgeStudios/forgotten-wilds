@@ -7599,6 +7599,28 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated: create_map_object ("mossy hollow at the base of a cypress tree, half-sunk in bog water, an old leather-bound book just visible tucked inside among the roots", 128x128, high top-down, basic shading, single color outline). Cropped to its square content bbox and resized to 144x144 with LANCZOS. Build script: scripts/build_landmark_objects.py. 128x128 original archived at public/assets/sprites/structures/original/bogwater-almanac-cache-source.png.',
   },
   {
+    id: 'structure.landmark-winter-count-hide-i-cache',
+    category: 'structure',
+    intendedUse:
+      'Marker for Endless Prairie\'s "a painted hide half-buried in the grass" point interactable (grants winter-count-hide-i, The Winter Counts side quest) - previously reused structure.landmark-drowned-ledger-cache as a temporary stand-in.',
+    filePath: 'sprites/structures/landmark-winter-count-hide-i-cache.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("a painted hide bundle half-buried in tall golden prairie grass, faint edge of pictograph visible", 128x128, high top-down, medium shading, single color outline), resized to 144x144 with LANCZOS. 128x128 original archived at public/assets/sprites/structures/original/landmark-winter-count-hide-i-cache.png.',
+  },
+  {
+    id: 'structure.landmark-winter-count-hide-ii-cache',
+    category: 'structure',
+    intendedUse:
+      'Marker for Endless Prairie\'s second "a painted hide half-buried in the grass" point interactable (grants winter-count-hide-ii, The Winter Counts side quest) - previously reused structure.landmark-bogwater-almanac-cache as a temporary stand-in.',
+    filePath: 'sprites/structures/landmark-winter-count-hide-ii-cache.png',
+    dimensions: { width: 144, height: 144 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated: create_map_object ("a second painted hide bundle tucked into a low grassy hollow, tied with rawhide cord", 128x128, high top-down, medium shading, single color outline), resized to 144x144 with LANCZOS. 128x128 original archived at public/assets/sprites/structures/original/landmark-winter-count-hide-ii-cache.png.',
+  },
+  {
     id: 'structure.landmark-wind-stone',
     category: 'structure',
     intendedUse:

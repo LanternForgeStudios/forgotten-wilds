@@ -473,12 +473,12 @@ whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, an
 
 **Status (2026-08-09): PixelLab quota renewed (subscription refreshed, ~1568 generations
 available).** Resuming the real-art pass region by region, same build order as originally shipped.
-**All 8 NPC portraits below are now done** (generated via `create_image_pixflux`, 400x400 painted
-background, resized via `scripts/resize_portraits.py`). NPC overworld sprites, enemy sprites,
-equipment/item icons, and the 2 landmark markers below are still outstanding - swap each using the
-generation prompts below, same "Simple flat-shaded fantasy game icon of..." / character-description
-conventions as every other section in this doc. None of this content is player-reachable yet
-(Highwind Crossing has no incoming transition from the rest of the world), so there's no urgency.
+**All 8 NPC portraits, all 18 equipment icons, all 5 item icons, and both landmark markers below
+are now done.** Only NPC overworld sprites (4 shop NPCs) and enemy sprites (4, plus Chapter 6's own
+3) remain outstanding - those need the more involved create_character+animate_character pipeline
+rather than a single create_map_object call, so they're next. None of this content is
+player-reachable yet (Highwind Crossing has no incoming transition from the rest of the world), so
+there's no urgency.
 
 4 NPCs (Chief Aiyana, Elder Koda, Niska, Prairie Spirit) already have **real** PixelLab overworld
 sprites (idle-only; see `feedback_region_build_workflow` memory on Niska's walk-cycle frame-count
@@ -523,7 +523,7 @@ fight-stance-idle pipeline as every other region's enemies - see the Enemies sec
 | Prairie Wolf | prairieWolves | Lean tan-grey prairie wolf, alert pack-hunter stance, wind-blown fur, sharp eyes. |
 | Dire Prairie Wolf | prairieWolves | Larger, more scarred prairie wolf, darker fur, imposing pack-leader stance. |
 
-### Equipment icons (18 - generate 128×128, final 64×64, across 6 families x 3 tiers)
+### Equipment icons (18 - generate 128×128, final 64×64, across 6 families x 3 tiers) - all 18 done
 
 Prairie Spear is a straight palette-swap of the already-real `ashwood-spear` weapon-layer sheet
 (see the "Equipment weapon-layer sprites" section above) - **once its icon exists**, no new
@@ -552,7 +552,7 @@ workflow in `feedback_region_build_workflow` memory) before any layer art can st
 | Woven Sky Charm *(uncommon)* | 64×64 | Simple flat-shaded fantasy game icon of a small woven charm of feathers and prairie grass, centered, transparent background. |
 | Skywalker's Charm *(rare)* | 64×64 | Simple flat-shaded fantasy game icon of an ornate feather-and-bead charm with a faint pale-blue glow, centered, transparent background. |
 
-### Item icons (5 - generate 128×128, final 64×64: materials, key items)
+### Item icons (5 - generate 128×128, final 64×64: materials, key items) - all 5 done
 
 | Item | Final Size | Generation prompt |
 |---|---|---|
@@ -562,11 +562,11 @@ workflow in `feedback_region_build_workflow` memory) before any layer art can st
 | Winter Count Hide II *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of a second rolled painted hide with faded pictographs, tied with a slightly different cord than the first, centered, transparent background. |
 | Guardian Memory Fragment III *(key item)* | 64×64 | Simple flat-shaded fantasy game icon of an angular purple crystal shard (faceted gem shape, not round) holding a faint ghostly glowing memory-image, centered, transparent background. |
 
-### Landmark markers (2 - generate ~128×128, final 144×144)
+### Landmark markers (2 - generate ~128×128, final 144×144) - both done
 
-Currently reusing Bayou's `structure.landmark-drowned-ledger-cache`/`-bogwater-almanac-cache`
-markers as a closer-fit temporary stand-in than the generic `structure.shrine-dormant` fallback -
-swap for bespoke art rather than leaving the reuse permanent.
+Now real bespoke markers (`structure.landmark-winter-count-hide-i-cache`/`-ii-cache`), replacing
+the earlier temporary reuse of Bayou's `structure.landmark-drowned-ledger-cache`/
+`-bogwater-almanac-cache` markers.
 
 | Landmark | Generation prompt |
 |---|---|
@@ -603,7 +603,7 @@ sprites, 5 equipment icons, 2 item icons, plus two art debts that aren't simple 
 | Thunder Roc | stormAvians | A fully-grown storm-touched raptor, wings spread, capable of grounding prey with a single wingbeat. |
 | Great Thunderbird *(boss, 256×256)* | boss | A massive, ancient storm-spirit bird, wings wreathed in lightning, imposing watchful eyes, perched at the summit of a wind-scoured peak - a guardian, not a monster. |
 
-### Equipment icons (5 - generate 128×128, final 64×64)
+### Equipment icons (5 - generate 128×128, final 64×64) - all 5 done
 
 | Equipment | Final Size | Generation prompt |
 |---|---|---|
@@ -613,7 +613,7 @@ sprites, 5 equipment icons, 2 item icons, plus two art debts that aren't simple 
 | Lantern of Open Skies *(found-item form)* | 64×64 | Simple flat-shaded fantasy game icon of an unlit brass lantern etched with a spiral wind-pattern, centered, transparent background. |
 | Lantern of Open Skies *(equipped, legendary)* | 64×64 | Simple flat-shaded fantasy game icon of a lit legendary lantern, glass etched with a spiral wind-pattern, faint pale glow, centered, transparent background. |
 
-### Item icons (2 - generate 128×128, final 64×64)
+### Item icons (2 - generate 128×128, final 64×64) - all 2 done
 
 | Item | Final Size | Generation prompt |
 |---|---|---|
