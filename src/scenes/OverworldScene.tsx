@@ -217,10 +217,20 @@ function isGlowingMushroom(refId: string): boolean {
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
 function labelForInteractable(refId: string, openedChests: string[], inventory: { itemId: string }[]): string {
   if (refId.startsWith('chest-')) return openedChests.includes(refId) ? 'Empty Chest' : 'Chest';
+  // Shrine-kind point interactables (POINT_LANDMARK_KIND[refId] === 'shrine') whose refId doesn't
+  // double as its own LOCATIONS entry the way mother-cypress-shrine/stone-circle-carvings do (they
+  // sit inside a larger field map that already has its own Location id) - without an explicit case
+  // here these fell all the way through to the 'something' fallback below.
+  if (refId === 'cedar-shrine-heart') return 'Ancient Cedar Shrine';
+  if (refId === 'heartwood-sanctuary-gate') return 'Heartwood Sanctuary Gate';
+  if (refId === 'star-crystal-shrine') return 'Star Crystal Shrine';
+  if (refId === 'winter-shrine') return 'Winter Shrine';
   // A fragment-kind refId IS its own granted itemId (collectWorldItem.ts) - once it's in the
   // player's inventory the flavor text below (describing something still hidden/waiting) is no
   // longer accurate, same staleness the sprite swap above already fixes for the visual.
   if (inventory.some((i) => i.itemId === refId)) return 'Already Collected';
+  if (refId === 'fallen-watchtower') return 'a crumbling watchtower, wind-worn and abandoned';
+  if (refId.startsWith('heart-seed-')) return 'a seed pod nestled among mossy roots, glowing faintly';
   if (refId === 'water-fragment') return 'a faint glimmer in the pool';
   if (refId === 'frostbound-treatise-cache') return 'a hidden cache behind the falls';
   if (refId === 'ember-codex-tunnel') return 'an overlooked maintenance tunnel';

@@ -33,7 +33,7 @@ import { RewardPopup } from '@/components/RewardPopup';
 import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
-import { NPCS, APOTHECARY_SHOP_IDS } from '@/data';
+import { NPCS, LOCATIONS, APOTHECARY_SHOP_IDS } from '@/data';
 import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
@@ -433,9 +433,10 @@ export function TownScene() {
   }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, presences, uid, locationId]);
 
   if (!map) {
+    const arrivingTownName = LOCATIONS.find((l) => l.id === locationId)?.name;
     return (
       <div className={styles.wrap}>
-        <p>Arriving in Ash Hallow...</p>
+        <p>{arrivingTownName ? `Arriving in ${arrivingTownName}...` : 'Arriving...'}</p>
       </div>
     );
   }
