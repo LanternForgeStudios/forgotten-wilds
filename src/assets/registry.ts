@@ -7020,7 +7020,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 128, height: 128 },
     status: 'final',
     notes:
-      'pixellab MCP-generated (create_character, humanoid, size 48 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/forest-echo/.',
+      'pixellab MCP-generated (create_character, humanoid, size 128 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/forest-echo/.',
   },
   {
     id: 'battle.enemy.corrupted-echo',
@@ -7031,7 +7031,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 128, height: 128 },
     status: 'final',
     notes:
-      'pixellab MCP-generated (create_character, humanoid, size 48 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/corrupted-echo/.',
+      'pixellab MCP-generated (create_character, humanoid, size 128 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/corrupted-echo/.',
   },
   // Whispering Pines (MSQ Volume IV, Chapter 8) enemies - rootWraiths family + Cedar Giant boss.
   {
@@ -7043,7 +7043,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 128, height: 128 },
     status: 'final',
     notes:
-      'pixellab MCP-generated (create_character, humanoid, size 48 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/root-wraith/.',
+      'pixellab MCP-generated (create_character, humanoid, size 128 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/root-wraith/.',
   },
   {
     id: 'battle.enemy.elder-root-wraith',
@@ -7054,7 +7054,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 128, height: 128 },
     status: 'final',
     notes:
-      'pixellab MCP-generated (create_character, humanoid, size 48 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/elder-root-wraith/.',
+      'pixellab MCP-generated (create_character, humanoid, size 128 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/elder-root-wraith/.',
   },
   {
     id: 'battle.enemy.cedar-giant',
