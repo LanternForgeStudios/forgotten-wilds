@@ -133,6 +133,12 @@ ICONS = {
     "serpent-guard-spear": (64, 64),
     "rougarou-warclub": (64, 64),
     "wind-stone": (64, 64),
+    # Endless Prairie (Volume III, Chapter 5/6) - PixelLab quota renewed 2026-08-09.
+    "wisp-feather": (64, 64),
+    "prairie-wolf-pelt": (64, 64),
+    "winter-count-hide-i": (64, 64),
+    "winter-count-hide-ii": (64, 64),
+    "guardian-memory-fragment-4": (64, 64),
 }
 
 SRC_DIR = os.path.join("art-staging", "icons")
