@@ -17,6 +17,7 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
 import { useExplorationDash } from '@/hooks/useExplorationDash';
+import { ENEMIES } from '@/data';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -343,7 +344,11 @@ export function DungeonScene() {
             x: o.x,
             y: o.y,
             spriteAssetId,
-            label: '???',
+            // '???' made no sense - the map icon IS the boss's own battle sprite, so there's
+            // nothing left to hide. Its real name is both more concise and more accurate than
+            // BOSS_TRIGGERS' own approachLabel (a full descriptive sentence meant for the
+            // "you find X" fail-to-fight-yet message, not a floating map tag).
+            label: ENEMIES.find((e) => e.id === refId)?.name ?? bossTrigger.approachLabel,
             displayScale: enemyMapIconScale(spriteAssetId, true),
           };
         }
