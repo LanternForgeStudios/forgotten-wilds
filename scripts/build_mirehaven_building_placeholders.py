@@ -33,6 +33,12 @@ SLUGS = [
     "mirehaven-blacksmith",
     "mirehaven-armory",
     "mirehaven-herbalist",
+    "highwind-crossing-chiefs-lodge",
+    "highwind-crossing-spirit-lodge",
+    "highwind-crossing-inn",
+    "highwind-crossing-general-store",
+    "highwind-crossing-blacksmith",
+    "highwind-crossing-armory",
 ]
 
 TARGET_SIZE = (144, 144)
