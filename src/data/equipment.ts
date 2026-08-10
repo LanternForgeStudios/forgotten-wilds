@@ -1507,6 +1507,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 5, maxHp: 4 },
     tier: 'common',
     familyId: 'frost-pike',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-frost-pike', female: 'sprite.equipment.worn-frost-pike-female' },
   },
   {
     id: 'bound-frost-pike',
@@ -1517,6 +1518,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 8, maxHp: 6, speed: 1 },
     tier: 'uncommon',
     familyId: 'frost-pike',
+    layerSpriteAssetId: { male: 'sprite.equipment.bound-frost-pike', female: 'sprite.equipment.bound-frost-pike-female' },
   },
   {
     id: 'glacier-forged-pike',
@@ -1527,6 +1529,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 12, maxHp: 10, defense: 1 },
     tier: 'rare',
     familyId: 'frost-pike',
+    layerSpriteAssetId: { male: 'sprite.equipment.glacier-forged-pike', female: 'sprite.equipment.glacier-forged-pike-female' },
   },
   {
     id: 'worn-winter-coat',

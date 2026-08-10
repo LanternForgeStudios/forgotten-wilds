@@ -148,6 +148,18 @@ ENEMIES = {
     "root-wraith": ("root-wraith", (128, 128)),
     "elder-root-wraith": ("elder-root-wraith", (128, 128)),
     "cedar-giant": ("cedar-giant", (256, 256)),
+    # Shattered Desert (Volume V, Chapters 9-10)
+    "dust-devil": ("dust-devil", (128, 128)),
+    "sandstorm-devil": ("sandstorm-devil", (128, 128)),
+    "celestial-wisp": ("celestial-wisp", (128, 128)),
+    "star-phantom": ("star-phantom", (128, 128)),
+    "canyon-giant": ("canyon-giant", (256, 256)),
+    # Frozen Frontier (Volume VI, Chapters 11-12)
+    "frost-wolf": ("frost-wolf", (128, 128)),
+    "alpha-frost-wolf": ("alpha-frost-wolf", (128, 128)),
+    "frozen-wraith": ("frozen-wraith", (128, 128)),
+    "ancient-frozen-wraith": ("ancient-frozen-wraith", (128, 128)),
+    "winter-stag": ("winter-stag", (256, 256)),
 }
 
 if __name__ == "__main__":

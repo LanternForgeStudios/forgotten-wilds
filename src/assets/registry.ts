@@ -1859,6 +1859,78 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.weathered-iron-sword's corrected (hand-touched-up) sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
   },
   {
+    id: 'sprite.equipment.worn-frost-pike',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - worn-frost-pike (Frozen Frontier Frost Pike family, common), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-frost-pike-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-frost-pike-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - worn-frost-pike (Frozen Frontier Frost Pike family, common), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-frost-pike-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.bound-frost-pike',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - bound-frost-pike (Frozen Frontier Frost Pike family, uncommon), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/bound-frost-pike-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.bound-frost-pike-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - bound-frost-pike (Frozen Frontier Frost Pike family, uncommon), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/bound-frost-pike-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.glacier-forged-pike',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - glacier-forged-pike (Frozen Frontier Frost Pike family, rare), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/glacier-forged-pike-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.glacier-forged-pike-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - glacier-forged-pike (Frozen Frontier Frost Pike family, rare), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/glacier-forged-pike-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
     id: 'sprite.equipment.wardens-broadsword',
     category: 'character',
     intendedUse:
@@ -7264,38 +7336,46 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'battle.enemy.frost-wolf',
     category: 'enemy',
-    intendedUse: 'Battle sprite for frost-wolf - also reused as its overworld field-encounter icon - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/frost-wolf-idle.svg',
-    dimensions: { width: 128, height: 128 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for frost-wolf - also reused as its overworld field-encounter icon',
+    filePath: 'sprites/enemies/frost-wolf-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, a lean, low quadruped body_type (template dog), frost-pale coat, size 128 + animate_character\'s idle template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/frost-wolf/.',
   },
   {
     id: 'battle.enemy.alpha-frost-wolf',
     category: 'enemy',
-    intendedUse: 'Battle sprite for alpha-frost-wolf - also reused as its overworld field-encounter icon - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/alpha-frost-wolf-idle.svg',
-    dimensions: { width: 128, height: 128 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for alpha-frost-wolf - also reused as its overworld field-encounter icon',
+    filePath: 'sprites/enemies/alpha-frost-wolf-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, a larger, denser-coated quadruped body_type (template dog), size 128 + animate_character\'s idle template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/alpha-frost-wolf/.',
   },
   {
     id: 'battle.enemy.frozen-wraith',
     category: 'enemy',
-    intendedUse: 'Battle sprite for frozen-wraith - also reused as its overworld field-encounter icon - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/frozen-wraith-idle.svg',
-    dimensions: { width: 128, height: 128 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for frozen-wraith - also reused as its overworld field-encounter icon',
+    filePath: 'sprites/enemies/frozen-wraith-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, a humanoid figure made of solid ice, translucent glowing pale blue-white body, size 128 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/frozen-wraith/.',
   },
   {
     id: 'battle.enemy.ancient-frozen-wraith',
     category: 'enemy',
-    intendedUse: 'Battle sprite for ancient-frozen-wraith - also reused as its overworld field-encounter icon - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/ancient-frozen-wraith-idle.svg',
-    dimensions: { width: 128, height: 128 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for ancient-frozen-wraith - also reused as its overworld field-encounter icon',
+    filePath: 'sprites/enemies/ancient-frozen-wraith-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, a larger, denser elder wraith of ice, more aggressive posture, size 128 + animate_character\'s fight-stance-idle-8-frames template, south direction only). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/ancient-frozen-wraith/.',
   },
   {
     id: 'battle.enemy.winter-stag',
