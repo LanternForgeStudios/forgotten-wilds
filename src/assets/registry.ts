@@ -6769,11 +6769,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.captain-astrid-frost',
     category: 'character',
-    intendedUse: 'Overworld sprite for captain-astrid-frost - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/captain-astrid-frost-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      "Overworld sprite for captain-astrid-frost - a wandering NPC (wanderRadius on its frosthaven.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/captain-astrid-frost-walk.png',
+    dimensions: { width: 288, height: 480 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template for the idle row, walking-4-frames template across all 4 cardinal directions for the walk rows - built as idle+walk together from the start, learning from marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/forest-warden-rowan-hart/prairie-spirit, which all shipped idle-only and still need the same follow-up fix). Added to NPC_WALK_ASSET_IDS in characterAnimations.ts. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/captain-astrid-frost/.",
   },
   {
     id: 'sprite.npc.aurora-keeper-lyra',
@@ -6790,11 +6793,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.winter-spirit',
     category: 'character',
-    intendedUse: 'Overworld sprite for winter-spirit - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/winter-spirit-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      "Overworld sprite for winter-spirit - a wandering NPC (wanderRadius on its aurora-basin.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/winter-spirit-walk.png',
+    dimensions: { width: 288, height: 480 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template for the idle row, walking-4-frames template across all 4 cardinal directions for the walk rows - built as idle+walk together from the start, learning from marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/forest-warden-rowan-hart/prairie-spirit, which all shipped idle-only and still need the same follow-up fix). Added to NPC_WALK_ASSET_IDS in characterAnimations.ts. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/winter-spirit/.",
   },
   {
     id: 'sprite.npc.innkeeper-greta',

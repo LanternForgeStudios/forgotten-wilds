@@ -45,6 +45,10 @@ const NPC_WALK_ASSET_IDS = new Set([
   'sprite.npc.sabine-thorne',
   // Shattered Desert (MSQ Volume V) - desert-ranger-tomas-vega roams Red Mesa (wanderRadius).
   'sprite.npc.desert-ranger-tomas-vega',
+  // Frozen Frontier (MSQ Volume VI) - captain-astrid-frost roams Frosthaven, winter-spirit roams
+  // Aurora Basin (both wanderRadius).
+  'sprite.npc.captain-astrid-frost',
+  'sprite.npc.winter-spirit',
 ]);
 /** Row layout for NPC_WALK_ASSET_IDS sheets: row 0 idle (breathing), rows 1-4 walking by facing -
  *  a fixed convention (not per-NPC configurable) since the build script that assembles these
