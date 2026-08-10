@@ -36,6 +36,8 @@ import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { battleStartCutscene, buildDefeatCutscene } from '@/data/cutscenes';
 import { getAssetUrl } from '@/assets/assetManager';
 import { playMusic, playSound } from '@/audio/audioService';
+import { LorePopup } from '@/components/LorePopup';
+import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
 import styles from './CombatScene.module.css';
 
 const RESTORE_STAT_LABEL: Record<'hp' | 'spirit' | 'lanternOil', string> = {
@@ -104,6 +106,11 @@ export function CombatScene() {
   });
   const [rewards, setRewards] = useState<ResolveCombatActionResponse['rewards']>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Lore learned from a quest that completed as a side effect of this fight - shown AFTER the
+  // victory panel's "Continue" is clicked (see handleContinueFromVictory below), never stacked on
+  // top of it, matching how the exploration scenes sequence RewardPopup -> LorePopup.
+  const { currentLorePopup, queueLorePopups, dismissCurrentLorePopup } = useLorePopupQueue();
+  const [awaitingLoreBeforeExit, setAwaitingLoreBeforeExit] = useState(false);
   // Up to 3 item ids queued to ride along with whatever primary action the player takes next
   // (duplicates allowed - e.g. 2x the same potion). Cleared only after a round actually resolves.
   const [tray, setTray] = useState<string[]>([]);
@@ -379,6 +386,7 @@ export function CombatScene() {
       } else {
         if (res.phase === 'victory') {
           setRewards(res.rewards);
+          queueLorePopups(res.rewards?.grantedLoreIds);
           void playSound('sfx.victory');
           if (res.rewards?.leveledUp) void playSound('sfx.level-up');
         } else if (res.phase === 'defeat') {
@@ -487,6 +495,22 @@ export function CombatScene() {
     } else {
       goToExploration();
     }
+  }
+
+  // Clicking "Continue" on a victory with queued lore shows the lore first (see render below)
+  // instead of leaving immediately - once the last lore popup is dismissed, this effect fires the
+  // actual scene transition that was deferred.
+  useEffect(() => {
+    if (awaitingLoreBeforeExit && !currentLorePopup) {
+      setAwaitingLoreBeforeExit(false);
+      void returnToExploration();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [awaitingLoreBeforeExit, currentLorePopup]);
+
+  function handleContinueFromVictory() {
+    if (currentLorePopup) setAwaitingLoreBeforeExit(true);
+    else void returnToExploration();
   }
 
   // Grouped by resource restored (HP/Spirit/Oil/Cure - see itemEffectGroupOf), then by rarity tier
@@ -906,7 +930,10 @@ export function CombatScene() {
         </div>
       )}
 
-      {(phase === 'victory' || phase === 'defeat' || phase === 'fled') && (
+      {(phase === 'victory' || phase === 'defeat' || phase === 'fled') &&
+        (awaitingLoreBeforeExit && currentLorePopup ? (
+          <LorePopup title={currentLorePopup.title} body={currentLorePopup.body} onClose={dismissCurrentLorePopup} />
+        ) : (
         <div className={styles.overlay}>
           <Panel style={{ width: 'min(420px, 90vw)', textAlign: 'center' }}>
             {phase === 'victory' && (
@@ -945,12 +972,12 @@ export function CombatScene() {
               </>
             )}
             {phase === 'fled' && <h2>You escaped.</h2>}
-            <button className={styles.actionButton} onClick={returnToExploration} style={{ marginTop: 12 }}>
+            <button className={styles.actionButton} onClick={handleContinueFromVictory} style={{ marginTop: 12 }}>
               Continue
             </button>
           </Panel>
         </div>
-      )}
+        ))}
 
       {phase === 'error' && (
         <div className={styles.overlay}>

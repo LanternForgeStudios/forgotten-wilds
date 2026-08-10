@@ -30,6 +30,8 @@ import { useJournalStore } from '@/state/useJournalStore';
 import { useSceneStore } from '@/state/useSceneStore';
 import { callTalkToNpc, callInteractWithShrine, callSendFriendRequest, type QuestRewardSummary } from '@/firebase/functionsClient';
 import { RewardPopup } from '@/components/RewardPopup';
+import { LorePopup } from '@/components/LorePopup';
+import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
 import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
@@ -148,8 +150,10 @@ export function TownScene() {
   const [message, setMessage] = useState<string | null>(null);
   // Shared reward-acknowledgment popup (see RewardPopup.tsx and OverworldScene.tsx's identical use).
   const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
+  const { currentLorePopup, queueLorePopups, dismissCurrentLorePopup } = useLorePopupQueue();
   function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
     if (!questRewards) return;
+    queueLorePopups(questRewards.grantedLoreIds);
     setRewardPopup({
       title: 'Quest Complete!',
       lines: buildRewardLines({
@@ -186,6 +190,7 @@ export function TownScene() {
     worldChatOpen ||
     message !== null ||
     rewardPopup !== null ||
+    currentLorePopup !== null ||
     shopActionChoice !== null ||
     activeApothecaryShopId !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
@@ -314,9 +319,10 @@ export function TownScene() {
   useEffect(() => {
     function handleInteract(e: KeyboardEvent) {
       if (isTypingTarget(e)) return;
-      if (e.key === 'Escape' && (shopActionChoice || rewardPopup || message)) {
+      if (e.key === 'Escape' && (shopActionChoice || rewardPopup || currentLorePopup || message)) {
         if (shopActionChoice) setShopActionChoice(null);
         else if (rewardPopup) setRewardPopup(null);
+        else if (currentLorePopup) dismissCurrentLorePopup();
         else setMessage(null);
         return;
       }
@@ -344,6 +350,7 @@ export function TownScene() {
     activeNpc,
     shopActionChoice,
     rewardPopup,
+    currentLorePopup,
     message,
     menuOpen,
     shopOpen,
@@ -492,6 +499,9 @@ export function TownScene() {
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {rewardPopup && (
         <RewardPopup title={rewardPopup.title} subtitle={rewardPopup.subtitle} lines={rewardPopup.lines} onClose={() => setRewardPopup(null)} />
+      )}
+      {!rewardPopup && currentLorePopup && (
+        <LorePopup title={currentLorePopup.title} body={currentLorePopup.body} onClose={dismissCurrentLorePopup} />
       )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {shopOpen && <Shop shopId={activeShopId ?? ''} initialTab={shopInitialTab} onClose={() => setShopOpen(false)} />}

@@ -175,6 +175,9 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       gold: number;
       itemIds: string[];
       grantedSkillIds: string[];
+      /** Lore entry ids unlocked by a quest (e.g. "defeat 3 mothlings") that completed as a side
+       *  effect of this victory. [] when nothing was unlocked. */
+      grantedLoreIds: string[];
       leveledUp: boolean;
       restore: VictoryRestore | null;
       /** Region names whose Lantern Oil upgrade just unlocked (a boss gating one was defeated for
@@ -252,6 +255,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         gold: reward.gold + questRewards.gold,
         itemIds: [...grantedItemIds, ...questRewards.itemIds],
         grantedSkillIds: questRewards.grantedSkillIds,
+        grantedLoreIds: questRewards.grantedLoreIds,
         leveledUp: save.player.level > levelBefore,
         restore,
         lanternOilUpgradeRegions: [...newlyUnlockedLanternRegions],

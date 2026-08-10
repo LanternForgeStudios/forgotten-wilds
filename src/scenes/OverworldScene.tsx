@@ -36,6 +36,8 @@ import {
 import { resyncSave } from '@/state/hydrate';
 import { LOCATIONS, NPCS } from '@/data';
 import { RewardPopup } from '@/components/RewardPopup';
+import { LorePopup } from '@/components/LorePopup';
+import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
 import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
@@ -282,8 +284,10 @@ export function OverworldScene() {
   // pickups (always) and for a quest completed by a talk/enter/visit/shrine event (only when it
   // actually granted something, since most of those events complete no quest at all).
   const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
+  const { currentLorePopup, queueLorePopups, dismissCurrentLorePopup } = useLorePopupQueue();
   function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
     if (!questRewards) return;
+    queueLorePopups(questRewards.grantedLoreIds);
     setRewardPopup({
       title: 'Quest Complete!',
       lines: buildRewardLines({
@@ -299,7 +303,8 @@ export function OverworldScene() {
   const hudBarHeight = useHudBarHeight();
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const otherOverlaysOpen = activeNpc !== null || menuOpen || journalOpen || message !== null || rewardPopup !== null;
+  const otherOverlaysOpen =
+    activeNpc !== null || menuOpen || journalOpen || message !== null || rewardPopup !== null || currentLorePopup !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
   const { pending, run } = usePendingAction();
@@ -314,6 +319,7 @@ export function OverworldScene() {
             setMessage("There's nothing left to find here.");
             return;
           }
+          queueLorePopups(res.questRewards?.grantedLoreIds);
           setRewardPopup({
             title: 'You found...',
             lines: buildRewardLines({
@@ -432,6 +438,7 @@ export function OverworldScene() {
             setMessage("There's nothing left to find here.");
             return;
           }
+          queueLorePopups(res.questRewards?.grantedLoreIds);
           setRewardPopup({
             title: 'You found...',
             lines: buildRewardLines({
@@ -456,6 +463,7 @@ export function OverworldScene() {
       if (isTypingTarget(e)) return;
       if (e.key === 'Escape') {
         if (rewardPopup) setRewardPopup(null);
+        else if (currentLorePopup) dismissCurrentLorePopup();
         else if (activeNpc) setActiveNpc(null);
         else if (message) setMessage(null);
         else if (menuOpen) setMenuOpen(false);
@@ -469,7 +477,7 @@ export function OverworldScene() {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rewardPopup, activeNpc, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
+  }, [rewardPopup, currentLorePopup, activeNpc, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
   // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
@@ -597,6 +605,9 @@ export function OverworldScene() {
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {rewardPopup && (
         <RewardPopup title={rewardPopup.title} subtitle={rewardPopup.subtitle} lines={rewardPopup.lines} onClose={() => setRewardPopup(null)} />
+      )}
+      {!rewardPopup && currentLorePopup && (
+        <LorePopup title={currentLorePopup.title} body={currentLorePopup.body} onClose={dismissCurrentLorePopup} />
       )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}

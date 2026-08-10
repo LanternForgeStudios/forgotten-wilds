@@ -199,6 +199,9 @@ export interface ResolveCombatActionResponse {
     /** Specialty Attack ids learned this fight - from a quest (e.g. "defeat 3 mothlings") that
      *  completed as a side effect of this victory. [] when nothing was learned. */
     grantedSkillIds: string[];
+    /** Lore entry ids unlocked by the same side-effect quest completion. [] when nothing was
+     *  unlocked. See LorePopup.tsx / useLorePopupQueue.ts for how this surfaces to the player. */
+    grantedLoreIds: string[];
     leveledUp: boolean;
     restore: { stat: 'hp' | 'spirit' | 'lanternOil'; amount: number } | null;
     /** Region names whose Lantern Oil upgrade just unlocked - a boss gating one (see

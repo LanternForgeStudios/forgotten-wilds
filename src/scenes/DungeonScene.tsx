@@ -33,6 +33,8 @@ import { callCollectWorldItem, callOpenChest, callInteractWithShrine, type Quest
 import { resyncSave } from '@/state/hydrate';
 import { playMusic, playSound } from '@/audio/audioService';
 import { RewardPopup } from '@/components/RewardPopup';
+import { LorePopup } from '@/components/LorePopup';
+import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
 import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import styles from './TownScene.module.css';
 
@@ -183,8 +185,10 @@ export function DungeonScene() {
   const [journalOpen, setJournalOpen] = useState(false);
   // Shared reward-acknowledgment popup (see RewardPopup.tsx and OverworldScene.tsx's identical use).
   const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
+  const { currentLorePopup, queueLorePopups, dismissCurrentLorePopup } = useLorePopupQueue();
   function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
     if (!questRewards) return;
+    queueLorePopups(questRewards.grantedLoreIds);
     setRewardPopup({
       title: 'Quest Complete!',
       lines: buildRewardLines({
@@ -205,7 +209,7 @@ export function DungeonScene() {
   const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const otherOverlaysOpen = message !== null || menuOpen || journalOpen || rewardPopup !== null;
+  const otherOverlaysOpen = message !== null || menuOpen || journalOpen || rewardPopup !== null || currentLorePopup !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, facingDelta, attemptMove, movementState } = useLocationExploration({
@@ -244,6 +248,7 @@ export function DungeonScene() {
             setMessage(worldItem.alreadyMessage);
             return;
           }
+          queueLorePopups(res.questRewards?.grantedLoreIds);
           setRewardPopup({
             title: 'You found...',
             subtitle: worldItem.label,
@@ -304,6 +309,7 @@ export function DungeonScene() {
       if (isTypingTarget(e)) return;
       if (e.key === 'Escape') {
         if (rewardPopup) setRewardPopup(null);
+        else if (currentLorePopup) dismissCurrentLorePopup();
         else if (message) setMessage(null);
         else if (menuOpen) setMenuOpen(false);
         else if (journalOpen) setJournalOpen(false);
@@ -323,7 +329,7 @@ export function DungeonScene() {
     window.addEventListener('keydown', handleInteract);
     return () => window.removeEventListener('keydown', handleInteract);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rewardPopup, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
+  }, [rewardPopup, currentLorePopup, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
   // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
@@ -453,6 +459,9 @@ export function DungeonScene() {
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {rewardPopup && (
         <RewardPopup title={rewardPopup.title} subtitle={rewardPopup.subtitle} lines={rewardPopup.lines} onClose={() => setRewardPopup(null)} />
+      )}
+      {!rewardPopup && currentLorePopup && (
+        <LorePopup title={currentLorePopup.title} body={currentLorePopup.body} onClose={dismissCurrentLorePopup} />
       )}
       {menuOpen && <CharacterMenu onClose={() => setMenuOpen(false)} />}
       {journalOpen && <JournalOfLegends onClose={() => setJournalOpen(false)} />}
