@@ -59,6 +59,11 @@ const NPC_WALK_ASSET_IDS = new Set([
   // prairie-spirit (Sacred Hills, wanderRadius) - regenerated fresh (its original art didn't match
   // the other spirit NPCs' ethereal style), then a walk cycle built alongside the new idle art.
   'sprite.npc.prairie-spirit',
+  // forest-warden-rowan-hart (Cedarwatch, wanderRadius) - walk rows added to the existing PixelLab
+  // character, same pattern as sand-spirit/scout-niska/cedar-spirit above. This was the last
+  // roaming NPC still missing a real walk cycle - confirmed via a full audit of every wanderRadius
+  // object across all live maps (public/assets/maps/*.json) against this set.
+  'sprite.npc.forest-warden-rowan-hart',
 ]);
 /** Row layout for NPC_WALK_ASSET_IDS sheets: row 0 idle (breathing), rows 1-4 walking by facing -
  *  a fixed convention (not per-NPC configurable) since the build script that assembles these

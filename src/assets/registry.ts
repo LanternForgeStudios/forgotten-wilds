@@ -7529,13 +7529,13 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     id: 'sprite.npc.forest-warden-rowan-hart',
     category: 'character',
     intendedUse:
-      'Overworld sprite for forest-warden-rowan-hart. Wanders Cedarwatch (wanderRadius). - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
-    filePath: 'sprites/characters/forest-warden-rowan-hart-idle.png',
-    dimensions: { width: 288, height: 96 },
+      "Overworld sprite for forest-warden-rowan-hart - a wandering NPC (wanderRadius on its cedarwatch.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/forest-warden-rowan-hart-walk.png',
+    dimensions: { width: 288, height: 480 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      'Generated via the pixellab MCP server (create_character + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/forest-warden-rowan-hart/.',
+      "Walk rows added to the character's existing PixelLab record (animate_character walking-4-frames, all 4 cardinal directions) rather than a full regeneration - the original idle art was already correct, only the walk cycle was missing. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/forest-warden-rowan-hart/.",
   },
   {
     id: 'sprite.npc.cedar-spirit',
