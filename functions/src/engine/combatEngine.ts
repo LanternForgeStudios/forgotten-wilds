@@ -675,7 +675,9 @@ export function resolveRound(input: RoundInput): RoundResult {
         resolveOffensiveHits(
           skill.power,
           `${skill.name} hits`,
-          (i) => weaknessMultiplier(i, skill.damageType),
+          (i) =>
+            (skill.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1) *
+            weaknessMultiplier(i, skill.damageType),
           skill.damageType,
           skill.inflictsAilmentId ? { id: skill.inflictsAilmentId, chance: skill.inflictAilmentChance ?? 0 } : undefined,
         );

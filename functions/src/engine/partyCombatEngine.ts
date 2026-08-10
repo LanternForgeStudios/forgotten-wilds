@@ -249,7 +249,9 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
         resolveOffensiveHits(
           skill.power,
           `${skill.name} hits`,
-          (i) => weaknessMultiplier(enemyDefs[i], skill.damageType),
+          (i) =>
+            (skill.effectiveAgainstFamilies?.includes(enemyDefs[i].family) ? 1.5 : 1) *
+            weaknessMultiplier(enemyDefs[i], skill.damageType),
           skill.damageType,
           skill.inflictsAilmentId ? { id: skill.inflictsAilmentId, chance: skill.inflictAilmentChance ?? 0 } : undefined,
         );

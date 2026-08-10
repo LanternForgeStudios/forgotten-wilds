@@ -143,7 +143,7 @@ describe('resolvePartyPlayerTurn', () => {
   });
 
   it("a Skill's ailment roll lands on an enemy vulnerable to it (frost-lance -> Freeze on a coal-spirit)", () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.3 inflict chance
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.35 inflict chance
     const coalSpirit = ENEMIES['coal-spirit'];
     // Padded well above coalSpirit's real maxHp (30) - see combatEngine.test.ts's identical fixture
     // comment: frost-lance's weakness bonus against this family would otherwise one-shot it, and a
@@ -164,6 +164,20 @@ describe('resolvePartyPlayerTurn', () => {
       [mothling()],
     );
     expect(result.enemyAilments[0]).toEqual([]);
+  });
+
+  it("a Skill's effectiveAgainstFamilies grants the same 1.5x bonus lanternAbility already gets, in party/Endless Battle too", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5); // fixed variance, above marsh-toxin's 0.3 ailment chance
+    const highAttack = stats({ spirit: 30, attack: 200 });
+    const familyMatch = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'skill', skillId: 'marsh-toxin' }, stats: highAttack }),
+      [{ enemyId: 'marsh-crocodile', level: 1, hp: 1000, ailments: [] }],
+    );
+    const noFamilyMatch = resolvePartyPlayerTurn(
+      player('p1', { action: { type: 'skill', skillId: 'marsh-toxin' }, stats: highAttack }),
+      [{ enemyId: 'restless-miner', level: 1, hp: 1000, ailments: [] }],
+    );
+    expect(familyMatch.hits[0].damage).toBeGreaterThan(noFamilyMatch.hits[0].damage);
   });
 
   it("a weapon's attackAilment rolls on a plain Attack, gated by the target's vulnerability", () => {
@@ -369,7 +383,7 @@ describe('resolvePvpTurn', () => {
   });
 
   it("a Skill's ailment roll lands on the opponent (frost-lance -> Freeze) - PvP has no vulnerability gate", () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.3 inflict chance
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.35 inflict chance
     const result = resolvePvpTurn(
       player('p1', { action: { type: 'skill', skillId: 'frost-lance' }, stats: stats({ spirit: 30 }) }),
       opponent({ hp: 1000, maxHp: 1000 }),

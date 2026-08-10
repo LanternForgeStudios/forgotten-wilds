@@ -1651,7 +1651,7 @@ describe('resolveRound - enemy ailments', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it("a Skill's ailment roll lands on an enemy vulnerable to it (frost-lance -> Freeze on a coal-spirit)", () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.3 inflict chance
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // below frost-lance's 0.35 inflict chance
     const coalSpirit = ENEMIES['coal-spirit'];
     // Padded well above coalSpirit's real maxHp (30) - frost-lance's spirit damage plus its 1.5x
     // weakness bonus against this family would otherwise one-shot it, and a defeated enemy never
@@ -1667,6 +1667,31 @@ describe('resolveRound - enemy ailments', () => {
     });
     expect(result.enemyAilments[0]).toStrictEqual([{ ailmentId: 'freeze' }]);
     expect(result.log.some((l) => l.includes('afflicted with Freeze'))).toBe(true);
+  });
+
+  it("a Skill's effectiveAgainstFamilies grants the same 1.5x bonus lanternAbility already gets (marsh-toxin vs. its own family)", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5); // fixed variance, and above marsh-toxin's 0.3 ailment chance so it never lands
+    const highAttack = stats({ speed: 999, spirit: 30, attack: 200 });
+    // Both targets share marsh-toxin's 'spirit' damageType as their weaknessDamageType only for
+    // marsh-crocodile - use a physical-weak target for both, so weaknessMultiplier stays 1x on
+    // both sides and effectiveAgainstFamilies (['swampCrocs']) is the only variable.
+    const familyMatch = resolveRound({
+      action: { type: 'skill', skillId: 'marsh-toxin' },
+      playerStats: highAttack,
+      inventory: [],
+      playerAilments: [],
+      ailmentResistances: [],
+      enemies: [{ enemyId: 'marsh-crocodile', level: 1, hp: 1000, ailments: [] }],
+    });
+    const noFamilyMatch = resolveRound({
+      action: { type: 'skill', skillId: 'marsh-toxin' },
+      playerStats: highAttack,
+      inventory: [],
+      playerAilments: [],
+      ailmentResistances: [],
+      enemies: [{ enemyId: 'restless-miner', level: 1, hp: 1000, ailments: [] }],
+    });
+    expect(familyMatch.hits[0].damage).toBeGreaterThan(noFamilyMatch.hits[0].damage);
   });
 
   it("a Skill's ailment roll is a no-op against an enemy not listed in its vulnerableAilments (ember-burst's Burn on a mothling)", () => {

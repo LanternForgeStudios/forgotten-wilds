@@ -242,8 +242,8 @@ export const SKILLS: Record<string, Skill> = {
     name: 'Elderwood Ember',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 24,
+    spiritCost: 14,
     effectiveAgainstFamilies: ['silentEchoes'],
     inflictsAilmentId: 'burn',
     inflictAilmentChance: 0.3,
@@ -253,11 +253,11 @@ export const SKILLS: Record<string, Skill> = {
     name: "Silver River's Chill",
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
+    power: 23,
     spiritCost: 12,
     effectiveAgainstFamilies: ['silentEchoes'],
     inflictsAilmentId: 'freeze',
-    inflictAilmentChance: 0.3,
+    inflictAilmentChance: 0.35,
   },
 
   // --- Shattered Desert side quest ("The Desert Relics") player-usable Specialty Attacks ---
@@ -269,8 +269,8 @@ export const SKILLS: Record<string, Skill> = {
     name: 'Canyon Wildfire',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 26,
+    spiritCost: 15,
     effectiveAgainstFamilies: ['dustDevils'],
     inflictsAilmentId: 'burn',
     inflictAilmentChance: 0.3,
@@ -280,33 +280,35 @@ export const SKILLS: Record<string, Skill> = {
     name: "Desert Night's Chill",
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 25,
+    spiritCost: 13,
     effectiveAgainstFamilies: ['dustDevils'],
     inflictsAilmentId: 'freeze',
-    inflictAilmentChance: 0.3,
+    inflictAilmentChance: 0.35,
   },
   'aurora-flare': {
     id: 'aurora-flare',
     name: 'Aurora Flare',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 28,
+    spiritCost: 16,
     effectiveAgainstFamilies: ['frostWolves'],
     inflictsAilmentId: 'burn',
     inflictAilmentChance: 0.3,
   },
+  // Priciest and lowest-chance of all 12 - Stun is a guaranteed full turn-skip when it lands, the
+  // strongest single-turn effect in the whole set (see the rebalance note above frost-lance).
   'frostbite-shatter': {
     id: 'frostbite-shatter',
     name: 'Frostbite Shatter',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 24,
+    spiritCost: 17,
     effectiveAgainstFamilies: ['frostWolves'],
     inflictsAilmentId: 'stun',
-    inflictAilmentChance: 0.3,
+    inflictAilmentChance: 0.25,
   },
 
   // --- Whispering Pines (MSQ Volume IV, Chapter 8) enemy signature move ---
@@ -459,28 +461,42 @@ export const SKILLS: Record<string, Skill> = {
   // Themed around Freeze/Burn via name/description and (now that enemies can be afflicted) an
   // ailment matching that theme, which only lands on a vulnerable target (coalSpirits/
   // waterSpirits/briarSpirits are all vulnerable to their respective ailment here, see
-  // enemies.ts's vulnerableAilments). Note: effectiveAgainstFamilies below is set but NOT
-  // currently read for a 'skill' action by either combat engine (only a 'lanternAbility' reads
-  // it, see combatEngine.ts/partyCombatEngine.ts's effectiveAgainstFamilies handling) - these two
-  // Skills' weakness bonus is inert today. Leaving that gap alone here since wiring it up would
-  // be a real damage-balance change, not a doc-comment fix.
+  // enemies.ts's vulnerableAilments). effectiveAgainstFamilies is now wired into skill-action
+  // damage (see combatEngine.ts/partyCombatEngine.ts's resolveOffensiveHits bonusMultiplier),
+  // mirroring the identical lanternAbility handling - a real 1.5x bonus, not flavor text.
+  //
+  // 2026-08 rebalance: these 12 quest-taught specialties used to be flat clones of each other
+  // (power 20 / cost 12 / 0.3 chance regardless of which ailment they inflicted), which made them
+  // interchangeable reskins. Two axes now differentiate them:
+  //  - Region tier: unlocked in roughly Iron Mountains -> Crimson Bayou -> Endless Prairie ->
+  //    Whispering Pines -> Shattered Desert -> Frozen Frontier order (matching the side quests
+  //    that teach them), so later-region versions of the same ailment hit harder and cost more -
+  //    the same "later region = stronger" curve equipment/enemies already follow.
+  //  - Ailment value against an enemy specifically (not the player): enemies never use cure items
+  //    or the Lantern Ability, so an inflicted ailment persists until the fight ends (except
+  //    Stun's 1-turn auto-expire). That makes Freeze's disablesLanternAbility clause dead weight
+  //    against an enemy (lowest DoT of the three curable ailments, no real secondary effect) -
+  //    priced cheap and high-chance. Silence permanently locks out the enemy's own signature move
+  //    for the rest of the fight once landed, and Stun is a full guaranteed turn-skip - both
+  //    priced as premium, lower-chance specialties. Burn/Poison sit in between (persistent DoT,
+  //    Burn's attack-debuff on top).
   'frost-lance': {
     id: 'frost-lance',
     name: 'Frost Lance',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 18,
+    spiritCost: 10,
     effectiveAgainstFamilies: ['coalSpirits'],
     inflictsAilmentId: 'freeze',
-    inflictAilmentChance: 0.3,
+    inflictAilmentChance: 0.35,
   },
   'ember-burst': {
     id: 'ember-burst',
     name: 'Ember Burst',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
+    power: 19,
     spiritCost: 12,
     effectiveAgainstFamilies: ['waterSpirits', 'briarSpirits'],
     inflictsAilmentId: 'burn',
@@ -489,16 +505,17 @@ export const SKILLS: Record<string, Skill> = {
 
   // Quest-taught Specialty Attacks, Crimson Bayou's own side quest (docs/Mytherra-SQ_breakdown.md,
   // "The Drowned Ledgers"). Same shape/convention as frost-lance/ember-burst above - ailments
-  // chosen to actually land on a real Bayou enemy family's vulnerableAilments (see enemies.ts),
-  // not just flavor-matched like effectiveAgainstFamilies (still inert for a 'skill' action, same
-  // gap noted above).
+  // chosen to actually land on a real Bayou enemy family's vulnerableAilments (see enemies.ts).
+  // Hush of the Reeds is priced as this pair's premium pick: Silence permanently locks the target
+  // enemy's signature move out for the rest of the fight (enemies never cure), the single
+  // strongest sustained effect among all 12 of these specialties.
   'marsh-toxin': {
     id: 'marsh-toxin',
     name: 'Marsh Toxin',
     kind: 'spiritArt',
     damageType: 'spirit',
     power: 20,
-    spiritCost: 12,
+    spiritCost: 13,
     effectiveAgainstFamilies: ['swampCrocs'],
     inflictsAilmentId: 'poison',
     inflictAilmentChance: 0.3,
@@ -508,11 +525,11 @@ export const SKILLS: Record<string, Skill> = {
     name: 'Hush of the Reeds',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 18,
+    spiritCost: 15,
     effectiveAgainstFamilies: ['rougarou'],
     inflictsAilmentId: 'silence',
-    inflictAilmentChance: 0.3,
+    inflictAilmentChance: 0.25,
   },
 
   // Quest-taught Specialty Attacks, Endless Prairie's own side quest (docs/Mytherra-SQ_breakdown.md,
@@ -522,19 +539,19 @@ export const SKILLS: Record<string, Skill> = {
     name: "Winter's Memory",
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 21,
+    spiritCost: 11,
     effectiveAgainstFamilies: ['windSpirits'],
     inflictsAilmentId: 'freeze',
-    inflictAilmentChance: 0.3,
+    inflictAilmentChance: 0.35,
   },
   'prairie-wildfire': {
     id: 'prairie-wildfire',
     name: 'Prairie Wildfire',
     kind: 'spiritArt',
     damageType: 'spirit',
-    power: 20,
-    spiritCost: 12,
+    power: 22,
+    spiritCost: 13,
     effectiveAgainstFamilies: ['prairieWolves'],
     inflictsAilmentId: 'burn',
     inflictAilmentChance: 0.3,
