@@ -7369,12 +7369,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.prairie-spirit',
     category: 'character',
-    intendedUse: "Overworld sprite for prairie-spirit - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT's shape)",
-    filePath: 'sprites/characters/prairie-spirit-idle.png',
-    dimensions: { width: 288, height: 96 },
+    intendedUse:
+      "Overworld sprite for prairie-spirit - a wandering NPC (wanderRadius on its sacred-hills.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/prairie-spirit-walk.png',
+    dimensions: { width: 288, height: 480 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated via the pixellab MCP server (create_character + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/prairie-spirit/.',
+    notes:
+      "Regenerated - the original character (a golden spiky-armored figure) didn't match the ethereal, robed look of the other spirit NPCs (winter-spirit, sand-spirit, cedar-spirit). Three fresh create_character attempts with increasingly explicit ethereal/non-human prompt language all still rendered as a plain clothed human woman (matching this session's own dust-devil precedent - some character concepts are model-seed-stubborn regardless of prompt wording). Shipped instead as an HLS hue-shift recolor of winter-spirit-walk.png (cool blue-white -> warm golden-tan, matching sand-spirit/cedar-spirit's own warm palettes), preserving winter-spirit's already-correct ethereal robed silhouette and lightness/shading exactly. Originals archived at public/assets/sprites/characters/original/prairie-spirit/ (the old, unused generation).",
   },
   // The 4 Highwind Crossing shop NPCs (innkeeper/storekeeper/blacksmith/armorer) have no
   // PixelLab character generated at all yet - out of generation quota this cycle (see
@@ -7458,7 +7460,8 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     filePath: 'portraits/prairie-spirit.png',
     dimensions: { width: 512, height: 512 },
     status: 'final',
-    notes: 'Generated via pixellab MCP create_image_pixflux (400x400, painted background), resized via scripts/resize_portraits.py. Original archived at public/assets/portraits/original/.',
+    notes:
+      "Regenerated - the original portrait rendered as a plain human woman, not matching the other spirit NPCs' ethereal look (same issue as the sprite - see sprite.npc.prairie-spirit's notes). Shipped as an HLS hue-shift recolor of winter-spirit's own portrait (cool blue-white -> warm golden-tan), preserving its aura/glow-mote painting and lightness/shading exactly. Original (unused) archived at public/assets/portraits/original/.",
   },
   {
     id: 'portrait.innkeeper-hattie',

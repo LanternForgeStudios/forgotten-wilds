@@ -56,6 +56,9 @@ const NPC_WALK_ASSET_IDS = new Set([
   'sprite.npc.sand-spirit',
   'sprite.npc.scout-niska',
   'sprite.npc.cedar-spirit',
+  // prairie-spirit (Sacred Hills, wanderRadius) - regenerated fresh (its original art didn't match
+  // the other spirit NPCs' ethereal style), then a walk cycle built alongside the new idle art.
+  'sprite.npc.prairie-spirit',
 ]);
 /** Row layout for NPC_WALK_ASSET_IDS sheets: row 0 idle (breathing), rows 1-4 walking by facing -
  *  a fixed convention (not per-NPC configurable) since the build script that assembles these
