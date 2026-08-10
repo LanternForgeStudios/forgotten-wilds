@@ -1062,6 +1062,36 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'crampon-glacier-boots', price: 74, currency: 'gold' },
   { itemId: 'worn-fur-gloves', price: 30, currency: 'gold' },
   { itemId: 'lined-fur-gloves', price: 64, currency: 'gold' },
+  // 2026-08 shop-unlock coverage pass - see functions/src/data/items.ts's identical block for
+  // the full rationale.
+  { itemId: 'windriders-spear', price: 349, currency: 'gold' },
+  { itemId: 'ancient-cedar-staff', price: 362, currency: 'gold' },
+  { itemId: 'solaris-blade', price: 375, currency: 'gold' },
+  { itemId: 'glacier-forged-pike', price: 562, currency: 'gold' },
+  { itemId: 'warden-bayou-vestments', price: 143, currency: 'gold' },
+  { itemId: 'warden-bayou-leg-wraps', price: 128, currency: 'gold' },
+  { itemId: 'mosswalker-boots', price: 132, currency: 'gold' },
+  { itemId: 'warden-mire-gloves', price: 114, currency: 'gold' },
+  { itemId: 'chieftains-buffalo-hide', price: 150, currency: 'gold' },
+  { itemId: 'windborn-riders-chaps', price: 132, currency: 'gold' },
+  { itemId: 'windrunner-boots', price: 136, currency: 'gold' },
+  { itemId: 'warden-rider-gloves', price: 119, currency: 'gold' },
+  { itemId: 'skywalkers-charm', price: 114, currency: 'gold' },
+  { itemId: 'elderwood-bark-armor', price: 158, currency: 'gold' },
+  { itemId: 'deep-root-leggings', price: 141, currency: 'gold' },
+  { itemId: 'ancient-root-boots', price: 145, currency: 'gold' },
+  { itemId: 'warden-vine-gloves', price: 128, currency: 'gold' },
+  { itemId: 'elders-cedar-charm', price: 123, currency: 'gold' },
+  { itemId: 'starwoven-nomad-robes', price: 167, currency: 'gold' },
+  { itemId: 'starwoven-nomad-leggings', price: 150, currency: 'gold' },
+  { itemId: 'sunrunner-boots', price: 154, currency: 'gold' },
+  { itemId: 'rangers-dune-wraps', price: 132, currency: 'gold' },
+  { itemId: 'astral-star-charm', price: 132, currency: 'gold' },
+  { itemId: 'auroraweave-coat', price: 176, currency: 'gold' },
+  { itemId: 'auroraweave-leggings', price: 158, currency: 'gold' },
+  { itemId: 'frostwardens-boots', price: 163, currency: 'gold' },
+  { itemId: 'frostwardens-gloves', price: 141, currency: 'gold' },
+  { itemId: 'radiant-aurora-charm', price: 141, currency: 'gold' },
 ];
 
 // Display-only grouping of SHOP_LISTINGS by which NPC/building sells it - purchaseItem.ts itself
@@ -1224,6 +1254,48 @@ export const SHOP_UNLOCK_TIERS: Record<string, { questId: string; itemIds: strin
     {
       questId: 'the-waters-remember',
       itemIds: ['serpent-fang-sword', 'rougarou-claw-axe', 'serpent-guard-spear', 'rougarou-warclub'],
+    },
+  ],
+  'delphine-armory': [
+    {
+      questId: 'the-waters-remember',
+      itemIds: ['warden-bayou-vestments', 'warden-bayou-leg-wraps', 'mosswalker-boots', 'warden-mire-gloves'],
+    },
+  ],
+  'garrett-forge': [
+    { questId: 'the-great-thunderbird', itemIds: ['windriders-spear', 'skywalkers-charm'] },
+  ],
+  'ruth-armory': [
+    {
+      questId: 'the-great-thunderbird',
+      itemIds: ['chieftains-buffalo-hide', 'windborn-riders-chaps', 'windrunner-boots', 'warden-rider-gloves'],
+    },
+  ],
+  'dara-forge': [
+    { questId: 'the-cedar-giant', itemIds: ['ancient-cedar-staff', 'elders-cedar-charm'] },
+  ],
+  'fenn-armory': [
+    {
+      questId: 'the-cedar-giant',
+      itemIds: ['elderwood-bark-armor', 'deep-root-leggings', 'ancient-root-boots', 'warden-vine-gloves'],
+    },
+  ],
+  'esteban-forge': [
+    { questId: 'the-canyon-giant', itemIds: ['solaris-blade', 'astral-star-charm'] },
+  ],
+  'carmen-armory': [
+    {
+      questId: 'the-canyon-giant',
+      itemIds: ['starwoven-nomad-robes', 'starwoven-nomad-leggings', 'sunrunner-boots', 'rangers-dune-wraps'],
+    },
+  ],
+  'sigrid-forge': [
+    { questId: 'the-winter-stag', itemIds: ['glacier-forged-pike', 'radiant-aurora-charm'] },
+  ],
+  'magnus-armory': [
+    {
+      questId: 'the-winter-stag',
+      itemIds: ['auroraweave-coat', 'auroraweave-leggings', 'frostwardens-boots', 'frostwardens-gloves'],
     },
   ],
 };

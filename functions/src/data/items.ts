@@ -454,6 +454,39 @@ export const SHOP_PRICES: Record<string, number> = {
   'crampon-glacier-boots': 74,
   'worn-fur-gloves': 30,
   'lined-fur-gloves': 64,
+  // 2026-08 shop-unlock coverage pass: Rare-tier prices for the armor/charm items newly unlocked
+  // via SHOP_UNLOCK_TIERS below (Rare weapon prices for this same pass already exist above, set
+  // by the weapon power-curve rescale). Priced at roughly 2.2x that region's own Uncommon-tier
+  // price for the same slot, matching witch-warded-charm's own existing ~2.9x Uncommon-to-Rare
+  // jump and Iron Mountains' veteran-keeper-coat/-trousers precedent.
+  'windriders-spear': 349,
+  'ancient-cedar-staff': 362,
+  'solaris-blade': 375,
+  'glacier-forged-pike': 562,
+  'warden-bayou-vestments': 143,
+  'warden-bayou-leg-wraps': 128,
+  'mosswalker-boots': 132,
+  'warden-mire-gloves': 114,
+  'chieftains-buffalo-hide': 150,
+  'windborn-riders-chaps': 132,
+  'windrunner-boots': 136,
+  'warden-rider-gloves': 119,
+  'skywalkers-charm': 114,
+  'elderwood-bark-armor': 158,
+  'deep-root-leggings': 141,
+  'ancient-root-boots': 145,
+  'warden-vine-gloves': 128,
+  'elders-cedar-charm': 123,
+  'starwoven-nomad-robes': 167,
+  'starwoven-nomad-leggings': 150,
+  'sunrunner-boots': 154,
+  'rangers-dune-wraps': 132,
+  'astral-star-charm': 132,
+  'auroraweave-coat': 176,
+  'auroraweave-leggings': 158,
+  'frostwardens-boots': 163,
+  'frostwardens-gloves': 141,
+  'radiant-aurora-charm': 141,
 };
 
 /** Additional items a shop unlocks once a specific quest completes, layered ON TOP of its
@@ -487,6 +520,57 @@ export const SHOP_UNLOCK_TIERS: Record<string, { questId: string; itemIds: strin
     {
       questId: 'the-waters-remember',
       itemIds: ['serpent-fang-sword', 'rougarou-claw-axe', 'serpent-guard-spear', 'rougarou-warclub'],
+    },
+  ],
+  // 2026-08 shop-unlock coverage pass: every region from here on already has its own Rare tier
+  // fully covered by that region's field-map chests (unlike Iron Mountains/Crimson Bayou, which
+  // both have more weapon-type families than their chest count can hold, hence their own
+  // unlock tiers above existing specifically to cover the "leftover" items chests never granted).
+  // These new tiers are a deliberate, guaranteed-purchase backup to chest RNG, not a gap-fill -
+  // gated behind each region's own boss-defeat quest (the same quest that already guarantees that
+  // region's Legendary totem), so "prove yourself against the region's guardian" unlocks buying
+  // its full Rare catalog outright. Forge shops (weapon+charm) and armory shops (chest/legs/
+  // boots/gloves) split the same way Iron Mountains/Crimson Bayou's own shops do.
+  'delphine-armory': [
+    {
+      questId: 'the-waters-remember',
+      itemIds: ['warden-bayou-vestments', 'warden-bayou-leg-wraps', 'mosswalker-boots', 'warden-mire-gloves'],
+    },
+  ],
+  'garrett-forge': [
+    { questId: 'the-great-thunderbird', itemIds: ['windriders-spear', 'skywalkers-charm'] },
+  ],
+  'ruth-armory': [
+    {
+      questId: 'the-great-thunderbird',
+      itemIds: ['chieftains-buffalo-hide', 'windborn-riders-chaps', 'windrunner-boots', 'warden-rider-gloves'],
+    },
+  ],
+  'dara-forge': [
+    { questId: 'the-cedar-giant', itemIds: ['ancient-cedar-staff', 'elders-cedar-charm'] },
+  ],
+  'fenn-armory': [
+    {
+      questId: 'the-cedar-giant',
+      itemIds: ['elderwood-bark-armor', 'deep-root-leggings', 'ancient-root-boots', 'warden-vine-gloves'],
+    },
+  ],
+  'esteban-forge': [
+    { questId: 'the-canyon-giant', itemIds: ['solaris-blade', 'astral-star-charm'] },
+  ],
+  'carmen-armory': [
+    {
+      questId: 'the-canyon-giant',
+      itemIds: ['starwoven-nomad-robes', 'starwoven-nomad-leggings', 'sunrunner-boots', 'rangers-dune-wraps'],
+    },
+  ],
+  'sigrid-forge': [
+    { questId: 'the-winter-stag', itemIds: ['glacier-forged-pike', 'radiant-aurora-charm'] },
+  ],
+  'magnus-armory': [
+    {
+      questId: 'the-winter-stag',
+      itemIds: ['auroraweave-coat', 'auroraweave-leggings', 'frostwardens-boots', 'frostwardens-gloves'],
     },
   ],
 };
