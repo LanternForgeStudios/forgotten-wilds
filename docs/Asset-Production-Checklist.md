@@ -826,10 +826,19 @@ anachronistic, matching this project's established "close enough after a retry" 
 
 ## Shattered Desert, Chapter 9: Beneath Forgotten Stars - outstanding placeholders
 
-**Status (2026-08-09): all 30 icons + all 8 NPC portraits done, real PixelLab art.** NPC overworld
-sprites in progress (`create_character` size=128 + `animate_character` breathing-idle, south only,
-per the Whispering Pines sizing lesson - see that region's status note). Enemy sprites not yet
-started. All 6 of Chapter 9's field/town maps reuse `tileset.overworld-terrain`/`overworld-decor2`/
+**Status (2026-08-09): all 30 icons + all 8 NPC portraits + all 8 NPC overworld sprites done, real
+PixelLab art** (`create_character` size=128 + `animate_character` breathing-idle, south only, per
+the Whispering Pines sizing lesson). desert-ranger-tomas-vega (the one roaming NPC, wanderRadius on
+red-mesa.json) additionally got real walk-cycle frames (`walking-4-frames` x4 directions) and was
+added to `NPC_WALK_ASSET_IDS` - built idle+walk together from the start, unlike marsh-spirit/
+sabine-thorne/cedar-spirit/scout-niska/forest-warden-rowan-hart/prairie-spirit, which all shipped
+idle-only and still need the same follow-up fix (flagged, not yet done - see those NPCs' own
+registry notes). Sunblade family (all 3 tiers, both genders) equipment-layer art shipped for free
+via `scripts/palette_swap_equipment_layer.py` off the existing weathered-iron-sword founder - the
+other 5 Shattered Desert equipment families have no matching founder silhouette and still need real
+hand-positioned layer art (a distinct, not-yet-started phase from icons). 5 enemy sprites (Dust
+Devil, Sandstorm Devil, Celestial Wisp, Star Phantom, Canyon Giant boss) in progress. All 6 of
+Chapter 9's field/town maps reuse `tileset.overworld-terrain`/`overworld-decor2`/
 `overworld-water` and `tileset.town-terrain` (not `tileset.cliff`/`tileset.beach`, both already
 flagged "provenance unconfirmed" elsewhere in this file, not safe to wire into real content) - not
 tracked as a placeholder gap the way character art is, the tiles are real, just generic and not
