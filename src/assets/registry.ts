@@ -7212,11 +7212,13 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'battle.enemy.canyon-giant',
     category: 'enemy',
-    intendedUse: 'Battle sprite for canyon-giant (boss, MSF-SD-007) - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/canyon-giant-idle.svg',
-    dimensions: { width: 256, height: 256 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for canyon-giant (boss, MSF-SD-007) - also reused as its overworld map marker icon - front-facing "fight stance" idle animation (single row x 8 frames of 256x256)',
+    filePath: 'sprites/enemies/canyon-giant-idle.png',
+    dimensions: { width: 2048, height: 256 },
+    frameSize: { width: 256, height: 256 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated (create_character, humanoid, size 128, high detail + animate_character\'s fight-stance-idle-8-frames template, south direction only - larger source size than the regular/elite enemies, matching great-thunderbird/cedar-giant\'s own boss-tier precedent). Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/canyon-giant/.',
   },
   {
     id: 'battle.enemy.frost-wolf',
