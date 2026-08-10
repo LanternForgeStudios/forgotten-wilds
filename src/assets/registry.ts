@@ -8244,11 +8244,13 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'battle.enemy.winter-stag',
     category: 'enemy',
-    intendedUse: 'Battle sprite for winter-stag (boss, MSF-FF-006) - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/winter-stag-idle.svg',
-    dimensions: { width: 256, height: 256 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for winter-stag (boss, MSF-FF-006)',
+    filePath: 'sprites/enemies/winter-stag-idle.png',
+    dimensions: { width: 2816, height: 256 },
+    frameSize: { width: 256, height: 256 },
+    status: 'final',
+    notes:
+      "pixellab MCP-generated (create_character, quadruped body_type with template='horse' as the closest available proxy for a stag's antlers/deer-shape - matching great-thunderbird's own precedent of using a cat template as a bird proxy - size 128, high detail + animate_character's idle-shaking-head template, south direction only - a full head-turn cycle, 11 frames, larger source size than the regular/elite enemies matching the boss-tier precedent). First attempt used rest-idle, which produced a lying-down pose wrong for a battle stance - retried with idle-shaking-head for a standing pose. Crop box computed automatically via scripts/build_bayou_enemy_idle_sheet.py. Original export archived at public/assets/sprites/enemies/original/winter-stag/.",
   },
   {
     id: 'battle.enemy.great-thunderbird',
