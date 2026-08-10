@@ -880,7 +880,7 @@ describe('resolveRound', () => {
     );
   });
 
-  describe('naively single-targeting a 3-enemy group stays winnable, with real risk', () => {
+  describe('naively single-targeting a 3-enemy group, under the 2026-08 CROWD_DAMAGE_FACTOR experiment', () => {
     // Real (non-999-speed) player stats built the same way applyLevelUp would - deliberately not
     // forcing speed:999, since real turn order (enemies are consistently a bit faster than the
     // player at every checkpoint) is exactly what makes a group fight dangerous and must be
@@ -892,14 +892,34 @@ describe('resolveRound', () => {
     // Simulates the whole fight by looping resolveRound, single-targeting whichever enemy is
     // still alive first (the default/simplest play pattern), until a terminal phase.
     //
-    // ENEMY_STAT_GROWTH_PER_LEVEL.maxHp was lowered (playtest-driven pacing pass, see git history)
-    // specifically to cut down how many rounds a non-boss fight takes - low enough that even a
-    // naive single-target strategy against a 3-enemy pack is winnable again, despite
-    // CROWD_DAMAGE_FACTOR remaining at its harder-tuned value from the earlier balance pass: fewer
-    // total rounds means less cumulative damage absorbed, more than offsetting the higher
-    // per-hit rate. What this test guards against is a *stomp* in either direction - real,
-    // multi-round attrition and a real dent taken, not an instant win or an instant loss.
-    it.each([10, 25, 50, 75, 100])('player level %i vs a real 3-mothling group is winnable, with real risk', (playerLevel) => {
+    // Historical note: this suite used to guard "naively single-targeting a 3-enemy group stays
+    // winnable, with real risk" as an invariant (remainingFraction always 15-60%, every level).
+    // CROWD_DAMAGE_FACTOR was deliberately raised at the user's request (2026-08, "so we can see
+    // how that feels": 2:0.3->0.75, 3:0.25->0.6, 4:0.2->0.5, 5:0.15->0.4, 6:0.1->0.3) to make
+    // multi-enemy fights meaningfully harder - this is a genuinely-requested playtest experiment,
+    // not a regression. Under the new curve, naive single-targeting a 3-mothling pack now loses
+    // outright at low levels (10, 25) and only barely survives at higher levels (as low as 0.3%
+    // HP remaining at level 75) - flag this to the user if the intent was "harder" rather than
+    // "sometimes unwinnable with the simplest play pattern," since that's a much larger swing than
+    // the raw factor numbers might suggest.
+    it('player level 10 vs a real 3-mothling group now loses outright', () => {
+      const { phase } = simulateNaive3MothlingFight(10);
+      expect(phase).toBe('defeat');
+    });
+    it('player level 25 vs a real 3-mothling group now loses outright', () => {
+      const { phase } = simulateNaive3MothlingFight(25);
+      expect(phase).toBe('defeat');
+    });
+    it.each([50, 75, 100])('player level %i vs a real 3-mothling group survives, but with thin margins', (playerLevel) => {
+      const { phase, remainingFraction } = simulateNaive3MothlingFight(playerLevel);
+      expect(phase).toBe('victory');
+      // No longer a "genuine risk corridor" (15-60%) - the new curve can leave as little as ~0.3%
+      // HP remaining. This floor only guards against an outright negative/zero-HP miscalculation.
+      expect(remainingFraction).toBeGreaterThan(0);
+      expect(remainingFraction).toBeLessThan(0.6);
+    });
+
+    function simulateNaive3MothlingFight(playerLevel: number): { phase: string; rounds: number; remainingFraction: number } {
       vi.spyOn(Math, 'random').mockReturnValue(0.5);
       const playerMaxHp = 60 + 8 * (playerLevel - 1);
       let playerHp = playerMaxHp;
@@ -934,15 +954,8 @@ describe('resolveRound', () => {
         rounds++;
       }
       vi.restoreAllMocks();
-
-      expect(phase).toBe('victory');
-      // Genuine risk, not a stomp: at every checkpoint this takes 9-15 rounds (verified by hand)
-      // and leaves the player at roughly a third to half HP, not untouched and not nearly dead.
-      expect(rounds).toBeGreaterThanOrEqual(8);
-      const remainingFraction = playerHp / playerMaxHp;
-      expect(remainingFraction).toBeGreaterThan(0.15);
-      expect(remainingFraction).toBeLessThan(0.6);
-    });
+      return { phase, rounds, remainingFraction: playerHp / playerMaxHp };
+    }
   });
 });
 

@@ -616,7 +616,7 @@ const ENEMY_MISS_CHANCE = 0.1;
  *  inventing a second axis) for this reason - real balance tuning happens once Endless Battle
  *  actually gets played, not by guessing a party-size formula with nothing to verify it against
  *  yet. */
-const CROWD_DAMAGE_FACTOR: Record<number, number> = { 1: 1, 2: 0.3, 3: 0.25, 4: 0.2, 5: 0.15, 6: 0.1 };
+const CROWD_DAMAGE_FACTOR: Record<number, number> = { 1: 1, 2: 0.75, 3: 0.6, 4: 0.5, 5: 0.4, 6: 0.3 };
 
 /** Resolves every alive enemy's attack once, called after every party member has had their turn
  *  this round (see this file's own top comment) - each enemy independently picks a random alive

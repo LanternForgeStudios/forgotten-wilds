@@ -348,7 +348,7 @@ const ENEMY_MISS_CHANCE = 0.1;
  *  first enemy, at every player level). A boss's own attack is never dampened (see enemyAttack) -
  *  only its "adds" are, and only by how many adds are alive, so a boss fought alone or with 0-1
  *  adds is completely unaffected by this table. */
-const CROWD_DAMAGE_FACTOR: Record<number, number> = { 1: 1, 2: 0.3, 3: 0.25, 4: 0.2, 5: 0.15, 6: 0.1 };
+const CROWD_DAMAGE_FACTOR: Record<number, number> = { 1: 1, 2: 0.75, 3: 0.6, 4: 0.5, 5: 0.4, 6: 0.3 };
 
 export function resolveRound(input: RoundInput): RoundResult {
   const { action } = input;
