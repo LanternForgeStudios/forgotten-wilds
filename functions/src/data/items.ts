@@ -354,23 +354,26 @@ export const SHOP_PRICES: Record<string, number> = {
   // Charm families, Common+Uncommon tiers (Rare comes from the region's own chests/boss instead,
   // same "shops stock the lower tiers" rule as Iron Mountains). Split the same Blacksmith/Armory
   // way: weapon/charm to Toussaint, chest/legs/boots/gloves to Delphine.
-  'weathered-cypress-cane': 32,
-  'bound-cypress-cane': 65,
+  // 2026-08 weapon power-curve pass: prices scale by the same per-step multipliers as
+  // equipment.ts's stat rescale (see its own top-of-file note) - anchored off Iron Mountains'
+  // own Rare-tier prices above.
+  'weathered-cypress-cane': 105,
+  'bound-cypress-cane': 161,
   // Crimson Bayou's own 4 new weapon-type families - Common/Uncommon priced with the rest of the
   // base catalog, matching cypress-cane's own pricing scale; Rare tiers priced (and gated) with
   // witch-warded-charm below.
-  'weathered-bog-cutlass': 32,
-  'weathered-bog-axe': 30,
-  'weathered-reed-spear': 29,
-  'weathered-bog-maul': 29,
-  'bound-bog-cutlass': 68,
-  'bound-bog-axe': 65,
-  'bound-reed-spear': 64,
-  'bound-bog-maul': 64,
-  'serpent-fang-sword': 145,
-  'rougarou-claw-axe': 140,
-  'serpent-guard-spear': 135,
-  'rougarou-warclub': 145,
+  'weathered-bog-cutlass': 108,
+  'weathered-bog-axe': 105,
+  'weathered-reed-spear': 101,
+  'weathered-bog-maul': 108,
+  'bound-bog-cutlass': 167,
+  'bound-bog-axe': 161,
+  'bound-reed-spear': 155,
+  'bound-bog-maul': 167,
+  'serpent-fang-sword': 233,
+  'rougarou-claw-axe': 225,
+  'serpent-guard-spear': 217,
+  'rougarou-warclub': 233,
   'marsh-reed-charm': 22,
   'swamp-talisman': 50,
   'tattered-bayou-vestments': 32,
@@ -389,8 +392,10 @@ export const SHOP_PRICES: Record<string, number> = {
   // Common+Uncommon only (Rare tier of every family is chest-found - see openChest.ts's Chapter 5
   // CHESTS entries). Priced a step above Bayou's own scale, same modest region-to-region increase
   // seen from Iron Mountains to Bayou above.
-  'weathered-prairie-spear': 30,
-  'bound-prairie-spear': 66,
+  // Prairie Spear priced per the 2026-08 weapon power-curve pass (anchored off Crimson Bayou's
+  // own reed-spear Rare) - no longer a modest step above Bayou's flat scale.
+  'weathered-prairie-spear': 162,
+  'bound-prairie-spear': 250,
   'feather-sky-charm': 24,
   'woven-sky-charm': 52,
   'worn-buffalo-hide': 34,
@@ -403,8 +408,10 @@ export const SHOP_PRICES: Record<string, number> = {
   'reinforced-rider-gloves': 54,
   // Whispering Pines (MSQ Volume IV, Chapter 7) - Common+Uncommon shop stock only, matching the
   // established "Rare tier is chest-found" split.
-  'weathered-cedar-staff': 32,
-  'bound-cedar-staff': 70,
+  // Cedar Staff priced per the 2026-08 weapon power-curve pass (anchored off Crimson Bayou's own
+  // cypress-cane Rare).
+  'weathered-cedar-staff': 168,
+  'bound-cedar-staff': 259,
   'carved-cedar-charm': 26,
   'woven-cedar-charm': 56,
   'worn-bark-armor': 36,
@@ -417,8 +424,10 @@ export const SHOP_PRICES: Record<string, number> = {
   'woven-vine-gloves': 58,
   // Shattered Desert (MSQ Volume V, Chapter 9) - Common+Uncommon shop stock only, matching the
   // established "Rare tier is chest-found" split.
-  'weathered-sunblade': 34,
-  'bound-sunblade': 74,
+  // Sunblade priced per the 2026-08 weapon power-curve pass (anchored off Crimson Bayou's own
+  // bog-cutlass Rare).
+  'weathered-sunblade': 174,
+  'bound-sunblade': 268,
   'sunworn-star-charm': 28,
   'banded-star-charm': 60,
   'worn-nomad-robes': 38,
@@ -431,8 +440,10 @@ export const SHOP_PRICES: Record<string, number> = {
   'woven-dune-wraps': 60,
   // Frozen Frontier (MSQ Volume VI, Chapter 11) - Common+Uncommon shop stock only, matching the
   // established "Rare tier is chest-found" split.
-  'worn-frost-pike': 38,
-  'bound-frost-pike': 80,
+  // Frost Pike priced per the 2026-08 weapon power-curve pass (anchored off Endless Prairie's own
+  // windriders-spear Rare - the most recent prior Spear-type appearance).
+  'worn-frost-pike': 261,
+  'bound-frost-pike': 401,
   'faded-aurora-charm': 30,
   'banded-aurora-charm': 64,
   'worn-winter-coat': 40,

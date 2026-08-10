@@ -1,4 +1,4 @@
-import type { Item, ShopListing } from '@/types';
+﻿import type { Item, ShopListing } from '@/types';
 
 // Display copy only — functions/src/data/items.ts is the authoritative source used server-side.
 export const ITEMS: Item[] = [
@@ -983,22 +983,22 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'ghostbreaker-warhammer', price: 145, currency: 'gold' },
   // Crimson Bayou - Cypress Cane/Bayou Vestments/Bayou Leg-Wraps/Marsh Boots/Mire Gloves/Bayou
   // Charm families, Common+Uncommon tiers.
-  { itemId: 'weathered-cypress-cane', price: 32, currency: 'gold' },
-  { itemId: 'bound-cypress-cane', price: 65, currency: 'gold' },
+  { itemId: 'weathered-cypress-cane', price: 105, currency: 'gold' },
+  { itemId: 'bound-cypress-cane', price: 161, currency: 'gold' },
   // Crimson Bayou's own 4 new weapon-type families - Common/Uncommon priced with the base
   // catalog, Rare priced (and gated) with witch-warded-charm below.
-  { itemId: 'weathered-bog-cutlass', price: 32, currency: 'gold' },
-  { itemId: 'weathered-bog-axe', price: 30, currency: 'gold' },
-  { itemId: 'weathered-reed-spear', price: 29, currency: 'gold' },
-  { itemId: 'weathered-bog-maul', price: 29, currency: 'gold' },
-  { itemId: 'bound-bog-cutlass', price: 68, currency: 'gold' },
-  { itemId: 'bound-bog-axe', price: 65, currency: 'gold' },
-  { itemId: 'bound-reed-spear', price: 64, currency: 'gold' },
-  { itemId: 'bound-bog-maul', price: 64, currency: 'gold' },
-  { itemId: 'serpent-fang-sword', price: 145, currency: 'gold' },
-  { itemId: 'rougarou-claw-axe', price: 140, currency: 'gold' },
-  { itemId: 'serpent-guard-spear', price: 135, currency: 'gold' },
-  { itemId: 'rougarou-warclub', price: 145, currency: 'gold' },
+  { itemId: 'weathered-bog-cutlass', price: 108, currency: 'gold' },
+  { itemId: 'weathered-bog-axe', price: 105, currency: 'gold' },
+  { itemId: 'weathered-reed-spear', price: 101, currency: 'gold' },
+  { itemId: 'weathered-bog-maul', price: 108, currency: 'gold' },
+  { itemId: 'bound-bog-cutlass', price: 167, currency: 'gold' },
+  { itemId: 'bound-bog-axe', price: 161, currency: 'gold' },
+  { itemId: 'bound-reed-spear', price: 155, currency: 'gold' },
+  { itemId: 'bound-bog-maul', price: 167, currency: 'gold' },
+  { itemId: 'serpent-fang-sword', price: 233, currency: 'gold' },
+  { itemId: 'rougarou-claw-axe', price: 225, currency: 'gold' },
+  { itemId: 'serpent-guard-spear', price: 217, currency: 'gold' },
+  { itemId: 'rougarou-warclub', price: 233, currency: 'gold' },
   { itemId: 'marsh-reed-charm', price: 22, currency: 'gold' },
   { itemId: 'swamp-talisman', price: 50, currency: 'gold' },
   { itemId: 'tattered-bayou-vestments', price: 32, currency: 'gold' },
@@ -1011,8 +1011,8 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'reinforced-mire-gloves', price: 52, currency: 'gold' },
   { itemId: 'witch-warded-charm', price: 145, currency: 'gold' },
   // Endless Prairie - Common+Uncommon only, matching functions/src/data/items.ts's SHOP_PRICES.
-  { itemId: 'weathered-prairie-spear', price: 30, currency: 'gold' },
-  { itemId: 'bound-prairie-spear', price: 66, currency: 'gold' },
+  { itemId: 'weathered-prairie-spear', price: 162, currency: 'gold' },
+  { itemId: 'bound-prairie-spear', price: 250, currency: 'gold' },
   { itemId: 'feather-sky-charm', price: 24, currency: 'gold' },
   { itemId: 'woven-sky-charm', price: 52, currency: 'gold' },
   { itemId: 'worn-buffalo-hide', price: 34, currency: 'gold' },
@@ -1024,8 +1024,8 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'worn-rider-gloves', price: 24, currency: 'gold' },
   { itemId: 'reinforced-rider-gloves', price: 54, currency: 'gold' },
   // Whispering Pines - Common+Uncommon only, matching functions/src/data/items.ts's SHOP_PRICES.
-  { itemId: 'weathered-cedar-staff', price: 32, currency: 'gold' },
-  { itemId: 'bound-cedar-staff', price: 70, currency: 'gold' },
+  { itemId: 'weathered-cedar-staff', price: 168, currency: 'gold' },
+  { itemId: 'bound-cedar-staff', price: 259, currency: 'gold' },
   { itemId: 'carved-cedar-charm', price: 26, currency: 'gold' },
   { itemId: 'woven-cedar-charm', price: 56, currency: 'gold' },
   { itemId: 'worn-bark-armor', price: 36, currency: 'gold' },
@@ -1037,8 +1037,8 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'worn-vine-gloves', price: 26, currency: 'gold' },
   { itemId: 'woven-vine-gloves', price: 58, currency: 'gold' },
   // Shattered Desert - Common+Uncommon only, matching functions/src/data/items.ts's SHOP_PRICES.
-  { itemId: 'weathered-sunblade', price: 34, currency: 'gold' },
-  { itemId: 'bound-sunblade', price: 74, currency: 'gold' },
+  { itemId: 'weathered-sunblade', price: 174, currency: 'gold' },
+  { itemId: 'bound-sunblade', price: 268, currency: 'gold' },
   { itemId: 'sunworn-star-charm', price: 28, currency: 'gold' },
   { itemId: 'banded-star-charm', price: 60, currency: 'gold' },
   { itemId: 'worn-nomad-robes', price: 38, currency: 'gold' },
@@ -1050,8 +1050,8 @@ export const SHOP_LISTINGS: ShopListing[] = [
   { itemId: 'worn-dune-wraps', price: 28, currency: 'gold' },
   { itemId: 'woven-dune-wraps', price: 60, currency: 'gold' },
   // Frozen Frontier - Common+Uncommon only, matching functions/src/data/items.ts's SHOP_PRICES.
-  { itemId: 'worn-frost-pike', price: 38, currency: 'gold' },
-  { itemId: 'bound-frost-pike', price: 80, currency: 'gold' },
+  { itemId: 'worn-frost-pike', price: 261, currency: 'gold' },
+  { itemId: 'bound-frost-pike', price: 401, currency: 'gold' },
   { itemId: 'faded-aurora-charm', price: 30, currency: 'gold' },
   { itemId: 'banded-aurora-charm', price: 64, currency: 'gold' },
   { itemId: 'worn-winter-coat', price: 40, currency: 'gold' },

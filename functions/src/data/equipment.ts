@@ -8,9 +8,8 @@
 // (Crimson Bayou x1.15, Endless Prairie x1.35, Whispering Pines x1.55, Shattered Desert x1.80,
 // Frozen Frontier x2.10 - Iron Mountains stays the x1.00 baseline), preserving each region's own
 // established stat "lean" (which fields it favors) while making later gear a real, meaningful
-// step up rather than a reskin. Weapon-type stat budgets stay flat by design (see
-// weathered-iron-sword's own comment) - not part of this pass. Totems/Lanterns already scaled up
-// correctly on their own and are also untouched.
+// step up rather than a reskin. Totems/Lanterns already scaled up correctly on their own and are
+// untouched.
 //
 // Same pass also expanded ailment-resistance coverage: previously only 2 of 7 equipment slots
 // (gloves, charm) ever carried it, capping every ailment at 60% even at Rare tier, and Stun had no
@@ -19,6 +18,19 @@
 // Bayou's own Poison with no unique identity), letting a full gloves+charm+totem+boots loadout
 // reach ~100% for one chosen ailment. Mythic/Legendary totems (the only slots with tiers above
 // Rare) scale resistance further (35%/45%) as a real end-game payoff.
+//
+// 2026-08 weapon power-curve pass (follow-up): weapon-type stat budgets used to be flat across
+// every region that shared a type (a Sword was identical in Iron Mountains, Crimson Bayou, and
+// Shattered Desert). Per explicit request, each weapon TYPE now escalates along its own chain of
+// region appearances (Staff: Iron Mountains -> Crimson Bayou -> Whispering Pines; Sword: Iron
+// Mountains -> Crimson Bayou -> Shattered Desert; Spear: Iron Mountains -> Crimson Bayou ->
+// Endless Prairie -> Frozen Frontier; Axe/Hammer: Iron Mountains -> Crimson Bayou only, no later
+// region carries them forward), anchored so each appearance's Uncommon tier exceeds the previous
+// appearance's Rare tier by ~15%, that appearance's own Rare tier is ~40% above its own Uncommon,
+// and its Common tier sits at a gentler ~35% below its own Uncommon (not anchored tightly to the
+// previous Rare, so the new region's entry tier doesn't already cost as much as the old region's
+// best weapon). Iron Mountains itself stays the untouched x1.00 baseline, same as the armor pass.
+// Shop prices (SHOP_PRICES in data/items.ts) scale by the same per-step multipliers.
 
 import type { AilmentResistance, EquipmentSlot } from '../shared-types';
 
@@ -394,14 +406,14 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'weathered-cypress-cane': {
     id: 'weathered-cypress-cane',
     slot: 'weapon',
-    statBonuses: { maxSpirit: 6, attack: 3, speed: 1 },
+    statBonuses: { maxHp: 7, attack: 7, defense: 1, speed: -1 },
     tier: 'common',
     familyId: 'cypress-cane',
   },
   'bound-cypress-cane': {
     id: 'bound-cypress-cane',
     slot: 'weapon',
-    statBonuses: { maxSpirit: 4, attack: 6, speed: 2 },
+    statBonuses: { maxHp: 12, attack: 12, defense: 2, speed: -2 },
     tier: 'uncommon',
     familyId: 'cypress-cane',
   },
@@ -410,95 +422,95 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'rougarou-fang-blade': {
     id: 'rougarou-fang-blade',
     slot: 'weapon',
-    statBonuses: { maxHp: 8, attack: 11, speed: 3, defense: -1 },
+    statBonuses: { maxHp: 16, attack: 16, defense: 3, speed: -3 },
     tier: 'rare',
     familyId: 'cypress-cane',
   },
   // Crimson Bayou's own 4 new weapon-type families (docs/Mytherra-Equipment_breakdown.md's
-  // "Weapon Types" section) - same per-type stat split/budget as Iron Mountains' own 4 families
-  // (Sword leans speed, Axe/Hammer lean defense, Spear leans maxHp), palette-swapped from the
-  // same universal founders once their layer art is hand-positioned.
+  // "Weapon Types" section) - same per-type stat split as Iron Mountains' own 4 founding families
+  // (Sword leans speed, Axe/Hammer lean defense, Spear leans maxHp), palette-swapped from the same
+  // universal founders once their layer art is hand-positioned.
   'weathered-bog-cutlass': {
     id: 'weathered-bog-cutlass',
     slot: 'weapon',
-    statBonuses: { attack: 7, speed: 1 },
+    statBonuses: { attack: 10, defense: -1, speed: 2 },
     tier: 'common',
     familyId: 'bog-cutlass',
   },
   'bound-bog-cutlass': {
     id: 'bound-bog-cutlass',
     slot: 'weapon',
-    statBonuses: { attack: 9, speed: 2 },
+    statBonuses: { attack: 15, defense: -1, speed: 3 },
     tier: 'uncommon',
     familyId: 'bog-cutlass',
   },
   'serpent-fang-sword': {
     id: 'serpent-fang-sword',
     slot: 'weapon',
-    statBonuses: { attack: 13, speed: 3, defense: -1 },
+    statBonuses: { attack: 21, defense: -2, speed: 5 },
     tier: 'rare',
     familyId: 'bog-cutlass',
   },
   'weathered-bog-axe': {
     id: 'weathered-bog-axe',
     slot: 'weapon',
-    statBonuses: { attack: 6, defense: 1, speed: -1 },
+    statBonuses: { attack: 10, defense: 2, speed: -2 },
     tier: 'common',
     familyId: 'bog-axe',
   },
   'bound-bog-axe': {
     id: 'bound-bog-axe',
     slot: 'weapon',
-    statBonuses: { attack: 9, defense: 2, speed: -1 },
+    statBonuses: { attack: 16, defense: 3, speed: -3 },
     tier: 'uncommon',
     familyId: 'bog-axe',
   },
   'rougarou-claw-axe': {
     id: 'rougarou-claw-axe',
     slot: 'weapon',
-    statBonuses: { attack: 14, defense: 3, speed: -3 },
+    statBonuses: { attack: 23, defense: 5, speed: -5 },
     tier: 'rare',
     familyId: 'bog-axe',
   },
   'weathered-reed-spear': {
     id: 'weathered-reed-spear',
     slot: 'weapon',
-    statBonuses: { attack: 5, maxHp: 4 },
+    statBonuses: { attack: 9, maxHp: 7, defense: 1 },
     tier: 'common',
     familyId: 'reed-spear',
   },
   'bound-reed-spear': {
     id: 'bound-reed-spear',
     slot: 'weapon',
-    statBonuses: { attack: 8, maxHp: 6, speed: 1 },
+    statBonuses: { attack: 14, maxHp: 12, defense: 1 },
     tier: 'uncommon',
     familyId: 'reed-spear',
   },
   'serpent-guard-spear': {
     id: 'serpent-guard-spear',
     slot: 'weapon',
-    statBonuses: { attack: 12, maxHp: 10, defense: 1 },
+    statBonuses: { attack: 19, maxHp: 16, defense: 2 },
     tier: 'rare',
     familyId: 'reed-spear',
   },
   'weathered-bog-maul': {
     id: 'weathered-bog-maul',
     slot: 'weapon',
-    statBonuses: { attack: 5, defense: 2, speed: -1 },
+    statBonuses: { attack: 9, maxHp: 7, defense: 3, speed: -2 },
     tier: 'common',
     familyId: 'bog-maul',
   },
   'bound-bog-maul': {
     id: 'bound-bog-maul',
     slot: 'weapon',
-    statBonuses: { attack: 8, defense: 3, speed: -2 },
+    statBonuses: { attack: 14, maxHp: 12, defense: 5, speed: -3 },
     tier: 'uncommon',
     familyId: 'bog-maul',
   },
   'rougarou-warclub': {
     id: 'rougarou-warclub',
     slot: 'weapon',
-    statBonuses: { attack: 12, maxHp: 10, defense: 4, speed: -3 },
+    statBonuses: { attack: 19, maxHp: 16, defense: 6, speed: -5 },
     tier: 'rare',
     familyId: 'bog-maul',
   },
@@ -657,28 +669,27 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   // --- Endless Prairie (MSQ Volume III) canonical equipment families ---
   // Common through Rare only, matching every prior region's own first pass - Mythic/Legendary
   // rows (White Buffalo Totem's higher tiers, etc.) wait for Chapter 6's quest content.
-  // Prairie Spear is a straight palette-swap of the Spear weapon type's founder (ashwood-spear) -
-  // same stat progression as every other region's Spear-type instance (weapon TYPES share a flat
-  // stat budget across regions, unlike armor families, which get the region-to-region power-creep
-  // treatment below - see reed-spear's identical numbers in Crimson Bayou above).
+  // Prairie Spear (2026-08 weapon power-curve pass): anchored off Crimson Bayou's own reed-spear
+  // Rare tier (the most recent prior Spear-type appearance), not a flat palette-swap anymore - see
+  // the top-of-file weapon power-curve note.
   'weathered-prairie-spear': {
     id: 'weathered-prairie-spear',
     slot: 'weapon',
-    statBonuses: { attack: 5, maxHp: 4 },
+    statBonuses: { attack: 14, maxHp: 12, defense: 1 },
     tier: 'common',
     familyId: 'prairie-spear',
   },
   'bound-prairie-spear': {
     id: 'bound-prairie-spear',
     slot: 'weapon',
-    statBonuses: { attack: 8, maxHp: 6, speed: 1 },
+    statBonuses: { attack: 22, maxHp: 18, defense: 2 },
     tier: 'uncommon',
     familyId: 'prairie-spear',
   },
   'windriders-spear': {
     id: 'windriders-spear',
     slot: 'weapon',
-    statBonuses: { attack: 12, maxHp: 10, defense: 1 },
+    statBonuses: { attack: 31, maxHp: 26, defense: 3 },
     tier: 'rare',
     familyId: 'prairie-spear',
   },
@@ -860,27 +871,27 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   // --- Whispering Pines (MSQ Volume IV, Chapter 7) canonical equipment families ---
   // Common through Rare only, matching every prior region's own first pass - Mythic/Legendary
   // rows (Cedar Giant Totem's higher tiers, Lantern of Ancient Roots) wait for Chapter 8.
-  // Cedar Staff is a straight palette-swap of the Staff weapon type's founder (weathered-walking-
-  // staff/ironwood-walking-staff/spiritwood-walking-staff) - identical statBonuses per tier, same
-  // flat-stat-budget-per-type rule Prairie Spear (Spear type) already established.
+  // Cedar Staff (2026-08 weapon power-curve pass): anchored off Crimson Bayou's own cypress-cane
+  // Rare tier (the most recent prior Staff-type appearance) - see the top-of-file weapon
+  // power-curve note.
   'weathered-cedar-staff': {
     id: 'weathered-cedar-staff',
     slot: 'weapon',
-    statBonuses: { maxSpirit: 5, attack: 4 },
+    statBonuses: { maxHp: 12, attack: 12, defense: 2, speed: -2 },
     tier: 'common',
     familyId: 'cedar-staff',
   },
   'bound-cedar-staff': {
     id: 'bound-cedar-staff',
     slot: 'weapon',
-    statBonuses: { maxSpirit: 3, attack: 7, speed: 1 },
+    statBonuses: { maxHp: 18, attack: 18, defense: 3, speed: -3 },
     tier: 'uncommon',
     familyId: 'cedar-staff',
   },
   'ancient-cedar-staff': {
     id: 'ancient-cedar-staff',
     slot: 'weapon',
-    statBonuses: { maxHp: 10, attack: 10, defense: 2, speed: -2 },
+    statBonuses: { maxHp: 26, attack: 26, defense: 5, speed: -5 },
     tier: 'rare',
     familyId: 'cedar-staff',
   },
@@ -1056,27 +1067,27 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   // --- Shattered Desert (MSQ Volume V, Chapter 9) canonical equipment families ---
   // Common through Rare only, matching every prior region's own first pass - Mythic/Legendary
   // rows (Canyon Giant Totem's higher tiers, Lantern of Forgotten Stars) wait for Chapter 10.
-  // Sunblade is a straight palette-swap of the Sword weapon type's founder (weathered-iron-sword/
-  // ironbound-sword/wardens-broadsword) - identical statBonuses per tier, same flat-stat-budget-
-  // per-type rule Prairie Spear/Cedar Staff already established.
+  // Sunblade (2026-08 weapon power-curve pass): anchored off Crimson Bayou's own bog-cutlass Rare
+  // tier (the most recent prior Sword-type appearance) - see the top-of-file weapon power-curve
+  // note.
   'weathered-sunblade': {
     id: 'weathered-sunblade',
     slot: 'weapon',
-    statBonuses: { attack: 7, speed: 1 },
+    statBonuses: { attack: 16, defense: -1, speed: 4 },
     tier: 'common',
     familyId: 'sunblade',
   },
   'bound-sunblade': {
     id: 'bound-sunblade',
     slot: 'weapon',
-    statBonuses: { attack: 9, speed: 2 },
+    statBonuses: { attack: 24, defense: -2, speed: 6 },
     tier: 'uncommon',
     familyId: 'sunblade',
   },
   'solaris-blade': {
     id: 'solaris-blade',
     slot: 'weapon',
-    statBonuses: { attack: 13, speed: 3, defense: -1 },
+    statBonuses: { attack: 34, defense: -3, speed: 8 },
     tier: 'rare',
     familyId: 'sunblade',
   },
@@ -1252,26 +1263,28 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   },
 
   // --- Frozen Frontier (MSQ Volume VI, Chapter 11) equipment ---
-  // Frost Pike (weapon, Spear type) - the flat cross-region weapon-type stat budget, confirmed
-  // identical across every Spear family so far (prairie-spear, reed-spear) - not touched again here.
+  // Frost Pike (2026-08 weapon power-curve pass): anchored off Endless Prairie's own
+  // windriders-spear Rare tier (the most recent prior Spear-type appearance - Whispering Pines
+  // and Shattered Desert don't carry the Spear type forward) - see the top-of-file weapon
+  // power-curve note.
   'worn-frost-pike': {
     id: 'worn-frost-pike',
     slot: 'weapon',
-    statBonuses: { attack: 5, maxHp: 4 },
+    statBonuses: { attack: 23, maxHp: 19, defense: 2 },
     tier: 'common',
     familyId: 'frost-pike',
   },
   'bound-frost-pike': {
     id: 'bound-frost-pike',
     slot: 'weapon',
-    statBonuses: { attack: 8, maxHp: 6, speed: 1 },
+    statBonuses: { attack: 36, maxHp: 30, defense: 3 },
     tier: 'uncommon',
     familyId: 'frost-pike',
   },
   'glacier-forged-pike': {
     id: 'glacier-forged-pike',
     slot: 'weapon',
-    statBonuses: { attack: 12, maxHp: 10, defense: 1 },
+    statBonuses: { attack: 50, maxHp: 42, defense: 5 },
     tier: 'rare',
     familyId: 'frost-pike',
   },
