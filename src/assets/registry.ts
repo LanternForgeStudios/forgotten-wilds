@@ -804,6 +804,50 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="packed snow ground, a worn icy trail, pale white-blue, faint footprint texture", upper="deep untouched snowdrift, sparkling frost, pale blue-white shimmer"). Ready 4x4 grid PNG, used as-is. Metadata archived at public/assets/tilesets/original/frosthaven-terrain/metadata.json. Build script: scripts/build_tilesets.py.',
   },
   {
+    id: 'tileset.frosthaven-town-terrain',
+    category: 'tileset',
+    intendedUse:
+      "Frosthaven's own town ground terrain - a 4x4 Wang autotile set (16x16 tiles) transitioning a packed-snow/icy-dirt path to snow-dusted town ground, replacing the generic tileset.town-terrain every other town's own themed variant now also replaces (see tileset.cedarwatch-town-terrain / tileset.red-mesa-town-terrain) - Ash Hallow, Mirehaven, and Highwind Crossing already had their own bespoke town tilesets from earlier sessions; only Cedarwatch/Red Mesa/Frosthaven were still on the generic fallback.",
+    filePath: 'tilesets/frosthaven-town-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="packed snow path worn to icy dirt, footprint texture", upper="snow-dusted town ground, pale white-blue"). Ready 4x4 grid PNG, used as-is. Build script: scripts/build_tilesets.py.',
+  },
+  {
+    id: 'tileset.cedarwatch-town-terrain',
+    category: 'tileset',
+    intendedUse:
+      "Cedarwatch's own town ground terrain - a 4x4 Wang autotile set (16x16 tiles) transitioning a packed dirt forest path to soft mossy/leaf-litter forest floor, replacing the generic tileset.town-terrain (see tileset.frosthaven-town-terrain's own note for the full context on why only these 3 towns needed this).",
+    filePath: 'tilesets/cedarwatch-town-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="packed dirt forest path, mossy roots", upper="soft forest floor, moss and fallen leaves"). Ready 4x4 grid PNG, used as-is. Build script: scripts/build_tilesets.py.',
+  },
+  {
+    id: 'tileset.red-mesa-town-terrain',
+    category: 'tileset',
+    intendedUse:
+      "Red Mesa's own town ground terrain - a 4x4 Wang autotile set (16x16 tiles) transitioning a packed red-dust canyon path to sandy warm-ochre desert town ground, replacing the generic tileset.town-terrain (see tileset.frosthaven-town-terrain's own note for the full context).",
+    filePath: 'tilesets/red-mesa-town-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="packed red-dust canyon path, sun-baked", upper="sandy desert town ground, warm ochre"). Ready 4x4 grid PNG, used as-is. Build script: scripts/build_tilesets.py.',
+  },
+  {
+    id: 'tileset.shattered-desert-terrain',
+    category: 'tileset',
+    intendedUse:
+      "Shattered Desert field ground terrain (Sunfire Dunes, Celestial Oasis, Canyon Depths, etc.) - a 4x4 Wang autotile set (16x16 tiles) transitioning cracked red-orange canyon rock to wind-swept golden desert sand, replacing the generic tileset.overworld-terrain/overworld-water this region's 6 field/town maps had shipped with (the one remaining region with no real themed field terrain, per Asset-Production-Checklist.md's own Chapter 9/10 status note).",
+    filePath: 'tilesets/shattered-desert-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes:
+      'pixellab MCP-generated via create_topdown_tileset (standard mode, 16x16, high top-down view; lower="sun-baked cracked red-orange canyon rock, dry desert wash", upper="fine wind-swept desert sand, warm golden dunes"). Ready 4x4 grid PNG, used as-is. Build script: scripts/build_tilesets.py.',
+  },
+  {
     id: 'sprite.npc-1',
     category: 'character',
     intendedUse: 'Uploaded NPC character sheet 1 - not yet assigned to any specific NPC or wired into any map',

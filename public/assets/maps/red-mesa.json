@@ -5569,8 +5569,8 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "name": "town-terrain",
-      "image": "../../../public/assets/tilesets/town-terrain.png",
+      "name": "red-mesa-town-terrain",
+      "image": "../../../public/assets/tilesets/red-mesa-town-terrain.png",
       "imagewidth": 64,
       "imageheight": 64,
       "tilewidth": 16,
@@ -5583,7 +5583,7 @@
         {
           "name": "tilesetAssetId",
           "type": "string",
-          "value": "tileset.town-terrain"
+          "value": "tileset.red-mesa-town-terrain"
         }
       ]
     },
@@ -5612,7 +5612,7 @@
     {
       "name": "tilesetAssetId",
       "type": "string",
-      "value": "tileset.town-terrain"
+      "value": "tileset.red-mesa-town-terrain"
     }
   ]
 }

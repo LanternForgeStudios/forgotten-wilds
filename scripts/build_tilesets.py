@@ -50,6 +50,10 @@ DIRECT_COPY_SETS = [
     "highwind-crossing-terrain",
     "frosthaven-terrain",
     "whispering-pines-terrain",
+    "frosthaven-town-terrain",
+    "cedarwatch-town-terrain",
+    "red-mesa-town-terrain",
+    "shattered-desert-terrain",
 ]
 
 os.makedirs(OUT_DIR, exist_ok=True)

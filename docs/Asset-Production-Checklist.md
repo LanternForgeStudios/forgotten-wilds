@@ -865,13 +865,31 @@ Nomad Leggings (legs), Sand Boots (boots), Dune Wraps (gloves), all 3 tiers x bo
 recolored from this project's generic per-slot templates (`worn-keeper-coat`/`traveler-pants`/
 `traveler-boots`/`leather-gauntlets`) per the same documented workflow used for Whispering Pines.
 `star-charm`/`sunstone-totem` are out of scope for equipment layers by design (worn under clothes/
-held out of frame, per `Equipment-Layering-Plan.md`). All 6 of
-Chapter 9's field/town maps reuse `tileset.overworld-terrain`/`overworld-decor2`/
-`overworld-water` and `tileset.town-terrain` (not `tileset.cliff`/`tileset.beach`, both already
-flagged "provenance unconfirmed" elsewhere in this file, not safe to wire into real content) - not
-tracked as a placeholder gap the way character art is, the tiles are real, just generic and not
-desert-themed. A genuine desert/canyon terrain pass (red-rock ground variants, mesa-band decor,
-sand-dune overhang tiles) would be a real visual upgrade later.
+held out of frame, per `Equipment-Layering-Plan.md`). **Update (2026-08-10): real desert ground
+terrain generated and wired in.** `tileset.shattered-desert-terrain` (4x4 Wang autotile, cracked
+red-orange canyon rock -> wind-swept golden sand, via `create_topdown_tileset`) now replaces
+`tileset.overworld-terrain` on both of Chapter 9's outdoor field maps (Sunfire Dunes, Celestial
+Oasis - the latter keeps `tileset.overworld-water` for its actual water, untouched). The dungeon
+interiors (Canyon Depths, Inner Observatory, Star Chamber, Star Lantern Sanctuary, Guardian Summit)
+correctly keep `tileset.tiny-dungeon`, same as every dungeon in the game - not a themed-terrain
+gap, dungeons are deliberately generic. Red Mesa itself (the town) also got its own
+`tileset.red-mesa-town-terrain` (packed red-dust path -> sandy ochre ground) in the same pass - see
+the "Town ground terrain" note below for the other 2 towns this covered. `tileset.cliff`/
+`tileset.beach` remain unused (still flagged "provenance unconfirmed" elsewhere in this file, not
+safe to wire into real content). Decor/overhang tiles (mesa-band rock decor, sand-dune overhangs)
+are still out of scope - see the "decor/overhang tiles" note in the Things Claude can't generate
+itself section below for why.
+
+**Town ground terrain (2026-08-10): 3 towns given their own themed tileset,** replacing the generic
+`tileset.town-terrain` every town used by default. Ash Hallow, Mirehaven, and Highwind Crossing
+already had their own bespoke tilesets from earlier sessions and were untouched. New: Frosthaven
+(`tileset.frosthaven-town-terrain`, packed snow/icy-dirt path -> snow-dusted ground), Cedarwatch
+(`tileset.cedarwatch-town-terrain`, packed dirt forest path -> mossy/leaf-litter forest floor), Red
+Mesa (`tileset.red-mesa-town-terrain`, packed red-dust path -> sandy ochre ground). Same
+`create_topdown_tileset` pipeline, same numeric fill/transition tile ids as every other terrain
+set, so each map's own `scripts/map-specs-richer/*.json` spec swap + `genMapRicher.mjs` regenerate
+needed no id remapping - just updating each tileset entry's `assetId`/`name`/`image` fields to
+point at the new tileset.
 
 ### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
 

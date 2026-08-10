@@ -5569,8 +5569,8 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "name": "town-terrain",
-      "image": "../../../public/assets/tilesets/town-terrain.png",
+      "name": "frosthaven-town-terrain",
+      "image": "../../../public/assets/tilesets/frosthaven-town-terrain.png",
       "imagewidth": 64,
       "imageheight": 64,
       "tilewidth": 16,
@@ -5583,7 +5583,7 @@
         {
           "name": "tilesetAssetId",
           "type": "string",
-          "value": "tileset.town-terrain"
+          "value": "tileset.frosthaven-town-terrain"
         }
       ]
     },
@@ -5612,7 +5612,7 @@
     {
       "name": "tilesetAssetId",
       "type": "string",
-      "value": "tileset.town-terrain"
+      "value": "tileset.frosthaven-town-terrain"
     }
   ]
 }

@@ -5365,8 +5365,8 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "name": "overworld-terrain",
-      "image": "../../../public/assets/tilesets/overworld-terrain.png",
+      "name": "shattered-desert-terrain",
+      "image": "../../../public/assets/tilesets/shattered-desert-terrain.png",
       "imagewidth": 64,
       "imageheight": 64,
       "tilewidth": 16,
@@ -5379,7 +5379,7 @@
         {
           "name": "tilesetAssetId",
           "type": "string",
-          "value": "tileset.overworld-terrain"
+          "value": "tileset.shattered-desert-terrain"
         }
       ]
     },
@@ -5408,7 +5408,7 @@
     {
       "name": "tilesetAssetId",
       "type": "string",
-      "value": "tileset.overworld-terrain"
+      "value": "tileset.shattered-desert-terrain"
     }
   ]
 }
