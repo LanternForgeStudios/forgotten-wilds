@@ -1,5 +1,25 @@
 // Authoritative — the client's src/data/equipment.ts is a display copy only.
 
+// 2026-08 region power-curve rebalance: chest/legs/boots/gloves stat totals used to be roughly
+// flat (sometimes even declining) from Iron Mountains through Frozen Frontier, despite enemies
+// and player level both scaling up cleanly every region - equipment wasn't keeping pace, so there
+// was little incentive to swap gear once a player left the first region or two. Every region past
+// Iron Mountains now multiplies its own chest/legs/boots/gloves stat fields by a fixed factor
+// (Crimson Bayou x1.15, Endless Prairie x1.35, Whispering Pines x1.55, Shattered Desert x1.80,
+// Frozen Frontier x2.10 - Iron Mountains stays the x1.00 baseline), preserving each region's own
+// established stat "lean" (which fields it favors) while making later gear a real, meaningful
+// step up rather than a reskin. Weapon-type stat budgets stay flat by design (see
+// weathered-iron-sword's own comment) - not part of this pass. Totems/Lanterns already scaled up
+// correctly on their own and are also untouched.
+//
+// Same pass also expanded ailment-resistance coverage: previously only 2 of 7 equipment slots
+// (gloves, charm) ever carried it, capping every ailment at 60% even at Rare tier, and Stun had no
+// coverage anywhere. Every region's Rare totem and Rare boots now also carry that region's
+// signature ailment (Stun for Whispering Pines specifically, which otherwise duplicated Crimson
+// Bayou's own Poison with no unique identity), letting a full gloves+charm+totem+boots loadout
+// reach ~100% for one chosen ailment. Mythic/Legendary totems (the only slots with tiers above
+// Rare) scale resistance further (35%/45%) as a real end-game payoff.
+
 import type { AilmentResistance, EquipmentSlot } from '../shared-types';
 
 // Re-exported (not redeclared) from shared-types - both files live inside functions/ (the same
@@ -239,12 +259,17 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'uncommon',
     familyId: 'traveler-boots',
   },
+  // Rare cap also gets a genuine Burn resistance perk, same region-signature-ailment pattern as
+  // keepers-gauntlets below - totem + boots are this pass's two new resistance-bearing slots,
+  // letting a full gloves+charm+totem+boots loadout stack toward ~100% Burn resistance instead of
+  // capping at 60% (see the 2026-08 ailment-resistance-coverage audit).
   'ranger-boots': {
     id: 'ranger-boots',
     slot: 'boots',
     statBonuses: { attack: 1, defense: 3, speed: 6 },
     tier: 'rare',
     familyId: 'traveler-boots',
+    ailmentResistance: [{ ailmentId: 'burn', reductionPercent: 0.2 }],
   },
   'work-gloves': {
     id: 'work-gloves',
@@ -320,9 +345,12 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 6 },
     tier: 'rare',
     familyId: 'mountain-spirits',
+    ailmentResistance: [{ ailmentId: 'burn', reductionPercent: 0.25 }],
   },
   // Legendary reward for defeating the Coalbound Warden (MSF-IM-011) - the first Legendary
-  // Spirit Totem, now that the quest content granting it exists.
+  // Spirit Totem, now that the quest content granting it exists. Ailment resistance climbs past
+  // Rare's 30% cap here (see the 2026-08 ailment-resistance-coverage audit's "no item scales
+  // resistance beyond Rare" gap) - a real end-game payoff for the family's own signature ailment.
   'mountain-guardian-totem': {
     id: 'mountain-guardian-totem',
     slot: 'spiritTotem',
@@ -330,6 +358,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'legendary',
     unique: true,
     familyId: 'mountain-spirits',
+    ailmentResistance: [{ ailmentId: 'burn', reductionPercent: 0.45 }],
   },
   // Crimson Bayou (MSQ Volume II): the region's Legendary Lantern (MSF-CB-008), following the same
   // found-item-then-equipped-upgrade pattern as miners-lost-lantern-equipped. No layerSpriteAssetId
@@ -353,6 +382,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'legendary',
     unique: true,
     familyId: 'cypress-spirits',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.45 }],
   },
   // Crimson Bayou's own Common-through-Rare equipment families (docs/Mytherra-Equipment_breakdown.md
   // Region 2 table: Cypress Cane / Bayou Vestments / Bayou Leg-Wraps / Marsh Boots / Mire Gloves /
@@ -475,42 +505,42 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'tattered-bayou-vestments': {
     id: 'tattered-bayou-vestments',
     slot: 'chest',
-    statBonuses: { maxHp: 10, defense: 2, speed: 1 },
+    statBonuses: { maxHp: 12, defense: 2, speed: 1 },
     tier: 'common',
     familyId: 'bayou-vestments',
   },
   'woven-bayou-vestments': {
     id: 'woven-bayou-vestments',
     slot: 'chest',
-    statBonuses: { maxHp: 15, defense: 4, speed: 2 },
+    statBonuses: { maxHp: 17, defense: 5, speed: 2 },
     tier: 'uncommon',
     familyId: 'bayou-vestments',
   },
   'warden-bayou-vestments': {
     id: 'warden-bayou-vestments',
     slot: 'chest',
-    statBonuses: { maxHp: 18, maxSpirit: 6, defense: 6, speed: 3 },
+    statBonuses: { maxHp: 21, maxSpirit: 7, defense: 7, speed: 3 },
     tier: 'rare',
     familyId: 'bayou-vestments',
   },
   'worn-bayou-leg-wraps': {
     id: 'worn-bayou-leg-wraps',
     slot: 'legs',
-    statBonuses: { maxHp: 6, defense: 1, speed: 1 },
+    statBonuses: { maxHp: 7, defense: 1, speed: 1 },
     tier: 'common',
     familyId: 'bayou-leg-wraps',
   },
   'woven-bayou-leg-wraps': {
     id: 'woven-bayou-leg-wraps',
     slot: 'legs',
-    statBonuses: { maxHp: 9, defense: 2, speed: 2 },
+    statBonuses: { maxHp: 10, defense: 2, speed: 2 },
     tier: 'uncommon',
     familyId: 'bayou-leg-wraps',
   },
   'warden-bayou-leg-wraps': {
     id: 'warden-bayou-leg-wraps',
     slot: 'legs',
-    statBonuses: { maxHp: 11, maxSpirit: 3, defense: 3, speed: 3 },
+    statBonuses: { maxHp: 13, maxSpirit: 3, defense: 3, speed: 3 },
     tier: 'rare',
     familyId: 'bayou-leg-wraps',
   },
@@ -524,16 +554,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'sturdy-marsh-boots': {
     id: 'sturdy-marsh-boots',
     slot: 'boots',
-    statBonuses: { defense: 2, speed: 5 },
+    statBonuses: { defense: 2, speed: 6 },
     tier: 'uncommon',
     familyId: 'marsh-boots',
   },
+  // Rare cap also gets a genuine Poison resistance perk, same region-signature-ailment pattern as
+  // warden-mire-gloves below - totem + boots are this pass's two new resistance-bearing slots
+  // (see mosswalker-boots' own comment on the design intent), letting a full gloves+charm+totem+
+  // boots loadout stack toward ~100% Poison resistance instead of capping at 60%.
   'mosswalker-boots': {
     id: 'mosswalker-boots',
     slot: 'boots',
-    statBonuses: { attack: 1, defense: 3, speed: 7 },
+    statBonuses: { attack: 1, defense: 3, speed: 8 },
     tier: 'rare',
     familyId: 'marsh-boots',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.2 }],
   },
   'worn-mire-gloves': {
     id: 'worn-mire-gloves',
@@ -545,7 +580,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'reinforced-mire-gloves': {
     id: 'reinforced-mire-gloves',
     slot: 'gloves',
-    statBonuses: { maxHp: 4, attack: 2, defense: 2 },
+    statBonuses: { maxHp: 5, attack: 2, defense: 2 },
     tier: 'uncommon',
     familyId: 'mire-gloves',
   },
@@ -555,7 +590,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'warden-mire-gloves': {
     id: 'warden-mire-gloves',
     slot: 'gloves',
-    statBonuses: { maxHp: 7, attack: 3, defense: 4 },
+    statBonuses: { maxHp: 8, attack: 3, defense: 5 },
     tier: 'rare',
     familyId: 'mire-gloves',
     ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
@@ -591,6 +626,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { speed: 4, maxSpirit: 3 },
     tier: 'rare',
     familyId: 'cypress-spirits',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.25 }],
   },
   'cypress-guardian-totem': {
     id: 'cypress-guardian-totem',
@@ -598,6 +634,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 8, maxSpirit: 8, defense: 3 },
     tier: 'mythic',
     familyId: 'cypress-spirits',
+    ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.35 }],
   },
   // Prologue reward (MSF-P-001) - a starting-kit armor piece, not part of any regional family.
   // Not unique - it's a plain wool cloak given to every new Lantern Keeper, not a one-of-a-kind
@@ -650,21 +687,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-buffalo-hide': {
     id: 'worn-buffalo-hide',
     slot: 'chest',
-    statBonuses: { maxHp: 12, defense: 2, speed: 2 },
+    statBonuses: { maxHp: 16, defense: 3, speed: 3 },
     tier: 'common',
     familyId: 'buffalo-hide',
   },
   'banded-buffalo-hide': {
     id: 'banded-buffalo-hide',
     slot: 'chest',
-    statBonuses: { maxHp: 17, defense: 4, speed: 3 },
+    statBonuses: { maxHp: 23, defense: 5, speed: 4 },
     tier: 'uncommon',
     familyId: 'buffalo-hide',
   },
   'chieftains-buffalo-hide': {
     id: 'chieftains-buffalo-hide',
     slot: 'chest',
-    statBonuses: { maxHp: 20, maxSpirit: 6, defense: 6, speed: 4 },
+    statBonuses: { maxHp: 27, maxSpirit: 8, defense: 8, speed: 5 },
     tier: 'rare',
     familyId: 'buffalo-hide',
   },
@@ -672,21 +709,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-riders-chaps': {
     id: 'worn-riders-chaps',
     slot: 'legs',
-    statBonuses: { maxHp: 7, defense: 1, speed: 2 },
+    statBonuses: { maxHp: 9, defense: 1, speed: 3 },
     tier: 'common',
     familyId: 'riders-chaps',
   },
   'banded-riders-chaps': {
     id: 'banded-riders-chaps',
     slot: 'legs',
-    statBonuses: { maxHp: 10, defense: 2, speed: 3 },
+    statBonuses: { maxHp: 14, defense: 3, speed: 4 },
     tier: 'uncommon',
     familyId: 'riders-chaps',
   },
   'windborn-riders-chaps': {
     id: 'windborn-riders-chaps',
     slot: 'legs',
-    statBonuses: { maxHp: 12, maxSpirit: 3, defense: 3, speed: 4 },
+    statBonuses: { maxHp: 16, maxSpirit: 4, defense: 4, speed: 5 },
     tier: 'rare',
     familyId: 'riders-chaps',
   },
@@ -695,23 +732,28 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-wind-boots': {
     id: 'worn-wind-boots',
     slot: 'boots',
-    statBonuses: { defense: 1, speed: 4 },
+    statBonuses: { defense: 1, speed: 5 },
     tier: 'common',
     familyId: 'wind-boots',
   },
   'swift-wind-boots': {
     id: 'swift-wind-boots',
     slot: 'boots',
-    statBonuses: { defense: 2, speed: 6 },
+    statBonuses: { defense: 3, speed: 8 },
     tier: 'uncommon',
     familyId: 'wind-boots',
   },
+  // Rare cap also gets a genuine Silence resistance perk, same region-signature-ailment pattern as
+  // warden-rider-gloves below - totem + boots are this pass's two new resistance-bearing slots,
+  // letting a full gloves+charm+totem+boots loadout stack toward ~100% Silence resistance instead
+  // of capping at 60%.
   'windrunner-boots': {
     id: 'windrunner-boots',
     slot: 'boots',
-    statBonuses: { attack: 1, defense: 3, speed: 8 },
+    statBonuses: { attack: 1, defense: 4, speed: 11 },
     tier: 'rare',
     familyId: 'wind-boots',
+    ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.2 }],
   },
   // Rider Gloves - a step above Mire Gloves. Rare cap gets a genuine Silence resistance perk, same
   // "Rare-tier resistance to the region's own signature ailment" pattern as warden-mire-gloves'
@@ -720,21 +762,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-rider-gloves': {
     id: 'worn-rider-gloves',
     slot: 'gloves',
-    statBonuses: { attack: 1, defense: 2 },
+    statBonuses: { attack: 1, defense: 3 },
     tier: 'common',
     familyId: 'rider-gloves',
   },
   'reinforced-rider-gloves': {
     id: 'reinforced-rider-gloves',
     slot: 'gloves',
-    statBonuses: { maxHp: 5, attack: 3, defense: 3 },
+    statBonuses: { maxHp: 7, attack: 4, defense: 4 },
     tier: 'uncommon',
     familyId: 'rider-gloves',
   },
   'warden-rider-gloves': {
     id: 'warden-rider-gloves',
     slot: 'gloves',
-    statBonuses: { maxHp: 8, attack: 4, defense: 5 },
+    statBonuses: { maxHp: 11, attack: 5, defense: 7 },
     tier: 'rare',
     familyId: 'rider-gloves',
     ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.3 }],
@@ -778,6 +820,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { speed: 5, maxSpirit: 4 },
     tier: 'rare',
     familyId: 'white-buffalo-totem',
+    ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.25 }],
   },
   // Mythic tier - Great Thunderbird's own lootTable chance drop (Chapter 6), same
   // "not every rare+ item needs a unique quest thread" pattern as cypress-guardian-totem. The
@@ -789,6 +832,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 10, maxSpirit: 9, defense: 4 },
     tier: 'mythic',
     familyId: 'white-buffalo-totem',
+    ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.35 }],
   },
   // Endless Prairie's own Legendary Lantern (MSF-EP-007), same shape as lantern-of-still-waters -
   // a step above its statBonuses/oilCapacity, one Lantern Ability (open-skies-renewal, healing).
@@ -810,6 +854,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'legendary',
     unique: true,
     familyId: 'white-buffalo-totem',
+    ailmentResistance: [{ ailmentId: 'silence', reductionPercent: 0.45 }],
   },
 
   // --- Whispering Pines (MSQ Volume IV, Chapter 7) canonical equipment families ---
@@ -844,21 +889,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-bark-armor': {
     id: 'worn-bark-armor',
     slot: 'chest',
-    statBonuses: { maxHp: 12, defense: 3, maxSpirit: 1 },
+    statBonuses: { maxHp: 19, defense: 5, maxSpirit: 2 },
     tier: 'common',
     familyId: 'bark-armor',
   },
   'banded-bark-armor': {
     id: 'banded-bark-armor',
     slot: 'chest',
-    statBonuses: { maxHp: 17, defense: 5, maxSpirit: 3 },
+    statBonuses: { maxHp: 26, defense: 8, maxSpirit: 5 },
     tier: 'uncommon',
     familyId: 'bark-armor',
   },
   'elderwood-bark-armor': {
     id: 'elderwood-bark-armor',
     slot: 'chest',
-    statBonuses: { maxHp: 22, maxSpirit: 8, defense: 8 },
+    statBonuses: { maxHp: 34, maxSpirit: 12, defense: 12 },
     tier: 'rare',
     familyId: 'bark-armor',
   },
@@ -866,21 +911,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-root-woven-leggings': {
     id: 'worn-root-woven-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 7, defense: 2 },
+    statBonuses: { maxHp: 11, defense: 3 },
     tier: 'common',
     familyId: 'root-woven-leggings',
   },
   'banded-root-woven-leggings': {
     id: 'banded-root-woven-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 10, defense: 3, maxSpirit: 1 },
+    statBonuses: { maxHp: 16, defense: 5, maxSpirit: 2 },
     tier: 'uncommon',
     familyId: 'root-woven-leggings',
   },
   'deep-root-leggings': {
     id: 'deep-root-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 13, maxSpirit: 4, defense: 4 },
+    statBonuses: { maxHp: 20, maxSpirit: 6, defense: 6 },
     tier: 'rare',
     familyId: 'root-woven-leggings',
   },
@@ -888,23 +933,29 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-root-boots': {
     id: 'worn-root-boots',
     slot: 'boots',
-    statBonuses: { defense: 2, speed: 2 },
+    statBonuses: { defense: 3, speed: 3 },
     tier: 'common',
     familyId: 'root-boots',
   },
   'banded-root-boots': {
     id: 'banded-root-boots',
     slot: 'boots',
-    statBonuses: { maxHp: 3, defense: 4, speed: 3 },
+    statBonuses: { maxHp: 5, defense: 6, speed: 5 },
     tier: 'uncommon',
     familyId: 'root-boots',
   },
+  // Rare cap also gets a genuine Stun resistance perk - Whispering Pines had no unique
+  // signature-ailment identity of its own (its charm/gloves resist Poison, the same ailment
+  // Crimson Bayou already covers) and Stun had zero coverage anywhere in the game before this -
+  // this closes both gaps in one stroke without touching the existing poison items (see the
+  // 2026-08 ailment-resistance-coverage audit).
   'ancient-root-boots': {
     id: 'ancient-root-boots',
     slot: 'boots',
-    statBonuses: { maxSpirit: 3, defense: 6, speed: 4 },
+    statBonuses: { maxSpirit: 5, defense: 9, speed: 6 },
     tier: 'rare',
     familyId: 'root-boots',
+    ailmentResistance: [{ ailmentId: 'stun', reductionPercent: 0.2 }],
   },
   // Vine Gloves - a step above Rider Gloves. Rare cap gets a genuine Poison resistance perk, same
   // "Rare-tier resistance to the region's own signature ailment" pattern as warden-rider-gloves'
@@ -913,21 +964,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-vine-gloves': {
     id: 'worn-vine-gloves',
     slot: 'gloves',
-    statBonuses: { attack: 1, defense: 2 },
+    statBonuses: { attack: 2, defense: 3 },
     tier: 'common',
     familyId: 'vine-gloves',
   },
   'woven-vine-gloves': {
     id: 'woven-vine-gloves',
     slot: 'gloves',
-    statBonuses: { maxHp: 5, attack: 2, defense: 4 },
+    statBonuses: { maxHp: 8, attack: 3, defense: 6 },
     tier: 'uncommon',
     familyId: 'vine-gloves',
   },
   'warden-vine-gloves': {
     id: 'warden-vine-gloves',
     slot: 'gloves',
-    statBonuses: { maxHp: 8, attack: 3, defense: 6 },
+    statBonuses: { maxHp: 12, attack: 5, defense: 9 },
     tier: 'rare',
     familyId: 'vine-gloves',
     ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
@@ -976,6 +1027,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxSpirit: 5, defense: 4 },
     tier: 'rare',
     familyId: 'young-cedar-totem',
+    ailmentResistance: [{ ailmentId: 'stun', reductionPercent: 0.25 }],
   },
   // Mythic tier - Cedar Giant's own lootTable chance drop (Chapter 8), same "not every rare+ item
   // needs a unique quest thread" pattern as elder-buffalo-totem. The family's Legendary cap
@@ -987,6 +1039,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 12, maxSpirit: 10, defense: 5 },
     tier: 'mythic',
     familyId: 'young-cedar-totem',
+    ailmentResistance: [{ ailmentId: 'stun', reductionPercent: 0.35 }],
   },
   // Young Cedar Totem family's Legendary cap - a guaranteed reward from the boss-defeat quest
   // itself (MSF-WP-008), same pattern as thunderbird-totem.
@@ -997,6 +1050,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'legendary',
     unique: true,
     familyId: 'young-cedar-totem',
+    ailmentResistance: [{ ailmentId: 'stun', reductionPercent: 0.45 }],
   },
 
   // --- Shattered Desert (MSQ Volume V, Chapter 9) canonical equipment families ---
@@ -1032,21 +1086,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-nomad-robes': {
     id: 'worn-nomad-robes',
     slot: 'chest',
-    statBonuses: { maxHp: 10, attack: 2, maxSpirit: 2 },
+    statBonuses: { maxHp: 18, attack: 4, maxSpirit: 4 },
     tier: 'common',
     familyId: 'nomad-robes',
   },
   'banded-nomad-robes': {
     id: 'banded-nomad-robes',
     slot: 'chest',
-    statBonuses: { maxHp: 14, attack: 4, maxSpirit: 4 },
+    statBonuses: { maxHp: 25, attack: 7, maxSpirit: 7 },
     tier: 'uncommon',
     familyId: 'nomad-robes',
   },
   'starwoven-nomad-robes': {
     id: 'starwoven-nomad-robes',
     slot: 'chest',
-    statBonuses: { maxHp: 18, attack: 6, maxSpirit: 8, defense: 2 },
+    statBonuses: { maxHp: 32, attack: 11, maxSpirit: 14, defense: 4 },
     tier: 'rare',
     familyId: 'nomad-robes',
   },
@@ -1054,21 +1108,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-nomad-leggings': {
     id: 'worn-nomad-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 6, attack: 1 },
+    statBonuses: { maxHp: 11, attack: 2 },
     tier: 'common',
     familyId: 'nomad-leggings',
   },
   'banded-nomad-leggings': {
     id: 'banded-nomad-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 9, attack: 2, maxSpirit: 1 },
+    statBonuses: { maxHp: 16, attack: 4, maxSpirit: 2 },
     tier: 'uncommon',
     familyId: 'nomad-leggings',
   },
   'starwoven-nomad-leggings': {
     id: 'starwoven-nomad-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 12, attack: 3, maxSpirit: 3, defense: 1 },
+    statBonuses: { maxHp: 22, attack: 5, maxSpirit: 5, defense: 2 },
     tier: 'rare',
     familyId: 'nomad-leggings',
   },
@@ -1077,23 +1131,28 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-sand-boots': {
     id: 'worn-sand-boots',
     slot: 'boots',
-    statBonuses: { speed: 2, attack: 1 },
+    statBonuses: { speed: 4, attack: 2 },
     tier: 'common',
     familyId: 'sand-boots',
   },
   'swift-sand-boots': {
     id: 'swift-sand-boots',
     slot: 'boots',
-    statBonuses: { speed: 3, attack: 2 },
+    statBonuses: { speed: 5, attack: 4 },
     tier: 'uncommon',
     familyId: 'sand-boots',
   },
+  // Rare cap also gets a genuine Blind resistance perk, same region-signature-ailment pattern as
+  // rangers-dune-wraps below - totem + boots are this pass's two new resistance-bearing slots,
+  // letting a full gloves+charm+totem+boots loadout stack toward ~100% Blind resistance instead of
+  // capping at 60%.
   'sunrunner-boots': {
     id: 'sunrunner-boots',
     slot: 'boots',
-    statBonuses: { speed: 4, attack: 3, maxSpirit: 2 },
+    statBonuses: { speed: 7, attack: 5, maxSpirit: 4 },
     tier: 'rare',
     familyId: 'sand-boots',
+    ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.2 }],
   },
   // Dune Wraps (gloves) - a step above Vine Gloves. Rare cap gets a genuine Blind resistance perk,
   // same "Rare-tier resistance to the region's own signature ailment" pattern as warden-vine-gloves'
@@ -1102,21 +1161,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-dune-wraps': {
     id: 'worn-dune-wraps',
     slot: 'gloves',
-    statBonuses: { attack: 2 },
+    statBonuses: { attack: 4 },
     tier: 'common',
     familyId: 'dune-wraps',
   },
   'woven-dune-wraps': {
     id: 'woven-dune-wraps',
     slot: 'gloves',
-    statBonuses: { maxHp: 4, attack: 4 },
+    statBonuses: { maxHp: 7, attack: 7 },
     tier: 'uncommon',
     familyId: 'dune-wraps',
   },
   'rangers-dune-wraps': {
     id: 'rangers-dune-wraps',
     slot: 'gloves',
-    statBonuses: { maxHp: 6, attack: 6, defense: 1 },
+    statBonuses: { maxHp: 11, attack: 11, defense: 2 },
     tier: 'rare',
     familyId: 'dune-wraps',
     ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.3 }],
@@ -1165,6 +1224,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxSpirit: 6, attack: 3 },
     tier: 'rare',
     familyId: 'sunstone-totem',
+    ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.25 }],
   },
   // Mythic tier - Canyon Giant's own lootTable chance drop (Chapter 10), same "not every rare+
   // item needs a unique quest thread" pattern as elder-buffalo-totem/elder-cedar-totem. The
@@ -1176,6 +1236,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 12, maxSpirit: 11, attack: 5 },
     tier: 'mythic',
     familyId: 'sunstone-totem',
+    ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.35 }],
   },
   // Sunstone Totem family's Legendary cap - a guaranteed reward from the boss-defeat quest itself
   // (MSF-SD-007), same pattern as thunderbird-totem/cedar-giant-totem. Named explicitly in the
@@ -1187,6 +1248,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'legendary',
     unique: true,
     familyId: 'sunstone-totem',
+    ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.45 }],
   },
 
   // --- Frozen Frontier (MSQ Volume VI, Chapter 11) equipment ---
@@ -1218,21 +1280,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-winter-coat': {
     id: 'worn-winter-coat',
     slot: 'chest',
-    statBonuses: { maxHp: 12, defense: 2 },
+    statBonuses: { maxHp: 25, defense: 4 },
     tier: 'common',
     familyId: 'winter-coat',
   },
   'lined-winter-coat': {
     id: 'lined-winter-coat',
     slot: 'chest',
-    statBonuses: { maxHp: 16, defense: 4 },
+    statBonuses: { maxHp: 34, defense: 8 },
     tier: 'uncommon',
     familyId: 'winter-coat',
   },
   'auroraweave-coat': {
     id: 'auroraweave-coat',
     slot: 'chest',
-    statBonuses: { maxHp: 20, defense: 6, attack: 2 },
+    statBonuses: { maxHp: 42, defense: 13, attack: 4 },
     tier: 'rare',
     familyId: 'winter-coat',
   },
@@ -1240,21 +1302,21 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-winter-leggings': {
     id: 'worn-winter-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 8, defense: 1 },
+    statBonuses: { maxHp: 17, defense: 2 },
     tier: 'common',
     familyId: 'winter-leggings',
   },
   'lined-winter-leggings': {
     id: 'lined-winter-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 11, defense: 2 },
+    statBonuses: { maxHp: 23, defense: 4 },
     tier: 'uncommon',
     familyId: 'winter-leggings',
   },
   'auroraweave-leggings': {
     id: 'auroraweave-leggings',
     slot: 'legs',
-    statBonuses: { maxHp: 14, defense: 4, attack: 1 },
+    statBonuses: { maxHp: 29, defense: 8, attack: 2 },
     tier: 'rare',
     familyId: 'winter-leggings',
   },
@@ -1263,44 +1325,49 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
   'worn-glacier-boots': {
     id: 'worn-glacier-boots',
     slot: 'boots',
-    statBonuses: { defense: 2, speed: 1 },
+    statBonuses: { defense: 4, speed: 2 },
     tier: 'common',
     familyId: 'glacier-boots',
   },
   'crampon-glacier-boots': {
     id: 'crampon-glacier-boots',
     slot: 'boots',
-    statBonuses: { defense: 3, speed: 2 },
+    statBonuses: { defense: 6, speed: 4 },
     tier: 'uncommon',
     familyId: 'glacier-boots',
   },
+  // Rare cap also gets a genuine Freeze resistance perk, same region-signature-ailment pattern as
+  // frostwardens-gloves below - totem + boots are this pass's two new resistance-bearing slots,
+  // letting a full gloves+charm+totem+boots loadout stack toward ~100% Freeze resistance instead
+  // of capping at 60%.
   'frostwardens-boots': {
     id: 'frostwardens-boots',
     slot: 'boots',
-    statBonuses: { defense: 4, speed: 3, maxHp: 3 },
+    statBonuses: { defense: 8, speed: 6, maxHp: 6 },
     tier: 'rare',
     familyId: 'glacier-boots',
+    ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.2 }],
   },
   // Fur Gloves - a step above Dune Wraps. Rare cap gets a genuine Freeze resistance perk, matching
   // Dune Wraps' own Blind-resistance-on-rare precedent.
   'worn-fur-gloves': {
     id: 'worn-fur-gloves',
     slot: 'gloves',
-    statBonuses: { attack: 2, defense: 1 },
+    statBonuses: { attack: 4, defense: 2 },
     tier: 'common',
     familyId: 'fur-gloves',
   },
   'lined-fur-gloves': {
     id: 'lined-fur-gloves',
     slot: 'gloves',
-    statBonuses: { attack: 3, defense: 2, maxHp: 3 },
+    statBonuses: { attack: 6, defense: 4, maxHp: 6 },
     tier: 'uncommon',
     familyId: 'fur-gloves',
   },
   'frostwardens-gloves': {
     id: 'frostwardens-gloves',
     slot: 'gloves',
-    statBonuses: { attack: 4, defense: 3, maxHp: 5 },
+    statBonuses: { attack: 8, defense: 6, maxHp: 10 },
     tier: 'rare',
     familyId: 'fur-gloves',
     ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.3 }],
@@ -1338,6 +1405,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 10, maxSpirit: 6, defense: 1 },
     tier: 'rare',
     familyId: 'winter-stag-totem',
+    ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.25 }],
   },
 
   // --- Frozen Frontier (MSQ Volume VI, Chapter 12) equipment ---
@@ -1359,6 +1427,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 15, maxSpirit: 12, defense: 3 },
     tier: 'mythic',
     familyId: 'winter-stag-totem',
+    ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.35 }],
   },
   // Winter Stag Totem family's Legendary cap - a guaranteed reward from the boss-defeat quest
   // itself (MSF-FF-006), same pattern as thunderbird-totem/cedar-giant-totem/canyon-giant-totem.
@@ -1371,5 +1440,6 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     tier: 'legendary',
     unique: true,
     familyId: 'winter-stag-totem',
+    ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.45 }],
   },
 };
