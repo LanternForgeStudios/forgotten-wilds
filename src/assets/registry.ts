@@ -5703,11 +5703,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'icon.item.guardian-memory-fragment-3',
     category: 'icon',
-    intendedUse: 'Item icon for guardian-memory-fragment-3 (Chapter 5 finale reward) - placeholder pending PixelLab quota',
-    filePath: 'icons/guardian-memory-fragment-3.svg',
+    intendedUse: 'Item icon for guardian-memory-fragment-3 (Chapter 5 finale reward)',
+    filePath: 'icons/guardian-memory-fragment-3.png',
     dimensions: { width: 64, height: 64 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+    status: 'final',
+    notes: 'pixellab MCP-generated: create_map_object ("a single glowing crystal shard, faceted, pale golden-amber light, centered", 128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/guardian-memory-fragment-3.png.',
   },
   {
     id: 'icon.equipment.white-buffalo-totem',

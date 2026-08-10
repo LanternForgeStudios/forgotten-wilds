@@ -153,7 +153,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
     }
   }
 
-  async function useItem(itemId: string) {
+  async function handleUseItem(itemId: string) {
     if (busy) return;
     setBusy(true);
     try {
@@ -338,7 +338,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                           title={wouldHelp ? undefined : 'Already at maximum - using this would have no effect.'}
                           onClick={(e) => {
                             e.stopPropagation();
-                            useItem(entry.itemId);
+                            handleUseItem(entry.itemId);
                           }}
                         >
                           {wouldHelp ? 'Use' : 'Full'}

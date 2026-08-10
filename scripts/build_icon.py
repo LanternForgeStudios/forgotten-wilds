@@ -16,6 +16,7 @@ from PIL import Image
 
 # filename (without extension) in art-staging/icons/ -> (output filename, final size)
 ICONS = {
+    "guardian-memory-fragment-3": (64, 64),
     "chieftains-buffalo-hide": (64, 64),
     "currency-gold": (32, 32),
     "currency-spirit-essence": (32, 32),
