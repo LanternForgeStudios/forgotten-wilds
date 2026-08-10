@@ -6757,11 +6757,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.elder-henrik',
     category: 'character',
-    intendedUse: 'Overworld sprite for elder-henrik - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/elder-henrik-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for elder-henrik - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/elder-henrik-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/elder-henrik/.',
   },
   {
     id: 'sprite.npc.captain-astrid-frost',
@@ -6775,11 +6778,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.aurora-keeper-lyra',
     category: 'character',
-    intendedUse: 'Overworld sprite for aurora-keeper-lyra - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/aurora-keeper-lyra-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for aurora-keeper-lyra - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/aurora-keeper-lyra-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/aurora-keeper-lyra/.',
   },
   {
     id: 'sprite.npc.winter-spirit',
@@ -6793,38 +6799,50 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.innkeeper-greta',
     category: 'character',
-    intendedUse: 'Overworld sprite for innkeeper-greta - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/innkeeper-greta-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for innkeeper-greta - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/innkeeper-greta-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/innkeeper-greta/.',
   },
   {
     id: 'sprite.npc.storekeeper-bjorn',
     category: 'character',
-    intendedUse: 'Overworld sprite for storekeeper-bjorn - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/storekeeper-bjorn-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for storekeeper-bjorn - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/storekeeper-bjorn-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/storekeeper-bjorn/.',
   },
   {
     id: 'sprite.npc.blacksmith-sigrid',
     category: 'character',
-    intendedUse: 'Overworld sprite for blacksmith-sigrid - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/blacksmith-sigrid-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for blacksmith-sigrid - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/blacksmith-sigrid-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/blacksmith-sigrid/.',
   },
   {
     id: 'sprite.npc.armorer-magnus',
     category: 'character',
-    intendedUse: 'Overworld sprite for armorer-magnus - placeholder pending PixelLab quota',
-    filePath: 'sprites/characters/armorer-magnus-idle.svg',
-    dimensions: { width: 72, height: 96 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py) - colored gradient panel + label, no external license concerns. Replace with real PixelLab art once quota refreshes.',
+    intendedUse:
+      'Overworld sprite for armorer-magnus - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
+    filePath: 'sprites/characters/armorer-magnus-idle.png',
+    dimensions: { width: 288, height: 96 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/armorer-magnus/.',
   },
   {
     id: 'portrait.elder-rowan-birch',
