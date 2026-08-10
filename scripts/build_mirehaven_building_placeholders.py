@@ -51,6 +51,12 @@ SLUGS = [
     "red-mesa-general-store",
     "red-mesa-blacksmith",
     "red-mesa-armory",
+    "frosthaven-explorer-headquarters",
+    "frosthaven-ice-chapel",
+    "frosthaven-inn",
+    "frosthaven-general-store",
+    "frosthaven-blacksmith",
+    "frosthaven-armory",
 ]
 
 TARGET_SIZE = (144, 144)
