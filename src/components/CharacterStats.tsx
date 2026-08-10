@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Panel } from './common/Panel';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { getAssetUrl } from '@/assets/assetManager';
@@ -10,6 +11,7 @@ import { aggregateAilmentResistances, formatAilmentResistance, formatStatBonuses
 import { StatBonusesText, AilmentResistanceText } from '@/components/common/StatBonusText';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
+import { RankProgressPopup } from './RankProgressPopup';
 import styles from './CharacterStats.module.css';
 
 interface CharacterStatsProps {
@@ -30,7 +32,8 @@ function baseAtLevel(stat: keyof typeof STAT_GROWTH_PER_LEVEL, level: number): n
 export function CharacterStats({ onClose }: CharacterStatsProps) {
   const player = usePlayerStore((s) => s.player);
   const now = useNow(250);
-  useOverlayClose(onClose);
+  const [showRankProgress, setShowRankProgress] = useState(false);
+  useOverlayClose(() => (showRankProgress ? setShowRankProgress(false) : onClose()));
 
   if (!player) return null;
 
@@ -58,8 +61,23 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
         <OverlayCloseButton onClick={onClose} />
         <div className={styles.header}>
           <h2 className={styles.name}>{player.name}</h2>
-          <span className={styles.level}>Level {player.level}</span>
+          <span
+            className={styles.level}
+            style={{ cursor: 'pointer', textDecoration: 'underline dotted' }}
+            title="See rank progression"
+            onClick={() => setShowRankProgress(true)}
+          >
+            Level {player.level}
+          </span>
         </div>
+        {showRankProgress && (
+          <RankProgressPopup
+            level={player.level}
+            spiritEssence={player.spiritEssence}
+            regionalReputation={player.regionalReputation}
+            onClose={() => setShowRankProgress(false)}
+          />
+        )}
         <p className={styles.xpLine}>
           {xpSpan > 0 ? `${xpIntoLevel} / ${xpSpan} XP to Level ${player.level + 1}` : 'Max Level'}
         </p>
@@ -160,8 +178,9 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
           <h3 className={styles.sectionTitle}>Currency</h3>
           <div className={styles.currencyRow}>
             <span>{player.gold}g Gold</span>
-            <span>{player.spiritEssence} Spirit Essence</span>
-            <span>{player.festivalTokens} Festival Tokens</span>
+            {/* Spirit Essence / Festival Tokens hidden from display for now (2026-08) - not
+                removed, so they're easy to re-show later; player.spiritEssence still drives
+                Spirit Rank regardless of whether the raw number is shown here. */}
             <span>{player.premiumCurrency} Premium Currency</span>
           </div>
         </div>

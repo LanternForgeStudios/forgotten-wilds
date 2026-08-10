@@ -37,7 +37,7 @@ export const STAT_GROWTH_PER_LEVEL = {
 // 10 tiers of 10 levels each across the level-100 cap - reuses the 4 pre-existing ExplorerRank
 // names (Newcomer/Wayfarer/Pathfinder/Keeper) in their natural early-game order and extends
 // upward. Kept in sync by hand with functions/src/data/leveling.ts.
-const EXPLORER_RANK_THRESHOLDS: { minLevel: number; rank: ExplorerRank }[] = [
+export const EXPLORER_RANK_THRESHOLDS: { minLevel: number; rank: ExplorerRank }[] = [
   { minLevel: 91, rank: 'Legend of Mytherra' },
   { minLevel: 81, rank: 'Lantern Sage' },
   { minLevel: 71, rank: 'Deepwalker' },
@@ -56,7 +56,7 @@ export function explorerRankForLevel(level: number): ExplorerRank {
 
 // Thresholds set at ~0/25/60/90% of the total spiritEssence actually grantable by every quest
 // reward in the game today (155). Kept in sync by hand with functions/src/data/leveling.ts.
-const SPIRIT_RANK_THRESHOLDS: { minEssence: number; rank: SpiritRank }[] = [
+export const SPIRIT_RANK_THRESHOLDS: { minEssence: number; rank: SpiritRank }[] = [
   { minEssence: 140, rank: 'Warden' },
   { minEssence: 90, rank: 'Resonant' },
   { minEssence: 40, rank: 'Attuned' },
@@ -69,7 +69,7 @@ export function spiritRankForEssence(spiritEssence: number): SpiritRank {
 
 // Same idea, percentages of the total regionalReputation actually grantable today (520). Kept in
 // sync by hand with functions/src/data/leveling.ts.
-const REGIONAL_REPUTATION_RANK_THRESHOLDS: { minReputation: number; rank: RegionalReputationRank }[] = [
+export const REGIONAL_REPUTATION_RANK_THRESHOLDS: { minReputation: number; rank: RegionalReputationRank }[] = [
   { minReputation: 470, rank: 'Living Legend of Mytherra' },
   { minReputation: 360, rank: 'Honored Friend' },
   { minReputation: 230, rank: 'Trusted Ally' },
