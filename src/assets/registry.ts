@@ -2219,6 +2219,294 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
   },
   {
+    id: 'sprite.equipment.worn-nomad-robes',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - worn-nomad-robes (Shattered Desert nomad-robes family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-nomad-robes-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-nomad-robes-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - worn-nomad-robes (Shattered Desert nomad-robes family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-nomad-robes-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-nomad-robes',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - banded-nomad-robes (Shattered Desert nomad-robes family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-nomad-robes-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-nomad-robes-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - banded-nomad-robes (Shattered Desert nomad-robes family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-nomad-robes-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.starwoven-nomad-robes',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - starwoven-nomad-robes (Shattered Desert nomad-robes family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/starwoven-nomad-robes-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.starwoven-nomad-robes-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - starwoven-nomad-robes (Shattered Desert nomad-robes family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/starwoven-nomad-robes-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-nomad-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - worn-nomad-leggings (Shattered Desert nomad-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-nomad-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-nomad-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - worn-nomad-leggings (Shattered Desert nomad-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-nomad-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-nomad-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - banded-nomad-leggings (Shattered Desert nomad-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-nomad-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-nomad-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - banded-nomad-leggings (Shattered Desert nomad-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-nomad-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.starwoven-nomad-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - starwoven-nomad-leggings (Shattered Desert nomad-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/starwoven-nomad-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.starwoven-nomad-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - starwoven-nomad-leggings (Shattered Desert nomad-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/starwoven-nomad-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-sand-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - worn-sand-boots (Shattered Desert sand-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-sand-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-sand-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - worn-sand-boots (Shattered Desert sand-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-sand-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.swift-sand-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - swift-sand-boots (Shattered Desert sand-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/swift-sand-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.swift-sand-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - swift-sand-boots (Shattered Desert sand-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/swift-sand-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.sunrunner-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - sunrunner-boots (Shattered Desert sand-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/sunrunner-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.sunrunner-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - sunrunner-boots (Shattered Desert sand-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/sunrunner-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-dune-wraps',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - worn-dune-wraps (Shattered Desert dune-wraps family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-dune-wraps-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-dune-wraps-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - worn-dune-wraps (Shattered Desert dune-wraps family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-dune-wraps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.woven-dune-wraps',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - woven-dune-wraps (Shattered Desert dune-wraps family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/woven-dune-wraps-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.woven-dune-wraps-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - woven-dune-wraps (Shattered Desert dune-wraps family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/woven-dune-wraps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.rangers-dune-wraps',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - rangers-dune-wraps (Shattered Desert dune-wraps family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/rangers-dune-wraps-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.rangers-dune-wraps-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - rangers-dune-wraps (Shattered Desert dune-wraps family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/rangers-dune-wraps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
     id: 'sprite.equipment.wardens-broadsword',
     category: 'character',
     intendedUse:

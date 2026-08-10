@@ -856,9 +856,13 @@ explicit "NOT a plain human body"/"NOT a person" negative-prompt language) despi
 sibling succeeding with identical phrasing - shipped instead as an HLS lightness/saturation recolor
 of sandstorm-devil-idle.png's real art (same silhouette, paler tone for the regular tier). Sunblade
 family (all 3 tiers, both genders) equipment-layer art shipped for free via
-`scripts/palette_swap_equipment_layer.py` off the existing weathered-iron-sword founder - the other 5
-Shattered Desert equipment families have no matching founder silhouette and still need real
-hand-positioned layer art (a distinct, not-yet-started phase from icons). All 6 of
+`scripts/palette_swap_equipment_layer.py` off the existing weathered-iron-sword founder.
+**Equipment layers (2026-08-10): all remaining 4 wearable families done too** - Nomad Robes (chest),
+Nomad Leggings (legs), Sand Boots (boots), Dune Wraps (gloves), all 3 tiers x both genders,
+recolored from this project's generic per-slot templates (`worn-keeper-coat`/`traveler-pants`/
+`traveler-boots`/`leather-gauntlets`) per the same documented workflow used for Whispering Pines.
+`star-charm`/`sunstone-totem` are out of scope for equipment layers by design (worn under clothes/
+held out of frame, per `Equipment-Layering-Plan.md`). All 6 of
 Chapter 9's field/town maps reuse `tileset.overworld-terrain`/`overworld-decor2`/
 `overworld-water` and `tileset.town-terrain` (not `tileset.cliff`/`tileset.beach`, both already
 flagged "provenance unconfirmed" elsewhere in this file, not safe to wire into real content) - not

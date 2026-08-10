@@ -1321,6 +1321,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 10, attack: 2, maxSpirit: 2 },
     tier: 'common',
     familyId: 'nomad-robes',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-nomad-robes', female: 'sprite.equipment.worn-nomad-robes-female' },
   },
   {
     id: 'banded-nomad-robes',
@@ -1331,6 +1332,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 14, attack: 4, maxSpirit: 4 },
     tier: 'uncommon',
     familyId: 'nomad-robes',
+    layerSpriteAssetId: { male: 'sprite.equipment.banded-nomad-robes', female: 'sprite.equipment.banded-nomad-robes-female' },
   },
   {
     id: 'starwoven-nomad-robes',
@@ -1341,6 +1343,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 18, attack: 6, maxSpirit: 8, defense: 2 },
     tier: 'rare',
     familyId: 'nomad-robes',
+    layerSpriteAssetId: { male: 'sprite.equipment.starwoven-nomad-robes', female: 'sprite.equipment.starwoven-nomad-robes-female' },
   },
   {
     id: 'worn-nomad-leggings',
@@ -1351,6 +1354,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 6, attack: 1 },
     tier: 'common',
     familyId: 'nomad-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-nomad-leggings', female: 'sprite.equipment.worn-nomad-leggings-female' },
   },
   {
     id: 'banded-nomad-leggings',
@@ -1361,6 +1365,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 9, attack: 2, maxSpirit: 1 },
     tier: 'uncommon',
     familyId: 'nomad-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.banded-nomad-leggings', female: 'sprite.equipment.banded-nomad-leggings-female' },
   },
   {
     id: 'starwoven-nomad-leggings',
@@ -1371,6 +1376,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 12, attack: 3, maxSpirit: 3, defense: 1 },
     tier: 'rare',
     familyId: 'nomad-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.starwoven-nomad-leggings', female: 'sprite.equipment.starwoven-nomad-leggings-female' },
   },
   {
     id: 'worn-sand-boots',
@@ -1381,6 +1387,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { speed: 2, attack: 1 },
     tier: 'common',
     familyId: 'sand-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-sand-boots', female: 'sprite.equipment.worn-sand-boots-female' },
   },
   {
     id: 'swift-sand-boots',
@@ -1391,6 +1398,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { speed: 3, attack: 2 },
     tier: 'uncommon',
     familyId: 'sand-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.swift-sand-boots', female: 'sprite.equipment.swift-sand-boots-female' },
   },
   {
     id: 'sunrunner-boots',
@@ -1401,6 +1409,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { speed: 4, attack: 3, maxSpirit: 2 },
     tier: 'rare',
     familyId: 'sand-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.sunrunner-boots', female: 'sprite.equipment.sunrunner-boots-female' },
   },
   {
     id: 'worn-dune-wraps',
@@ -1411,6 +1420,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 2 },
     tier: 'common',
     familyId: 'dune-wraps',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-dune-wraps', female: 'sprite.equipment.worn-dune-wraps-female' },
   },
   {
     id: 'woven-dune-wraps',
@@ -1421,6 +1431,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 4, attack: 4 },
     tier: 'uncommon',
     familyId: 'dune-wraps',
+    layerSpriteAssetId: { male: 'sprite.equipment.woven-dune-wraps', female: 'sprite.equipment.woven-dune-wraps-female' },
   },
   {
     id: 'rangers-dune-wraps',
@@ -1431,6 +1442,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 6, attack: 6, defense: 1 },
     tier: 'rare',
     familyId: 'dune-wraps',
+    layerSpriteAssetId: { male: 'sprite.equipment.rangers-dune-wraps', female: 'sprite.equipment.rangers-dune-wraps-female' },
     ailmentResistance: [{ ailmentId: 'blind', reductionPercent: 0.3 }],
   },
   {
