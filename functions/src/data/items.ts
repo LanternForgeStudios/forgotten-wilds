@@ -504,7 +504,7 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'miners-mallet',
     'river-stone-charm',
   ],
-  'ash-hallow-armory': ['worn-keeper-coat', 'worn-keeper-trousers', 'traveler-boots', 'work-gloves'],
+  'ash-hallow-armory': ['worn-keeper-coat', 'worn-keeper-trousers', 'reinforced-keeper-trousers', 'traveler-boots', 'work-gloves'],
   apothecary: [
     'healing-poultice',
     'greater-healing-poultice',

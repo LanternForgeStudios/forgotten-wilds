@@ -157,7 +157,7 @@ export const ENEMIES: Enemy[] = [
     xpReward: 13,
     goldReward: 7,
     lootTable: [
-      { itemId: 'frost-wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       { itemId: 'echo-herb', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
     loreBlurb: 'A lean, sure-footed wolf that hunts the high passes of Raven Ridge.',

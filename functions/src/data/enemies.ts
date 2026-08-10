@@ -205,7 +205,7 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
     xpReward: 13,
     goldReward: 7,
     lootTable: [
-      { itemId: 'frost-wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'wolf-fang', chance: 0.4, minQuantity: 1, maxQuantity: 2 },
       // ridge-ambush inflicts Silence - echo-herb cures it.
       { itemId: 'echo-herb', chance: 0.12, minQuantity: 1, maxQuantity: 1 },
     ],
