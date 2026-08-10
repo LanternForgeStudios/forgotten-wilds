@@ -4,6 +4,7 @@ import { EQUIPMENT } from '../data/equipment';
 import { grantItem } from './inventoryEngine';
 import { applyLevelUp } from './levelingEngine';
 import { equipIntoSlot } from './equipmentEngine';
+import { spiritRankForEssence, regionalReputationRankForTotal } from '../data/leveling';
 import type { PlayerSave, QuestProgress } from '../shared-types';
 
 export function effectiveStatus(
@@ -185,6 +186,11 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
     save.player.gold += reward.gold;
     save.player.spiritEssence += reward.spiritEssence ?? 0;
     save.player.regionalReputation += reward.regionalReputation ?? 0;
+    // Unconditional, not just when this reward actually granted essence/reputation - self-heals
+    // any save whose rank predates these derivations existing, same spirit as applyLevelUp's own
+    // explorerRank self-heal.
+    save.player.spiritRank = spiritRankForEssence(save.player.spiritEssence);
+    save.player.regionalReputationRank = regionalReputationRankForTotal(save.player.regionalReputation);
     for (const itemId of reward.itemIds ?? []) {
       // A unique reward item already owned some other way is skipped, not an error - the quest
       // still completes and its xp/gold still land. grantItem's own return value (true only when

@@ -780,6 +780,10 @@ export function UserProfile({ onClose }: UserProfileProps) {
               <span>{player.explorerRank}</span>
             </div>
             <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Regional Reputation</span>
+              <span>{player.regionalReputationRank}</span>
+            </div>
+            <div className={styles.infoRow}>
               <span className={styles.infoLabel}>Member Since</span>
               <span>{memberSince}</span>
             </div>

@@ -28,6 +28,7 @@ export function buildFreshPlayer(
     spiritRank: 'Unawakened',
     explorerRank: 'Newcomer',
     regionalReputation: 0,
+    regionalReputationRank: 'Stranger',
     equipment: { ...freshPlayerEquipment(), lantern: 'keepers-lantern' },
     currentLocationId: STARTING_LOCATION_ID,
     staminaUpdatedAt: now,

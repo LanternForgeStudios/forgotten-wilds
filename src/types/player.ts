@@ -1,4 +1,4 @@
-import type { EquipmentSlot, ExplorerRank, SpiritRank, Stats } from './stats';
+import type { EquipmentSlot, ExplorerRank, RegionalReputationRank, SpiritRank, Stats } from './stats';
 import type { InventoryItem } from './item';
 import type { QuestProgress } from './quest';
 import type { JournalState } from './journal';
@@ -18,6 +18,7 @@ export interface Player {
   spiritRank: SpiritRank;
   explorerRank: ExplorerRank;
   regionalReputation: number;
+  regionalReputationRank: RegionalReputationRank;
   equipment: PlayerEquipment;
   currentLocationId: string;
   /** Server clock reading the last time Stamina was reconciled - lets Dash compute how much has

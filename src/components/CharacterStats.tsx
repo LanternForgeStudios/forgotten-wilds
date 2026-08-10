@@ -70,7 +70,7 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
             Explorer Rank <strong>{player.explorerRank}</strong>
           </span>
           <span>
-            Regional Reputation <strong>{player.regionalReputation}</strong>
+            Regional Reputation <strong>{player.regionalReputationRank}</strong> ({player.regionalReputation})
           </span>
         </div>
 

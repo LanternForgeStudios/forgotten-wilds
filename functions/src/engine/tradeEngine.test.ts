@@ -37,6 +37,7 @@ function makeSave(inventory: InventoryItem[], gold: number, equipment: PlayerEqu
       spiritRank: 'Unawakened',
       explorerRank: 'Newcomer',
       regionalReputation: 0,
+      regionalReputationRank: 'Stranger',
       equipment,
       currentLocationId: 'ash-hallow',
     },

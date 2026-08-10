@@ -1,6 +1,6 @@
 // Display copy only — functions/src/data/leveling.ts is authoritative for level-up resolution.
 
-import type { ExplorerRank } from '@/types';
+import type { ExplorerRank, RegionalReputationRank, SpiritRank } from '@/types';
 
 export const MAX_LEVEL = 100;
 
@@ -52,4 +52,31 @@ const EXPLORER_RANK_THRESHOLDS: { minLevel: number; rank: ExplorerRank }[] = [
 
 export function explorerRankForLevel(level: number): ExplorerRank {
   return EXPLORER_RANK_THRESHOLDS.find((t) => level >= t.minLevel)!.rank;
+}
+
+// Thresholds set at ~0/25/60/90% of the total spiritEssence actually grantable by every quest
+// reward in the game today (155). Kept in sync by hand with functions/src/data/leveling.ts.
+const SPIRIT_RANK_THRESHOLDS: { minEssence: number; rank: SpiritRank }[] = [
+  { minEssence: 140, rank: 'Warden' },
+  { minEssence: 90, rank: 'Resonant' },
+  { minEssence: 40, rank: 'Attuned' },
+  { minEssence: 0, rank: 'Unawakened' },
+];
+
+export function spiritRankForEssence(spiritEssence: number): SpiritRank {
+  return SPIRIT_RANK_THRESHOLDS.find((t) => spiritEssence >= t.minEssence)!.rank;
+}
+
+// Same idea, percentages of the total regionalReputation actually grantable today (520). Kept in
+// sync by hand with functions/src/data/leveling.ts.
+const REGIONAL_REPUTATION_RANK_THRESHOLDS: { minReputation: number; rank: RegionalReputationRank }[] = [
+  { minReputation: 470, rank: 'Living Legend of Mytherra' },
+  { minReputation: 360, rank: 'Honored Friend' },
+  { minReputation: 230, rank: 'Trusted Ally' },
+  { minReputation: 100, rank: 'Acquaintance' },
+  { minReputation: 0, rank: 'Stranger' },
+];
+
+export function regionalReputationRankForTotal(regionalReputation: number): RegionalReputationRank {
+  return REGIONAL_REPUTATION_RANK_THRESHOLDS.find((t) => regionalReputation >= t.minReputation)!.rank;
 }

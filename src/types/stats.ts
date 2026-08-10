@@ -68,3 +68,9 @@ export type ExplorerRank =
   | 'Deepwalker'
   | 'Lantern Sage'
   | 'Legend of Mytherra';
+
+/** Awarded automatically from the player's regionalReputation total, in 5 tiers - see
+ *  regionalReputationRankForTotal in data/leveling.ts for the exact thresholds. A pure display
+ *  label over the existing single global regionalReputation counter, not a per-region tracker
+ *  and not a gate on anything. */
+export type RegionalReputationRank = 'Stranger' | 'Acquaintance' | 'Trusted Ally' | 'Honored Friend' | 'Living Legend of Mytherra';
