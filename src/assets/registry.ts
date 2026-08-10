@@ -7357,12 +7357,14 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'sprite.npc.scout-niska',
     category: 'character',
-    intendedUse: "Overworld sprite for scout-niska - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT's shape). Wanders Highwind Crossing (wanderRadius) but not yet in NPC_WALK_ASSET_IDS - see intendedUse note above.",
-    filePath: 'sprites/characters/scout-niska-idle.png',
-    dimensions: { width: 288, height: 96 },
+    intendedUse:
+      "Overworld sprite for scout-niska - a wandering NPC (wanderRadius on its highwind-crossing.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/scout-niska-walk.png',
+    dimensions: { width: 288, height: 480 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: 'Generated via the pixellab MCP server (create_character + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/scout-niska/.',
+    notes:
+      "Walk rows added to the character's existing PixelLab record (animate_character walking-4-frames, all 4 cardinal directions) rather than a full regeneration - her original idle art was already correct, only the walk cycle was missing. Its first walk attempt (this same character, an earlier session) used the plain 'walking' template, which produced 6 frames per direction that didn't match the idle row's 4 - that mismatched animation group was deleted and regenerated with walking-4-frames specifically. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/scout-niska/.",
   },
   {
     id: 'sprite.npc.prairie-spirit',
@@ -7536,13 +7538,13 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     id: 'sprite.npc.cedar-spirit',
     category: 'character',
     intendedUse:
-      'Overworld sprite for cedar-spirit. Wanders the Ancient Cedar Shrine (wanderRadius). - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
-    filePath: 'sprites/characters/cedar-spirit-idle.png',
-    dimensions: { width: 288, height: 96 },
+      "Overworld sprite for cedar-spirit - a wandering NPC (wanderRadius on its ancient-cedar-shrine.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/cedar-spirit-walk.png',
+    dimensions: { width: 288, height: 480 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      'Generated via the pixellab MCP server (create_character + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/cedar-spirit/.',
+      "Walk rows added to the character's existing PixelLab record (animate_character walking-4-frames, all 4 cardinal directions) rather than a full regeneration - the original idle art was already correct, only the walk cycle was missing. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/cedar-spirit/.",
   },
   {
     id: 'sprite.npc.innkeeper-marge',
@@ -7634,13 +7636,13 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     id: 'sprite.npc.sand-spirit',
     category: 'character',
     intendedUse:
-      'Overworld sprite for sand-spirit - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
-    filePath: 'sprites/characters/sand-spirit-idle.png',
-    dimensions: { width: 288, height: 96 },
+      "Overworld sprite for sand-spirit - a wandering NPC (wanderRadius on its celestial-oasis.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/sand-spirit-walk.png',
+    dimensions: { width: 288, height: 480 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/sand-spirit/.',
+      "Walk rows added to the character's existing PixelLab record (animate_character walking-4-frames, all 4 cardinal directions) rather than a full regeneration - the original idle art was already correct, only the walk cycle was missing. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/sand-spirit/.",
   },
   {
     id: 'sprite.npc.innkeeper-rosa',

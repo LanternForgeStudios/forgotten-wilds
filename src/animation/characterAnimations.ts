@@ -49,6 +49,13 @@ const NPC_WALK_ASSET_IDS = new Set([
   // Aurora Basin (both wanderRadius).
   'sprite.npc.captain-astrid-frost',
   'sprite.npc.winter-spirit',
+  // Endless Prairie / Shattered Desert / Whispering Pines follow-up pass - sand-spirit (Celestial
+  // Oasis), scout-niska (Highwind Crossing), and cedar-spirit (Ancient Cedar Shrine) all roam
+  // (wanderRadius) but shipped idle-only originally; walk rows added to their existing PixelLab
+  // characters via animate_character rather than a full regeneration.
+  'sprite.npc.sand-spirit',
+  'sprite.npc.scout-niska',
+  'sprite.npc.cedar-spirit',
 ]);
 /** Row layout for NPC_WALK_ASSET_IDS sheets: row 0 idle (breathing), rows 1-4 walking by facing -
  *  a fixed convention (not per-NPC configurable) since the build script that assembles these
