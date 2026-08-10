@@ -322,10 +322,10 @@ export async function callDash(): Promise<{ stamina: number; maxStamina: number;
 export async function callOpenChest(
   locationId: string,
   chestId: string,
-): Promise<{ alreadyOpened: boolean; itemId: string }> {
+): Promise<{ alreadyOpened: boolean; itemId: string; itemQuantity?: number; gold?: number; xp?: number }> {
   const fn = httpsCallable<
     { locationId: string; chestId: string },
-    { alreadyOpened: boolean; itemId: string }
+    { alreadyOpened: boolean; itemId: string; itemQuantity?: number; gold?: number; xp?: number }
   >(functions, 'openChest');
   const result = await fn({ locationId, chestId });
   return result.data;

@@ -294,7 +294,15 @@ export function DungeonScene() {
             return;
           }
           void playSound('sfx.chest-open');
-          setRewardPopup({ title: 'You found...', subtitle: 'Chest', lines: buildRewardLines({ itemIds: [res.itemId] }) });
+          setRewardPopup({
+            title: 'You found...',
+            subtitle: 'Chest',
+            lines: buildRewardLines({
+              gold: res.gold,
+              xp: res.xp,
+              itemIds: Array(res.itemQuantity ?? 1).fill(res.itemId),
+            }),
+          });
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The chest will not open.'));
     } else if (obj?.refId) {
