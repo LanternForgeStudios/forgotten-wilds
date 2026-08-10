@@ -300,6 +300,9 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       className={`${styles.itemCard} ${isSelected ? styles.itemCardSelected : ''}`}
                       onClick={() => setSelectedItemId(entry.itemId)}
                     >
+                      {(equipDef ?? itemDef) && (
+                        <TierBadge tier={(equipDef ?? itemDef)!.tier} style={{ position: 'absolute', top: 4, right: 4 }} />
+                      )}
                       {entry.iconAssetId && <img src={getAssetUrl(entry.iconAssetId)} alt="" className={styles.icon} />}
                       <span className={styles.itemName}>{entry.name}</span>
                       <span style={{ fontSize: 11, opacity: 0.7 }}>x{entry.quantity}</span>
