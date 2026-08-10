@@ -6685,13 +6685,13 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     id: 'sprite.npc.desert-ranger-tomas-vega',
     category: 'character',
     intendedUse:
-      'Overworld sprite for desert-ranger-tomas-vega - south-facing idle animation (single row x 4 frames of 72x96, IDLE_ANIMATION_LAYOUT\'s shape).',
-    filePath: 'sprites/characters/desert-ranger-tomas-vega-idle.png',
-    dimensions: { width: 288, height: 96 },
+      "Overworld sprite for desert-ranger-tomas-vega - a wandering NPC (wanderRadius on its red-mesa.json map object). 5-row sheet: idle (breathing, south-facing) + walking down/left/up/right, 4 frames each at 72x96, matching NPC_WALK_ANIMATION_LAYOUT's row order exactly.",
+    filePath: 'sprites/characters/desert-ranger-tomas-vega-walk.png',
+    dimensions: { width: 288, height: 480 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      'Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template, south direction only). Crop box computed automatically via scripts/build_bayou_npc_idle_sheet.py. Originals archived at public/assets/sprites/characters/original/desert-ranger-tomas-vega/.',
+      "Generated via the pixellab MCP server (create_character, humanoid, size 128 + animate_character breathing-idle template for the idle row, walking-4-frames template across all 4 cardinal directions for the walk rows - built as idle+walk together from the start, unlike marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/forest-warden-rowan-hart/prairie-spirit which all shipped idle-only first and needed a follow-up pass). Added to NPC_WALK_ASSET_IDS in characterAnimations.ts. Crop box computed automatically (union bbox across all 5 rows, aspect-corrected) via scripts/build_bayou_npc_walk_sheet.py. Originals archived at public/assets/sprites/characters/original/desert-ranger-tomas-vega/.",
   },
   {
     id: 'sprite.npc.sand-spirit',

@@ -43,6 +43,8 @@ const NPC_WALK_ASSET_IDS = new Set([
   // built with idle-only sheets initially, same gap this whole set exists to avoid.
   'sprite.npc.marsh-spirit',
   'sprite.npc.sabine-thorne',
+  // Shattered Desert (MSQ Volume V) - desert-ranger-tomas-vega roams Red Mesa (wanderRadius).
+  'sprite.npc.desert-ranger-tomas-vega',
 ]);
 /** Row layout for NPC_WALK_ASSET_IDS sheets: row 0 idle (breathing), rows 1-4 walking by facing -
  *  a fixed convention (not per-NPC configurable) since the build script that assembles these
