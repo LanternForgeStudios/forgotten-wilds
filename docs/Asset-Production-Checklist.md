@@ -963,19 +963,19 @@ tiles are real, just generic.
 
 ## Frozen Frontier, Chapter 11: Into the Endless Winter - outstanding placeholders
 
-**Status (2026-08-10): all 19 equipment icons + all 3 item icons + all 8 NPC portraits done, real
-PixelLab art.** `tileset.frosthaven-terrain` (a genuine snow/ice Wang autotile set for the region's
-5 field maps) was generated earlier - the first brand-new real tileset this project generated
-instead of reusing an existing one, since none of the vetted tilesets (grass/desert/marsh) have a
-snow palette. Frosthaven's own town ground still reuses `tileset.town-terrain`, matching every
-prior region's town. NPC overworld sprites in progress (`create_character` size=128 +
-`animate_character`, per the established sizing convention) - captain-astrid-frost and winter-spirit
-(the 2 roaming NPCs, wanderRadius on frosthaven.json/aurora-basin.json) are being built with real
-idle+walk-cycle sheets from the start this time, avoiding the idle-only gap left on several earlier
-regions' wanderers. captain-astrid-frost's portrait needed a retry (first attempt had a visible
-watermark and an anachronistic flag patch). 2 enemy sprites (Frost Wolf, Alpha Frost Wolf) and
-Chapter 12's 3 enemy sprites (Frozen Wraith, Ancient Frozen Wraith, Winter Stag boss) not yet
-started.
+**Status (2026-08-10): all 19 equipment icons + all 3 item icons + all 8 NPC portraits + all 8 NPC
+overworld sprites done, real PixelLab art.** `tileset.frosthaven-terrain` (a genuine snow/ice Wang
+autotile set for the region's 5 field maps) was generated earlier - the first brand-new real
+tileset this project generated instead of reusing an existing one, since none of the vetted
+tilesets (grass/desert/marsh) have a snow palette. Frosthaven's own town ground still reuses
+`tileset.town-terrain`, matching every prior region's town. captain-astrid-frost and winter-spirit
+(the 2 roaming NPCs, wanderRadius on frosthaven.json/aurora-basin.json) were built with real
+idle+walk-cycle sheets from the start, avoiding the idle-only gap left on marsh-spirit/
+sabine-thorne/cedar-spirit/scout-niska/forest-warden-rowan-hart/prairie-spirit (those 6 still need
+the same follow-up fix, flagged, not yet done). captain-astrid-frost's portrait needed a retry
+(first attempt had a visible watermark and an anachronistic flag patch); a Sigrid/Bjorn character-ID
+mix-up during the sprite batch was caught and corrected before committing. 5 enemy sprites (Frost
+Wolf, Alpha Frost Wolf, Frozen Wraith, Ancient Frozen Wraith, Winter Stag boss) in progress.
 
 ### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
 
@@ -1051,7 +1051,8 @@ No Chapter 11 NPC has real PixelLab art yet, sprite or portrait.
 **Status (2026-08-10): all 5 equipment icons + all 3 item icons done, real PixelLab art** (shipped
 as part of the same 29-icon Chapter 11+12 batch). No new NPCs this chapter (Aurora Keeper Lyra and
 Elias Rowan both reprise existing roles). 3 enemy sprites (Frozen Wraith, Ancient Frozen Wraith,
-Winter Stag boss) not yet started. All 5 of the Hall of Eternal Winter's dungeon rooms reuse
+Winter Stag boss) in progress (shipped as part of the same 5-enemy Chapter 11+12 batch). All 5 of
+the Hall of Eternal Winter's dungeon rooms reuse
 `tileset.tiny-dungeon`, same as every dungeon before it - not tracked as a placeholder gap, the
 tiles are real, just generic.
 
