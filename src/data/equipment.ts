@@ -1564,6 +1564,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 12, defense: 2 },
     tier: 'common',
     familyId: 'winter-coat',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-winter-coat', female: 'sprite.equipment.worn-winter-coat-female' },
   },
   {
     id: 'lined-winter-coat',
@@ -1574,6 +1575,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 16, defense: 4 },
     tier: 'uncommon',
     familyId: 'winter-coat',
+    layerSpriteAssetId: { male: 'sprite.equipment.lined-winter-coat', female: 'sprite.equipment.lined-winter-coat-female' },
   },
   {
     id: 'auroraweave-coat',
@@ -1584,6 +1586,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 20, defense: 6, attack: 2 },
     tier: 'rare',
     familyId: 'winter-coat',
+    layerSpriteAssetId: { male: 'sprite.equipment.auroraweave-coat', female: 'sprite.equipment.auroraweave-coat-female' },
   },
   {
     id: 'worn-winter-leggings',
@@ -1594,6 +1597,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 8, defense: 1 },
     tier: 'common',
     familyId: 'winter-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-winter-leggings', female: 'sprite.equipment.worn-winter-leggings-female' },
   },
   {
     id: 'lined-winter-leggings',
@@ -1604,6 +1608,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 11, defense: 2 },
     tier: 'uncommon',
     familyId: 'winter-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.lined-winter-leggings', female: 'sprite.equipment.lined-winter-leggings-female' },
   },
   {
     id: 'auroraweave-leggings',
@@ -1614,6 +1619,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 14, defense: 4, attack: 1 },
     tier: 'rare',
     familyId: 'winter-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.auroraweave-leggings', female: 'sprite.equipment.auroraweave-leggings-female' },
   },
   {
     id: 'worn-glacier-boots',
@@ -1624,6 +1630,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { defense: 2, speed: 1 },
     tier: 'common',
     familyId: 'glacier-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-glacier-boots', female: 'sprite.equipment.worn-glacier-boots-female' },
   },
   {
     id: 'crampon-glacier-boots',
@@ -1634,6 +1641,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { defense: 3, speed: 2 },
     tier: 'uncommon',
     familyId: 'glacier-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.crampon-glacier-boots', female: 'sprite.equipment.crampon-glacier-boots-female' },
   },
   {
     id: 'frostwardens-boots',
@@ -1644,6 +1652,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { defense: 4, speed: 3, maxHp: 3 },
     tier: 'rare',
     familyId: 'glacier-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.frostwardens-boots', female: 'sprite.equipment.frostwardens-boots-female' },
   },
   {
     id: 'worn-fur-gloves',
@@ -1654,6 +1663,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 2, defense: 1 },
     tier: 'common',
     familyId: 'fur-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-fur-gloves', female: 'sprite.equipment.worn-fur-gloves-female' },
   },
   {
     id: 'lined-fur-gloves',
@@ -1664,6 +1674,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 3, defense: 2, maxHp: 3 },
     tier: 'uncommon',
     familyId: 'fur-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.lined-fur-gloves', female: 'sprite.equipment.lined-fur-gloves-female' },
   },
   {
     id: 'frostwardens-gloves',
@@ -1674,6 +1685,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 4, defense: 3, maxHp: 5 },
     tier: 'rare',
     familyId: 'fur-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.frostwardens-gloves', female: 'sprite.equipment.frostwardens-gloves-female' },
     ailmentResistance: [{ ailmentId: 'freeze', reductionPercent: 0.3 }],
   },
   {

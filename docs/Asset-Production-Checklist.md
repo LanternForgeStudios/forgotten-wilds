@@ -1002,7 +1002,11 @@ fight-stance-idle-8-frames); Winter Stag boss used `template='horse'` with `idle
 after a first attempt with `rest-idle` produced a lying-down pose, wrong for a battle stance. Frost
 Pike family (all 3 tiers, both genders) equipment-layer art shipped for free via
 `scripts/palette_swap_equipment_layer.py` off the existing ashwood-spear founder - both items'
-icons share the same straight-haft-with-blade silhouette.
+icons share the same straight-haft-with-blade silhouette. The remaining 4 wearable families
+(Winter Coat/Winter Leggings/Glacier Boots/Fur Gloves, all 3 tiers x both genders each) are also
+done, recolored from this project's generic per-slot templates (`worn-keeper-coat`/`traveler-pants`/
+`traveler-boots`/`leather-gauntlets`), same workflow as Whispering Pines and Shattered Desert -
+Frozen Frontier's equipment-layer coverage is now complete for every wearable slot.
 
 ### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
 

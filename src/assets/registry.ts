@@ -2507,6 +2507,294 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
   },
   {
+    id: 'sprite.equipment.worn-winter-coat',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - worn-winter-coat (Frozen Frontier winter-coat family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-winter-coat-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-winter-coat-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - worn-winter-coat (Frozen Frontier winter-coat family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-winter-coat-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.lined-winter-coat',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - lined-winter-coat (Frozen Frontier winter-coat family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/lined-winter-coat-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.lined-winter-coat-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - lined-winter-coat (Frozen Frontier winter-coat family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/lined-winter-coat-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.auroraweave-coat',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - auroraweave-coat (Frozen Frontier winter-coat family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/auroraweave-coat-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.auroraweave-coat-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - auroraweave-coat (Frozen Frontier winter-coat family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/auroraweave-coat-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-winter-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - worn-winter-leggings (Frozen Frontier winter-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-winter-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-winter-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - worn-winter-leggings (Frozen Frontier winter-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-winter-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.lined-winter-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - lined-winter-leggings (Frozen Frontier winter-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/lined-winter-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.lined-winter-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - lined-winter-leggings (Frozen Frontier winter-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/lined-winter-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.auroraweave-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - auroraweave-leggings (Frozen Frontier winter-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/auroraweave-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.auroraweave-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - auroraweave-leggings (Frozen Frontier winter-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/auroraweave-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-glacier-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - worn-glacier-boots (Frozen Frontier glacier-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-glacier-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-glacier-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - worn-glacier-boots (Frozen Frontier glacier-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-glacier-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.crampon-glacier-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - crampon-glacier-boots (Frozen Frontier glacier-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/crampon-glacier-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.crampon-glacier-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - crampon-glacier-boots (Frozen Frontier glacier-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/crampon-glacier-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.frostwardens-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - frostwardens-boots (Frozen Frontier glacier-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/frostwardens-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.frostwardens-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - frostwardens-boots (Frozen Frontier glacier-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/frostwardens-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-fur-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - worn-fur-gloves (Frozen Frontier fur-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-fur-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-fur-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - worn-fur-gloves (Frozen Frontier fur-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-fur-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.lined-fur-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - lined-fur-gloves (Frozen Frontier fur-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/lined-fur-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.lined-fur-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - lined-fur-gloves (Frozen Frontier fur-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/lined-fur-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.frostwardens-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - frostwardens-gloves (Frozen Frontier fur-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/frostwardens-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.frostwardens-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - frostwardens-gloves (Frozen Frontier fur-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/frostwardens-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
     id: 'sprite.equipment.wardens-broadsword',
     category: 'character',
     intendedUse:
