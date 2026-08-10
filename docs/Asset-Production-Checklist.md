@@ -963,15 +963,19 @@ tiles are real, just generic.
 
 ## Frozen Frontier, Chapter 11: Into the Endless Winter - outstanding placeholders
 
-**Status (2026-08-05): the PixelLab quota check for this chapter turned up 23 real generations
-available (not the exhausted quota every prior chapter assumed).** Spent 1 of them on a real
-`tileset.frosthaven-terrain` (a genuine snow/ice Wang autotile set for the region's 5 field maps) -
-the first time this session a brand-new real tileset was generated instead of reusing an existing
-one, since none of the vetted tilesets (grass/desert/marsh) have a snow palette. Frosthaven's own
-town ground still reuses `tileset.town-terrain`, matching every prior region's town. Everything
-below - all 8 NPCs, both enemy sprites, all 19 equipment icons, all 3 item icons - stayed SVG
-placeholder, banking the remaining ~22 generations for Chapter 12's dungeon/boss/Lantern of Winter's
-Resolve.
+**Status (2026-08-10): all 19 equipment icons + all 3 item icons + all 8 NPC portraits done, real
+PixelLab art.** `tileset.frosthaven-terrain` (a genuine snow/ice Wang autotile set for the region's
+5 field maps) was generated earlier - the first brand-new real tileset this project generated
+instead of reusing an existing one, since none of the vetted tilesets (grass/desert/marsh) have a
+snow palette. Frosthaven's own town ground still reuses `tileset.town-terrain`, matching every
+prior region's town. NPC overworld sprites in progress (`create_character` size=128 +
+`animate_character`, per the established sizing convention) - captain-astrid-frost and winter-spirit
+(the 2 roaming NPCs, wanderRadius on frosthaven.json/aurora-basin.json) are being built with real
+idle+walk-cycle sheets from the start this time, avoiding the idle-only gap left on several earlier
+regions' wanderers. captain-astrid-frost's portrait needed a retry (first attempt had a visible
+watermark and an anachronistic flag patch). 2 enemy sprites (Frost Wolf, Alpha Frost Wolf) and
+Chapter 12's 3 enemy sprites (Frozen Wraith, Ancient Frozen Wraith, Winter Stag boss) not yet
+started.
 
 ### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
 
@@ -1044,13 +1048,12 @@ No Chapter 11 NPC has real PixelLab art yet, sprite or portrait.
 
 ## Frozen Frontier, Chapter 12: The Last Memory - outstanding placeholders
 
-**Status (2026-08-06): same PixelLab budget note as Chapter 11 - real generations are available
-(~22 remaining after Chapter 11's tileset) but everything below stayed SVG placeholder anyway**,
-since Chapter 12 is the game's own Book One finale and doesn't introduce a new town/NPC cast (Aurora
-Keeper Lyra and Elias Rowan both reprise existing roles) - no single asset here felt like a
-higher-leverage spend than banking the budget for whenever a real character-art pass becomes
-practical. All 5 of the Hall of Eternal Winter's dungeon rooms reuse `tileset.tiny-dungeon`, same as
-every dungeon before it - not tracked as a placeholder gap, the tiles are real, just generic.
+**Status (2026-08-10): all 5 equipment icons + all 3 item icons done, real PixelLab art** (shipped
+as part of the same 29-icon Chapter 11+12 batch). No new NPCs this chapter (Aurora Keeper Lyra and
+Elias Rowan both reprise existing roles). 3 enemy sprites (Frozen Wraith, Ancient Frozen Wraith,
+Winter Stag boss) not yet started. All 5 of the Hall of Eternal Winter's dungeon rooms reuse
+`tileset.tiny-dungeon`, same as every dungeon before it - not tracked as a placeholder gap, the
+tiles are real, just generic.
 
 ### Enemy battle sprites (3 - 128×128 regular/elite, 256×256 boss)
 
