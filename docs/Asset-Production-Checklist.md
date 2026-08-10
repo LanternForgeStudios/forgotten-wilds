@@ -634,9 +634,12 @@ linking it in.
 garment" equipment-layer workflow (`docs/Equipment-Layering-Plan.md`'s "Update 2026-08-02" section)
 rather than requiring a silhouette match (that rule is specific to weapons) - chest from
 `worn-keeper-coat`, legs from `traveler-pants`, boots from `traveler-boots`, gloves from
-`leather-gauntlets`. `weathered-cedar-staff`'s own family was checked against
-`weathered-walking-staff` first and rejected (cedar-staff's icon is actually a spear/leaf-blade
-shape, not a cane) - still needs real hand-positioned art, not a free recolor. `warden-vine-gloves`
+`leather-gauntlets`. **Update (2026-08-10): the Cedar Staff family is done too** - correctly
+rejected against `weathered-walking-staff`/`ironwood-walking-staff` (cedar-staff's icon is a
+straight-shaft-with-leafy-crown shape, not the walking-staff family's curved cane handle), but a
+direct visual test confirmed `ashwood-spear`'s own straight-shaft-with-point silhouette (the same
+founder already proven for Frozen Frontier's frost-pike) is close enough to recolor cleanly - all 3
+tiers x both genders shipped from that founder instead. `warden-vine-gloves`
 (and by extension the rest of the vine-gloves family) recolored noticeably darker/near-black rather
 than olive-green - the `leather-gauntlets` source sheet's visible pixels are themselves near-black
 shadow tones at this tiny glove scale, so no amount of re-clustering fixes it (tried n_materials=3,

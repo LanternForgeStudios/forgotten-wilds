@@ -3275,6 +3275,78 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
   },
   {
+    id: 'sprite.equipment.weathered-cedar-staff',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - weathered-cedar-staff (Whispering Pines Cedar Staff family, common), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/weathered-cedar-staff-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.weathered-cedar-staff-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - weathered-cedar-staff (Whispering Pines Cedar Staff family, common), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/weathered-cedar-staff-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.bound-cedar-staff',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - bound-cedar-staff (Whispering Pines Cedar Staff family, uncommon), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/bound-cedar-staff-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.bound-cedar-staff-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - bound-cedar-staff (Whispering Pines Cedar Staff family, uncommon), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/bound-cedar-staff-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.ancient-cedar-staff',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - ancient-cedar-staff (Whispering Pines Cedar Staff family, rare), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/ancient-cedar-staff-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.ancient-cedar-staff-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - ancient-cedar-staff (Whispering Pines Cedar Staff family, rare), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/ancient-cedar-staff-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
     id: 'sprite.equipment.wardens-broadsword',
     category: 'character',
     intendedUse:

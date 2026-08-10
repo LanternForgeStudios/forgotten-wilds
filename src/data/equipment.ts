@@ -1050,6 +1050,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 5, attack: 4 },
     tier: 'common',
     familyId: 'cedar-staff',
+    layerSpriteAssetId: { male: 'sprite.equipment.weathered-cedar-staff', female: 'sprite.equipment.weathered-cedar-staff-female' },
   },
   {
     id: 'bound-cedar-staff',
@@ -1060,6 +1061,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 3, attack: 7, speed: 1 },
     tier: 'uncommon',
     familyId: 'cedar-staff',
+    layerSpriteAssetId: { male: 'sprite.equipment.bound-cedar-staff', female: 'sprite.equipment.bound-cedar-staff-female' },
   },
   {
     id: 'ancient-cedar-staff',
@@ -1070,6 +1072,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 10, attack: 10, defense: 2, speed: -2 },
     tier: 'rare',
     familyId: 'cedar-staff',
+    layerSpriteAssetId: { male: 'sprite.equipment.ancient-cedar-staff', female: 'sprite.equipment.ancient-cedar-staff-female' },
   },
   {
     id: 'worn-bark-armor',
