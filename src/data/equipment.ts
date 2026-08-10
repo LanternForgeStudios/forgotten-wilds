@@ -402,6 +402,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     unique: true,
     oilCapacity: 35,
     lanternAbilityIds: ['still-waters-calm'],
+    layerSpriteAssetId: { male: 'sprite.equipment.lantern-of-still-waters-equipped', female: 'sprite.equipment.lantern-of-still-waters-equipped-female' },
   },
   {
     id: 'mother-cypress-totem',
@@ -1021,6 +1022,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     unique: true,
     oilCapacity: 38,
     lanternAbilityIds: ['open-skies-renewal'],
+    layerSpriteAssetId: { male: 'sprite.equipment.lantern-of-open-skies-equipped', female: 'sprite.equipment.lantern-of-open-skies-equipped-female' },
   },
   {
     id: 'thunderbird-totem',
@@ -1245,6 +1247,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     unique: true,
     oilCapacity: 40,
     lanternAbilityIds: ['ancient-roots-reach'],
+    layerSpriteAssetId: { male: 'sprite.equipment.lantern-of-ancient-roots-equipped', female: 'sprite.equipment.lantern-of-ancient-roots-equipped-female' },
   },
   {
     id: 'young-cedar-totem',
@@ -1488,6 +1491,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     unique: true,
     oilCapacity: 42,
     lanternAbilityIds: ['astral-ward'],
+    layerSpriteAssetId: { male: 'sprite.equipment.lantern-of-forgotten-stars-equipped', female: 'sprite.equipment.lantern-of-forgotten-stars-equipped-female' },
   },
   {
     id: 'sunstone-totem',
@@ -1741,6 +1745,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     unique: true,
     oilCapacity: 45,
     lanternAbilityIds: ['resolve-renewed'],
+    layerSpriteAssetId: { male: 'sprite.equipment.lantern-of-winters-resolve-equipped', female: 'sprite.equipment.lantern-of-winters-resolve-equipped-female' },
   },
   {
     id: 'elder-winter-stag-totem',

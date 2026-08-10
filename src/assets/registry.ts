@@ -2795,6 +2795,486 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
   },
   {
+    id: 'sprite.equipment.weathered-prairie-spear',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - weathered-prairie-spear (Endless Prairie prairie-spear family, common), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/weathered-prairie-spear-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.weathered-prairie-spear-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - weathered-prairie-spear (Endless Prairie prairie-spear family, common), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/weathered-prairie-spear-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.bound-prairie-spear',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - bound-prairie-spear (Endless Prairie prairie-spear family, uncommon), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/bound-prairie-spear-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.bound-prairie-spear-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - bound-prairie-spear (Endless Prairie prairie-spear family, uncommon), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/bound-prairie-spear-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.windriders-spear',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - windriders-spear (Endless Prairie prairie-spear family, rare), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/windriders-spear-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.windriders-spear-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the weapon slot - windriders-spear (Endless Prairie prairie-spear family, rare), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/windriders-spear-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-buffalo-hide',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - worn-buffalo-hide (Endless Prairie buffalo-hide family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/worn-buffalo-hide-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-buffalo-hide-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - worn-buffalo-hide (Endless Prairie buffalo-hide family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/worn-buffalo-hide-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-buffalo-hide',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - banded-buffalo-hide (Endless Prairie buffalo-hide family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/banded-buffalo-hide-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-buffalo-hide-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - banded-buffalo-hide (Endless Prairie buffalo-hide family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/banded-buffalo-hide-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-riders-chaps',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - worn-riders-chaps (Endless Prairie riders-chaps family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/worn-riders-chaps-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-riders-chaps-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - worn-riders-chaps (Endless Prairie riders-chaps family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/worn-riders-chaps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-riders-chaps',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - banded-riders-chaps (Endless Prairie riders-chaps family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/banded-riders-chaps-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-riders-chaps-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - banded-riders-chaps (Endless Prairie riders-chaps family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/banded-riders-chaps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.windborn-riders-chaps',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - windborn-riders-chaps (Endless Prairie riders-chaps family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/windborn-riders-chaps-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.windborn-riders-chaps-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - windborn-riders-chaps (Endless Prairie riders-chaps family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/windborn-riders-chaps-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-wind-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - worn-wind-boots (Endless Prairie wind-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/worn-wind-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-wind-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - worn-wind-boots (Endless Prairie wind-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/worn-wind-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.swift-wind-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - swift-wind-boots (Endless Prairie wind-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/swift-wind-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.swift-wind-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - swift-wind-boots (Endless Prairie wind-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/swift-wind-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.windrunner-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - windrunner-boots (Endless Prairie wind-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/windrunner-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.windrunner-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - windrunner-boots (Endless Prairie wind-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/windrunner-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-rider-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - worn-rider-gloves (Endless Prairie rider-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/worn-rider-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-rider-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - worn-rider-gloves (Endless Prairie rider-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/worn-rider-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.reinforced-rider-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - reinforced-rider-gloves (Endless Prairie rider-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/reinforced-rider-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.reinforced-rider-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - reinforced-rider-gloves (Endless Prairie rider-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/reinforced-rider-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.warden-rider-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - warden-rider-gloves (Endless Prairie rider-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/warden-rider-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.warden-rider-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - warden-rider-gloves (Endless Prairie rider-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
+    filePath: 'sprites/equipment/warden-rider-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-still-waters-equipped',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-still-waters-equipped (Crimson Bayou's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-still-waters-equipped-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-still-waters-equipped-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-still-waters-equipped (Crimson Bayou's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-still-waters-equipped-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-open-skies-equipped',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-open-skies-equipped (Endless Prairie's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-open-skies-equipped-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-open-skies-equipped-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-open-skies-equipped (Endless Prairie's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-open-skies-equipped-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-ancient-roots-equipped',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-ancient-roots-equipped (Whispering Pines's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-ancient-roots-equipped-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-ancient-roots-equipped-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-ancient-roots-equipped (Whispering Pines's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-ancient-roots-equipped-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-forgotten-stars-equipped',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-forgotten-stars-equipped (Shattered Desert's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-forgotten-stars-equipped-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-forgotten-stars-equipped-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-forgotten-stars-equipped (Shattered Desert's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-forgotten-stars-equipped-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-winters-resolve-equipped',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-winters-resolve-equipped (Frozen Frontier's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-winters-resolve-equipped-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.lantern-of-winters-resolve-equipped-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the lantern slot - lantern-of-winters-resolve-equipped (Frozen Frontier's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
+    filePath: 'sprites/equipment/lantern-of-winters-resolve-equipped-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.keepers-lantern-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface/glow color differs.",
+  },
+  {
+    id: 'sprite.equipment.chieftains-buffalo-hide',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - chieftains-buffalo-hide (Endless Prairie buffalo-hide family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/chieftains-buffalo-hide-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.chieftains-buffalo-hide-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - chieftains-buffalo-hide (Endless Prairie buffalo-hide family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow. Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/chieftains-buffalo-hide-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
     id: 'sprite.equipment.wardens-broadsword',
     category: 'character',
     intendedUse:
@@ -4954,11 +5434,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'icon.equipment.chieftains-buffalo-hide',
     category: 'icon',
-    intendedUse: "Equipment icon for chieftains-buffalo-hide (Rare-tier Buffalo Hide) - placeholder pending PixelLab quota",
-    filePath: 'icons/chieftains-buffalo-hide.svg',
+    intendedUse: 'Equipment icon for chieftains-buffalo-hide (Rare-tier Buffalo Hide)',
+    filePath: 'icons/chieftains-buffalo-hide.png',
     dimensions: { width: 64, height: 64 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art once quota refreshes.',
+    status: 'final',
+    notes: 'pixellab MCP-generated: create_map_object ("a ceremonial buffalo hide coat with tribal beadwork trim, centered", 128x128, high top-down view, basic shading, single color outline), downscaled to 64x64 with LANCZOS. Build script: scripts/build_icon.py. 128x128 original archived at public/assets/icons/original/chieftains-buffalo-hide.png.',
   },
   {
     id: 'icon.equipment.worn-riders-chaps',
