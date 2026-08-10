@@ -4,9 +4,9 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
-import { EQUIPMENT, STARTING_STATS, STAT_GROWTH_PER_LEVEL, XP_THRESHOLDS } from '@/data';
+import { AILMENTS, EQUIPMENT, STARTING_STATS, STAT_GROWTH_PER_LEVEL, XP_THRESHOLDS } from '@/data';
 import { EQUIPMENT_SLOTS } from '@/types';
-import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
+import { aggregateAilmentResistances, formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { StatBonusesText, AilmentResistanceText } from '@/components/common/StatBonusText';
 import { predictedStamina } from '@/utils/staminaRegen';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
@@ -43,6 +43,8 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
     const itemId = player.equipment[slot];
     return { slot, def: itemId ? EQUIPMENT.find((e) => e.id === itemId) : undefined };
   });
+  const ailmentResistances = aggregateAilmentResistances(equippedDefs.map(({ def }) => def?.ailmentResistance));
+  const resistedAilmentIds = Object.keys(ailmentResistances).filter((id) => ailmentResistances[id] > 0);
 
   const xpIntoLevel = player.level < XP_THRESHOLDS.length - 1 ? player.xp - XP_THRESHOLDS[player.level] : 0;
   const xpSpan =
@@ -137,6 +139,22 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
             </tbody>
           </table>
         </div>
+
+        {resistedAilmentIds.length > 0 && (
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Ailment Resistance</h3>
+            <table className={styles.statTable}>
+              <tbody>
+                {resistedAilmentIds.map((ailmentId) => (
+                  <tr key={ailmentId}>
+                    <td className={styles.statName}>{AILMENTS[ailmentId]?.name ?? ailmentId}</td>
+                    <td className={styles.statTotal}>{Math.round(ailmentResistances[ailmentId] * 100)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Currency</h3>

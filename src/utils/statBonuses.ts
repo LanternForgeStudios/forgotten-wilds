@@ -1,6 +1,20 @@
 import { AILMENTS } from '@/data';
 import type { AilmentResistance, Stats } from '@/types';
 
+/** Sums every equipped item's ailmentResistance entries by ailmentId, clamped to [0,1] per
+ *  ailment - mirrors the server's applyAilmentResistance/computeAilmentResistances (additive,
+ *  then clamped), display-only so nothing here is authoritative. Used by the Combat Stats
+ *  screen's Ailment Resistance summary. */
+export function aggregateAilmentResistances(resistanceLists: (AilmentResistance[] | undefined)[]): Record<string, number> {
+  const totals: Record<string, number> = {};
+  for (const list of resistanceLists) {
+    for (const { ailmentId, reductionPercent } of list ?? []) {
+      totals[ailmentId] = Math.min(1, (totals[ailmentId] ?? 0) + reductionPercent);
+    }
+  }
+  return totals;
+}
+
 export const STAT_BONUS_LABELS: Record<string, string> = {
   attack: 'ATK',
   defense: 'DEF',
