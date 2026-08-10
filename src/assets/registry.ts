@@ -1931,6 +1931,294 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.ashwood-spear-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
   },
   {
+    id: 'sprite.equipment.worn-bark-armor',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - worn-bark-armor (Whispering Pines bark-armor family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-bark-armor-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-bark-armor-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - worn-bark-armor (Whispering Pines bark-armor family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-bark-armor-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-bark-armor',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - banded-bark-armor (Whispering Pines bark-armor family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-bark-armor-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-bark-armor-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - banded-bark-armor (Whispering Pines bark-armor family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-bark-armor-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.elderwood-bark-armor',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - elderwood-bark-armor (Whispering Pines bark-armor family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/elderwood-bark-armor-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.elderwood-bark-armor-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the chest slot - elderwood-bark-armor (Whispering Pines bark-armor family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/elderwood-bark-armor-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-root-woven-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - worn-root-woven-leggings (Whispering Pines root-woven-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-root-woven-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-root-woven-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - worn-root-woven-leggings (Whispering Pines root-woven-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-root-woven-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-root-woven-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - banded-root-woven-leggings (Whispering Pines root-woven-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-root-woven-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-root-woven-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - banded-root-woven-leggings (Whispering Pines root-woven-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-root-woven-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.deep-root-leggings',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - deep-root-leggings (Whispering Pines root-woven-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/deep-root-leggings-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.deep-root-leggings-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the legs slot - deep-root-leggings (Whispering Pines root-woven-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/deep-root-leggings-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-pants-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-root-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - worn-root-boots (Whispering Pines root-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-root-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-root-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - worn-root-boots (Whispering Pines root-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-root-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-root-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - banded-root-boots (Whispering Pines root-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-root-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.banded-root-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - banded-root-boots (Whispering Pines root-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/banded-root-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.ancient-root-boots',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - ancient-root-boots (Whispering Pines root-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/ancient-root-boots-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.ancient-root-boots-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the boots slot - ancient-root-boots (Whispering Pines root-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/ancient-root-boots-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.traveler-boots-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-vine-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - worn-vine-gloves (Whispering Pines vine-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-vine-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.worn-vine-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - worn-vine-gloves (Whispering Pines vine-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/worn-vine-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.woven-vine-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - woven-vine-gloves (Whispering Pines vine-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/woven-vine-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.woven-vine-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - woven-vine-gloves (Whispering Pines vine-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/woven-vine-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.warden-vine-gloves',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - warden-vine-gloves (Whispering Pines vine-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/warden-vine-gloves-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
+    id: 'sprite.equipment.warden-vine-gloves-female',
+    category: 'character',
+    intendedUse:
+      "Equipment layer for the gloves slot - warden-vine-gloves (Whispering Pines vine-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.female.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
+    filePath: 'sprites/equipment/warden-vine-gloves-female-animated.png',
+    dimensions: { width: 288, height: 768 },
+    frameSize: { width: 72, height: 96 },
+    status: 'final',
+    notes:
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.leather-gauntlets-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+  },
+  {
     id: 'sprite.equipment.wardens-broadsword',
     category: 'character',
     intendedUse:

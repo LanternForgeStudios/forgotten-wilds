@@ -629,6 +629,23 @@ pair (2), equipment/item icons (23), and the field-terrain tileset. None of this
 player-reachable yet (no transition connects any shipped map to Cedarwatch), so no urgency on
 linking it in.
 
+**Equipment layers (2026-08-10): all 12 Bark Armor/Root-Woven Leggings/Root Boots/Vine Gloves items
+(both genders) done**, palette-swapped per the project's own documented "recolor the generic base
+garment" equipment-layer workflow (`docs/Equipment-Layering-Plan.md`'s "Update 2026-08-02" section)
+rather than requiring a silhouette match (that rule is specific to weapons) - chest from
+`worn-keeper-coat`, legs from `traveler-pants`, boots from `traveler-boots`, gloves from
+`leather-gauntlets`. `weathered-cedar-staff`'s own family was checked against
+`weathered-walking-staff` first and rejected (cedar-staff's icon is actually a spear/leaf-blade
+shape, not a cane) - still needs real hand-positioned art, not a free recolor. `warden-vine-gloves`
+(and by extension the rest of the vine-gloves family) recolored noticeably darker/near-black rather
+than olive-green - the `leather-gauntlets` source sheet's visible pixels are themselves near-black
+shadow tones at this tiny glove scale, so no amount of re-clustering fixes it (tried n_materials=3,
+no improvement); shipped anyway per this project's established "close enough" precedent, flagged
+here rather than hidden. The `traveler-pants`/legs-slot founder was never run through
+`scripts/record_anchor_from_sheet.py`, so `docs/equipment-layer-anchors.json` has no `worn-legs`
+bucket at all - a pre-existing gap (not something this batch introduced), harmless since the anchor
+table is a tooling aid for future auto-placement, not read at runtime.
+
 **Field terrain (2026-08-09): real forest tileset generated and wired in.** All 5 outdoor Chapter 7
 field maps (Mistwood Path, Elder Forest, Silver River, Ancient Cedar Shrine, Heartwood Approach)
 now use `tileset.whispering-pines-terrain` (a real mossy-ground/dirt-path Wang autotile, via
@@ -963,19 +980,25 @@ tiles are real, just generic.
 
 ## Frozen Frontier, Chapter 11: Into the Endless Winter - outstanding placeholders
 
-**Status (2026-08-10): all 19 equipment icons + all 3 item icons + all 8 NPC portraits + all 8 NPC
-overworld sprites done, real PixelLab art.** `tileset.frosthaven-terrain` (a genuine snow/ice Wang
-autotile set for the region's 5 field maps) was generated earlier - the first brand-new real
-tileset this project generated instead of reusing an existing one, since none of the vetted
-tilesets (grass/desert/marsh) have a snow palette. Frosthaven's own town ground still reuses
-`tileset.town-terrain`, matching every prior region's town. captain-astrid-frost and winter-spirit
-(the 2 roaming NPCs, wanderRadius on frosthaven.json/aurora-basin.json) were built with real
-idle+walk-cycle sheets from the start, avoiding the idle-only gap left on marsh-spirit/
-sabine-thorne/cedar-spirit/scout-niska/forest-warden-rowan-hart/prairie-spirit (those 6 still need
-the same follow-up fix, flagged, not yet done). captain-astrid-frost's portrait needed a retry
-(first attempt had a visible watermark and an anachronistic flag patch); a Sigrid/Bjorn character-ID
-mix-up during the sprite batch was caught and corrected before committing. 5 enemy sprites (Frost
-Wolf, Alpha Frost Wolf, Frozen Wraith, Ancient Frozen Wraith, Winter Stag boss) in progress.
+**Status (2026-08-10): all Chapter 11/12 character art done - 19 equipment icons + all 3 item icons
++ all 8 NPC portraits + all 8 NPC overworld sprites + all 5 enemy sprites (incl. Winter Stag
+boss).** `tileset.frosthaven-terrain` (a genuine snow/ice Wang autotile set for the region's 5
+field maps) was generated earlier - the first brand-new real tileset this project generated
+instead of reusing an existing one, since none of the vetted tilesets (grass/desert/marsh) have a
+snow palette. Frosthaven's own town ground still reuses `tileset.town-terrain`, matching every
+prior region's town. captain-astrid-frost and winter-spirit (the 2 roaming NPCs, wanderRadius on
+frosthaven.json/aurora-basin.json) were built with real idle+walk-cycle sheets from the start,
+avoiding the idle-only gap left on marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/
+forest-warden-rowan-hart/prairie-spirit (those 6 still need the same follow-up fix, flagged, not
+yet done). captain-astrid-frost's portrait needed a retry (first attempt had a visible watermark
+and an anachronistic flag patch); a Sigrid/Bjorn character-ID mix-up during the sprite batch was
+caught and corrected before committing. Frost Wolf/Alpha Frost Wolf used `template='dog'`
+quadruped bodies with the `idle` animation (quadruped body types don't expose
+fight-stance-idle-8-frames); Winter Stag boss used `template='horse'` with `idle-shaking-head`
+after a first attempt with `rest-idle` produced a lying-down pose, wrong for a battle stance. Frost
+Pike family (all 3 tiers, both genders) equipment-layer art shipped for free via
+`scripts/palette_swap_equipment_layer.py` off the existing ashwood-spear founder - both items'
+icons share the same straight-haft-with-blade silhouette.
 
 ### NPC portraits (8 - 512×512, painted background, head-and-shoulders)
 
@@ -1048,11 +1071,10 @@ No Chapter 11 NPC has real PixelLab art yet, sprite or portrait.
 
 ## Frozen Frontier, Chapter 12: The Last Memory - outstanding placeholders
 
-**Status (2026-08-10): all 5 equipment icons + all 3 item icons done, real PixelLab art** (shipped
-as part of the same 29-icon Chapter 11+12 batch). No new NPCs this chapter (Aurora Keeper Lyra and
-Elias Rowan both reprise existing roles). 3 enemy sprites (Frozen Wraith, Ancient Frozen Wraith,
-Winter Stag boss) in progress (shipped as part of the same 5-enemy Chapter 11+12 batch). All 5 of
-the Hall of Eternal Winter's dungeon rooms reuse
+**Status (2026-08-10): all 5 equipment icons + all 3 item icons + all 3 enemy sprites (Frozen
+Wraith, Ancient Frozen Wraith, Winter Stag boss) done, real PixelLab art** (shipped as part of the
+same 29-icon / 5-enemy Chapter 11+12 batches). No new NPCs this chapter (Aurora Keeper Lyra and
+Elias Rowan both reprise existing roles). All 5 of the Hall of Eternal Winter's dungeon rooms reuse
 `tileset.tiny-dungeon`, same as every dungeon before it - not tracked as a placeholder gap, the
 tiles are real, just generic.
 

@@ -1078,6 +1078,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 12, defense: 3, maxSpirit: 1 },
     tier: 'common',
     familyId: 'bark-armor',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-bark-armor', female: 'sprite.equipment.worn-bark-armor-female' },
   },
   {
     id: 'banded-bark-armor',
@@ -1088,6 +1089,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 17, defense: 5, maxSpirit: 3 },
     tier: 'uncommon',
     familyId: 'bark-armor',
+    layerSpriteAssetId: { male: 'sprite.equipment.banded-bark-armor', female: 'sprite.equipment.banded-bark-armor-female' },
   },
   {
     id: 'elderwood-bark-armor',
@@ -1098,6 +1100,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 22, maxSpirit: 8, defense: 8 },
     tier: 'rare',
     familyId: 'bark-armor',
+    layerSpriteAssetId: { male: 'sprite.equipment.elderwood-bark-armor', female: 'sprite.equipment.elderwood-bark-armor-female' },
   },
   {
     id: 'worn-root-woven-leggings',
@@ -1108,6 +1111,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 7, defense: 2 },
     tier: 'common',
     familyId: 'root-woven-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-root-woven-leggings', female: 'sprite.equipment.worn-root-woven-leggings-female' },
   },
   {
     id: 'banded-root-woven-leggings',
@@ -1118,6 +1122,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 10, defense: 3, maxSpirit: 1 },
     tier: 'uncommon',
     familyId: 'root-woven-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.banded-root-woven-leggings', female: 'sprite.equipment.banded-root-woven-leggings-female' },
   },
   {
     id: 'deep-root-leggings',
@@ -1128,6 +1133,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 13, maxSpirit: 4, defense: 4 },
     tier: 'rare',
     familyId: 'root-woven-leggings',
+    layerSpriteAssetId: { male: 'sprite.equipment.deep-root-leggings', female: 'sprite.equipment.deep-root-leggings-female' },
   },
   {
     id: 'worn-root-boots',
@@ -1138,6 +1144,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { defense: 2, speed: 2 },
     tier: 'common',
     familyId: 'root-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-root-boots', female: 'sprite.equipment.worn-root-boots-female' },
   },
   {
     id: 'banded-root-boots',
@@ -1148,6 +1155,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 3, defense: 4, speed: 3 },
     tier: 'uncommon',
     familyId: 'root-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.banded-root-boots', female: 'sprite.equipment.banded-root-boots-female' },
   },
   {
     id: 'ancient-root-boots',
@@ -1158,6 +1166,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 3, defense: 6, speed: 4 },
     tier: 'rare',
     familyId: 'root-boots',
+    layerSpriteAssetId: { male: 'sprite.equipment.ancient-root-boots', female: 'sprite.equipment.ancient-root-boots-female' },
   },
   {
     id: 'worn-vine-gloves',
@@ -1168,6 +1177,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 1, defense: 2 },
     tier: 'common',
     familyId: 'vine-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.worn-vine-gloves', female: 'sprite.equipment.worn-vine-gloves-female' },
   },
   {
     id: 'woven-vine-gloves',
@@ -1178,6 +1188,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 5, attack: 2, defense: 4 },
     tier: 'uncommon',
     familyId: 'vine-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.woven-vine-gloves', female: 'sprite.equipment.woven-vine-gloves-female' },
   },
   {
     id: 'warden-vine-gloves',
@@ -1188,6 +1199,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 8, attack: 3, defense: 6 },
     tier: 'rare',
     familyId: 'vine-gloves',
+    layerSpriteAssetId: { male: 'sprite.equipment.warden-vine-gloves', female: 'sprite.equipment.warden-vine-gloves-female' },
     ailmentResistance: [{ ailmentId: 'poison', reductionPercent: 0.3 }],
   },
   {
