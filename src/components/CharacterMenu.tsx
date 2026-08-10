@@ -309,19 +309,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                       {equipDef && bestIdsBySlot.get(equipDef.slot)?.has(entry.itemId) && <BestBadge />}
                       {equipDef &&
                         (isEquipped ? (
-                          <>
-                            <span style={{ fontSize: 11, color: 'var(--fw-spirit)' }}>Equipped</span>
-                            {formatStatBonuses(equipDef.statBonuses) && (
-                              <span style={{ fontSize: 10, opacity: 0.85 }}>
-                                <StatBonusesText bonuses={equipDef.statBonuses} />
-                              </span>
-                            )}
-                            {formatAilmentResistance(equipDef.ailmentResistance) && (
-                              <span style={{ fontSize: 10, opacity: 0.85 }}>
-                                <AilmentResistanceText resistances={equipDef.ailmentResistance} />
-                              </span>
-                            )}
-                          </>
+                          <span style={{ fontSize: 11, color: 'var(--fw-spirit)' }}>Equipped</span>
                         ) : (
                           <button
                             className={styles.smallButton}
@@ -334,6 +322,16 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                             Equip
                           </button>
                         ))}
+                      {equipDef && formatStatBonuses(equipDef.statBonuses) && (
+                        <span style={{ fontSize: 10, opacity: 0.85 }}>
+                          <StatBonusesText bonuses={equipDef.statBonuses} />
+                        </span>
+                      )}
+                      {equipDef && formatAilmentResistance(equipDef.ailmentResistance) && (
+                        <span style={{ fontSize: 10, opacity: 0.85 }}>
+                          <AilmentResistanceText resistances={equipDef.ailmentResistance} />
+                        </span>
+                      )}
                       {isUsable && (
                         <button
                           className={styles.smallButton}
