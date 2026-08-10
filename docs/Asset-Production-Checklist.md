@@ -826,18 +826,22 @@ anachronistic, matching this project's established "close enough after a retry" 
 
 ## Shattered Desert, Chapter 9: Beneath Forgotten Stars - outstanding placeholders
 
-**Status (2026-08-09): all 30 icons + all 8 NPC portraits + all 8 NPC overworld sprites done, real
-PixelLab art** (`create_character` size=128 + `animate_character` breathing-idle, south only, per
-the Whispering Pines sizing lesson). desert-ranger-tomas-vega (the one roaming NPC, wanderRadius on
-red-mesa.json) additionally got real walk-cycle frames (`walking-4-frames` x4 directions) and was
-added to `NPC_WALK_ASSET_IDS` - built idle+walk together from the start, unlike marsh-spirit/
-sabine-thorne/cedar-spirit/scout-niska/forest-warden-rowan-hart/prairie-spirit, which all shipped
-idle-only and still need the same follow-up fix (flagged, not yet done - see those NPCs' own
-registry notes). Sunblade family (all 3 tiers, both genders) equipment-layer art shipped for free
-via `scripts/palette_swap_equipment_layer.py` off the existing weathered-iron-sword founder - the
-other 5 Shattered Desert equipment families have no matching founder silhouette and still need real
-hand-positioned layer art (a distinct, not-yet-started phase from icons). 5 enemy sprites (Dust
-Devil, Sandstorm Devil, Celestial Wisp, Star Phantom, Canyon Giant boss) in progress. All 6 of
+**Status (2026-08-09): all Chapter 9/10 character art done - 30 icons, 8 NPC portraits, 8 NPC
+overworld sprites, all 5 enemy sprites (incl. Canyon Giant boss).** `create_character` size=128 +
+`animate_character` breathing-idle, south only, per the Whispering Pines sizing lesson.
+desert-ranger-tomas-vega (the one roaming NPC, wanderRadius on red-mesa.json) additionally got real
+walk-cycle frames (`walking-4-frames` x4 directions) and was added to `NPC_WALK_ASSET_IDS` - built
+idle+walk together from the start, unlike marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/
+forest-warden-rowan-hart/prairie-spirit, which all shipped idle-only and still need the same
+follow-up fix (flagged, not yet done - see those NPCs' own registry notes). dust-devil's
+`create_character` base kept rendering a bare human body across 4 separate attempts (including
+explicit "NOT a plain human body"/"NOT a person" negative-prompt language) despite its sandstorm-devil
+sibling succeeding with identical phrasing - shipped instead as an HLS lightness/saturation recolor
+of sandstorm-devil-idle.png's real art (same silhouette, paler tone for the regular tier). Sunblade
+family (all 3 tiers, both genders) equipment-layer art shipped for free via
+`scripts/palette_swap_equipment_layer.py` off the existing weathered-iron-sword founder - the other 5
+Shattered Desert equipment families have no matching founder silhouette and still need real
+hand-positioned layer art (a distinct, not-yet-started phase from icons). All 6 of
 Chapter 9's field/town maps reuse `tileset.overworld-terrain`/`overworld-decor2`/
 `overworld-water` and `tileset.town-terrain` (not `tileset.cliff`/`tileset.beach`, both already
 flagged "provenance unconfirmed" elsewhere in this file, not safe to wire into real content) - not
@@ -921,10 +925,10 @@ founder before any layer art can start.
 
 ## Shattered Desert, Chapter 10: The Sky Remembers - outstanding placeholders
 
-**Status (2026-08-09): all 3 equipment icons + all 5 item icons done, real PixelLab art (shipped as
-part of the same 30-icon Chapter 9+10 batch).** No new NPCs this chapter (Elder Santiago Ortega and
-Scholar Nia Solis reprise their Chapter 9 roles). 3 enemy sprites (Celestial Wisp, Star Phantom,
-Canyon Giant boss) not yet started. All 5 of the Forgotten Observatory's dungeon rooms (Inner
+**Status (2026-08-09): all done, real PixelLab art** - 3 equipment icons + 5 item icons (shipped as
+part of the same 30-icon Chapter 9+10 batch) and all 3 enemy sprites (Celestial Wisp, Star Phantom,
+Canyon Giant boss). No new NPCs this chapter (Elder Santiago Ortega and Scholar Nia Solis reprise
+their Chapter 9 roles). All 5 of the Forgotten Observatory's dungeon rooms (Inner
 Observatory, Star Chamber, Star Lantern Sanctuary, Canyon Depths, Guardian Summit) reuse
 `tileset.tiny-dungeon`, same as every dungeon before it - not tracked as a placeholder gap, the
 tiles are real, just generic.
