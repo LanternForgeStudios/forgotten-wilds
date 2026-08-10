@@ -7175,11 +7175,13 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'battle.enemy.dust-devil',
     category: 'enemy',
-    intendedUse: 'Battle sprite for dust-devil - also reused as its overworld field-encounter icon - placeholder pending PixelLab quota',
-    filePath: 'sprites/enemies/dust-devil-idle.svg',
-    dimensions: { width: 128, height: 128 },
-    status: 'placeholder',
-    notes: 'Procedurally-generated SVG (scripts/gen_placeholder_svg.py). Replace with real PixelLab art (animated idle sheet) once quota refreshes.',
+    intendedUse: 'Battle sprite for dust-devil - also reused as its overworld field-encounter icon (see useFieldEncounters.ts) - front-facing "fight stance" idle animation (single row x 8 frames of 128x128)',
+    filePath: 'sprites/enemies/dust-devil-idle.png',
+    dimensions: { width: 1024, height: 128 },
+    frameSize: { width: 128, height: 128 },
+    status: 'final',
+    notes:
+      "4 separate pixellab MCP create_character attempts (including explicit \"NOT a plain human body\"/\"NOT a person\" negative-prompt language) all rendered a bare humanoid instead of a sand elemental - unlike its sandstorm-devil sibling, which succeeded with the identical phrasing. Shipped instead as a lightness/saturation recolor (HLS shift, scripts inline, not a saved script) of sandstorm-devil-idle.png's successful sheet - same silhouette/texture, paler sand tone for the regular-tier sibling. Alpha/positions untouched.",
   },
   {
     id: 'battle.enemy.sandstorm-devil',
