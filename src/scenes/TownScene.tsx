@@ -170,6 +170,7 @@ export function TownScene() {
   const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
   const appearance = usePlayerStore((s) => s.player?.appearance ?? 'white-dark');
   const equipment = usePlayerStore((s) => s.player?.equipment);
+  const playerLevel = usePlayerStore((s) => s.player?.level ?? 1);
   const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const questProgress = useQuestStore((s) => s.progress);
   const inventory = useInventoryStore((s) => s.items);
@@ -518,7 +519,11 @@ export function TownScene() {
                   Upgrade Lantern
                 </button>
               )}
-              {APOTHECARY_SHOP_IDS.includes(shopActionChoice) && (
+              {/* Gated at level 2 (i.e. "won at least one fight") - previously ungated, so a
+                  brand-new level-1 character saw this the moment they first walked into any
+                  Apothecary, before doing anything else. Mirrors requestApothecaryQuest.ts's own
+                  server-side check below - this is just the earlier, friendlier warning. */}
+              {APOTHECARY_SHOP_IDS.includes(shopActionChoice) && playerLevel >= 2 && (
                 <button className={menuStyles.smallButton} onClick={() => chooseShopAction('restock')}>
                   Restock Supplies
                 </button>

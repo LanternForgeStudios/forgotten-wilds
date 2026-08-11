@@ -33,20 +33,45 @@ export function ApothecaryRestockPanel({ shopId, onClose }: ApothecaryRestockPan
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reward, setReward] = useState<{ gold: number; xp: number; itemIds: string[] } | null>(null);
+  // Bumped by the "Try Again" button below to re-fire the request effect on demand.
+  const [retryToken, setRetryToken] = useState(0);
   useOverlayClose(onClose);
 
   useEffect(() => {
     if (quest || loading) return;
+    let cancelled = false;
     setLoading(true);
     setError(null);
-    callRequestApothecaryQuest(shopId)
-      .then(async () => {
-        if (uid) await resyncSave(uid);
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Could not request a restock job.'))
-      .finally(() => setLoading(false));
+
+    // The server's "not at that location" precondition can transiently fail right after walking
+    // into a freshly-entered location - useLocationExploration.ts's own callEnterLocation is
+    // fire-and-forget, so its save of currentLocationId may not have landed yet by the time this
+    // fires (most likely on a brand-new session's very first Cloud Functions calls). Retry a
+    // couple of times with a short backoff before surfacing an error, rather than leaving the
+    // player stuck with no next step besides closing the panel.
+    async function attempt(retriesLeft: number): Promise<void> {
+      try {
+        await callRequestApothecaryQuest(shopId);
+        if (uid && !cancelled) await resyncSave(uid);
+      } catch (err) {
+        if (retriesLeft > 0) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          if (!cancelled) await attempt(retriesLeft - 1);
+        } else if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Could not request a restock job.');
+        }
+      }
+    }
+
+    void attempt(2).finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shopId, quest]);
+  }, [shopId, quest, retryToken]);
 
   const owned = quest ? (inventory.find((i) => i.itemId === quest.materialId)?.quantity ?? 0) : 0;
   const canTurnIn = !!quest && owned >= quest.requiredCount;
@@ -97,7 +122,20 @@ export function ApothecaryRestockPanel({ shopId, onClose }: ApothecaryRestockPan
               </button>
             </div>
           )}
-          {error && <p style={{ color: 'var(--fw-danger)', fontSize: 13, marginTop: 10 }}>{error}</p>}
+          {error && (
+            <div style={{ marginTop: 10, textAlign: 'center' }}>
+              <p style={{ color: 'var(--fw-danger)', fontSize: 13, margin: '0 0 8px' }}>{error}</p>
+              <button
+                className={styles.smallButton}
+                onClick={() => {
+                  setError(null);
+                  setRetryToken((t) => t + 1);
+                }}
+              >
+                Try Again
+              </button>
+            </div>
+          )}
           <p className={styles.closeHint}>Click outside or press Esc to close</p>
         </Panel>
       </div>

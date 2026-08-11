@@ -36,6 +36,14 @@ export const requestApothecaryQuest = onCall<ApothecaryShopRequest>(async (reque
       throw new HttpsError('failed-precondition', 'You are not at that location.');
     }
 
+    // Gated at level 2 (i.e. "won at least one fight") - mirrors TownScene.tsx's own earlier,
+    // friendlier client-side check (which just hides the button); this is the real enforcement,
+    // since a brand-new level-1 character could otherwise request a restock job the instant they
+    // first walked into any Apothecary.
+    if (save.player.level < 2) {
+      throw new HttpsError('failed-precondition', 'Come back once you have some experience under your belt.');
+    }
+
     const existing = save.apothecaryQuests[shopId];
     if (existing) return { quest: existing };
 
