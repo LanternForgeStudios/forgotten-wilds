@@ -1454,17 +1454,29 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   Solo combat only - party/Endless Battle and PvP always use Medium.
                 </p>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  {(['easy', 'medium', 'hard'] as Difficulty[]).map((level) => (
-                    <button
-                      key={level}
-                      className={styles.smallButton}
-                      disabled={busy || player?.difficulty === level}
-                      style={player?.difficulty === level ? { borderColor: 'var(--fw-accent)', color: 'var(--fw-accent)' } : undefined}
-                      onClick={() => changeDifficulty(level)}
-                    >
-                      {level === 'easy' ? 'Easy' : level === 'medium' ? 'Medium' : 'Hard'}
-                    </button>
-                  ))}
+                  {(['easy', 'medium', 'hard'] as Difficulty[]).map((level) => {
+                    const isActive = player?.difficulty === level;
+                    return (
+                      <button
+                        key={level}
+                        className={styles.smallButton}
+                        // Only busy disables - the active one stays clickable (a harmless no-op
+                        // re-select) rather than disabled, since a native disabled button's own
+                        // dimmed browser styling was fighting the accent-color override below and
+                        // making the "current" button look the SAME as the others, not different.
+                        disabled={busy}
+                        style={
+                          isActive
+                            ? { background: 'var(--fw-accent)', borderColor: 'var(--fw-accent)', color: 'var(--fw-bg-deep)', fontWeight: 'bold' }
+                            : undefined
+                        }
+                        onClick={() => changeDifficulty(level)}
+                      >
+                        {level === 'easy' ? 'Easy' : level === 'medium' ? 'Medium' : 'Hard'}
+                        {isActive ? ' ✓' : ''}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
