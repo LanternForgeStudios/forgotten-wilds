@@ -469,6 +469,103 @@ whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, an
 
 ---
 
+## Battle backgrounds (43 - full-screen combat backdrops) - outstanding placeholders
+
+Every field/dungeon location from Crimson Bayou onward currently falls back to the generic
+`battle-bg.forest` (field) or `battle-bg.hollow-rail-mine` (dungeon) - the mine background in
+particular is a real mismatch for a sky temple, a desert observatory, or an ice hall. Only Iron
+Mountains has dedicated per-location art (`battle-bg.ironwood-trail`, `.raven-ridge`,
+`.whisper-falls`, `.black-briar-forest` for its 4 major field locations, `.hollow-rail-mine` for its
+one dungeon). This section brings every other region up to that same one-background-per-major-
+location granularity.
+
+**Spec**: 1672×941 PNG, painterly full-screen illustration - matches the existing Iron Mountains set
+exactly (same dimensions, same "AI-generated illustration commissioned for this project" pipeline,
+not pixellab-generatable - see "Things Claude can't generate itself" below, same reason the
+Ash-Hallow-quality building facades aren't). **No character, creature, or player figure in frame** -
+this renders behind the combat UI and every combat sprite, so it needs to read as an empty
+establishing shot of the location, not a populated scene. Landscape framing, atmospheric depth (a
+clear foreground/midground/background separation reads best at this aspect ratio). Each region's
+prompt below leans on that region's own established palette from elsewhere in this doc (terrain
+tileset descriptions, NPC portrait settings) plus each location's own in-game flavor text
+(`description` in `src/data/locations.ts`), so the result should already match the world's tone
+without extra iteration.
+
+**Registry id convention**: `battle-bg.<location-id>` (matches the Iron Mountains precedent exactly -
+e.g. `ironwood-trail` -> `battle-bg.ironwood-trail`). The ids below are proposed, not yet in the
+registry - hand off the finished file for a location and it gets registered + wired into
+`locations.ts`'s `battleBackgroundAssetId` in one pass, same as the tilesets.
+
+### Crimson Bayou (4: 3 field + 1 dungeon)
+
+| Location | Registry id | Generation prompt |
+|---|---|---|
+| Cypress Marsh | `battle-bg.cypress-marsh` | A hushed, water-logged bayou marsh at dusk, ancient cypress trees with roots knotted deep into dark still water, hanging moss, warm lantern-gold light filtering through the canopy, painterly fantasy illustration, no characters in frame. |
+| Murkwater Trails | `battle-bg.murkwater-trails` | Winding waterlogged bayou paths through deep reeds and half-submerged cypress roots, murky green-brown water, an old weathered cemetery marker glimpsed in the distance, muted swamp-green and rust palette, painterly fantasy illustration, no characters in frame. |
+| Hidden River Landing | `battle-bg.hidden-river-landing` | A weathered wooden dock hidden among tall reeds, dark river water rising higher than it should, warm lantern-light from a nearby post, quiet and tense atmosphere, painterly fantasy illustration, no characters in frame. |
+| Temple of the Deep Current | `battle-bg.temple-of-the-deep-current` | A flooded ancient stone temple interior, water pooling across cracked tile floors, faint bioluminescent glow reflecting off wet stone columns, submerged carvings of serpent guardians, dim and reverent atmosphere, painterly fantasy illustration, no characters in frame. |
+
+### Endless Prairie (10: 5 field + 5 dungeon)
+
+| Location | Registry id | Generation prompt |
+|---|---|---|
+| Golden Prairie | `battle-bg.golden-prairie` | Rolling golden grassland stretching to the horizon, tall grass bending in a constant wind, warm late-afternoon light, vast open sky, painterly fantasy illustration, no characters in frame. |
+| Spirit Herd Plains | `battle-bg.spirit-herd-plains` | Open windswept plains with a distant buffalo herd silhouetted on the horizon, tall golden-tan grass, wide sky with drifting clouds, painterly fantasy illustration, no characters in frame. |
+| Sacred Hills | `battle-bg.sacred-hills` | A ring of low grassy hills at dusk, wind visibly moving through the grass as if carrying something unseen, soft golden-purple sky, quiet and mystical atmosphere, painterly fantasy illustration, no characters in frame. |
+| Stone Circle Valley | `battle-bg.stone-circle-valley` | A valley of weathered standing stones arranged in a careful ring, worn carvings on their faces, golden prairie grass around their bases, warm late-day light, painterly fantasy illustration, no characters in frame. |
+| Thunderbird Mesa Approach | `battle-bg.thunderbird-mesa-approach` | Grassland giving way to bare windswept rock, a massive cloud-wrapped mesa rising in the distance, dramatic sky, sense of increasing altitude and wind, painterly fantasy illustration, no characters in frame. |
+| Summit Temple | `battle-bg.summit-temple` | A wind-scoured stone temple interior at the foot of a great mesa, weathered stone mechanisms and carved pillars, shafts of light through gaps in the ceiling, painterly fantasy illustration, no characters in frame. |
+| Sky Bridge | `battle-bg.sky-bridge` | A narrow ancient stone bridge arcing over open cloud far above the ground, wind-blown mist, dizzying sense of height, dramatic sky, painterly fantasy illustration, no characters in frame. |
+| Storm Galleries | `battle-bg.storm-galleries` | Open-air stone chambers with tall carved pillars, lightning crackling between them instead of dispersing, dark stormy sky, electric blue-white light against weathered stone, painterly fantasy illustration, no characters in frame. |
+| Lantern Sanctuary (Endless Prairie) | `battle-bg.lantern-sanctuary` | A quiet round stone chamber, a single old lantern burning untended at its center, warm golden light against ancient windswept stonework, reverent hushed atmosphere, painterly fantasy illustration, no characters in frame. |
+| Guardian Peak | `battle-bg.guardian-peak` | A mesa's true summit, open to the sky on every side, thin high-altitude clouds level with the viewer, sense of a vast ancient watcher's domain, dramatic golden-hour light, painterly fantasy illustration, no characters in frame. |
+
+### Whispering Pines (9: 5 field + 4 dungeon)
+
+| Location | Registry id | Generation prompt |
+|---|---|---|
+| Mistwood Path | `battle-bg.mistwood-path` | A narrow forest trail between fog-wrapped cedar trunks, thick mist muffling everything, pale filtered light, mossy undergrowth, painterly fantasy illustration, no characters in frame. |
+| Elder Forest | `battle-bg.elder-forest` | The oldest stand of trees in the forest, a dense unbroken canopy blocking direct sun, deep green shadow and scattered pale light shafts, ancient and still, painterly fantasy illustration, no characters in frame. |
+| Silver River | `battle-bg.silver-river` | A cold, clear forest river cutting through mossy banks, old abandoned fishing camps on the far shore, dappled light through overhanging branches, painterly fantasy illustration, no characters in frame. |
+| Ancient Cedar Shrine | `battle-bg.ancient-cedar-shrine` | A shrine grown directly into the trunk of a massive ancient cedar, faint pale-green spirit-glow at its roots, moss and old carved wood, hushed reverent atmosphere, painterly fantasy illustration, no characters in frame. |
+| Heartwood Approach | `battle-bg.heartwood-approach` | The forest thinning to reveal massive roots breaking the surface like buried ribs, a hidden sanctuary entrance below, dramatic tangled root formations, pale forest light, painterly fantasy illustration, no characters in frame. |
+| Root Caverns | `battle-bg.root-caverns` | A cavern of interlocking roots as thick as tree trunks, descending into darkness below the forest floor, faint pale bioluminescent moss-light, painterly fantasy illustration, no characters in frame. |
+| Inner Archive | `battle-bg.inner-archive` | A chamber of shelving grown from living root, mostly bare, a few surviving bundles of ancient records, faint pale root-light, quiet and forgotten atmosphere, painterly fantasy illustration, no characters in frame. |
+| Lantern Sanctuary (Whispering Pines) | `battle-bg.heartwood-lantern-sanctuary` | A round root-walled chamber deep underground, a single unlit lantern waiting at its center, faint pale-green ambient root-light, reverent hushed atmosphere, painterly fantasy illustration, no characters in frame. |
+| Guardian Grove | `battle-bg.guardian-grove` | A vast open underground cavern lit by pale root-light, an enormous still shape watching from the shadows, scale and stillness emphasized, painterly fantasy illustration, no characters in frame. |
+
+### Shattered Desert (10: 5 field + 5 dungeon)
+
+| Location | Registry id | Generation prompt |
+|---|---|---|
+| Sunfire Dunes | `battle-bg.sunfire-dunes` | Endless rolling sand dunes, heat shimmer visible in the distance, warm golden-orange desert light, wind-carved ripple patterns in the sand, painterly fantasy illustration, no characters in frame. |
+| Crimson Canyons | `battle-bg.crimson-canyons` | Deep narrow red-rock canyons, cracked sun-baked stone walls close on either side, dramatic warm red-orange lighting, painterly fantasy illustration, no characters in frame. |
+| Painted Mesas | `battle-bg.painted-mesas` | Banded desert cliffs layered in a dozen warm colors, like sedimentary strata recording a history no one can read, dramatic late-day light, painterly fantasy illustration, no characters in frame. |
+| Celestial Oasis | `battle-bg.celestial-oasis` | A pocket of green and open water ringed with standing stones angled toward the sky, palm trees, a striking contrast against surrounding desert, twilight sky, painterly fantasy illustration, no characters in frame. |
+| Forgotten Observatory Approach | `battle-bg.forgotten-observatory-approach` | Desert dunes thinning as the ground rises toward a massive regular stone structure in the distance, warm sand tones giving way to weathered grey stone, painterly fantasy illustration, no characters in frame. |
+| Inner Observatory | `battle-bg.inner-observatory` | A vast circular chamber ringed with dead brass astronomical instruments, dust-caked dials, faint starlight from a domed opening above, painterly fantasy illustration, no characters in frame. |
+| Star Chamber | `battle-bg.star-chamber` | A domed stone room, its ceiling painted with a faded star-map that no longer quite matches the real sky, warm ochre stone and faint pale starlight, painterly fantasy illustration, no characters in frame. |
+| Lantern Sanctuary (Shattered Desert) | `battle-bg.star-lantern-sanctuary` | A round chamber at the heart of an ancient observatory, a single unlit lantern at its center, warm sandstone walls, faint starlight ambiance, reverent hushed atmosphere, painterly fantasy illustration, no characters in frame. |
+| Canyon Depths | `battle-bg.canyon-depths` | A deep narrow crevice where the sky above narrows to a thin bright line, cool still air, tall red-rock walls close on both sides, painterly fantasy illustration, no characters in frame. |
+| Guardian Summit | `battle-bg.guardian-summit` | A wide stone platform carved from canyon rock, open to the sky, an enormous still shape watching from the edge, dramatic warm desert-sunset light, painterly fantasy illustration, no characters in frame. |
+
+### Frozen Frontier (10: 5 field + 5 dungeon)
+
+| Location | Registry id | Generation prompt |
+|---|---|---|
+| Snowveil Forest | `battle-bg.snowveil-forest` | Pine trees bent white under thick snow, a barely-visible trail beneath, pale blue-white winter light, quiet and muffled atmosphere, painterly fantasy illustration, no characters in frame. |
+| Frozen River | `battle-bg.frozen-river` | A river frozen mid-current, its surface holding the frozen shape of moving water, pale blue-white ice, cold clear light, painterly fantasy illustration, no characters in frame. |
+| Glacier Pass | `battle-bg.glacier-pass` | A narrow pass between towering walls of blue-white glacial ice, breath-fog cold, dramatic icy blue lighting, painterly fantasy illustration, no characters in frame. |
+| Aurora Basin | `battle-bg.aurora-basin` | A wide open snowfield ringed with standing stones, faint aurora-light beginning to flicker across a dark sky, pale blue-green and violet tones, painterly fantasy illustration, no characters in frame. |
+| Hall of Eternal Winter Approach | `battle-bg.hall-of-eternal-winter-approach` | Snow thinning to reveal a scoured stone stair leading up to an ancient weathered doorway, pale winter light, sense of great age, painterly fantasy illustration, no characters in frame. |
+| Hall of Eternal Winter | `battle-bg.hall-of-eternal-winter` | A vast frozen hall, tall columns rimed thick with frost that has never thawed, pale blue ambient light, cold and monumental atmosphere, painterly fantasy illustration, no characters in frame. |
+| Lantern Sanctuary (Frozen Frontier) | `battle-bg.winter-lantern-sanctuary` | A round frost-rimed chamber deep in an ancient hall, a single unlit lantern at its center, pale blue-white ambient light, reverent hushed atmosphere, painterly fantasy illustration, no characters in frame. |
+| Guardian Chamber | `battle-bg.guardian-chamber` | A wide stone chamber lined with carved likenesses of past Guardians, all facing the same direction, cold pale light, solemn and watchful atmosphere, painterly fantasy illustration, no characters in frame. |
+| Summit of Winter | `battle-bg.summit-of-winter` | An open ice platform at a hall's highest point, a great shape carved from ice keeping watch, dramatic pale aurora-tinged sky, painterly fantasy illustration, no characters in frame. |
+| Hall of Memories | `battle-bg.hall-of-memories` | A quiet chamber lined with six empty stone alcoves, each shaped to hold something long missing, pale cold light, solemn anticipatory atmosphere, painterly fantasy illustration, no characters in frame. |
+
+---
+
 ## Endless Prairie (Volume III, Chapter 5) - all real art done
 
 **Status (2026-08-09): PixelLab quota renewed (subscription refreshed, ~1568 generations
