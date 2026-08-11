@@ -1,12 +1,44 @@
 import { QUESTS } from '@/data';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
-import type { DialogueLine, Npc, QuestProgress } from '@/types';
+import type { DialogueLine, Npc, Quest, QuestProgress } from '@/types';
 
-/** Which dialogue variant an NPC is currently showing, as a key (a gating quest id, or 'base' if
- *  none of its variants are unlocked yet) - mirrors the server's currentNpcDialogueVariantKey
- *  (functions/src/engine/questEngine.ts) exactly, first-completed-quest-wins, most-advanced-first. */
+/** True while `quest` is active (not completed) and `objectiveId` is a "report back" beat that's
+ *  ready to fire: every objective it names in requiresObjectiveIds is already at its own
+ *  requiredCount, but the objective itself hasn't been credited yet. This is the moment the player
+ *  is walking back to an NPC having just done the fetch/kill/shrine step elsewhere - the dialogue
+ *  box for THAT exact conversation renders off quest state captured before the talkToNpc call
+ *  resolves (see talkToNpc.ts's comment on shownVariantKey), so this has to be checked from the
+ *  pre-credit state, not the post-credit one. */
+function isObjectiveReadyToReport(quest: Quest, objectiveId: string, questProgress: Record<string, QuestProgress>): boolean {
+  if (effectiveQuestStatus(quest, questProgress) !== 'active') return false;
+  const objective = quest.objectives.find((o) => o.id === objectiveId);
+  if (!objective) return false;
+  const progress = questProgress[quest.id];
+  const ownCount = progress?.objectiveCounts?.[objectiveId] ?? 0;
+  if (ownCount >= objective.requiredCount) return false;
+  const reqIds = objective.requiresObjectiveIds ?? [];
+  return reqIds.every((reqId) => {
+    const reqObjective = quest.objectives.find((o) => o.id === reqId);
+    if (!reqObjective) return false;
+    return (progress?.objectiveCounts?.[reqId] ?? 0) >= reqObjective.requiredCount;
+  });
+}
+
+/** Which dialogue variant an NPC is currently showing, as a key - mirrors the server's
+ *  currentNpcDialogueVariantKey (functions/src/engine/questEngine.ts) exactly. Checks "report
+ *  back" variants first (a more specific/immediate state - see isObjectiveReadyToReport), keyed
+ *  as `${questId}:${objectiveId}`; then falls through to the first completed-quest variant
+ *  (most-advanced-first); then 'base'. */
 export function resolveNpcDialogueVariantKey(npc: Npc, questProgress: Record<string, QuestProgress>): string {
   for (const variant of npc.dialogueVariants ?? []) {
+    if (!variant.reportForObjectiveId) continue;
+    const quest = QUESTS.find((q) => q.id === variant.questId);
+    if (quest && isObjectiveReadyToReport(quest, variant.reportForObjectiveId, questProgress)) {
+      return `${variant.questId}:${variant.reportForObjectiveId}`;
+    }
+  }
+  for (const variant of npc.dialogueVariants ?? []) {
+    if (variant.reportForObjectiveId) continue;
     const quest = QUESTS.find((q) => q.id === variant.questId);
     if (quest && effectiveQuestStatus(quest, questProgress) === 'completed') {
       return variant.questId;
@@ -21,7 +53,13 @@ export function resolveNpcDialogueVariantKey(npc: Npc, questProgress: Record<str
 export function resolveNpcDialogue(npc: Npc, questProgress: Record<string, QuestProgress>): DialogueLine[] {
   const key = resolveNpcDialogueVariantKey(npc, questProgress);
   if (key === 'base') return npc.dialogue;
-  return npc.dialogueVariants!.find((v) => v.questId === key)!.lines;
+  const separatorIndex = key.indexOf(':');
+  if (separatorIndex !== -1) {
+    const questId = key.slice(0, separatorIndex);
+    const objectiveId = key.slice(separatorIndex + 1);
+    return npc.dialogueVariants!.find((v) => v.questId === questId && v.reportForObjectiveId === objectiveId)!.lines;
+  }
+  return npc.dialogueVariants!.find((v) => v.questId === key && !v.reportForObjectiveId)!.lines;
 }
 
 /** Whether this NPC has dialogue the player hasn't heard yet - either they've never talked to this

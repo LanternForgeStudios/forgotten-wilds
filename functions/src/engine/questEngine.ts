@@ -1,5 +1,5 @@
 import { QUESTS, type QuestDef, type QuestObjectiveType } from '../data/quests';
-import { NPC_DIALOGUE_VARIANT_QUEST_IDS } from '../data/npcDialogueVariants';
+import { NPC_DIALOGUE_VARIANT_QUEST_IDS, NPC_DIALOGUE_REPORT_VARIANTS } from '../data/npcDialogueVariants';
 import { EQUIPMENT } from '../data/equipment';
 import { grantItem } from './inventoryEngine';
 import { applyLevelUp } from './levelingEngine';
@@ -22,12 +22,37 @@ export function effectiveStatus(
   return 'active';
 }
 
+/** True while `questId` is active (not completed) and `objectiveId` is a "report back" beat
+ *  that's ready to fire: every objective it names in requiresObjectiveIds is already at its own
+ *  requiredCount, but the objective itself hasn't been credited yet - mirrors the client's
+ *  isObjectiveReadyToReport (src/utils/npcDialogue.ts) exactly. */
+function isObjectiveReadyToReport(questId: string, objectiveId: string, quests: Record<string, QuestProgress>): boolean {
+  if (effectiveStatus(questId, quests) !== 'active') return false;
+  const def = QUESTS[questId];
+  const objective = def?.objectives.find((o) => o.id === objectiveId);
+  if (!objective) return false;
+  const progress = quests[questId];
+  const ownCount = progress?.objectiveCounts?.[objectiveId] ?? 0;
+  if (ownCount >= objective.requiredCount) return false;
+  const reqIds = objective.requiresObjectiveIds ?? [];
+  return reqIds.every((reqId) => {
+    const reqObjective = def.objectives.find((o) => o.id === reqId);
+    if (!reqObjective) return false;
+    return (progress?.objectiveCounts?.[reqId] ?? 0) >= reqObjective.requiredCount;
+  });
+}
+
 /** Which dialogue variant an NPC is currently showing, as a key (a gating quest id, or 'base' if
  *  none of that NPC's variants are unlocked yet) - mirrors the client's resolveNpcDialogue exactly
  *  (first-completed-quest-wins, most-advanced-first), just returning the key instead of the lines
  *  themselves (this file has no knowledge of dialogue text, only which quest unlocks which variant -
- *  see npcDialogueVariants.ts). Used by talkToNpc.ts to track what the player has and hasn't heard. */
+ *  see npcDialogueVariants.ts). Checks "report back" variants first (a more specific/immediate
+ *  state), keyed as `${questId}:${objectiveId}`. Used by talkToNpc.ts to track what the player has
+ *  and hasn't heard. */
 export function currentNpcDialogueVariantKey(npcId: string, quests: Record<string, QuestProgress>): string {
+  for (const { questId, objectiveId } of NPC_DIALOGUE_REPORT_VARIANTS[npcId] ?? []) {
+    if (isObjectiveReadyToReport(questId, objectiveId, quests)) return `${questId}:${objectiveId}`;
+  }
   for (const questId of NPC_DIALOGUE_VARIANT_QUEST_IDS[npcId] ?? []) {
     if (effectiveStatus(questId, quests) === 'completed') return questId;
   }

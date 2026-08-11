@@ -14,6 +14,13 @@ export interface QuestObjective {
   description: string;
   targetId: string;
   requiredCount: number;
+  /** Other objective ids (within this same quest) that must already be at their own
+   *  requiredCount before this one can be credited - display-only mirror of the server's
+   *  requiresObjectiveIds (functions/src/data/quests.ts), needed client-side so
+   *  resolveNpcDialogueVariantKey (src/utils/npcDialogue.ts) can detect a "report back" moment:
+   *  quest active, this objective's prerequisites already done, the objective itself not yet
+   *  credited. Only populated on objectives that actually gate a "return and report" beat. */
+  requiresObjectiveIds?: string[];
 }
 
 export interface QuestReward {

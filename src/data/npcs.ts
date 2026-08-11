@@ -91,6 +91,22 @@ export const NPCS: Npc[] = [
           { speaker: 'Elias Rowan', text: "Go learn this town before I ask you to leave it. Ash Hallow's worth knowing." },
         ],
       },
+      {
+        questId: 'frostbound-pages',
+        reportForObjectiveId: 'talk-elias-frostbound',
+        lines: [
+          { speaker: 'Elias Rowan', text: "The Frostbound Treatise, out of the falls after all this time. I didn't think anyone would ever find it." },
+          { speaker: 'Elias Rowan', text: "Miriam's the one who can actually read it, not me. Take it to the Archive - she's been waiting on this longer than you know." },
+        ],
+      },
+      {
+        questId: 'embers-beneath-stone',
+        reportForObjectiveId: 'talk-elias-embers',
+        lines: [
+          { speaker: 'Elias Rowan', text: "The Ember Codex. Out of that tunnel at Raven Ridge, of all places - I'd have sworn nothing survived in there." },
+          { speaker: 'Elias Rowan', text: "Same as the Treatise before it - Miriam's the one who can actually read it. Get it to the Archive." },
+        ],
+      },
     ],
   },
   {
@@ -307,6 +323,22 @@ export const NPCS: Npc[] = [
           { speaker: 'Historian Miriam', text: "The Town Shrine's sat dark since before I was born. Go on - I'll want to know exactly how it felt." },
         ],
       },
+      {
+        questId: 'frostbound-pages',
+        reportForObjectiveId: 'talk-miriam-frostbound',
+        lines: [
+          { speaker: 'Historian Miriam', text: "Elias sent word ahead - the Frostbound Treatise, in my hands at last. Let me see it properly." },
+          { speaker: 'Historian Miriam', text: "Give me a moment. If this is what I think it is, Ash Hallow hasn't seen a Keeper discipline like this in generations." },
+        ],
+      },
+      {
+        questId: 'embers-beneath-stone',
+        reportForObjectiveId: 'talk-miriam-embers',
+        lines: [
+          { speaker: 'Historian Miriam', text: "Elias said you'd found a second manuscript - the Ember Codex, and in far better condition than I dared hope." },
+          { speaker: 'Historian Miriam', text: "Give me a little time with it. Two forgotten disciplines in as many months - I still can't quite believe our luck." },
+        ],
+      },
     ],
   },
   {
@@ -436,6 +468,22 @@ export const NPCS: Npc[] = [
           { speaker: 'Mayor Celeste Broussard', text: "Whatever's happening beneath the water now, I trust you to see it through the same as you did her." },
         ],
       },
+      {
+        questId: 'the-drowned-ledger',
+        reportForObjectiveId: 'talk-celeste-ledger',
+        lines: [
+          { speaker: 'Mayor Celeste Broussard', text: "The Drowned Ledger, pulled whole out of Murkwater Trails. I didn't think anyone would ever find that thing intact." },
+          { speaker: 'Mayor Celeste Broussard', text: "Lucien's the one who can actually make sense of it, not me. Take it to him at the Archive - he's been chasing rumors of this ledger for years." },
+        ],
+      },
+      {
+        questId: 'the-bogwater-almanac',
+        reportForObjectiveId: 'talk-celeste-almanac',
+        lines: [
+          { speaker: 'Mayor Celeste Broussard', text: "The Bogwater Almanac, out of Cypress Marsh in one piece. Two lost volumes recovered in as many weeks - Mirehaven's history is coming back faster than I expected." },
+          { speaker: 'Mayor Celeste Broussard', text: "Same as the Ledger - Lucien needs to see this before either of us gets ahead of ourselves." },
+        ],
+      },
     ],
   },
   {
@@ -480,6 +528,38 @@ export const NPCS: Npc[] = [
         lines: [
           { speaker: 'Lucien Boudreaux', text: "Those temple records confirmed what I feared - the memory-loss was never natural. Something down there has been feeding on it." },
           { speaker: 'Lucien Boudreaux', text: "Sabine's going to need you again, and soon. Whatever's beneath the temple isn't finished." },
+        ],
+      },
+      {
+        questId: 'the-silent-grove',
+        reportForObjectiveId: 'talk-lucien-2',
+        lines: [
+          { speaker: 'Lucien Boudreaux', text: "Mother Cypress Shrine, found at last - and asleep, from what you're describing. That tracks with everything else this marsh has been losing." },
+          { speaker: 'Lucien Boudreaux', text: "If she's the reason names are slipping out of Mirehaven, Keeper, then waking her isn't just kindness. It's the only cure I can think of." },
+        ],
+      },
+      {
+        questId: 'reflections-of-the-past',
+        reportForObjectiveId: 'talk-lucien-temple',
+        lines: [
+          { speaker: 'Lucien Boudreaux', text: "The Reflection Pools actually gave something up. Temple Records - let me see what's survived the damp." },
+          { speaker: 'Lucien Boudreaux', text: "Give me a moment with these. If the ancient Keepers left anything readable down there, I want every word of it." },
+        ],
+      },
+      {
+        questId: 'the-drowned-ledger',
+        reportForObjectiveId: 'talk-lucien-ledger',
+        lines: [
+          { speaker: 'Lucien Boudreaux', text: "Celeste sent word you'd found the Drowned Ledger. Let me actually hold it before I let myself believe it." },
+          { speaker: 'Lucien Boudreaux', text: "Give me time with this. Marsh Toxin's mentioned in half the old rumors about this ledger - if it's real, that's a discipline worth having back." },
+        ],
+      },
+      {
+        questId: 'the-bogwater-almanac',
+        reportForObjectiveId: 'talk-lucien-almanac',
+        lines: [
+          { speaker: 'Lucien Boudreaux', text: "Celeste says you've got the Bogwater Almanac. After the Ledger, I almost don't believe there's a second one out there - let me see it." },
+          { speaker: 'Lucien Boudreaux', text: "Hush of the Reeds is named in the margins of the Ledger, if my memory serves. Give me a moment to confirm it." },
         ],
       },
     ],
@@ -742,6 +822,22 @@ export const NPCS: Npc[] = [
           { speaker: 'Chief Aiyana Whitefeather', text: "Highwind Crossing is yours to walk as you please, Keeper. Scout Niska can point you toward the herd, if you're looking for a place to start." },
         ],
       },
+      {
+        questId: 'the-first-winter-count',
+        reportForObjectiveId: 'talk-aiyana-winter-count-i',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "A Winter Count hide, out of the Golden Prairie grass after all this time. Let me see it properly before we take it any further." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "Koda reads the old pictographs better than anyone left in Highwind Crossing. He'll want this in his hands, not mine." },
+        ],
+      },
+      {
+        questId: 'the-second-winter-count',
+        reportForObjectiveId: 'talk-aiyana-winter-count-ii',
+        lines: [
+          { speaker: 'Chief Aiyana Whitefeather', text: "A second hide, out of Spirit Herd Plains this time. I wasn't certain there'd be one at all - the first told half a story at best." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "Koda will want this in hand before either of us guesses what it says. Take it to him." },
+        ],
+      },
     ],
   },
   {
@@ -788,6 +884,30 @@ export const NPCS: Npc[] = [
           { speaker: 'Elder Koda Running Elk', text: "I've spent forty years guessing at what those carvings meant. I never once guessed that." },
         ],
       },
+      {
+        questId: 'the-stone-circles',
+        reportForObjectiveId: 'talk-koda-report',
+        lines: [
+          { speaker: 'Elder Koda Running Elk', text: "You've actually seen the carvings yourself, not just heard me describe them. Sit - tell me exactly what you found before I say what I think it means." },
+          { speaker: 'Elder Koda Running Elk', text: "Forty years of guessing, and I still want to hear it in your own words first." },
+        ],
+      },
+      {
+        questId: 'the-first-winter-count',
+        reportForObjectiveId: 'talk-koda-winter-count-i',
+        lines: [
+          { speaker: 'Elder Koda Running Elk', text: "Aiyana sent you with a Winter Count hide. Let me see the pictographs - hides this old don't survive the plains by accident." },
+          { speaker: 'Elder Koda Running Elk', text: "Give me a moment to read it properly. Whatever this hide remembers, I intend to get every mark of it right." },
+        ],
+      },
+      {
+        questId: 'the-second-winter-count',
+        reportForObjectiveId: 'talk-koda-winter-count-ii',
+        lines: [
+          { speaker: 'Elder Koda Running Elk', text: "A second Winter Count. Aiyana wasn't exaggerating - let me actually read this one before we speak any further." },
+          { speaker: 'Elder Koda Running Elk', text: "Give me a moment. If this names the same Keeper as the first hide, I want to be certain before I say so out loud." },
+        ],
+      },
     ],
   },
   {
@@ -830,6 +950,30 @@ export const NPCS: Npc[] = [
         lines: [
           { speaker: 'Prairie Spirit', text: 'Three stones, three voices, one wind carrying all of them at once. You hear it now too, don\'t you? Even if you can\'t yet make out the words.' },
           { speaker: 'Prairie Spirit', text: 'Elder Koda will make more sense of it than I can. I only carry the sound. He carries the memory of what it meant.' },
+        ],
+      },
+      {
+        questId: 'voices-on-the-wind',
+        reportForObjectiveId: 'talk-prairie-spirit-restore',
+        lines: [
+          { speaker: 'Prairie Spirit', text: '...all three stones, carried back on your own two feet instead of the wind. I can feel them from here.' },
+          { speaker: 'Prairie Spirit', text: 'Bring them closer. Let the wind finish what it started, and we will both hear what it has been trying to say.' },
+        ],
+      },
+      {
+        questId: 'the-skys-second-gift',
+        reportForObjectiveId: 'talk-prairie-spirit-charm2',
+        lines: [
+          { speaker: 'Prairie Spirit', text: '...the wolves answered for the relic, and the relic answered for you. I felt every part of that from here.' },
+          { speaker: 'Prairie Spirit', text: 'Bring it closer, small lantern-light. What you carry now is proof enough of what I asked for.' },
+        ],
+      },
+      {
+        questId: 'the-herds-enduring-bond',
+        reportForObjectiveId: 'talk-prairie-spirit-totem2',
+        lines: [
+          { speaker: 'Prairie Spirit', text: '...the storm answered for the relic this time, not the wolves. Either way, you are still standing, and the relic is still yours to give.' },
+          { speaker: 'Prairie Spirit', text: 'Bring it closer. A second binding asks more of both of us than the first did - I mean to be certain you have earned it.' },
         ],
       },
     ],
@@ -1007,6 +1151,38 @@ export const NPCS: Npc[] = [
           { speaker: 'Archivist Elowen', text: "Lantern Keepers used to study here for years before they were sent anywhere else. I don't know when that stopped, exactly. Another gap in the record, same as all the others." },
         ],
       },
+      {
+        questId: 'the-lost-library',
+        reportForObjectiveId: 'talk-elowen-report',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "Records, actually recovered from Heartwood Approach. Let me see them before I let myself hope they're what I think they are." },
+          { speaker: 'Archivist Elowen', text: "Give me a moment. Every shelf that abruptly stops mid-sentence in this library, and now, finally, something that might explain why." },
+        ],
+      },
+      {
+        questId: 'the-first-recording',
+        reportForObjectiveId: 'talk-elowen-recording-i',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "A root-knot, grown in a pattern that isn't natural. Let me look closer - I've read a great many strange things in this library, but never one still alive." },
+          { speaker: 'Archivist Elowen', text: "I don't think I can read this alone. The Cedar Spirit might understand root-speech better than any book on my shelves." },
+        ],
+      },
+      {
+        questId: 'the-second-recording',
+        reportForObjectiveId: 'talk-elowen-recording-ii',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "A second root-knot, from the Ancient Cedar Shrine this time. Whoever grew these meant for them to be found together, not apart." },
+          { speaker: 'Archivist Elowen', text: "The Cedar Spirit read the first one better than I ever could. This one should go to them too." },
+        ],
+      },
+      {
+        questId: 'the-keeper-beneath-the-cedar',
+        reportForObjectiveId: 'talk-elowen-lantern',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "The Lantern of Ancient Roots, actually in hand. Let me see it properly - I've read about it for thirty years and never once expected to hold it." },
+          { speaker: 'Archivist Elowen', text: "Give me a moment with the inscriptions. Whoever last carried this deserves to have their name recorded properly, not guessed at." },
+        ],
+      },
     ],
   },
   {
@@ -1064,6 +1240,46 @@ export const NPCS: Npc[] = [
         lines: [
           { speaker: 'Cedar Spirit', text: 'Root, and root, and root again - the forest reaching back through me, further than I could reach alone. I had forgotten what it felt like to be whole.' },
           { speaker: 'Cedar Spirit', text: 'What was hidden opens now. Whatever you find further in, Keeper, know that this shrine will remember what you did here, long after I am withered again.' },
+        ],
+      },
+      {
+        questId: 'the-forest-has-fallen-silent',
+        reportForObjectiveId: 'talk-cedar-spirit-meet',
+        lines: [
+          { speaker: 'Cedar Spirit', text: '...you found the shrine on your own, where the roots grow thin enough for light to reach. Few ever do.' },
+          { speaker: 'Cedar Spirit', text: 'Come closer, small light. I have not spoken to anyone in longer than this forest can easily remember - and I have a great deal to ask of you.' },
+        ],
+      },
+      {
+        questId: 'the-first-recording',
+        reportForObjectiveId: 'talk-cedar-spirit-recording-i',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'Elowen sent this to me, grown rather than written. Let it rest against the roots a moment - I need to listen, not read.' },
+          { speaker: 'Cedar Spirit', text: 'Root speaks slower than voice. Give me time, small light, and I will tell you what it remembers.' },
+        ],
+      },
+      {
+        questId: 'the-second-recording',
+        reportForObjectiveId: 'talk-cedar-spirit-recording-ii',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'A second knot. Let it rest with the first, small light, and give me a moment to hear them together, not apart.' },
+          { speaker: 'Cedar Spirit', text: 'Two messages, grown slowly enough that whoever planted them never expected either to be read alone.' },
+        ],
+      },
+      {
+        questId: 'the-cedars-second-ring',
+        reportForObjectiveId: 'talk-cedar-spirit-charm3',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'The echoes answered for the relic, and the relic answered for you. I felt every part of that through the roots.' },
+          { speaker: 'Cedar Spirit', text: 'Bring it closer, small light. A second Charm binding asks more of the forest than the first did, and I mean to give it properly.' },
+        ],
+      },
+      {
+        questId: 'roots-that-remember',
+        reportForObjectiveId: 'talk-cedar-spirit-totem3',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'The wraiths answered for the relic this time, not the echoes. Either way, you are still standing, and the relic is still yours to give.' },
+          { speaker: 'Cedar Spirit', text: 'Bring it closer. A third Spirit Totem is no small trust to extend - I mean to be certain you have earned it.' },
         ],
       },
     ],
@@ -1220,6 +1436,30 @@ export const NPCS: Npc[] = [
           { speaker: 'Scholar Nia Solis', text: "A Star Crystal, fractured at the Celestial Oasis shrine. The Sand Spirit will know more about restoring it than any book on my shelves." },
         ],
       },
+      {
+        questId: 'the-first-relic',
+        reportForObjectiveId: 'talk-nia-relic-i',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "Tomas sent word - a relic, out of Sunfire Dunes. Let me examine it properly before either of us gets ahead of what it might mean." },
+          { speaker: 'Scholar Nia Solis', text: "Give me a moment with the markings. If it matches the star-pattern on the rest of this museum, that tells us something." },
+        ],
+      },
+      {
+        questId: 'the-second-relic',
+        reportForObjectiveId: 'talk-nia-relic-ii',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "A second relic already? Tomas has a better eye for this than he gives himself credit for. Let me see it." },
+          { speaker: 'Scholar Nia Solis', text: "Give me a moment to compare it against the first. Two pieces from the same hand tell a very different story than one." },
+        ],
+      },
+      {
+        questId: 'lantern-of-forgotten-stars',
+        reportForObjectiveId: 'talk-nia-lantern',
+        lines: [
+          { speaker: 'Scholar Nia Solis', text: "The Lantern of Forgotten Stars, actually in your hands. Let me see it properly - I've read about this lantern for years and never once expected to hold it." },
+          { speaker: 'Scholar Nia Solis', text: "Give me a moment with the inscriptions. Keeper Orion Vale's name deserves to be recorded properly, not guessed at from fragments." },
+        ],
+      },
     ],
   },
   {
@@ -1247,6 +1487,22 @@ export const NPCS: Npc[] = [
           { speaker: 'Tomas Vega', text: "Found in Sunfire Dunes, of all places. I've walked that ground a hundred times and never once looked down." },
         ],
       },
+      {
+        questId: 'the-first-relic',
+        reportForObjectiveId: 'talk-tomas-relic-i',
+        lines: [
+          { speaker: 'Tomas Vega', text: "A relic, actually pulled out of Sunfire Dunes. Let me get a proper look at it before we bother Nia with it." },
+          { speaker: 'Tomas Vega', text: "Carved the same as half of what's in her museum, near as I can tell. She'll want this more than I do - take it to her." },
+        ],
+      },
+      {
+        questId: 'the-second-relic',
+        reportForObjectiveId: 'talk-tomas-relic-ii',
+        lines: [
+          { speaker: 'Tomas Vega', text: "A second relic, wedged into a ledge in Crimson Canyons. I've walked that ground more times than I can count and never once looked twice." },
+          { speaker: 'Tomas Vega', text: "Same as before - Nia's the one who can actually place it. Take it to the museum." },
+        ],
+      },
     ],
   },
   {
@@ -1267,6 +1523,22 @@ export const NPCS: Npc[] = [
         lines: [
           { speaker: 'Sand Spirit', text: 'Whole again, and the stars sharper for it already. I had forgotten how much of the sky I was supposed to be able to see.' },
           { speaker: 'Sand Spirit', text: 'The old roads are opening now, Keeper. Whatever you find at the Observatory, know that this oasis will remember what you did here.' },
+        ],
+      },
+      {
+        questId: 'the-stars-second-light',
+        reportForObjectiveId: 'talk-sand-spirit-charm4',
+        lines: [
+          { speaker: 'Sand Spirit', text: 'The dust devils answered for the relic, and the relic answered for you. The wind carried word of it before you arrived.' },
+          { speaker: 'Sand Spirit', text: 'Bring it closer, small light. A fourth Charm binding asks more of the desert than any before it - let me see that you have earned it.' },
+        ],
+      },
+      {
+        questId: 'sands-that-endure',
+        reportForObjectiveId: 'talk-sand-spirit-totem4',
+        lines: [
+          { speaker: 'Sand Spirit', text: 'The wisps answered for the relic this time, not the dust. Either way, you are still standing, and the relic is still yours to give.' },
+          { speaker: 'Sand Spirit', text: 'Bring it closer. A fourth Spirit Totem is the last I have to offer - let me be certain it is given to the right hands.' },
         ],
       },
     ],
@@ -1381,6 +1653,22 @@ export const NPCS: Npc[] = [
           { speaker: 'Captain Astrid Frost', text: "Whatever's wrong with the Aurora Crystal, it's tied to whatever's been taking my scouts. I'd stake my rank on it." },
         ],
       },
+      {
+        questId: 'the-first-scout',
+        reportForObjectiveId: 'talk-astrid-scout-i',
+        lines: [
+          { speaker: 'Captain Astrid Frost', text: "Effects, out of Frozen River. Let me see them - I need to know before I say anything to the rest of the company." },
+          { speaker: 'Captain Astrid Frost', text: "Lyra's better suited to reading what they mean than I am. Take them to the Ice Chapel. I'll be here when you're done." },
+        ],
+      },
+      {
+        questId: 'the-second-scout',
+        reportForObjectiveId: 'talk-astrid-scout-ii',
+        lines: [
+          { speaker: 'Captain Astrid Frost', text: "A second set of effects, out of Glacier Pass. I keep telling myself I'm ready for this and I keep being wrong." },
+          { speaker: 'Captain Astrid Frost', text: "Take them to Lyra, same as before. I'll want to know everything, when you're both ready to tell me." },
+        ],
+      },
     ],
   },
   {
@@ -1436,6 +1724,30 @@ export const NPCS: Npc[] = [
         lines: [
           { speaker: 'Aurora Keeper Lyra', text: "The aurora is thin, but it's there. First real light this chapel has seen in longer than I've kept it." },
           { speaker: 'Aurora Keeper Lyra', text: "The Hall of Eternal Winter is past Glacier Pass, through Aurora Basin now that the shrine's restored the way. Whatever's inside has been waiting the longest of anything in Mytherra." },
+        ],
+      },
+      {
+        questId: 'the-first-scout',
+        reportForObjectiveId: 'talk-lyra-scout-i',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "Astrid sent you with the scout's effects. Let me see them - I want to know what happened before I decide how much of it she needs to hear." },
+          { speaker: 'Aurora Keeper Lyra', text: "Give me a moment. Whatever this tells me, I intend to get it right before I say a word to her." },
+        ],
+      },
+      {
+        questId: 'the-second-scout',
+        reportForObjectiveId: 'talk-lyra-scout-ii',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "The second scout's effects. Astrid held together better than I expected, sending you here - let me see what they are before that changes." },
+          { speaker: 'Aurora Keeper Lyra', text: "Give me a moment. I owe both of them the truth, done carefully, not rushed." },
+        ],
+      },
+      {
+        questId: 'lantern-of-winters-resolve',
+        reportForObjectiveId: 'talk-lyra-lantern',
+        lines: [
+          { speaker: 'Aurora Keeper Lyra', text: "The Lantern of Winter's Resolve, actually in hand. Let me see it properly - I've kept this chapel lit for its return longer than I've admitted to anyone." },
+          { speaker: 'Aurora Keeper Lyra', text: "Give me a moment with it. Eira Winterborn's name deserves to be spoken properly, not guessed at from what little survives." },
         ],
       },
     ],

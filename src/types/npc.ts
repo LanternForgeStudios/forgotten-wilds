@@ -8,6 +8,15 @@ export interface DialogueLine {
 export interface NpcDialogueVariant {
   /** One of this NPC's own gameplayHook.questIds. */
   questId: string;
+  /** When set, this is a "report back" variant: shown while `questId` is still ACTIVE (not yet
+   *  completed), once this specific objective's requiresObjectiveIds are already satisfied but the
+   *  objective itself hasn't been credited yet - i.e. the player just did the fetch/kill/shrine
+   *  step elsewhere and is walking back to this NPC to turn it in. Without this, an NPC shows the
+   *  exact same lines for "here's the job" and "I'm back, did it" (both happen while the same quest
+   *  is active), since the ordinary completed-quest variant below can't distinguish the two - see
+   *  resolveNpcDialogueVariantKey. Checked before every completed-quest variant, regardless of
+   *  array order, since it reflects a more specific/immediate state. */
+  reportForObjectiveId?: string;
   lines: DialogueLine[];
 }
 

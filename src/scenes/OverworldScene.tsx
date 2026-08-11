@@ -189,6 +189,34 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'lost-scout-effects-ii-cache': 'structure.landmark-bogwater-almanac-cache-glow',
 };
 
+/** refId -> granted itemId, for the minority of world-item interactables whose refId does NOT
+ *  equal the item collectWorldItem.ts actually grants (mirrors the divergent entries in
+ *  functions/src/data/locations.ts's WORLD_ITEMS - every "-cache"/"-tunnel" named refId, plus the
+ *  two original prologue-era fragments). Every "is this already collected" check below must
+ *  resolve through grantedItemIdFor, not compare refId to itemId directly, or the check silently
+ *  and permanently reads as "not collected" even after the item is in inventory (2026-08-10:
+ *  reported for the Winter Count hides, which never flipped to their collected sprite/label). */
+const FRAGMENT_GRANTED_ITEM_ID: Record<string, string> = {
+  'mossy-creek': 'stone-fragment',
+  'fallen-watchtower': 'wind-fragment',
+  'frostbound-treatise-cache': 'frostbound-treatise',
+  'ember-codex-tunnel': 'ember-codex',
+  'bogwater-almanac-cache': 'bogwater-almanac',
+  'drowned-ledger-cache': 'drowned-ledger',
+  'winter-count-hide-i-cache': 'winter-count-hide-i',
+  'winter-count-hide-ii-cache': 'winter-count-hide-ii',
+  'heartwood-recording-i-cache': 'heartwood-recording-i',
+  'heartwood-recording-ii-cache': 'heartwood-recording-ii',
+  'desert-relic-i-cache': 'desert-relic-i',
+  'desert-relic-ii-cache': 'desert-relic-ii',
+  'lost-scout-effects-i-cache': 'lost-scout-effects-i',
+  'lost-scout-effects-ii-cache': 'lost-scout-effects-ii',
+};
+
+function grantedItemIdFor(refId: string): string {
+  return FRAGMENT_GRANTED_ITEM_ID[refId] ?? refId;
+}
+
 /** Post-collection sprite for a 'fragment'-kind interactable, shown once its item is in the
  *  player's inventory (collectWorldItem.ts grants it once and never removes it, so presence in
  *  inventory IS the "collected" flag - same convention DungeonScene.tsx's isWorldItemCollected
@@ -230,7 +258,7 @@ function labelForInteractable(refId: string, openedChests: string[], inventory: 
   // A fragment-kind refId IS its own granted itemId (collectWorldItem.ts) - once it's in the
   // player's inventory the flavor text below (describing something still hidden/waiting) is no
   // longer accurate, same staleness the sprite swap above already fixes for the visual.
-  if (inventory.some((i) => i.itemId === refId)) return 'Already Collected';
+  if (inventory.some((i) => i.itemId === grantedItemIdFor(refId))) return 'Already Collected';
   if (refId === 'fallen-watchtower') return 'a crumbling watchtower, wind-worn and abandoned';
   if (refId.startsWith('heart-seed-')) return 'a seed pod nestled among mossy roots, glowing faintly';
   if (refId === 'water-fragment') return 'a faint glimmer in the pool';
@@ -526,7 +554,7 @@ export function OverworldScene() {
             ? shrineSpriteAssetId(o.refId!, questProgress)
             : isGlowingMushroom(o.refId!)
               ? 'structure.decor-glowing-mushroom'
-              : inventory.some((i) => i.itemId === o.refId)
+              : inventory.some((i) => i.itemId === grantedItemIdFor(o.refId!))
                 ? (fragmentCollectedSpriteAssetId(o.refId!) ?? FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant')
                 : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');
         return {
