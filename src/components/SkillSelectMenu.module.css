@@ -1,0 +1,77 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Wider than the old single-column list (360px) - wide enough for a 2-3 column grid per ailment
+   group, so a full specialty roster reads as a handful of short horizontal rows instead of one
+   long vertical scroll. */
+.panel {
+  width: min(560px, 92vw);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.title {
+  margin: 0 0 10px;
+  color: var(--fw-accent);
+}
+
+.group {
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.group:last-child {
+  margin-bottom: 0;
+}
+
+.groupLabel {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.skillButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  font-size: 12px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--fw-panel-border);
+  border-radius: 6px;
+  color: var(--fw-text);
+  cursor: pointer;
+}
+
+.skillButton:hover:not(:disabled) {
+  border-color: var(--fw-accent);
+}
+
+.skillButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.spCost {
+  font-size: 10px;
+  opacity: 0.7;
+}

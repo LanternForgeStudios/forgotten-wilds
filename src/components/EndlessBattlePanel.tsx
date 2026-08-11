@@ -24,6 +24,7 @@ import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
 import { TIER_ORDER } from '@/utils/tier';
 import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
+import { SkillSelectMenu } from './SkillSelectMenu';
 import type { PartyBattleSession, PartyCombatHitResult, PartyEnemyHitResult } from '@/types';
 import styles from './EndlessBattlePanel.module.css';
 
@@ -658,25 +659,12 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
       </Panel>
 
       {showSkillMenu && (
-        <div className={styles.overlay} onClick={() => setShowSkillMenu(false)}>
-          <Panel style={{ width: 'min(360px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-            <OverlayCloseButton onClick={() => setShowSkillMenu(false)} />
-            <h3 className={styles.sectionTitle}>Select Spirit Ability</h3>
-            <div className={styles.list}>
-              {knownSkills.map((skill) => (
-                <button
-                  key={skill.id}
-                  className={styles.smallButton}
-                  disabled={me.spirit < skill.spiritCost}
-                  title={describeSkill(skill)}
-                  onClick={() => submitSkill(skill.id)}
-                >
-                  {skill.name} ({skill.spiritCost} SP)
-                </button>
-              ))}
-            </div>
-          </Panel>
-        </div>
+        <SkillSelectMenu
+          skills={knownSkills}
+          playerSpirit={me.spirit}
+          onClose={() => setShowSkillMenu(false)}
+          onSelect={submitSkill}
+        />
       )}
 
       {showItemMenu && (

@@ -37,6 +37,7 @@ import { battleStartCutscene, buildDefeatCutscene } from '@/data/cutscenes';
 import { getAssetUrl } from '@/assets/assetManager';
 import { playMusic, playSound } from '@/audio/audioService';
 import { LorePopup } from '@/components/LorePopup';
+import { SkillSelectMenu } from '@/components/SkillSelectMenu';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
 import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import styles from './CombatScene.module.css';
@@ -655,32 +656,15 @@ export function CombatScene() {
         })()}
 
       {showSkillMenu && (
-        <div className={styles.overlay} onClick={() => setShowSkillMenu(false)}>
-          <Panel style={{ width: 'min(360px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-            <OverlayCloseButton onClick={() => setShowSkillMenu(false)} />
-            <h3 style={{ margin: '0 0 10px', color: 'var(--fw-accent)' }}>Select Spirit Ability</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {knownSkills.map((skill) => (
-                <div key={skill.id}>
-                  <button
-                    type="button"
-                    className={styles.actionButton}
-                    style={{ width: '100%' }}
-                    disabled={(player?.stats.spirit ?? 0) < skill.spiritCost}
-                    title={describeSkill(skill)}
-                    onClick={() => {
-                      setShowSkillMenu(false);
-                      act('skill', { skillId: skill.id });
-                    }}
-                  >
-                    {skill.name} ({skill.spiritCost} SP)
-                  </button>
-                  <p style={{ fontSize: 11, opacity: 0.75, margin: '4px 2px 0' }}>{describeSkill(skill)}</p>
-                </div>
-              ))}
-            </div>
-          </Panel>
-        </div>
+        <SkillSelectMenu
+          skills={knownSkills}
+          playerSpirit={player?.stats.spirit ?? 0}
+          onClose={() => setShowSkillMenu(false)}
+          onSelect={(skillId) => {
+            setShowSkillMenu(false);
+            act('skill', { skillId });
+          }}
+        />
       )}
 
       <div className={isBlinded ? `${styles.stage} ${styles.stageBlurred}` : styles.stage}>
