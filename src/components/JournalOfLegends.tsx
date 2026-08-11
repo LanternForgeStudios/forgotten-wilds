@@ -13,6 +13,7 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { TIER_LABELS, TIER_COLORS } from '@/utils/tier';
 import { sellPriceFor } from '@/utils/sellPrice';
+import { COLLECT_ITEM_LANDMARK_REF_ID, locationsDroppingItem, locationsSpawningEnemy } from '@/utils/questLocationLookup';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { StatBonusesText, AilmentResistanceText } from '@/components/common/StatBonusText';
 import { LanternAbilitiesText } from '@/components/common/LanternAbilitiesText';
@@ -175,14 +176,19 @@ const LOCATION_KIND_LABELS: Record<LocationKind, string> = {
   dungeon: 'Dungeon',
 };
 
-/** Every top-level (main-area) location id currently relevant to an active quest - covers the two
- *  objective types with an unambiguous single location (talkToNpc via the target NPC's home,
- *  reachLocation when its targetId is a real top-level location id directly, both of which cover
- *  the overwhelming majority of this game's quest chains). collectItem/defeatEnemies/
- *  interactWithShrine objectives are deliberately NOT resolved here - an item or enemy isn't tied
- *  to one specific location the way talking to someone or reaching a place is, so guessing one
- *  would be misleading rather than just incomplete. Only an objective the player hasn't already
- *  satisfied counts, so a quest with 2 of 3 objectives done only flags the location of what's left. */
+/** Every top-level (main-area) location id currently relevant to an active quest - covers
+ *  talkToNpc (via the target NPC's home), reachLocation (when its targetId is a real top-level
+ *  location id directly), defeatEnemies (via locationsSpawningEnemy - which location(s) the
+ *  target enemy's encounterTable appears on), defeatBoss (same lookup, a boss is also just an
+ *  enemy id), and collectItem when the item is an enemy drop rather than a fixed landmark pickup
+ *  (via locationsDroppingItem - see questLocationLookup.ts for both; MiniMap.tsx's
+ *  COLLECT_ITEM_LANDMARK_REF_ID handles the fixed-pickup case at a precise on-map position,
+ *  which this function doesn't attempt to duplicate). interactWithShrine is the one objective
+ *  type still deliberately NOT resolved here - a shrine's own location is already implied by
+ *  whichever quest is guiding the player there via an earlier reachLocation objective in the same
+ *  chain, so a dedicated shrine lookup hasn't been worth adding. Only an objective the player
+ *  hasn't already satisfied counts, so a quest with 2 of 3 objectives done only flags the
+ *  location of what's left. */
 function activeQuestRelevantLocationIds(questProgress: Record<string, QuestProgress>): Set<string> {
   const ids = new Set<string>();
   for (const quest of QUESTS) {
@@ -198,6 +204,10 @@ function activeQuestRelevantLocationIds(questProgress: Record<string, QuestProgr
       } else if (objective.type === 'reachLocation') {
         const loc = LOCATIONS.find((l) => l.id === objective.targetId);
         if (loc) ids.add(mainLocationId(loc.id));
+      } else if (objective.type === 'defeatEnemies' || objective.type === 'defeatBoss') {
+        for (const locationId of locationsSpawningEnemy(objective.targetId)) ids.add(mainLocationId(locationId));
+      } else if (objective.type === 'collectItem' && !COLLECT_ITEM_LANDMARK_REF_ID[objective.targetId]) {
+        for (const locationId of locationsDroppingItem(objective.targetId)) ids.add(mainLocationId(locationId));
       }
     }
   }

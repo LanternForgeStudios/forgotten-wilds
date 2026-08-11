@@ -7,6 +7,7 @@ import { useMapPreferencesStore } from '@/state/useMapPreferencesStore';
 import { getBlockedMessage } from '@/utils/locationGates';
 import { ENEMIES, LOCATIONS, NPCS, QUESTS } from '@/data';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
+import { COLLECT_ITEM_LANDMARK_REF_ID } from '@/utils/questLocationLookup';
 import type { QuestProgress, TileMap } from '@/types';
 import styles from './MiniMap.module.css';
 
@@ -94,22 +95,6 @@ const INTERACTABLE_LABEL_FALLBACK: Record<string, string> = {
   'wind-stone-stone-circle-valley': 'Wind Stone',
 };
 
-/** Reverse of functions/src/functions/collectWorldItem.ts's WORLD_ITEMS map (itemId -> the
- *  interactable refId that grants it) - a collectItem objective's targetId is an item id, not a
- *  map refId, so a quest like "recover the Stone Fragment from Mossy Creek" needs this to resolve
- *  which on-map landmark to highlight. Not every collectItem objective needs an entry here (the
- *  Heart Seeds and The Drowned Ledgers' key items never got one, and still don't) - only add one
- *  when the on-map landmark is worth highlighting. Keep in sync by hand if a new one is added. */
-const COLLECT_ITEM_LANDMARK_REF_ID: Record<string, string> = {
-  'stone-fragment': 'mossy-creek',
-  'wind-fragment': 'fallen-watchtower',
-  'water-fragment': 'water-fragment',
-  'miners-lost-lantern': 'miners-lost-lantern',
-  'wind-stone-golden-prairie': 'wind-stone-golden-prairie',
-  'wind-stone-spirit-herd-plains': 'wind-stone-spirit-herd-plains',
-  'wind-stone-stone-circle-valley': 'wind-stone-stone-circle-valley',
-};
-
 /** Resolves a mini-map display name + whether this is a major boss (drawn in a distinct color) for
  *  any non-chest interactable refId. Tried in order: ENEMIES (covers boss fights encoded as
  *  interactable objects, e.g. coalbound-warden), then LOCATIONS (covers real landmarks like
@@ -139,15 +124,18 @@ function resolveInteractable(refId: string): { label: string; isBoss: boolean } 
  *  this component never reads), area exits (with a lock-state color, per locationGates.ts's binary
  *  story-locked/unlocked model - no key/puzzle/ability taxonomy exists in this codebase to draw a
  *  richer distinction), and selected active-quest markers for reachLocation/interactWithShrine/
- *  collectItem/talkToNpc objectives resolvable on this specific map, gated per-objective on that
- *  objective still being unmet (not just the quest overall being active) - verified against every
- *  objective in every quest's data (see COLLECT_ITEM_LANDMARK_REF_ID and the reachLocation branch
- *  below for the two non-obvious cases: a collectItem target is an item id needing translation to
- *  the landmark that grants it, and a reachLocation target can be either a real cross-map
- *  transition or an in-map landmark interactable, not always the former). talkToNpc is the one
- *  deliberate exception to "no regular NPCs": an NPC who's the unmet target of an active quest
- *  objective gets a real marker+label so the player can find them, since nothing else marks an
- *  NPC's position.
+ *  defeatBoss/collectItem/talkToNpc objectives resolvable on this specific map, gated
+ *  per-objective on that objective still being unmet (not just the quest overall being active) -
+ *  verified against every objective in every quest's data (see COLLECT_ITEM_LANDMARK_REF_ID and
+ *  the reachLocation branch below for the two non-obvious cases: a collectItem target is an item
+ *  id needing translation to the landmark that grants it, and a reachLocation target can be
+ *  either a real cross-map transition or an in-map landmark interactable, not always the
+ *  former). talkToNpc is the one deliberate exception to "no regular NPCs": an NPC who's the
+ *  unmet target of an active quest objective gets a real marker+label so the player can find
+ *  them, since nothing else marks an NPC's position. defeatEnemies (a random field encounter, not
+ *  a fixed map object with a real position, unlike a boss) is deliberately NOT resolved here -
+ *  see JournalOfLegends.tsx's activeQuestRelevantLocationIds, which resolves it at location
+ *  granularity instead.
  *  Every marker's name is drawn inline rather than explained via a separate legend. */
 export function MiniMap({ map, position, locationId, openedChests, questProgress, onClose }: MiniMapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -329,6 +317,13 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
         } else if (objective.type === 'interactWithShrine') {
           const shrine = map.objects.find((o) => o.type === 'interactable' && o.refId === objective.targetId);
           if (shrine) drawQuestAccent(shrine.x, shrine.y);
+        } else if (objective.type === 'defeatBoss') {
+          // Unlike defeatEnemies (a random field encounter with no fixed position - see
+          // JournalOfLegends.tsx's activeQuestRelevantLocationIds for how that's resolved
+          // instead, at location granularity), a boss IS a fixed interactable object on its own
+          // map (e.g. coalbound-warden) - same lookup as interactWithShrine/talkToNpc above.
+          const boss = map.objects.find((o) => o.type === 'interactable' && o.refId === objective.targetId);
+          if (boss) drawQuestAccent(boss.x, boss.y);
         } else if (objective.type === 'collectItem') {
           // targetId here is an item id, not a map refId (see COLLECT_ITEM_LANDMARK_REF_ID) -
           // resolve to the landmark that actually grants it before looking for a map object.
