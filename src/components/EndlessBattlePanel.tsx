@@ -406,6 +406,10 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
             targetIndex={selectedTarget}
             targetMode={targetMode}
             canPickTarget={canAct && aliveEnemies.length > 1}
+            // See PhaserBattleCanvasProps.inputSuspended's own doc comment - without this, a
+            // click on a Spirit Specialty/item button that happens to sit over an enemy sprite
+            // also fires that sprite's own Phaser pointerdown handler and silently re-targets.
+            inputSuspended={showSkillMenu || showItemMenu}
             onTargetEnemy={(index) => {
               setTargetMode('single');
               setSelectedTarget(index);

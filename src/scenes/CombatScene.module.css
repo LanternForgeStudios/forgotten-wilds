@@ -279,6 +279,22 @@
   gap: 4px;
 }
 
+/* Ailment Cures specifically (up to 5 items: antidote/burn-salve/thaw-crystal/eye-drops/echo-herb)
+   - a single stacked column of that many rows made this the tallest group by far and stretched
+   the whole modal's height. Two columns instead, same width budget as every other group. */
+.itemMenuColumnGrid {
+  flex: 1 1 200px;
+  min-width: 200px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 10px;
+  align-content: start;
+}
+
+.itemMenuColumnGrid .itemMenuColumnTitle {
+  grid-column: 1 / -1;
+}
+
 .itemMenuColumnTitle {
   margin: 0 0 2px;
   font-size: 12px;

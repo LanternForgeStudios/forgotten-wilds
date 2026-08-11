@@ -18,6 +18,10 @@ interface PhaserBattleCanvasProps {
   targetIndex: number | null;
   targetMode: 'single' | 'all';
   canPickTarget: boolean;
+  /** True whenever a full-screen React overlay (Spirit Specialty select, item-use modal, ailment
+   *  detail popup, etc.) is covering the canvas - see BattleScene.setTargeting's own doc comment
+   *  for why this has to be a real, separate signal rather than reusing canPickTarget. */
+  inputSuspended: boolean;
   onTargetEnemy: (index: number) => void;
   /** True once the fight has reached victory/defeat/fled/error - tells the Scene to stop every
    *  tween/emitter so the arena isn't idly animating behind the overlay Panel, without unmounting
@@ -62,6 +66,7 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
     targetIndex,
     targetMode,
     canPickTarget,
+    inputSuspended,
     onTargetEnemy,
     combatEnded,
     ailmentFxEvent,
@@ -178,8 +183,8 @@ export function PhaserBattleCanvas(props: PhaserBattleCanvasProps) {
 
   useEffect(() => {
     if (!sceneReady) return;
-    sceneRef.current?.setTargeting(targetIndex, targetMode, canPickTarget);
-  }, [sceneReady, targetIndex, targetMode, canPickTarget]);
+    sceneRef.current?.setTargeting(targetIndex, targetMode, canPickTarget, inputSuspended);
+  }, [sceneReady, targetIndex, targetMode, canPickTarget, inputSuspended]);
 
   useEffect(() => {
     if (!sceneReady || outgoingHits.length === 0) return;

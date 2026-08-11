@@ -379,6 +379,13 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             targetIndex={0}
             targetMode="single"
             canPickTarget={false}
+            // onTargetEnemy is already a no-op below, so this doesn't fix an observable bug the
+            // way it does in solo/Endless Battle - but the opponent sprite (always the implicit
+            // target in a 1-on-1 duel) stays interactive/hand-cursor regardless of canPickTarget,
+            // same loophole described in PhaserBattleCanvasProps.inputSuspended's own doc comment,
+            // so this keeps all three combat surfaces consistent rather than leaving PvP as the
+            // one place a modal doesn't actually suspend the canvas underneath it.
+            inputSuspended={showSkillMenu || showItemMenu}
             onTargetEnemy={() => {}}
             combatEnded={battle.status !== 'active'}
             ailmentFxEvent={ailmentFxEvent}

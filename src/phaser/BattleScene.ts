@@ -334,11 +334,23 @@ export class BattleScene extends Phaser.Scene {
 
   /** Target-ring/marker visuals + each sprite's interactive state, ported verbatim from
    *  CombatScene's old `disabled={targetMode !== 'all' && !canPickTarget && enemy.index !==
-   *  targetIndex}`. */
-  setTargeting(targetIndex: number | null, targetMode: 'single' | 'all', canPickTarget: boolean): void {
+   *  targetIndex}`.
+   *
+   *  `inputSuspended` (2026-08) unconditionally forces every sprite non-interactive, bypassing
+   *  the target/canPickTarget formula above entirely - that formula always leaves the CURRENTLY
+   *  targeted sprite clickable regardless of canPickTarget, which is fine during normal play but
+   *  is exactly the gap that let a React overlay rendered on top of the canvas (the Spirit
+   *  Specialty select menu, the item-use modal, the ailment detail popup) silently re-target
+   *  through itself: Phaser's own input system does its own hit-testing against sprite bounds
+   *  using raw pointer coordinates, blind to whatever DOM element a browser click was actually
+   *  delivered to, so a still-interactive sprite underneath a full-screen modal fires its own
+   *  pointerdown/onTargetEnemy the instant a click lands anywhere over it - including a click on
+   *  a button in the modal that just happens to be positioned above that sprite. The caller
+   *  passes true whenever any such modal is open. */
+  setTargeting(targetIndex: number | null, targetMode: 'single' | 'all', canPickTarget: boolean, inputSuspended: boolean): void {
     for (const [index, slot] of this.enemySlots) {
       const isTarget = targetMode === 'all' || index === targetIndex;
-      const disabled = targetMode !== 'all' && !canPickTarget && index !== targetIndex;
+      const disabled = inputSuspended || (targetMode !== 'all' && !canPickTarget && index !== targetIndex);
 
       if (isTarget && !slot.targetRing) {
         const w = slot.sprite.displayWidth + 12;

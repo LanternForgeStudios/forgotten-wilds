@@ -539,6 +539,10 @@ export function CombatScene() {
     });
   const canAct = phase === 'playerTurn' && !playbackActive;
   const canPickTarget = aliveEnemies.length > 1 && canAct;
+  // Every full-screen modal that renders on top of the battle canvas - see
+  // PhaserBattleCanvasProps.inputSuspended's own doc comment for why this has to be threaded all
+  // the way into Phaser's own sprite interactivity, not just left to normal DOM stacking.
+  const targetingSuspended = !!selectedAilmentId || showSkillMenu || phase === 'itemMenu' || phase === 'usingItems';
   const combatEnded = phase === 'victory' || phase === 'defeat' || phase === 'fled' || phase === 'error';
   const isSilenced = playerAilments.some((a) => AILMENTS[a.ailmentId]?.effect.blocksSkill);
   const isLanternDisabled = playerAilments.some((a) => AILMENTS[a.ailmentId]?.effect.disablesLanternAbility);
@@ -680,6 +684,7 @@ export function CombatScene() {
               targetIndex={targetIndex}
               targetMode={targetMode}
               canPickTarget={canPickTarget}
+              inputSuspended={targetingSuspended}
               onTargetEnemy={(index) => {
                 setTargetMode('single');
                 setTargetIndex(index);
@@ -835,7 +840,7 @@ export function CombatScene() {
                   );
                   if (groupItems.length === 0) return null;
                   return (
-                    <div key={group} className={styles.itemMenuColumn}>
+                    <div key={group} className={group === 'cure' ? styles.itemMenuColumnGrid : styles.itemMenuColumn}>
                       <p className={styles.itemMenuColumnTitle}>{ITEM_EFFECT_GROUP_LABELS[group]}</p>
                       {groupItems.map((i) => {
                         const def = ITEMS.find((d) => d.id === i.itemId);
