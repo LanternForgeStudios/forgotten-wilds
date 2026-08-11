@@ -23,6 +23,7 @@ import { itemDisplayName, itemIconAssetId, groupRewardItemIds } from '@/utils/it
 import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
 import { TIER_ORDER } from '@/utils/tier';
+import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import type { PartyBattleSession, PartyCombatHitResult, PartyEnemyHitResult } from '@/types';
 import styles from './EndlessBattlePanel.module.css';
 
@@ -45,7 +46,9 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   const inventory = useInventoryStore((s) => s.items);
   const [battle, setBattle] = useState<PartyBattleSession | null>(null);
   const [selectedTarget, setSelectedTarget] = useState(0);
-  const [targetMode, setTargetMode] = useState<'single' | 'all'>('single');
+  const [targetMode, setTargetMode] = useState<'single' | 'all'>(() =>
+    useCombatPreferencesStore.getState().defaultTargetAll ? 'all' : 'single',
+  );
   const [showSkillMenu, setShowSkillMenu] = useState(false);
   const [showItemMenu, setShowItemMenu] = useState(false);
   // Up to 3 item ids queued in the item menu, applied IMMEDIATELY (via callUseItemInPartyBattle)
@@ -65,8 +68,9 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   // participants) - collapses the stagger between multiple enemies' attacks in *this player's own*
   // canvas so a round plays out all at once instead of one attacker at a time. Matches solo
   // combat's own fastRounds (CombatScene.tsx) exactly: purely a local animation-pacing choice, so
-  // one player toggling it has zero effect on what anyone else in the same battle sees.
-  const [fastRounds, setFastRounds] = useState(false);
+  // one player toggling it has zero effect on what anyone else in the same battle sees. Seeded
+  // from the player's saved default (Settings > Encounter Defaults), same as solo combat.
+  const [fastRounds, setFastRounds] = useState(() => useCombatPreferencesStore.getState().defaultFastRounds);
   const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
   // While a fight is actively in progress, Escape/click-outside must NOT silently dismiss this

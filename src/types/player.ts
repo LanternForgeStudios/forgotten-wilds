@@ -1,4 +1,4 @@
-import type { EquipmentSlot, ExplorerRank, RegionalReputationRank, SpiritRank, Stats } from './stats';
+import type { Difficulty, EquipmentSlot, ExplorerRank, RegionalReputationRank, SpiritRank, Stats } from './stats';
 import type { InventoryItem } from './item';
 import type { QuestProgress } from './quest';
 import type { JournalState } from './journal';
@@ -43,6 +43,8 @@ export interface Player {
    *  data/lanternOilUpgrades.ts) - 0/absent means never upgraded. See
    *  functions/src/shared-types/index.ts's matching field for the full design reasoning. */
   lanternOilUpgrades: Record<string, number>;
+  /** Solo-combat-only, see the Difficulty type's own doc comment. Defaults to 'medium'. */
+  difficulty: Difficulty;
 }
 
 /** One dynamically-generated Apothecary/Herbalist "restock" request - see PlayerSave's own

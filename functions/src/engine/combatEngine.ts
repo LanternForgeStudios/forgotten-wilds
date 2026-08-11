@@ -14,7 +14,7 @@ import {
   scaleLanternAbility,
   weightedPick,
 } from './combatMath';
-import type { AilmentResistance, CombatAction, Stats, ActiveAilment } from '../shared-types';
+import type { AilmentResistance, CombatAction, Stats, ActiveAilment, Difficulty } from '../shared-types';
 
 export function rollEnemyForLocation(locationId: string): EnemyDefinition {
   const table = ENCOUNTER_TABLES[locationId];
@@ -217,6 +217,10 @@ export interface RoundInput {
    *  consumed by the 'lanternAbility' action (see combatMath.ts's scaleLanternAbility); resolved
    *  by the caller from save.player.lanternOilUpgrades[equippedLanternId], not looked up here. */
   lanternOilTier?: number;
+  /** Solo-combat-only difficulty preference (see shared-types' Difficulty and
+   *  CROWD_DAMAGE_FACTOR_BY_DIFFICULTY below) - defaults to 'medium' when omitted, so every
+   *  existing test/call site that doesn't care about difficulty keeps behaving exactly as before. */
+  difficulty?: Difficulty;
 }
 
 export type RoundOutcomePhase = 'continue' | 'victory' | 'defeat' | 'fled';
@@ -347,10 +351,22 @@ const ENEMY_MISS_CHANCE = 0.1;
  *  numerically: undamped, a 3-enemy fight killed the player before they could even finish off the
  *  first enemy, at every player level). A boss's own attack is never dampened (see enemyAttack) -
  *  only its "adds" are, and only by how many adds are alive, so a boss fought alone or with 0-1
- *  adds is completely unaffected by this table. */
-const CROWD_DAMAGE_FACTOR: Record<number, number> = { 1: 1, 2: 0.75, 3: 0.6, 4: 0.5, 5: 0.4, 6: 0.3 };
+ *  adds is completely unaffected by this table.
+ *
+ *  Solo-combat-only Difficulty setting (2026-08, see shared-types' Difficulty and
+ *  setDifficulty.ts) selects one of these three tables - party/Endless Battle and PvP
+ *  (partyCombatEngine.ts) always use a single fixed table matching 'medium' here, unaffected by
+ *  this setting, per its own doc comment. 'medium' is the same values the game shipped with after
+ *  the 2026-08 crowd-damage hardening pass; 'easy' reuses the original pre-hardening values
+ *  (already well-tested); 'hard' pushes further past 'medium' by the same rough step. */
+const CROWD_DAMAGE_FACTOR_BY_DIFFICULTY: Record<Difficulty, Record<number, number>> = {
+  easy: { 1: 1, 2: 0.3, 3: 0.25, 4: 0.2, 5: 0.15, 6: 0.1 },
+  medium: { 1: 1, 2: 0.75, 3: 0.6, 4: 0.5, 5: 0.4, 6: 0.3 },
+  hard: { 1: 1, 2: 0.9, 3: 0.8, 4: 0.7, 5: 0.6, 6: 0.5 },
+};
 
 export function resolveRound(input: RoundInput): RoundResult {
+  const crowdDamageFactor = CROWD_DAMAGE_FACTOR_BY_DIFFICULTY[input.difficulty ?? 'medium'];
   const { action } = input;
   const log: string[] = [];
   let playerHp = input.playerStats.hp;
@@ -516,7 +532,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     );
     let dmg = computeDamage(skill.power, stats.attack * attackMultiplier, input.playerStats.defense);
     if (def.tier !== 'boss') {
-      const crowdFactor = CROWD_DAMAGE_FACTOR[Math.min(6, aliveNonBossCount())] ?? 1;
+      const crowdFactor = crowdDamageFactor[Math.min(6, aliveNonBossCount())] ?? 1;
       dmg = Math.max(1, Math.round(dmg * crowdFactor));
     }
     if (playerDefending) dmg = Math.round(dmg / 2);

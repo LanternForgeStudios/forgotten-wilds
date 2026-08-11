@@ -74,3 +74,8 @@ export type ExplorerRank =
  *  label over the existing single global regionalReputation counter, not a per-region tracker
  *  and not a gate on anything. */
 export type RegionalReputationRank = 'Stranger' | 'Acquaintance' | 'Trusted Ally' | 'Honored Friend' | 'Living Legend of Mytherra';
+
+/** Solo-combat-only difficulty preference - see functions/src/shared-types/index.ts's matching
+ *  field for the full design reasoning (party/Endless Battle and PvP always resolve at
+ *  'medium' regardless of this setting). */
+export type Difficulty = 'easy' | 'medium' | 'hard';

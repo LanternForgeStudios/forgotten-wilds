@@ -69,6 +69,13 @@ export type ExplorerRank =
  *  and not a gate on anything (shops show their full catalog regardless of reputation). */
 export type RegionalReputationRank = 'Stranger' | 'Acquaintance' | 'Trusted Ally' | 'Honored Friend' | 'Living Legend of Mytherra';
 
+/** Solo-combat-only difficulty preference (see combatEngine.ts's CROWD_DAMAGE_FACTOR_BY_DIFFICULTY)
+ *  - party/Endless Battle and PvP always resolve at 'medium' regardless of this setting, since a
+ *  shared-enemy-roster or opponent fight isn't just the player's own choice to make harder/easier.
+ *  Changed via setDifficulty.ts, same "one field, one small onCall function" shape as gender/
+ *  appearance via setPlayerSkin.ts. */
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 export type PlayerEquipment = Partial<Record<EquipmentSlot, string | null>>;
 
 export interface Player {
@@ -120,6 +127,10 @@ export interface Player {
    *  equipmentEngine.ts's backfillPlayerEquipment) - every one of this field's own read call sites
    *  already calls that first. */
   lanternOilUpgrades: Record<string, number>;
+  /** Solo-combat-only, see the Difficulty type's own doc comment. Defaults to 'medium' for a
+   *  fresh character (newCharacter.ts) and as a read-time fallback for any save that predates
+   *  this field (see resolveCombatAction.ts). */
+  difficulty: Difficulty;
 }
 
 export interface InventoryItem {

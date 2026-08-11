@@ -38,6 +38,7 @@ function makeSave(inventory: InventoryItem[], gold: number, equipment: PlayerEqu
       explorerRank: 'Newcomer',
       regionalReputation: 0,
       regionalReputationRank: 'Stranger',
+      difficulty: 'medium',
       equipment,
       currentLocationId: 'ash-hallow',
     },

@@ -38,6 +38,7 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { playMusic, playSound } from '@/audio/audioService';
 import { LorePopup } from '@/components/LorePopup';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
+import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import styles from './CombatScene.module.css';
 
 const RESTORE_STAT_LABEL: Record<'hp' | 'spirit' | 'lanternOil', string> = {
@@ -61,7 +62,9 @@ export function CombatScene() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [enemies, setEnemies] = useState<EncounterEnemy[]>([]);
   const [targetIndex, setTargetIndex] = useState<number | null>(null);
-  const [targetMode, setTargetMode] = useState<'single' | 'all'>('single');
+  const [targetMode, setTargetMode] = useState<'single' | 'all'>(() =>
+    useCombatPreferencesStore.getState().defaultTargetAll ? 'all' : 'single',
+  );
   const [log, setLog] = useState<string[]>([]);
   const [playerAilments, setPlayerAilments] = useState<ActiveAilment[]>([]);
   // Drives PhaserBattleCanvas's FX-pack ailment bursts (poison/burn/freeze) - key increments every
@@ -132,11 +135,12 @@ export function CombatScene() {
   // so without this the player could queue up another action mid-animation (reported as "attacking
   // out of turn" - the enemies' own attacks were still visually resolving).
   const [playbackActive, setPlaybackActive] = useState(false);
-  // Per-encounter, defaults off - collapses the pause between multiple enemies' attacks (but not
+  // Per-encounter - collapses the pause between multiple enemies' attacks (but not
   // PRE_ENEMY_ATTACK_DELAY_MS itself) so a player who'd rather not sit through a staggered 4-5
-  // enemy round every time can speed through it. Resets to off on a fresh encounter (new
-  // CombatScene mount), not persisted across fights.
-  const [fastRounds, setFastRounds] = useState(false);
+  // enemy round every time can speed through it. Seeded from the player's saved default (Settings
+  // > Encounter Defaults) on a fresh encounter (new CombatScene mount); still resets to that
+  // default rather than persisting mid-session toggles across fights.
+  const [fastRounds, setFastRounds] = useState(() => useCombatPreferencesStore.getState().defaultFastRounds);
   const hitBatchRef = useRef(0);
   const encounterGuardRef = useRef<{ locationId: string; cancelled: boolean } | null>(null);
   // True once a defeat round's response has arrived but its (already-respawned-at-Ash-Hallow)

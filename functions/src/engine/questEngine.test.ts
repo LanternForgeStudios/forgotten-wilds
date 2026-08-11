@@ -21,6 +21,7 @@ function emptySave(overrides: Partial<PlayerSave> = {}): PlayerSave {
       explorerRank: 'Newcomer',
       regionalReputation: 0,
       regionalReputationRank: 'Stranger',
+      difficulty: 'medium',
       equipment: { weapon: null, chest: null, legs: null, boots: null, gloves: null, charm: null, lantern: null, spiritTotem: null },
       currentLocationId: 'ash-hallow',
     },

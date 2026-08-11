@@ -37,6 +37,7 @@ export function buildFreshPlayer(
     appearance,
     lastChestClaimedAt: 0,
     lanternOilUpgrades: {},
+    difficulty: 'medium',
   };
 }
 

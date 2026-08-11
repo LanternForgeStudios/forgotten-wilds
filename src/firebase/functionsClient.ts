@@ -4,6 +4,7 @@ import type {
   ClanLeaderboardEntry,
   CombatAction,
   DamageType,
+  Difficulty,
   EnemyTier,
   PartyBattleParticipantStats,
   PartyBattleStatus,
@@ -37,6 +38,12 @@ export async function callSetPlayerSkin(
     { gender: 'male' | 'female'; appearance: Appearance }
   >(functions, 'setPlayerSkin');
   const result = await fn({ gender, appearance });
+  return result.data;
+}
+
+export async function callSetDifficulty(difficulty: Difficulty): Promise<{ difficulty: Difficulty }> {
+  const fn = httpsCallable<{ difficulty: Difficulty }, { difficulty: Difficulty }>(functions, 'setDifficulty');
+  const result = await fn({ difficulty });
   return result.data;
 }
 

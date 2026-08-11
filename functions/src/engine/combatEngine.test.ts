@@ -919,7 +919,23 @@ describe('resolveRound', () => {
       expect(remainingFraction).toBeLessThan(0.6);
     });
 
-    function simulateNaive3MothlingFight(playerLevel: number): { phase: string; rounds: number; remainingFraction: number } {
+    it("'easy' difficulty recovers the old always-winnable-with-real-risk invariant at level 10", () => {
+      const { phase, remainingFraction } = simulateNaive3MothlingFight(10, 'easy');
+      expect(phase).toBe('victory');
+      expect(remainingFraction).toBeGreaterThan(0.15);
+    });
+
+    it("'hard' difficulty is strictly harsher than 'medium' for the same fight", () => {
+      const medium = simulateNaive3MothlingFight(50, 'medium');
+      const hard = simulateNaive3MothlingFight(50, 'hard');
+      expect(medium.phase).toBe('victory');
+      expect(hard.remainingFraction).toBeLessThan(medium.remainingFraction);
+    });
+
+    function simulateNaive3MothlingFight(
+      playerLevel: number,
+      difficulty?: 'easy' | 'medium' | 'hard',
+    ): { phase: string; rounds: number; remainingFraction: number } {
       vi.spyOn(Math, 'random').mockReturnValue(0.5);
       const playerMaxHp = 60 + 8 * (playerLevel - 1);
       let playerHp = playerMaxHp;
@@ -947,6 +963,7 @@ describe('resolveRound', () => {
           playerAilments: [],
           ailmentResistances: [],
           enemies,
+          difficulty,
         });
         playerHp = result.playerHp;
         enemies = enemies.map((e, i) => ({ ...e, hp: result.enemyHp[i] }));

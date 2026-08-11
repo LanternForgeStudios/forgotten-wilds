@@ -160,6 +160,10 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
       lanternOilTier: save.player.equipment.lantern
         ? (save.player.lanternOilUpgrades?.[save.player.equipment.lantern] ?? 0)
         : 0,
+      // Self-heals any save that predates this field, same "?? fallback at the one read site"
+      // idiom as lanternOilUpgrades/knownSkillIds above - solo combat only, see the Difficulty
+      // type's own doc comment for why party/PvP never read this.
+      difficulty: save.player.difficulty ?? 'medium',
     });
 
     save.player.stats.hp = result.playerHp;

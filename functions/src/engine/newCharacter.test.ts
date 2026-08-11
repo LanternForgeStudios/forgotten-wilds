@@ -16,6 +16,7 @@ describe('buildFreshPlayer', () => {
     expect(player.explorerRank).toBe('Newcomer');
     expect(player.regionalReputation).toBe(0);
     expect(player.regionalReputationRank).toBe('Stranger');
+    expect(player.difficulty).toBe('medium');
     expect(player.currentLocationId).toBe(STARTING_LOCATION_ID);
     expect(player.staminaUpdatedAt).toBe(1000);
   });

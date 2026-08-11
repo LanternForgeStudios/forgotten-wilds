@@ -31,6 +31,7 @@ import {
   callFinalizeTrade,
   callCancelTrade,
   callSetPlayerSkin,
+  callSetDifficulty,
   callCreateClan,
   callInviteToClan,
   callRespondToClanInvite,
@@ -55,6 +56,7 @@ import { useNow } from '@/hooks/useNow';
 import { isPresenceOnline } from '@/utils/presence';
 import { useToastStore } from '@/state/useToastStore';
 import { useAudioSettingsStore } from '@/state/useAudioSettingsStore';
+import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import { TradeOfferPanel } from './TradeOfferPanel';
 import { ITEMS, EQUIPMENT } from '@/data';
 import { MAX_CLAN_SIZE } from '@/types';
@@ -62,6 +64,7 @@ import type {
   ClanDoc,
   ClanInvite,
   ClanLeaderboardEntry,
+  Difficulty,
   DirectMessage,
   SoloEndlessLeaderboardEntry,
   FriendRequest,
@@ -110,6 +113,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const authUser = useAuthStore((s) => s.user);
   const player = usePlayerStore((s) => s.player);
   const audioSettings = useAudioSettingsStore();
+  const combatPrefs = useCombatPreferencesStore();
   useOverlayClose(onClose);
 
   const uid = authUser?.uid;
@@ -411,6 +415,17 @@ export function UserProfile({ onClose }: UserProfileProps) {
     setBusy(true);
     try {
       await callSetPlayerSkin(gender, appearance);
+      if (uid) await resyncSave(uid);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function changeDifficulty(difficulty: Difficulty) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await callSetDifficulty(difficulty);
       if (uid) await resyncSave(uid);
     } finally {
       setBusy(false);
@@ -1431,6 +1446,52 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   style={{ width: '100%', marginTop: 6 }}
                   aria-label="Sound effects volume"
                 />
+              </div>
+
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 'bold', margin: '0 0 6px' }}>Difficulty</p>
+                <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>
+                  Solo combat only - party/Endless Battle and PvP always use Medium.
+                </p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {(['easy', 'medium', 'hard'] as Difficulty[]).map((level) => (
+                    <button
+                      key={level}
+                      className={styles.smallButton}
+                      disabled={busy || player?.difficulty === level}
+                      style={player?.difficulty === level ? { borderColor: 'var(--fw-accent)', color: 'var(--fw-accent)' } : undefined}
+                      onClick={() => changeDifficulty(level)}
+                    >
+                      {level === 'easy' ? 'Easy' : level === 'medium' ? 'Medium' : 'Hard'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 'bold', margin: '0 0 6px' }}>Encounter Defaults</p>
+                <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>
+                  Starting state for these toggles in every encounter (solo, PvP, and Endless Battle) - each can
+                  still be changed mid-fight.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={combatPrefs.defaultFastRounds}
+                      onChange={(e) => combatPrefs.setDefaultFastRounds(e.target.checked)}
+                    />
+                    Fast Rounds
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={combatPrefs.defaultTargetAll}
+                      onChange={(e) => combatPrefs.setDefaultTargetAll(e.target.checked)}
+                    />
+                    Target All
+                  </label>
+                </div>
               </div>
             </div>
           </div>
