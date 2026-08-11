@@ -734,23 +734,6 @@ export function CombatScene() {
 
         <div className={styles.bottomPanel}>
         <Panel className={styles.actionsPanel}>
-          <button
-            type="button"
-            className={styles.fastRoundsToggle}
-            // Disabled for the same full window canAct already gates on (phase === 'resolving'
-            // covers the network round-trip, playbackActive covers the staggered log-reveal/
-            // toast/hit-playback timeouts that keep running for up to ~1-2s after phase has
-            // already flipped back to 'playerTurn') - act()'s in-flight response handler captures
-            // fastRounds by closure at call time to schedule those timeouts, while
-            // PhaserBattleCanvas reads the live prop when its own effect fires after the response
-            // lands, so toggling anywhere in that window would desync the log text from the
-            // animation for that round.
-            disabled={phase === 'resolving' || playbackActive}
-            onClick={() => setFastRounds((f) => !f)}
-            title="When multiple enemies attack in the same round, let their attacks land together instead of staggered one at a time."
-          >
-            Fast Rounds: {fastRounds ? 'On' : 'Off'}
-          </button>
           {/* Covers both the network round-trip (phase 'resolving', before any response has
            *  arrived) and the staggered hit-playback after it (playbackActive) - without this,
            *  a slow response left the action buttons disabled with no visible reason, reading
@@ -826,6 +809,23 @@ export function CombatScene() {
           </button>
           <button className={styles.actionButton} disabled={!canAct} onClick={() => act('flee')}>
             Flee
+          </button>
+          <button
+            type="button"
+            className={styles.fastRoundsToggle}
+            // Disabled for the same full window canAct already gates on (phase === 'resolving'
+            // covers the network round-trip, playbackActive covers the staggered log-reveal/
+            // toast/hit-playback timeouts that keep running for up to ~1-2s after phase has
+            // already flipped back to 'playerTurn') - act()'s in-flight response handler captures
+            // fastRounds by closure at call time to schedule those timeouts, while
+            // PhaserBattleCanvas reads the live prop when its own effect fires after the response
+            // lands, so toggling anywhere in that window would desync the log text from the
+            // animation for that round.
+            disabled={phase === 'resolving' || playbackActive}
+            onClick={() => setFastRounds((f) => !f)}
+            title="When multiple enemies attack in the same round, let their attacks land together instead of staggered one at a time."
+          >
+            Fast Rounds: {fastRounds ? 'On' : 'Off'}
           </button>
         </Panel>
         </div>

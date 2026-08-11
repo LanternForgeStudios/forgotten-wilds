@@ -629,7 +629,12 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                                   <span style={{ fontSize: 11, opacity: 0.6 }}>You are here</span>
                                 )}
                                 {loc?.fastTravel && id !== currentLocationId && !fastTravelUnlocked && (
-                                  <span style={{ fontSize: 11, opacity: 0.6 }}>Restore the Ash Hallow shrine to unlock Fast Travel</span>
+                                  <span
+                                    style={{ fontSize: 11, opacity: 0.6 }}
+                                    title="Restore the Ash Hallow shrine to unlock Fast Travel."
+                                  >
+                                    Locked
+                                  </span>
                                 )}
                               </div>
                               {expandedLoc &&

@@ -202,16 +202,18 @@
   box-sizing: border-box;
 }
 
+/* A rarely-touched preference, not a primary action - deliberately NOT grid-column: 1 / -1
+   (which used to claim a full empty row above the actual action buttons on every single fight,
+   just to right-align one small pill). Flows as a normal compact grid cell instead, alongside
+   Attack/Skill/etc, and is rendered last in the JSX so real actions always read first. */
 .fastRoundsToggle {
-  grid-column: 1 / -1;
-  justify-self: end;
   background: transparent;
   border: 1px solid var(--fw-panel-border);
   color: var(--fw-text-dim);
   font-size: 10px;
   padding: 2px 8px;
   border-radius: 10px;
-  margin-bottom: 2px;
+  align-self: center;
 }
 
 .fastRoundsToggle:hover {
