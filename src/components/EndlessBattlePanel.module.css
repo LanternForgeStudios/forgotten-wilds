@@ -163,15 +163,6 @@
   gap: 8px;
 }
 
-/* A cure item whose ailment is currently active, in the item menu - matches
-   CombatScene.module.css's own .itemRowCureReady so it stands out from the rest of the list. */
-.itemRowCureReady {
-  background: rgba(224, 169, 74, 0.18);
-  outline: 1px solid var(--fw-accent);
-  border-radius: 4px;
-  padding: 2px 4px;
-}
-
 .rowName {
   flex: 1;
   font-size: 13px;

@@ -1,0 +1,98 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* Wide enough for one column per resource group (HP/Spirit/Oil/Cure) side by side instead of one
+   long scrolling list - see ITEM_EFFECT_GROUP_ORDER. */
+.itemMenuPanel {
+  width: min(720px, 92vw);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.title {
+  margin: 0 0 10px;
+  color: var(--fw-accent);
+}
+
+.itemMenuColumns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.itemMenuColumn {
+  flex: 1 1 200px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Ailment Cures specifically (up to 5 items: antidote/burn-salve/thaw-crystal/eye-drops/echo-herb)
+   - a single stacked column of that many rows made this the tallest group by far and stretched
+   the whole modal's height. Two columns instead, same width budget as every other group. */
+.itemMenuColumnGrid {
+  flex: 1 1 200px;
+  min-width: 200px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 10px;
+  align-content: start;
+}
+
+.itemMenuColumnGrid .itemMenuColumnTitle {
+  grid-column: 1 / -1;
+}
+
+.itemMenuColumnTitle {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--fw-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  padding: 6px 4px;
+  border-radius: 4px;
+}
+
+/* A cure item whose ailment is currently active - stands out among the tray so the player doesn't
+   have to read every row's name to find the one that actually helps right now. */
+.itemRowCureReady {
+  background: rgba(224, 169, 74, 0.18);
+  outline: 1px solid var(--fw-accent);
+}
+
+.smallButton {
+  background: var(--fw-accent-dim);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  padding: 10px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.smallButton:hover:not(:disabled) {
+  background: var(--fw-accent);
+  color: var(--fw-bg-deep);
+}
+
+.smallButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

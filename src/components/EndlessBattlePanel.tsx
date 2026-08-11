@@ -25,6 +25,7 @@ import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from 
 import { TIER_ORDER } from '@/utils/tier';
 import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import { SkillSelectMenu } from './SkillSelectMenu';
+import { ItemUseMenu } from './ItemUseMenu';
 import type { PartyBattleSession, PartyCombatHitResult, PartyEnemyHitResult } from '@/types';
 import styles from './EndlessBattlePanel.module.css';
 
@@ -672,65 +673,25 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
       )}
 
       {showItemMenu && (
-        <div className={styles.overlay} onClick={() => !usingItems && setShowItemMenu(false)}>
-          <Panel style={{ width: 'min(360px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-            <OverlayCloseButton onClick={() => setShowItemMenu(false)} />
-            <h3 className={styles.sectionTitle}>Use Items</h3>
-            {/* Queuing here doesn't submit anything by itself - "Done" below applies each queued
-                item immediately (costs no turn), matching solo combat's own item menu exactly. Only
-                items that would currently do something are offered, and a ready ailment cure is
-                highlighted, same as CombatScene.tsx's wouldHelp/itemRowCureReady. */}
-            <div className={styles.list}>
-              {combatItems.length === 0 && <p className={styles.empty}>No usable items.</p>}
-              {combatItems.map((i) => {
-                const def = ITEMS.find((d) => d.id === i.itemId);
-                const cureAilmentId = def?.effect?.cureAilmentId;
-                const wouldHelp = me
-                  ? itemWouldHaveEffect(def?.effect, { ...me, stamina: 0, maxStamina: 0 }, me.ailments.map((a) => a.ailmentId))
-                  : false;
-                const queued = queuedCountFor(i.itemId);
-                const canAdd = wouldHelp && canQueueMore && queued < i.quantity;
-                return (
-                  <div
-                    key={i.itemId}
-                    className={cureAilmentId && wouldHelp ? `${styles.rowHeader} ${styles.itemRowCureReady}` : styles.rowHeader}
-                  >
-                    <span className={styles.rowName} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      {itemIconAssetId(i.itemId) && (
-                        <img
-                          src={getAssetUrl(itemIconAssetId(i.itemId)!)}
-                          alt=""
-                          style={{ width: 18, height: 18, imageRendering: 'pixelated', flexShrink: 0 }}
-                        />
-                      )}
-                      <span>
-                        {itemDisplayName(i.itemId)} x{i.quantity}
-                        {queued > 0 ? ` (queued ${queued})` : ''}
-                        {!wouldHelp && (cureAilmentId ? ' (not needed)' : ' (full)')}
-                      </span>
-                    </span>
-                    <button
-                      className={styles.smallButton}
-                      disabled={usingItems || !canAdd}
-                      title={wouldHelp ? undefined : cureAilmentId ? 'You do not have that ailment.' : 'Already at maximum.'}
-                      onClick={() => queueItem(i.itemId)}
-                    >
-                      Add
-                    </button>
-                    <button className={styles.smallButton} disabled={usingItems || queued === 0} onClick={() => dequeueItem(i.itemId)}>
-                      Remove
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            <div className={styles.actionRow}>
-              <button className={styles.smallButton} disabled={usingItems} onClick={() => void finishItemMenu()}>
-                {usingItems ? 'Using items...' : 'Done'}
-              </button>
-            </div>
-          </Panel>
-        </div>
+        <ItemUseMenu
+          items={combatItems.map((i) => {
+            const def = ITEMS.find((d) => d.id === i.itemId);
+            return {
+              itemId: i.itemId,
+              quantity: i.quantity,
+              wouldHelp: me
+                ? itemWouldHaveEffect(def?.effect, { ...me, stamina: 0, maxStamina: 0 }, me.ailments.map((a) => a.ailmentId))
+                : false,
+              queued: queuedCountFor(i.itemId),
+            };
+          })}
+          canQueueMore={canQueueMore}
+          busy={usingItems}
+          onQueue={queueItem}
+          onDequeue={dequeueItem}
+          onDone={() => void finishItemMenu()}
+          onClose={() => setShowItemMenu(false)}
+        />
       )}
 
       {confirmLeave && (

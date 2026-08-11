@@ -24,9 +24,8 @@ import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKIL
 import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
-import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
+import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
 import { TIER_ORDER } from '@/utils/tier';
-import { itemDisplayName, itemIconAssetId } from '@/utils/itemName';
 import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { buildRewardLines } from '@/utils/rewardLines';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
@@ -38,6 +37,7 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { playMusic, playSound } from '@/audio/audioService';
 import { LorePopup } from '@/components/LorePopup';
 import { SkillSelectMenu } from '@/components/SkillSelectMenu';
+import { ItemUseMenu } from '@/components/ItemUseMenu';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
 import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import styles from './CombatScene.module.css';
@@ -821,106 +821,22 @@ export function CombatScene() {
       </div>
 
       {(phase === 'itemMenu' || phase === 'usingItems') && (
-        <div
-          className={styles.overlay}
-          onClick={() => {
-            if (phase !== 'usingItems') setPhase('playerTurn');
-          }}
-        >
-          <Panel className={styles.itemMenuPanel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-            {phase !== 'usingItems' && <OverlayCloseButton onClick={() => setPhase('playerTurn')} />}
-            <h3 style={{ margin: '0 0 10px', color: 'var(--fw-accent)' }}>Use Items</h3>
-            {combatItems.length === 0 ? (
-              <p style={{ fontSize: 12 }}>No usable items.</p>
-            ) : (
-              <div className={styles.itemMenuColumns}>
-                {ITEM_EFFECT_GROUP_ORDER.map((group) => {
-                  const groupItems = combatItems.filter(
-                    (i) => itemEffectGroupOf(ITEMS.find((d) => d.id === i.itemId)) === group,
-                  );
-                  if (groupItems.length === 0) return null;
-                  return (
-                    <div key={group} className={group === 'cure' ? styles.itemMenuColumnGrid : styles.itemMenuColumn}>
-                      <p className={styles.itemMenuColumnTitle}>{ITEM_EFFECT_GROUP_LABELS[group]}</p>
-                      {groupItems.map((i) => {
-                        const def = ITEMS.find((d) => d.id === i.itemId);
-                        const cureAilmentId = def?.effect?.cureAilmentId;
-                        const wouldHelp = player
-                          ? itemWouldHaveEffect(
-                              def?.effect,
-                              player.stats,
-                              playerAilments.map((a) => a.ailmentId),
-                            )
-                          : false;
-                        // A cure item with no matching active ailment isn't "Full" (that wording
-                        // implies a capped stat bar) - it's simply not needed right now.
-                        // Conversely, when it DOES match an active ailment, highlight the row so
-                        // the right cure stands out instead of making the player read every
-                        // item's name to find it.
-                        const queued = queuedCountFor(i.itemId);
-                        const canAdd = wouldHelp && canQueueMore && queued < i.quantity;
-                        return (
-                          <div
-                            key={i.itemId}
-                            className={cureAilmentId && wouldHelp ? `${styles.itemRow} ${styles.itemRowCureReady}` : styles.itemRow}
-                          >
-                            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              {itemIconAssetId(i.itemId) && (
-                                <img
-                                  src={getAssetUrl(itemIconAssetId(i.itemId)!)}
-                                  alt=""
-                                  style={{ width: 20, height: 20, imageRendering: 'pixelated', flexShrink: 0 }}
-                                />
-                              )}
-                              <span>
-                                {itemDisplayName(i.itemId)} x{i.quantity}
-                                {queued > 0 && ` — queued: ${queued}`}
-                                {!wouldHelp && (cureAilmentId ? ' (Not needed)' : ' (Full)')}
-                              </span>
-                            </span>
-                            <div style={{ display: 'flex', gap: 4 }}>
-                              <button
-                                type="button"
-                                className={styles.actionButton}
-                                disabled={phase === 'usingItems' || queued === 0}
-                                onClick={() => dequeueItem(i.itemId)}
-                              >
-                                -
-                              </button>
-                              <button
-                                type="button"
-                                className={styles.actionButton}
-                                disabled={phase === 'usingItems' || !canAdd}
-                                title={
-                                  wouldHelp
-                                    ? undefined
-                                    : cureAilmentId
-                                      ? 'Not needed right now - you do not have that ailment.'
-                                      : 'Already at maximum - using this would have no effect.'
-                                }
-                                onClick={() => queueItem(i.itemId)}
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            <button
-              className={styles.actionButton}
-              disabled={phase === 'usingItems'}
-              onClick={finishItemMenu}
-              style={{ marginTop: 12 }}
-            >
-              {phase === 'usingItems' ? 'Using items...' : 'Done'}
-            </button>
-          </Panel>
-        </div>
+        <ItemUseMenu
+          items={combatItems.map((i) => ({
+            itemId: i.itemId,
+            quantity: i.quantity,
+            wouldHelp: player
+              ? itemWouldHaveEffect(ITEMS.find((d) => d.id === i.itemId)?.effect, player.stats, playerAilments.map((a) => a.ailmentId))
+              : false,
+            queued: queuedCountFor(i.itemId),
+          }))}
+          canQueueMore={canQueueMore}
+          busy={phase === 'usingItems'}
+          onQueue={queueItem}
+          onDequeue={dequeueItem}
+          onDone={finishItemMenu}
+          onClose={() => setPhase('playerTurn')}
+        />
       )}
 
       {(phase === 'victory' || phase === 'defeat' || phase === 'fled') &&
