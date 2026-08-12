@@ -24,8 +24,25 @@ const DASH_GLIDE_MS = 100;
  *  renderer's document order (overhang divs are always painted last). */
 const OVERHANG_DEPTH = 1000;
 /** Entities and the player sit between decoration layers and the overhang. Deliberately higher
- *  than any plausible decoration-layer count. */
+ *  than any plausible decoration-layer count. This is a FLOOR, not the actual depth every entity
+ *  renders at - see depthForY()/update() below, which add a Y-based offset on top of this every
+ *  frame so a sprite lower on screen (closer to the camera) draws over one higher up, instead of
+ *  every entity sharing this exact same depth and falling back to Phaser's default same-depth
+ *  ordering (child/creation order) - the cause of a real reported bug where the player sprite
+ *  rendered behind a static interactable (a fireplace) it was standing in front of, because the
+ *  interactable happened to be added to the display list after the player. */
 const ENTITY_DEPTH = 500;
+/** How much of the 500-unit gap between ENTITY_DEPTH and OVERHANG_DEPTH a Y-sorted entity's own
+ *  offset is allowed to use, leaving headroom below ENTITY_LABEL_DEPTH for labels/badges to always
+ *  stay above every entity body regardless of Y. ironwood-trail.json is this game's tallest map
+ *  today at 48 tiles (768px @ 16px tiles); dividing by 3 keeps its offset (~256) comfortably under
+ *  this cap with room to spare for future larger maps. */
+const ENTITY_Y_SORT_DIVISOR = 3;
+const ENTITY_Y_SORT_MAX_OFFSET = 480;
+/** Always above every entity/player body regardless of its Y-sorted depth (see ENTITY_DEPTH's own
+ *  comment), but still under OVERHANG_DEPTH - a nameplate shouldn't out-rank a tree canopy above
+ *  the character it's labeling. */
+const ENTITY_LABEL_DEPTH = OVERHANG_DEPTH - 1;
 /** Stacking order for equipment layer sprites, as small fractional offsets from the base player
  *  sprite's own ENTITY_DEPTH (see docs/Equipment-Layering-Plan.md) - boots under legs under chest
  *  under gloves under weapon/lantern. Tuned by eye once real layer art exists; weapon and lantern
@@ -148,6 +165,30 @@ export class ExplorationScene extends Phaser.Scene {
     // dot texture on the rare chance a dash is triggered before this finishes loading.
     loadSceneTexture(this, DASH_DUST_FX_ASSET_ID).catch(() => {});
     this.onReady?.();
+  }
+
+  /** Y-sort depth for a sprite at pixel-space `y` - see ENTITY_DEPTH's own comment for why this
+   *  exists. Clamped so an unexpectedly tall future map can't push an entity's depth into
+   *  ENTITY_LABEL_DEPTH/OVERHANG_DEPTH territory. */
+  private depthForY(y: number): number {
+    return ENTITY_DEPTH + Math.min(y / ENTITY_Y_SORT_DIVISOR, ENTITY_Y_SORT_MAX_OFFSET);
+  }
+
+  /** Re-sorts every entity (and the player) by their current on-screen Y every frame, including
+   *  mid-glide-tween - a purely static per-sprite depth (the old behavior) meant two entities'
+   *  relative front/back order never changed after creation regardless of where either one moved,
+   *  which is what let a stationary interactable end up permanently in front of the player. */
+  update(): void {
+    if (this.playerSprite) {
+      const playerDepth = this.depthForY(this.playerSprite.y);
+      this.playerSprite.setDepth(playerDepth);
+      for (const [slot, visual] of this.equipmentLayerSprites) {
+        visual.sprite.setDepth(playerDepth + (EQUIPMENT_LAYER_DEPTH_OFFSET[slot] ?? 0.5));
+      }
+    }
+    for (const visual of this.entityVisuals.values()) {
+      visual.sprite.setDepth(this.depthForY(visual.sprite.y));
+    }
   }
 
   /** Builds the tilemap for a location from the already-parsed TileMap (see the plan's "Tiled
@@ -597,7 +638,7 @@ export class ExplorationScene extends Phaser.Scene {
             padding: { x: 4, y: 1 },
           })
           .setOrigin(0.5, 1)
-          .setDepth(ENTITY_DEPTH + 1);
+          .setDepth(ENTITY_LABEL_DEPTH);
       } else {
         visual.label.setText(entity.label).setPosition(x, labelY);
       }
@@ -619,7 +660,7 @@ export class ExplorationScene extends Phaser.Scene {
             padding: { x: 2, y: 0 },
           })
           .setOrigin(0.5, 1)
-          .setDepth(ENTITY_DEPTH + 1);
+          .setDepth(ENTITY_LABEL_DEPTH);
       } else {
         visual.badge.setPosition(badgeX, badgeY);
       }
