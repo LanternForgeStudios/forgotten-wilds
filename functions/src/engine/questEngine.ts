@@ -25,21 +25,19 @@ export function effectiveStatus(
 /** True while `questId` is active (not completed) and `objectiveId` is a "report back" beat
  *  that's ready to fire: every objective it names in requiresObjectiveIds is already at its own
  *  requiredCount, but the objective itself hasn't been credited yet - mirrors the client's
- *  isObjectiveReadyToReport (src/utils/npcDialogue.ts) exactly. */
+ *  isObjectiveReadyToReport (src/utils/npcDialogue.ts) exactly. Delegates the prerequisite check
+ *  to objectivePrerequisitesSatisfied (below) rather than re-walking requiresObjectiveIds itself,
+ *  so there's one definition of "satisfied" shared with advanceQuests instead of two that can
+ *  quietly diverge on an edge case (e.g. a typo'd prerequisite id). */
 function isObjectiveReadyToReport(questId: string, objectiveId: string, quests: Record<string, QuestProgress>): boolean {
   if (effectiveStatus(questId, quests) !== 'active') return false;
   const def = QUESTS[questId];
   const objective = def?.objectives.find((o) => o.id === objectiveId);
-  if (!objective) return false;
-  const progress = quests[questId];
-  const ownCount = progress?.objectiveCounts?.[objectiveId] ?? 0;
+  if (!def || !objective) return false;
+  const progress = quests[questId] ?? { status: 'active', objectiveCounts: {} };
+  const ownCount = progress.objectiveCounts[objectiveId] ?? 0;
   if (ownCount >= objective.requiredCount) return false;
-  const reqIds = objective.requiresObjectiveIds ?? [];
-  return reqIds.every((reqId) => {
-    const reqObjective = def.objectives.find((o) => o.id === reqId);
-    if (!reqObjective) return false;
-    return (progress?.objectiveCounts?.[reqId] ?? 0) >= reqObjective.requiredCount;
-  });
+  return objectivePrerequisitesSatisfied(def, objective, progress);
 }
 
 /** Which dialogue variant an NPC is currently showing, as a key (a gating quest id, or 'base' if

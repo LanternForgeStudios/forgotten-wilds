@@ -314,4 +314,46 @@ describe('currentNpcDialogueVariantKey', () => {
     expect(keyAfterCompletion).toBe('shadows-on-raven-ridge');
     expect(keyAfterCompletion).not.toBe(keyBeforeCompletion);
   });
+
+  describe('report-back variants', () => {
+    // frostbound-pages: get-frostbound-treatise (collectItem) -> talk-elias-frostbound (requires
+    // get-frostbound-treatise) -> talk-miriam-frostbound (requires talk-elias-frostbound).
+    // elias-rowan's own dialogueVariants order puts 'the-mountain-remembers' (frostbound-pages's
+    // prerequisiteQuestId) right after 'frostbound-pages' itself, so it's the expected fallback
+    // whenever the report-back variant isn't currently ready.
+    it('does not offer the report variant while its own prerequisite objective is unmet', () => {
+      const quests = {
+        'the-mountain-remembers': { status: 'completed' as const, objectiveCounts: {} },
+        'frostbound-pages': { status: 'active' as const, objectiveCounts: {} },
+      };
+      expect(currentNpcDialogueVariantKey('elias-rowan', quests)).toBe('the-mountain-remembers');
+    });
+
+    it('offers the report variant once the prerequisite objective is credited but the report objective itself is not', () => {
+      const quests = {
+        'the-mountain-remembers': { status: 'completed' as const, objectiveCounts: {} },
+        'frostbound-pages': { status: 'active' as const, objectiveCounts: { 'get-frostbound-treatise': 1 } },
+      };
+      expect(currentNpcDialogueVariantKey('elias-rowan', quests)).toBe('frostbound-pages:talk-elias-frostbound');
+    });
+
+    it('stops offering the report variant once its own objective is credited, reverting to the prior completed variant while the quest is still active', () => {
+      const quests = {
+        'the-mountain-remembers': { status: 'completed' as const, objectiveCounts: {} },
+        'frostbound-pages': {
+          status: 'active' as const,
+          objectiveCounts: { 'get-frostbound-treatise': 1, 'talk-elias-frostbound': 1 },
+        },
+      };
+      expect(currentNpcDialogueVariantKey('elias-rowan', quests)).toBe('the-mountain-remembers');
+    });
+
+    it('resolves to the quest-completed variant, not the report variant, once the whole quest is completed', () => {
+      const quests = {
+        'the-mountain-remembers': { status: 'completed' as const, objectiveCounts: {} },
+        'frostbound-pages': { status: 'completed' as const, objectiveCounts: {} },
+      };
+      expect(currentNpcDialogueVariantKey('elias-rowan', quests)).toBe('frostbound-pages');
+    });
+  });
 });

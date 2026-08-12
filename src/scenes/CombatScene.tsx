@@ -24,8 +24,7 @@ import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKIL
 import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
-import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
-import { TIER_ORDER } from '@/utils/tier';
+import { itemWouldHaveEffect, sortCombatConsumables } from '@/utils/itemEffect';
 import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { buildRewardLines } from '@/utils/rewardLines';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
@@ -39,6 +38,7 @@ import { LorePopup } from '@/components/LorePopup';
 import { SkillSelectMenu } from '@/components/SkillSelectMenu';
 import { ItemUseMenu } from '@/components/ItemUseMenu';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
+import { useItemTray } from '@/hooks/useItemTray';
 import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import styles from './CombatScene.module.css';
 
@@ -116,14 +116,13 @@ export function CombatScene() {
   const { currentLorePopup, queueLorePopups, dismissCurrentLorePopup } = useLorePopupQueue();
   const [awaitingLoreBeforeExit, setAwaitingLoreBeforeExit] = useState(false);
   // Up to 3 item ids queued to ride along with whatever primary action the player takes next
-  // (duplicates allowed - e.g. 2x the same potion). Cleared only after a round actually resolves.
-  const [tray, setTray] = useState<string[]>([]);
-  // Items already used this turn via a *previous* trip through the item menu - finishItemMenu
-  // clears `tray` back to [] the instant it uses a batch, so tray.length alone can't cap "3 items
-  // per turn": without this, reopening Items after clicking Done resets canQueueMore and lets the
-  // player use another 3, repeatedly, all before ever taking their turn's real action. Reset only
-  // when the player actually commits that action (see act()), not when the item menu closes.
-  const [itemsUsedThisTurn, setItemsUsedThisTurn] = useState(0);
+  // (duplicates allowed - e.g. 2x the same potion), capped against how many of each the player
+  // actually owns. Cleared only after a round actually resolves (see act()) - reset only when the
+  // player actually commits that action, not when the item menu closes. combatItems is declared
+  // later in this component, but the closure below isn't invoked until a caller queues an item
+  // (always after this render has finished), so referencing it here is safe.
+  const { tray, queuedCountFor, canQueueMore, queueItem, dequeueItem, clearTray, recordItemsUsed, resetItemsUsedThisTurn } =
+    useItemTray((itemId) => combatItems.find((i) => i.itemId === itemId)?.quantity ?? 0);
   // Per-enemy hit results from the most recent round, fed into PhaserBattleCanvas to drive its hit
   // effects; batched by id so a stale timeout can't clear a *newer* round's hits. Split into two
   // arrays (one per data direction) since the engine now reports outgoing (player -> enemy) and
@@ -249,7 +248,7 @@ export function CombatScene() {
   ) {
     if (!sessionId || phase === 'resolving' || playbackActive) return;
     setPhase('resolving');
-    setItemsUsedThisTurn(0);
+    resetItemsUsedThisTurn();
     try {
       const needsTarget = type === 'attack' || type === 'skill' || type === 'lanternAbility';
       const res = await callResolveCombatAction(sessionId, {
@@ -311,7 +310,7 @@ export function CombatScene() {
       } else {
         patchStats({ hp: res.playerHp, spirit: res.playerSpirit, lanternOil: res.playerLanternOil });
       }
-      setTray([]);
+      clearTray();
       setLanternUsedThisRound(!res.turnConsumed);
 
       // Matches BattleScene.playIncomingHits' own schedule (PRE_ENEMY_ATTACK_DELAY_MS before the
@@ -417,22 +416,6 @@ export function CombatScene() {
     }
   }
 
-  const queuedCountFor = (itemId: string) => tray.filter((id) => id === itemId).length;
-  const canQueueMore = itemsUsedThisTurn + tray.length < 3;
-
-  function queueItem(itemId: string) {
-    if (!canQueueMore) return;
-    setTray((prev) => [...prev, itemId]);
-  }
-
-  function dequeueItem(itemId: string) {
-    setTray((prev) => {
-      const i = prev.lastIndexOf(itemId);
-      if (i === -1) return prev;
-      return [...prev.slice(0, i), ...prev.slice(i + 1)];
-    });
-  }
-
   // "Done" on the item menu - queued items are used immediately (via the same out-of-combat
   // useItem Cloud Function the Inventory menu uses, not a combat round: it only ever touches
   // users/{uid}, never combatSessions/{uid}, so calling it mid-fight is safe and costs no turn).
@@ -463,8 +446,8 @@ export function CombatScene() {
         failed = true;
       }
     }
-    setItemsUsedThisTurn((n) => n + usedCount);
-    setTray([]);
+    recordItemsUsed(usedCount);
+    clearTray();
     if (uid) await resyncSave(uid);
     if (failed) {
       useToastStore.getState().push("Some of those items wouldn't have done anything - skipped.");
@@ -518,25 +501,7 @@ export function CombatScene() {
     else void returnToExploration();
   }
 
-  // Grouped by resource restored (HP/Spirit/Oil/Cure - see itemEffectGroupOf), then by rarity tier
-  // within each group, so e.g. every Healing Poultice tier sits together sorted weakest-to-
-  // strongest instead of scattering alphabetically across the tray by name.
-  const combatItems = inventory
-    .filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable')
-    .slice()
-    .sort((a, b) => {
-      const defA = ITEMS.find((d) => d.id === a.itemId);
-      const defB = ITEMS.find((d) => d.id === b.itemId);
-      const groupA = itemEffectGroupOf(defA);
-      const groupB = itemEffectGroupOf(defB);
-      const groupIndexA = groupA ? ITEM_EFFECT_GROUP_ORDER.indexOf(groupA) : ITEM_EFFECT_GROUP_ORDER.length;
-      const groupIndexB = groupB ? ITEM_EFFECT_GROUP_ORDER.indexOf(groupB) : ITEM_EFFECT_GROUP_ORDER.length;
-      if (groupIndexA !== groupIndexB) return groupIndexA - groupIndexB;
-      const tierA = defA ? TIER_ORDER[defA.tier] : 0;
-      const tierB = defB ? TIER_ORDER[defB.tier] : 0;
-      if (tierA !== tierB) return tierA - tierB;
-      return (defA?.name ?? a.itemId).localeCompare(defB?.name ?? b.itemId);
-    });
+  const combatItems = sortCombatConsumables(inventory);
   const canAct = phase === 'playerTurn' && !playbackActive;
   const canPickTarget = aliveEnemies.length > 1 && canAct;
   // Every full-screen modal that renders on top of the battle canvas - see

@@ -14,14 +14,23 @@ interface DialogueBoxProps {
 
 export function DialogueBox({ lines, portraitAssetId, onClose, footer }: DialogueBoxProps) {
   const [index, setIndex] = useState(0);
-  const line = lines[index];
-  const isLast = index === lines.length - 1;
+  // `lines` is recomputed from live quest state on every render (resolveNpcDialogue reads the
+  // Zustand store directly, not a snapshot frozen at open-time - see talkToNpc.ts's own comment on
+  // why the *shown* variant is captured server-side instead), so a resync landing mid-read (e.g.
+  // this exact conversation completing an objective) can swap in a shorter lines array while
+  // `index` still points past its new end. Clamping here turns that into "show the last available
+  // line of the new variant" instead of `line` becoming undefined - which made the whole box
+  // silently render nothing, with no way to close it since the click/Space handlers live on the
+  // now-unrendered box (activeNpc stayed set, soft-locking the scene until a page refresh).
+  const clampedIndex = Math.min(index, lines.length - 1);
+  const line = lines[clampedIndex];
+  const isLast = clampedIndex === lines.length - 1;
 
   function advance() {
     if (isLast) {
       onClose();
     } else {
-      setIndex((i) => i + 1);
+      setIndex(clampedIndex + 1);
     }
   }
 

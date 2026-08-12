@@ -17,9 +17,13 @@ function isObjectiveReadyToReport(quest: Quest, objectiveId: string, questProgre
   const ownCount = progress?.objectiveCounts?.[objectiveId] ?? 0;
   if (ownCount >= objective.requiredCount) return false;
   const reqIds = objective.requiresObjectiveIds ?? [];
+  // A referenced prerequisite id that doesn't resolve to a real objective (should never happen with
+  // correctly-authored quest data) is treated as already-satisfied, not blocking - matches the
+  // server's objectivePrerequisitesSatisfied (functions/src/engine/questEngine.ts) exactly, so both
+  // sides compute the same dialogue key from the same quest state.
   return reqIds.every((reqId) => {
     const reqObjective = quest.objectives.find((o) => o.id === reqId);
-    if (!reqObjective) return false;
+    if (!reqObjective) return true;
     return (progress?.objectiveCounts?.[reqId] ?? 0) >= reqObjective.requiredCount;
   });
 }

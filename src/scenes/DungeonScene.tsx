@@ -31,6 +31,7 @@ import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
 import { callCollectWorldItem, callOpenChest, callInteractWithShrine, type QuestRewardSummary } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { grantedItemIdFor } from '@/utils/worldItems';
 import { playMusic, playSound } from '@/audio/audioService';
 import { RewardPopup } from '@/components/RewardPopup';
 import { LorePopup } from '@/components/LorePopup';
@@ -176,7 +177,7 @@ export function DungeonScene() {
   // signal for swapping its map marker to a collected-state sprite - same idea as openedChests
   // above, just derived from inventory instead of a dedicated Firestore list.
   const inventory = useInventoryStore((s) => s.items);
-  const isWorldItemCollected = (refId: string) => inventory.some((i) => i.itemId === refId);
+  const isWorldItemCollected = (refId: string) => inventory.some((i) => i.itemId === grantedItemIdFor(refId));
   useEffect(() => {
     void playMusic('music.dungeon');
   }, []);

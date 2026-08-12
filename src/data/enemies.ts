@@ -461,6 +461,7 @@ export const ENEMIES: Enemy[] = [
     lootTable: [
       { itemId: 'ancient-serpent-scale', chance: 1, minQuantity: 1, maxQuantity: 1 },
       { itemId: 'antidote', chance: 0.25, minQuantity: 1, maxQuantity: 2 },
+      { itemId: 'cypress-guardian-totem', chance: 0.4, minQuantity: 1, maxQuantity: 1 },
     ],
     loreBlurb:
       'Coiled beneath the Temple of the Deep Current since before Mirehaven had a name, guarding a memory it is slowly forgetting how to keep.',

@@ -34,6 +34,7 @@ import {
   type QuestRewardSummary,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
+import { grantedItemIdFor } from '@/utils/worldItems';
 import { LOCATIONS, NPCS } from '@/data';
 import { RewardPopup } from '@/components/RewardPopup';
 import { LorePopup } from '@/components/LorePopup';
@@ -189,33 +190,9 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'lost-scout-effects-ii-cache': 'structure.landmark-bogwater-almanac-cache-glow',
 };
 
-/** refId -> granted itemId, for the minority of world-item interactables whose refId does NOT
- *  equal the item collectWorldItem.ts actually grants (mirrors the divergent entries in
- *  functions/src/data/locations.ts's WORLD_ITEMS - every "-cache"/"-tunnel" named refId, plus the
- *  two original prologue-era fragments). Every "is this already collected" check below must
- *  resolve through grantedItemIdFor, not compare refId to itemId directly, or the check silently
- *  and permanently reads as "not collected" even after the item is in inventory (2026-08-10:
- *  reported for the Winter Count hides, which never flipped to their collected sprite/label). */
-const FRAGMENT_GRANTED_ITEM_ID: Record<string, string> = {
-  'mossy-creek': 'stone-fragment',
-  'fallen-watchtower': 'wind-fragment',
-  'frostbound-treatise-cache': 'frostbound-treatise',
-  'ember-codex-tunnel': 'ember-codex',
-  'bogwater-almanac-cache': 'bogwater-almanac',
-  'drowned-ledger-cache': 'drowned-ledger',
-  'winter-count-hide-i-cache': 'winter-count-hide-i',
-  'winter-count-hide-ii-cache': 'winter-count-hide-ii',
-  'heartwood-recording-i-cache': 'heartwood-recording-i',
-  'heartwood-recording-ii-cache': 'heartwood-recording-ii',
-  'desert-relic-i-cache': 'desert-relic-i',
-  'desert-relic-ii-cache': 'desert-relic-ii',
-  'lost-scout-effects-i-cache': 'lost-scout-effects-i',
-  'lost-scout-effects-ii-cache': 'lost-scout-effects-ii',
-};
-
-function grantedItemIdFor(refId: string): string {
-  return FRAGMENT_GRANTED_ITEM_ID[refId] ?? refId;
-}
+// grantedItemIdFor (refId -> granted itemId, for the minority of world-item interactables whose
+// refId doesn't equal the granted item's own id) now lives in src/utils/worldItems.ts, shared with
+// DungeonScene.tsx - see that file's doc comment for the 2026-08-10 bug this guards against.
 
 /** Post-collection sprite for a 'fragment'-kind interactable, shown once its item is in the
  *  player's inventory (collectWorldItem.ts grants it once and never removes it, so presence in

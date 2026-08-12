@@ -4,6 +4,7 @@ import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { PhaserBattleCanvas } from './combat/PhaserBattleCanvas';
 import { SkillSelectMenu } from './SkillSelectMenu';
 import { ItemUseMenu } from './ItemUseMenu';
+import { useItemTray } from '@/hooks/useItemTray';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
@@ -21,8 +22,7 @@ import { getAssetUrl } from '@/assets/assetManager';
 import { AILMENTS, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
-import { itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER } from '@/utils/itemEffect';
-import { TIER_ORDER } from '@/utils/tier';
+import { itemWouldHaveEffect, sortCombatConsumables } from '@/utils/itemEffect';
 import type { PartyBattleSession } from '@/types';
 // Reuses Endless Battle's stylesheet - same Panel/list/bar chrome, no PvP-specific classes needed.
 import styles from './EndlessBattlePanel.module.css';
@@ -46,10 +46,12 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   const [showItemMenu, setShowItemMenu] = useState(false);
   // Up to 3 item ids queued in the item menu, applied immediately on "Done" - matches solo
   // combat's own tray/finishItemMenu and EndlessBattlePanel's identical rework; items never
-  // consume a turn. See EndlessBattlePanel.tsx's finishItemMenu for the full reasoning.
-  const [tray, setTray] = useState<string[]>([]);
+  // consume a turn. See EndlessBattlePanel.tsx's finishItemMenu for the full reasoning. combatItems
+  // is declared later in this component, but the closure below isn't invoked until a caller queues
+  // an item (always after this render has finished), so referencing it here is safe.
+  const { tray, queuedCountFor, canQueueMore, queueItem, dequeueItem, clearTray, recordItemsUsed, resetItemsUsedThisTurn } =
+    useItemTray((itemId) => combatItems.find((i) => i.itemId === itemId)?.quantity ?? 0);
   const [usingItems, setUsingItems] = useState(false);
-  const [itemsUsedThisTurn, setItemsUsedThisTurn] = useState(0);
   const [confirmForfeit, setConfirmForfeit] = useState(false);
   const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
@@ -283,48 +285,16 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   const lanternAbilities = (lanternDef?.lanternAbilityIds ?? [])
     .map((id) => LANTERN_ABILITIES.find((a) => a.id === id))
     .filter((a): a is NonNullable<typeof a> => !!a);
-  // Grouped by resource restored (HP/Spirit/Oil/Cure), then by rarity tier within each group - see
-  // CombatScene.tsx's identical sort for the full reasoning.
-  const combatItems = inventory
-    .filter((i) => ITEMS.find((def) => def.id === i.itemId)?.category === 'consumable')
-    .slice()
-    .sort((a, b) => {
-      const defA = ITEMS.find((d) => d.id === a.itemId);
-      const defB = ITEMS.find((d) => d.id === b.itemId);
-      const groupA = itemEffectGroupOf(defA);
-      const groupB = itemEffectGroupOf(defB);
-      const groupIndexA = groupA ? ITEM_EFFECT_GROUP_ORDER.indexOf(groupA) : ITEM_EFFECT_GROUP_ORDER.length;
-      const groupIndexB = groupB ? ITEM_EFFECT_GROUP_ORDER.indexOf(groupB) : ITEM_EFFECT_GROUP_ORDER.length;
-      if (groupIndexA !== groupIndexB) return groupIndexA - groupIndexB;
-      const tierA = defA ? TIER_ORDER[defA.tier] : 0;
-      const tierB = defB ? TIER_ORDER[defB.tier] : 0;
-      if (tierA !== tierB) return tierA - tierB;
-      return (defA?.name ?? a.itemId).localeCompare(defB?.name ?? b.itemId);
-    });
+  const combatItems = sortCombatConsumables(inventory);
 
   async function submit(action: Parameters<typeof callSubmitPartyBattleAction>[1]) {
-    setItemsUsedThisTurn(0);
+    resetItemsUsedThisTurn();
     await run(() => callSubmitPartyBattleAction(battleId, action), 'Could not submit that action.');
   }
 
   function submitSkill(skillId: string) {
     setShowSkillMenu(false);
     void submit({ type: 'skill', skillId });
-  }
-
-  const queuedCountFor = (itemId: string) => tray.filter((id) => id === itemId).length;
-  const canQueueMore = itemsUsedThisTurn + tray.length < 3;
-  function queueItem(itemId: string) {
-    const owned = combatItems.find((i) => i.itemId === itemId)?.quantity ?? 0;
-    if (!canQueueMore || queuedCountFor(itemId) >= owned) return;
-    setTray((prev) => [...prev, itemId]);
-  }
-  function dequeueItem(itemId: string) {
-    setTray((prev) => {
-      const i = prev.lastIndexOf(itemId);
-      if (i === -1) return prev;
-      return [...prev.slice(0, i), ...prev.slice(i + 1)];
-    });
   }
 
   async function finishItemMenu() {
@@ -344,8 +314,8 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
         failed = true;
       }
     }
-    setItemsUsedThisTurn((n) => n + usedCount);
-    setTray([]);
+    recordItemsUsed(usedCount);
+    clearTray();
     setUsingItems(false);
     if (uid) await resyncSave(uid);
     if (failed) setError("Some of those items wouldn't have done anything - skipped.");
@@ -385,7 +355,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             // same loophole described in PhaserBattleCanvasProps.inputSuspended's own doc comment,
             // so this keeps all three combat surfaces consistent rather than leaving PvP as the
             // one place a modal doesn't actually suspend the canvas underneath it.
-            inputSuspended={showSkillMenu || showItemMenu}
+            inputSuspended={showSkillMenu || showItemMenu || confirmForfeit}
             onTargetEnemy={() => {}}
             combatEnded={battle.status !== 'active'}
             ailmentFxEvent={ailmentFxEvent}
@@ -569,7 +539,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
             return {
               itemId: i.itemId,
               quantity: i.quantity,
-              wouldHelp: itemWouldHaveEffect(def?.effect, { ...me, stamina: 0, maxStamina: 0 }, me.ailments.map((a) => a.ailmentId)),
+              wouldHelp: itemWouldHaveEffect(def?.effect, me, me.ailments.map((a) => a.ailmentId)),
               queued: queuedCountFor(i.itemId),
             };
           })}
