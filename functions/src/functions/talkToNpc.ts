@@ -114,10 +114,20 @@ export const talkToNpc = onCall<TalkToNpcRequest>(async (request) => {
     // time, before the post-talk resync) - not whatever variant this same conversation might have
     // just unlocked.
     const shownVariantKey = currentNpcDialogueVariantKey(npcId, save.quests);
-    save.seenNpcDialogueVariant = { ...(save.seenNpcDialogueVariant ?? {}), [npcId]: shownVariantKey };
 
     const completions = advanceQuests(save.quests, { type: 'talkToNpc', targetId: npcId });
     const questRewards = applyQuestRewards(save, completions);
+
+    // A "report back" key (shape `${questId}:${objectiveId}`) is guaranteed to stop being current
+    // the instant this exact call credits its objective above - it can never be shown again for
+    // this npc/quest pair, so recording it as "seen" would leave the "!" badge with nothing it
+    // could ever match against, making it reappear immediately even though the player was just
+    // there and saw everything this conversation had to say. Record what's actually current *after*
+    // advancing instead, for this case only - the ordinary (non-report) case still records the
+    // pre-credit key, so a genuine "you haven't read the reaction to what you just completed" badge
+    // is preserved rather than silently marked seen before the player ever saw it.
+    const keyToRecordAsSeen = shownVariantKey.includes(':') ? currentNpcDialogueVariantKey(npcId, save.quests) : shownVariantKey;
+    save.seenNpcDialogueVariant = { ...(save.seenNpcDialogueVariant ?? {}), [npcId]: keyToRecordAsSeen };
     save.updatedAt = Date.now();
     tx.set(userRef, save);
 

@@ -1,558 +1,1162 @@
 {
-  "type": "map",
-  "orientation": "orthogonal",
-  "renderorder": "right-down",
-  "compressionlevel": -1,
-  "infinite": false,
-  "tiledversion": "1.12.2",
-  "version": "1.10",
-  "width": 13,
-  "height": 10,
-  "tilewidth": 16,
-  "tileheight": 16,
-  "nextlayerid": 4,
-  "nextobjectid": 5,
-  "layers": [
+ "type": "map",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "compressionlevel": -1,
+ "infinite": false,
+ "tiledversion": "1.12.2",
+ "version": "1.10",
+ "width": 13,
+ "height": 10,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "nextlayerid": 6,
+ "nextobjectid": 5,
+ "layers": [
+  {
+   "id": 1,
+   "type": "tilelayer",
+   "name": "ground",
+   "width": 13,
+   "height": 10,
+   "data": [
+    21,
+    22,
+    22,
+    22,
+    22,
+    22,
+    22,
+    22,
+    22,
+    22,
+    22,
+    22,
+    38,
+    147,
+    48,
+    49,
+    49,
+    49,
+    49,
+    49,
+    49,
+    49,
+    49,
+    49,
+    51,
+    56,
+    147,
+    66,
+    67,
+    67,
+    67,
+    67,
+    67,
+    67,
+    67,
+    67,
+    68,
+    69,
+    56,
+    147,
+    66,
+    67,
+    67,
+    67,
+    67,
+    67,
+    67,
+    67,
+    67,
+    68,
+    69,
+    56,
+    147,
+    66,
+    67,
+    67,
+    67,
+    67,
+    67,
+    68,
+    67,
+    67,
+    68,
+    69,
+    56,
+    147,
+    66,
+    67,
+    68,
+    67,
+    68,
+    67,
+    68,
+    68,
+    67,
+    68,
+    69,
+    56,
+    147,
+    66,
+    67,
+    68,
+    67,
+    68,
+    67,
+    67,
+    68,
+    67,
+    68,
+    69,
+    56,
+    147,
+    66,
+    67,
+    68,
+    67,
+    68,
+    68,
+    68,
+    68,
+    67,
+    68,
+    69,
+    56,
+    147,
+    66,
+    67,
+    68,
+    68,
+    68,
+    68,
+    68,
+    68,
+    68,
+    68,
+    87,
+    56,
+    165,
+    181,
+    181,
+    181,
+    181,
+    181,
+    85,
+    181,
+    181,
+    181,
+    181,
+    181,
+    182
+   ],
+   "visible": true,
+   "opacity": 1,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "id": 2,
+   "type": "tilelayer",
+   "name": "decorations-1",
+   "width": 13,
+   "height": 10,
+   "data": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "visible": true,
+   "opacity": 1,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "data": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "height": 10,
+   "id": 5,
+   "name": "overhang-1",
+   "opacity": 1,
+   "type": "tilelayer",
+   "visible": true,
+   "width": 13,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "id": 3,
+   "type": "objectgroup",
+   "name": "objects",
+   "draworder": "topdown",
+   "objects": [
     {
-      "id": 1,
-      "type": "tilelayer",
-      "name": "ground",
-      "width": 13,
-      "height": 10,
-      "data": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        1,
-        1,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        1,
-        1,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        1,
-        1,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        1,
-        1,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        1,
-        1,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        1,
-        1,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        1,
-        1,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        25,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        25,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      "visible": true,
-      "opacity": 1,
-      "x": 0,
-      "y": 0
+     "id": 1,
+     "name": "",
+     "type": "spawnPoint",
+     "x": 96,
+     "y": 128,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "refId",
+       "type": "string",
+       "value": "from-ash-hallow"
+      }
+     ]
     },
     {
-      "id": 2,
-      "type": "tilelayer",
-      "name": "decorations-1",
-      "width": 13,
-      "height": 10,
-      "data": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        133,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        133,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "visible": true,
-      "opacity": 1,
-      "x": 0,
-      "y": 0
+     "id": 2,
+     "name": "",
+     "type": "npc",
+     "x": 96,
+     "y": 48,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "refId",
+       "type": "string",
+       "value": "aldren-stone"
+      }
+     ]
     },
     {
-      "id": 3,
-      "type": "objectgroup",
-      "name": "objects",
-      "draworder": "topdown",
-      "objects": [
-        {
-          "id": 1,
-          "name": "",
-          "type": "spawnPoint",
-          "x": 96,
-          "y": 128,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "properties": [
-            {
-              "name": "refId",
-              "type": "string",
-              "value": "from-ash-hallow"
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "name": "",
-          "type": "npc",
-          "x": 96,
-          "y": 48,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "properties": [
-            {
-              "name": "refId",
-              "type": "string",
-              "value": "aldren-stone"
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "name": "",
-          "type": "transition",
-          "x": 96,
-          "y": 144,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "properties": [
-            {
-              "name": "refId",
-              "type": "string",
-              "value": "ash-hallow"
-            },
-            {
-              "name": "targetSpawnId",
-              "type": "string",
-              "value": "from-ash-hallow-blacksmith"
-            },
-            {
-              "name": "requiredFacing",
-              "type": "string",
-              "value": "down"
-            }
-          ]
-        },
-        {
-          "id": 4,
-          "name": "",
-          "type": "interactable",
-          "x": 32,
-          "y": 32,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "properties": [
-            {
-              "name": "refId",
-              "type": "string",
-              "value": "fireplace"
-            }
-          ]
-        }
-      ],
-      "opacity": 1,
-      "visible": true,
-      "x": 0,
-      "y": 0
+     "id": 3,
+     "name": "",
+     "type": "transition",
+     "x": 96,
+     "y": 144,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "refId",
+       "type": "string",
+       "value": "ash-hallow"
+      },
+      {
+       "name": "targetSpawnId",
+       "type": "string",
+       "value": "from-ash-hallow-blacksmith"
+      },
+      {
+       "name": "requiredFacing",
+       "type": "string",
+       "value": "down"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "interactable",
+     "x": 32,
+     "y": 32,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "refId",
+       "type": "string",
+       "value": "fireplace"
+      }
+     ]
     }
-  ],
-  "tilesets": [
+   ],
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 4,
+   "name": "collisions",
+   "objects": [],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  }
+ ],
+ "tilesets": [
+  {
+   "columns": 5,
+   "firstgid": 1,
+   "image": "../tilesets/interior-decor.png",
+   "imageheight": 64,
+   "imagewidth": 80,
+   "margin": 0,
+   "name": "interior-decor",
+   "properties": [
     {
-      "firstgid": 1,
-      "name": "tiny-dungeon",
-      "image": "../../../public/assets/tilesets/tiny-dungeon.png",
-      "imagewidth": 192,
-      "imageheight": 176,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 12,
-      "tilecount": 132,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.tiny-dungeon"
-        }
-      ],
-      "tiles": [
-        {
-          "id": 0,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "firstgid": 133,
-      "name": "velmora-environments",
-      "image": "../../../public/assets/tilesets/VelmoraRealms-Environments_Free-16.png",
-      "imagewidth": 160,
-      "imageheight": 96,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 10,
-      "tilecount": 60,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.velmora-environments-16"
-        }
-      ]
-    },
-    {
-      "firstgid": 193,
-      "name": "dungeon-building-kit",
-      "image": "../../../public/assets/tilesets/dungeon-building-kit.png",
-      "imagewidth": 128,
-      "imageheight": 112,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 8,
-      "tilecount": 56,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.dungeon-building-kit"
-        }
-      ]
-    },
-    {
-      "firstgid": 249,
-      "name": "mine-decor",
-      "image": "../../../public/assets/tilesets/mine-decor.png",
-      "imagewidth": 64,
-      "imageheight": 48,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 4,
-      "tilecount": 12,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.mine-decor"
-        }
-      ]
-    },
-    {
-      "firstgid": 261,
-      "name": "mine-floor-terrain",
-      "image": "../../../public/assets/tilesets/mine-floor-terrain.png",
-      "imagewidth": 64,
-      "imageheight": 64,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 4,
-      "tilecount": 16,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.mine-floor-terrain"
-        }
-      ]
-    },
-    {
-      "firstgid": 277,
-      "name": "interior-building-kit",
-      "image": "../../../public/assets/tilesets/interior-building-kit.png",
-      "imagewidth": 128,
-      "imageheight": 112,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 8,
-      "tilecount": 56,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.interior-building-kit"
-        }
-      ]
-    },
-    {
-      "firstgid": 333,
-      "name": "interior-decor",
-      "image": "../../../public/assets/tilesets/interior-decor.png",
-      "imagewidth": 80,
-      "imageheight": 64,
-      "tilewidth": 16,
-      "tileheight": 16,
-      "margin": 0,
-      "spacing": 0,
-      "columns": 5,
-      "tilecount": 20,
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.interior-decor"
-        }
-      ]
+     "name": "tilesetAssetId",
+     "type": "string",
+     "value": "tileset.interior-decor"
     }
-  ],
-  "properties": [
+   ],
+   "spacing": 0,
+   "tilecount": 20,
+   "tileheight": 16,
+   "tilewidth": 16
+  },
+  {
+   "columns": 18,
+   "firstgid": 21,
+   "image": "../tilesets/TopDownHouse_FloorsAndWalls.png",
+   "imageheight": 144,
+   "imagewidth": 288,
+   "margin": 0,
+   "name": "TopDownHouse_FloorsAndWalls",
+   "properties": [
     {
-      "name": "tilesetAssetId",
-      "type": "string",
-      "value": "tileset.tiny-dungeon"
+     "name": "tilesetAssetId",
+     "type": "string",
+     "value": "tileset.retro-interior-floors-walls"
     }
-  ]
+   ],
+   "spacing": 0,
+   "tilecount": 162,
+   "tileheight": 16,
+   "tiles": [
+    {
+     "id": 0,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 1,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 35,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 36,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 53,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 54,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 71,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 72,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 89,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 90,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 107,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 108,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 125,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 126,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 143,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 144,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 145,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 146,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 147,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 148,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 149,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 150,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 151,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 152,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 153,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 154,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 155,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 156,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 157,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 158,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 159,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 160,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    },
+    {
+     "id": 161,
+     "properties": [
+      {
+       "name": "walkable",
+       "type": "bool",
+       "value": false
+      }
+     ]
+    }
+   ],
+   "tilewidth": 16
+  },
+  {
+   "columns": 13,
+   "firstgid": 183,
+   "image": "../tilesets/TopDownHouse_FurnitureState1.png",
+   "imageheight": 288,
+   "imagewidth": 208,
+   "margin": 0,
+   "name": "TopDownHouse_FurnitureState1",
+   "properties": [
+    {
+     "name": "tilesetAssetId",
+     "type": "string",
+     "value": "tileset.retro-interior-furniture-1"
+    }
+   ],
+   "spacing": 0,
+   "tilecount": 234,
+   "tileheight": 16,
+   "tilewidth": 16
+  },
+  {
+   "columns": 13,
+   "firstgid": 417,
+   "image": "../tilesets/TopDownHouse_FurnitureState2.png",
+   "imageheight": 288,
+   "imagewidth": 208,
+   "margin": 0,
+   "name": "TopDownHouse_FurnitureState2",
+   "properties": [
+    {
+     "name": "tilesetAssetId",
+     "type": "string",
+     "value": "tileset.retro-interior-furniture-2"
+    }
+   ],
+   "spacing": 0,
+   "tilecount": 234,
+   "tileheight": 16,
+   "tilewidth": 16
+  },
+  {
+   "columns": 18,
+   "firstgid": 651,
+   "image": "../tilesets/TopDownHouse_DoorsAndWindows.png",
+   "imageheight": 160,
+   "imagewidth": 288,
+   "margin": 0,
+   "name": "TopDownHouse_DoorsAndWindows",
+   "properties": [
+    {
+     "name": "tilesetAssetId",
+     "type": "string",
+     "value": "tileset.retro-interior-doors-windows"
+    }
+   ],
+   "spacing": 0,
+   "tilecount": 180,
+   "tileheight": 16,
+   "tilewidth": 16
+  }
+ ],
+ "properties": [
+  {
+   "name": "tilesetAssetId",
+   "type": "string",
+   "value": "tileset.tiny-dungeon"
+  }
+ ]
 }

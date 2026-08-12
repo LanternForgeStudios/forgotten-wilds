@@ -1,5 +1,5 @@
 import { QUESTS, type QuestDef, type QuestObjectiveType } from '../data/quests';
-import { NPC_DIALOGUE_VARIANT_QUEST_IDS, NPC_DIALOGUE_REPORT_VARIANTS } from '../data/npcDialogueVariants';
+import { NPC_DIALOGUE_VARIANTS } from '../data/npcDialogueVariants';
 import { EQUIPMENT } from '../data/equipment';
 import { grantItem } from './inventoryEngine';
 import { applyLevelUp } from './levelingEngine';
@@ -48,11 +48,14 @@ function isObjectiveReadyToReport(questId: string, objectiveId: string, quests: 
  *  state), keyed as `${questId}:${objectiveId}`. Used by talkToNpc.ts to track what the player has
  *  and hasn't heard. */
 export function currentNpcDialogueVariantKey(npcId: string, quests: Record<string, QuestProgress>): string {
-  for (const { questId, objectiveId } of NPC_DIALOGUE_REPORT_VARIANTS[npcId] ?? []) {
-    if (isObjectiveReadyToReport(questId, objectiveId, quests)) return `${questId}:${objectiveId}`;
+  const variants = NPC_DIALOGUE_VARIANTS[npcId] ?? [];
+  for (const v of variants) {
+    if (v.reportForObjectiveId && isObjectiveReadyToReport(v.questId, v.reportForObjectiveId, quests)) {
+      return `${v.questId}:${v.reportForObjectiveId}`;
+    }
   }
-  for (const questId of NPC_DIALOGUE_VARIANT_QUEST_IDS[npcId] ?? []) {
-    if (effectiveStatus(questId, quests) === 'completed') return questId;
+  for (const v of variants) {
+    if (!v.reportForObjectiveId && effectiveStatus(v.questId, quests) === 'completed') return v.questId;
   }
   return 'base';
 }
