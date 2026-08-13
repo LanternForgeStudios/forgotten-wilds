@@ -93,24 +93,21 @@ a standalone asset pack. Original `Terms.txt` files are preserved under each pac
 A number of OTHER tileset packs (not the Pixel Crawler/Anokolisa set above, which has a clear,
 confirmed license) were uploaded early in the project without a recorded source, and their own
 registry `notes` field says so explicitly ("provenance unconfirmed, verify license before shipping
-as final"). Most of these were never wired into a map and were retired to
-`public/assets/tilesets/old/` (unregistered) during the same 2026-08 pass that brought the Pixel
-Crawler set in - see `docs/Asset-Production-Checklist.md`'s "Already-uploaded packs" note for what
-else is still sitting there unused (Time Fantasy-style, Velmora-branded, grassland, etc.).
+as final"). The 2026-08 Pixel Crawler migration redrew every non-interior map and retired every
+tileset that redraw made unused to `public/assets/tilesets/old/` (unregistered) - see
+`docs/Asset-Production-Checklist.md`'s "Already-uploaded packs" note for what else is sitting there
+unused (Time Fantasy-style, Velmora-branded, grassland, `ground-tiles-16`,
+`trees-signs-rocks-bridge-16`, `graveyard-set-16`, etc.). Being unregistered and unused means these
+no longer ship to players, so they're not an outstanding license risk - just untracked files kept
+around in case the source is ever identified.
 
 **The following ARE STILL actively used in live, shipped maps today** (the ones with a currently
 non-empty "Used in" column below), which makes clearing their actual license a real, outstanding
-task, not just housekeeping. Several of these are expected to become fully unused - and safe to
-retire the same way - as the 2026-08 Pixel Crawler migration works through redrawing every
-non-interior map's `ground` layer (in progress; each map's old tilesets get retired at the same
-time that map is redrawn, not all at once up front, so a still-live map is never left broken):
+task, not just housekeeping:
 
 | Tileset | Used in |
 |---|---|
 | `tileset.retro-interior-floors-walls`, `-doors-windows`, `-furniture-1`, `-furniture-2` (the "TopDownHouse" pack) | ~40 references each across most building-interior maps (protected - interior maps are out of scope for the tileset migration) |
-| `tileset.ground-tiles-16` | Ash Hallow, Black Briar Forest, Ironwood Trail, Raven Ridge, Whisper Falls - pending redraw |
-| `tileset.trees-signs-rocks-bridge-16` | same 5 maps as above - pending redraw |
-| `tileset.graveyard-set-16` | Black Briar Forest - pending redraw |
 | `tileset.rpg-icons-2` | Ash Hallow Armory, Ash Hallow Blacksmith |
 
 If the original source of any of these can't be identified and confirmed as freely licensed, treat

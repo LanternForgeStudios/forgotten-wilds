@@ -453,13 +453,14 @@ the raw pixellab exports) + `scripts/wire_new_tilesets.py` (map-JSON wiring, saf
 
 ### Already-uploaded packs (mostly a wiring decision if you ever need them, not new art to commission)
 
-You also already have a large library of real, uploaded tileset packs not yet used in any map
-(grassland, a "Time Fantasy"-style pack, a Velmora-branded pack, a graveyard set, water/beach/cliff/
-path sheets, and more - see the `tileset` category in `src/assets/registry.ts` for the full list
-with dimensions). Most carry a "provenance unconfirmed, verify license before shipping as final"
-note - the pixellab-generated sets above sidestep that entirely, so treat this library as a
-fallback for one-off needs (e.g. `tileset.graveyard-set`, already in use by `black-briar-forest`)
-rather than the default.
+You also already have a large library of real, uploaded-but-unregistered tileset packs sitting in
+`public/assets/tilesets/old/` (grassland, a "Time Fantasy"-style pack, a Velmora-branded pack, a
+graveyard set, water/beach/cliff/path sheets, and more), retired there during the 2026-08 Pixel
+Crawler migration once the maps that used them were redrawn with the new tileset families - see
+`public/CREDITS.md`'s "Uploaded tileset packs with unconfirmed provenance" section for why
+("provenance unconfirmed, verify license before shipping as final"). They're not currently
+registered or shipping to players; re-registering one is a valid fallback for a future one-off need
+if the Pixel Crawler families above don't fit, but isn't the default path.
 
 (Done: the 14 mislabeled entries that used to live here - `tx-player`, `velmora-slime-animation`,
 and the 12 uploaded `npc-N` sheets - have been moved to `sprites/characters/`/`sprites/enemies/`
