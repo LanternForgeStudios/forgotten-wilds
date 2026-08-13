@@ -35,6 +35,7 @@ import {
 import { resyncSave } from '@/state/hydrate';
 import { grantedItemIdFor } from '@/utils/worldItems';
 import { LOCATIONS, NPCS } from '@/data';
+import { resolveDecorEntity } from '@/data/decorEntities';
 import { RewardPopup } from '@/components/RewardPopup';
 import { LorePopup } from '@/components/LorePopup';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
@@ -211,14 +212,6 @@ function fragmentCollectedSpriteAssetId(refId: string): string | undefined {
   return `${baseId}-collected`;
 }
 
-/** Purely decorative, non-gated interactable - no Cloud Function call, falls through to
- *  attemptInteract's generic "you find X" flavor branch at the bottom (labelForInteractable
- *  below supplies the label). Multiple instances per map share this refId prefix (each with a
- *  unique numeric suffix, same convention as chest-<location>-<n>). */
-function isGlowingMushroom(refId: string): boolean {
-  return refId.startsWith('glowing-mushroom');
-}
-
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
 function labelForInteractable(refId: string, openedChests: string[], inventory: { itemId: string }[]): string {
@@ -254,7 +247,8 @@ function labelForInteractable(refId: string, openedChests: string[], inventory: 
   if (refId === 'desert-charm-relic' || refId === 'desert-totem-relic') return 'a sun-worn relic, humming with old spirit-craft';
   if (refId.startsWith('aurora-crystal-fragment-')) return 'a shard of ice holding a faint trace of aurora-light';
   if (refId === 'lost-scout-effects-i-cache' || refId === 'lost-scout-effects-ii-cache') return "a lost scout's frozen pack";
-  if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';
+  const decorEntity = resolveDecorEntity(refId);
+  if (decorEntity) return decorEntity.label;
   const landmark = LOCATIONS.find((l) => l.id === refId);
   if (landmark) return landmark.name;
   return 'something';
@@ -518,14 +512,15 @@ export function OverworldScene() {
       .map((o) => {
         const isChest = o.refId!.startsWith('chest-');
         const isShrine = POINT_LANDMARK_KIND[o.refId!] === 'shrine';
+        const decorEntity = resolveDecorEntity(o.refId!);
         const spriteAssetId = isChest
           ? openedChests.includes(o.refId!)
             ? 'structure.chest-open'
             : 'structure.chest'
           : isShrine
             ? shrineSpriteAssetId(o.refId!, questProgress)
-            : isGlowingMushroom(o.refId!)
-              ? 'structure.decor-glowing-mushroom'
+            : decorEntity
+              ? decorEntity.spriteAssetId
               : inventory.some((i) => i.itemId === grantedItemIdFor(o.refId!))
                 ? (fragmentCollectedSpriteAssetId(o.refId!) ?? FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant')
                 : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');

@@ -40,15 +40,16 @@ across otherwise-walkable grass, for example), and `walkable: false` is the righ
 ground tile itself inherently shouldn't be stood on everywhere it's placed (water, a chasm). Use
 whichever is more convenient for a given obstacle - they compose freely.
 
-**Snap rectangles to the tile grid.** The player moves tile-by-tile - there's no sub-tile
-positioning - so a `collisions` rectangle can only ever block whole tiles, never "half" one. Enable
-Tiled's **Snap to Grid** (View → Snapping, or the magnet icon in the toolbar) before drawing
-collision rectangles, and size/position them as exact multiples of the tile size. If you don't, two
-things make the blocked area look bigger in-game than the rectangle looked in Tiled: (1) any
-non-tile-aligned rectangle still blocks *every* whole tile it overlaps at all, even by one pixel,
-and (2) a rectangle smaller than one tile still blocks that entire tile - there's no way to
-represent "partially blocked." Grid-snapped rectangles sidestep both: what you see in Tiled is
-exactly the tiles that block in-game, with no rounding ambiguity.
+**Draw rectangles at whatever exact pixel size/position the obstacle needs - no grid-snapping
+required.** Player movement is continuous, velocity-based Arcade Physics (not tile-stepped), and
+every `collisions` rectangle becomes a real Arcade static body at its exact native-pixel
+coordinates (see `src/assets/tiledLoader.ts`'s own top-of-file comment and
+`src/phaser/ExplorationScene.ts`) - a rectangle 6px wide only blocks those 6px, not a whole tile.
+Tiled's **Snap to Grid** is still fine to leave on for convenient placement, it's just no longer
+required for correctness the way it used to be under the old tile-stepped movement. Toggle the F9
+debug overlay in-game (desktop only) to see every collision rectangle drawn in red against the
+live map, exactly where it'll actually block - the fastest way to confirm a rectangle you drew
+lines up with the art.
 
 ## The `objects` layer
 
@@ -56,13 +57,21 @@ Still an **Object Layer** named `objects`, with each object's Class/Type field s
 `npc`, `transition`, `interactable`, `zone`, `spawnPoint`. Any other value here will fail to load
 (this layer is validated strictly, unlike `collisions`).
 
+For a purely decorative `interactable` (a fireplace, a glowing mushroom, a campfire prop - no
+gameplay effect, just an ambient/animated prop), see `docs/Map-Object-Catalog.md` for the full list
+of ready-to-use `refId`s and how to register a new one.
+
 `zone` is a **rectangle** object (unlike the others, which are points) - a walk-in sub-area that
-fires once the player's tile steps into it (no explicit Interact needed), e.g. a named clearing or
-camp within a larger overworld map. Give it a `refId` custom property the same way a `transition`/
-`interactable` would; each scene decides what actually happens on entry (see
-`useLocationExploration.ts`'s `onZoneEnter` option and `OverworldScene.tsx`'s dispatch for a real
-example). A `zone` and a same-refId point `interactable` can coexist (e.g. a walk-in clearing that
-also contains a separate shrine you still approach and Interact with) - they're independent objects.
+fires the moment the player's physics body overlaps it at all (no explicit Interact needed), e.g. a
+named clearing or camp within a larger overworld map. Drawn at whatever exact pixel size/position
+the area needs, same pixel-precise convention as `collisions` above - it triggers on real overlap
+with its drawn rectangle, not a tile-rounded approximation. Give it a `refId` custom property the
+same way a `transition`/`interactable` would; each scene decides what actually happens on entry
+(see `ExplorationScene.ts`'s `onZoneEnter` callback, wired from `PhaserExplorationCanvas.tsx`, and
+`OverworldScene.tsx`'s dispatch for a real example). A `zone` and a same-refId point `interactable`
+can coexist (e.g. a walk-in clearing that also contains a separate shrine you still approach and
+Interact with) - they're independent objects. `transition` objects work the same overlap-triggered
+way (see `ExplorationScene.ts`'s `onTransitionEnter` callback).
 
 ## Multiple tilesets per map
 

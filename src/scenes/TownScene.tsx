@@ -35,6 +35,7 @@ import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS, LOCATIONS, APOTHECARY_SHOP_IDS } from '@/data';
+import { resolveDecorEntity } from '@/data/decorEntities';
 import type { Npc, OnlinePresence } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
@@ -111,16 +112,6 @@ const BUILDING_MARKERS: Record<string, { label: string; spriteAssetId: string }>
  *  the same way OverworldScene routes shrine landmarks through interactWithShrine. */
 const SHRINES = new Set(['ash-hallow-shrine']);
 
-/** Purely decorative, non-gated interactables (no Cloud Function call - just a flavor message),
- *  keyed by refId. Animated via structure.decor-fireplace's own frameSize idle loop, same generic
- *  mechanism as structure.chest/structure.shrine-activated - no new animation code needed here. */
-const DECOR_ENTITIES: Record<string, { label: string; spriteAssetId: string; flavorText: string }> = {
-  fireplace: {
-    label: 'Fireplace',
-    spriteAssetId: 'structure.decor-fireplace',
-    flavorText: 'The fire crackles warmly, filling the room with a gentle heat.',
-  },
-};
 
 export function TownScene() {
   const locationId = useSceneStore((s) => s.params.locationId) ?? 'ash-hallow';
@@ -291,8 +282,9 @@ export function TownScene() {
 
     // result.kind === 'interactable'
     const refId = result.id;
-    if (DECOR_ENTITIES[refId]) {
-      setMessage(DECOR_ENTITIES[refId].flavorText);
+    const decorEntity = resolveDecorEntity(refId);
+    if (decorEntity) {
+      setMessage(decorEntity.flavorText);
       return;
     }
     if (SHRINES.has(refId)) {
@@ -412,9 +404,9 @@ export function TownScene() {
       .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
     const decorEntities: GridEntity[] = map.objects
-      .filter((o) => o.type === 'interactable' && o.refId && DECOR_ENTITIES[o.refId])
+      .filter((o) => o.type === 'interactable' && o.refId && resolveDecorEntity(o.refId))
       .map((o) => {
-        const decor = DECOR_ENTITIES[o.refId!];
+        const decor = resolveDecorEntity(o.refId!)!;
         return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: decor.spriteAssetId, label: decor.label, blocksMovement: true };
       });
 

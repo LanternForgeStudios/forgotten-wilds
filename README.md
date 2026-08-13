@@ -2,9 +2,11 @@
 
 **[Play it live](https://lanternforgestudios.github.io/forgotten-wilds/)**
 
-A browser-based JRPG set in Mytherra's Iron Mountains. Single-player exploration, turn-based
-combat, and quests today; live town presence, friends/messaging, and player-to-player trading
-now, with clean seams for future party/chat/lodge/world-event systems.
+A browser-based JRPG set in the world of Mytherra. Book One's story is complete end to end across
+all 6 regions (Iron Mountains, Crimson Bayou, Endless Prairie, Whispering Pines, Shattered Desert,
+Frozen Frontier) and 12 chapters. Single-player exploration, turn-based combat, and quests; live
+town presence, friends/messaging, and player-to-player trading; clean seams for future party/
+lodge/world-event systems.
 
 Frontend: React + TypeScript + Vite. Backend: Firebase (Auth, Firestore, Cloud Functions). The
 cloud is the source of truth — the client never writes game state directly; every mutation
@@ -71,11 +73,16 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
 - `src/data/` — display-only seed data (items, equipment, enemies, NPCs, quests, locations, lore)
 - `src/assets/` — the Asset Manager and registry (`registry.ts`); every sprite/tileset/icon/map
   is looked up by id here, never imported by file path directly. See `public/CREDITS.md` for
-  what's real CC0 art (Kenney.nl) vs. generated placeholder. Maps are genuinely Tiled-compliant
+  attribution across every art/audio source in use (pixellab.ai-generated, externally-commissioned
+  painterly art, Kenney.nl CC0, CC-BY-licensed audio) and which uploaded tileset packs still have
+  unconfirmed licensing. Maps are genuinely Tiled-compliant
   JSON (open any `public/assets/maps/*.json` directly in the Tiled editor) — see
   `docs/Tiled-Map-Authoring.md` for the layer model, multi-tileset support, and required export
-  settings. `scripts/genMapRicher.mjs` (+ specs in `scripts/map-specs-richer/`) generates this
-  format from a small spec instead of hand-typing tile arrays; `scripts/genMap.mjs` is an older,
+  settings; `docs/Map-Object-Catalog.md` for every placeable refId/structure and where the raw
+  tileset art lives; `docs/Map-Redraw-Tracker.md` for which tileset family (or families) is
+  pre-wired into each specific map, ready to hand-paint from. `scripts/genMapRicher.mjs` (+ specs
+  in `scripts/map-specs-richer/`) generates this format from a small spec instead of hand-typing
+  tile arrays; `scripts/genMap.mjs` is an older,
   simpler single-tileset-room-only generator kept for quick stubs.
 - `functions/src/data/` — the **authoritative** copies of the same content (prices, stats, loot,
   quest definitions) that the client's copies must stay in sync with by hand; the client copies
@@ -143,33 +150,41 @@ sign-in inputs, Character Creation's name field) — see `src/utils/browserLockd
 
 ## Known limitations (MVP scope)
 
-- Region transitions along the main story path (Ironwood Trail, Raven Ridge, Whisper Falls,
-  Hollow Rail Mine) are quest-gated - both client-side (a clear in-game message) and server-side
-  (`functions/src/functions/enterLocation.ts` rejects the request outright), so sequence-breaking
-  into those specific regions early isn't possible. Outside of those gates, quest objectives in
-  general (`reachLocation`, `collectItem`, etc.) still only advance if the triggering action
-  happens *after* the prerequisite quest is already completed - they don't retroactively credit.
-  Normal linear play is unaffected either way.
+- Region/chapter transitions along the entire main story path - every region entry point and every
+  region's own final dungeon, across all 6 regions (Iron Mountains through Frozen Frontier) - are
+  quest-gated, both client-side (a clear in-game message, `src/utils/locationGates.ts`) and
+  server-side (`functions/src/functions/enterLocation.ts`'s `LOCATION_GATES` rejects the request
+  outright), so sequence-breaking into a not-yet-reached region or dungeon isn't possible. Outside
+  of those gates, quest objectives in general (`reachLocation`, `collectItem`, etc.) still only
+  advance if the triggering action happens *after* the prerequisite quest is already completed -
+  they don't retroactively credit. Normal linear play is unaffected either way.
 - Vitest covers the pure combat/quest/equipment engine functions (`functions/src/engine/*.test.ts`)
   but not the Cloud Functions themselves (Firestore transactions) or any client code yet.
-- Equipment-layering base bodies (8 total: 4 appearances x 2 genders, `sprite.player.base.
-  {gender}.{appearance}` in `src/assets/registry.ts`) are fully generated and registered; the
-  character-creation/profile picker UI now lets players choose both gender and appearance
-  (`CharacterCreationScene.tsx`, `UserProfile.tsx`'s Skin tab). The Phaser rendering
-  infrastructure for stacking per-slot equipment sprites onto the base body
-  (`ExplorationScene.setPlayer`'s `equipmentLayers`) is also built, but no equipped item has
-  layer art yet, so equipping gear causes no visible change in-game today - see
-  `docs/Equipment-Layering-Plan.md` for the phased plan and current status.
+- Equipment layering is complete: the 8 base bodies (4 appearances x 2 genders, `sprite.player.base.
+  {gender}.{appearance}` in `src/assets/registry.ts`) are fully generated and registered, the
+  character-creation/profile picker UI lets players choose both gender and appearance
+  (`CharacterCreationScene.tsx`, `UserProfile.tsx`'s Skin tab), and every layerable equipment item
+  (weapon/chest/legs/boots/gloves/lantern - 123 of 123, charm/spiritTotem are out of scope by
+  design) has real male AND female layer art wired via `layerSpriteAssetId` in
+  `src/data/equipment.ts`, stacked onto the base body by `ExplorationScene.setPlayer`'s
+  `equipmentLayers` - equipping gear visibly changes the player's overworld sprite today. See
+  `docs/Equipment-Layering-Plan.md` for the build pipeline and history.
 - The player has a real, pixellab.ai-generated 4-direction walk+run sprite sheet for both skins
-  (`sprite.player.male`/`.female`), and all 14 NPC overworld sprites and all 14 dialogue portraits
-  now have real art too (`src/assets/registry.ts`; originals archived under each asset folder's own
-  `original/`). A few NPCs (Elias Rowan, Finn Rowan) also have a real ambient idle animation
-  instead of a static frame - a new, opt-in-per-NPC capability
-  (`animationLayoutForSprite` in `src/animation/characterAnimations.ts`); an NPC with no idle sheet
-  just keeps showing its static frame. Enemies can use the same idle-animation mechanism for a
-  "fight stance" loop, shown both in battle and as their overworld field-encounter icon - 4 of 13
-  enemies (Mothling, Greater Mothling, Restless Miner, Foreman Wraith) have one; the rest are still
-  placeholder SVGs. See `docs/Asset-Production-Checklist.md` for exactly what's done vs. remaining
+  (`sprite.player.male`/`.female`), and all 55 NPC overworld sprites and all 55 dialogue portraits
+  across every region now have real art too (`src/assets/registry.ts`; originals archived under
+  each asset folder's own `original/`). Nearly every stationary NPC also has a real ambient idle
+  animation instead of a static frame (`animationLayoutForSprite` in
+  `src/animation/characterAnimations.ts`, opt-in per NPC - one with no idle sheet just keeps
+  showing its static frame), and every NPC that actually wanders (`wanderRadius`) has a real
+  walk-cycle to match (`NPC_WALK_ASSET_IDS` in the same file). Enemies use the same idle-animation
+  mechanism for a "fight stance" loop, shown both in battle and as their overworld field-encounter
+  icon - all 42 enemies across every region (Iron Mountains through Frozen Frontier) have real
+  pixellab-generated art and a real idle animation; none are placeholder SVGs anymore. The one
+  outstanding art gap is real: every region past Iron Mountains (43 major locations across Crimson
+  Bayou/Endless Prairie/Whispering Pines/Shattered Desert/Frozen Frontier) still falls back to a
+  generic forest/mine battle background rather than dedicated per-location art, since that
+  painterly full-screen style needs external production pixellab can't produce. See
+  `docs/Asset-Production-Checklist.md` for exactly what's done vs. remaining
   across every asset category, and the `scripts/build_*.py` pipelines used to process a new
   pixellab.ai export (stage it under `art-staging/characters/` for players/NPCs or
   `art-staging/enemies/` for enemies).

@@ -948,9 +948,11 @@ overworld sprites, all 5 enemy sprites (incl. Canyon Giant boss).** `create_char
 `animate_character` breathing-idle, south only, per the Whispering Pines sizing lesson.
 desert-ranger-tomas-vega (the one roaming NPC, wanderRadius on red-mesa.json) additionally got real
 walk-cycle frames (`walking-4-frames` x4 directions) and was added to `NPC_WALK_ASSET_IDS` - built
-idle+walk together from the start, unlike marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/
-forest-warden-rowan-hart/prairie-spirit, which all shipped idle-only and still need the same
-follow-up fix (flagged, not yet done - see those NPCs' own registry notes). dust-devil's
+idle+walk together from the start. marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/
+forest-warden-rowan-hart/prairie-spirit, which had shipped idle-only, have since had the same
+walk-cycle follow-up done too - see `NPC_WALK_ASSET_IDS` in `src/animation/characterAnimations.ts`,
+whose own comment confirms this was closed via "a full audit of every wanderRadius object across
+all live maps" against that set. No roaming NPC is idle-only anymore. dust-devil's
 `create_character` base kept rendering a bare human body across 4 separate attempts (including
 explicit "NOT a plain human body"/"NOT a person" negative-prompt language) despite its sandstorm-devil
 sibling succeeding with identical phrasing - shipped instead as an HLS lightness/saturation recolor
@@ -1110,9 +1112,10 @@ instead of reusing an existing one, since none of the vetted tilesets (grass/des
 snow palette. Frosthaven's own town ground still reuses `tileset.town-terrain`, matching every
 prior region's town. captain-astrid-frost and winter-spirit (the 2 roaming NPCs, wanderRadius on
 frosthaven.json/aurora-basin.json) were built with real idle+walk-cycle sheets from the start,
-avoiding the idle-only gap left on marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/
-forest-warden-rowan-hart/prairie-spirit (those 6 still need the same follow-up fix, flagged, not
-yet done). captain-astrid-frost's portrait needed a retry (first attempt had a visible watermark
+same as every other roaming NPC in the game at this point - see the Chapter 9 section above for
+where the marsh-spirit/sabine-thorne/cedar-spirit/scout-niska/forest-warden-rowan-hart/
+prairie-spirit walk-cycle follow-up was closed out. captain-astrid-frost's portrait needed a retry
+(first attempt had a visible watermark
 and an anachronistic flag patch); a Sigrid/Bjorn character-ID mix-up during the sprite batch was
 caught and corrected before committing. Frost Wolf/Alpha Frost Wolf used `template='dog'`
 quadruped bodies with the `idle` animation (quadruped body types don't expose

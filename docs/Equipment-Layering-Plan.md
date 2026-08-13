@@ -1,5 +1,15 @@
 # Equipment Layering Plan
 
+**Current status (verified against the live codebase, supersedes every status note below): DONE.**
+All 123 of 123 layerable equipment items (every weapon/chest/legs/boots/gloves/lantern item across
+every region shipped so far) have real male AND female layer art wired via `layerSpriteAssetId` in
+`src/data/equipment.ts` - equipping any covered slot visibly changes the player's overworld sprite.
+charm/spiritTotem remain intentionally out of scope (see below). The rest of this document is a
+detailed build log of *how* that was reached across many sessions - useful for the pipeline/scripts
+and for onboarding a new equivalent item, but its older "in progress"/"next up" status notes are
+historical, not current; don't trust a specific status claim further down this file without
+checking `layerSpriteAssetId` coverage in `src/data/equipment.ts` directly first.
+
 Goal: the player's visible overworld sprite reflects their currently-equipped weapon, armor,
 gloves, boots, and lantern - not just the inventory/equip-menu icons that already exist. Charm and
 spiritTotem (the two small accessory slots) are **not** in scope - they're worn under clothes or
@@ -93,7 +103,10 @@ animation frames stay perfectly synced between the base sprite and its layer. No
 the 2 equipment items with real layer art (see Phase 3 below) - resolves to `[]` for every other
 equipped item, same as before.
 
-**Next up**: finish Phase 3 (pilot loadout - walking-only, male-only, see that section below).
+**Next up (superseded - see the "Current status" banner at the top of this doc): nothing** - every
+phase below completed across many later sessions; this line is kept as a historical marker of where
+the doc's own "Status" section stopped being updated in place, in favor of the append-only "Update"
+sections that follow it.
 
 ## The hard problem: frame-perfect alignment
 

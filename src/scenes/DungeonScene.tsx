@@ -17,6 +17,7 @@ import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationV
 import { useDragMovement } from '@/hooks/useDragMovement';
 import { useExplorationDash } from '@/hooks/useExplorationDash';
 import { ENEMIES } from '@/data';
+import { resolveDecorEntity } from '@/data/decorEntities';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -157,7 +158,8 @@ function labelForInteractable(refId: string, openedChests: string[]): string {
   if (BOSS_TRIGGERS[refId]) return BOSS_TRIGGERS[refId].approachLabel;
   if (WORLD_ITEM_INTERACTABLES[refId]) return WORLD_ITEM_INTERACTABLES[refId].label;
   if (SHRINE_INTERACTABLES[refId]) return 'Shrine';
-  if (refId.startsWith('glowing-mushroom')) return 'Glowing Mushroom';
+  const decorEntity = resolveDecorEntity(refId);
+  if (decorEntity) return decorEntity.label;
   return 'something';
 }
 
@@ -379,13 +381,14 @@ export function DungeonScene() {
             blocksMovement: true,
           };
         }
-        if (refId.startsWith('glowing-mushroom')) {
+        const decorEntity = resolveDecorEntity(refId);
+        if (decorEntity) {
           return {
             id: refId,
             x: o.x,
             y: o.y,
-            spriteAssetId: 'structure.decor-glowing-mushroom',
-            label: 'Glowing Mushroom',
+            spriteAssetId: decorEntity.spriteAssetId,
+            label: decorEntity.label,
             blocksMovement: true,
           };
         }
