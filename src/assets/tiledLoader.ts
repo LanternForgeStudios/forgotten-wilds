@@ -5,6 +5,18 @@ import { getAssetUrl } from './assetManager';
 // that this game actually uses. Maps are authored directly to this schema (or exported from the Tiled editor)
 // and reference tile IDs only — no map file hardcodes an image filename; the tileset image is resolved through
 // the asset registry via `tilesetAssetId` in the map's custom properties.
+//
+// Pixel-precise authoring (movement is now continuous Arcade Physics, not tile-stepped): every
+// rectangle drawn on the `collisions` object layer, and every object's own width/height on the
+// `objects` layer (zones especially - npc/transition/interactable/spawnPoint are still normally
+// point-placed), is used EXACTLY as drawn - no snapping or expansion to the tile grid. A fence
+// rectangle that's 6px wide only blocks those 6px; a zone that's not a whole number of tiles only
+// triggers within its own real bounds. This is a real behavior change from Tiled's own visual grid
+// snapping (still fine to use for placement, just no longer required for correctness) - draw
+// collision/zone rectangles at whatever exact size and position the art actually needs. Every
+// object also gets a `pixelX/Y/Width/Height` fallback of one full native tile when point-placed
+// (no explicit width/height in Tiled), preserving the old "occupies its whole tile" behavior until
+// a map author draws a real rectangle for it - see the `objects` mapping below.
 
 interface TiledProperty {
   name: string;
@@ -193,7 +205,9 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     .map((o) => {
       // Only 'zone' objects are ever authored as real Tiled rectangles (every other object type is
       // a point) - width/height (and the tile-span x/y below) fall out as the point's own single
-      // tile for those, same as before.
+      // tile for those, same as before. pixelWidth/pixelHeight (below) fall back to a full tile for
+      // any point-placed object so Arcade Physics footprints preserve today's "occupies its whole
+      // tile" behavior until a map author draws a real rectangle for it.
       const span = o.width || o.height ? pixelRectToTileSpan(o.x, o.y, o.width ?? 0, o.height ?? 0, raw.tilewidth, raw.tileheight) : null;
       return {
         type: objectType(o.type),
@@ -203,6 +217,10 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
         targetSpawnId: propValue<string>(o.properties, 'targetSpawnId'),
         width: span?.width,
         height: span?.height,
+        pixelX: o.x,
+        pixelY: o.y,
+        pixelWidth: o.width || raw.tilewidth,
+        pixelHeight: o.height || raw.tileheight,
         wanderRadius: propValue<number>(o.properties, 'wanderRadius'),
         requiredFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'requiredFacing'),
       };
@@ -211,10 +229,12 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
   // 'collisions' is an object layer of discrete, non-interactive obstacles (fences, rocks, ledges,
   // barriers). Parsed entirely separately from `objects` above - it never flows through
   // objectType()'s allow-list, and the object's own Class/Type field is ignored (geometry only).
+  // Emitted as native-pixel rectangles, exactly as drawn in Tiled (no tile-snapping/expansion) -
+  // Arcade Physics static bodies use these coordinates directly (see ExplorationScene.ts).
   const collisionObjects: CollisionRect[] = raw.layers
     .filter((l): l is TiledObjectGroup => l.type === 'objectgroup' && l.name === 'collisions')
     .flatMap((l) => l.objects)
-    .map((o) => pixelRectToTileSpan(o.x, o.y, o.width || raw.tilewidth, o.height || raw.tileheight, raw.tilewidth, raw.tileheight));
+    .map((o) => ({ x: o.x, y: o.y, width: o.width || raw.tilewidth, height: o.height || raw.tileheight }));
 
   // Opt-out, not opt-in: any populated ground tile is walkable unless its own tileset explicitly
   // marks it `walkable: false` (walls, water, chasms, ...). Checks strictly against `=== false` -

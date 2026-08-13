@@ -1,106 +1,61 @@
 import { useCallback, useRef } from 'react';
-import type { RefObject } from 'react';
-import type { Facing, GridPosition } from './useGridMovement';
 import { callDash } from '@/firebase/functionsClient';
 import { usePlayerStore } from '@/state/usePlayerStore';
 
-// Must exceed useGridMovement's own dash-step throttle (dashStepIntervalMs, 100ms default) or each
-// scheduled attemptMove call would just get swallowed by that throttle instead of actually
-// advancing a tile - the whole hold would then stop after its very first tile, since every
-// subsequent attemptMove call gets silently no-op'd by the movement throttle and the "position
-// didn't change" collision check mistakes that for a wall. This no longer has to also budget for a
-// server round-trip (see the stamina-debit comment in startDash below), so it's kept just
-// comfortably above the throttle floor rather than padded for network latency - the closer to it,
-// the smoother a held dash feels.
-const DASH_STEP_MS = 120;
-
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+// How often the stamina cost fires while dashHeld stays true - the server-authoritative dash Cloud
+// Function (functions/src/functions/dash.ts) charges a fixed cost per call, not per tile, so this
+// is now a plain fixed-interval debit fully decoupled from movement/tiles (continuous movement has
+// no more "tiles" to debit per - see ExplorationScene.ts's updatePlayerPhysics). Kept at the same
+// cadence the old tile-stepping loop used (DASH_STEP_MS) purely to preserve the existing stamina-
+// drain feel, not because anything about the interval itself is tied to movement anymore.
+const DASH_STAMINA_INTERVAL_MS = 120;
 
 interface UseDashOptions {
-  attemptMove: (facing: Facing, options?: { isDash?: boolean }) => void;
-  positionRef: RefObject<GridPosition>;
+  /** Flips the shared movement-input ref's dashHeld flag (see useMovementInput.ts) - the actual
+   *  speed boost is Arcade Physics reading that flag every frame in ExplorationScene.ts, not
+   *  anything this hook does directly. This hook only owns the Stamina side. */
+  setDashHeld: (held: boolean) => void;
 }
 
-/** Dash: hold to run in the given direction (or the player's current facing, e.g. the mobile Dash
- *  button) until Stamina runs out, the held direction changes to something new, or movement is
- *  blocked by collision - replacing the old fixed "5 tiles for a flat upfront cost" model. Movement
- *  starts on the very first held frame - no ramp-up beat, and no cooldown between holds either (a
- *  player with Stamina to spend can release and immediately hold again) - Stamina itself is the
- *  only throttle, per the design decision that a flat extra cooldown on top of it was an
- *  unnecessary second gate. Stamina is debited per tile via the server-authoritative dash Cloud
- *  Function (functions/src/functions/dash.ts), fired fire-and-forget alongside each tile's
- *  movement rather than gating it - see the loop's own comment for why. Call `startDash` on press
- *  (optionally with an explicit facing) and `stopDash` on release - see useDashKeybind.ts
- *  (keyboard: Shift held) and MobileHud.tsx (touch: press-and-hold). */
-export function useDash({ attemptMove, positionRef }: UseDashOptions) {
+/** Dash: hold to run faster until Stamina runs out or released - the server-authoritative Stamina
+ *  debit (functions/src/functions/dash.ts) fires on a fixed interval while held, independent of
+ *  movement/collision (which Arcade Physics now owns entirely on its own, continuously). Call
+ *  `startDash` on press and `stopDash` on release - see useDashKeybind.ts (keyboard: Shift held)
+ *  and MobileHud.tsx (touch: press-and-hold). */
+export function useDash({ setDashHeld }: UseDashOptions) {
   const dashingRef = useRef(false);
-  // The currently-held direction - null means "not dashing" and is also the hold-loop's own stop
-  // signal. A direction key pressed while already dashing just updates this (see startDash's
-  // early-return branch); the run loop below reads it fresh every tile instead of capturing one
-  // fixed facing for the whole hold.
-  const facingRef = useRef<Facing | null>(null);
+  const intervalRef = useRef<number | undefined>(undefined);
   const patchStats = usePlayerStore((s) => s.patchStats);
   const patchPlayer = usePlayerStore((s) => s.patchPlayer);
-  // A dash step landing on a transition tile changes locations mid-loop - for a same-kind
-  // transition the scene doesn't remount, so this hook's hold-loop keeps running with whatever
-  // attemptMove it captured at call time, which would now be bound to the *old* map's collision
-  // data while positionRef has already moved on to the new location's spawn point. Reading through
-  // a ref (same pattern useDragMovement.ts/useGridMovement.ts already use for this exact class of
-  // bug) guarantees every remaining iteration validates against whichever map is actually current.
-  const attemptMoveRef = useRef(attemptMove);
-  attemptMoveRef.current = attemptMove;
 
   const stopDash = useCallback(() => {
-    facingRef.current = null;
-  }, []);
+    dashingRef.current = false;
+    setDashHeld(false);
+    if (intervalRef.current !== undefined) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
+    }
+  }, [setDashHeld]);
 
-  const startDash = useCallback(
-    async (requestedFacing?: Facing) => {
-      if (dashingRef.current) {
-        // Already running - just steer it, don't start a second overlapping hold.
-        if (requestedFacing) facingRef.current = requestedFacing;
-        return;
-      }
+  const startDash = useCallback(() => {
+    if (dashingRef.current) return;
+    dashingRef.current = true;
+    setDashHeld(true);
 
-      const facing = requestedFacing ?? positionRef.current.facing;
-      facingRef.current = facing;
-      dashingRef.current = true;
+    function tick() {
+      callDash()
+        .then((result) => {
+          patchStats({ stamina: result.stamina, maxStamina: result.maxStamina });
+          patchPlayer({ staminaUpdatedAt: result.staminaUpdatedAt });
+        })
+        .catch(() => {
+          stopDash(); // out of Stamina
+        });
+    }
 
-      // Each tile's stamina debit is fired but NOT awaited before the next tile's attemptMove -
-      // waiting on that round-trip every single tile is what made a held dash visibly stutter
-      // (move, pause, move, pause) even on fast local latency, since the server call always
-      // outlasted GLIDE_MS's glide duration. The move itself was never server-persisted state to
-      // begin with (only the Stamina cost is), so this trades a small amount of debit strictness
-      // (a rejected call's tile has already visually happened by the time the rejection arrives -
-      // at most one tile's worth) for genuinely smooth, continuous movement. staminaExhausted is
-      // set the instant any call rejects, stopping the loop before the *next* tile fires.
-      let staminaExhausted = false;
-      try {
-        while (facingRef.current !== null && !staminaExhausted) {
-          const before = positionRef.current;
-          attemptMoveRef.current(facingRef.current, { isDash: true });
-          callDash()
-            .then((result) => {
-              patchStats({ stamina: result.stamina, maxStamina: result.maxStamina });
-              patchPlayer({ staminaUpdatedAt: result.staminaUpdatedAt });
-            })
-            .catch(() => {
-              staminaExhausted = true; // out of Stamina
-            });
-          await wait(DASH_STEP_MS);
-          const after = positionRef.current;
-          if (after.x === before.x && after.y === before.y) break; // blocked - stop the dash here
-        }
-      } finally {
-        dashingRef.current = false;
-        facingRef.current = null;
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [patchStats, patchPlayer, positionRef],
-  );
+    tick();
+    intervalRef.current = window.setInterval(tick, DASH_STAMINA_INTERVAL_MS);
+  }, [patchStats, patchPlayer, setDashHeld, stopDash]);
 
   return { startDash, stopDash };
 }

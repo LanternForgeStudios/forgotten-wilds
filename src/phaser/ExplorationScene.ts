@@ -1,25 +1,65 @@
 import Phaser from 'phaser';
-import type { TileLayer, TileMap, EquipmentSlot } from '@/types';
-import type { GridPosition } from '@/hooks/useGridMovement';
+import type { TileLayer, TileMap, MapObject, CollisionRect, EquipmentSlot } from '@/types';
+import type { GridPosition, Facing } from '@/hooks/useGridMovement';
+import { FACING_TO_DELTA } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
-import { PLAYER_ANIMATION_LAYOUT, animationLayoutForSprite } from '@/animation/characterAnimations';
+import { PLAYER_ANIMATION_LAYOUT, animationLayoutForSprite, resolveDisplayRow } from '@/animation/characterAnimations';
 import { getAssetDefinition } from '@/assets/assetManager';
 import { createCharacterAnimations, animationKey } from './animationDefs';
 import { ensureParticleTexture } from './battleEffects';
 import { loadSceneTexture } from './textureLoader';
 import type { GridEntity } from '@/components/exploration/PhaserExplorationCanvas';
+import type { MovementInputState } from '@/hooks/useMovementInput';
 
-/** The glide-between-tiles animation duration - matches useGridMovement.ts's own default
- *  `stepIntervalMs` (220ms, the throttle gating how often a new step is allowed) so one tile's
- *  glide finishes exactly as the next step becomes available, instead of visibly sitting still for
- *  the gap between them. Previously 120ms against a 220ms throttle, which left ~100ms of dead time
- *  at the end of every single tile - the actual cause of movement reading as "choppy, one block at
- *  a time" despite already being tweened, not a missing-tween problem. */
+/** The glide-tween duration for non-player entities (NPCs/other players - see upsertEntity) as
+ *  they move from their last reported tile to their next one. The player itself no longer tweens
+ *  between discrete tiles at all (see updatePlayerPhysics/PLAYER_WALK_TILES_PER_S below) - this
+ *  constant is now entity-only, kept at its old value since wandering-NPC step cadence
+ *  (useWanderingNpcs.ts's STEP_INTERVAL_MS) is unchanged. */
 const GLIDE_MS = 220;
-/** Dash's own faster glide duration - matches useGridMovement.ts's dashStepIntervalMs (100ms
- *  default), the same "glide finishes exactly as the next step becomes available" reasoning as
- *  GLIDE_MS above, just at Dash's higher step rate. */
-const DASH_GLIDE_MS = 100;
+/** Continuous player movement speed, in tiles/second (not px/s - see the physics-coordinate-space
+ *  comment near VOID_TILE_INDEX for why: multiplying by `this.tileSize` each frame keeps speed
+ *  correct in game-world terms regardless of the current viewport zoom). Chosen to match the old
+ *  discrete model's own cadence (one tile every stepIntervalMs=220ms => ~4.5 tiles/s) as a feel-
+ *  neutral starting point - a real "does this feel right" pass is expected once this is
+ *  playtested, not a value to treat as final. */
+const WALK_SPEED_TILES_PER_S = 1000 / 220;
+/** Same starting-point reasoning as WALK_SPEED_TILES_PER_S, matching the old dashStepIntervalMs
+ *  (100ms/tile => 10 tiles/s). */
+const DASH_SPEED_TILES_PER_S = 1000 / 100;
+/** The player's Arcade Physics body footprint, as a fraction of its sprite's own frame size -
+ *  deliberately smaller than the full sprite (which includes head/torso that shouldn't collide)
+ *  and biased toward the feet, matching a typical top-down RPG's "shadow footprint" collision
+ *  convention. Tuned by eye against the actual sprite art once played, not derived from anything -
+ *  flagged in the plan as an explicit follow-up tuning pass, not a value to treat as final. */
+const PLAYER_BODY_WIDTH_RATIO = 0.5;
+const PLAYER_BODY_HEIGHT_RATIO = 0.3;
+/** Same "shadow footprint" idea as PLAYER_BODY_WIDTH/HEIGHT_RATIO, applied to any entity with
+ *  `blocksMovement: true` (NPCs, chests, shrines, decor - see GridEntity's own doc comment). Not
+ *  reusing the player's own ratio constants directly despite the identical values - these are
+ *  conceptually a different tuning knob (entity art proportions won't always match the player's),
+ *  they just happen to start at the same starting-point numbers. */
+const ENTITY_BODY_WIDTH_RATIO = 0.5;
+const ENTITY_BODY_HEIGHT_RATIO = 0.3;
+/** How close (in tiles) the player must be to a field-encounter icon to trigger it - see
+ *  checkFieldEncounterProximity. Roughly "standing on or immediately adjacent to it," matching the
+ *  old discrete model's "landed on this exact tile" trigger closely enough to feel the same,
+ *  without needing an exact-tile match now that position is continuous. */
+const FIELD_ENCOUNTER_PROXIMITY_RADIUS_TILES = 0.6;
+/** Directional interaction probe (queryInteraction) - a rectangle extending out from the player's
+ *  body edge in the current facing direction, replacing the old discrete model's "check the exact
+ *  tile one step ahead" targeting. LENGTH deliberately less than a full tile ("genuinely adjacent,"
+ *  not "anywhere in the next tile"); WIDTH deliberately less than a full tile too, so a diagonally-
+ *  adjacent object (one tile over AND up) doesn't fall inside the probe just because it's close -
+ *  interaction should still require roughly facing the thing, not just being near it. Starting
+ *  points, not final - tune by feel once played (see the plan's own open-items note on this). */
+const INTERACTION_PROBE_LENGTH_TILES = 0.6;
+const INTERACTION_PROBE_WIDTH_TILES = 0.7;
+/** How often (ms) the physics-driven player position is reported back to React (see
+ *  flushPositionUpdate) - throttled well below the 60fps physics tick since HUD/minimap/heartbeat
+ *  consumers don't need a re-render every frame; ~15Hz is imperceptibly different from per-frame
+ *  for anything reading it, at a fraction of the render cost. */
+const POSITION_FLUSH_INTERVAL_MS = 66;
 /** Always renders above every tile layer and every entity/player sprite - same as the old DOM
  *  renderer's document order (overhang divs are always painted last). */
 const OVERHANG_DEPTH = 1000;
@@ -77,6 +117,32 @@ const DASH_DUST_COLOR = 0xb8a888;
  *  see spawnDashDust's textures.exists guard for the (rare) fallback path. */
 const DASH_DUST_FX_ASSET_ID = 'fx.smoke-puff';
 
+/** Movement/collision migration to Arcade Physics (see docs/plan) - Physics geometry lives in the
+ *  SAME render/viewport-scaled coordinate space every sprite and tile layer already uses (`x *
+ *  this.tileSize`), not Tiled's native pixel space. Arcade colliders check overlapping *world*
+ *  AABBs, and Phaser's own tilemap-collision system reads a layer's live world bounds through its
+ *  own scale/position - so a physics body has to share that same scaled frame to align with it at
+ *  all, rather than introducing a second, parallel coordinate system alongside the one already in
+ *  use everywhere else in this file. `CollisionRect`/`MapObject.pixelX/Y/W/H` (native Tiled pixels)
+ *  are converted to this scaled space with `* this.viewportScale` wherever a body/debug rect is
+ *  built. This is scale-invariant for the one thing that actually needs to be resize-safe (the
+ *  tile-float `GridPosition` reported back to React - see setPlayer/Phase 2): px / tileSize is the
+ *  same ratio whether px and tileSize are both native or both scaled. */
+
+/** Reserved tile index for the synthetic "void" tile placed at every empty (gid<=0) ground cell -
+ *  see loadMap's void-tile-fill step. Deliberately far above any real map's tile-id range (every
+ *  map's total tile count today is a few hundred at most) so it can never collide with a real
+ *  tileset's own firstgid..firstgid+tilecount-1 span, without needing to compute the actual max
+ *  gid in use (this game's internal TileMap model doesn't carry each tileset's tilecount, only its
+ *  own tiles' individual walkable properties). Phaser resolves a tile index to its owning tileset
+ *  by range lookup, not by allocating an array sized to the index itself, so a large constant here
+ *  doesn't cost memory proportional to its value. */
+const VOID_TILE_INDEX = 100_000;
+
+function voidTileTextureKey(tileWidth: number, tileHeight: number): string {
+  return `void-tile-texture-${tileWidth}x${tileHeight}`;
+}
+
 /** Texture-cache key for a tileset's map-grid-scaled copy - see loadMap's tileset pre-scaling
  *  step. Namespaced by target size (not just the source asset id) so the same tileset loaded for
  *  two different maps with different grid sizes wouldn't collide on one cached texture. */
@@ -102,13 +168,25 @@ interface EntityVisual {
   spriteAssetId: string;
   label?: Phaser.GameObjects.Text;
   badge?: Phaser.GameObjects.Text;
+  /** Mirrors GridEntity.interactionKind - set once at creation (see upsertEntity), read by
+   *  queryInteraction to find nearby NPCs/other players. Undefined for every other entity kind
+   *  (building/exit markers, field-encounter icons, decor/shrine - the latter are looked up via
+   *  currentMapObjects directly instead, since they're static MapObjects with their own refId). */
+  interactionKind?: 'npc' | 'presence';
 }
 
 /** The one generic exploration-rendering Phaser Scene - loaded once per Game instance, reused
  *  across every location (mirrors useLocationExploration.ts's "one hook, many locations" shape,
- *  not "one Scene per location"). Every method here is called imperatively by
- *  PhaserExplorationCanvas.tsx in response to prop changes - this scene owns no game logic
- *  (collision, spawn, transitions) at all, that all stays in the existing React hooks. */
+ *  not "one Scene per location"). Most methods here are still called imperatively by
+ *  PhaserExplorationCanvas.tsx in response to React prop changes (spawn placement, entity/UI-
+ *  driven state, camera/viewport) - but movement itself is a deliberate exception: player velocity,
+ *  Arcade Physics collision (ground/collision-rects/NPCs/interactables), zone/transition overlap
+ *  detection, and the directional interaction probe (queryInteraction) all live HERE, in Phaser's
+ *  own per-frame update loop, not in a React hook - Arcade Physics has to run inside that loop to
+ *  work at all (see update()/syncAfterPhysicsStep()'s own comments for the exact timing). React
+ *  still owns everything the physics *triggers* the meaning of: server calls, dialogue/quest/
+ *  inventory state, UI - see useLocationExploration.ts's handleTransitionEnter for where that
+ *  boundary sits concretely. */
 export class ExplorationScene extends Phaser.Scene {
   private tileSize = 48;
   /** tileSize ÷ the map's own native tile pixel size (map.tileWidth) - the actual current viewport
@@ -121,6 +199,83 @@ export class ExplorationScene extends Phaser.Scene {
    *  setPlayer call so a location transition snaps the player to the new spawn point instantly
    *  instead of gliding from the previous map's pixel coordinates. */
   private mapJustChanged = false;
+
+  /** The `ground` tile layer specifically (a subset of mapLayers) - captured separately so
+   *  setCollision/the Arcade tilemap collider can target it without re-searching mapLayers by
+   *  name every time. Rebuilt alongside mapLayers on every real location swap; null for a map
+   *  with no ground layer at all (shouldn't happen for a real map, but loadMap already tolerates
+   *  it via orderedLayers' `.filter((l): l is TileLayer => !!l)`). */
+  private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
+  /** One static Arcade body per `collisions`-layer rectangle from the current map, in render-
+   *  scaled space (see the module-level comment on physics coordinate space above). Rebuilt
+   *  alongside mapLayers on every real location swap. No collider is registered against the
+   *  player yet (Phase 1 is geometry-only, inspectable via the debug overlay) - see Phase 2. */
+  private collisionStaticGroup: Phaser.Physics.Arcade.StaticGroup | null = null;
+  /** Raw collision rectangles/map objects for the current map, kept only for the debug overlay's
+   *  per-frame redraw (drawn from data directly, not from live body state, since object-footprint
+   *  bodies aren't built until Phase 3). */
+  private currentCollisionRects: CollisionRect[] = [];
+  private currentMapObjects: MapObject[] = [];
+  private debugGraphics: Phaser.GameObjects.Graphics | null = null;
+  private debugEnabled = false;
+  /** Re-registered (destroy old, create new) every time groundLayer/collisionStaticGroup are
+   *  rebuilt (a real location swap) - see registerPlayerColliders. Null until the player sprite
+   *  and at least one of those two exist. */
+  private playerGroundCollider: Phaser.Physics.Arcade.Collider | null = null;
+  private playerRectCollider: Phaser.Physics.Arcade.Collider | null = null;
+  private playerEntityCollider: Phaser.Physics.Arcade.Collider | null = null;
+  /** Every entity sprite with `blocksMovement: true` (NPCs, chests, shrines, decor - see
+   *  GridEntity's own doc comment) gets a dynamic Arcade body added to this ONE shared group in
+   *  upsertEntity - created once in create() (not per-map, unlike collisionStaticGroup) since
+   *  Phaser Groups auto-remove a member the instant its GameObject is destroyed (standard Group
+   *  behavior - listens for each member's own DESTROY event), so setEntities' existing per-location
+   *  destroy-stale-entities loop already keeps this group's membership correct with no extra
+   *  bookkeeping needed here. A body's position is NOT driven by physics velocity - NPCs move via
+   *  the tween in upsertEntity's own reposition code, and Arcade re-derives a dynamic body's
+   *  position from its GameObject's transform every step regardless of what moved it, so the
+   *  collider still sees each entity's real, current (possibly tweening) position. */
+  private entityCollisionGroup: Phaser.Physics.Arcade.Group | null = null;
+
+  /** Shared input-state ref (see useMovementInput.ts) that updatePlayerPhysics reads every frame -
+   *  bound once by PhaserExplorationCanvas via bindInput, not passed per-call, since it's a stable
+   *  ref object for the life of the exploration session. */
+  private inputRef: { current: MovementInputState } | null = null;
+  /** True while an overlay (dialogue, menus, shop, ...) is open - movement/dash input is ignored
+   *  but depth-sort/debug drawing continue normally. Set via setSuspended. */
+  private suspended = false;
+  /** The player's current facing, derived from velocity every frame (see updatePlayerPhysics) -
+   *  persists at its last value while stationary, same as the old discrete model's `facing`. */
+  private facing: Facing = 'down';
+  private onPositionChange?: (pos: GridPosition, movementState: MovementState) => void;
+  private positionFlushAccumulatorMs = 0;
+  private lastDashDustAtMs = 0;
+  /** Set every update() (pre-physics-step), read by syncAfterPhysicsStep (post-physics-step) -
+   *  see that method's own comment for why movementState itself is computed in update() (it
+   *  doesn't depend on the sprite's resolved position) while everything that USES it to touch
+   *  sprite.x/y-derived state has to happen later. */
+  private currentMovementState: MovementState = 'idle';
+
+  /** Leading-edge overlap tracking for zone/transition objects - keyed by object REFERENCE, not
+   *  refId (two distinct transition tiles can legitimately share the same target-location refId,
+   *  e.g. two separate doors into the same building; keying by refId could then have one tile's
+   *  "not overlapping" state clobber another's "overlapping" state within the same frame's loop -
+   *  object identity has no such collision). Cleared on every real location swap (loadMap) since
+   *  `currentMapObjects` itself gets replaced with a new array then. */
+  private zoneOverlapState = new Map<MapObject, boolean>();
+  private transitionOverlapState = new Map<MapObject, boolean>();
+  /** Which `currentMapKey` the overlap-state maps above were last primed for (see
+   *  checkZoneAndTransitionOverlaps/primeOverlapState) - null means "not primed for the current
+   *  map yet," which is also what loadMap resets it to on every real swap. */
+  private overlapStatePrimedForMapKey: string | null = null;
+  private onZoneEnter?: (refId: string) => void;
+  private onTransitionEnter?: (obj: MapObject) => void;
+  /** Tile-int positions (matching GridEntity's own convention) - set via setFieldEncounterIcons,
+   *  checked for player proximity every frame in checkFieldEncounterProximity. Keyed by id (already
+   *  unique/time-stamped by the caller - see useFieldEncounters.ts) rather than object reference
+   *  since the caller passes a fresh array every render. */
+  private fieldEncounterIcons: { id: string; x: number; y: number }[] = [];
+  private fieldEncounterOverlapState = new Map<string, boolean>();
+  private onFieldEncounterNear?: (icon: { id: string; x: number; y: number }) => void;
 
   private playerSprite: Phaser.GameObjects.Sprite | null = null;
   private playerTextureKey: string | null = null;
@@ -164,7 +319,72 @@ export class ExplorationScene extends Phaser.Scene {
     // Fire-and-forget: spawnDashDust checks textures.exists before using this, falling back to the
     // dot texture on the rare chance a dash is triggered before this finishes loading.
     loadSceneTexture(this, DASH_DUST_FX_ASSET_ID).catch(() => {});
+    this.physics.world.gravity.set(0, 0);
+    // Created once (not per-map) - see its own field doc comment for why membership doesn't need
+    // manual per-location bookkeeping.
+    this.entityCollisionGroup = this.physics.add.group();
+    // Always above everything, including overhang layers - collision/interaction geometry needs
+    // to stay visible over a tree canopy, not get hidden under it.
+    this.debugGraphics = this.add.graphics().setDepth(OVERHANG_DEPTH + 100);
+    // Registered here (not in the constructor - `this.events` doesn't exist until boot completes,
+    // same reasoning as the onReady comment above) - see syncAfterPhysicsStep's own comment for
+    // why this has to run on POST_UPDATE specifically, not update(). Safe to register unconditionally
+    // every create() call: ExplorationScene is a fresh instance per Phaser.Game (one Game per
+    // Town/Overworld/Dungeon mount - see PhaserExplorationCanvas.tsx), so there's never a prior
+    // listener on this same scene instance to duplicate.
+    this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.syncAfterPhysicsStep, this);
     this.onReady?.();
+  }
+
+  /** Toggles the collision/interaction-bounds debug overlay (player/entity bodies, collision-rect
+   *  static bodies, object footprints) - see update()'s drawDebugOverlay call. Zero per-frame cost
+   *  when disabled (drawDebugOverlay early-returns before touching debugGraphics). */
+  setDebugEnabled(enabled: boolean): void {
+    this.debugEnabled = enabled;
+    if (!enabled) this.debugGraphics?.clear();
+  }
+
+  /** Binds the shared input-state ref (see useMovementInput.ts) that updatePlayerPhysics reads
+   *  every frame - called once by PhaserExplorationCanvas, not per-render, since the ref object
+   *  itself is stable for the life of the exploration session. */
+  bindInput(inputRef: { current: MovementInputState }): void {
+    this.inputRef = inputRef;
+  }
+
+  /** While true, movement/dash input is ignored (an overlay is open) - depth-sort and the debug
+   *  overlay keep running normally. */
+  setSuspended(suspended: boolean): void {
+    this.suspended = suspended;
+  }
+
+  /** Registered once by PhaserExplorationCanvas - see flushPositionUpdate for the throttling. */
+  setPositionCallback(cb: (pos: GridPosition, movementState: MovementState) => void): void {
+    this.onPositionChange = cb;
+  }
+
+  /** Registered once by PhaserExplorationCanvas - fires once per real entry into a `zone` object's
+   *  rectangle (leading edge only, see zoneOverlapState/checkZoneAndTransitionOverlaps). */
+  setZoneEnterCallback(cb: (refId: string) => void): void {
+    this.onZoneEnter = cb;
+  }
+
+  /** Registered once by PhaserExplorationCanvas - fires once per real entry onto a `transition`
+   *  object's rectangle (leading edge only, same mechanism as setZoneEnterCallback). */
+  setTransitionEnterCallback(cb: (obj: MapObject) => void): void {
+    this.onTransitionEnter = cb;
+  }
+
+  /** Called by PhaserExplorationCanvas whenever the live field-encounter icon list changes (see
+   *  useFieldEncounters.ts) - tile-int positions, same convention as GridEntity. */
+  setFieldEncounterIcons(icons: { id: string; x: number; y: number }[]): void {
+    this.fieldEncounterIcons = icons;
+  }
+
+  /** Registered once by PhaserExplorationCanvas - fires once per real approach within
+   *  FIELD_ENCOUNTER_PROXIMITY_RADIUS_TILES of an icon (leading edge, see
+   *  fieldEncounterOverlapState/checkFieldEncounterProximity). */
+  setFieldEncounterNearCallback(cb: (icon: { id: string; x: number; y: number }) => void): void {
+    this.onFieldEncounterNear = cb;
   }
 
   /** Y-sort depth for a sprite at pixel-space `y` - see ENTITY_DEPTH's own comment for why this
@@ -174,20 +394,410 @@ export class ExplorationScene extends Phaser.Scene {
     return ENTITY_DEPTH + Math.min(y / ENTITY_Y_SORT_DIVISOR, ENTITY_Y_SORT_MAX_OFFSET);
   }
 
-  /** Re-sorts every entity (and the player) by their current on-screen Y every frame, including
-   *  mid-glide-tween - a purely static per-sprite depth (the old behavior) meant two entities'
-   *  relative front/back order never changed after creation regardless of where either one moved,
-   *  which is what let a stationary interactable end up permanently in front of the player. */
-  update(): void {
-    if (this.playerSprite) {
-      const playerDepth = this.depthForY(this.playerSprite.y);
-      this.playerSprite.setDepth(playerDepth);
+  /** Reads the shared input ref and drives the player's Arcade body velocity every frame - the
+   *  actual "continuous, Arcade-Physics-driven movement" this migration exists for. Deliberately
+   *  does NOT touch `playerSprite.x/y` or anything derived from it (depth-sort, equipment-layer
+   *  mirroring, the throttled React position report) - see syncAfterPhysicsStep's own comment for
+   *  why that has to happen in a separate, later hook instead of here. */
+  update(_time: number, _delta: number): void {
+    const sprite = this.playerSprite;
+    if (!sprite || !sprite.body) return;
+    const body = sprite.body as Phaser.Physics.Arcade.Body;
+
+    const input = !this.suspended && this.inputRef ? this.inputRef.current : null;
+    let dx = 0;
+    let dy = 0;
+    if (input) {
+      if (input.left) dx -= 1;
+      if (input.right) dx += 1;
+      if (input.up) dy -= 1;
+      if (input.down) dy += 1;
+    }
+    const dashHeld = input?.dashHeld ?? false;
+
+    // Dash with no directional input held runs in the last-faced direction - mirrors the old
+    // discrete model's mobile UX (MobileHud's Dash button has no directional companion of its
+    // own on a touchscreen with no keyboard - see that file's doc comment).
+    if (dashHeld && dx === 0 && dy === 0) {
+      const delta2 = FACING_TO_DELTA[this.facing];
+      dx = delta2.dx;
+      dy = delta2.dy;
+    }
+
+    if (dx !== 0 && dy !== 0) {
+      dx *= Math.SQRT1_2;
+      dy *= Math.SQRT1_2;
+    }
+
+    const speedTilesPerSec = dashHeld ? DASH_SPEED_TILES_PER_S : WALK_SPEED_TILES_PER_S;
+    const speedPxPerSec = speedTilesPerSec * this.tileSize;
+    body.setVelocity(dx * speedPxPerSec, dy * speedPxPerSec);
+
+    if (dx !== 0 || dy !== 0) {
+      this.facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
+    }
+    this.currentMovementState = dx === 0 && dy === 0 ? 'idle' : dashHeld ? 'running' : 'walking';
+
+    this.applyPlayerAnimation(this.currentMovementState);
+  }
+
+  /** Runs after Arcade Physics has fully resolved this frame's movement/collisions AND already
+   *  written the result back into playerSprite.x/y - everything here that reads playerSprite.x/y
+   *  has to run at this point, not from update() above. Phaser's own per-frame Scene event order
+   *  is PRE_UPDATE -> UPDATE (world.update: computes body.position, does NOT touch the GameObject
+   *  yet) -> the scene's own update() (where velocity gets set, above) -> POST_UPDATE
+   *  (world.postUpdate -> Body.postUpdate: THIS is what actually copies body.position into
+   *  playerSprite.x/y - see node_modules/phaser/src/physics/arcade/Body.js's own postUpdate doc
+   *  comment: "Feeds the Body results back into the parent Game Object"). Reading
+   *  playerSprite.x/y from inside update() therefore returns the PREVIOUS frame's resolved
+   *  position, one full frame stale - which is exactly what made every equipment layer (mirrored
+   *  from that stale read) visibly trail behind the base sprite while moving, and disappear the
+   *  instant movement stopped (once velocity is 0, position stops changing frame to frame, so
+   *  "stale" and "current" happen to read the same value) - reported live and confirmed by
+   *  reading Phaser's own source, not just guessed at. Registered once, in create(), via
+   *  `this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.syncAfterPhysicsStep, this)` - the
+   *  Arcade Physics plugin registers its own POST_UPDATE listener (world.postUpdate) during scene
+   *  boot, before create() ever runs (see ArcadePhysics.start()), so ours is guaranteed to fire
+   *  second on every frame, after the GameObject sync has already happened. */
+  private syncAfterPhysicsStep(_time: number, delta: number): void {
+    const sprite = this.playerSprite;
+    if (sprite) {
+      for (const [, visual] of this.equipmentLayerSprites) {
+        visual.sprite.setPosition(sprite.x, sprite.y);
+      }
+      const playerDepth = this.depthForY(sprite.y);
+      sprite.setDepth(playerDepth);
       for (const [slot, visual] of this.equipmentLayerSprites) {
         visual.sprite.setDepth(playerDepth + (EQUIPMENT_LAYER_DEPTH_OFFSET[slot] ?? 0.5));
       }
+      if (this.currentMovementState === 'running' && this.time.now - this.lastDashDustAtMs > 150) {
+        this.lastDashDustAtMs = this.time.now;
+        this.spawnDashDust(sprite.x, sprite.y);
+      }
+      this.flushPositionUpdate(delta, this.currentMovementState);
+      this.checkZoneAndTransitionOverlaps();
+      this.checkFieldEncounterProximity();
     }
     for (const visual of this.entityVisuals.values()) {
       visual.sprite.setDepth(this.depthForY(visual.sprite.y));
+    }
+    this.drawDebugOverlay();
+  }
+
+  /** Native-pixel object rect, scaled to render space, tested against the player's current Arcade
+   *  body bounds - shared by checkZoneAndTransitionOverlaps and primeOverlapState so the "is this
+   *  object currently overlapped" math can't drift between the two call sites. */
+  private isOverlappingPlayer(obj: MapObject, body: Phaser.Physics.Arcade.Body): boolean {
+    const rx = obj.pixelX * this.viewportScale;
+    const ry = obj.pixelY * this.viewportScale;
+    const rw = obj.pixelWidth * this.viewportScale;
+    const rh = obj.pixelHeight * this.viewportScale;
+    return body.x < rx + rw && body.x + body.width > rx && body.y < ry + rh && body.y + body.height > ry;
+  }
+
+  /** Leading-edge zone/transition entry, replacing the old discrete model's "compare this step's
+   *  landed tile against the previous one" check (see useLocationExploration.ts's git history) -
+   *  same idea, just driven by a real per-frame rectangle overlap against the player's Arcade body
+   *  instead of a once-per-discrete-step tile comparison. Only fires on the frame overlap starts,
+   *  not on every frame spent inside (zoneOverlapState/transitionOverlapState track "was this
+   *  object being overlapped last frame" - see their own doc comment for why they're keyed by
+   *  object reference, not refId). */
+  private checkZoneAndTransitionOverlaps(): void {
+    const sprite = this.playerSprite;
+    if (!sprite || !sprite.body) return;
+    const body = sprite.body as Phaser.Physics.Arcade.Body;
+    // loadMap and setPlayer are two independent async chains (separate React effects racing their
+    // own texture loads) - by the time THIS first runs after a real map swap, either one could have
+    // finished first. Priming lazily here, keyed by currentMapKey (only reset when a swap actually
+    // completes on the loadMap side - see loadMap's own currentMapObjects assignment), fires
+    // exactly once per real swap regardless of which side won the race, rather than trying to prime
+    // from a single call site and risking currentMapObjects still referencing the PREVIOUS
+    // location's objects if setPlayer happened to resolve first. See primeOverlapState's own
+    // comment for what "priming" prevents (spawning directly on a transition/zone tile re-firing it
+    // immediately - confirmed live, the same bug class the old rounded-tile bridge had).
+    if (this.overlapStatePrimedForMapKey !== this.currentMapKey) {
+      this.primeOverlapState();
+      this.overlapStatePrimedForMapKey = this.currentMapKey;
+    }
+    for (const obj of this.currentMapObjects) {
+      if ((obj.type !== 'zone' && obj.type !== 'transition') || !obj.refId) continue;
+      const overlapping = this.isOverlappingPlayer(obj, body);
+      const state = obj.type === 'zone' ? this.zoneOverlapState : this.transitionOverlapState;
+      const wasOverlapping = state.get(obj) ?? false;
+      state.set(obj, overlapping);
+      if (overlapping && !wasOverlapping) {
+        if (obj.type === 'zone') this.onZoneEnter?.(obj.refId);
+        else this.onTransitionEnter?.(obj);
+      }
+    }
+  }
+
+  /** Seeds zone/transition overlap state to reflect wherever the player is RIGHT NOW, without
+   *  firing any callback - called lazily by checkZoneAndTransitionOverlaps (see its own comment
+   *  for why lazily, not from a single fixed call site) the first time it runs against a given
+   *  map. Without this, an interior's exit door spawns the player back on top of the very
+   *  transition tile that leads back into it, and loadMap's own state.clear() would otherwise
+   *  leave that read as "wasn't overlapping a moment ago" on the very first real check -
+   *  immediately re-entering the transition and bouncing between the two locations before
+   *  anything settles. This is the exact same failure mode the OLD rounded-tile bridge had (fixed
+   *  there by suppressing the first post-spawn tile evaluation) - the equivalent fix for a real
+   *  per-frame overlap check is priming "already known to be overlapping" instead of skipping a
+   *  check outright, since skipping isn't an option here (this runs continuously, not once). */
+  private primeOverlapState(): void {
+    const sprite = this.playerSprite;
+    if (!sprite || !sprite.body) return;
+    const body = sprite.body as Phaser.Physics.Arcade.Body;
+    for (const obj of this.currentMapObjects) {
+      if ((obj.type !== 'zone' && obj.type !== 'transition') || !obj.refId) continue;
+      const state = obj.type === 'zone' ? this.zoneOverlapState : this.transitionOverlapState;
+      state.set(obj, this.isOverlappingPlayer(obj, body));
+    }
+  }
+
+  /** Leading-edge proximity trigger for field-encounter icons - replaces the old discrete model's
+   *  "landed exactly on this tile" match (see useFieldEncounters.ts's consumeAt, still keyed by the
+   *  icon's own exact tile coordinates - only how it gets CALLED changed, not its own contract).
+   *  Distance-based rather than a rectangle overlap since an icon has no real "footprint" of its
+   *  own the way a zone/transition does - it's a marker at a point. */
+  private checkFieldEncounterProximity(): void {
+    const sprite = this.playerSprite;
+    if (!sprite || !this.onFieldEncounterNear) return;
+    const radiusPx = FIELD_ENCOUNTER_PROXIMITY_RADIUS_TILES * this.tileSize;
+    const seenIds = new Set<string>();
+    for (const icon of this.fieldEncounterIcons) {
+      seenIds.add(icon.id);
+      const iconX = icon.x * this.tileSize + this.tileSize / 2;
+      const iconY = icon.y * this.tileSize + this.tileSize;
+      const dx = sprite.x - iconX;
+      const dy = sprite.y - iconY;
+      const near = dx * dx + dy * dy <= radiusPx * radiusPx;
+      const wasNear = this.fieldEncounterOverlapState.get(icon.id) ?? false;
+      this.fieldEncounterOverlapState.set(icon.id, near);
+      if (near && !wasNear) this.onFieldEncounterNear(icon);
+    }
+    // Drop tracking for any icon no longer in the live list (consumed/respawned elsewhere) so a
+    // reused id can't inherit a stale "was near" flag - ids are already time-stamped/unique in
+    // practice (see useFieldEncounters.ts), but this costs nothing and removes the assumption.
+    for (const id of this.fieldEncounterOverlapState.keys()) {
+      if (!seenIds.has(id)) this.fieldEncounterOverlapState.delete(id);
+    }
+  }
+
+  private static rectsOverlap(
+    a: { x: number; y: number; width: number; height: number },
+    b: { x: number; y: number; width: number; height: number },
+  ): boolean {
+    return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+  }
+
+  /** A MapObject's native-pixel footprint, scaled to render space - same conversion used
+   *  throughout this file (drawDebugOverlay, checkZoneAndTransitionOverlaps). */
+  private objectRect(obj: MapObject): { x: number; y: number; width: number; height: number } {
+    return {
+      x: obj.pixelX * this.viewportScale,
+      y: obj.pixelY * this.viewportScale,
+      width: obj.pixelWidth * this.viewportScale,
+      height: obj.pixelHeight * this.viewportScale,
+    };
+  }
+
+  /** An entity sprite's approximate footprint for interaction purposes - entities (NPCs, other
+   *  players) don't carry a real pixel footprint the way MapObjects do, so this reuses the same
+   *  "shadow footprint" ratio the entity's own collision body would use if it had one (see
+   *  ENTITY_BODY_WIDTH/HEIGHT_RATIO), computed directly from the sprite's current displayed size/
+   *  position rather than requiring an actual Arcade body - a presence (other player) entity never
+   *  gets one (see GridEntity.blocksMovement's own doc comment), so this has to work without it. */
+  private entityInteractionRect(sprite: Phaser.GameObjects.Sprite): { x: number; y: number; width: number; height: number } {
+    const w = sprite.width * sprite.scaleX * ENTITY_BODY_WIDTH_RATIO;
+    const h = sprite.height * sprite.scaleY * ENTITY_BODY_HEIGHT_RATIO;
+    // Feet-anchor origin (0.5, 1) - same convention as every sprite in this file.
+    return { x: sprite.x - w / 2, y: sprite.y - h, width: w, height: h };
+  }
+
+  /** The directional interaction probe rectangle, extending out from the player's body edge in the
+   *  current facing direction - see INTERACTION_PROBE_LENGTH/WIDTH_TILES' own comment. */
+  private interactionProbeRect(body: Phaser.Physics.Arcade.Body): { x: number; y: number; width: number; height: number } {
+    const lengthPx = INTERACTION_PROBE_LENGTH_TILES * this.tileSize;
+    const widthPx = INTERACTION_PROBE_WIDTH_TILES * this.tileSize;
+    const centerX = body.x + body.width / 2;
+    const centerY = body.y + body.height / 2;
+    switch (this.facing) {
+      case 'up':
+        return { x: centerX - widthPx / 2, y: body.y - lengthPx, width: widthPx, height: lengthPx };
+      case 'down':
+        return { x: centerX - widthPx / 2, y: body.y + body.height, width: widthPx, height: lengthPx };
+      case 'left':
+        return { x: body.x - lengthPx, y: centerY - widthPx / 2, width: lengthPx, height: widthPx };
+      case 'right':
+        return { x: body.x + body.width, y: centerY - widthPx / 2, width: lengthPx, height: widthPx };
+    }
+  }
+
+  /** Finds whatever the player is currently facing and genuinely adjacent to - replaces the old
+   *  discrete model's "check the exact tile one step ahead of the player" targeting (see
+   *  TownScene.tsx/OverworldScene.tsx/DungeonScene.tsx's attemptInteract, all three identical) with
+   *  a real pixel-space probe rectangle. Checked in the same priority order the old per-scene code
+   *  used (NPC, then another player, then a static interactable) so an NPC standing next to a chest
+   *  still resolves to talking, not looting. Returns the SAME kind of identifier each caller already
+   *  knows how to look its own data up by: an npc/interactable's `refId`, or a presence entity's own
+   *  GridEntity `id` (e.g. `player-<uid>`, so the caller can match it back to a live presence doc
+   *  exactly the way it already does for rendering). */
+  queryInteraction(): { kind: 'npc' | 'presence' | 'interactable'; id: string } | null {
+    const sprite = this.playerSprite;
+    if (!sprite || !sprite.body) return null;
+    const body = sprite.body as Phaser.Physics.Arcade.Body;
+    const probe = this.interactionProbeRect(body);
+
+    for (const [id, visual] of this.entityVisuals) {
+      if (visual.interactionKind !== 'npc') continue;
+      if (ExplorationScene.rectsOverlap(probe, this.entityInteractionRect(visual.sprite))) {
+        return { kind: 'npc', id };
+      }
+    }
+    for (const [id, visual] of this.entityVisuals) {
+      if (visual.interactionKind !== 'presence') continue;
+      if (ExplorationScene.rectsOverlap(probe, this.entityInteractionRect(visual.sprite))) {
+        return { kind: 'presence', id };
+      }
+    }
+    for (const obj of this.currentMapObjects) {
+      if (obj.type !== 'interactable' || !obj.refId) continue;
+      if (ExplorationScene.rectsOverlap(probe, this.objectRect(obj))) {
+        return { kind: 'interactable', id: obj.refId };
+      }
+    }
+    return null;
+  }
+
+  /** Plays/stops the base sprite's (and every equipment layer's) walk/run animation, or pins the
+   *  idle frame - driven every frame by the Scene's own live facing/movementState now, not passed
+   *  in from React (see setPlayer's own comment: React's copy of these is a throttled ~15Hz
+   *  mirror, too stale to drive per-frame animation switching cleanly). */
+  private applyPlayerAnimation(movementState: MovementState): void {
+    const sprite = this.playerSprite;
+    if (!sprite || !this.playerTextureKey) return;
+    const idleFrame = resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, this.facing) * PLAYER_ANIMATION_LAYOUT.frameCount;
+
+    if (getAssetDefinition(this.playerTextureKey).frameSize) {
+      if (movementState === 'walking' || movementState === 'running') {
+        const key = animationKey(this.playerTextureKey, movementState, this.facing);
+        if (!sprite.anims.isPlaying || sprite.anims.currentAnim?.key !== key) sprite.play(key);
+      } else {
+        sprite.anims.stop();
+        sprite.setFrame(idleFrame);
+      }
+    }
+
+    // Every equipment layer must show the SAME limb frame as the base at all times. This does NOT
+    // give each layer its own independent Animation instance to play (an earlier version of this
+    // code did - see git history) - two separately-timed Animation objects (Phaser ties an
+    // animation's frame progress to the GameObject playing it, not to the animation key) staying
+    // in lockstep purely by each independently advancing at "the same" rate is fragile: a restart
+    // resynced them at that instant, but any later edge case (a layer created/equipped mid-cycle,
+    // a second restart landing a tick apart, etc.) could knock them back out of phase with no way
+    // to self-correct - reported live as a persistent frame-off look, most visible on legs/limb-
+    // heavy layers, even after the base-vs-layer *position* bug was separately fixed. Instead,
+    // every layer directly mirrors the base's own CURRENT texture frame every tick - every layer
+    // sheet shares the base's exact row/frameCount/frame-numbering layout (see docs/Equipment-
+    // Layering-Plan.md), so the base's own frame name/index applies unchanged to any layer's own
+    // spritesheet. This is a pixel-perfect copy each frame, not two clocks hoping to agree - there
+    // is nothing left to drift out of sync.
+    for (const visual of this.equipmentLayerSprites.values()) {
+      if (!getAssetDefinition(visual.spriteAssetId).frameSize) continue;
+      if (visual.sprite.anims.isPlaying) visual.sprite.anims.stop();
+      visual.sprite.setFrame(movementState === 'walking' || movementState === 'running' ? sprite.frame.name : idleFrame);
+    }
+  }
+
+  /** Reports the physics-driven player position back to React, throttled to
+   *  POSITION_FLUSH_INTERVAL_MS (see its own comment) - converts the sprite's render-scaled pixel
+   *  position back to a fractional tile GridPosition using the exact inverse of setPlayer's own
+   *  spawn-placement formula (`pos.x * tileSize + tileSize/2` / `pos.y * tileSize + tileSize`), so
+   *  a stationary player's reported position round-trips to the same integer it was placed at. */
+  private flushPositionUpdate(delta: number, movementState: MovementState): void {
+    const sprite = this.playerSprite;
+    if (!sprite || !this.onPositionChange) return;
+    this.positionFlushAccumulatorMs += delta;
+    if (this.positionFlushAccumulatorMs < POSITION_FLUSH_INTERVAL_MS) return;
+    this.positionFlushAccumulatorMs = 0;
+    this.onPositionChange(
+      { x: sprite.x / this.tileSize - 0.5, y: sprite.y / this.tileSize - 1, facing: this.facing },
+      movementState,
+    );
+  }
+
+  /** (Re)registers the player-vs-level colliders - called once groundLayer/collisionStaticGroup
+   *  exist (end of loadMap's real-swap branch) and once the player sprite itself first exists (end
+   *  of setPlayer's first-creation branch), covering either possible ordering of those two async
+   *  calls. Destroys any prior collider first since loadMap rebuilds groundLayer/
+   *  collisionStaticGroup from scratch on every real location swap - a stale collider would still
+   *  reference the just-destroyed previous map's layer/group. */
+  private registerPlayerColliders(): void {
+    if (!this.playerSprite) return;
+    this.playerGroundCollider?.destroy();
+    this.playerGroundCollider = this.groundLayer ? this.physics.add.collider(this.playerSprite, this.groundLayer) : null;
+    this.playerRectCollider?.destroy();
+    this.playerRectCollider = this.collisionStaticGroup
+      ? this.physics.add.collider(this.playerSprite, this.collisionStaticGroup)
+      : null;
+    this.playerEntityCollider?.destroy();
+    this.playerEntityCollider = this.entityCollisionGroup
+      ? this.physics.add.collider(this.playerSprite, this.entityCollisionGroup)
+      : null;
+  }
+
+  /** Collision/interaction-bounds overlay, toggled via F9 (see PhaserExplorationCanvas.tsx) - draws
+   *  every piece of geometry this file's movement/collision/interaction code actually uses, in the
+   *  same render-scaled space everything else here uses (see the physics-coordinate-space comment
+   *  near VOID_TILE_INDEX), so it can be eyeballed directly against the real map art:
+   *  - orange: ground tiles Arcade considers solid (walls, water, void-filled empty cells)
+   *  - red: `collisions`-layer static bodies (fences, rocks, ledges)
+   *  - cyan: every MapObject's native-pixel footprint (zones, transitions, npc/interactable points)
+   *  - yellow: live entity collision bodies (NPCs, interactable entities - entityCollisionGroup)
+   *  - green: the player's own Arcade body
+   *  - magenta: the current directional interaction probe rectangle (queryInteraction) */
+  private drawDebugOverlay(): void {
+    const g = this.debugGraphics;
+    if (!g || !this.debugEnabled) return;
+    g.clear();
+    if (this.groundLayer) {
+      g.lineStyle(1, 0xff8800, 0.6);
+      this.groundLayer.forEachTile((tile) => {
+        if (!tile.collides) return;
+        g.strokeRect(tile.pixelX * this.viewportScale, tile.pixelY * this.viewportScale, tile.width * this.viewportScale, tile.height * this.viewportScale);
+      });
+    }
+    g.lineStyle(1, 0xff4444, 1);
+    for (const rect of this.currentCollisionRects) {
+      g.strokeRect(
+        rect.x * this.viewportScale,
+        rect.y * this.viewportScale,
+        rect.width * this.viewportScale,
+        rect.height * this.viewportScale,
+      );
+    }
+    g.lineStyle(1, 0x44ccff, 1);
+    for (const obj of this.currentMapObjects) {
+      g.strokeRect(
+        obj.pixelX * this.viewportScale,
+        obj.pixelY * this.viewportScale,
+        obj.pixelWidth * this.viewportScale,
+        obj.pixelHeight * this.viewportScale,
+      );
+    }
+    g.lineStyle(1, 0xffff44, 1);
+    for (const visual of this.entityVisuals.values()) {
+      if (!visual.sprite.body) continue;
+      const body = visual.sprite.body as Phaser.Physics.Arcade.Body;
+      g.strokeRect(body.x, body.y, body.width, body.height);
+    }
+    if (this.playerSprite?.body) {
+      const body = this.playerSprite.body as Phaser.Physics.Arcade.Body;
+      g.lineStyle(1, 0x66ff66, 1);
+      g.strokeRect(body.x, body.y, body.width, body.height);
+      g.lineStyle(1, 0xff44ff, 1);
+      const probe = this.interactionProbeRect(body);
+      g.strokeRect(probe.x, probe.y, probe.width, probe.height);
     }
   }
 
@@ -227,6 +837,15 @@ export class ExplorationScene extends Phaser.Scene {
     this.currentMapKey = map.locationId;
     for (const layer of this.mapLayers) layer.destroy();
     this.mapLayers = [];
+    this.groundLayer = null;
+    this.collisionStaticGroup?.clear(true, true);
+    this.collisionStaticGroup = null;
+    this.currentCollisionRects = map.collisionObjects;
+    this.currentMapObjects = map.objects;
+    this.zoneOverlapState.clear();
+    this.transitionOverlapState.clear();
+    this.fieldEncounterOverlapState.clear();
+    this.overlapStatePrimedForMapKey = null;
 
     // A tileset's own tile size can differ from the map's grid (e.g. a 32px prop sheet on a 16px-
     // grid map) - this project's tilesets are all configured in Tiled with "Tile Render Size: Map
@@ -303,11 +922,34 @@ export class ExplorationScene extends Phaser.Scene {
       return tilemap.addTilesetImage(t.assetId, key, tileWidth, tileHeight, 0, 0, t.firstgid - 1)!;
     });
 
+    // A synthetic, fully-transparent 1-tile "void" tileset covering every currently-empty (gid<=0)
+    // ground cell - see VOID_TILE_INDEX's own comment. Registered here (not create()) since it's
+    // sized to this map's own tile dimensions, which can differ per map.
+    const voidKey = voidTileTextureKey(map.tileWidth, map.tileHeight);
+    if (!this.textures.exists(voidKey)) {
+      const canvas = document.createElement('canvas');
+      canvas.width = map.tileWidth;
+      canvas.height = map.tileHeight;
+      this.textures.addCanvas(voidKey, canvas);
+    }
+    const voidTileset = tilemap.addTilesetImage('void-tile', voidKey, map.tileWidth, map.tileHeight, 0, 0, VOID_TILE_INDEX)!;
+    const tilesetsWithVoid = [...tilesets, voidTileset];
+
+    let groundPhaserLayer: Phaser.Tilemaps.TilemapLayer | null = null;
     orderedLayers.forEach((layer, index) => {
-      const phaserLayer = tilemap.createBlankLayer(layer.name, tilesets, 0, 0, map.width, map.height)!;
+      const isGround = layer.name === 'ground';
+      const phaserLayer = tilemap.createBlankLayer(layer.name, tilesetsWithVoid, 0, 0, map.width, map.height)!;
       layer.data.forEach((gid, i) => {
-        if (gid <= 0) return;
-        phaserLayer.putTileAt(gid - 1, i % map.width, Math.floor(i / map.width));
+        const tx = i % map.width;
+        const ty = Math.floor(i / map.width);
+        if (gid <= 0) {
+          // Only the ground layer needs a real (collidable) tile at an empty cell - an irregularly
+          // shaped map's missing edge tiles must still block movement, same as an explicit wall.
+          // Decoration/overhang layers have no collision concept, so they keep the old skip.
+          if (isGround) phaserLayer.putTileAt(VOID_TILE_INDEX, tx, ty);
+          return;
+        }
+        phaserLayer.putTileAt(gid - 1, tx, ty);
       });
       phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(this.viewportScale);
       const overhangMatch = /^overhang(?:-(\d+))?$/.exec(layer.name);
@@ -315,7 +957,30 @@ export class ExplorationScene extends Phaser.Scene {
       // decoration/entity layer (OVERHANG_DEPTH is already higher than any plausible decoration count).
       phaserLayer.setDepth(overhangMatch ? OVERHANG_DEPTH + Number(overhangMatch[1] ?? 0) : index);
       this.mapLayers.push(phaserLayer);
+      if (isGround) groundPhaserLayer = phaserLayer;
     });
+    this.groundLayer = groundPhaserLayer;
+
+    if (groundPhaserLayer) {
+      const nonWalkableIndices = map.nonWalkableTileIds.map((gid) => gid - 1);
+      (groundPhaserLayer as Phaser.Tilemaps.TilemapLayer).setCollision([VOID_TILE_INDEX, ...nonWalkableIndices]);
+    }
+
+    // One static Arcade body per Tiled 'collisions' rectangle, in render-scaled space (see the
+    // physics-coordinate-space comment near VOID_TILE_INDEX) - built now for the debug overlay to
+    // draw against real geometry; no collider is registered against the player until Phase 2.
+    this.collisionStaticGroup = this.physics.add.staticGroup();
+    for (const rect of map.collisionObjects) {
+      const zone = this.add.zone(
+        (rect.x + rect.width / 2) * this.viewportScale,
+        (rect.y + rect.height / 2) * this.viewportScale,
+        rect.width * this.viewportScale,
+        rect.height * this.viewportScale,
+      );
+      this.physics.add.existing(zone, true);
+      this.collisionStaticGroup.add(zone);
+    }
+    this.registerPlayerColliders();
   }
 
   /** Loads the texture (if not already loaded) and registers PLAYER_ANIMATION_LAYOUT's walk/run
@@ -345,16 +1010,22 @@ export class ExplorationScene extends Phaser.Scene {
     this.playerTextureKey = spriteAssetId;
   }
 
-  /** Positions/animates the player sprite - the player isn't part of `entities`, matching the old
-   *  TileGrid's own player-is-rendered-separately convention. `equipmentLayers` stacks one extra
-   *  sprite per equipped slot with layer art (see docs/Equipment-Layering-Plan.md), kept in
-   *  lockstep with the base sprite's own position/scale/animation every call - empty in practice
-   *  until real layer art exists. */
+  /** Creates (once) or updates the player's texture/equipment-layer sprites - the player isn't
+   *  part of `entities`, matching the old TileGrid's own player-is-rendered-separately convention.
+   *  Position is no longer driven from here on every call: since Arcade Physics owns the player's
+   *  frame-by-frame position now (see updatePlayerPhysics), `pos` is only consulted to (re)place
+   *  the physics body on first creation or on a real location transition (`snapInstantly` - the
+   *  same condition that used to gate "snap vs. tween" back when React drove position every step).
+   *  Likewise, walk/run/idle animation switching moved to applyPlayerAnimation (called every frame
+   *  from updatePlayerPhysics using the Scene's own live facing/movementState) rather than being
+   *  driven by React-passed frameRow/movementState params here - React's copy of those is a
+   *  throttled ~15Hz mirror of what Phaser already knows moment-to-moment, too stale to drive
+   *  per-frame animation switching cleanly. `equipmentLayers` stacks one extra sprite per equipped
+   *  slot with layer art (see docs/Equipment-Layering-Plan.md) - empty in practice until real
+   *  layer art exists. */
   async setPlayer(
     pos: GridPosition,
     spriteAssetId: string,
-    frameRow: number,
-    movementState: MovementState,
     equipmentLayers: { slot: EquipmentSlot; spriteAssetId: string }[] = [],
   ): Promise<void> {
     this.playerGeneration++;
@@ -373,12 +1044,22 @@ export class ExplorationScene extends Phaser.Scene {
 
     const snapInstantly = !this.playerSprite || this.mapJustChanged;
     this.mapJustChanged = false;
-    if (!this.playerSprite) {
+    const firstCreation = !this.playerSprite;
+    if (firstCreation) {
       // Origin (0.5, 1) anchors the sprite's feet to its tile position rather than its center, so
       // taller-than-one-tile art (see the 3/4-view scale spec and REFERENCE_VIEWPORT_SCALE above)
       // lines up with the ground instead of floating with its vertical midpoint on the tile - the
       // 48x64 player placeholder is already taller than one 48px tile at desktop's reference scale.
-      this.playerSprite = this.add.sprite(0, 0, spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
+      const sprite = this.add.sprite(0, 0, spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
+      this.physics.add.existing(sprite);
+      const body = sprite.body as Phaser.Physics.Arcade.Body;
+      // Deliberately smaller than the full sprite frame, biased toward the feet - see
+      // PLAYER_BODY_WIDTH_RATIO/HEIGHT_RATIO's own comment.
+      const bodyWidth = sprite.width * PLAYER_BODY_WIDTH_RATIO;
+      const bodyHeight = sprite.height * PLAYER_BODY_HEIGHT_RATIO;
+      body.setSize(bodyWidth, bodyHeight);
+      body.setOffset((sprite.width - bodyWidth) / 2, sprite.height - bodyHeight);
+      this.playerSprite = sprite;
       // setCamera has its own `if (this.playerSprite) camera.startFollow(...)` check, but
       // setCamera and setPlayer are two independent React effects that can run in either order -
       // and setPlayer's own texture load (ensurePlayerAnimations, just awaited above) means the
@@ -388,63 +1069,42 @@ export class ExplorationScene extends Phaser.Scene {
       // instead of only recovering once some later, unrelated resize re-triggers setCamera
       // (confirmed by hand: this is exactly why rotating the phone "fixed" a dead camera - the
       // resize was incidentally the first thing to re-run setCamera after the sprite existed).
-      this.cameras.main.startFollow(this.playerSprite);
-    } else if (textureChanged) {
+      // roundPixels=true (2nd arg) - the player now sits at a fractional pixel position almost
+      // constantly while walking (continuous Arcade Physics, not tile-snapped), so an un-rounded
+      // camera scroll is fractional nearly all the time instead of just briefly mid-tween like the
+      // old discrete model. A fractional camera scroll lets every sprite's texture sampling bleed a
+      // texel into its neighboring frame in the packed spritesheet (frames have no padding) -
+      // reported live as a visible ghosting/bleed "in all directions" around every character
+      // sprite (base and equipment layers alike) once movement went continuous.
+      this.cameras.main.startFollow(sprite, true);
+      // groundLayer/collisionStaticGroup may already exist if loadMap's own real-swap branch
+      // finished before this first setPlayer call did (the two are independent React effects,
+      // either can win the race) - safe to call unconditionally either way, see its own comment.
+      this.registerPlayerColliders();
+    }
+    const sprite = this.playerSprite!;
+    if (textureChanged) {
       // The player changed skin mid-session (Profile's Skin tab) - swap the existing sprite's
       // texture instead of leaving it stuck on whichever skin it was first created with.
-      this.playerSprite.setTexture(spriteAssetId);
+      sprite.setTexture(spriteAssetId);
     }
-    const sprite = this.playerSprite;
+    this.playerTextureKey = spriteAssetId;
     sprite.setScale(this.viewportScale / REFERENCE_VIEWPORT_SCALE);
 
-    const targetX = pos.x * this.tileSize + this.tileSize / 2;
-    const targetY = pos.y * this.tileSize + this.tileSize;
-    // 'running' only ever means mid-Dash today (see useGridMovement.ts) - kick up a puff of dust
-    // from where the player is leaving, behind them as they go. Skipped on an instant snap (a
-    // location transition, not real movement) since there's no "leaving from" position to kick
-    // dust up from.
-    if (!snapInstantly && movementState === 'running') {
-      this.spawnDashDust(sprite.x, sprite.y);
-    }
     if (snapInstantly) {
-      this.tweens.killTweensOf(sprite);
+      const targetX = pos.x * this.tileSize + this.tileSize / 2;
+      const targetY = pos.y * this.tileSize + this.tileSize;
       sprite.setPosition(targetX, targetY);
-    } else {
-      const duration = movementState === 'running' ? DASH_GLIDE_MS : GLIDE_MS;
-      this.tweens.add({ targets: sprite, x: targetX, y: targetY, duration, ease: 'Linear' });
+      const body = sprite.body as Phaser.Physics.Arcade.Body;
+      body.reset(targetX, targetY);
+      this.facing = pos.facing;
+      this.applyPlayerAnimation('idle');
     }
 
-    // A static single-frame skin (male/female - see Player.gender) has no rows/frames to animate or
-    // select at all - only a real spritesheet (frameSize set, today just the sprite.player
-    // fallback) has any frame beyond its one default. Matches setEntities' own `if
-    // (def.frameSize)` guard for NPCs below.
-    if (getAssetDefinition(spriteAssetId).frameSize) {
-      if (movementState === 'walking' || movementState === 'running') {
-        const key = animationKey(spriteAssetId, movementState, pos.facing);
-        // `currentAnim` reflects the *last* animation loaded into this sprite, not whether it's
-        // still actually playing - the idle branch below calls `anims.stop()` without clearing it,
-        // so re-pressing the same direction right after stopping saw a matching currentAnim.key
-        // and skipped play() entirely, leaving the sprite frozen on its last frame while still
-        // gliding to the next tile (reported live as "the animation only works on direction
-        // change" - a same-direction stop-then-go never restarted it). `isPlaying` is the actual
-        // signal for whether anything is animating right now.
-        if (!sprite.anims.isPlaying || sprite.anims.currentAnim?.key !== key) sprite.play(key);
-      } else {
-        // Idle has no dedicated row on the sheet - `frameRow` is already resolveDisplayRow's
-        // fallback-to-frame-0-of-the-walking-row answer, computed by the caller (same as the old
-        // TileGrid's `playerFrameRow` prop) rather than re-derived here.
-        sprite.anims.stop();
-        sprite.setFrame(frameRow * PLAYER_ANIMATION_LAYOUT.frameCount);
-      }
-    }
-
-    // Equipment layers: one child sprite per equipped slot with layer art, kept in lockstep with
-    // the base sprite above (same position/scale/animation) - every layer sheet must share the
-    // base's exact 8-row x 4-frame x 72x96 layout for this to line up. Each layer plays its OWN
-    // animation key (computed against its own spriteAssetId, not the base's) since a Phaser
-    // Animation is tied to the texture it was created against - but since every layer shares the
-    // same row/frameCount/frameRate as the base, playing them all in the same tick keeps them
-    // visually frame-synced regardless of each one's distinct literal key string.
+    // Equipment layers: one child sprite per equipped slot with layer art. Position/animation are
+    // driven every frame by updatePlayerPhysics/applyPlayerAnimation now (see this method's own
+    // comment) - this just creates/retextures/tears down the sprites and snaps them alongside the
+    // base sprite on a real transition.
     const seenSlots = new Set<EquipmentSlot>();
     for (const layer of equipmentLayers) {
       seenSlots.add(layer.slot);
@@ -464,26 +1124,8 @@ export class ExplorationScene extends Phaser.Scene {
         visual.sprite.setTexture(layer.spriteAssetId);
         visual.spriteAssetId = layer.spriteAssetId;
       }
-      const layerSprite = visual.sprite;
-      layerSprite.setScale(sprite.scaleX, sprite.scaleY);
-      if (snapInstantly) {
-        this.tweens.killTweensOf(layerSprite);
-        layerSprite.setPosition(targetX, targetY);
-      } else {
-        const duration = movementState === 'running' ? DASH_GLIDE_MS : GLIDE_MS;
-        this.tweens.add({ targets: layerSprite, x: targetX, y: targetY, duration, ease: 'Linear' });
-      }
-      if (getAssetDefinition(layer.spriteAssetId).frameSize) {
-        if (movementState === 'walking' || movementState === 'running') {
-          const layerKey = animationKey(layer.spriteAssetId, movementState, pos.facing);
-          if (!layerSprite.anims.isPlaying || layerSprite.anims.currentAnim?.key !== layerKey) {
-            layerSprite.play(layerKey);
-          }
-        } else {
-          layerSprite.anims.stop();
-          layerSprite.setFrame(frameRow * PLAYER_ANIMATION_LAYOUT.frameCount);
-        }
-      }
+      visual.sprite.setScale(sprite.scaleX, sprite.scaleY);
+      if (snapInstantly) visual.sprite.setPosition(sprite.x, sprite.y);
     }
     // A slot that had a layer sprite before but isn't in this call's list anymore (unequipped, or
     // switched to an item with no layer art) gets its sprite torn down.
@@ -548,7 +1190,23 @@ export class ExplorationScene extends Phaser.Scene {
       if (generation !== this.entityGeneration) return;
       // Same feet-anchor origin as the player sprite (setPlayer above) - see its comment.
       const sprite = this.add.sprite(0, 0, entity.spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
-      visual = { sprite, spriteAssetId: entity.spriteAssetId };
+      if (entity.blocksMovement) {
+        // A dynamic (not static) body on purpose - a wandering NPC's sprite moves via the tween
+        // below, not via velocity, and Arcade re-derives a dynamic body's position from its
+        // GameObject's transform every step regardless of what moved it, so the collider always
+        // sees the entity's real current position. Membership in entityCollisionGroup is what
+        // actually makes it collide with the player - see that field's own doc comment for why no
+        // manual cleanup is needed when this entity is later destroyed (setEntities' reconciliation).
+        this.physics.add.existing(sprite);
+        const body = sprite.body as Phaser.Physics.Arcade.Body;
+        body.moves = false;
+        const bodyWidth = sprite.width * ENTITY_BODY_WIDTH_RATIO;
+        const bodyHeight = sprite.height * ENTITY_BODY_HEIGHT_RATIO;
+        body.setSize(bodyWidth, bodyHeight);
+        body.setOffset((sprite.width - bodyWidth) / 2, sprite.height - bodyHeight);
+        this.entityCollisionGroup?.add(sprite);
+      }
+      visual = { sprite, spriteAssetId: entity.spriteAssetId, interactionKind: entity.interactionKind };
       this.entityVisuals.set(entity.id, visual);
       // Mirrors ensurePlayerAnimations - a static single-frame sprite (no frameSize) has no rows to
       // register at all. Safe to call unconditionally for every frameSize'd entity sharing this
@@ -679,7 +1337,9 @@ export class ExplorationScene extends Phaser.Scene {
     const camera = this.cameras.main;
     camera.setViewport(0, 0, viewportWidthPx, viewportHeightPx);
     camera.setBounds(0, 0, worldWidthPx, worldHeightPx, true);
-    if (this.playerSprite) camera.startFollow(this.playerSprite);
+    // roundPixels=true - see the other startFollow call's comment (setPlayer's first-creation
+    // branch) for why this matters now that movement is continuous, not tile-snapped.
+    if (this.playerSprite) camera.startFollow(this.playerSprite, true);
   }
 
   setViewport(viewportSize: { width: number; height: number }): void {

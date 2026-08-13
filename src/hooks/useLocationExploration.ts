@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useGridMovement, type GridPosition } from './useGridMovement';
+import { useMovementInput } from './useMovementInput';
 import { useTileMap } from './useTileMap';
 import { useWanderingNpcs } from './useWanderingNpcs';
 import { useSceneStore } from '@/state/useSceneStore';
@@ -11,32 +12,18 @@ import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
 import { getBlockedMessage } from '@/utils/locationGates';
 import { playSound } from '@/audio/audioService';
 import { LOCATIONS } from '@/data';
+import type { MapObject } from '@/types';
 
 interface UseLocationExplorationOptions {
   locationId: string;
   suspended?: boolean;
-  /** Called on every completed step (dash included - a visible, deliberately-placed field
-   *  encounter icon isn't the kind of thing Dash should let the player slip past unnoticed, unlike
-   *  the old invisible per-tile probability roll this replaced). The caller owns the actual icon
-   *  set (see useFieldEncounters) and decides what, if anything, happened at this position. */
-  onFieldEncounterStep?: (pos: GridPosition) => void;
   /** Called instead of transitioning when the target location is gated behind an incomplete
    *  quest - the caller decides how to surface it (every scene already has a message Panel). */
   onBlockedTransition?: (message: string) => void;
-  /** Called once when the player's tile steps into a `zone` object's rectangle it wasn't already
-   *  standing in (not on every step while inside, not on exit) - the caller decides what visiting
-   *  that landmark actually does (visitLandmark/collectWorldItem/etc., see OverworldScene.tsx). */
-  onZoneEnter?: (refId: string) => void;
 }
 
 /** Shared map-load + spawn-resolution + movement + transition logic for Town/Overworld/Dungeon scenes. */
-export function useLocationExploration({
-  locationId,
-  suspended,
-  onFieldEncounterStep,
-  onBlockedTransition,
-  onZoneEnter,
-}: UseLocationExplorationOptions) {
+export function useLocationExploration({ locationId, suspended, onBlockedTransition }: UseLocationExplorationOptions) {
   const location = LOCATIONS.find((l) => l.id === locationId)!;
   const { map } = useTileMap(locationId, location.mapAssetId);
   const params = useSceneStore((s) => s.params);
@@ -68,38 +55,28 @@ export function useLocationExploration({
     // silently reuse whichever spawn point was resolved the very first time that map was loaded.
   }, [map, locationId, params.locationId, params.spawnId, params.spawnX, params.spawnY]);
 
-  // Tracks the tile the player stepped from, purely to detect a zone's entering edge (see
-  // handleStep's zone check below) - reset whenever locationId changes so a brand-new map's first
-  // step never compares against a stale position from wherever the player just left.
-  const prevPosRef = useRef<{ x: number; y: number } | null>(null);
-  useEffect(() => {
-    prevPosRef.current = null;
-  }, [locationId]);
+  // Paused while an overlay (dialogue, menus, shop, etc.) is open, same as movement - an NPC
+  // wandering off mid-conversation reads as a bug, not ambience.
+  const wanderPositions = useWanderingNpcs(map, suspended);
 
-  // No `isDash` param (unlike the old encounterZone-gated version) - field-encounter icons trigger
-  // regardless of Dash, per the onFieldEncounterStep doc comment above.
-  const handleStep = (pos: GridPosition) => {
-    if (!map) return;
+  const { position, positionRef, movementState, reportPosition, spawnPosition } = useGridMovement({ start: spawnPoint });
+  const movementInput = useMovementInput(!suspended && !!map);
 
-    const prevPos = prevPosRef.current;
-    prevPosRef.current = { x: pos.x, y: pos.y };
-    if (onZoneEnter) {
-      for (const zone of map.objects) {
-        if (zone.type !== 'zone' || !zone.refId) continue;
-        const w = zone.width ?? 1;
-        const h = zone.height ?? 1;
-        const insideNow = pos.x >= zone.x && pos.x < zone.x + w && pos.y >= zone.y && pos.y < zone.y + h;
-        if (!insideNow) continue;
-        const insideBefore =
-          !!prevPos && prevPos.x >= zone.x && prevPos.x < zone.x + w && prevPos.y >= zone.y && prevPos.y < zone.y + h;
-        if (!insideBefore) onZoneEnter(zone.refId);
-      }
-    }
+  // Rounded to the nearest tile - still used for facing-tile interaction targeting in
+  // TownScene/OverworldScene/DungeonScene's attemptInteract (Phase 4 replaces this with a real
+  // pixel-space probe; not yet done). Zone/transition entry itself no longer goes through this -
+  // see handleZoneEnter/handleTransitionEnter below, driven by ExplorationScene's own per-frame
+  // Arcade overlap checks instead of a rounded-tile comparison.
+  const tileX = Math.round(position.x);
+  const tileY = Math.round(position.y);
+  const tilePosition = useMemo<GridPosition>(() => ({ x: tileX, y: tileY, facing: position.facing }), [tileX, tileY, position.facing]);
 
-    // Triggers from any approach direction - see isWalkable's own note in useGridMovement.ts, which
-    // no longer treats a requiredFacing mismatch as a wall either.
-    const transition = map.objects.find((o) => o.type === 'transition' && o.x === pos.x && o.y === pos.y);
-    if (transition?.refId) {
+  // Passed to PhaserExplorationCanvas as `onTransitionEnter`. Quest-gate check + goTo() - identical
+  // logic to what the old rounded-tile effect ran inline, just invoked from a real physics overlap
+  // event now instead of a tile-equality comparison.
+  const handleTransitionEnter = useCallback(
+    (transition: MapObject) => {
+      if (!transition.refId) return;
       const blockedMessage = getBlockedMessage(transition.refId, useQuestStore.getState().progress);
       if (blockedMessage) {
         onBlockedTransition?.(blockedMessage);
@@ -110,25 +87,22 @@ export function useLocationExploration({
       if (scene) {
         void playSound('sfx.transition');
         goTo(scene, { locationId: transition.refId, spawnId: transition.targetSpawnId });
-        return;
       }
-    }
+    },
+    [goTo, onBlockedTransition],
+  );
 
-    onFieldEncounterStep?.(pos);
-  };
-
-  // Paused while an overlay (dialogue, menus, shop, etc.) is open, same as movement - an NPC
-  // wandering off mid-conversation reads as a bug, not ambience.
-  const wanderPositions = useWanderingNpcs(map, suspended);
-  const dynamicBlockers = useMemo(() => Object.values(wanderPositions), [wanderPositions]);
-
-  const { position, positionRef, facingDelta, attemptMove, movementState } = useGridMovement({
+  return {
+    location,
     map,
-    start: spawnPoint,
-    suspended,
-    onStep: handleStep,
-    dynamicBlockers,
-  });
-
-  return { location, map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions };
+    position,
+    positionRef,
+    tilePosition,
+    spawnPosition,
+    movementState,
+    reportPosition,
+    movementInput,
+    wanderPositions,
+    handleTransitionEnter,
+  };
 }

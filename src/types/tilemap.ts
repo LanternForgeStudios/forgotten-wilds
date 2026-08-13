@@ -25,6 +25,17 @@ export interface MapObject {
    *  same rectangle convention as CollisionRect below. Undefined/1x1 for every other object type. */
   width?: number;
   height?: number;
+  /** Native-pixel footprint (Tiled's own coordinate space, unrelated to any render-time viewport
+   *  scale), always populated for every object type - used by Arcade Physics bodies/interaction
+   *  probes for exact-position collision instead of the tile-quantized x/y/width/height above. When
+   *  an object was point-placed in Tiled (no explicit width/height - true for everything except
+   *  hand-drawn zone rectangles today), pixelWidth/pixelHeight fall back to a full tile so existing
+   *  maps keep their current "blocks/occupies its whole tile" behavior until re-authored with a real
+   *  rectangle. */
+  pixelX: number;
+  pixelY: number;
+  pixelWidth: number;
+  pixelHeight: number;
   /** for npc objects: max tile distance the npc will wander from this spawn point (cosmetic client-side
    *  animation only, not server state). Omitted/undefined means the npc stands still. */
   wanderRadius?: number;
@@ -36,9 +47,11 @@ export interface MapObject {
 }
 
 /** A discrete, non-interactive collision-only obstacle (fence, rock, ledge, barrier) authored as a
- *  rectangle (or point) object on the Tiled 'collisions' object layer. Tile-coordinate span,
- *  deliberately separate from MapObject/MapObjectType - it has no `type` discriminant, no refId,
- *  nothing beyond geometry, and never flows through the objects layer's type validation. */
+ *  rectangle (or point) object on the Tiled 'collisions' object layer. Native-pixel rectangle
+ *  (Tiled's own coordinate space, exactly as drawn - no tile-snapping/expansion), deliberately
+ *  separate from MapObject/MapObjectType - it has no `type` discriminant, no refId, nothing beyond
+ *  geometry, and never flows through the objects layer's type validation. Used directly as an
+ *  Arcade Physics static body's bounds. */
 export interface CollisionRect {
   x: number;
   y: number;

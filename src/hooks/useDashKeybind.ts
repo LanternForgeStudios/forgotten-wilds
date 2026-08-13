@@ -1,14 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { isTypingTarget } from '@/utils/keyboard';
-import { KEY_TO_FACING, type Facing } from './useGridMovement';
 
-/** Shift alone starts Dash - held down, it runs in whichever direction the player is currently
- *  facing until released, out of Stamina, or blocked (see useDash.ts). A direction key pressed
- *  while Shift is already held steers the ongoing dash to that new facing instead of taking a
- *  normal step (useGridMovement's own keydown handler explicitly ignores shift-held keydowns so
- *  the two never both fire from one keypress) - startDash itself treats an already-running hold as
- *  "just update the facing," not a second overlapping dash. */
-export function useDashKeybind(startDash: (facing?: Facing) => void, stopDash: () => void, enabled: boolean) {
+/** Shift alone starts Dash - held down, it runs (faster, in whatever direction is currently held -
+ *  or the last-faced direction if none is, see ExplorationScene.ts's updatePlayerPhysics) until
+ *  released, out of Stamina, or blocked. No direction-key branching needed here anymore - unlike
+ *  the old discrete-step model, dash no longer owns a separate movement loop that a direction key
+ *  had to "steer"; holding Shift and a direction key are just two independent booleans on the same
+ *  shared input ref (see useMovementInput.ts), read together every physics frame. */
+export function useDashKeybind(startDash: () => void, stopDash: () => void, enabled: boolean) {
   const shiftHeldRef = useRef(false);
 
   useEffect(() => {
@@ -21,19 +20,9 @@ export function useDashKeybind(startDash: (facing?: Facing) => void, stopDash: (
     }
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (isTypingTarget(e)) return;
-      if (e.key === 'Shift') {
-        if (!shiftHeldRef.current) {
-          shiftHeldRef.current = true;
-          startDash();
-        }
-        return;
-      }
-      if (!e.shiftKey) return;
-      const facing = KEY_TO_FACING[e.key];
-      if (!facing) return;
-      e.preventDefault();
-      startDash(facing);
+      if (isTypingTarget(e) || e.key !== 'Shift' || shiftHeldRef.current) return;
+      shiftHeldRef.current = true;
+      startDash();
     }
 
     function handleKeyUp(e: KeyboardEvent) {
@@ -43,8 +32,8 @@ export function useDashKeybind(startDash: (facing?: Facing) => void, stopDash: (
     }
 
     // Losing focus (alt-tab, clicking outside the game) never fires a keyup for whatever was held
-    // - without this, the hold would keep running (or the browser would eventually deliver a keyup
-    // for the wrong key entirely) until some unrelated keypress happened to touch Shift again.
+    // - without this, the dash would keep running until some unrelated keypress happened to touch
+    // Shift again.
     function handleBlur() {
       if (!shiftHeldRef.current) return;
       shiftHeldRef.current = false;

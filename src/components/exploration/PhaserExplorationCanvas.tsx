@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import type { EquipmentSlot, TileMap } from '@/types';
+import type { EquipmentSlot, MapObject, TileMap } from '@/types';
 import type { Facing, GridPosition } from '@/hooks/useGridMovement';
+import type { MovementInputState } from '@/hooks/useMovementInput';
 import type { MovementState } from '@/animation/characterAnimations';
 import { ExplorationScene } from '@/phaser/ExplorationScene';
 
@@ -32,26 +33,69 @@ export interface GridEntity {
    *  (128x128/256x256) are sized for the combat screen, not for a small "something's nearby" map
    *  marker. Defaults to 1 (no change) when omitted. */
   displayScale?: number;
+  /** Whether the player's Arcade Physics body should collide with this entity - true for NPCs and
+   *  solid interactables (chests, shrines, decor), false for anything that must stay walk-through
+   *  (building/exit transition markers, other players' presence avatars, field-encounter icons).
+   *  Mirrors the old discrete model's BLOCKING_OBJECT_TYPES/dynamicBlockers split, now unified into
+   *  one per-entity flag since both kinds of blocker get a real Arcade body here (see
+   *  ExplorationScene.ts's upsertEntity). Defaults to false when omitted. */
+  blocksMovement?: boolean;
+  /** Marks this entity as a valid target for the directional interaction probe (see
+   *  ExplorationScene.ts's queryInteraction) - 'npc' for talkable NPCs, 'presence' for other
+   *  players' live avatars. Omitted for anything not meant to be interacted with directly this way
+   *  (building/exit markers, field-encounter icons) - static interactables (chests, shrines, decor)
+   *  don't need this either, since queryInteraction finds those directly from the map's own
+   *  `interactable`-type objects instead of from the rendered entity list. */
+  interactionKind?: 'npc' | 'presence';
 }
 
 interface PhaserExplorationCanvasProps {
   map: TileMap;
+  /** Only consulted to (re)place the player on first mount or a real location transition - see
+   *  ExplorationScene.ts's setPlayer doc comment. Continuous movement is driven entirely by Arcade
+   *  Physics inside the Scene now, not by this prop on every render. */
   player: GridPosition;
   playerSpriteAssetId: string;
+  /** Shared input-state ref (see useMovementInput.ts) the Scene reads every frame to drive the
+   *  player's Arcade body velocity - bound once, not re-read per render. */
+  movementInputRef: { current: MovementInputState };
+  /** True while an overlay (dialogue, menus, shop, etc.) is open - movement/dash input is ignored. */
+  suspended?: boolean;
+  /** Called with the physics-driven player position/movementState, throttled to ~15Hz (see
+   *  ExplorationScene.ts's POSITION_FLUSH_INTERVAL_MS) - the caller (useLocationExploration's
+   *  reportPosition) mirrors this into React state for HUD/minimap/heartbeat/interaction. */
+  onPositionChange?: (pos: GridPosition, movementState: MovementState) => void;
+  /** Fires once (leading edge only) when the player's Arcade body enters a `zone` map object's
+   *  real rectangle - see ExplorationScene.ts's checkZoneAndTransitionOverlaps. */
+  onZoneEnter?: (refId: string) => void;
+  /** Fires once (leading edge only) when the player's Arcade body enters a `transition` map
+   *  object's rectangle - the caller decides what a transition actually does (quest-gate check +
+   *  goTo, see useLocationExploration.ts's handleTransitionEnter). */
+  onTransitionEnter?: (transition: MapObject) => void;
+  /** Tile-int icon positions (see useFieldEncounters.ts) - checked for player proximity every
+   *  frame (see ExplorationScene.ts's checkFieldEncounterProximity). */
+  fieldEncounterIcons?: { id: string; x: number; y: number }[];
+  /** Fires once (leading edge only) per real approach to a field-encounter icon. */
+  onFieldEncounterNear?: (icon: { id: string; x: number; y: number }) => void;
   entities?: GridEntity[];
   scale?: number;
   /** Visible window size in exact pixels (typically the real available window area) - maps larger
    *  than this scroll to keep the player centered. Omit for a map that should always render at
    *  full size (no camera). */
   viewportSize?: { width: number; height: number };
-  /** Row of the player's sprite sheet to show (from resolveDisplayRow) - the player isn't part of
-   *  `entities`, so it gets its own pair of animation props here. */
-  playerFrameRow?: number;
-  playerMovementState?: MovementState;
   /** Equipped-item sprite layers stacked on top of the player (see
    *  docs/Equipment-Layering-Plan.md) - resolved by the caller from player.equipment + each
    *  equipped item's layerSpriteAssetId[gender]. Empty in practice until real layer art ships. */
   equipmentLayers?: { slot: EquipmentSlot; spriteAssetId: string }[];
+}
+
+/** Imperative handle exposed via ref - `queryInteraction` is the only method a caller needs
+ *  (see TownScene.tsx/OverworldScene.tsx/DungeonScene.tsx's attemptInteract), reading directly
+ *  from the live Scene rather than needing its own React-state mirror of interaction-probe
+ *  results the way position/movementState do (a one-shot query on keypress doesn't need to be
+ *  reactive between renders the way continuous position does). */
+export interface PhaserExplorationCanvasHandle {
+  queryInteraction: () => { kind: 'npc' | 'presence' | 'interactable'; id: string } | null;
 }
 
 /** Phaser-backed replacement for the old DOM/CSS TileGrid - same prop shape, so every scene's JSX
@@ -60,13 +104,22 @@ interface PhaserExplorationCanvasProps {
  *  re-rendering JSX - Phaser owns its own render loop. All game logic (collision, movement
  *  throttling, transitions, encounters) stays exactly where it already lived, in
  *  useGridMovement.ts/useLocationExploration.ts - this component and its Scene are pure rendering. */
-export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
-  const { map, player, playerSpriteAssetId, scale = 3 } = props;
+export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle, PhaserExplorationCanvasProps>(
+  function PhaserExplorationCanvas(props, ref) {
+  const { map, player, playerSpriteAssetId, movementInputRef, scale = 3 } = props;
   const entities = props.entities ?? [];
   const viewportSize = props.viewportSize;
-  const playerFrameRow = props.playerFrameRow ?? 0;
-  const playerMovementState = props.playerMovementState ?? 'idle';
+  const suspended = props.suspended ?? false;
   const equipmentLayers = props.equipmentLayers ?? [];
+  const fieldEncounterIcons = props.fieldEncounterIcons ?? [];
+  const onPositionChangeRef = useRef(props.onPositionChange);
+  onPositionChangeRef.current = props.onPositionChange;
+  const onZoneEnterRef = useRef(props.onZoneEnter);
+  onZoneEnterRef.current = props.onZoneEnter;
+  const onTransitionEnterRef = useRef(props.onTransitionEnter);
+  onTransitionEnterRef.current = props.onTransitionEnter;
+  const onFieldEncounterNearRef = useRef(props.onFieldEncounterNear);
+  onFieldEncounterNearRef.current = props.onFieldEncounterNear;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -95,6 +148,15 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
     const scene = new ExplorationScene(() => {
       if (!cancelled) setSceneReady(true);
     });
+    // Bound once (not per-render) - the input ref object itself is stable for the life of the
+    // exploration session (see useMovementInput.ts), and the position-report callback goes through
+    // a ref (onPositionChangeRef) so it always calls the CURRENT prop closure without needing to
+    // be re-bound every time the parent re-renders with a new inline function.
+    scene.bindInput(movementInputRef);
+    scene.setPositionCallback((pos, state) => onPositionChangeRef.current?.(pos, state));
+    scene.setZoneEnterCallback((refId) => onZoneEnterRef.current?.(refId));
+    scene.setTransitionEnterCallback((transition) => onTransitionEnterRef.current?.(transition));
+    scene.setFieldEncounterNearCallback((icon) => onFieldEncounterNearRef.current?.(icon));
     const game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: containerRef.current ?? undefined,
@@ -104,6 +166,11 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
       backgroundColor: '#120e0b',
       scene,
       banner: false,
+      // Movement/collision is migrating to Arcade Physics (see ExplorationScene.ts) - zero gravity
+      // since this is a top-down game, no falling. `debug` stays off here; ExplorationScene draws
+      // its own toggleable overlay instead (see setDebugEnabled) rather than Phaser's built-in one,
+      // since the built-in flag isn't runtime-toggleable without recreating this Game instance.
+      physics: { default: 'arcade', arcade: { gravity: { x: 0, y: 0 }, debug: false } },
     });
     gameRef.current = game;
     sceneRef.current = scene;
@@ -116,6 +183,14 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      queryInteraction: () => sceneRef.current?.queryInteraction() ?? null,
+    }),
+    [],
+  );
 
   const tileSize = map.tileWidth * scale;
   const worldWidthPx = map.width * tileSize;
@@ -143,15 +218,41 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
 
   useEffect(() => {
     if (!sceneReady) return;
-    void sceneRef.current?.setPlayer(player, playerSpriteAssetId, playerFrameRow, playerMovementState, equipmentLayers);
+    void sceneRef.current?.setPlayer(player, playerSpriteAssetId, equipmentLayers);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sceneReady, player, playerSpriteAssetId, playerFrameRow, playerMovementState, equipmentLayers, tileSize]);
+  }, [sceneReady, player, playerSpriteAssetId, equipmentLayers, tileSize]);
+
+  useEffect(() => {
+    sceneRef.current?.setSuspended(suspended);
+  }, [suspended]);
 
   useEffect(() => {
     if (!sceneReady) return;
     sceneRef.current?.setEntities(entities);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneReady, entities, tileSize]);
+
+  useEffect(() => {
+    if (!sceneReady) return;
+    sceneRef.current?.setFieldEncounterIcons(fieldEncounterIcons);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneReady, fieldEncounterIcons]);
+
+  // Dev-only collision/interaction-bounds overlay toggle (see ExplorationScene.ts's
+  // setDebugEnabled/drawDebugOverlay) - F9 rather than a UI button since this is a development aid,
+  // not a player-facing feature. Scoped to this one component (not per-scene) so it works
+  // identically in Town/Overworld/Dungeon without three copies of the same keybind.
+  useEffect(() => {
+    if (!sceneReady) return;
+    let enabled = false;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'F9') return;
+      enabled = !enabled;
+      sceneRef.current?.setDebugEnabled(enabled);
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [sceneReady]);
 
   useEffect(() => {
     if (!sceneReady) return;
@@ -209,4 +310,5 @@ export function PhaserExplorationCanvas(props: PhaserExplorationCanvasProps) {
       </div>
     </div>
   );
-}
+  },
+);

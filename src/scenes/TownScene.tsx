@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Panel } from '@/components/common/Panel';
-import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
+import { TileGrid, type GridEntity, type TileGridHandle } from '@/components/exploration/TileGrid';
 import { MessageOverlay } from '@/components/exploration/MessageOverlay';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
@@ -15,7 +15,6 @@ import { WorldChat } from '@/components/WorldChat';
 import { MiniMap } from '@/components/MiniMap';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useMapOverlay } from '@/hooks/useMapOverlay';
-import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -196,17 +195,18 @@ export function TownScene() {
     activeApothecaryShopId !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
-  const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
+  const { map, position, spawnPosition, reportPosition, movementInput, wanderPositions, handleTransitionEnter } = useLocationExploration({
     locationId,
     suspended,
     onBlockedTransition: setMessage,
   });
   const [presences, setPresences] = useState<OnlinePresence[]>([]);
   const { pending, run } = usePendingAction();
+  const gridRef = useRef<TileGridHandle>(null);
 
   useHeartbeat(uid, displayName, locationId, position, gender);
-  useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const { startDash, stopDash } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
+  useDragMovement(gridWrapperRef, movementInput.setDirectionHeld, isMobile && !suspended);
+  const { startDash, stopDash } = useExplorationDash(movementInput.setDashHeld, staminaUnlocked && !suspended);
 
   useEffect(() => subscribeToPresence(setPresences), []);
 
@@ -241,15 +241,15 @@ export function TownScene() {
 
   function attemptInteract() {
     if (suspended || !map) return;
-    const { dx, dy } = facingDelta(position.facing);
-    const target = { x: position.x + dx, y: position.y + dy };
-    const npcObject = map.objects.find((o) => {
-      if (o.type !== 'npc' || !o.refId) return false;
-      const pos = wanderPositions[o.refId] ?? { x: o.x, y: o.y };
-      return pos.x === target.x && pos.y === target.y;
-    });
-    if (npcObject?.refId) {
-      const npc = NPCS.find((n) => n.id === npcObject.refId);
+    // Pixel-space directional probe (see ExplorationScene.ts's queryInteraction) - replaces the
+    // old exact-facing-tile lookup. `result.id` is whatever the matched kind's own data is keyed
+    // by: an npc/interactable's refId, or a presence entity's GridEntity id (`player-<uid>`, the
+    // same id otherPlayerEntities below already renders it under).
+    const result = gridRef.current?.queryInteraction();
+    if (!result) return;
+
+    if (result.kind === 'npc') {
+      const npc = NPCS.find((n) => n.id === result.id);
       if (npc) {
         setActiveNpc(npc);
         void playSound('sfx.npc-talk');
@@ -262,45 +262,40 @@ export function TownScene() {
       }
       return;
     }
-    // Other players aren't map objects (they're live presence docs, positioned by their own
-    // x/y - see otherPlayerEntities above), so this is a separate check rather than folding into
-    // the npcObject search above.
-    const now = Date.now();
-    const otherPlayer = presences.find(
-      (p) =>
-        p.uid !== uid &&
-        p.locationId === locationId &&
-        now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS &&
-        p.x === target.x &&
-        p.y === target.y,
-    );
-    if (otherPlayer) {
-      const name = otherPlayer.displayName;
-      run(() => callSendFriendRequest(otherPlayer.uid), 'Sending friend request...')
-        ?.then((res) => {
-          setMessage(
-            res.status === 'sent'
-              ? `Friend request sent to ${name}.`
-              : res.status === 'accepted'
-                ? `You and ${name} are now friends!`
-                : `You already have a pending request with ${name}.`,
-          );
-        })
-        .catch((err) => setMessage(err instanceof Error ? err.message : `Could not reach ${name}.`));
+
+    if (result.kind === 'presence') {
+      const now = Date.now();
+      const otherPlayer = presences.find(
+        (p) =>
+          `player-${p.uid}` === result.id &&
+          p.uid !== uid &&
+          p.locationId === locationId &&
+          now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS,
+      );
+      if (otherPlayer) {
+        const name = otherPlayer.displayName;
+        run(() => callSendFriendRequest(otherPlayer.uid), 'Sending friend request...')
+          ?.then((res) => {
+            setMessage(
+              res.status === 'sent'
+                ? `Friend request sent to ${name}.`
+                : res.status === 'accepted'
+                  ? `You and ${name} are now friends!`
+                  : `You already have a pending request with ${name}.`,
+            );
+          })
+          .catch((err) => setMessage(err instanceof Error ? err.message : `Could not reach ${name}.`));
+      }
       return;
     }
-    const decorObject = map.objects.find(
-      (o) => o.type === 'interactable' && o.refId && DECOR_ENTITIES[o.refId] && o.x === target.x && o.y === target.y,
-    );
-    if (decorObject?.refId) {
-      setMessage(DECOR_ENTITIES[decorObject.refId].flavorText);
+
+    // result.kind === 'interactable'
+    const refId = result.id;
+    if (DECOR_ENTITIES[refId]) {
+      setMessage(DECOR_ENTITIES[refId].flavorText);
       return;
     }
-    const shrineObject = map.objects.find(
-      (o) => o.type === 'interactable' && o.refId && SHRINES.has(o.refId) && o.x === target.x && o.y === target.y,
-    );
-    if (shrineObject?.refId) {
-      const refId = shrineObject.refId;
+    if (SHRINES.has(refId)) {
       run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
@@ -359,10 +354,7 @@ export function TownScene() {
     journalOpen,
     worldChatOpen,
     map,
-    position,
-    facingDelta,
     uid,
-    wanderPositions,
   ]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
@@ -389,6 +381,8 @@ export function TownScene() {
           // for everyone else regardless of what's passed here.
           movementState: pos.isMoving ? 'walking' : undefined,
           facing: pos.facing,
+          blocksMovement: true,
+          interactionKind: 'npc',
         };
       });
 
@@ -407,6 +401,7 @@ export function TownScene() {
         y: o.y,
         spriteAssetId: shrineSpriteAssetId(o.refId!, questProgress),
         label: 'Shrine',
+        blocksMovement: true,
       }));
 
     // Every transition that doesn't already get a building facade (buildingEntities above) -
@@ -420,7 +415,7 @@ export function TownScene() {
       .filter((o) => o.type === 'interactable' && o.refId && DECOR_ENTITIES[o.refId])
       .map((o) => {
         const decor = DECOR_ENTITIES[o.refId!];
-        return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: decor.spriteAssetId, label: decor.label };
+        return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: decor.spriteAssetId, label: decor.label, blocksMovement: true };
       });
 
     const now = Date.now();
@@ -435,6 +430,7 @@ export function TownScene() {
         y: p.y,
         spriteAssetId: p.gender === 'female' ? 'sprite.player.female' : 'sprite.player.male',
         label: p.displayName,
+        interactionKind: 'presence' as const,
       }));
 
     return [...npcEntities, ...buildingEntities, ...shrineEntities, ...decorEntities, ...exitEntities, ...otherPlayerEntities];
@@ -455,14 +451,17 @@ export function TownScene() {
       {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
+          ref={gridRef}
           map={map}
-          player={position}
+          player={spawnPosition}
           playerSpriteAssetId={resolvePlayerBaseSpriteAssetId(gender, appearance)}
+          movementInputRef={movementInput.inputRef}
+          suspended={suspended}
+          onPositionChange={reportPosition}
+          onTransitionEnter={handleTransitionEnter}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}
-          playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
-          playerMovementState={movementState}
           equipmentLayers={equipmentLayers}
         />
       </div>
@@ -472,7 +471,7 @@ export function TownScene() {
           underneath it. */}
       {battleOverlayOpen ? null : isMobile ? (
         <>
-          <DirectionPad attemptMove={attemptMove} />
+          <DirectionPad setDirectionHeld={movementInput.setDirectionHeld} />
           <MobileHud
             onInteract={attemptInteract}
             onDashStart={staminaUnlocked ? () => startDash() : undefined}

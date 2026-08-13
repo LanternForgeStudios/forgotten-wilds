@@ -30,11 +30,12 @@ export interface WanderPosition {
   isMoving?: boolean;
 }
 
-/** Current tile of every npc on the map - not just the ones that wander. This doubles as the
- *  single source of truth for npc collision (see `dynamicBlockers` in useGridMovement): a static
- *  npc's entry never moves from its home tile, and a `wanderRadius` npc's entry is nudged by a
- *  cosmetic client-side random walk (not server state, not synced between players - npc position
- *  doesn't affect gameplay fairness the way player/combat state does). */
+/** Current tile of every npc on the map - not just the ones that wander. This is the single source
+ *  of truth for where each NPC is actually rendered/collides right now (see each scene's own
+ *  `entities` GridEntity list and ExplorationScene.ts's entityCollisionGroup): a static npc's entry
+ *  never moves from its home tile, and a `wanderRadius` npc's entry is nudged by a cosmetic
+ *  client-side random walk (not server state, not synced between players - npc position doesn't
+ *  affect gameplay fairness the way player/combat state does). */
 export function useWanderingNpcs(map: TileMap | null, paused?: boolean): Record<string, WanderPosition> {
   const [positions, setPositions] = useState<Record<string, WanderPosition>>({});
   const pausedRef = useRef(paused);

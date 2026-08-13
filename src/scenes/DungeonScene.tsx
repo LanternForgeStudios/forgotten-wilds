@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { PlayerHUD } from '@/components/PlayerHUD';
-import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
+import { TileGrid, type GridEntity, type TileGridHandle } from '@/components/exploration/TileGrid';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { MessageOverlay } from '@/components/exploration/MessageOverlay';
@@ -10,7 +10,6 @@ import { MiniMap } from '@/components/MiniMap';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useFieldEncounters } from '@/hooks/useFieldEncounters';
 import { useMapOverlay } from '@/hooks/useMapOverlay';
-import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -213,35 +212,38 @@ export function DungeonScene() {
   const otherOverlaysOpen = message !== null || menuOpen || journalOpen || rewardPopup !== null || currentLorePopup !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
-  const { map, position, positionRef, facingDelta, attemptMove, movementState } = useLocationExploration({
-    locationId,
-    suspended,
-    onFieldEncounterStep: (pos) => {
-      const icon = consumeFieldEncounterAt(pos.x, pos.y);
-      if (icon) goTo('combat', { locationId, spawnX: pos.x, spawnY: pos.y });
-    },
-    onBlockedTransition: setMessage,
-  });
+  const { map, position, positionRef, tilePosition, spawnPosition, reportPosition, movementInput, handleTransitionEnter } =
+    useLocationExploration({
+      locationId,
+      suspended,
+      onBlockedTransition: setMessage,
+    });
   const { icons: fieldEncounterIcons, consumeAt: consumeFieldEncounterAt } = useFieldEncounters(map, locationId, positionRef);
+  const gridRef = useRef<TileGridHandle>(null);
+
+  function handleFieldEncounterNear(icon: { id: string; x: number; y: number }) {
+    const consumed = consumeFieldEncounterAt(icon.x, icon.y);
+    if (consumed) goTo('combat', { locationId, spawnX: icon.x, spawnY: icon.y });
+  }
 
   const { pending, run } = usePendingAction();
 
   useHeartbeat(uid, displayName, locationId, position, gender);
-  useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const { startDash, stopDash } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
+  useDragMovement(gridWrapperRef, movementInput.setDirectionHeld, isMobile && !suspended);
+  const { startDash, stopDash } = useExplorationDash(movementInput.setDashHeld, staminaUnlocked && !suspended);
 
   function attemptInteract() {
     if (suspended || !map) return;
-    const { dx, dy } = facingDelta(position.facing);
-    const target = { x: position.x + dx, y: position.y + dy };
-    const obj = map.objects.find(
-      (o) => o.type === 'interactable' && o.x === target.x && o.y === target.y,
-    );
-    const worldItem = obj?.refId ? WORLD_ITEM_INTERACTABLES[obj.refId] : undefined;
-    const bossTrigger = obj?.refId ? BOSS_TRIGGERS[obj.refId] : undefined;
-    const shrine = obj?.refId ? SHRINE_INTERACTABLES[obj.refId] : undefined;
-    if (worldItem && obj?.refId) {
-      const refId = obj.refId;
+    // Pixel-space directional probe (see ExplorationScene.ts's queryInteraction) - replaces the
+    // old exact-facing-tile lookup. Dungeon interactables are always kind 'interactable' (no NPCs
+    // down here) - `refId` is what every lookup table below is keyed by.
+    const result = gridRef.current?.queryInteraction();
+    if (!result) return;
+    const refId = result.id;
+    const worldItem = WORLD_ITEM_INTERACTABLES[refId];
+    const bossTrigger = BOSS_TRIGGERS[refId];
+    const shrine = SHRINE_INTERACTABLES[refId];
+    if (worldItem) {
       run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
@@ -262,21 +264,20 @@ export function DungeonScene() {
           });
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'It will not budge.'));
-    } else if (bossTrigger && obj?.refId) {
-      const bossId = obj.refId;
+    } else if (bossTrigger) {
+      const bossId = refId;
       const ready = questProgress[bossTrigger.prerequisiteQuestId]?.status === 'completed';
       if (ready) {
         goTo('combat', {
           locationId,
           bossId,
-          spawnX: position.x,
-          spawnY: position.y,
+          spawnX: tilePosition.x,
+          spawnY: tilePosition.y,
         });
       } else {
         setMessage(bossTrigger.blockedMessage);
       }
-    } else if (shrine && obj?.refId) {
-      const refId = obj.refId;
+    } else if (shrine) {
       run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
@@ -285,8 +286,8 @@ export function DungeonScene() {
           else setMessage(shrine.message);
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
-    } else if (obj?.refId?.startsWith('chest-')) {
-      const chestId = obj.refId;
+    } else if (refId.startsWith('chest-')) {
+      const chestId = refId;
       run(() => callOpenChest(locationId, chestId), 'Opening chest...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
@@ -306,8 +307,8 @@ export function DungeonScene() {
           });
         })
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The chest will not open.'));
-    } else if (obj?.refId) {
-      const label = labelForInteractable(obj.refId, openedChests);
+    } else {
+      const label = labelForInteractable(refId, openedChests);
       const article = label.startsWith('Empty') ? 'an ' : 'a ';
       setMessage(`You find ${article}${label.toLowerCase()}. Perhaps it will mean something, in time.`);
     }
@@ -338,7 +339,7 @@ export function DungeonScene() {
     window.addEventListener('keydown', handleInteract);
     return () => window.removeEventListener('keydown', handleInteract);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rewardPopup, currentLorePopup, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, goTo]);
+  }, [rewardPopup, currentLorePopup, message, menuOpen, journalOpen, map, tilePosition, uid, questProgress, goTo]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
   // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
@@ -365,6 +366,7 @@ export function DungeonScene() {
             // "you find X" fail-to-fight-yet message, not a floating map tag).
             label: ENEMIES.find((e) => e.id === refId)?.name ?? bossTrigger.approachLabel,
             displayScale: enemyMapIconScale(spriteAssetId, true),
+            blocksMovement: true,
           };
         }
         if (SHRINE_INTERACTABLES[refId]) {
@@ -374,10 +376,18 @@ export function DungeonScene() {
             y: o.y,
             spriteAssetId: shrineSpriteAssetId(refId, questProgress),
             label: 'Shrine',
+            blocksMovement: true,
           };
         }
         if (refId.startsWith('glowing-mushroom')) {
-          return { id: refId, x: o.x, y: o.y, spriteAssetId: 'structure.decor-glowing-mushroom', label: 'Glowing Mushroom' };
+          return {
+            id: refId,
+            x: o.x,
+            y: o.y,
+            spriteAssetId: 'structure.decor-glowing-mushroom',
+            label: 'Glowing Mushroom',
+            blocksMovement: true,
+          };
         }
         const worldItem = WORLD_ITEM_INTERACTABLES[refId];
         if (worldItem) {
@@ -388,6 +398,7 @@ export function DungeonScene() {
             y: o.y,
             spriteAssetId: collected ? worldItem.collectedSpriteAssetId : worldItem.dormantSpriteAssetId,
             label: collected ? 'Empty Alcove' : worldItem.label,
+            blocksMovement: true,
           };
         }
         return {
@@ -396,6 +407,7 @@ export function DungeonScene() {
           y: o.y,
           spriteAssetId: openedChests.includes(refId) ? 'structure.chest-open' : 'structure.chest',
           label: labelForInteractable(refId, openedChests),
+          blocksMovement: true,
         };
       });
 
@@ -431,14 +443,19 @@ export function DungeonScene() {
       {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
+          ref={gridRef}
           map={map}
-          player={position}
+          player={spawnPosition}
           playerSpriteAssetId={resolvePlayerBaseSpriteAssetId(gender, appearance)}
+          movementInputRef={movementInput.inputRef}
+          suspended={suspended}
+          onPositionChange={reportPosition}
+          onTransitionEnter={handleTransitionEnter}
+          fieldEncounterIcons={fieldEncounterIcons}
+          onFieldEncounterNear={handleFieldEncounterNear}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}
-          playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
-          playerMovementState={movementState}
           equipmentLayers={equipmentLayers}
         />
       </div>
@@ -448,7 +465,7 @@ export function DungeonScene() {
           underneath it. */}
       {battleOverlayOpen ? null : isMobile ? (
         <>
-          <DirectionPad attemptMove={attemptMove} />
+          <DirectionPad setDirectionHeld={movementInput.setDirectionHeld} />
           <MobileHud
             onInteract={attemptInteract}
             onDashStart={staminaUnlocked ? () => startDash() : undefined}

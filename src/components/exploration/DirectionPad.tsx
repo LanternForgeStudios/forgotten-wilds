@@ -2,35 +2,38 @@ import { useEffect, useRef } from 'react';
 import type { Facing } from '@/hooks/useGridMovement';
 import styles from './DirectionPad.module.css';
 
-const REPEAT_MS = 150;
-
 interface DirectionPadProps {
-  attemptMove: (facing: Facing) => void;
+  setDirectionHeld: (facing: Facing, held: boolean) => void;
 }
 
 /** Visible 4-direction arrow control for mobile - a supplement to drag-to-move for players who'd
- *  rather tap/hold a button than swipe across the map itself. */
-export function DirectionPad({ attemptMove }: DirectionPadProps) {
-  const intervalRef = useRef<number | undefined>(undefined);
+ *  rather tap/hold a button than swipe across the map itself. Just reports "this direction is
+ *  currently held" to the shared movement-input ref (see useMovementInput.ts) - no repeat-polling
+ *  interval needed, since Arcade Physics already re-reads the ref every frame on its own. */
+export function DirectionPad({ setDirectionHeld }: DirectionPadProps) {
+  // Tracks which button is currently down on THIS pointer, so a dropped pointerup/pointercancel
+  // (gesture interrupted, finger drags off-screen, browser quirk) can still be released by the
+  // window-level fallback below without needing to know which facing it was.
+  const heldFacingRef = useRef<Facing | null>(null);
 
   function start(facing: Facing) {
-    attemptMove(facing);
-    intervalRef.current = window.setInterval(() => attemptMove(facing), REPEAT_MS);
+    if (heldFacingRef.current) setDirectionHeld(heldFacingRef.current, false);
+    heldFacingRef.current = facing;
+    setDirectionHeld(facing, true);
   }
 
   function stop() {
-    if (intervalRef.current !== undefined) {
-      window.clearInterval(intervalRef.current);
-      intervalRef.current = undefined;
+    if (heldFacingRef.current) {
+      setDirectionHeld(heldFacingRef.current, false);
+      heldFacingRef.current = null;
     }
   }
 
   // Touch devices occasionally never deliver a pointerup/pointercancel to the button that
   // started the hold (gesture interrupted, finger drags off-screen, browser quirk) - without
-  // this, a dropped event leaves the repeat interval running forever and the player appears
-  // stuck walking in whatever direction was last held. A window-level listener catches the
-  // release wherever it actually lands, and unmounting mid-hold (e.g. an overlay swaps this
-  // component out) can't leak the interval either.
+  // this, a dropped event leaves that direction stuck held forever. A window-level listener
+  // catches the release wherever it actually lands, and unmounting mid-hold (e.g. an overlay
+  // swaps this component out) can't leak the held state either.
   useEffect(() => {
     window.addEventListener('pointerup', stop);
     window.addEventListener('pointercancel', stop);

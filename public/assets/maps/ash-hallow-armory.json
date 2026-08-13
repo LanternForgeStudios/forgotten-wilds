@@ -125,19 +125,19 @@
          "name":"collisions",
          "objects":[
                 {
-                 "height":20,
+                 "height":28,
                  "id":7,
                  "name":"",
                  "opacity":1,
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":164,
-                 "x":24,
+                 "width":176,
+                 "x":16,
                  "y":20
                 }, 
                 {
-                 "height":8,
+                 "height":12,
                  "id":8,
                  "name":"",
                  "opacity":1,
@@ -146,7 +146,7 @@
                  "visible":true,
                  "width":20,
                  "x":168,
-                 "y":68
+                 "y":64
                 }],
          "opacity":1,
          "type":"objectgroup",

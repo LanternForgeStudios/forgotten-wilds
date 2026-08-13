@@ -185,16 +185,16 @@
          "name":"collisions",
          "objects":[
                 {
-                 "height":8,
+                 "height":24,
                  "id":5,
                  "name":"",
                  "opacity":1,
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":32,
-                 "x":152,
-                 "y":52
+                 "width":44,
+                 "x":148,
+                 "y":48
                 }, 
                 {
                  "height":8,
@@ -209,19 +209,19 @@
                  "y":132
                 }, 
                 {
-                 "height":8,
+                 "height":16,
                  "id":7,
                  "name":"",
                  "opacity":1,
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":8,
-                 "x":20,
-                 "y":52
+                 "width":12,
+                 "x":16,
+                 "y":48
                 }, 
                 {
-                 "height":24,
+                 "height":28,
                  "id":8,
                  "name":"",
                  "opacity":1,

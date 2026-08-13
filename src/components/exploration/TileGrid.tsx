@@ -3,4 +3,4 @@
 // Town/Overworld/Dungeon all import TileGrid from this one path, so all three are already on
 // Phaser via this single swap (not a per-scene migration).
 export { PhaserExplorationCanvas as TileGrid } from './PhaserExplorationCanvas';
-export type { GridEntity } from './PhaserExplorationCanvas';
+export type { GridEntity, PhaserExplorationCanvasHandle as TileGridHandle } from './PhaserExplorationCanvas';

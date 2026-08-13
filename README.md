@@ -98,8 +98,13 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   driven by `src/components/combat/PhaserBattleCanvas.tsx`), and cutscenes (`CutsceneScene.ts`,
   driven by `src/components/cutscene/PhaserCutsceneCanvas.tsx`) — background, map tiles, sprites,
   camera, hit/defeat effects. Every menu/overlay (Journal, Shop, Inventory, the action-selection
-  panels, the cutscene text box) stays ordinary React+CSS; these Scene classes own zero game
-  logic, just imperative rendering called in response to React state changes.
+  panels, the cutscene text box) stays ordinary React+CSS. `BattleScene`/`CutsceneScene` own zero
+  game logic, just imperative rendering called in response to React state changes - but
+  `ExplorationScene` is the one deliberate exception: player movement is continuous Arcade Physics
+  now (not tile-stepped), so it owns velocity/collision/interaction-probe/zone-transition-overlap
+  logic directly (Arcade's own per-frame simulation has to run inside Phaser's loop, not React's) -
+  React still owns everything the physics *triggers* (server calls, dialogue/quest/inventory
+  state, UI). See that file's own top-of-class comment for the exact boundary.
 - Cutscenes (`src/components/cutscene/Cutscene.tsx`, `src/state/useCutsceneStore.ts`,
   `src/data/cutscenes.ts`) are a single global overlay mounted once at the app root (`App.tsx`),
   triggered from anywhere via `useCutsceneStore.getState().play(config)` — a new character's
@@ -114,8 +119,13 @@ Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgo
   Function responses or a save read via `hydrate.ts`'s `hydrateAllStores`/`resyncSave` — never
   computed client-side.
 - `src/hooks/` — shared client logic, notably `useLocationExploration.ts` (the map-load +
-  spawn/movement/transition logic Town/Overworld/Dungeon all extend rather than copy-paste) and
-  `useGridMovement.ts` (tile-grid movement, dash, animation state).
+  spawn-resolution logic Town/Overworld/Dungeon all extend rather than copy-paste, plus the
+  transition quest-gate/goTo handler passed down to `ExplorationScene`'s physics-driven overlap
+  detection), `useMovementInput.ts` (the shared keyboard/touch input-state ref Arcade Physics reads
+  every frame), and `useGridMovement.ts` (now just the React-side mirror of the physics-reported
+  player position, plus the `isWalkable` tile-candidate check wandering NPCs/field-encounter
+  placement still use - actual movement/collision live in `ExplorationScene.ts`, see `src/phaser/`
+  above).
 - `src/utils/` — small stateless helpers (dialogue-variant resolution, item-effect checks, sell
   pricing, the browser right-click/copy-paste lockdown, etc.), one file per concern.
 - `src/engine/` — a small client-side mirror of quest-status logic (`quests/questStatus.ts`) used

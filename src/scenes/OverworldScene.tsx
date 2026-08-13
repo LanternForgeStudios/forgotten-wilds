@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { PlayerHUD } from '@/components/PlayerHUD';
-import { TileGrid, type GridEntity } from '@/components/exploration/TileGrid';
+import { TileGrid, type GridEntity, type TileGridHandle } from '@/components/exploration/TileGrid';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
 import { DialogueBox } from '@/components/DialogueBox';
@@ -11,7 +11,6 @@ import { MiniMap } from '@/components/MiniMap';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useFieldEncounters } from '@/hooks/useFieldEncounters';
 import { useMapOverlay } from '@/hooks/useMapOverlay';
-import { PLAYER_ANIMATION_LAYOUT, resolveDisplayRow } from '@/animation/characterAnimations';
 import { useHeartbeat } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -355,34 +354,33 @@ export function OverworldScene() {
     }
   }
 
-  const { map, position, positionRef, facingDelta, attemptMove, movementState, wanderPositions } = useLocationExploration({
-    locationId,
-    suspended,
-    onFieldEncounterStep: (pos) => {
-      const icon = consumeFieldEncounterAt(pos.x, pos.y);
-      if (icon) goTo('combat', { locationId, spawnX: pos.x, spawnY: pos.y });
-    },
-    onBlockedTransition: setMessage,
-    onZoneEnter: handleZoneEnter,
-  });
+  const { map, position, positionRef, spawnPosition, reportPosition, movementInput, wanderPositions, handleTransitionEnter } =
+    useLocationExploration({
+      locationId,
+      suspended,
+      onBlockedTransition: setMessage,
+    });
   const { icons: fieldEncounterIcons, consumeAt: consumeFieldEncounterAt } = useFieldEncounters(map, locationId, positionRef);
+  const gridRef = useRef<TileGridHandle>(null);
+
+  function handleFieldEncounterNear(icon: { id: string; x: number; y: number }) {
+    const consumed = consumeFieldEncounterAt(icon.x, icon.y);
+    if (consumed) goTo('combat', { locationId, spawnX: icon.x, spawnY: icon.y });
+  }
 
   useHeartbeat(uid, displayName, locationId, position, gender);
-  useDragMovement(gridWrapperRef, attemptMove, isMobile && !suspended);
-  const { startDash, stopDash } = useExplorationDash(attemptMove, positionRef, staminaUnlocked && !suspended);
+  useDragMovement(gridWrapperRef, movementInput.setDirectionHeld, isMobile && !suspended);
+  const { startDash, stopDash } = useExplorationDash(movementInput.setDashHeld, staminaUnlocked && !suspended);
 
   function attemptInteract() {
     if (suspended || !map) return;
-    const { dx, dy } = facingDelta(position.facing);
-    const target = { x: position.x + dx, y: position.y + dy };
+    // Pixel-space directional probe (see ExplorationScene.ts's queryInteraction) - replaces the
+    // old exact-facing-tile lookup. `result.id` is the matched npc/interactable's own refId.
+    const result = gridRef.current?.queryInteraction();
+    if (!result) return;
 
-    const npcObject = map.objects.find((o) => {
-      if (o.type !== 'npc' || !o.refId) return false;
-      const pos = wanderPositions[o.refId] ?? { x: o.x, y: o.y };
-      return pos.x === target.x && pos.y === target.y;
-    });
-    if (npcObject?.refId) {
-      const npc = NPCS.find((n) => n.id === npcObject.refId);
+    if (result.kind === 'npc') {
+      const npc = NPCS.find((n) => n.id === result.id);
       if (npc) {
         setActiveNpc(npc);
         void playSound('sfx.npc-talk');
@@ -396,11 +394,10 @@ export function OverworldScene() {
       return;
     }
 
-    const obj = map.objects.find(
-      (o) => o.type === 'interactable' && o.x === target.x && o.y === target.y,
-    );
-    if (obj?.refId?.startsWith('chest-')) {
-      const chestId = obj.refId;
+    // result.kind === 'interactable' (presence isn't rendered/interactable in Overworld)
+    const refId = result.id;
+    if (refId.startsWith('chest-')) {
+      const chestId = refId;
       run(() => callOpenChest(locationId, chestId), 'Opening chest...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
@@ -422,8 +419,7 @@ export function OverworldScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The chest will not open.'));
       return;
     }
-    if (obj?.refId && POINT_LANDMARK_KIND[obj.refId] === 'shrine') {
-      const refId = obj.refId;
+    if (POINT_LANDMARK_KIND[refId] === 'shrine') {
       const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
       run(() => callInteractWithShrine(locationId, refId), 'Interacting with shrine...')
         ?.then(async (res) => {
@@ -442,8 +438,7 @@ export function OverworldScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'The shrine does not respond.'));
       return;
     }
-    if (obj?.refId && POINT_LANDMARK_KIND[obj.refId] === 'fragment') {
-      const refId = obj.refId;
+    if (POINT_LANDMARK_KIND[refId] === 'fragment') {
       run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
@@ -465,10 +460,8 @@ export function OverworldScene() {
         .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
       return;
     }
-    if (obj?.refId) {
-      const label = labelForInteractable(obj.refId, openedChests, inventory);
-      setMessage(`You find ${label.startsWith('Empty') ? 'an ' + label.toLowerCase() : 'a ' + label.toLowerCase()}. Perhaps it will mean something, in time.`);
-    }
+    const label = labelForInteractable(refId, openedChests, inventory);
+    setMessage(`You find ${label.startsWith('Empty') ? 'an ' + label.toLowerCase() : 'a ' + label.toLowerCase()}. Perhaps it will mean something, in time.`);
   }
 
   useEffect(() => {
@@ -490,7 +483,7 @@ export function OverworldScene() {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rewardPopup, currentLorePopup, activeNpc, message, menuOpen, journalOpen, map, position, facingDelta, uid, questProgress, wanderPositions]);
+  }, [rewardPopup, currentLorePopup, activeNpc, message, menuOpen, journalOpen, map, uid, questProgress]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
   // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
@@ -515,6 +508,8 @@ export function OverworldScene() {
           // (NPC_WALK_ASSET_IDS) - see TownScene.tsx's identical wiring for the full explanation.
           movementState: pos.isMoving ? 'walking' : undefined,
           facing: pos.facing,
+          blocksMovement: true,
+          interactionKind: 'npc',
         };
       });
 
@@ -540,6 +535,7 @@ export function OverworldScene() {
           y: o.y,
           spriteAssetId,
           label: labelForInteractable(o.refId!, openedChests, inventory),
+          blocksMovement: true,
         };
       });
 
@@ -574,14 +570,20 @@ export function OverworldScene() {
       {pending && <div className={styles.pendingIndicator}>{pending}</div>}
       <div ref={gridWrapperRef} style={{ touchAction: 'none' }}>
         <TileGrid
+          ref={gridRef}
           map={map}
-          player={position}
+          player={spawnPosition}
           playerSpriteAssetId={resolvePlayerBaseSpriteAssetId(gender, appearance)}
+          movementInputRef={movementInput.inputRef}
+          suspended={suspended}
+          onPositionChange={reportPosition}
+          onZoneEnter={handleZoneEnter}
+          onTransitionEnter={handleTransitionEnter}
+          fieldEncounterIcons={fieldEncounterIcons}
+          onFieldEncounterNear={handleFieldEncounterNear}
           entities={entities}
           scale={scale}
           viewportSize={viewportSize}
-          playerFrameRow={resolveDisplayRow(PLAYER_ANIMATION_LAYOUT, movementState, position.facing)}
-          playerMovementState={movementState}
           equipmentLayers={equipmentLayers}
         />
       </div>
@@ -591,7 +593,7 @@ export function OverworldScene() {
           underneath it. */}
       {battleOverlayOpen ? null : isMobile ? (
         <>
-          <DirectionPad attemptMove={attemptMove} />
+          <DirectionPad setDirectionHeld={movementInput.setDirectionHeld} />
           <MobileHud
             onInteract={attemptInteract}
             onDashStart={staminaUnlocked ? () => startDash() : undefined}
