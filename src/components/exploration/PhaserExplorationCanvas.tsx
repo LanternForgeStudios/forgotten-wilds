@@ -170,7 +170,13 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
       // since this is a top-down game, no falling. `debug` stays off here; ExplorationScene draws
       // its own toggleable overlay instead (see setDebugEnabled) rather than Phaser's built-in one,
       // since the built-in flag isn't runtime-toggleable without recreating this Game instance.
-      physics: { default: 'arcade', arcade: { gravity: { x: 0, y: 0 }, debug: false } },
+      // fps: 120 (double Phaser's own 60 default) - Arcade Physics only resolves collisions once per
+      // fixed step, so a body's per-step displacement is velocity/fps; at Dash speed this was large
+      // enough, relative to a thin NPC/interactable hitbox, to skip clean past it in a single step
+      // (reported live: Dash lets the player pass through NPCs/shrines/chests that normal walking
+      // correctly blocks). Doubling the step rate halves that per-step distance with no change to
+      // actual movement speed or feel - the standard mitigation for this class of tunneling.
+      physics: { default: 'arcade', arcade: { gravity: { x: 0, y: 0 }, debug: false, fps: 120 } },
     });
     gameRef.current = game;
     sceneRef.current = scene;

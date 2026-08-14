@@ -36,10 +36,12 @@ const PLAYER_BODY_WIDTH_RATIO = 0.5;
 const PLAYER_BODY_HEIGHT_RATIO = 0.3;
 /** Same "shadow footprint" idea as PLAYER_BODY_WIDTH/HEIGHT_RATIO, applied to any entity with
  *  `blocksMovement: true` (NPCs, chests, shrines, decor - see GridEntity's own doc comment). Not
- *  reusing the player's own ratio constants directly despite the identical values - these are
- *  conceptually a different tuning knob (entity art proportions won't always match the player's),
- *  they just happen to start at the same starting-point numbers. */
-const ENTITY_BODY_WIDTH_RATIO = 0.5;
+ *  reusing the player's own ratio constants directly - these are conceptually a different tuning
+ *  knob (entity art proportions won't always match the player's), and the width ratio has since
+ *  diverged on purpose: widened from 0.5 to reduce how easily a fast-moving player (Dash) can
+ *  tunnel past a thin static hitbox in one physics step (Arcade Physics only checks collision once
+ *  per fixed 60Hz step - a wider target narrows the gap a single dash-speed step could clear). */
+const ENTITY_BODY_WIDTH_RATIO = 0.75;
 const ENTITY_BODY_HEIGHT_RATIO = 0.3;
 /** How close (in tiles) the player must be to a field-encounter icon to trigger it - see
  *  checkFieldEncounterProximity. Roughly "standing on or immediately adjacent to it," matching the
