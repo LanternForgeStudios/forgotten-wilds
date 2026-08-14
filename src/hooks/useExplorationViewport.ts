@@ -38,7 +38,7 @@ export function useHudBarHeight(): number {
 }
 
 function computeViewport(isMobile: boolean) {
-  const scale = isMobile ? 2 : 3;
+  const scale = 2;
   const hudHeight = computeHudBarHeight(isMobile);
   return {
     scale,

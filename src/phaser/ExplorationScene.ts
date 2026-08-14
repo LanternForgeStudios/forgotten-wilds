@@ -101,16 +101,18 @@ const EQUIPMENT_LAYER_DEPTH_OFFSET: Partial<Record<EquipmentSlot, number>> = {
  *  BattleScene's defeat effect - reused here rather than duplicating the Graphics->texture
  *  boilerplate, tinted differently per call site. */
 const PARTICLE_TEXTURE_KEY = 'fx-dot';
-/** The viewport zoom level (see useExplorationViewport.ts's desktop `scale`) that every character/
- *  structure/decoration asset's own pixel dimensions are authored against - a 48x64 sprite is
- *  meant to render at exactly 48x64 screen pixels at this reference zoom, not be force-fit to
- *  exactly one tile's width. Player/entity render scale is this reference's ratio to whatever the
- *  actual current viewport scale is (1.0 on desktop, ~0.67 on mobile's 2x scale), so an asset
- *  authored larger or smaller than one tile stays proportionally larger or smaller than a tile at
- *  any zoom level, instead of every entity being stretched/squashed to exactly fill one tile -
- *  which is what silently made the 48x64 player placeholder (48 native width happens to equal one
- *  tile's width at 3x) look barely taller than a 32x32 NPC placeholder than intended. */
+/** The viewport zoom level that every character/structure/decoration asset's own pixel dimensions
+ *  are authored against - a 48x64 sprite is meant to render at exactly 48x64 screen pixels
+ *  (ENTITY_VISUAL_SCALE below), not be force-fit to exactly one tile's width. Player/NPC/
+ *  interactable sprites are pinned to this reference size regardless of the current tile viewport
+ *  scale (see useExplorationViewport.ts's `scale`) - by request, so shrinking tiles down (e.g. for
+ *  a wider view on desktop) doesn't also shrink characters/props; only the ground grid zooms.
+ *  Previously entity scale tracked viewportScale proportionally (1.0 at desktop's old 3x, ~0.67 at
+ *  mobile's 2x) - see ENTITY_VISUAL_SCALE for where that ratio used to be computed. */
 const REFERENCE_VIEWPORT_SCALE = 3;
+/** Fixed scale factor applied to every player/NPC/interactable sprite - always render at native
+ *  reference size (see REFERENCE_VIEWPORT_SCALE), independent of the tile grid's own zoom level. */
+const ENTITY_VISUAL_SCALE = 1;
 /** --fw-text-dim - a dusty tan/grey, reads as ground dust rather than anything magical. */
 const DASH_DUST_COLOR = 0xb8a888;
 /** Real FX-pack sheet for the Dash dust puff, replacing the generated dot texture once loaded -
@@ -1089,7 +1091,7 @@ export class ExplorationScene extends Phaser.Scene {
       sprite.setTexture(spriteAssetId);
     }
     this.playerTextureKey = spriteAssetId;
-    sprite.setScale(this.viewportScale / REFERENCE_VIEWPORT_SCALE);
+    sprite.setScale(ENTITY_VISUAL_SCALE);
 
     if (snapInstantly) {
       const targetX = pos.x * this.tileSize + this.tileSize / 2;
@@ -1240,7 +1242,7 @@ export class ExplorationScene extends Phaser.Scene {
     const def = getAssetDefinition(entity.spriteAssetId);
     const x = entity.x * this.tileSize + this.tileSize / 2;
     const y = entity.y * this.tileSize + this.tileSize;
-    visual.sprite.setScale((this.viewportScale / REFERENCE_VIEWPORT_SCALE) * (entity.displayScale ?? 1));
+    visual.sprite.setScale(ENTITY_VISUAL_SCALE * (entity.displayScale ?? 1));
     if (def.frameSize) {
       const row = entity.frameRow ?? 0;
       const column = entity.frameColumn ?? 0;
