@@ -89,11 +89,14 @@ Enemies/Entities/Social/Weapons/Icons/MockUps content, which is deliberately out
 migrated and registered - verified by an exact-path audit script cross-referencing every migration
 manifest used this session against the full folder tree, not just spot-checked.
 
-**Single-tile tilesets** (`tileset.general-tree-model1-size2` … `general-tree-model3-size5`, 12
-total): each is one whole standalone tree image registered as its own 1-tile tileset (tile size =
-the full image) rather than a multi-item sheet - add it as an embedded tileset same as any other,
-then stamp it repeatedly onto `decorations-1`/`overhang-1` to scatter trees across a map cheaply,
-without needing a `refId` object per tree.
+**Standalone tree tilesets** (`tileset.general-tree-model1-size2` … `general-tree-model3-size5`, 12
+total): each is one whole tree image, registered as a real 16x16-grid tileset like every other
+Pixel Crawler pack (confirmed 2026-08: initially embedded as a 1-tile whole-image stamp, which drew
+the entire tree squashed into a single 16px map cell - fixed by re-slicing at the tree's native
+16x16 grid). Since a tree spans many cells, place it in Tiled by selecting the *whole tree's tile
+region* from the tileset picker (drag-select all of it, not just one cell) and stamping that
+multi-tile block onto `decorations-1`/`overhang-1` - Tiled preserves the block's shape when you
+stamp it, so the full tree reconstructs correctly across the cells it covers.
 
 **Reflowed grid animations**: `general-anvil-01/-02/-03`, `general-alchemy-table-01/-02/-03`,
 `general-furnace-bricks/-iron/-stone-01/-02/-03`, and `general-sawmill-level-2/-3` (17 items,

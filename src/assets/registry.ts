@@ -508,7 +508,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model1-size2',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model1-size2.png',
     dimensions: { width: 256, height: 128 },
     status: 'final',
@@ -517,7 +517,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model1-size3',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model1-size3.png',
     dimensions: { width: 208, height: 192 },
     status: 'final',
@@ -526,7 +526,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model1-size4',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model1-size4.png',
     dimensions: { width: 368, height: 256 },
     status: 'final',
@@ -535,7 +535,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model1-size5',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model1-size5.png',
     dimensions: { width: 448, height: 368 },
     status: 'final',
@@ -544,7 +544,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model2-size2',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model2-size2.png',
     dimensions: { width: 128, height: 96 },
     status: 'final',
@@ -553,7 +553,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model2-size3',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model2-size3.png',
     dimensions: { width: 144, height: 160 },
     status: 'final',
@@ -562,7 +562,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model2-size4',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model2-size4.png',
     dimensions: { width: 192, height: 224 },
     status: 'final',
@@ -571,7 +571,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model2-size5',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model2-size5.png',
     dimensions: { width: 288, height: 320 },
     status: 'final',
@@ -580,7 +580,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model3-size2',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model3-size2.png',
     dimensions: { width: 128, height: 160 },
     status: 'final',
@@ -589,7 +589,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model3-size3',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model3-size3.png',
     dimensions: { width: 192, height: 288 },
     status: 'final',
@@ -598,7 +598,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model3-size4',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model3-size4.png',
     dimensions: { width: 400, height: 416 },
     status: 'final',
@@ -607,7 +607,7 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
   {
     id: 'tileset.general-tree-model3-size5',
     category: 'tileset',
-    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a single standalone tree image, registered as a 1-tile tileset (tile size = whole image) so it can be stamped repeatedly onto decorations-1/overhang-1 for cheap scattered forest decoration, rather than requiring an individual refId object per instance.',
+    intendedUse: 'Migrated from Pixel Crawler - General (formerly "Free Pack") (art-staging/tilesets) - a standalone tree image, registered as a real 16x16-grid tileset (like every other Pixel Crawler pack) rather than a 1-tile whole-image stamp, so it can be hand-sliced in Tiled as a multi-tile block that reconstructs the full tree across several map cells, and scattered repeatedly onto decorations-1/overhang-1 for forest decoration without requiring an individual refId object per instance.',
     filePath: 'tilesets/general-tree-model3-size5.png',
     dimensions: { width: 384, height: 512 },
     status: 'final',
