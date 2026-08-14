@@ -11,7 +11,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 6,
-  "nextobjectid": 5,
+  "nextobjectid": 8,
   "layers": [
     {
       "id": 1,
@@ -540,7 +540,44 @@
       "draworder": "topdown",
       "id": 4,
       "name": "collisions",
-      "objects": [],
+      "objects": [
+        {
+          "height": 4,
+          "id": 5,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 56,
+          "x": 76,
+          "y": 156
+        },
+        {
+          "height": 16,
+          "id": 6,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 4,
+          "x": 76,
+          "y": 144
+        },
+        {
+          "height": 16,
+          "id": 7,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 4,
+          "x": 128,
+          "y": 144
+        }
+      ],
       "opacity": 1,
       "type": "objectgroup",
       "visible": true,
