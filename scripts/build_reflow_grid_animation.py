@@ -57,8 +57,24 @@ def reflow(src_path: str, dest_path: str, rows: int, cols: int, cw: int, ch: int
             x0, y0 = c * cw, r * ch
             out.paste(img.crop((x0, y0, x0 + cw, y0 + ch)), (idx * cw, 0))
             idx += 1
+    # A rows x cols grid is frequently padded to a rectangle by the source pack even when the real
+    # animation has fewer frames (the last row(s) are blank filler) - if reflowed verbatim, this
+    # project's frameCount = dimensions.width / frameSize.width (see characterAnimations.ts) plays
+    # straight through those transparent cells, reading as a blank-frame flash before the loop
+    # restarts (reported live against general-anvil-01). Trim any fully-transparent frames off the
+    # end before saving - real content is never expected after a padding gap for these packs.
+    real_frames = total_frames
+    while real_frames > 0:
+        frame = out.crop(((real_frames - 1) * cw, 0, real_frames * cw, ch))
+        if frame.getchannel('A').getextrema()[1] == 0:
+            real_frames -= 1
+        else:
+            break
+    if real_frames != total_frames:
+        out = out.crop((0, 0, real_frames * cw, ch))
+        print(f'  trimmed {total_frames - real_frames} trailing blank frame(s)')
     out.save(dest_path)
-    print(f'{dest_path}: {rows}x{cols} grid -> {total_frames} frames, strip {out.width}x{out.height}')
+    print(f'{dest_path}: {rows}x{cols} grid -> {real_frames} frames, strip {out.width}x{out.height}')
 
 
 if __name__ == '__main__':

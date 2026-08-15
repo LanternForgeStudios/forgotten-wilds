@@ -108,6 +108,15 @@ plus column autocorrelation, not guessed) before being registered as a normal an
 original grid-layout source files are preserved unchanged at `public/assets/tilesets/old/` under
 their prior (superseded) tileset filenames, in case a future item needs the same treatment.
 
+A source grid is often padded to a full rectangle even when the real animation has fewer frames
+than rows×cols (the last row(s) are blank filler cells). The reflow script now trims any
+fully-transparent frames off the *end* of the strip before saving - if it reflowed them verbatim,
+this project's frameCount = `dimensions.width / frameSize.width` would loop straight through the
+blank cells, showing as a blank-frame flash right before the animation restarts. 8 of the 17 items
+above (`general-anvil-01/-02/-03`, `general-alchemy-table-01/-02/-03`, `general-sawmill-level-2/-3`)
+shipped with this bug initially (reported live against `general-anvil-01`) and were re-trimmed by
+hand; the `general-furnace-*` sheets were already blank-frame-free (their 2x2 grids have no padding).
+
 **Two remaining static reference-only sheets** (`tileset.general-bonfire-catalog`,
 `general-cooking-equipment`): unlike the grids above, these two are genuinely one-off catalog
 images (several *different* unlit fire-pit/cooking-equipment styles shown side by side), not frames
