@@ -103,6 +103,29 @@ const EQUIPMENT_LAYER_DEPTH_OFFSET: Partial<Record<EquipmentSlot, number>> = {
  *  BattleScene's defeat effect - reused here rather than duplicating the Graphics->texture
  *  boilerplate, tinted differently per call site. */
 const PARTICLE_TEXTURE_KEY = 'fx-dot';
+/** Small soft-edged ellipse, generated once (see ensureShadowTexture) and reused via
+ *  setDisplaySize per instance - one shared texture rather than a separate generated image per
+ *  sprite width, since the shape is identical and only the scale differs. */
+const SHADOW_TEXTURE_KEY = 'entity-shadow';
+const SHADOW_TEXTURE_SIZE = { width: 40, height: 20 };
+/** Ground-contact shadow width as a fraction of the owning sprite's own native width - proportional
+ *  so a small NPC and a tall one both get a footprint-sized shadow rather than a fixed size that
+ *  looks wrong on either end. Height is a fixed fraction of width (a flattened top-down ellipse),
+ *  not of the sprite's height - a shadow's footprint shouldn't grow just because the character/prop
+ *  art itself is tall. Wide/flat rather than a tall blob, matching how a shadow reads at a top-down
+ *  camera angle. */
+const SHADOW_WIDTH_RATIO = 0.9;
+const SHADOW_HEIGHT_TO_WIDTH_RATIO = 0.35;
+/** How far above the sprite's own anchor point (sprite.y - see setPlayer/upsertEntity's "origin
+ *  (0.5, 1)" comment) a shadow is centered, as a fraction of the sprite's frame height. Not 0 -
+ *  every character sheet here is cropped/exported with a margin of fully transparent pixels below
+ *  the actual drawn feet (confirmed against sprite.player.male's own registry note: art content
+ *  fills a 60x80 box inside a 72x96 frame), so sprite.y (the frame's bottom edge) sits visibly
+ *  *below* the real feet. Centering a shadow exactly at sprite.y therefore left a gap between the
+ *  feet and the shadow, reading as the character floating (reported live). This is a tuned
+ *  approximation, not derived per-sprite - it won't be pixel-perfect for every asset, but reads
+ *  right across the character sheets in use today. */
+const SHADOW_Y_OFFSET_RATIO = 0.1;
 /** The viewport zoom level that every character/structure/decoration asset's own pixel dimensions
  *  are authored against - a 48x64 sprite is meant to render at exactly 48x64 screen pixels
  *  (ENTITY_VISUAL_SCALE below), not be force-fit to exactly one tile's width. Player/NPC/
@@ -177,6 +200,10 @@ interface EntityVisual {
    *  (building/exit markers, field-encounter icons, decor/shrine - the latter are looked up via
    *  currentMapObjects directly instead, since they're static MapObjects with their own refId). */
   interactionKind?: 'npc' | 'presence';
+  /** Ground-contact shadow, only present for 'npc'/'presence' entities (see upsertEntity) - gives
+   *  characters visual depth against the flat ground the same way the player's own shadow does.
+   *  Absent for buildings/exit markers/decor/shrines, which already sit flush on the ground art. */
+  shadow?: Phaser.GameObjects.Image;
 }
 
 /** The one generic exploration-rendering Phaser Scene - loaded once per Game instance, reused
@@ -282,6 +309,7 @@ export class ExplorationScene extends Phaser.Scene {
   private onFieldEncounterNear?: (icon: { id: string; x: number; y: number }) => void;
 
   private playerSprite: Phaser.GameObjects.Sprite | null = null;
+  private playerShadow: Phaser.GameObjects.Image | null = null;
   private playerTextureKey: string | null = null;
   /** Same race-guard pattern as entityGeneration - only matters once the player sprite's own
    *  texture can change at runtime (e.g. a future equipment-appearance swap), but guarded now for
@@ -320,6 +348,7 @@ export class ExplorationScene extends Phaser.Scene {
     // `new Phaser.Game(...)` returns (confirmed the hard way: that's exactly what threw
     // "Cannot read properties of undefined (reading 'once')").
     ensureParticleTexture(this, PARTICLE_TEXTURE_KEY);
+    this.ensureShadowTexture();
     // Fire-and-forget: spawnDashDust checks textures.exists before using this, falling back to the
     // dot texture on the rare chance a dash is triggered before this finishes loading.
     loadSceneTexture(this, DASH_DUST_FX_ASSET_ID).catch(() => {});
@@ -398,6 +427,52 @@ export class ExplorationScene extends Phaser.Scene {
     return ENTITY_DEPTH + Math.min(y / ENTITY_Y_SORT_DIVISOR, ENTITY_Y_SORT_MAX_OFFSET);
   }
 
+  /** Generates the shared soft-edged ellipse texture every player/NPC shadow reuses (see
+   *  SHADOW_TEXTURE_KEY) - a few concentric ellipses of increasing alpha drawn small-to-large-first
+   *  so later (smaller, more opaque) draws blend over earlier (larger, fainter) ones, producing a
+   *  soft falloff toward the edge rather than one flat-alpha shape with a hard boundary. Generated
+   *  once per Game instance (mirrors ensureParticleTexture's own guard), not per sprite - every
+   *  shadow is the same shared texture, scaled per-instance via setDisplaySize. */
+  private ensureShadowTexture(): void {
+    if (this.textures.exists(SHADOW_TEXTURE_KEY)) return;
+    const { width, height } = SHADOW_TEXTURE_SIZE;
+    const g = this.add.graphics();
+    const layers = [
+      { scale: 1, alpha: 0.12 },
+      { scale: 0.7, alpha: 0.14 },
+      { scale: 0.45, alpha: 0.16 },
+    ];
+    for (const layer of layers) {
+      g.fillStyle(0x000000, layer.alpha);
+      g.fillEllipse(width / 2, height / 2, (width / 2) * layer.scale, (height / 2) * layer.scale);
+    }
+    g.generateTexture(SHADOW_TEXTURE_KEY, width, height);
+    g.destroy();
+  }
+
+  /** Creates one shadow image sized proportionally to `ownerSprite`'s own native width (see
+   *  SHADOW_WIDTH_RATIO) - shared by both the player (setPlayer) and NPC/presence entities
+   *  (upsertEntity), positioned/depth-sorted every frame in syncAfterPhysicsStep alongside their
+   *  owner. Depth starts at ENTITY_DEPTH - 1 (same "just behind the entity layer" convention
+   *  spawnDashDust's emitter already uses) - corrected to track the owner's own Y-sorted depth once
+   *  movement starts, so it never renders in front of anything actually further "north". */
+  private createShadowFor(ownerSprite: Phaser.GameObjects.Sprite): Phaser.GameObjects.Image {
+    const width = ownerSprite.width * SHADOW_WIDTH_RATIO;
+    const height = width * SHADOW_HEIGHT_TO_WIDTH_RATIO;
+    return this.add
+      .image(ownerSprite.x, this.shadowY(ownerSprite), SHADOW_TEXTURE_KEY)
+      .setDisplaySize(width, height)
+      .setDepth(ENTITY_DEPTH - 1);
+  }
+
+  /** Where a shadow's own Y should sit for a given owner sprite this frame - see
+   *  SHADOW_Y_OFFSET_RATIO's own comment for why this isn't just `ownerSprite.y`. `ownerSprite.height`
+   *  is the frame's native (unscaled) height, same basis PLAYER/ENTITY_BODY_HEIGHT_RATIO already use
+   *  for collision body sizing - stable regardless of sprite.scaleY, so no need to cache it. */
+  private shadowY(ownerSprite: Phaser.GameObjects.Sprite): number {
+    return ownerSprite.y - ownerSprite.height * SHADOW_Y_OFFSET_RATIO;
+  }
+
   /** Reads the shared input ref and drives the player's Arcade body velocity every frame - the
    *  actual "continuous, Arcade-Physics-driven movement" this migration exists for. Deliberately
    *  does NOT touch `playerSprite.x/y` or anything derived from it (depth-sort, equipment-layer
@@ -474,6 +549,7 @@ export class ExplorationScene extends Phaser.Scene {
       for (const [slot, visual] of this.equipmentLayerSprites) {
         visual.sprite.setDepth(playerDepth + (EQUIPMENT_LAYER_DEPTH_OFFSET[slot] ?? 0.5));
       }
+      this.playerShadow?.setPosition(sprite.x, this.shadowY(sprite)).setDepth(playerDepth - 0.5);
       if (this.currentMovementState === 'running' && this.time.now - this.lastDashDustAtMs > 150) {
         this.lastDashDustAtMs = this.time.now;
         this.spawnDashDust(sprite.x, sprite.y);
@@ -483,7 +559,9 @@ export class ExplorationScene extends Phaser.Scene {
       this.checkFieldEncounterProximity();
     }
     for (const visual of this.entityVisuals.values()) {
-      visual.sprite.setDepth(this.depthForY(visual.sprite.y));
+      const entityDepth = this.depthForY(visual.sprite.y);
+      visual.sprite.setDepth(entityDepth);
+      visual.shadow?.setPosition(visual.sprite.x, this.shadowY(visual.sprite)).setDepth(entityDepth - 0.5);
     }
     this.drawDebugOverlay();
   }
@@ -1064,6 +1142,7 @@ export class ExplorationScene extends Phaser.Scene {
       body.setSize(bodyWidth, bodyHeight);
       body.setOffset((sprite.width - bodyWidth) / 2, sprite.height - bodyHeight);
       this.playerSprite = sprite;
+      this.playerShadow = this.createShadowFor(sprite);
       // setCamera has its own `if (this.playerSprite) camera.startFollow(...)` check, but
       // setCamera and setPlayer are two independent React effects that can run in either order -
       // and setPlayer's own texture load (ensurePlayerAnimations, just awaited above) means the
@@ -1178,6 +1257,7 @@ export class ExplorationScene extends Phaser.Scene {
       visual.sprite.destroy();
       visual.label?.destroy();
       visual.badge?.destroy();
+      visual.shadow?.destroy();
       this.entityVisuals.delete(id);
     }
   }
@@ -1210,7 +1290,11 @@ export class ExplorationScene extends Phaser.Scene {
         body.setOffset((sprite.width - bodyWidth) / 2, sprite.height - bodyHeight);
         this.entityCollisionGroup?.add(sprite);
       }
-      visual = { sprite, spriteAssetId: entity.spriteAssetId, interactionKind: entity.interactionKind };
+      // A shadow reads as ground contact - only meaningful for actual characters (NPCs, other
+      // players), not buildings/exit markers/decor/shrines, which already sit flush on the map art.
+      const shadow =
+        entity.interactionKind === 'npc' || entity.interactionKind === 'presence' ? this.createShadowFor(sprite) : undefined;
+      visual = { sprite, spriteAssetId: entity.spriteAssetId, interactionKind: entity.interactionKind, shadow };
       this.entityVisuals.set(entity.id, visual);
       // Mirrors ensurePlayerAnimations - a static single-frame sprite (no frameSize) has no rows to
       // register at all. Safe to call unconditionally for every frameSize'd entity sharing this
