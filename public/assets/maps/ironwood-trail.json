@@ -10721,40 +10721,40 @@
           "y": 128
         },
         {
+          "height": 0,
           "id": 16,
           "name": "",
-          "type": "interactable",
-          "x": 800,
-          "y": 160,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
           "properties": [
             {
               "name": "refId",
               "type": "string",
               "value": "glowing-mushroom-1"
             }
-          ]
+          ],
+          "rotation": 0,
+          "type": "interactable",
+          "visible": true,
+          "width": 0,
+          "x": 800,
+          "y": 160
         },
         {
+          "height": 0,
           "id": 17,
           "name": "",
-          "type": "interactable",
-          "x": 880,
-          "y": 560,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
           "properties": [
             {
               "name": "refId",
               "type": "string",
               "value": "glowing-mushroom-2"
             }
-          ]
+          ],
+          "rotation": 0,
+          "type": "interactable",
+          "visible": true,
+          "width": 0,
+          "x": 880,
+          "y": 560
         }
       ],
       "opacity": 1,
@@ -10886,6 +10886,146 @@
       ],
       "spacing": 0,
       "tilecount": 8112,
+      "tileheight": 16,
+      "tilewidth": 16
+    },
+    {
+      "columns": 13,
+      "firstgid": 9215,
+      "image": "../tilesets/general-rocks.png",
+      "imageheight": 304,
+      "imagewidth": 208,
+      "margin": 0,
+      "name": "general-rocks",
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.general-rocks"
+        }
+      ],
+      "spacing": 0,
+      "tilecount": 247,
+      "tileheight": 16,
+      "tilewidth": 16
+    },
+    {
+      "columns": 25,
+      "firstgid": 9462,
+      "image": "../tilesets/general-wall-tiles.png",
+      "imageheight": 400,
+      "imagewidth": 400,
+      "margin": 0,
+      "name": "general-wall-tiles",
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.general-wall-tiles"
+        }
+      ],
+      "spacing": 0,
+      "tilecount": 625,
+      "tileheight": 16,
+      "tilewidth": 16
+    },
+    {
+      "columns": 25,
+      "firstgid": 10087,
+      "image": "../tilesets/general-water-tiles.png",
+      "imageheight": 400,
+      "imagewidth": 400,
+      "margin": 0,
+      "name": "general-water-tiles",
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.general-water-tiles"
+        }
+      ],
+      "spacing": 0,
+      "tilecount": 625,
+      "tileheight": 16,
+      "tilewidth": 16
+    },
+    {
+      "columns": 25,
+      "firstgid": 10712,
+      "image": "../tilesets/general-vegetation.png",
+      "imageheight": 432,
+      "imagewidth": 400,
+      "margin": 0,
+      "name": "general-vegetation",
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.general-vegetation"
+        }
+      ],
+      "spacing": 0,
+      "tilecount": 675,
+      "tileheight": 16,
+      "tilewidth": 16
+    },
+    {
+      "columns": 16,
+      "firstgid": 11387,
+      "image": "../tilesets/general-wall-variations.png",
+      "imageheight": 480,
+      "imagewidth": 256,
+      "margin": 0,
+      "name": "general-wall-variations",
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.general-wall-variations"
+        }
+      ],
+      "spacing": 0,
+      "tilecount": 480,
+      "tileheight": 16,
+      "tilewidth": 16
+    },
+    {
+      "columns": 25,
+      "firstgid": 11867,
+      "image": "../tilesets/general-floors-tiles.png",
+      "imageheight": 416,
+      "imagewidth": 400,
+      "margin": 0,
+      "name": "general-floors-tiles",
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.general-floors-tiles"
+        }
+      ],
+      "spacing": 0,
+      "tilecount": 650,
+      "tileheight": 16,
+      "tilewidth": 16
+    },
+    {
+      "columns": 12,
+      "firstgid": 12517,
+      "image": "../tilesets/general-tree-model3-size3.png",
+      "imageheight": 288,
+      "imagewidth": 192,
+      "margin": 0,
+      "name": "general-tree-model3-size3",
+      "properties": [
+        {
+          "name": "tilesetAssetId",
+          "type": "string",
+          "value": "tileset.general-tree-model3-size3"
+        }
+      ],
+      "spacing": 0,
+      "tilecount": 216,
       "tileheight": 16,
       "tilewidth": 16
     }
