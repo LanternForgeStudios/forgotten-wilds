@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { callAs, readPlayer, resetFirestore, seedPlayer } from '../testUtils/firestoreTestEnv';
+import { describe, expect, it } from 'vitest';
+import { callAs, readPlayer, seedPlayer } from '../testUtils/firestoreTestEnv';
 import { equipItem, unequipItem } from './equipItem';
 
-describe('equipItem', () => {
-  beforeEach(async () => {
-    await resetFirestore();
-  });
+// Isolation between tests (and between this file and any other emulator-backed test file running
+// in parallel) comes from every test using its own never-reused uid - see firestoreTestEnv.ts's
+// resetFirestore() doc comment for why there's deliberately no shared beforeEach wipe here.
 
+describe('equipItem', () => {
   it('rejects an unauthenticated request', async () => {
     await expect(equipItem.run({ data: { itemId: 'weathered-walking-staff' }, auth: undefined })).rejects.toThrow();
   });
@@ -119,10 +119,6 @@ describe('equipItem', () => {
 });
 
 describe('unequipItem', () => {
-  beforeEach(async () => {
-    await resetFirestore();
-  });
-
   it('rejects an unauthenticated request', async () => {
     await expect(unequipItem.run({ data: { slot: 'weapon' }, auth: undefined })).rejects.toThrow();
   });

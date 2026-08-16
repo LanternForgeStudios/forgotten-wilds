@@ -29,11 +29,16 @@ if (getApps().length === 0) {
   initializeApp({ projectId: EMULATOR_PROJECT_ID });
 }
 
-/** Wipes every document in the emulator's Firestore instance - call in a beforeEach so one test's
- *  writes never leak into the next. Uses the emulator's own REST clear-data endpoint (there's no
- *  Admin SDK method for "delete everything"). Fails fast with a clear message (rather than each
- *  test in the file timing out separately trying to read/write a Firestore that isn't there) if
- *  the emulator isn't reachable at all. */
+/** Wipes every document in the emulator's Firestore instance. NOT meant to be called from a
+ *  per-test beforeEach - vitest runs test FILES in parallel by default, and every test file that
+ *  imports this module shares the same emulator instance, so one file's "clean slate" wipe races
+ *  with (and deletes) another file's still-in-progress writes (reproduced live: a full suite run
+ *  threw "No character found" for tests that pass fine in isolation). Test isolation instead comes
+ *  from every test using its own never-reused uid (seedPlayer's `.set()` is already a full
+ *  overwrite, so a fresh uid never needs a prior wipe) - that's parallel-safe by construction.
+ *  This function still exists for the rare test that genuinely needs to assert against an empty
+ *  database; call it directly in that one test, not in a shared beforeEach. Fails fast with a
+ *  clear message if the emulator isn't reachable at all. */
 export async function resetFirestore(): Promise<void> {
   let res: Response;
   try {
