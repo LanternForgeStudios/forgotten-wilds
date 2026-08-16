@@ -1,24 +1,9 @@
 {
-  "type": "map",
-  "orientation": "orthogonal",
-  "renderorder": "right-down",
   "compressionlevel": -1,
-  "infinite": false,
-  "tiledversion": "1.12.2",
-  "version": "1.10",
-  "width": 13,
   "height": 10,
-  "tilewidth": 16,
-  "tileheight": 16,
-  "nextlayerid": 6,
-  "nextobjectid": 7,
+  "infinite": false,
   "layers": [
     {
-      "id": 1,
-      "type": "tilelayer",
-      "name": "ground",
-      "width": 13,
-      "height": 10,
       "data": [
         21,
         22,
@@ -33,100 +18,87 @@
         22,
         22,
         38,
-        147,
-        48,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        51,
-        56,
-        147,
-        66,
+        39,
+        44,
+        45,
+        45,
+        45,
+        45,
+        45,
+        45,
+        45,
+        45,
+        46,
+        47,
+        164,
+        39,
+        62,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        65,
+        164,
+        39,
+        62,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        65,
+        164,
+        39,
         67,
         67,
         67,
-        67,
-        67,
-        67,
+        85,
+        85,
         67,
         67,
         68,
-        69,
-        56,
-        147,
-        66,
-        67,
-        67,
-        67,
-        67,
-        67,
-        67,
-        67,
+        85,
         67,
         68,
-        69,
-        56,
-        147,
-        66,
+        164,
+        39,
         67,
         67,
         67,
-        67,
-        67,
-        68,
-        67,
-        67,
-        68,
-        69,
-        56,
-        147,
-        66,
-        67,
-        68,
-        67,
-        68,
-        67,
-        68,
-        68,
-        67,
-        68,
-        69,
-        56,
-        147,
-        66,
-        67,
-        68,
+        85,
+        86,
+        85,
         67,
         68,
         67,
         67,
         68,
+        164,
+        39,
+        85,
+        85,
+        85,
+        85,
+        86,
+        67,
+        85,
+        86,
         67,
         68,
-        69,
-        56,
-        147,
-        66,
-        67,
         68,
-        67,
-        68,
-        68,
-        68,
-        68,
-        67,
-        68,
-        69,
-        56,
-        147,
-        66,
-        67,
+        164,
+        39,
+        85,
+        86,
         68,
         68,
         68,
@@ -135,33 +107,53 @@
         68,
         68,
         68,
-        87,
-        56,
+        68,
+        164,
+        39,
+        85,
+        86,
+        86,
+        86,
+        86,
+        86,
+        86,
+        86,
+        86,
+        86,
+        86,
+        164,
         165,
-        181,
-        181,
-        181,
-        181,
+        166,
+        166,
+        166,
+        166,
         85,
         85,
         85,
-        181,
-        181,
-        181,
-        181,
+        166,
+        166,
+        166,
+        166,
         182
       ],
-      "visible": true,
+      "height": 10,
+      "id": 1,
+      "name": "ground",
       "opacity": 1,
-      "x": 0,
-      "y": 0
-    },
-    {
-      "id": 2,
+      "properties": [
+        {
+          "name": "walkable",
+          "type": "bool",
+          "value": false
+        }
+      ],
       "type": "tilelayer",
-      "name": "decorations-1",
+      "visible": true,
       "width": 13,
-      "height": 10,
+      "x": 0,
+      "y": 0
+    },
+    {
       "data": [
         0,
         0,
@@ -190,16 +182,43 @@
         0,
         0,
         0,
+        237,
+        238,
+        239,
         0,
+        237,
+        238,
+        239,
         0,
+        237,
+        238,
+        239,
         0,
         0,
+        250,
+        251,
+        252,
         0,
+        250,
+        251,
+        252,
         0,
+        250,
+        251,
+        252,
         0,
         0,
+        263,
+        264,
+        265,
         0,
+        263,
+        264,
+        265,
         0,
+        263,
+        264,
+        265,
         0,
         0,
         0,
@@ -225,6 +244,7 @@
         0,
         0,
         0,
+        244,
         0,
         0,
         0,
@@ -237,8 +257,10 @@
         0,
         0,
         0,
+        257,
         0,
         0,
+        306,
         0,
         0,
         0,
@@ -248,37 +270,7 @@
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        270,
         0,
         0,
         0,
@@ -294,8 +286,13 @@
         0,
         0
       ],
-      "visible": true,
+      "height": 10,
+      "id": 2,
+      "name": "decorations-1",
       "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 13,
       "x": 0,
       "y": 0
     },
@@ -380,6 +377,7 @@
         0,
         0,
         0,
+        280,
         0,
         0,
         0,
@@ -392,8 +390,7 @@
         0,
         0,
         0,
-        0,
-        0,
+        293,
         0,
         0,
         0,
@@ -433,7 +430,7 @@
         0
       ],
       "height": 10,
-      "id": 5,
+      "id": 3,
       "name": "overhang-1",
       "opacity": 1,
       "type": "tilelayer",
@@ -443,21 +440,14 @@
       "y": 0
     },
     {
-      "id": 3,
-      "type": "objectgroup",
-      "name": "objects",
       "draworder": "topdown",
+      "id": 4,
+      "name": "objects",
       "objects": [
         {
+          "height": 0,
           "id": 1,
           "name": "",
-          "type": "spawnPoint",
-          "x": 96,
-          "y": 128,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -469,36 +459,36 @@
               "type": "string",
               "value": "up"
             }
-          ]
+          ],
+          "rotation": 0,
+          "type": "spawnPoint",
+          "visible": true,
+          "width": 0,
+          "x": 104,
+          "y": 128
         },
         {
+          "height": 0,
           "id": 2,
           "name": "",
-          "type": "npc",
-          "x": 96,
-          "y": 48,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
           "properties": [
             {
               "name": "refId",
               "type": "string",
               "value": "lucien-boudreaux"
             }
-          ]
+          ],
+          "rotation": 0,
+          "type": "npc",
+          "visible": true,
+          "width": 0,
+          "x": 80,
+          "y": 88
         },
         {
+          "height": 0,
           "id": 3,
           "name": "",
-          "type": "transition",
-          "x": 96,
-          "y": 144,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
           "properties": [
             {
               "name": "refId",
@@ -515,22 +505,53 @@
               "type": "string",
               "value": "down"
             }
-          ]
+          ],
+          "rotation": 0,
+          "type": "transition",
+          "visible": true,
+          "width": 0,
+          "x": 104,
+          "y": 148
         }
       ],
       "opacity": 1,
+      "type": "objectgroup",
       "visible": true,
       "x": 0,
       "y": 0
     },
     {
       "draworder": "topdown",
-      "id": 4,
+      "id": 5,
       "name": "collisions",
       "objects": [
         {
+          "height": 8,
+          "id": 7,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 8,
+          "x": 20,
+          "y": 132
+        },
+        {
+          "height": 40,
+          "id": 8,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 8,
+          "x": 180,
+          "y": 100
+        },
+        {
           "height": 4,
-          "id": 4,
+          "id": 9,
           "name": "",
           "opacity": 1,
           "rotation": 0,
@@ -542,7 +563,7 @@
         },
         {
           "height": 16,
-          "id": 5,
+          "id": 10,
           "name": "",
           "opacity": 1,
           "rotation": 0,
@@ -554,7 +575,7 @@
         },
         {
           "height": 16,
-          "id": 6,
+          "id": 11,
           "name": "",
           "opacity": 1,
           "rotation": 0,
@@ -563,6 +584,54 @@
           "width": 4,
           "x": 128,
           "y": 144
+        },
+        {
+          "height": 48,
+          "id": 12,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 176,
+          "x": 16,
+          "y": 16
+        },
+        {
+          "height": 12,
+          "id": 13,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 40,
+          "x": 20,
+          "y": 68
+        },
+        {
+          "height": 12,
+          "id": 14,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 40,
+          "x": 84,
+          "y": 68
+        },
+        {
+          "height": 12,
+          "id": 15,
+          "name": "",
+          "opacity": 1,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 40,
+          "x": 148,
+          "y": 68
         }
       ],
       "opacity": 1,
@@ -572,6 +641,19 @@
       "y": 0
     }
   ],
+  "nextlayerid": 6,
+  "nextobjectid": 16,
+  "orientation": "orthogonal",
+  "properties": [
+    {
+      "name": "tilesetAssetId",
+      "type": "string",
+      "value": "tileset.tiny-dungeon"
+    }
+  ],
+  "renderorder": "right-down",
+  "tiledversion": "1.12.2",
+  "tileheight": 16,
   "tilesets": [
     {
       "columns": 5,
@@ -813,16 +895,6 @@
           ]
         },
         {
-          "id": 36,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
           "id": 53,
           "properties": [
             {
@@ -833,27 +905,7 @@
           ]
         },
         {
-          "id": 54,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
           "id": 71,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 72,
           "properties": [
             {
               "name": "walkable",
@@ -884,16 +936,6 @@
         },
         {
           "id": 107,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 108,
           "properties": [
             {
               "name": "walkable",
@@ -953,67 +995,7 @@
           ]
         },
         {
-          "id": 146,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 147,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
           "id": 148,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 149,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 150,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 151,
-          "properties": [
-            {
-              "name": "walkable",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 152,
           "properties": [
             {
               "name": "walkable",
@@ -1136,48 +1118,8 @@
       "tilewidth": 16
     },
     {
-      "columns": 13,
-      "firstgid": 417,
-      "image": "../tilesets/TopDownHouse_FurnitureState2.png",
-      "imageheight": 288,
-      "imagewidth": 208,
-      "margin": 0,
-      "name": "TopDownHouse_FurnitureState2",
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.retro-interior-furniture-2"
-        }
-      ],
-      "spacing": 0,
-      "tilecount": 234,
-      "tileheight": 16,
-      "tilewidth": 16
-    },
-    {
-      "columns": 18,
-      "firstgid": 651,
-      "image": "../tilesets/TopDownHouse_DoorsAndWindows.png",
-      "imageheight": 160,
-      "imagewidth": 288,
-      "margin": 0,
-      "name": "TopDownHouse_DoorsAndWindows",
-      "properties": [
-        {
-          "name": "tilesetAssetId",
-          "type": "string",
-          "value": "tileset.retro-interior-doors-windows"
-        }
-      ],
-      "spacing": 0,
-      "tilecount": 180,
-      "tileheight": 16,
-      "tilewidth": 16
-    },
-    {
       "columns": 17,
-      "firstgid": 831,
+      "firstgid": 417,
       "image": "../tilesets/general-anvil.png",
       "imageheight": 160,
       "imagewidth": 272,
@@ -1197,7 +1139,7 @@
     },
     {
       "columns": 25,
-      "firstgid": 1001,
+      "firstgid": 587,
       "image": "../tilesets/general-building-props.png",
       "imageheight": 400,
       "imagewidth": 400,
@@ -1217,7 +1159,7 @@
     },
     {
       "columns": 42,
-      "firstgid": 1626,
+      "firstgid": 1212,
       "image": "../tilesets/general-building-walls.png",
       "imageheight": 800,
       "imagewidth": 672,
@@ -1237,7 +1179,7 @@
     },
     {
       "columns": 18,
-      "firstgid": 3726,
+      "firstgid": 3312,
       "image": "../tilesets/general-cooking-equipment.png",
       "imageheight": 224,
       "imagewidth": 288,
@@ -1257,7 +1199,7 @@
     },
     {
       "columns": 18,
-      "firstgid": 3978,
+      "firstgid": 3564,
       "image": "../tilesets/general-cooking-station.png",
       "imageheight": 224,
       "imagewidth": 288,
@@ -1277,7 +1219,7 @@
     },
     {
       "columns": 25,
-      "firstgid": 4230,
+      "firstgid": 3816,
       "image": "../tilesets/general-esoteric.png",
       "imageheight": 400,
       "imagewidth": 400,
@@ -1297,7 +1239,7 @@
     },
     {
       "columns": 25,
-      "firstgid": 4855,
+      "firstgid": 4441,
       "image": "../tilesets/general-farm.png",
       "imageheight": 400,
       "imagewidth": 400,
@@ -1317,7 +1259,7 @@
     },
     {
       "columns": 12,
-      "firstgid": 5480,
+      "firstgid": 5066,
       "image": "../tilesets/general-furnace.png",
       "imageheight": 384,
       "imagewidth": 192,
@@ -1337,7 +1279,7 @@
     },
     {
       "columns": 50,
-      "firstgid": 5768,
+      "firstgid": 5354,
       "image": "../tilesets/general-furniture.png",
       "imageheight": 864,
       "imagewidth": 800,
@@ -1357,7 +1299,7 @@
     },
     {
       "columns": 38,
-      "firstgid": 8468,
+      "firstgid": 8054,
       "image": "../tilesets/general-interior-props.png",
       "imageheight": 384,
       "imagewidth": 608,
@@ -1377,7 +1319,7 @@
     },
     {
       "columns": 41,
-      "firstgid": 9380,
+      "firstgid": 8966,
       "image": "../tilesets/general-interior-walls.png",
       "imageheight": 400,
       "imagewidth": 656,
@@ -1397,7 +1339,7 @@
     },
     {
       "columns": 12,
-      "firstgid": 10405,
+      "firstgid": 9991,
       "image": "../tilesets/general-meat.png",
       "imageheight": 144,
       "imagewidth": 192,
@@ -1417,7 +1359,7 @@
     },
     {
       "columns": 10,
-      "firstgid": 10513,
+      "firstgid": 10099,
       "image": "../tilesets/general-props-pan.png",
       "imageheight": 176,
       "imagewidth": 160,
@@ -1437,7 +1379,7 @@
     },
     {
       "columns": 25,
-      "firstgid": 10623,
+      "firstgid": 10209,
       "image": "../tilesets/general-props-shadows.png",
       "imageheight": 400,
       "imagewidth": 400,
@@ -1457,7 +1399,7 @@
     },
     {
       "columns": 25,
-      "firstgid": 11248,
+      "firstgid": 10834,
       "image": "../tilesets/general-resources.png",
       "imageheight": 400,
       "imagewidth": 400,
@@ -1477,7 +1419,7 @@
     },
     {
       "columns": 25,
-      "firstgid": 11873,
+      "firstgid": 11459,
       "image": "../tilesets/general-tools.png",
       "imageheight": 400,
       "imagewidth": 400,
@@ -1497,7 +1439,7 @@
     },
     {
       "columns": 12,
-      "firstgid": 12498,
+      "firstgid": 12084,
       "image": "../tilesets/general-workbench.png",
       "imageheight": 352,
       "imagewidth": 192,
@@ -1516,11 +1458,8 @@
       "tilewidth": 16
     }
   ],
-  "properties": [
-    {
-      "name": "tilesetAssetId",
-      "type": "string",
-      "value": "tileset.tiny-dungeon"
-    }
-  ]
+  "tilewidth": 16,
+  "type": "map",
+  "version": "1.10",
+  "width": 13
 }
