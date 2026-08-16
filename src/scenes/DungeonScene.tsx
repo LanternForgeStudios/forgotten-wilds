@@ -16,7 +16,7 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
 import { useExplorationDash } from '@/hooks/useExplorationDash';
-import { ENEMIES } from '@/data';
+import { ENEMIES, LOCATIONS } from '@/data';
 import { resolveDecorEntity } from '@/data/decorEntities';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -179,9 +179,12 @@ export function DungeonScene() {
   // above, just derived from inventory instead of a dedicated Firestore list.
   const inventory = useInventoryStore((s) => s.items);
   const isWorldItemCollected = (refId: string) => inventory.some((i) => i.itemId === grantedItemIdFor(refId));
+  // Region-specific dungeon theme when defined, falling back to the generic dungeon track - see
+  // OverworldScene's identical pattern.
   useEffect(() => {
-    void playMusic('music.dungeon');
-  }, []);
+    const location = LOCATIONS.find((l) => l.id === locationId);
+    void playMusic(location?.musicAssetId ?? 'music.dungeon');
+  }, [locationId]);
   const [message, setMessage] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);

@@ -76,6 +76,10 @@ interface PhaserExplorationCanvasProps {
   /** Fires once (leading edge only) when the player's Arcade body enters a `zone` map object's
    *  real rectangle - see ExplorationScene.ts's checkZoneAndTransitionOverlaps. */
   onZoneEnter?: (refId: string) => void;
+  /** Fires whenever the SET of `zone` refIds the player is currently standing inside changes -
+   *  entry AND exit, unlike onZoneEnter's leading-edge-only firing. Used for subarea background
+   *  music, which needs to know when the player leaves a zone too, not just enters it. */
+  onActiveZonesChange?: (refIds: string[]) => void;
   /** Fires once (leading edge only) when the player's Arcade body enters a `transition` map
    *  object's rectangle - the caller decides what a transition actually does (quest-gate check +
    *  goTo, see useLocationExploration.ts's handleTransitionEnter). */
@@ -124,6 +128,8 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
   onPositionChangeRef.current = props.onPositionChange;
   const onZoneEnterRef = useRef(props.onZoneEnter);
   onZoneEnterRef.current = props.onZoneEnter;
+  const onActiveZonesChangeRef = useRef(props.onActiveZonesChange);
+  onActiveZonesChangeRef.current = props.onActiveZonesChange;
   const onTransitionEnterRef = useRef(props.onTransitionEnter);
   onTransitionEnterRef.current = props.onTransitionEnter;
   const onFieldEncounterNearRef = useRef(props.onFieldEncounterNear);
@@ -163,6 +169,7 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
     scene.bindInput(movementInputRef);
     scene.setPositionCallback((pos, state) => onPositionChangeRef.current?.(pos, state));
     scene.setZoneEnterCallback((refId) => onZoneEnterRef.current?.(refId));
+    scene.setActiveZonesChangeCallback((refIds) => onActiveZonesChangeRef.current?.(refIds));
     scene.setTransitionEnterCallback((transition) => onTransitionEnterRef.current?.(transition));
     scene.setFieldEncounterNearCallback((icon) => onFieldEncounterNearRef.current?.(icon));
     const game = new Phaser.Game({

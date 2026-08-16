@@ -49,6 +49,7 @@ export const LOCATIONS: Location[] = [
     npcIds: [],
     fastTravel: false,
     parentLocationId: 'ironwood-trail',
+    musicAssetId: 'music.peaceful-village',
   },
   {
     id: 'spirit-grove',
@@ -61,6 +62,7 @@ export const LOCATIONS: Location[] = [
     npcIds: [],
     fastTravel: false,
     parentLocationId: 'ironwood-trail',
+    musicAssetId: 'music.lost-shrine',
   },
   {
     id: 'mossy-creek',
@@ -73,6 +75,7 @@ export const LOCATIONS: Location[] = [
     npcIds: [],
     fastTravel: false,
     parentLocationId: 'ironwood-trail',
+    musicAssetId: 'music.peaceful-night',
   },
   {
     id: 'fallen-watchtower',
@@ -143,6 +146,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.dwarven-mine',
   },
   {
     id: 'ash-hallow-elias-house',
@@ -284,6 +288,7 @@ export const LOCATIONS: Location[] = [
       'herbalist-noelle',
     ],
     fastTravel: true,
+    musicAssetId: 'music.port-town',
   },
   {
     id: 'cypress-marsh',
@@ -298,6 +303,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: ['marsh-spirit'],
     fastTravel: true,
+    musicAssetId: 'music.spirits-forest',
   },
   {
     id: 'mother-cypress-shrine',
@@ -310,6 +316,7 @@ export const LOCATIONS: Location[] = [
     npcIds: [],
     fastTravel: false,
     parentLocationId: 'cypress-marsh',
+    musicAssetId: 'music.spirits-forest',
   },
   {
     id: 'murkwater-trails',
@@ -324,6 +331,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.silent-forest',
   },
   {
     id: 'hidden-river-landing',
@@ -338,6 +346,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: ['sabine-thorne'],
     fastTravel: true,
+    musicAssetId: 'music.silent-forest',
   },
   {
     id: 'temple-of-the-deep-current',
@@ -353,6 +362,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.temple-of-the-deep',
   },
   {
     id: 'mirehaven-town-hall',
@@ -467,6 +477,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [],
     npcIds: ['scout-niska'],
     fastTravel: true,
+    musicAssetId: 'music.mighty-kingdom',
   },
   {
     id: 'golden-prairie',
@@ -481,6 +492,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.winds-roam',
   },
   {
     id: 'spirit-herd-plains',
@@ -495,6 +507,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.winds-roam',
   },
   {
     id: 'sacred-hills',
@@ -509,6 +522,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: ['prairie-spirit'],
     fastTravel: true,
+    musicAssetId: 'music.traveling-sky',
   },
   {
     id: 'stone-circle-valley',
@@ -523,6 +537,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.winds-roam',
   },
   {
     id: 'thunderbird-mesa-approach',
@@ -537,6 +552,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.traveling-sky',
   },
   {
     id: 'highwind-crossing-chiefs-lodge',
@@ -629,6 +645,7 @@ export const LOCATIONS: Location[] = [
     npcIds: [],
     fastTravel: false,
     parentLocationId: 'stone-circle-valley',
+    musicAssetId: 'music.winds-roam',
   },
 
   // Endless Prairie (MSQ Volume III), Chapter 6: Wings of the First Promise - the Thunderbird Mesa
@@ -653,6 +670,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.pyramid',
   },
   {
     id: 'sky-bridge',
@@ -667,6 +685,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.calm-before-storm',
   },
   {
     id: 'storm-galleries',
@@ -681,6 +700,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.calm-before-storm',
   },
   {
     id: 'lantern-sanctuary',
@@ -692,6 +712,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [{ enemyId: 'storm-wisp', weight: 1 }],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.holy-sanctuary',
   },
   {
     id: 'guardian-peak',
@@ -706,6 +727,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.calm-before-storm',
   },
 
   // --- Whispering Pines (MSQ Volume IV), Chapter 7: The Silent Forest ---
@@ -725,6 +747,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.wood-forest-town',
   },
   {
     id: 'mistwood-path',
@@ -739,6 +762,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.the-journey',
   },
   {
     id: 'elder-forest',
@@ -753,6 +777,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.the-journey',
   },
   {
     id: 'silver-river',
@@ -767,6 +792,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.unknown-island',
   },
   {
     id: 'ancient-cedar-shrine',
@@ -778,6 +804,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [{ enemyId: 'corrupted-echo', weight: 1 }],
     npcIds: ['cedar-spirit'],
     fastTravel: true,
+    musicAssetId: 'music.unknown-island',
   },
   {
     id: 'heartwood-approach',
@@ -792,6 +819,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.unknown-island',
   },
   {
     id: 'cedarwatch-elders-lodge',
@@ -891,6 +919,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.hidden-cavern',
   },
   {
     id: 'inner-archive',
@@ -905,6 +934,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.ancient-library',
   },
   {
     id: 'heartwood-lantern-sanctuary',
@@ -916,6 +946,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [{ enemyId: 'elder-root-wraith', weight: 1 }],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.holy-sanctuary',
   },
   {
     id: 'guardian-grove',
@@ -930,6 +961,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.calm-before-storm',
   },
 
   // --- Shattered Desert (MSQ Volume V), Chapter 9: Beneath Forgotten Stars ---
@@ -943,6 +975,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [],
     npcIds: ['desert-ranger-tomas-vega'],
     fastTravel: true,
+    musicAssetId: 'music.east-town',
   },
   {
     id: 'sunfire-dunes',
@@ -957,6 +990,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.never-give-up',
   },
   {
     id: 'crimson-canyons',
@@ -971,6 +1005,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.never-give-up',
   },
   {
     id: 'painted-mesas',
@@ -985,6 +1020,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.pyramid',
   },
   {
     id: 'celestial-oasis',
@@ -996,6 +1032,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [{ enemyId: 'sandstorm-devil', weight: 1 }],
     npcIds: ['sand-spirit'],
     fastTravel: true,
+    musicAssetId: 'music.pyramid',
   },
   {
     id: 'forgotten-observatory-approach',
@@ -1010,6 +1047,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.pyramid',
   },
   {
     id: 'red-mesa-elders-hall',
@@ -1110,6 +1148,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.old-magician',
   },
   {
     id: 'star-chamber',
@@ -1124,6 +1163,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.temple-of-the-deep',
   },
   {
     id: 'star-lantern-sanctuary',
@@ -1135,6 +1175,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [{ enemyId: 'star-phantom', weight: 1 }],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.holy-sanctuary',
   },
   {
     id: 'canyon-depths',
@@ -1149,6 +1190,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.dangerous-cave',
   },
   {
     id: 'guardian-summit',
@@ -1163,6 +1205,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.calm-before-storm',
   },
 
   // --- Frozen Frontier (MSQ Volume VI), Chapter 11: Into the Endless Winter ---
@@ -1176,6 +1219,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [],
     npcIds: ['captain-astrid-frost'],
     fastTravel: true,
+    musicAssetId: 'music.firelight-town',
   },
   {
     id: 'snowveil-forest',
@@ -1190,6 +1234,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.peaceful-night',
   },
   {
     id: 'frozen-river',
@@ -1204,6 +1249,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.peaceful-night',
   },
   {
     id: 'glacier-pass',
@@ -1218,6 +1264,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.the-journey',
   },
   {
     id: 'aurora-basin',
@@ -1229,6 +1276,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [{ enemyId: 'alpha-frost-wolf', weight: 1 }],
     npcIds: ['winter-spirit'],
     fastTravel: true,
+    musicAssetId: 'music.the-journey',
   },
   {
     id: 'hall-of-eternal-winter-approach',
@@ -1243,6 +1291,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.the-journey',
   },
   {
     id: 'frosthaven-explorer-headquarters',
@@ -1343,6 +1392,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.frozen-abyss',
   },
   {
     id: 'winter-lantern-sanctuary',
@@ -1354,6 +1404,7 @@ export const LOCATIONS: Location[] = [
     encounterTable: [{ enemyId: 'ancient-frozen-wraith', weight: 1 }],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.holy-sanctuary',
   },
   {
     id: 'guardian-chamber',
@@ -1368,6 +1419,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.calm-before-storm',
   },
   {
     id: 'summit-of-winter',
@@ -1382,6 +1434,7 @@ export const LOCATIONS: Location[] = [
     ],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.frozen-abyss',
   },
   {
     id: 'hall-of-memories',
@@ -1393,5 +1446,6 @@ export const LOCATIONS: Location[] = [
     encounterTable: [],
     npcIds: [],
     fastTravel: true,
+    musicAssetId: 'music.ancient-library',
   },
 ];

@@ -257,12 +257,28 @@ function labelForInteractable(refId: string, openedChests: string[], inventory: 
 export function OverworldScene() {
   const locationId = useSceneStore((s) => s.params.locationId) ?? 'ironwood-trail';
   const goTo = useSceneStore((s) => s.goTo);
-  // One generic overworld theme for all regions this MVP pass (per-region variants are a
-  // follow-up) - playMusic no-ops if it's already playing, so crossing between regions doesn't
-  // restart the track.
+  // Region-specific theme when the location defines one, falling back to the generic overworld
+  // track otherwise - playMusic no-ops if it's already playing, so crossing between locations that
+  // share a track doesn't restart it. Re-runs on locationId change (fast travel, a transition into
+  // a new region) - see handleActiveZonesChange below for the subarea override layered on top of
+  // this base track while standing inside a landmark zone (Hunter's Camp, Spirit Grove, etc).
   useEffect(() => {
-    void playMusic('music.overworld');
-  }, []);
+    const location = LOCATIONS.find((l) => l.id === locationId);
+    void playMusic(location?.musicAssetId ?? 'music.overworld');
+  }, [locationId]);
+  // Fires whenever the set of `zone` map objects the player is standing inside changes (see
+  // ExplorationScene's onActiveZonesChange). Landmark subareas sharing this map (parentLocationId
+  // === locationId) with their own musicAssetId override the region's base track while the player
+  // is inside them; leaving reverts to it. Picks the first matching zone if more than one somehow
+  // overlaps - real map layouts don't nest landmark zones today, so this is just a tiebreak, not a
+  // load-bearing design choice.
+  function handleActiveZonesChange(refIds: string[]) {
+    const activeSubarea = refIds
+      .map((refId) => LOCATIONS.find((l) => l.id === refId && l.parentLocationId === locationId))
+      .find((l) => l?.musicAssetId);
+    const baseLocation = LOCATIONS.find((l) => l.id === locationId);
+    void playMusic(activeSubarea?.musicAssetId ?? baseLocation?.musicAssetId ?? 'music.overworld');
+  }
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
@@ -579,6 +595,7 @@ export function OverworldScene() {
           suspended={suspended}
           onPositionChange={reportPosition}
           onZoneEnter={handleZoneEnter}
+          onActiveZonesChange={handleActiveZonesChange}
           onTransitionEnter={handleTransitionEnter}
           fieldEncounterIcons={fieldEncounterIcons}
           onFieldEncounterNear={handleFieldEncounterNear}

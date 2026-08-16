@@ -31,4 +31,12 @@ export interface Location {
    *  a small dot on a cramped town map. Falls back to `name` when omitted (every non-building
    *  location - trails, dungeons, field maps - already has a short enough name on its own). */
   shortName?: string;
+  /** A registry.ts `music.*` audio asset id to play while exploring this location, overriding the
+   *  scene's kind-based default (music.town/music.overworld/music.dungeon). Omitted means "use the
+   *  default" - not every location needs a bespoke pick. For a landmark sub-location reached by
+   *  walking into a `zone` map object rather than a scene transition (parentLocationId set, same
+   *  mapAssetId as its parent - e.g. Hunter's Camp within Ironwood Trail), this is the subarea
+   *  track that plays only while the player is standing inside that zone; leaving it reverts to
+   *  the parent location's own musicAssetId/default. See OverworldScene's handleActiveZonesChange. */
+  musicAssetId?: string;
 }

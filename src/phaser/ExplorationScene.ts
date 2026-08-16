@@ -168,6 +168,15 @@ const DASH_DUST_FX_ASSET_ID = 'fx.smoke-puff';
  *  doesn't cost memory proportional to its value. */
 const VOID_TILE_INDEX = 100_000;
 
+/** Set equality by value, order-independent - used to decide whether the player's currently-
+ *  overlapped zone refIds actually changed this frame (see onActiveZonesChange), rather than
+ *  firing the callback on every frame the player merely stands still inside a zone. */
+function setsHaveSameMembers(a: Set<string>, b: Set<string>): boolean {
+  if (a.size !== b.size) return false;
+  for (const value of a) if (!b.has(value)) return false;
+  return true;
+}
+
 function voidTileTextureKey(tileWidth: number, tileHeight: number): string {
   return `void-tile-texture-${tileWidth}x${tileHeight}`;
 }
@@ -306,6 +315,13 @@ export class ExplorationScene extends Phaser.Scene {
   private overlapStatePrimedForMapKey: string | null = null;
   private onZoneEnter?: (refId: string) => void;
   private onTransitionEnter?: (obj: MapObject) => void;
+  /** Every zone refId the player's body is CURRENTLY overlapping (not leading-edge like
+   *  onZoneEnter - this is a level, not an edge), recomputed every checkZoneAndTransitionOverlaps
+   *  call. Drives subarea music (see onActiveZonesChange) - unlike a one-shot pickup/shrine
+   *  interaction, background music needs to know when the player LEAVES a zone too, not just when
+   *  they enter it. */
+  private activeZoneRefIds = new Set<string>();
+  private onActiveZonesChange?: (refIds: string[]) => void;
   /** Tile-int positions (matching GridEntity's own convention) - set via setFieldEncounterIcons,
    *  checked for player proximity every frame in checkFieldEncounterProximity. Keyed by id (already
    *  unique/time-stamped by the caller - see useFieldEncounters.ts) rather than object reference
@@ -405,6 +421,14 @@ export class ExplorationScene extends Phaser.Scene {
    *  rectangle (leading edge only, see zoneOverlapState/checkZoneAndTransitionOverlaps). */
   setZoneEnterCallback(cb: (refId: string) => void): void {
     this.onZoneEnter = cb;
+  }
+
+  /** Registered once by PhaserExplorationCanvas - fires whenever the SET of zone refIds the player
+   *  is currently standing inside changes (entry OR exit), unlike setZoneEnterCallback's leading-
+   *  edge-only firing. Used for subarea background music (see OverworldScene's handleActiveZones
+   *  Change), which needs to revert to the region's base track on exit, not just switch on entry. */
+  setActiveZonesChangeCallback(cb: (refIds: string[]) => void): void {
+    this.onActiveZonesChange = cb;
   }
 
   /** Registered once by PhaserExplorationCanvas - fires once per real entry onto a `transition`
@@ -615,6 +639,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.primeOverlapState();
       this.overlapStatePrimedForMapKey = this.currentMapKey;
     }
+    const newActiveZoneRefIds = new Set<string>();
     for (const obj of this.currentMapObjects) {
       if ((obj.type !== 'zone' && obj.type !== 'transition') || !obj.refId) continue;
       const overlapping = this.isOverlappingPlayer(obj, body);
@@ -625,6 +650,11 @@ export class ExplorationScene extends Phaser.Scene {
         if (obj.type === 'zone') this.onZoneEnter?.(obj.refId);
         else this.onTransitionEnter?.(obj);
       }
+      if (obj.type === 'zone' && overlapping) newActiveZoneRefIds.add(obj.refId);
+    }
+    if (!setsHaveSameMembers(newActiveZoneRefIds, this.activeZoneRefIds)) {
+      this.activeZoneRefIds = newActiveZoneRefIds;
+      this.onActiveZonesChange?.(Array.from(newActiveZoneRefIds));
     }
   }
 
@@ -941,6 +971,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.currentMapObjects = map.objects;
     this.zoneOverlapState.clear();
     this.transitionOverlapState.clear();
+    this.activeZoneRefIds.clear();
     this.fieldEncounterOverlapState.clear();
     this.overlapStatePrimedForMapKey = null;
 

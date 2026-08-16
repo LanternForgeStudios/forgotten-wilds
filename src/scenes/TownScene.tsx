@@ -115,11 +115,15 @@ const SHRINES = new Set(['ash-hallow-shrine']);
 
 export function TownScene() {
   const locationId = useSceneStore((s) => s.params.locationId) ?? 'ash-hallow';
-  // One theme for Ash Hallow and all its interiors - playMusic no-ops if it's already playing, so
-  // moving between the town square and a building doesn't restart the track.
+  // One theme per town, shared with all its interiors (a building falls back to its parent town's
+  // musicAssetId before the generic default, so an interior with no bespoke track of its own still
+  // matches its town rather than reverting to a flat game-wide theme) - playMusic no-ops if it's
+  // already playing, so moving between the town square and a building doesn't restart the track.
   useEffect(() => {
-    void playMusic('music.town');
-  }, []);
+    const location = LOCATIONS.find((l) => l.id === locationId);
+    const parentLocation = location?.parentLocationId ? LOCATIONS.find((l) => l.id === location.parentLocationId) : undefined;
+    void playMusic(location?.musicAssetId ?? parentLocation?.musicAssetId ?? 'music.town');
+  }, [locationId]);
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
