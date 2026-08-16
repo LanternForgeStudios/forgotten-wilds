@@ -42,6 +42,12 @@ export interface Item {
   unique?: boolean;
 }
 
+/** The 5 universal melee weapon types (docs/Mytherra-Equipment_breakdown.md's "Weapon Types"
+ *  section) - mirrors functions/src/data/equipment.ts's own WeaponType, kept as a separate
+ *  declaration for the same reason the rest of this file is a display-only mirror of the
+ *  server's authoritative data (see functions/src/data/equipment.ts's own doc comment). */
+export type WeaponType = 'staff' | 'sword' | 'axe' | 'spear' | 'hammer';
+
 export interface EquipmentItem {
   id: string;
   name: string;
@@ -53,6 +59,10 @@ export interface EquipmentItem {
   /** Which equipment family this belongs to (e.g. 'walking-staff') - display/grouping only, not
    *  read by any equip mechanic. See functions/src/data/equipment.ts for the full explanation. */
   familyId?: string;
+  /** Weapon-slot only: which of the 5 universal melee types this is - drives CombatScene's
+   *  per-weapon-type hit SFX (see WEAPON_TYPE_SFX). Display copy only, same convention as every
+   *  other field here. */
+  weaponType?: WeaponType;
   unique?: boolean;
   /** Lantern-slot only: how much Lantern Oil this lantern holds, and which Lantern Ability id(s)
    *  (src/data/lanternAbilities.ts) it grants while equipped. */
