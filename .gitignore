@@ -29,6 +29,14 @@ emulator-data/
 # User's personal scratch folder for editing art before it moves into the staging pipeline
 art-staging/tmp-working/
 
+# Helton Yan's Pixel Combat SFX pack (~3.4GB, 1854 files) - too large to commit as a full
+# "preserved library" the way every other audio/art pack in this project is (see the other audio
+# packs under public/assets/audio/library/ for the normal convention). Kept local-only for
+# reference/future picks - see docs/Audio-Usage-Tracker.md for what's been wired from it so far
+# (those specific files get copied out to public/assets/audio/{music,sfx}/ and ARE committed,
+# same as any other picked asset - only this raw source library itself is excluded).
+public/assets/audio/library/sfx/helton-yan-pixel-combat/
+
 # Python bytecode cache from scripts/*.py
 __pycache__/
 *.pyc
