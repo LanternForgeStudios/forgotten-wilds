@@ -23,9 +23,12 @@ grind combat, or intentionally break things without touching real player data.
    - port 4000 (Emulator UI)
    On Windows, `Get-NetTCPConnection -LocalPort <port>` → `OwningProcess` → `Stop-Process` for
    any of these still bound from a prior run.
-2. Launch the emulator suite in the background from the project root:
+2. Launch the emulator suite in the background from the project root, importing saved state so
+   test accounts/characters/quest progress persist across restarts (`./emulator-data/` — gitignored,
+   local-only). Create the directory first if it doesn't exist yet (a fresh checkout, or the very
+   first run) — `--import` errors out if the path is missing rather than just starting empty:
    ```
-   npx --yes firebase-tools emulators:start --only auth,firestore,functions
+   npx --yes firebase-tools emulators:start --only auth,firestore,functions --import=./emulator-data
    ```
    Wait for `All emulators ready!` in its output before proceeding — don't assume it's up after a
    fixed sleep, poll the log/port instead.
@@ -40,11 +43,17 @@ grind combat, or intentionally break things without touching real player data.
 
 ## Stop
 
-1. Find and stop the Vite and Firebase CLI/emulator `node` processes, **and** the Firestore
+1. **Export state before killing anything**, so the next `start` picks up where this session left
+   off: `npx --yes firebase-tools emulators:export ./emulator-data --force` while the emulator hub
+   is still running (this hits the running hub's own export endpoint — it does NOT need the
+   emulators to shut down gracefully first, which matters because the next step force-kills them;
+   relying on `--export-on-exit` instead would silently lose data, since a `Stop-Process -Force`
+   kill on Windows doesn't give the process a chance to run a shutdown hook).
+2. Find and stop the Vite and Firebase CLI/emulator `node` processes, **and** the Firestore
    emulator's `java` process — killing only `node` processes leaves Firestore's port held open
    and causes the next `start` to fail with "port taken."
-2. Confirm the five ports above are free afterward.
-3. Report what was stopped.
+3. Confirm the five ports above are free afterward.
+4. Report what was stopped (and that state was exported).
 
 ## Notes
 
@@ -55,3 +64,6 @@ grind combat, or intentionally break things without touching real player data.
   `deploy_backend` skill's note), the emulators themselves are local-only and don't need it —
   only `npx firebase-tools` fetching itself the first time, or the client hitting the internet,
   would.
+- `./emulator-data/` (gitignored) is the persisted snapshot — delete it to reset local dev back to
+  a clean slate. It's what makes a seeded test account (see `functions/scripts/unlock_test_account.js`)
+  stay unlocked across restarts instead of needing to be re-created/re-seeded every session.

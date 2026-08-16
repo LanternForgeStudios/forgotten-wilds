@@ -46,11 +46,16 @@ in `.env.local` points the client at the emulators instead of production, so loc
 never touches real data:
 
 ```
-npx firebase-tools emulators:start --only auth,firestore,functions
+npx firebase-tools emulators:start --only auth,firestore,functions --import=./emulator-data
 npm run dev
 ```
 
 Emulator UI: http://127.0.0.1:4000. Vite dev server: http://localhost:5173/forgotten-wilds/.
+
+`--import=./emulator-data` restores whatever local test accounts/characters/quest progress were
+saved on a previous run (the directory is gitignored, local-only, and doesn't exist until the
+first save) - export the current state at any time, emulators still running, with
+`npx firebase-tools emulators:export ./emulator-data --force`.
 
 ## Building & deploying
 
