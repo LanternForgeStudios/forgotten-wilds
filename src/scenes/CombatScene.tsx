@@ -20,7 +20,7 @@ import { useToastStore } from '@/state/useToastStore';
 import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useSceneStore } from '@/state/useSceneStore';
-import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS } from '@/data';
+import { AILMENTS, ENEMIES, EQUIPMENT, ITEMS, LANTERN_ABILITIES, LOCATIONS, SKILLS, type WeaponType } from '@/data';
 import type { ActiveAilment } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
@@ -46,6 +46,32 @@ const RESTORE_STAT_LABEL: Record<'hp' | 'spirit' | 'lanternOil', string> = {
   hp: 'HP',
   spirit: 'Spirit',
   lanternOil: 'Lantern Oil',
+};
+
+/** One hit cue per universal weapon type (docs/Mytherra-Equipment_breakdown.md), played for a
+ *  plain 'attack' action (the one action mechanically tied to whatever's actually in the weapon
+ *  slot) instead of the generic sfx.combat-hit. Every other skill still gets its own dedicated
+ *  sfxAssetId (or falls back to sfx.combat-hit) - this only ever applies to 'attack' itself. */
+const WEAPON_TYPE_SFX: Record<WeaponType, string> = {
+  sword: 'sfx.weapon.sword',
+  staff: 'sfx.weapon.staff',
+  axe: 'sfx.weapon.axe',
+  spear: 'sfx.weapon.spear',
+  hammer: 'sfx.weapon.hammer',
+};
+
+/** Fallback hit cue for a spirit-damageType Skill whose own inflictsAilmentId names one of these -
+ *  see WEAPON_TYPE_SFX's own doc comment for the sibling physical-damageType case, and
+ *  sfx.skill.spirit-generic (act()'s own fallback-of-the-fallback) for a spirit skill that doesn't
+ *  inflict any of these. Stun has no cure item (see data/items.ts) but is still a real inflicted
+ *  ailment some skills can cause, so it's included here even though nothing in AILMENTS gates it. */
+const AILMENT_SFX: Record<string, string> = {
+  burn: 'sfx.ailment.burn',
+  freeze: 'sfx.ailment.freeze',
+  stun: 'sfx.ailment.stun',
+  poison: 'sfx.ailment.poison',
+  blind: 'sfx.ailment.blind',
+  silence: 'sfx.ailment.silence',
 };
 
 type Phase = 'starting' | 'playerTurn' | 'resolving' | 'itemMenu' | 'usingItems' | 'victory' | 'defeat' | 'fled' | 'error';
@@ -337,12 +363,20 @@ export function CombatScene() {
       // generic hit sound - gated on an actual landed hit for an offensive action (skills are
       // always offensive; a lantern ability can be healing/defensive instead, in which case there
       // are no `hits` to check at all, so its own cue just plays whenever the action resolves).
-      // Falls back to the shared sfx.combat-hit for every other action type, a miss, or an
-      // action with no dedicated cue of its own (most of them).
+      // A skill with no bespoke cue of its own falls back to a *weapon-type* sound (physical
+      // damageType - it's still fundamentally "you hit them with your weapon, just skillfully")
+      // or the generic sfx.combat-hit for everything else (a miss, or a spirit-damageType skill
+      // with no dedicated cue).
       let dedicatedSoundId: string | undefined;
       if (type === 'skill') {
         const skill = SKILLS.find((s) => s.id === (options?.skillId ?? 'keepers-strike'));
-        if (playerHitLanded && skill?.sfxAssetId) dedicatedSoundId = skill.sfxAssetId;
+        if (playerHitLanded && skill?.sfxAssetId) {
+          dedicatedSoundId = skill.sfxAssetId;
+        } else if (playerHitLanded && skill?.damageType === 'physical') {
+          dedicatedSoundId = weaponDef?.weaponType ? WEAPON_TYPE_SFX[weaponDef.weaponType] : undefined;
+        } else if (playerHitLanded && skill?.damageType === 'spirit') {
+          dedicatedSoundId = (skill.inflictsAilmentId && AILMENT_SFX[skill.inflictsAilmentId]) || 'sfx.skill.spirit-generic';
+        }
       } else if (type === 'lanternAbility') {
         const ability = LANTERN_ABILITIES.find((a) => a.id === options?.abilityId);
         if (ability?.sfxAssetId && (ability.category !== 'offensive' || playerHitLanded)) {

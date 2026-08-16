@@ -10504,6 +10504,172 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes: 'User-picked from the staged library at public/assets/audio/library/sfx/Items/heart_collect.wav - a warm restorative sound for this healing Lantern Ability, same convention as the sfx.skill.* cues.',
   },
+  // 2026-08 weapon-type attack SFX (see docs/Audio-Usage-Tracker.md) - one per the 5 universal
+  // weapon types (docs/Mytherra-Equipment_breakdown.md), played for a plain 'attack' action
+  // instead of the generic sfx.combat-hit, keyed off EquipmentDefinition.weaponType via
+  // CombatScene.tsx's WEAPON_TYPE_SFX. Not personally auditioned (filenames/categories only) -
+  // please confirm by ear.
+  {
+    id: 'sfx.weapon.sword',
+    category: 'audio',
+    intendedUse: "Basic 'attack' action hit cue when a Sword-type weapon is equipped (or no weapon at all - Sword is the fallback) - see CombatScene.tsx's WEAPON_TYPE_SFX",
+    filePath: 'audio/sfx/weapon-sword.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Attacks/Sword Attacks Hits and Blocks/Sword Attack 1.wav - literal sword swing.",
+  },
+  {
+    id: 'sfx.weapon.staff',
+    category: 'audio',
+    intendedUse: "Basic 'attack' action hit cue when a Staff-type weapon is equipped - see CombatScene.tsx's WEAPON_TYPE_SFX",
+    filePath: 'audio/sfx/weapon-staff.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Spells/Spell Impact 1.wav - a light elemental-agnostic impact, fitting Staff's own spirit-leaning stat budget better than a blunt physical thud.",
+  },
+  {
+    id: 'sfx.weapon.axe',
+    category: 'audio',
+    intendedUse: "Basic 'attack' action hit cue when an Axe-type weapon is equipped - see CombatScene.tsx's WEAPON_TYPE_SFX",
+    filePath: 'audio/sfx/weapon-axe.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/FGHTImpt_HIT-Strong Smack_HY_PC-001.wav (local-only pack, gitignored - see docs/Audio-Usage-Tracker.md) - heavy chopping-weight smack. Resampled from the source pack's native 96kHz/24-bit down to this project's usual 44.1kHz/16-bit (same format every other sfx entry uses) - the original was ~4x larger for no audible benefit at typical playback.",
+  },
+  {
+    id: 'sfx.weapon.spear',
+    category: 'audio',
+    intendedUse: "Basic 'attack' action hit cue when a Spear-type weapon is equipped - see CombatScene.tsx's WEAPON_TYPE_SFX",
+    filePath: 'audio/sfx/weapon-spear.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/DSGNMisc_HIT-Gore Pierce_HY_PC-001.wav (local-only pack, gitignored) - literal piercing-thrust character. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
+  },
+  {
+    id: 'sfx.weapon.hammer',
+    category: 'audio',
+    intendedUse: "Basic 'attack' action hit cue when a Hammer-type weapon is equipped - see CombatScene.tsx's WEAPON_TYPE_SFX",
+    filePath: 'audio/sfx/weapon-hammer.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/DSGNImpt_MELEE-Homerunner_HY_PC-001.wav (local-only pack, gitignored) - big heavy blunt-impact connect. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
+  },
+  // 2026-08 skill hit-sound grouping (see docs/Audio-Usage-Tracker.md) - for any Skill with no
+  // bespoke sfxAssetId of its own (most of them - only ember-burst/frost-lance/keepers-strike
+  // have one), CombatScene.tsx falls back to one of these based on the skill's own damageType/
+  // inflictsAilmentId: 'physical' uses the weapon-type sfx above instead, 'spirit' uses whichever
+  // of these matches its inflictsAilmentId, or sfx.skill.spirit-generic if it doesn't inflict one.
+  {
+    id: 'sfx.skill.spirit-generic',
+    category: 'audio',
+    intendedUse: "Fallback hit cue for any spirit-damageType Skill with no bespoke sfxAssetId and no inflictsAilmentId - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/skill-spirit-generic.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Spells/Spell Impact 2.wav - generic magical impact, distinct take from sfx.weapon.staff's own Spell Impact 1.wav.",
+  },
+  {
+    id: 'sfx.ailment.burn',
+    category: 'audio',
+    intendedUse: "Fallback hit cue for a spirit-damageType Skill whose inflictsAilmentId is 'burn' - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/ailment-burn.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Spells/Fireball 1.wav - literal fire cast.",
+  },
+  {
+    id: 'sfx.ailment.freeze',
+    category: 'audio',
+    intendedUse: "Fallback hit cue for a spirit-damageType Skill whose inflictsAilmentId is 'freeze' - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/ailment-freeze.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Spells/Ice Freeze 1.wav - literal ice/freeze cast.",
+  },
+  {
+    id: 'sfx.ailment.stun',
+    category: 'audio',
+    intendedUse: "Fallback hit cue for a spirit-damageType Skill whose inflictsAilmentId is 'stun' - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/ailment-stun.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Spells/Rock Meteor Throw 1.wav - heavy stunning impact.",
+  },
+  {
+    id: 'sfx.ailment.poison',
+    category: 'audio',
+    intendedUse: "Fallback hit cue for a spirit-damageType Skill whose inflictsAilmentId is 'poison' - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/ailment-poison.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/MAGSpel_CAST-Underwater_HY_PC-001.wav (local-only pack, gitignored) - murky/toxic quality, no literal poison-themed cast in either staged pack. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe. Not personally auditioned - please confirm by ear, this is the least confident pick of the 7 ailment/spirit cues.",
+  },
+  {
+    id: 'sfx.ailment.blind',
+    category: 'audio',
+    intendedUse: "Fallback hit cue for a spirit-damageType Skill whose inflictsAilmentId is 'blind' - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/ailment-blind.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/MAGSpel_CAST-Zap Up_HY_PC-001.wav (local-only pack, gitignored) - a rising bright zap/flash. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
+  },
+  {
+    id: 'sfx.ailment.silence',
+    category: 'audio',
+    intendedUse: "Fallback hit cue for a spirit-damageType Skill whose inflictsAilmentId is 'silence' - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/ailment-silence.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/MAGSpel_CAST-Hollow Spell_HY_PC-001.wav (local-only pack, gitignored) - \"Hollow\" reads as an emptying/muting quality, fitting Silence. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
+  },
+  // 2026-08: the 5 remaining Lantern Abilities without their own cue (only lantern-flame/
+  // steadfast-ember had one before), matching each ability's own category (offensive/defensive/
+  // healing) and flavor name. Not personally auditioned - please confirm by ear.
+  {
+    id: 'sfx.lanternAbility.still-waters-calm',
+    category: 'audio',
+    intendedUse: "Ability-specific cue for Still Waters Calm (defensive) - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/lantern-ability-still-waters-calm.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/DSGNSynth_BUFF-Bonus Max Shield_HY_PC-001.wav (local-only pack, gitignored) - a shield/ward-raising tone. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
+  },
+  {
+    id: 'sfx.lanternAbility.open-skies-renewal',
+    category: 'audio',
+    intendedUse: "Ability-specific cue for Open Skies Renewal (healing) - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/lantern-ability-open-skies-renewal.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/MAGAngl_BUFF-Healing Gusts_HY_PC-001.wav (local-only pack, gitignored) - \"Gusts\" fits this ability's own wind/sky flavor text directly. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
+  },
+  {
+    id: 'sfx.lanternAbility.ancient-roots-reach',
+    category: 'audio',
+    intendedUse: "Ability-specific cue for Ancient Roots' Reach (offensive) - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/lantern-ability-ancient-roots-reach.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Spells/Rock Meteor Swarm 1.wav - earthy/rooted impact for this earth-flavored offensive ability.",
+  },
+  {
+    id: 'sfx.lanternAbility.astral-ward',
+    category: 'audio',
+    intendedUse: "Ability-specific cue for Astral Ward (defensive) - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/lantern-ability-astral-ward.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/MAGAngl_BUFF-Shimmering Winds_HY_PC-001.wav (local-only pack, gitignored) - ethereal/starlight quality fitting this ability's own \"dead starlight\" flavor text. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
+  },
+  {
+    id: 'sfx.lanternAbility.resolve-renewed',
+    category: 'audio',
+    intendedUse: "Ability-specific cue for Resolve Renewed (healing) - see CombatScene.tsx's act()",
+    filePath: 'audio/sfx/lantern-ability-resolve-renewed.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/MAGAngl_BUFF-Simple Heal_HY_PC-001.wav (local-only pack, gitignored) - a clean, literal heal tone. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
+  },
 ];
 
 export function findAsset(id: string): AssetDefinition | undefined {

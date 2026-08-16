@@ -17,6 +17,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 5, attack: 4 },
     tier: 'common',
     familyId: 'walking-staff',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-walking-staff', female: 'sprite.equipment.weathered-walking-staff-female' },
   },
   // Sword weapon type (docs/Mytherra-Equipment_breakdown.md's "Weapon Types" section) -
@@ -30,6 +31,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 7, speed: 1 },
     tier: 'common',
     familyId: 'iron-sword',
+    weaponType: 'sword',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-iron-sword', female: 'sprite.equipment.weathered-iron-sword-female' },
   },
   // Axe weapon type founder.
@@ -42,6 +44,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 6, defense: 1, speed: -1 },
     tier: 'common',
     familyId: 'miners-pick',
+    weaponType: 'axe',
     layerSpriteAssetId: { male: 'sprite.equipment.miners-pick', female: 'sprite.equipment.miners-pick-female' },
   },
   // Spear weapon type founder.
@@ -54,6 +57,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 5, maxHp: 4 },
     tier: 'common',
     familyId: 'ashwood-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.ashwood-spear', female: 'sprite.equipment.ashwood-spear-female' },
   },
   // Hammer weapon type founder - built one-handed (mace/war-maul).
@@ -66,6 +70,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 5, defense: 2, speed: -1 },
     tier: 'common',
     familyId: 'miners-mallet',
+    weaponType: 'hammer',
     layerSpriteAssetId: { male: 'sprite.equipment.miners-mallet', female: 'sprite.equipment.miners-mallet-female' },
   },
   // Uncommon/Rare tiers of the 4 new Iron Mountains weapon-type families - layer sprites are each
@@ -79,6 +84,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 9, speed: 2 },
     tier: 'uncommon',
     familyId: 'iron-sword',
+    weaponType: 'sword',
     layerSpriteAssetId: { male: 'sprite.equipment.ironbound-sword', female: 'sprite.equipment.ironbound-sword-female' },
   },
   {
@@ -90,6 +96,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 13, speed: 3, defense: -1 },
     tier: 'rare',
     familyId: 'iron-sword',
+    weaponType: 'sword',
     layerSpriteAssetId: { male: 'sprite.equipment.wardens-broadsword', female: 'sprite.equipment.wardens-broadsword-female' },
   },
   {
@@ -101,6 +108,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 9, defense: 2, speed: -1 },
     tier: 'uncommon',
     familyId: 'miners-pick',
+    weaponType: 'axe',
     layerSpriteAssetId: { male: 'sprite.equipment.ironbound-axe', female: 'sprite.equipment.ironbound-axe-female' },
   },
   {
@@ -112,6 +120,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 14, defense: 3, speed: -3 },
     tier: 'rare',
     familyId: 'miners-pick',
+    weaponType: 'axe',
     layerSpriteAssetId: { male: 'sprite.equipment.ghost-miners-axe', female: 'sprite.equipment.ghost-miners-axe-female' },
   },
   {
@@ -123,6 +132,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 8, maxHp: 6, speed: 1 },
     tier: 'uncommon',
     familyId: 'ashwood-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.ironbound-spear', female: 'sprite.equipment.ironbound-spear-female' },
   },
   {
@@ -134,6 +144,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 12, maxHp: 10, defense: 1 },
     tier: 'rare',
     familyId: 'ashwood-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.ridgehunters-spear', female: 'sprite.equipment.ridgehunters-spear-female' },
   },
   {
@@ -145,6 +156,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 8, defense: 3, speed: -2 },
     tier: 'uncommon',
     familyId: 'miners-mallet',
+    weaponType: 'hammer',
     layerSpriteAssetId: { male: 'sprite.equipment.ironbound-war-maul', female: 'sprite.equipment.ironbound-war-maul-female' },
   },
   {
@@ -156,6 +168,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 12, maxHp: 10, defense: 4, speed: -3 },
     tier: 'rare',
     familyId: 'miners-mallet',
+    weaponType: 'hammer',
     layerSpriteAssetId: { male: 'sprite.equipment.ghostbreaker-warhammer', female: 'sprite.equipment.ghostbreaker-warhammer-female' },
   },
   {
@@ -167,6 +180,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxSpirit: 3, attack: 7, speed: 1 },
     tier: 'uncommon',
     familyId: 'walking-staff',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.ironwood-walking-staff', female: 'sprite.equipment.ironwood-walking-staff-female' },
   },
   {
@@ -178,6 +192,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 10, attack: 10, defense: 2, speed: -2 },
     tier: 'rare',
     familyId: 'walking-staff',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.spiritwood-walking-staff', female: 'sprite.equipment.spiritwood-walking-staff-female' },
   },
   {
@@ -428,6 +443,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 7, attack: 7, defense: 1, speed: -1 },
     tier: 'common',
     familyId: 'cypress-cane',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-cypress-cane', female: 'sprite.equipment.weathered-cypress-cane-female' },
   },
   {
@@ -439,6 +455,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 12, attack: 12, defense: 2, speed: -2 },
     tier: 'uncommon',
     familyId: 'cypress-cane',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.bound-cypress-cane', female: 'sprite.equipment.bound-cypress-cane-female' },
   },
   {
@@ -450,6 +467,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 16, attack: 16, defense: 3, speed: -3 },
     tier: 'rare',
     familyId: 'cypress-cane',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.rougarou-fang-blade', female: 'sprite.equipment.rougarou-fang-blade-female' },
   },
   // Crimson Bayou's own 4 new weapon-type families (docs/Mytherra-Equipment_breakdown.md's
@@ -463,6 +481,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 10, defense: -1, speed: 2 },
     tier: 'common',
     familyId: 'bog-cutlass',
+    weaponType: 'sword',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-bog-cutlass', female: 'sprite.equipment.weathered-bog-cutlass-female' },
   },
   {
@@ -474,6 +493,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 15, defense: -1, speed: 3 },
     tier: 'uncommon',
     familyId: 'bog-cutlass',
+    weaponType: 'sword',
     layerSpriteAssetId: { male: 'sprite.equipment.bound-bog-cutlass', female: 'sprite.equipment.bound-bog-cutlass-female' },
   },
   {
@@ -485,6 +505,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 21, defense: -2, speed: 5 },
     tier: 'rare',
     familyId: 'bog-cutlass',
+    weaponType: 'sword',
     layerSpriteAssetId: { male: 'sprite.equipment.serpent-fang-sword', female: 'sprite.equipment.serpent-fang-sword-female' },
   },
   {
@@ -496,6 +517,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 10, defense: 2, speed: -2 },
     tier: 'common',
     familyId: 'bog-axe',
+    weaponType: 'axe',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-bog-axe', female: 'sprite.equipment.weathered-bog-axe-female' },
   },
   {
@@ -507,6 +529,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 16, defense: 3, speed: -3 },
     tier: 'uncommon',
     familyId: 'bog-axe',
+    weaponType: 'axe',
     layerSpriteAssetId: { male: 'sprite.equipment.bound-bog-axe', female: 'sprite.equipment.bound-bog-axe-female' },
   },
   {
@@ -518,6 +541,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 23, defense: 5, speed: -5 },
     tier: 'rare',
     familyId: 'bog-axe',
+    weaponType: 'axe',
     layerSpriteAssetId: { male: 'sprite.equipment.rougarou-claw-axe', female: 'sprite.equipment.rougarou-claw-axe-female' },
   },
   {
@@ -529,6 +553,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 9, maxHp: 7, defense: 1 },
     tier: 'common',
     familyId: 'reed-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-reed-spear', female: 'sprite.equipment.weathered-reed-spear-female' },
   },
   {
@@ -540,6 +565,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 14, maxHp: 12, defense: 1 },
     tier: 'uncommon',
     familyId: 'reed-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.bound-reed-spear', female: 'sprite.equipment.bound-reed-spear-female' },
   },
   {
@@ -551,6 +577,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 19, maxHp: 16, defense: 2 },
     tier: 'rare',
     familyId: 'reed-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.serpent-guard-spear', female: 'sprite.equipment.serpent-guard-spear-female' },
   },
   {
@@ -562,6 +589,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 9, maxHp: 7, defense: 3, speed: -2 },
     tier: 'common',
     familyId: 'bog-maul',
+    weaponType: 'hammer',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-bog-maul', female: 'sprite.equipment.weathered-bog-maul-female' },
   },
   {
@@ -573,6 +601,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 14, maxHp: 12, defense: 5, speed: -3 },
     tier: 'uncommon',
     familyId: 'bog-maul',
+    weaponType: 'hammer',
     layerSpriteAssetId: { male: 'sprite.equipment.bound-bog-maul', female: 'sprite.equipment.bound-bog-maul-female' },
   },
   {
@@ -584,6 +613,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 19, maxHp: 16, defense: 6, speed: -5 },
     tier: 'rare',
     familyId: 'bog-maul',
+    weaponType: 'hammer',
     layerSpriteAssetId: { male: 'sprite.equipment.rougarou-warclub', female: 'sprite.equipment.rougarou-warclub-female' },
   },
   {
@@ -809,6 +839,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 14, maxHp: 12, defense: 1 },
     tier: 'common',
     familyId: 'prairie-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-prairie-spear', female: 'sprite.equipment.weathered-prairie-spear-female' },
   },
   {
@@ -820,6 +851,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 22, maxHp: 18, defense: 2 },
     tier: 'uncommon',
     familyId: 'prairie-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.bound-prairie-spear', female: 'sprite.equipment.bound-prairie-spear-female' },
   },
   {
@@ -831,6 +863,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 31, maxHp: 26, defense: 3 },
     tier: 'rare',
     familyId: 'prairie-spear',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.windriders-spear', female: 'sprite.equipment.windriders-spear-female' },
   },
   {
@@ -1061,6 +1094,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 12, attack: 12, defense: 2, speed: -2 },
     tier: 'common',
     familyId: 'cedar-staff',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.weathered-cedar-staff', female: 'sprite.equipment.weathered-cedar-staff-female' },
   },
   {
@@ -1072,6 +1106,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 18, attack: 18, defense: 3, speed: -3 },
     tier: 'uncommon',
     familyId: 'cedar-staff',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.bound-cedar-staff', female: 'sprite.equipment.bound-cedar-staff-female' },
   },
   {
@@ -1083,6 +1118,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { maxHp: 26, attack: 26, defense: 5, speed: -5 },
     tier: 'rare',
     familyId: 'cedar-staff',
+    weaponType: 'staff',
     layerSpriteAssetId: { male: 'sprite.equipment.ancient-cedar-staff', female: 'sprite.equipment.ancient-cedar-staff-female' },
   },
   {
@@ -1310,6 +1346,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 16, defense: -1, speed: 4 },
     tier: 'common',
     familyId: 'sunblade',
+    weaponType: 'sword',
   },
   {
     id: 'bound-sunblade',
@@ -1321,6 +1358,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 24, defense: -2, speed: 6 },
     tier: 'uncommon',
     familyId: 'sunblade',
+    weaponType: 'sword',
   },
   {
     id: 'solaris-blade',
@@ -1332,6 +1370,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 34, defense: -3, speed: 8 },
     tier: 'rare',
     familyId: 'sunblade',
+    weaponType: 'sword',
   },
   {
     id: 'worn-nomad-robes',
@@ -1557,6 +1596,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 23, maxHp: 19, defense: 2 },
     tier: 'common',
     familyId: 'frost-pike',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.worn-frost-pike', female: 'sprite.equipment.worn-frost-pike-female' },
   },
   {
@@ -1568,6 +1608,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 36, maxHp: 30, defense: 3 },
     tier: 'uncommon',
     familyId: 'frost-pike',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.bound-frost-pike', female: 'sprite.equipment.bound-frost-pike-female' },
   },
   {
@@ -1579,6 +1620,7 @@ export const EQUIPMENT: EquipmentItem[] = [
     statBonuses: { attack: 50, maxHp: 42, defense: 5 },
     tier: 'rare',
     familyId: 'frost-pike',
+    weaponType: 'spear',
     layerSpriteAssetId: { male: 'sprite.equipment.glacier-forged-pike', female: 'sprite.equipment.glacier-forged-pike-female' },
   },
   {

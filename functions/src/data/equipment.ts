@@ -52,6 +52,10 @@ export interface StatBonuses {
   speed?: number;
 }
 
+/** The 5 universal weapon silhouettes every region's own weapon family is a themed reskin of -
+ *  see docs/Mytherra-Equipment_breakdown.md's "Weapon Types" section. Weapon-slot items only. */
+export type WeaponType = 'staff' | 'sword' | 'axe' | 'spear' | 'hammer';
+
 export interface EquipmentDefinition {
   id: string;
   slot: EquipmentSlot;
@@ -62,6 +66,13 @@ export interface EquipmentDefinition {
    *  each region contributes exactly one family per slot, Common through Rare in this pass;
    *  Mythic/Legendary rows wait for the quest content that will grant them. */
   familyId?: string;
+  /** Weapon-slot only: which of the 5 universal types this family's silhouette is (derived from
+   *  familyId, same mapping docs/Mytherra-Equipment_breakdown.md's own table already documents -
+   *  this just makes it a real, machine-readable field instead of only living in a doc). Drives
+   *  combat's per-weapon-type attack SFX (see CombatScene.tsx) - a mechanical use case that
+   *  didn't exist when that doc was written ("no combat-engine changes come with this" was true
+   *  at the time). */
+  weaponType?: WeaponType;
   /** Caps ownership at 1 and blocks a second copy from ever being granted - for milestone-only
    *  gear, not shop stock. */
   unique?: boolean;
@@ -97,6 +108,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxSpirit: 5, attack: 4 },
     tier: 'common',
     familyId: 'walking-staff',
+    weaponType: 'staff',
   },
   // Sword weapon type (docs/Mytherra-Equipment_breakdown.md's "Weapon Types" section) -
   // weathered-iron-sword is the universal Sword founder item: its (still-pending) layer sprite
@@ -110,6 +122,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 7, speed: 1 },
     tier: 'common',
     familyId: 'iron-sword',
+    weaponType: 'sword',
   },
   // Axe weapon type founder - heavier hit than Sword, at the cost of speed (leans defense instead
   // of the Sword line's speed-leaning split).
@@ -119,6 +132,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 6, defense: 1, speed: -1 },
     tier: 'common',
     familyId: 'miners-pick',
+    weaponType: 'axe',
   },
   // Spear weapon type founder - reach/endurance flavor (HP bonus instead of Sword/Axe's
   // speed/defense split).
@@ -128,6 +142,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 5, maxHp: 4 },
     tier: 'common',
     familyId: 'ashwood-spear',
+    weaponType: 'spear',
   },
   // Hammer weapon type founder - built one-handed (mace/war-maul, not a two-handed maul - no
   // held-two-hand anchor category exists). Heaviest/slowest of the 4 new types, defense-leaning.
@@ -137,6 +152,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 5, defense: 2, speed: -1 },
     tier: 'common',
     familyId: 'miners-mallet',
+    weaponType: 'hammer',
   },
   // Uncommon/Rare tiers of the 4 new Iron Mountains weapon-type families. Stat-tier budgets
   // mirror the walking-staff family's own progression (roughly matching magnitude at each tier),
@@ -148,6 +164,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 9, speed: 2 },
     tier: 'uncommon',
     familyId: 'iron-sword',
+    weaponType: 'sword',
   },
   'wardens-broadsword': {
     id: 'wardens-broadsword',
@@ -155,6 +172,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 13, speed: 3, defense: -1 },
     tier: 'rare',
     familyId: 'iron-sword',
+    weaponType: 'sword',
   },
   'ironbound-axe': {
     id: 'ironbound-axe',
@@ -162,6 +180,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 9, defense: 2, speed: -1 },
     tier: 'uncommon',
     familyId: 'miners-pick',
+    weaponType: 'axe',
   },
   'ghost-miners-axe': {
     id: 'ghost-miners-axe',
@@ -169,6 +188,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 14, defense: 3, speed: -3 },
     tier: 'rare',
     familyId: 'miners-pick',
+    weaponType: 'axe',
   },
   'ironbound-spear': {
     id: 'ironbound-spear',
@@ -176,6 +196,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 8, maxHp: 6, speed: 1 },
     tier: 'uncommon',
     familyId: 'ashwood-spear',
+    weaponType: 'spear',
   },
   'ridgehunters-spear': {
     id: 'ridgehunters-spear',
@@ -183,6 +204,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 12, maxHp: 10, defense: 1 },
     tier: 'rare',
     familyId: 'ashwood-spear',
+    weaponType: 'spear',
   },
   'ironbound-war-maul': {
     id: 'ironbound-war-maul',
@@ -190,6 +212,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 8, defense: 3, speed: -2 },
     tier: 'uncommon',
     familyId: 'miners-mallet',
+    weaponType: 'hammer',
   },
   'ghostbreaker-warhammer': {
     id: 'ghostbreaker-warhammer',
@@ -197,6 +220,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 12, maxHp: 10, defense: 4, speed: -3 },
     tier: 'rare',
     familyId: 'miners-mallet',
+    weaponType: 'hammer',
   },
   'ironwood-walking-staff': {
     id: 'ironwood-walking-staff',
@@ -204,6 +228,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxSpirit: 3, attack: 7, speed: 1 },
     tier: 'uncommon',
     familyId: 'walking-staff',
+    weaponType: 'staff',
   },
   'spiritwood-walking-staff': {
     id: 'spiritwood-walking-staff',
@@ -211,6 +236,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 10, attack: 10, defense: 2, speed: -2 },
     tier: 'rare',
     familyId: 'walking-staff',
+    weaponType: 'staff',
   },
   'worn-keeper-coat': {
     id: 'worn-keeper-coat',
@@ -409,6 +435,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 7, attack: 7, defense: 1, speed: -1 },
     tier: 'common',
     familyId: 'cypress-cane',
+    weaponType: 'staff',
   },
   'bound-cypress-cane': {
     id: 'bound-cypress-cane',
@@ -416,6 +443,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 12, attack: 12, defense: 2, speed: -2 },
     tier: 'uncommon',
     familyId: 'cypress-cane',
+    weaponType: 'staff',
   },
   // Named separately from the cane family in the design doc ("Rougarou Fang Blade") but slotted as
   // its Rare tier - same family progression shape as every other Rare cap in this pass.
@@ -425,6 +453,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 16, attack: 16, defense: 3, speed: -3 },
     tier: 'rare',
     familyId: 'cypress-cane',
+    weaponType: 'staff',
   },
   // Crimson Bayou's own 4 new weapon-type families (docs/Mytherra-Equipment_breakdown.md's
   // "Weapon Types" section) - same per-type stat split as Iron Mountains' own 4 founding families
@@ -436,6 +465,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 10, defense: -1, speed: 2 },
     tier: 'common',
     familyId: 'bog-cutlass',
+    weaponType: 'sword',
   },
   'bound-bog-cutlass': {
     id: 'bound-bog-cutlass',
@@ -443,6 +473,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 15, defense: -1, speed: 3 },
     tier: 'uncommon',
     familyId: 'bog-cutlass',
+    weaponType: 'sword',
   },
   'serpent-fang-sword': {
     id: 'serpent-fang-sword',
@@ -450,6 +481,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 21, defense: -2, speed: 5 },
     tier: 'rare',
     familyId: 'bog-cutlass',
+    weaponType: 'sword',
   },
   'weathered-bog-axe': {
     id: 'weathered-bog-axe',
@@ -457,6 +489,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 10, defense: 2, speed: -2 },
     tier: 'common',
     familyId: 'bog-axe',
+    weaponType: 'axe',
   },
   'bound-bog-axe': {
     id: 'bound-bog-axe',
@@ -464,6 +497,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 16, defense: 3, speed: -3 },
     tier: 'uncommon',
     familyId: 'bog-axe',
+    weaponType: 'axe',
   },
   'rougarou-claw-axe': {
     id: 'rougarou-claw-axe',
@@ -471,6 +505,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 23, defense: 5, speed: -5 },
     tier: 'rare',
     familyId: 'bog-axe',
+    weaponType: 'axe',
   },
   'weathered-reed-spear': {
     id: 'weathered-reed-spear',
@@ -478,6 +513,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 9, maxHp: 7, defense: 1 },
     tier: 'common',
     familyId: 'reed-spear',
+    weaponType: 'spear',
   },
   'bound-reed-spear': {
     id: 'bound-reed-spear',
@@ -485,6 +521,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 14, maxHp: 12, defense: 1 },
     tier: 'uncommon',
     familyId: 'reed-spear',
+    weaponType: 'spear',
   },
   'serpent-guard-spear': {
     id: 'serpent-guard-spear',
@@ -492,6 +529,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 19, maxHp: 16, defense: 2 },
     tier: 'rare',
     familyId: 'reed-spear',
+    weaponType: 'spear',
   },
   'weathered-bog-maul': {
     id: 'weathered-bog-maul',
@@ -499,6 +537,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 9, maxHp: 7, defense: 3, speed: -2 },
     tier: 'common',
     familyId: 'bog-maul',
+    weaponType: 'hammer',
   },
   'bound-bog-maul': {
     id: 'bound-bog-maul',
@@ -506,6 +545,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 14, maxHp: 12, defense: 5, speed: -3 },
     tier: 'uncommon',
     familyId: 'bog-maul',
+    weaponType: 'hammer',
   },
   'rougarou-warclub': {
     id: 'rougarou-warclub',
@@ -513,6 +553,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 19, maxHp: 16, defense: 6, speed: -5 },
     tier: 'rare',
     familyId: 'bog-maul',
+    weaponType: 'hammer',
   },
   'tattered-bayou-vestments': {
     id: 'tattered-bayou-vestments',
@@ -678,6 +719,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 14, maxHp: 12, defense: 1 },
     tier: 'common',
     familyId: 'prairie-spear',
+    weaponType: 'spear',
   },
   'bound-prairie-spear': {
     id: 'bound-prairie-spear',
@@ -685,6 +727,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 22, maxHp: 18, defense: 2 },
     tier: 'uncommon',
     familyId: 'prairie-spear',
+    weaponType: 'spear',
   },
   'windriders-spear': {
     id: 'windriders-spear',
@@ -692,6 +735,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 31, maxHp: 26, defense: 3 },
     tier: 'rare',
     familyId: 'prairie-spear',
+    weaponType: 'spear',
   },
   // Buffalo Hide (chest) - a step above Crimson Bayou's own Bayou Vestments, speed-leaning per the
   // region's Speed/Critical/Balanced-offense theme (docs/Mytherra-Equipment_breakdown.md).
@@ -880,6 +924,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 12, attack: 12, defense: 2, speed: -2 },
     tier: 'common',
     familyId: 'cedar-staff',
+    weaponType: 'staff',
   },
   'bound-cedar-staff': {
     id: 'bound-cedar-staff',
@@ -887,6 +932,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 18, attack: 18, defense: 3, speed: -3 },
     tier: 'uncommon',
     familyId: 'cedar-staff',
+    weaponType: 'staff',
   },
   'ancient-cedar-staff': {
     id: 'ancient-cedar-staff',
@@ -894,6 +940,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { maxHp: 26, attack: 26, defense: 5, speed: -5 },
     tier: 'rare',
     familyId: 'cedar-staff',
+    weaponType: 'staff',
   },
   // Bark Armor (chest) - a step above Buffalo Hide, leaning into Spirit/Defense per the region's
   // own Wisdom/Nature theme (docs/Mytherra-Equipment_breakdown.md) rather than Prairie's Speed.
@@ -1076,6 +1123,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 16, defense: -1, speed: 4 },
     tier: 'common',
     familyId: 'sunblade',
+    weaponType: 'sword',
   },
   'bound-sunblade': {
     id: 'bound-sunblade',
@@ -1083,6 +1131,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 24, defense: -2, speed: 6 },
     tier: 'uncommon',
     familyId: 'sunblade',
+    weaponType: 'sword',
   },
   'solaris-blade': {
     id: 'solaris-blade',
@@ -1090,6 +1139,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 34, defense: -3, speed: 8 },
     tier: 'rare',
     familyId: 'sunblade',
+    weaponType: 'sword',
   },
   // Nomad Robes (chest) - a step above Bark Armor, leaning into Attack/Spirit per the region's own
   // Truth/Sun/Stars "high-risk offense" theme (docs/Mytherra-Equipment_breakdown.md) rather than
@@ -1273,6 +1323,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 23, maxHp: 19, defense: 2 },
     tier: 'common',
     familyId: 'frost-pike',
+    weaponType: 'spear',
   },
   'bound-frost-pike': {
     id: 'bound-frost-pike',
@@ -1280,6 +1331,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 36, maxHp: 30, defense: 3 },
     tier: 'uncommon',
     familyId: 'frost-pike',
+    weaponType: 'spear',
   },
   'glacier-forged-pike': {
     id: 'glacier-forged-pike',
@@ -1287,6 +1339,7 @@ export const EQUIPMENT: Record<string, EquipmentDefinition> = {
     statBonuses: { attack: 50, maxHp: 42, defense: 5 },
     tier: 'rare',
     familyId: 'frost-pike',
+    weaponType: 'spear',
   },
   // Winter Coat (chest) - Health/Defense leaning, matching the region's own "Health, Defense,
   // Counterattacks" theme rather than Nomad Robes' attack/spirit lean.

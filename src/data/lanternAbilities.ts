@@ -45,6 +45,7 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
   {
     id: 'still-waters-calm',
     name: 'Still Waters Calm',
+    sfxAssetId: 'sfx.lanternAbility.still-waters-calm',
     category: 'defensive',
     oilCost: 10,
     description:
@@ -53,6 +54,7 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
   {
     id: 'open-skies-renewal',
     name: 'Open Skies Renewal',
+    sfxAssetId: 'sfx.lanternAbility.open-skies-renewal',
     category: 'healing',
     oilCost: 12,
     healHpPercent: 0.25,
@@ -62,6 +64,7 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
   {
     id: 'ancient-roots-reach',
     name: "Ancient Roots' Reach",
+    sfxAssetId: 'sfx.lanternAbility.ancient-roots-reach',
     category: 'offensive',
     oilCost: 10,
     power: 24,
@@ -72,6 +75,7 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
   {
     id: 'astral-ward',
     name: 'Astral Ward',
+    sfxAssetId: 'sfx.lanternAbility.astral-ward',
     category: 'defensive',
     oilCost: 12,
     description:
@@ -80,6 +84,7 @@ export const LANTERN_ABILITIES: LanternAbility[] = [
   {
     id: 'resolve-renewed',
     name: 'Resolve Renewed',
+    sfxAssetId: 'sfx.lanternAbility.resolve-renewed',
     category: 'healing',
     oilCost: 14,
     healHpPercent: 0.3,
