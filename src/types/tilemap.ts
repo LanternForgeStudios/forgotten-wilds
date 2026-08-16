@@ -39,6 +39,12 @@ export interface MapObject {
   /** for npc objects: max tile distance the npc will wander from this spawn point (cosmetic client-side
    *  animation only, not server state). Omitted/undefined means the npc stands still. */
   wanderRadius?: number;
+  /** for spawnPoint objects only: which way the player should face on arrival. Every interior
+   *  building's own front-door spawn point sets this to 'up' (walking in, you face further into
+   *  the room, not back out the door you just came through) - see useLocationExploration.ts's
+   *  spawnPoint resolution. Omitted/undefined defaults to 'down' (outdoor/dungeon maps, which
+   *  don't set this property at all). */
+  spawnFacing?: 'up' | 'down' | 'left' | 'right';
   /** Legacy field, parsed from older map data but no longer enforced - every transition now
    *  triggers from any approach direction (see useGridMovement.ts's isWalkable and
    *  useLocationExploration.ts's handleStep). Kept on the type so existing map JSON with this
@@ -73,7 +79,10 @@ export interface TileMap {
    *  ExplorationScene.ts must pass to Phaser's addTilesetImage instead of the map's own tileWidth/
    *  tileHeight below - using the map's size for every tileset previously cropped the wrong
    *  sub-region of any tileset whose native size differed from it. */
-  tilesets: { assetId: string; firstgid: number; tileWidth: number; tileHeight: number }[];
+  /** `columns` is this tileset's own sheet width in tiles - needed to convert a gid into a source
+   *  (col, row) crop of the tileset image (see MiniMap.tsx's tile-art rendering, the only consumer
+   *  that needs it; ExplorationScene.ts gets this for free from Phaser's own addTilesetImage). */
+  tilesets: { assetId: string; firstgid: number; tileWidth: number; tileHeight: number; columns: number }[];
   layers: TileLayer[];
   objects: MapObject[];
   /** Discrete static collision-only obstacles from the 'collisions' object layer. Empty if the map

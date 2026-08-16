@@ -81,7 +81,7 @@ export function isWalkable(map: TileMap, x: number, y: number): boolean {
 }
 
 interface UseGridMovementOptions {
-  start: { x: number; y: number };
+  start: { x: number; y: number; facing?: Facing };
 }
 
 /** Owns the React-visible mirror of the player's position/movementState - Arcade Physics
@@ -91,7 +91,7 @@ interface UseGridMovementOptions {
  *  "snap to a new spawn point on a real location transition" reset, same as before. */
 export function useGridMovement({ start }: UseGridMovementOptions) {
   const [resolvedStart, setResolvedStart] = useState(start);
-  const [position, setPosition] = useState<GridPosition>({ x: start.x, y: start.y, facing: 'down' });
+  const [position, setPosition] = useState<GridPosition>({ x: start.x, y: start.y, facing: start.facing ?? 'down' });
   const [movementState, setMovementState] = useState<MovementState>('idle');
   const positionRef = useRef(position);
   positionRef.current = position;
@@ -103,7 +103,7 @@ export function useGridMovement({ start }: UseGridMovementOptions) {
   // map's real spawn point.
   if (start.x !== resolvedStart.x || start.y !== resolvedStart.y) {
     setResolvedStart(start);
-    setPosition({ x: start.x, y: start.y, facing: 'down' });
+    setPosition({ x: start.x, y: start.y, facing: start.facing ?? 'down' });
   }
 
   const reportPosition = useCallback((pos: GridPosition, state: MovementState) => {
@@ -119,8 +119,8 @@ export function useGridMovement({ start }: UseGridMovementOptions) {
   // benefit (setPlayer already no-ops position writes outside that case, but still does async
   // texture-check work each call).
   const spawnPosition = useMemo<GridPosition>(
-    () => ({ x: resolvedStart.x, y: resolvedStart.y, facing: 'down' }),
-    [resolvedStart.x, resolvedStart.y],
+    () => ({ x: resolvedStart.x, y: resolvedStart.y, facing: resolvedStart.facing ?? 'down' }),
+    [resolvedStart.x, resolvedStart.y, resolvedStart.facing],
   );
 
   return { position, positionRef, movementState, reportPosition, spawnPosition };

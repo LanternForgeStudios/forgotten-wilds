@@ -26,4 +26,9 @@ export interface Location {
    *  three). Omitted means "just a generic building" - still shown as a building marker, just not
    *  tagged as one of the three special kinds. */
   buildingKind?: 'shop' | 'inn' | 'apothecary';
+  /** Short 1-2 word label for the mini-map's building markers (see MiniMap.tsx) - `name` itself is
+   *  full flavor text ("The Ash Hallow Forge", "Elias Rowan's House") that reads as clutter next to
+   *  a small dot on a cramped town map. Falls back to `name` when omitted (every non-building
+   *  location - trails, dungeons, field maps - already has a short enough name on its own). */
+  shortName?: string;
 }

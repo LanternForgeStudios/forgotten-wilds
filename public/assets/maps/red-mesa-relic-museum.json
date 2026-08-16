@@ -463,6 +463,11 @@
               "name": "refId",
               "type": "string",
               "value": "from-red-mesa"
+            },
+            {
+              "name": "spawnFacing",
+              "type": "string",
+              "value": "up"
             }
           ]
         },

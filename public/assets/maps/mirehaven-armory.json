@@ -463,6 +463,11 @@
               "name": "refId",
               "type": "string",
               "value": "from-mirehaven"
+            },
+            {
+              "name": "spawnFacing",
+              "type": "string",
+              "value": "up"
             }
           ]
         },

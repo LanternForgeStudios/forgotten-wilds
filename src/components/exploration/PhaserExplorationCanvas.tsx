@@ -47,6 +47,14 @@ export interface GridEntity {
    *  don't need this either, since queryInteraction finds those directly from the map's own
    *  `interactable`-type objects instead of from the rendered entity list. */
   interactionKind?: 'npc' | 'presence';
+  /** Ground-contact shadow (see ExplorationScene.ts's createShadowFor) - true for field-encounter
+   *  enemy icons and dungeon boss triggers, which read as characters standing on the ground the
+   *  same way NPCs/other players already do, but aren't a queryInteraction target so they don't
+   *  set interactionKind (that field alone already implies a shadow for 'npc'/'presence' - this is
+   *  purely additive for entities that need one without being an interaction-probe target).
+   *  Omitted/false for everything else (buildings/exit markers/decor/shrines/chests, which already
+   *  sit flush on the map art). */
+  hasShadow?: boolean;
 }
 
 interface PhaserExplorationCanvasProps {

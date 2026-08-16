@@ -1291,9 +1291,12 @@ export class ExplorationScene extends Phaser.Scene {
         this.entityCollisionGroup?.add(sprite);
       }
       // A shadow reads as ground contact - only meaningful for actual characters (NPCs, other
-      // players), not buildings/exit markers/decor/shrines, which already sit flush on the map art.
+      // players, field-encounter enemy icons/bosses via hasShadow), not buildings/exit
+      // markers/decor/shrines/chests, which already sit flush on the map art.
       const shadow =
-        entity.interactionKind === 'npc' || entity.interactionKind === 'presence' ? this.createShadowFor(sprite) : undefined;
+        entity.interactionKind === 'npc' || entity.interactionKind === 'presence' || entity.hasShadow
+          ? this.createShadowFor(sprite)
+          : undefined;
       visual = { sprite, spriteAssetId: entity.spriteAssetId, interactionKind: entity.interactionKind, shadow };
       this.entityVisuals.set(entity.id, visual);
       // Mirrors ensurePlayerAnimations - a static single-frame sprite (no frameSize) has no rows to

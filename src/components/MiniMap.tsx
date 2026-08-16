@@ -8,8 +8,24 @@ import { getBlockedMessage } from '@/utils/locationGates';
 import { ENEMIES, LOCATIONS, NPCS, QUESTS } from '@/data';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
 import { COLLECT_ITEM_LANDMARK_REF_ID } from '@/utils/questLocationLookup';
+import { getCachedImage, loadImage } from '@/assets/assetManager';
 import type { QuestProgress, TileMap } from '@/types';
 import styles from './MiniMap.module.css';
+
+const MINIMAP_TILE_LAYER_NAME = /^(ground|decorations-\d+|overhang(-\d+)?)$/;
+
+/** Finds which of the map's tilesets a gid belongs to - the one with the largest firstgid that's
+ *  still <= gid (tilesets are listed in ascending firstgid order, but this doesn't assume that -
+ *  it just picks the closest one below). Mirrors the same lookup Phaser does internally when it
+ *  resolves a gid against every addTilesetImage call in ExplorationScene.ts, just done by hand
+ *  here since a plain 2D canvas has no equivalent built in. */
+function tilesetForGid(map: TileMap, gid: number): TileMap['tilesets'][number] | undefined {
+  let best: TileMap['tilesets'][number] | undefined;
+  for (const ts of map.tilesets) {
+    if (gid >= ts.firstgid && (!best || ts.firstgid > best.firstgid)) best = ts;
+  }
+  return best;
+}
 
 /** Terrain-only walkability for the base tile-grid background color - deliberately NOT the same
  *  check useGridMovement's isWalkable uses for real movement. That function also treats any
@@ -141,6 +157,14 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hiddenQuestIds = useMapPreferencesStore((s) => s.hiddenQuestIds);
   const [canvasBudget, setCanvasBudget] = useState(computeCanvasBudget);
+  // Tileset images load async (loadImage()), but this component draws synchronously inside a
+  // canvas effect - the first draw for a never-before-opened tileset can only use whatever's
+  // already cached (getCachedImage), leaving that tile on the plain walkable/blocked fill below
+  // it. Bumping this once each requested image resolves re-runs the draw effect so the real art
+  // fills in without the player needing to close/reopen the map. Every tileset asset is cached
+  // forever after its first load (see assetManager.ts's imageCache), so this only ever matters
+  // once per tileset per session.
+  const [tilesetLoadTick, setTilesetLoadTick] = useState(0);
   useOverlayClose(onClose);
 
   // Recomputed on resize (rotating a phone, resizing a desktop window) - same
@@ -172,11 +196,56 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
 
     ctx.clearRect(0, 0, width, height);
 
-    // Walkable/blocked tile grid.
+    // Walkable/blocked tile grid - the base layer, still drawn everywhere. Real tile art (below)
+    // paints over most of it once loaded, but this stays visible for any tile whose tileset hasn't
+    // finished loading yet, and for genuinely empty (gid 0) cells no layer ever draws over.
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
         ctx.fillStyle = isTerrainWalkable(map, x, y) ? COLOR_WALKABLE : COLOR_BLOCKED;
         ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+      }
+    }
+
+    // The actual map art, scaled down, layered on top of the flat fill above - request every
+    // tileset this map uses; draw with whatever's already cached from a prior visit/session, and
+    // schedule a redraw (tilesetLoadTick) for anything that wasn't. Pixel art should stay crisp
+    // rather than smeared when shrunk this much.
+    ctx.imageSmoothingEnabled = false;
+    const tilesetImages = new Map<string, HTMLImageElement>();
+    for (const ts of map.tilesets) {
+      const cached = getCachedImage(ts.assetId);
+      if (cached) {
+        tilesetImages.set(ts.assetId, cached);
+      } else {
+        loadImage(ts.assetId)
+          .then(() => setTilesetLoadTick((t) => t + 1))
+          .catch(() => {});
+      }
+    }
+    for (const layer of map.layers) {
+      if (!layer.visible || !MINIMAP_TILE_LAYER_NAME.test(layer.name)) continue;
+      for (let y = 0; y < map.height; y++) {
+        for (let x = 0; x < map.width; x++) {
+          const gid = layer.data[y * map.width + x];
+          if (!gid) continue;
+          const tileset = tilesetForGid(map, gid);
+          const image = tileset && tilesetImages.get(tileset.assetId);
+          if (!tileset || !image) continue;
+          const localId = gid - tileset.firstgid;
+          const col = localId % tileset.columns;
+          const row = Math.floor(localId / tileset.columns);
+          ctx.drawImage(
+            image,
+            col * tileset.tileWidth,
+            row * tileset.tileHeight,
+            tileset.tileWidth,
+            tileset.tileHeight,
+            x * cellSize,
+            y * cellSize,
+            cellSize,
+            cellSize,
+          );
+        }
       }
     }
 
@@ -266,7 +335,7 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
               : target.buildingKind === 'apothecary'
                 ? COLOR_APOTHECARY
                 : COLOR_BUILDING;
-        drawMarkerWithLabel(obj.x, obj.y, color, 'square', target.name);
+        drawMarkerWithLabel(obj.x, obj.y, color, 'square', target.shortName ?? target.name);
       } else {
         const locked = !!getBlockedMessage(obj.refId, questProgress);
         drawMarkerWithLabel(obj.x, obj.y, locked ? COLOR_EXIT_LOCKED : COLOR_EXIT_OPEN, 'diamond', target.name);
@@ -382,7 +451,7 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
     ctx.strokeStyle = COLOR_PLAYER;
     ctx.lineWidth = 2;
     ctx.stroke();
-  }, [map, position, locationId, openedChests, questProgress, hiddenQuestIds, canvasBudget]);
+  }, [map, position, locationId, openedChests, questProgress, hiddenQuestIds, canvasBudget, tilesetLoadTick]);
 
   return (
     <div className={styles.overlay} onClick={onClose}>

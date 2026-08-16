@@ -369,6 +369,7 @@ export function DungeonScene() {
             label: ENEMIES.find((e) => e.id === refId)?.name ?? bossTrigger.approachLabel,
             displayScale: enemyMapIconScale(spriteAssetId, true),
             blocksMovement: true,
+            hasShadow: true,
           };
         }
         if (SHRINE_INTERACTABLES[refId]) {
@@ -383,12 +384,14 @@ export function DungeonScene() {
         }
         const decorEntity = resolveDecorEntity(refId);
         if (decorEntity) {
+          // No floating name tag for purely ambient decor (fireplace, mushrooms, every general-*
+          // station prop) - only quest-relevant interactables and shrines keep one.
           return {
             id: refId,
             x: o.x,
             y: o.y,
             spriteAssetId: decorEntity.spriteAssetId,
-            label: decorEntity.label,
+            label: undefined,
             blocksMovement: true,
           };
         }
@@ -404,12 +407,15 @@ export function DungeonScene() {
             blocksMovement: true,
           };
         }
+        // Falls through to here only for chests (every other interactable kind returned above) -
+        // no floating name tag for those either, same as decor. labelForInteractable is still used
+        // elsewhere for the "You find a X" flavor message, just not for this floating tag.
         return {
           id: refId,
           x: o.x,
           y: o.y,
           spriteAssetId: openedChests.includes(refId) ? 'structure.chest-open' : 'structure.chest',
-          label: labelForInteractable(refId, openedChests),
+          label: undefined,
           blocksMovement: true,
         };
       });
@@ -420,6 +426,7 @@ export function DungeonScene() {
       y: icon.y,
       spriteAssetId: icon.spriteAssetId,
       displayScale: enemyMapIconScale(icon.spriteAssetId, icon.isBoss),
+      hasShadow: true,
     }));
 
     // Every transition (the entrance from Black Briar Forest, the exit to the Mine Office) gets a

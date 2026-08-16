@@ -101,6 +101,11 @@
                          "name":"refId",
                          "type":"string",
                          "value":"from-ash-hallow"
+                        },
+                        {
+                         "name":"spawnFacing",
+                         "type":"string",
+                         "value":"up"
                         }],
                  "rotation":0,
                  "type":"spawnPoint",

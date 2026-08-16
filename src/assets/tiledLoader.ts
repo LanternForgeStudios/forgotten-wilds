@@ -158,6 +158,7 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     firstgid: t.firstgid,
     tileWidth: t.tilewidth ?? raw.tilewidth,
     tileHeight: t.tileheight ?? raw.tileheight,
+    columns: t.columns ?? 1,
   }));
 
   if (import.meta.env.DEV) {
@@ -203,12 +204,27 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     .filter((l): l is TiledObjectGroup => l.type === 'objectgroup' && l.name !== 'collisions')
     .flatMap((l) => l.objects)
     .map((o) => {
-      // Only 'zone' objects are ever authored as real Tiled rectangles (every other object type is
-      // a point) - width/height (and the tile-span x/y below) fall out as the point's own single
-      // tile for those, same as before. pixelWidth/pixelHeight (below) fall back to a full tile for
-      // any point-placed object so Arcade Physics footprints preserve today's "occupies its whole
-      // tile" behavior until a map author draws a real rectangle for it.
-      const span = o.width || o.height ? pixelRectToTileSpan(o.x, o.y, o.width ?? 0, o.height ?? 0, raw.tilewidth, raw.tileheight) : null;
+      // 'zone' objects are authored as real Tiled rectangles whose x/y IS the rectangle's own
+      // top-left corner (there's no separate "anchor point" for a zone - it's just an area), so
+      // both the tile-span x/y below and the pixel rect stay exactly as drawn.
+      //
+      // 'transition' objects can now also carry real width/height (building-entry hitboxes widened
+      // to comfortably cover the doorway, see docs/Map-Object-Catalog.md) but x/y there still means
+      // the single-tile anchor point the map was originally authored with - the same point
+      // TownScene/OverworldScene/DungeonScene place the transition's *visual* icon (the building
+      // facade/exit marker sprite) at via the tile x/y below. So for any non-zone type, x/y is
+      // never treated as a rect's top-left: the tile-span computation is skipped entirely (x/y
+      // stays the raw anchor), and the *pixel* rect is centered on that same anchor by splitting
+      // the extra width/height evenly on both sides, rather than extending only right/down from it
+      // Tiled-rectangle-style. Getting this wrong once already visibly detached the trigger
+      // hitbox from its icon (reported live as "the hit box starts in the bottom-middle and goes
+      // to the right") - centering keeps the two in the same place no matter how wide the trigger
+      // grows. A no-op for every ordinary point-placed object (pixelWidth/pixelHeight both equal
+      // the map's own tile size there, so the centering offset is 0).
+      const span = o.type === 'zone' && (o.width || o.height) ? pixelRectToTileSpan(o.x, o.y, o.width ?? 0, o.height ?? 0, raw.tilewidth, raw.tileheight) : null;
+      const pixelWidth = o.width || raw.tilewidth;
+      const pixelHeight = o.height || raw.tileheight;
+      const isCenteredRect = o.type !== 'zone' && (o.width || o.height);
       return {
         type: objectType(o.type),
         x: span?.x ?? Math.floor(o.x / raw.tilewidth),
@@ -217,12 +233,13 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
         targetSpawnId: propValue<string>(o.properties, 'targetSpawnId'),
         width: span?.width,
         height: span?.height,
-        pixelX: o.x,
-        pixelY: o.y,
-        pixelWidth: o.width || raw.tilewidth,
-        pixelHeight: o.height || raw.tileheight,
+        pixelX: isCenteredRect ? o.x - (pixelWidth - raw.tilewidth) / 2 : o.x,
+        pixelY: isCenteredRect ? o.y - (pixelHeight - raw.tileheight) / 2 : o.y,
+        pixelWidth,
+        pixelHeight,
         wanderRadius: propValue<number>(o.properties, 'wanderRadius'),
         requiredFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'requiredFacing'),
+        spawnFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'spawnFacing'),
       };
     });
 

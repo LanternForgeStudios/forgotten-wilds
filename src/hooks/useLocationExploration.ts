@@ -42,13 +42,21 @@ export function useLocationExploration({ locationId, suspended, onBlockedTransit
   }, [uid, locationId]);
 
   const spawnPoint = useMemo(() => {
-    if (!map) return { x: 1, y: 1 };
+    if (!map) return { x: 1, y: 1, facing: 'down' as const };
     if (params.locationId === locationId && params.spawnX !== undefined && params.spawnY !== undefined) {
-      return { x: params.spawnX, y: params.spawnY };
+      return { x: params.spawnX, y: params.spawnY, facing: 'down' as const };
     }
+    const spawnPoints = map.objects.filter((o) => o.type === 'spawnPoint');
     const spawnId = params.locationId === locationId ? (params.spawnId ?? 'default') : 'default';
-    const spawn = map.objects.find((o) => o.type === 'spawnPoint' && o.refId === spawnId);
-    return spawn ? { x: spawn.x, y: spawn.y } : { x: 1, y: 1 };
+    // Exact refId match first; otherwise fall back to the map's first-authored spawn point rather
+    // than a hardcoded {1,1} corner. No interior building map actually defines a 'default' spawn -
+    // every one of them names its (only, or primary) spawn point after where it's entered from
+    // (e.g. 'from-ash-hallow') - so a cold reload/direct nav with no matching params used to always
+    // resolve to {1,1} (reported live: "spawns in the top-left instead of the normal entry spawn
+    // point"). Falling back to spawnPoints[0] lands on that same front-door spawn instead, since
+    // every interior map authors it as its first (often only) spawn point object.
+    const spawn = spawnPoints.find((o) => o.refId === spawnId) ?? spawnPoints[0];
+    return spawn ? { x: spawn.x, y: spawn.y, facing: spawn.spawnFacing ?? 'down' } : { x: 1, y: 1, facing: 'down' as const };
     // useTileMap caches loaded maps across visits, so `map` keeps the same object reference on a
     // repeat visit - this must also depend on the actual spawn-selecting params, or arriving back
     // at an already-cached location from a different neighboring map won't recompute and will

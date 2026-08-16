@@ -524,12 +524,17 @@ export function OverworldScene() {
               : inventory.some((i) => i.itemId === grantedItemIdFor(o.refId!))
                 ? (fragmentCollectedSpriteAssetId(o.refId!) ?? FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant')
                 : (FRAGMENT_SPRITE_ASSET_ID[o.refId!] ?? 'structure.shrine-dormant');
+        // No floating name tag for chests or purely ambient decor (fireplace, mushrooms, every
+        // general-* station prop) - only quest-relevant interactables (fragments/lore caches,
+        // named shrine landmarks) and shrines keep one. The "You find a X" flavor message
+        // (attemptInteract above) still calls labelForInteractable itself - only this floating tag
+        // is suppressed here.
         return {
           id: o.refId!,
           x: o.x,
           y: o.y,
           spriteAssetId,
-          label: labelForInteractable(o.refId!, openedChests, inventory),
+          label: isChest || decorEntity ? undefined : labelForInteractable(o.refId!, openedChests, inventory),
           blocksMovement: true,
         };
       });
@@ -540,6 +545,7 @@ export function OverworldScene() {
       y: icon.y,
       spriteAssetId: icon.spriteAssetId,
       displayScale: enemyMapIconScale(icon.spriteAssetId, icon.isBoss),
+      hasShadow: true,
     }));
 
     // Every transition (region-to-region crossings) gets a visible pulsing exit marker instead of

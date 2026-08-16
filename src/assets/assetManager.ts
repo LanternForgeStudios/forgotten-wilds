@@ -44,6 +44,14 @@ export function preload(ids: string[]): Promise<HTMLImageElement[]> {
   return Promise.all(ids.map(loadImage));
 }
 
+/** Synchronous peek at the image cache loadImage() fills - for a caller (MiniMap's tile-art
+ *  rendering) that draws synchronously inside a canvas effect and can't await a Promise mid-draw.
+ *  Returns undefined for anything not yet loaded; the caller is expected to also call loadImage()
+ *  itself to kick off loading and redraw once it resolves. */
+export function getCachedImage(id: string): HTMLImageElement | undefined {
+  return imageCache.get(id);
+}
+
 export function listPlaceholderAssets() {
   return ASSET_REGISTRY.filter((a) => a.status === 'placeholder');
 }

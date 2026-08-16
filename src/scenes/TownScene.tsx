@@ -407,7 +407,12 @@ export function TownScene() {
       .filter((o) => o.type === 'interactable' && o.refId && resolveDecorEntity(o.refId))
       .map((o) => {
         const decor = resolveDecorEntity(o.refId!)!;
-        return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: decor.spriteAssetId, label: decor.label, blocksMovement: true };
+        // No floating name tag for purely ambient decor (fireplace, mushrooms, every general-*
+        // station prop) - only quest-relevant interactables and shrines keep one (reported live:
+        // these were cluttering the map with tooltips for props that don't do anything on
+        // interact besides flavor text). The flavor-text-only interact path itself still uses
+        // decor.label for its message - only this floating tag is suppressed.
+        return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: decor.spriteAssetId, label: undefined, blocksMovement: true };
       });
 
     const now = Date.now();

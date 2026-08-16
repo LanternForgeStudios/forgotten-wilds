@@ -147,6 +147,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-elias-house',
     name: "Elias Rowan's House",
+    shortName: 'House',
     kind: 'town',
     description: 'A modest waystation house, lantern-lit and lined with old Keeper texts.',
     mapAssetId: 'map.ash-hallow-elias-house',
@@ -159,6 +160,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-mara-shop',
     name: "Mara Ash's General Store",
+    shortName: 'Shop',
     kind: 'town',
     description: "Ash Hallow's general store — poultices, draughts, and gear for the trail.",
     mapAssetId: 'map.ash-hallow-mara-shop',
@@ -172,6 +174,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-inn',
     name: 'The Ash Hallow Inn',
+    shortName: 'Inn',
     kind: 'town',
     description: 'Warm beds and a hot meal for ridge-worn travelers.',
     mapAssetId: 'map.ash-hallow-inn',
@@ -185,6 +188,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-blacksmith',
     name: 'The Ash Hallow Forge',
+    shortName: 'Forge',
     kind: 'town',
     description: 'A working forge, its owner past caring whether business is good so long as the fire stays lit.',
     mapAssetId: 'map.ash-hallow-blacksmith',
@@ -197,6 +201,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-apothecary',
     name: "Willow's Apothecary",
+    shortName: 'Apothecary',
     kind: 'town',
     description: 'Shelves of jarred remedies, the air thick with dried herbs and lantern smoke.',
     mapAssetId: 'map.ash-hallow-apothecary',
@@ -210,6 +215,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-armory',
     name: 'The Ash Hallow Armory',
+    shortName: 'Armory',
     kind: 'town',
     description: 'Racks of fitted coats, boots, and gloves - built to outlast the mountain, not just look sturdy.',
     mapAssetId: 'map.ash-hallow-armory',
@@ -222,6 +228,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-archive',
     name: 'The Ash Hallow Archive',
+    shortName: 'Archive',
     kind: 'town',
     description: "Ash Hallow's small archive, kept by a historian who remembers what the town chose to forget.",
     mapAssetId: 'map.ash-hallow-archive',
@@ -234,6 +241,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-mine-office',
     name: 'The Mine Office',
+    shortName: 'Mine Office',
     kind: 'town',
     description: 'A cramped office of shift ledgers and unclosed accounts, all of them for Hollow Rail Mine.',
     mapAssetId: 'map.ash-hallow-mine-office',
@@ -246,6 +254,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'ash-hallow-town-hall',
     name: 'Ash Hallow Town Hall',
+    shortName: 'Town Hall',
     kind: 'town',
     description: "The mayor's office, modest as the town it oversees.",
     mapAssetId: 'map.ash-hallow-town-hall',
@@ -348,6 +357,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'mirehaven-town-hall',
     name: 'Mirehaven Town Hall',
+    shortName: 'Town Hall',
     kind: 'town',
     description: "The Town Council's modest riverside hall, where Mayor Celeste Broussard keeps Mirehaven running.",
     mapAssetId: 'map.mirehaven-town-hall',
@@ -360,6 +370,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'mirehaven-archive',
     name: 'The Mirehaven Archive',
+    shortName: 'Archive',
     kind: 'town',
     description: "Bayou Historian Lucien Boudreaux's cluttered study, shelves sagging under waterlogged records.",
     mapAssetId: 'map.mirehaven-archive',
@@ -372,6 +383,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'mirehaven-inn',
     name: 'The Mirehaven Inn',
+    shortName: 'Inn',
     kind: 'town',
     description: 'A stilted inn above the water, its rooms swaying gently with the current.',
     mapAssetId: 'map.mirehaven-inn',
@@ -385,6 +397,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'mirehaven-general-store',
     name: "Mirehaven's General Store",
+    shortName: 'Store',
     kind: 'town',
     description: "Mirehaven's general store, shelves stocked with river-trade goods and travel supplies.",
     mapAssetId: 'map.mirehaven-general-store',
@@ -398,6 +411,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'mirehaven-blacksmith',
     name: 'The Mirehaven Forge',
+    shortName: 'Forge',
     kind: 'town',
     description: 'A riverside forge, its coals kept hot despite the damp bayou air.',
     mapAssetId: 'map.mirehaven-blacksmith',
@@ -410,6 +424,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'mirehaven-armory',
     name: 'The Mirehaven Armory',
+    shortName: 'Armory',
     kind: 'town',
     description: 'Racks of moss-treated coats and mire-proofed boots, built to weather the bayou.',
     mapAssetId: 'map.mirehaven-armory',
@@ -422,6 +437,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'mirehaven-herbalist',
     name: "Mirehaven's Herbalist",
+    shortName: 'Herbalist',
     kind: 'town',
     description: "Mirehaven's herbalist, shelves lined with bayou remedies and river-cure tonics.",
     mapAssetId: 'map.mirehaven-herbalist',
@@ -525,6 +541,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'highwind-crossing-chiefs-lodge',
     name: "The Chief's Lodge",
+    shortName: 'Chief\'s Lodge',
     kind: 'town',
     description: 'A broad council lodge at the heart of Highwind Crossing, where Chief Aiyana Whitefeather hears the town\'s concerns.',
     mapAssetId: 'map.highwind-crossing-chiefs-lodge',
@@ -537,6 +554,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'highwind-crossing-spirit-lodge',
     name: 'The Spirit Lodge',
+    shortName: 'Spirit Lodge',
     kind: 'town',
     description: "Elder Koda Running Elk's lodge, hung with woven records older than the town itself.",
     mapAssetId: 'map.highwind-crossing-spirit-lodge',
@@ -549,6 +567,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'highwind-crossing-inn',
     name: 'The Highwind Inn',
+    shortName: 'Inn',
     kind: 'town',
     description: 'A low timber inn, its porch facing west to catch the sunset over the grass.',
     mapAssetId: 'map.highwind-crossing-inn',
@@ -562,6 +581,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'highwind-crossing-general-store',
     name: "Highwind Crossing's General Store",
+    shortName: 'Store',
     kind: 'town',
     description: "Highwind Crossing's general store, shelves stocked for travelers heading out onto the open prairie.",
     mapAssetId: 'map.highwind-crossing-general-store',
@@ -575,6 +595,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'highwind-crossing-blacksmith',
     name: 'The Highwind Forge',
+    shortName: 'Forge',
     kind: 'town',
     description: 'A wind-battered forge at the edge of town, its smith used to tempering steel against the cold prairie nights.',
     mapAssetId: 'map.highwind-crossing-blacksmith',
@@ -587,6 +608,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'highwind-crossing-armory',
     name: 'The Highwind Armory',
+    shortName: 'Armory',
     kind: 'town',
     description: 'Racks of buffalo-hide coats and windproofed boots, built for the open trail rather than a castle wall.',
     mapAssetId: 'map.highwind-crossing-armory',
@@ -774,6 +796,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'cedarwatch-elders-lodge',
     name: "The Elder's Lodge",
+    shortName: 'Elder\'s Lodge',
     kind: 'town',
     description: "A broad council hall at the heart of Cedarwatch, where Elder Rowan Birch hears the town's concerns.",
     mapAssetId: 'map.cedarwatch-elders-lodge',
@@ -786,6 +809,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'cedarwatch-great-tree-library',
     name: 'The Great Tree Library',
+    shortName: 'Library',
     kind: 'town',
     description: "Archivist Elowen's library, built into a hollowed cedar and lined floor to canopy with waterlogged, half-legible records.",
     mapAssetId: 'map.cedarwatch-great-tree-library',
@@ -798,6 +822,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'cedarwatch-inn',
     name: 'The Cedarwatch Inn',
+    shortName: 'Inn',
     kind: 'town',
     description: 'A timber inn built around a living cedar trunk, its common room warmed by a hearth that never seems to smoke.',
     mapAssetId: 'map.cedarwatch-inn',
@@ -811,6 +836,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'cedarwatch-general-store',
     name: "Cedarwatch's General Store",
+    shortName: 'Store',
     kind: 'town',
     description: "Cedarwatch's general store, shelves stocked with trail goods for travelers heading deeper into the forest.",
     mapAssetId: 'map.cedarwatch-general-store',
@@ -824,6 +850,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'cedarwatch-blacksmith',
     name: 'The Cedarwatch Forge',
+    shortName: 'Forge',
     kind: 'town',
     description: 'A forge built low and open-walled among the trees, its smith used to shaping tools for loggers and travelers alike.',
     mapAssetId: 'map.cedarwatch-blacksmith',
@@ -836,6 +863,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'cedarwatch-armory',
     name: 'The Cedarwatch Armory',
+    shortName: 'Armory',
     kind: 'town',
     description: 'Racks of bark-plated armor and root-woven leggings, built for silent movement beneath the canopy.',
     mapAssetId: 'map.cedarwatch-armory',
@@ -986,6 +1014,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'red-mesa-elders-hall',
     name: "The Elder's Hall",
+    shortName: 'Elder\'s Hall',
     kind: 'town',
     description: "A cliffside chamber where Elder Santiago Ortega hears Red Mesa's own concerns.",
     mapAssetId: 'map.red-mesa-elders-hall',
@@ -998,6 +1027,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'red-mesa-relic-museum',
     name: 'The Relic Museum',
+    shortName: 'Museum',
     kind: 'town',
     description: "Scholar Nia Solis's own museum, shelves lined with recovered pottery, star charts, and fragments of a civilization no one alive remembers.",
     mapAssetId: 'map.red-mesa-relic-museum',
@@ -1010,6 +1040,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'red-mesa-inn',
     name: 'The Red Mesa Inn',
+    shortName: 'Inn',
     kind: 'town',
     description: 'A cliffside inn carved cool against the desert heat, its common room lit by hanging lanterns.',
     mapAssetId: 'map.red-mesa-inn',
@@ -1023,6 +1054,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'red-mesa-general-store',
     name: "Red Mesa's General Store",
+    shortName: 'Store',
     kind: 'town',
     description: "Red Mesa's general store, its shelves stocked for travelers heading out into the dunes.",
     mapAssetId: 'map.red-mesa-general-store',
@@ -1036,6 +1068,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'red-mesa-blacksmith',
     name: 'The Red Mesa Forge',
+    shortName: 'Forge',
     kind: 'town',
     description: 'A forge cut into the canyon rock, its smith used to tempering steel against desert extremes.',
     mapAssetId: 'map.red-mesa-blacksmith',
@@ -1048,6 +1081,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'red-mesa-armory',
     name: 'The Red Mesa Armory',
+    shortName: 'Armory',
     kind: 'town',
     description: 'Racks of sun-worn leathers and sand-scarred plate, built for travel under a merciless sun.',
     mapAssetId: 'map.red-mesa-armory',
@@ -1213,6 +1247,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'frosthaven-explorer-headquarters',
     name: 'Explorer Headquarters',
+    shortName: 'Explorer HQ',
     kind: 'town',
     description: "Elder Henrik's own command post, maps of the frontier pinned floor to ceiling, most of them marked with roads that no longer lead anywhere safe.",
     mapAssetId: 'map.frosthaven-explorer-headquarters',
@@ -1225,6 +1260,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'frosthaven-ice-chapel',
     name: 'The Ice Chapel',
+    shortName: 'Ice Chapel',
     kind: 'town',
     description: "A small chapel carved from packed ice and old timber, where Aurora Keeper Lyra tends what little of the aurora's own light still reaches Frosthaven.",
     mapAssetId: 'map.frosthaven-ice-chapel',
@@ -1237,6 +1273,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'frosthaven-inn',
     name: 'The Frosthaven Inn',
+    shortName: 'Inn',
     kind: 'town',
     description: 'A low, warm inn built to hold heat against the frontier cold, its common room smelling of woodsmoke and melted snow.',
     mapAssetId: 'map.frosthaven-inn',
@@ -1250,6 +1287,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'frosthaven-general-store',
     name: "Frosthaven's General Store",
+    shortName: 'Store',
     kind: 'town',
     description: "Frosthaven's general store, its shelves stocked with what a traveler actually needs this far north.",
     mapAssetId: 'map.frosthaven-general-store',
@@ -1263,6 +1301,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'frosthaven-blacksmith',
     name: 'The Frosthaven Forge',
+    shortName: 'Forge',
     kind: 'town',
     description: 'A forge kept burning around the clock, less for the work than because letting it go cold this far north is its own kind of risk.',
     mapAssetId: 'map.frosthaven-blacksmith',
@@ -1275,6 +1314,7 @@ export const LOCATIONS: Location[] = [
   {
     id: 'frosthaven-armory',
     name: 'The Frosthaven Armory',
+    shortName: 'Armory',
     kind: 'town',
     description: 'Racks of fur-lined plate and frost-worn leathers, built for a cold that does not forgive being underdressed.',
     mapAssetId: 'map.frosthaven-armory',
