@@ -15,8 +15,10 @@ export const STARTING_STATS = {
   maxHp: 60,
   spirit: 30,
   maxSpirit: 30,
-  lanternOil: 20,
-  maxLanternOil: 20,
+  // 30, matching keepers-lantern's own oilCapacity - see functions/src/data/leveling.ts's
+  // matching comment for why (was 20, drifted out of sync with a balance change).
+  lanternOil: 30,
+  maxLanternOil: 30,
   // Locked at 0/0 until the Guardian of Ironwood quest chain unlocks Dash.
   stamina: 0,
   maxStamina: 0,

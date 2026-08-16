@@ -20,8 +20,12 @@ export const STARTING_STATS = {
   maxHp: 60,
   spirit: 30,
   maxSpirit: 30,
-  lanternOil: 20,
-  maxLanternOil: 20,
+  // 30, matching keepers-lantern's own oilCapacity (see equipment.ts's comment on that item for
+  // why it's 30 and not the original 20) - drifted out of sync with that balance change for a
+  // while (still 20 here), caught by equipItem.test.ts's lantern-swap test actually asserting a
+  // fresh character's starting capacity against what re-equipping keepers-lantern derives.
+  lanternOil: 30,
+  maxLanternOil: 30,
   // Locked at 0/0 until the Guardian of Ironwood quest chain unlocks Dash - see interactWithShrine.ts.
   stamina: 0,
   maxStamina: 0,

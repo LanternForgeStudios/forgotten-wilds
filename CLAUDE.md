@@ -63,9 +63,14 @@ number that affects gameplay (damage, price, drop rate, xp), it has to change in
   flags (quest log, inventory, journal, shop, inn) and a matching keybinding. It's repetitive by
   design for now — if a fourth or fifth overlay gets added, consider factoring the
   open/close/suspend wiring into a shared hook rather than copy-pasting a sixth time.
-- Tests: only `functions/src/engine/*.ts` has Vitest coverage. The Cloud Functions themselves
-  (Firestore transactions) and all client code are untested — verified by hand via the emulator
-  suite instead. If you add meaningful pure logic anywhere, test it the same way.
+- Tests: `functions/src/engine/*.ts` has full Vitest coverage (pure functions, no I/O). A growing
+  set of Cloud Functions themselves also have coverage now (e.g. `functions/src/functions/
+  equipItem.test.ts`) via `functions/src/testUtils/firestoreTestEnv.ts` — real `.run()` calls
+  against a real Firestore, but the **emulator**, never production; these tests require the
+  emulator running first (`/run_local start`) and fail fast with a clear message if it isn't. Not
+  every Cloud Function has this yet — extend the same pattern to new ones as they're touched, same
+  spirit as testing new pure engine logic. All client code is still untested — verified by hand via
+  the emulator suite instead.
 
 ## Local dev environment gotchas (this machine)
 
