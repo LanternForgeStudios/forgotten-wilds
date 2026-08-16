@@ -10670,6 +10670,82 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/MAGAngl_BUFF-Simple Heal_HY_PC-001.wav (local-only pack, gitignored) - a clean, literal heal tone. Resampled to 44.1kHz/16-bit, same reason as sfx.weapon.axe.",
   },
+  // 2026-08 walking/dashing footstep SFX (see docs/Audio-Usage-Tracker.md and
+  // src/utils/footstepSurface.ts) - one walk + one run/dash cue per surface (dirt/stone/water/
+  // wood), assigned per-location by kind+region rather than per-tile. Played on a throttled
+  // interval while the player's movementState is 'walking'/'running' - see ExplorationScene.ts.
+  {
+    id: 'sfx.footstep.dirt.walk',
+    category: 'audio',
+    intendedUse: 'Walking footstep on a dirt-surfaced location (forest/plains overworld regions, every town square) - see ExplorationScene.ts',
+    filePath: 'audio/sfx/footstep-dirt-walk.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Dirt/Dirt Walk 1.wav (4 more numbered variants staged, unused for now).',
+  },
+  {
+    id: 'sfx.footstep.dirt.run',
+    category: 'audio',
+    intendedUse: 'Dashing/running footstep on a dirt-surfaced location - see ExplorationScene.ts',
+    filePath: 'audio/sfx/footstep-dirt-run.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Dirt/Dirt Run 1.wav.',
+  },
+  {
+    id: 'sfx.footstep.stone.walk',
+    category: 'audio',
+    intendedUse: 'Walking footstep on a stone-surfaced location (dungeons, Shattered Desert/Frozen Frontier) - see ExplorationScene.ts',
+    filePath: 'audio/sfx/footstep-stone-walk.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Stone/Stone Walk 1.wav.',
+  },
+  {
+    id: 'sfx.footstep.stone.run',
+    category: 'audio',
+    intendedUse: 'Dashing/running footstep on a stone-surfaced location - see ExplorationScene.ts',
+    filePath: 'audio/sfx/footstep-stone-run.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Stone/Stone Run 1.wav.',
+  },
+  {
+    id: 'sfx.footstep.water.walk',
+    category: 'audio',
+    intendedUse: 'Walking footstep on a water-surfaced location (Crimson Bayou) - see ExplorationScene.ts',
+    filePath: 'audio/sfx/footstep-water-walk.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Water/Water Walk 1.wav.',
+  },
+  {
+    id: 'sfx.footstep.water.run',
+    category: 'audio',
+    intendedUse: 'Dashing/running footstep on a water-surfaced location - see ExplorationScene.ts',
+    filePath: 'audio/sfx/footstep-water-run.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Water/Water Run 1.wav.',
+  },
+  {
+    id: 'sfx.footstep.wood.walk',
+    category: 'audio',
+    intendedUse: 'Walking footstep on a wood-surfaced location (every town building interior) - see ExplorationScene.ts',
+    filePath: 'audio/sfx/footstep-wood-walk.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Wood/Wood Walk 1.wav.',
+  },
+  {
+    id: 'sfx.footstep.wood.run',
+    category: 'audio',
+    intendedUse: 'Dashing/running footstep on a wood-surfaced location - see ExplorationScene.ts',
+    filePath: 'audio/sfx/footstep-wood-run.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Wood/Wood Run 1.wav.',
+  },
 ];
 
 export function findAsset(id: string): AssetDefinition | undefined {

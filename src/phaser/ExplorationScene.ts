@@ -10,6 +10,8 @@ import { ensureParticleTexture } from './battleEffects';
 import { loadSceneTexture } from './textureLoader';
 import type { GridEntity } from '@/components/exploration/PhaserExplorationCanvas';
 import type { MovementInputState } from '@/hooks/useMovementInput';
+import { playSound } from '@/audio/audioService';
+import { footstepSurfaceFor, type FootstepSurface } from '@/utils/footstepSurface';
 
 /** The glide-tween duration for non-player entities (NPCs/other players - see upsertEntity) as
  *  they move from their last reported tile to their next one. The player itself no longer tweens
@@ -280,6 +282,10 @@ export class ExplorationScene extends Phaser.Scene {
   private onPositionChange?: (pos: GridPosition, movementState: MovementState) => void;
   private positionFlushAccumulatorMs = 0;
   private lastDashDustAtMs = 0;
+  /** Which footstep sfx family (dirt/stone/water/wood) the current map's location resolves to -
+   *  see footstepSurfaceFor. Recomputed once per loadMap call, not per frame. */
+  private currentFootstepSurface: FootstepSurface = 'dirt';
+  private lastFootstepAtMs = 0;
   /** Set every update() (pre-physics-step), read by syncAfterPhysicsStep (post-physics-step) -
    *  see that method's own comment for why movementState itself is computed in update() (it
    *  doesn't depend on the sprite's resolved position) while everything that USES it to touch
@@ -553,6 +559,14 @@ export class ExplorationScene extends Phaser.Scene {
       if (this.currentMovementState === 'running' && this.time.now - this.lastDashDustAtMs > 150) {
         this.lastDashDustAtMs = this.time.now;
         this.spawnDashDust(sprite.x, sprite.y);
+      }
+      if (this.currentMovementState === 'walking' || this.currentMovementState === 'running') {
+        const footstepIntervalMs = this.currentMovementState === 'running' ? 220 : 350;
+        if (this.time.now - this.lastFootstepAtMs > footstepIntervalMs) {
+          this.lastFootstepAtMs = this.time.now;
+          const variant = this.currentMovementState === 'running' ? 'run' : 'walk';
+          playSound(`sfx.footstep.${this.currentFootstepSurface}.${variant}`);
+        }
       }
       this.flushPositionUpdate(delta, this.currentMovementState);
       this.checkZoneAndTransitionOverlaps();
@@ -917,6 +931,7 @@ export class ExplorationScene extends Phaser.Scene {
     if (generation !== this.mapGeneration) return;
 
     this.currentMapKey = map.locationId;
+    this.currentFootstepSurface = footstepSurfaceFor(map.locationId);
     for (const layer of this.mapLayers) layer.destroy();
     this.mapLayers = [];
     this.groundLayer = null;
