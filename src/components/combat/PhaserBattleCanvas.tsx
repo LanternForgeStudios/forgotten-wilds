@@ -9,8 +9,8 @@ export type { BattleEnemyVisual };
 interface PhaserBattleCanvasProps {
   backgroundAssetId: string;
   enemies: BattleEnemyVisual[];
-  outgoingHits: (CombatHitResult & { key: number })[];
-  incomingHits: (EnemyHitResult & { key: number })[];
+  outgoingHits: (CombatHitResult & { key: number; themedAilmentId?: string; targetMaxHp: number })[];
+  incomingHits: (EnemyHitResult & { key: number; hitVfxGroup: 'beast' | 'earthen' | 'spirit' | 'boss' })[];
   playerMaxHp: number;
   /** Player's per-encounter toggle - collapses the stagger between multiple enemies' attacks so a
    *  round plays out (and log lines reveal) all at once instead of one attacker at a time. */

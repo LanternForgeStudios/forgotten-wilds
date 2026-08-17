@@ -96,6 +96,47 @@ interiors → wood, Crimson Bayou → water, Shattered Desert/Frozen Frontier ov
 everything else → dirt). Playback throttling (350ms walk / 220ms dash) is in
 `ExplorationScene.ts`'s `syncAfterPhysicsStep`.
 
+### Combat SFX/VFX bug fixes and additions (2026-08-16, second pass)
+
+Fixed a real bug: `CombatScene.tsx`'s `act()` had a doc comment describing weapon-type SFX for the
+plain `'attack'` action, but the actual `if/else if` chain never checked `type === 'attack'` at
+all - every basic attack played the generic `sfx.combat-hit` "thud" regardless of equipped weapon,
+which is what a player would notice first. Added the missing branch.
+
+| Category | Ids | Source pack |
+|---|---|---|
+| Enemy hit, incoming (4 shared groups) | `sfx.enemy-hit.{beast,earthen,spirit,boss}` | Helton Yan |
+| Item-use, by consumable type (3; ailment cure reuses the existing `sfx.item-use`) | `sfx.item-use.{hp,spirit,oil}` | Helton Yan |
+
+`src/utils/enemyHitGroup.ts` maps every `Enemy.family` to one of 4 shared hit-SFX/VFX groups
+(`beast`/`earthen`/`spirit`, plus `boss` which always wins regardless of family) - used identically
+by `CombatScene.tsx`, `EndlessBattlePanel.tsx`, and `PvpBattlePanel.tsx` (PvP has no `Enemy`/family
+for a human opponent, so it always uses `earthen`, the plainest physical-hit group). Enemy attacks
+now play their group's SFX **and** burst a matching VFX (`BattleScene.ts`'s `ENEMY_HIT_FX_ASSET`)
+staggered per-attacker, in step with the existing per-attacker lunge animation - previously a
+multi-enemy round played one flat `sfx.combat-hit` no matter how many enemies attacked or what
+kind they were, with zero incoming-hit VFX burst at all.
+
+Also fixed the "spirit specialty" visual complaint directly: a spirit-damageType Skill tied to a
+specific ailment (Marsh Toxin → poison, Ember Burst → burn, Frost Lance → freeze, etc.) previously
+only showed its themed color the round the ailment roll actually succeeded - every other landed hit
+fell back to a single generic "purple" `fx.magic-spark` burst regardless of the skill's own
+identity. `CombatScene.tsx` now computes a `themedAilmentId` for any such skill and passes it
+through to `BattleScene.playOutgoingHits`, which always bursts that ailment's own FX
+(`AILMENT_FX_ASSET`) for a landed hit - an actual ailment proc still layers the bigger, separate
+`playEnemyAilmentTakesHold` burst on top, so the routine case reads as themed-but-normal and an
+actual proc reads as themed-and-bigger, not "colorless until it procs."
+
+Two more physical-hit/intensity changes, both in `src/phaser/battleEffects.ts`:
+- `playSlashEffect`/`ensureSlashTexture`: a procedurally generated (no new art asset) diagonal
+  slash streak that plays a beat before a physical hit's blood-splatter burst - "weapon makes
+  contact" then "the payoff," instead of both firing in the same instant.
+- `fxIntensityFor(damage, referenceMaxHp)`: scales every hit-FX burst's particle count/size by how
+  big the hit was relative to the target's (or player's) own max HP - floored well above the old
+  fixed defaults so even a weak hit still reads as a real hit, not just "more of the same small
+  particles" for a strong one. Applied to both outgoing (`playOutgoingHits`) and incoming
+  (`playIncomingHits`) bursts.
+
 ### Available in the library but not yet wired
 
 The Free Fantasy SFX Pack (~400 files, fully committed) has entire untouched categories:
@@ -113,18 +154,20 @@ that's almost entirely unused. It's gitignored (`.gitignore` line for
 `public/assets/audio/library/sfx/helton-yan-pixel-combat/`) and stays **local-only** on this
 machine.
 
-- **Committed**: 10 derived clips, each resampled to this project's usual 44.1kHz/16-bit and copied
-  to `public/assets/audio/sfx/` under this game's own naming (`weapon-axe.wav`,
+- **Committed**: 17 derived clips, each resampled to this project's usual 44.1kHz/16-bit and copied
+  to `public/assets/audio/sfx/` under this game's own naming. Original 10: `weapon-axe.wav`,
   `weapon-spear.wav`, `weapon-hammer.wav`, `ailment-poison.wav`, `ailment-blind.wav`,
   `ailment-silence.wav`, `lantern-ability-still-waters-calm.wav`,
   `lantern-ability-open-skies-renewal.wav`, `lantern-ability-astral-ward.wav`,
-  `lantern-ability-resolve-renewed.wav`). Each one's registry `notes` field records the exact
+  `lantern-ability-resolve-renewed.wav`. Added this pass: `enemy-hit-beast.wav`,
+  `enemy-hit-earthen.wav`, `enemy-hit-spirit.wav`, `enemy-hit-boss.wav`, `item-use-hp.wav`,
+  `item-use-spirit.wav`, `item-use-oil.wav`. Each one's registry `notes` field records the exact
   source filename inside the pack, so a future session can re-derive it even without the pack
   present.
-- **Available, not committed**: the other ~1,844 files, still on disk locally for whenever a
+- **Available, not committed**: the other ~1,837 files, still on disk locally for whenever a
   future SFX need comes up (more weapon variants, monster-specific hit cues, UI sounds). If this
   machine's local copy is ever lost, the pack would need to be re-downloaded/re-extracted before
-  any of those "available but unused" files could be picked from again — only the 10 already-wired
+  any of those "available but unused" files could be picked from again — only the 17 already-wired
   derivatives survive that.
 - **Reconciling later**: search `src/assets/registry.ts` for `helton` (case-insensitive) to find
   every currently-wired id sourced from this pack — that grep is the authoritative "what's wired"

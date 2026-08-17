@@ -1551,7 +1551,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'fx.bone-fragment',
     category: 'icon',
-    intendedUse: 'Battle VFX particle sheet: bone fragment - 4-frame animated, load via load.spritesheet and drive with add.particles per fx_pack/phaser-example.ts - not yet wired into any battle effect',
+    intendedUse: "Battle VFX particle sheet: bone fragment - 4-frame animated, load via load.spritesheet and drive with add.particles per fx_pack/phaser-example.ts - incoming-hit burst for the 'earthen'/'boss' enemy-hit VFX groups (see BattleScene.ts's ENEMY_HIT_FX_ASSET)",
     filePath: 'tilesets/fx_pack/sheets/bone_fragment.png',
     dimensions: { width: 64, height: 16 },
     frameSize: { width: 16, height: 16 },
@@ -10570,6 +10570,40 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     status: 'final',
     notes: 'Source: art-staging library copy at public/assets/audio/library/sfx/UI/pop_2.wav - soft pop, one of 4 near-identical variants staged (pop_1-4) - swap freely if another take reads better. Not personally auditioned (filenames/categories only) - please confirm by ear.',
   },
+  // Consumable-type-specific item-use SFX (2026-08-16) - CombatScene.tsx's item menu previously
+  // played nothing at all on use (sfx.item-use above was wired only into CharacterMenu's
+  // out-of-combat inventory tab). CombatScene now picks one of these 3 by the used item's own
+  // ItemEffect fields (healHpPercent/reviveOnDefeat -> hp, healSpiritPercent -> spirit,
+  // restoreOilPercent -> oil), falling back to the existing generic sfx.item-use for a pure
+  // cureAilmentId item (a shared cue across every ailment cure is enough - see
+  // docs/Audio-Usage-Tracker.md, no per-ailment-cure variant was requested).
+  {
+    id: 'sfx.item-use.hp',
+    category: 'audio',
+    intendedUse: "Using an HP-restoring (or revive) consumable in combat - see CombatScene.tsx's finishItemMenu",
+    filePath: 'audio/sfx/item-use-hp.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/DSGNTonl_USABLE-Generic Consume_HY_PC-001.wav (local-only pack, gitignored - see docs/Audio-Usage-Tracker.md) - a drink/swallow-adjacent consume cue, fitting a potion. Resampled to 44.1kHz/16-bit, same reason as every other Helton Yan pick.",
+  },
+  {
+    id: 'sfx.item-use.spirit',
+    category: 'audio',
+    intendedUse: "Using a Spirit-restoring consumable in combat - see CombatScene.tsx's finishItemMenu",
+    filePath: 'audio/sfx/item-use-spirit.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/DSGNTonl_USABLE-Magic Item_HY_PC-001.wav (local-only pack, gitignored) - a sparkly/magical consume cue, distinct from the lantern-ability healing cues already wired elsewhere. Resampled to 44.1kHz/16-bit, same reason as sfx.item-use.hp.',
+  },
+  {
+    id: 'sfx.item-use.oil',
+    category: 'audio',
+    intendedUse: "Using a Lantern Oil-restoring consumable in combat - see CombatScene.tsx's finishItemMenu",
+    filePath: 'audio/sfx/item-use-oil.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/DSGNTonl_USABLE-Metallic Item_HY_PC-001.wav (local-only pack, gitignored) - a metallic/mechanical consume cue, fitting refilling a lantern rather than drinking a potion. Resampled to 44.1kHz/16-bit, same reason as sfx.item-use.hp.',
+  },
   {
     id: 'sfx.craft-success',
     category: 'audio',
@@ -10982,6 +11016,48 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: null,
     status: 'final',
     notes: 'Source: public/assets/audio/library/sfx/free-fantasy-sfx-pack/WAV Files/SFX/Footsteps/Wood/Wood Run 1.wav.',
+  },
+
+  // Enemy hit SFX (2026-08-16) - one per shared enemy-family group, keyed off Enemy.family via
+  // ENEMY_HIT_SFX_GROUP in CombatScene.tsx - replaces the flat sfx.combat-hit every enemy attack
+  // used regardless of what kind of creature landed it. Grouped rather than per-family (18+
+  // distinct families would be a lot of near-identical impact cues) - see
+  // docs/Audio-Usage-Tracker.md for the group breakdown.
+  {
+    id: 'sfx.enemy-hit.beast',
+    category: 'audio',
+    intendedUse: 'Incoming-hit cue for claw/bite predator enemy families (Cliff Wolf/Ridge Hawk, swamp crocs, rougarou, prairie wolves, frost wolves)',
+    filePath: 'audio/sfx/enemy-hit-beast.wav',
+    dimensions: null,
+    status: 'final',
+    notes: "Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/FGHTImpt_HIT-Strong Punch_HY_PC-001.wav (local-only pack, gitignored - see docs/Audio-Usage-Tracker.md) - sharp, weighty impact reads as a claw/bite strike. Resampled from the source pack's native 96kHz/24-bit down to this project's usual 44.1kHz/16-bit, same reason as every other Helton Yan pick.",
+  },
+  {
+    id: 'sfx.enemy-hit.earthen',
+    category: 'audio',
+    intendedUse: 'Incoming-hit cue for grounded/physical enemy families (restless miners, coal spirits, bog witches, frozen wraiths)',
+    filePath: 'audio/sfx/enemy-hit-earthen.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/FGHTImpt_MELEE-Gut Punch_HY_PC-001.wav (local-only pack, gitignored) - duller, heavier thud than the beast cue, fitting a grounded humanoid/undead strike. Resampled to 44.1kHz/16-bit, same reason as sfx.enemy-hit.beast.',
+  },
+  {
+    id: 'sfx.enemy-hit.spirit',
+    category: 'audio',
+    intendedUse: 'Incoming-hit cue for ethereal/elemental enemy families (mothlings, briar spirits, water/wind spirits, storm avians, silent echoes, root wraiths, dust devils, celestial wisps)',
+    filePath: 'audio/sfx/enemy-hit-spirit.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/DSGNTonl_SKILL IMPACT-Energetic Impact_HY_PC-001.wav (local-only pack, gitignored) - a tonal/energetic impact rather than a physical thud, fitting a non-corporeal attacker. Resampled to 44.1kHz/16-bit, same reason as sfx.enemy-hit.beast.',
+  },
+  {
+    id: 'sfx.enemy-hit.boss',
+    category: 'audio',
+    intendedUse: 'Incoming-hit cue for the boss enemy family/tier, regardless of underlying element',
+    filePath: 'audio/sfx/enemy-hit-boss.wav',
+    dimensions: null,
+    status: 'final',
+    notes: 'Source: public/assets/audio/library/sfx/helton-yan-pixel-combat/FGHTImpt_MELEE-Kick Critical_HY_PC-001.wav (local-only pack, gitignored) - the most climactic-sounding of the impact variants, reserved for boss encounters specifically. Resampled to 44.1kHz/16-bit, same reason as sfx.enemy-hit.beast.',
   },
 ];
 

@@ -12,6 +12,8 @@ import {
   COLOR_INCOMING_DAMAGE,
   COLOR_MISS,
   ensureParticleTexture,
+  ensureSlashTexture,
+  fxIntensityFor,
   INCOMING_HIT_STAGGER_MS,
   PRE_ENEMY_ATTACK_DELAY_MS,
   playDefeatEffect,
@@ -20,9 +22,11 @@ import {
   playIncomingCameraImpact,
   playIncomingLunge,
   playOutgoingHitOnSprite,
+  playSlashEffect,
 } from './battleEffects';
 
 const PARTICLE_TEXTURE_KEY = 'fx-dot';
+const SLASH_TEXTURE_KEY = 'fx-slash';
 const DEFEAT_FX_ASSET_ID = 'fx.smoke-puff';
 const DEFEAT_FX_FRAMES = [0, 1, 2, 3];
 // Maps a playerAilments entry to the FX-pack sheet that visualizes it - only ailments with a real
@@ -49,6 +53,15 @@ const HIT_FX_ASSET: Record<DamageType, string> = {
   physical: 'fx.blood-splatter',
   lantern: 'fx.holy-light',
   spirit: 'fx.magic-spark',
+};
+// Impact FX for an INCOMING hit (enemy -> player), keyed by CombatScene.tsx's own
+// ENEMY_FAMILY_HIT_GROUP (mirrors its ENEMY_HIT_SFX id-per-group, just the visual half) - bursts
+// at playIncomingHits' own floating-text anchor, since no player sprite exists in the arena today.
+const ENEMY_HIT_FX_ASSET: Record<'beast' | 'earthen' | 'spirit' | 'boss', string> = {
+  beast: 'fx.blood-splatter',
+  earthen: 'fx.bone-fragment',
+  spirit: 'fx.dark-energy',
+  boss: 'fx.bone-fragment',
 };
 // Anchors the enemy sprite's own center - the HP bar/name/tier-text stack renders *below* that
 // (see createEnemySlot: barY = sprite bottom edge + ~14px, then name/tier further down still),
@@ -126,6 +139,7 @@ export class BattleScene extends Phaser.Scene {
 
   create() {
     ensureParticleTexture(this, PARTICLE_TEXTURE_KEY);
+    ensureSlashTexture(this, SLASH_TEXTURE_KEY);
     // Fire-and-forget: the defeat effect (playDefeat below) checks textures.exists before using
     // this, falling back to the dot texture on the (rare) chance a fight's first kill lands before
     // this finishes loading.
@@ -370,18 +384,41 @@ export class BattleScene extends Phaser.Scene {
   }
 
   /** Player's outgoing hits this round. Tint-flash + recoil-punch tween + floating "-N"/"MISS"
-   *  text per hit. A defeated:true hit chains into playDefeat once the impact tween settles. Also
-   *  bursts a generic impact FX (blood/holy-light/magic-spark, keyed by damageType - see
-   *  HIT_FX_ASSET) on the target's own sprite for every landed hit, skipped when ailmentInflicted
-   *  is set (that hit already gets its own bigger, ailment-colored burst instead - see
-   *  playEnemyAilmentTakesHold). */
+   *  text per hit, plus a slash-streak precursor (see SLASH_TEXTURE_KEY, a procedurally generated
+   *  texture - no new art asset, same convention as PARTICLE_TEXTURE_KEY) for a physical hit only -
+   *  a spirit/lantern hit's own impact FX already reads as the "weapon contact" beat on its own.
+   *  Also bursts an impact FX on the target's own sprite for every landed hit: `themedAilmentId`
+   *  (set by the caller whenever the acting skill has its own elemental identity - e.g. Marsh Toxin
+   *  is always poison-themed, whether or not the poison roll actually lands this turn - see
+   *  CombatScene.tsx's own themedAilmentId comment) wins when present, so a themed skill always
+   *  shows its own colored FX (poison-cloud/ember/ice-shard/dark-energy) instead of the generic
+   *  damageType one; `ailmentInflicted` (the ailment actually landing THIS hit) wins over that if
+   *  different, so an untelegraphed ailment proc still gets its own correct color. Both cases still
+   *  layer under playEnemyAilmentTakesHold's own bigger burst the round an ailment is newly
+   *  inflicted - intentional escalation, not double-counting: routine landed hits get the themed
+   *  color, an actual proc gets that same color twice in quick succession. Falls back to the
+   *  generic HIT_FX_ASSET (blood/holy-light/magic-spark, keyed by damageType) for anything with no
+   *  elemental identity at all (a plain attack, or a spirit skill with no ailment tie). */
   playOutgoingHits(
-    hits: { targetIndex: number; damage: number; missed: boolean; defeated: boolean; damageType: DamageType; ailmentInflicted?: string }[],
+    hits: {
+      targetIndex: number;
+      damage: number;
+      missed: boolean;
+      defeated: boolean;
+      damageType: DamageType;
+      ailmentInflicted?: string;
+      themedAilmentId?: string;
+      targetMaxHp: number;
+    }[],
   ): void {
-    // Loads each unique damageType's FX texture once per round (via one batched Promise.all)
-    // rather than once per hit that needs it - a multi-hit target-all round previously reloaded
-    // (or re-queued, for an already-loaded texture) the same texture up to once per hit.
-    const neededAssetIds = [...new Set(hits.filter((h) => !h.missed && !h.ailmentInflicted).map((h) => HIT_FX_ASSET[h.damageType]))];
+    const assetIdFor = (hit: (typeof hits)[number]): string => {
+      const ailmentTheme = hit.ailmentInflicted ?? hit.themedAilmentId;
+      return (ailmentTheme && AILMENT_FX_ASSET[ailmentTheme]) || HIT_FX_ASSET[hit.damageType];
+    };
+    // Loads each unique FX texture once per round (via one batched Promise.all) rather than once
+    // per hit that needs it - a multi-hit target-all round previously reloaded (or re-queued, for
+    // an already-loaded texture) the same texture up to once per hit.
+    const neededAssetIds = [...new Set(hits.filter((h) => !h.missed).map(assetIdFor))];
     const texturesLoaded = Promise.all(neededAssetIds.map((assetId) => loadSceneTexture(this, assetId)));
 
     for (const hit of hits) {
@@ -393,9 +430,17 @@ export class BattleScene extends Phaser.Scene {
       }
       playOutgoingHitOnSprite(this, slot.sprite);
       playFloatingText(this, slot.sprite.x, slot.sprite.y - slot.sprite.displayHeight / 2 - 20, `-${hit.damage}`, COLOR_DAMAGE);
-      if (!hit.ailmentInflicted) {
-        const assetId = HIT_FX_ASSET[hit.damageType];
-        texturesLoaded.then(() => playFxBurst(this, slot.sprite.x, slot.sprite.y, assetId, 10)).catch(() => {});
+      const assetId = assetIdFor(hit);
+      const { quantity, intensity } = fxIntensityFor(hit.damage, hit.targetMaxHp);
+      if (hit.damageType === 'physical') {
+        // Slash reads as the weapon making contact; the impact burst (blood, here) follows a beat
+        // later as the payoff, instead of both firing in the same instant and blurring together.
+        playSlashEffect(this, slot.sprite.x, slot.sprite.y, SLASH_TEXTURE_KEY);
+        texturesLoaded.then(() => {
+          this.time.delayedCall(90, () => playFxBurst(this, slot.sprite.x, slot.sprite.y, assetId, quantity, intensity));
+        }).catch(() => {});
+      } else {
+        texturesLoaded.then(() => playFxBurst(this, slot.sprite.x, slot.sprite.y, assetId, quantity, intensity)).catch(() => {});
       }
       if (hit.defeated) {
         this.time.delayedCall(120, () => this.playDefeat(hit.targetIndex));
@@ -416,7 +461,7 @@ export class BattleScene extends Phaser.Scene {
    *  toggle) collapses the inter-enemy stagger to 0 so every hit lands together -
    *  PRE_ENEMY_ATTACK_DELAY_MS still applies either way. */
   playIncomingHits(
-    hits: { attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean }[],
+    hits: { attackerIndex: number; damage: number; missed: boolean; wasDefended: boolean; hitVfxGroup: 'beast' | 'earthen' | 'spirit' | 'boss' }[],
     playerMaxHp: number,
     fastRounds: boolean,
   ): void {
@@ -427,6 +472,10 @@ export class BattleScene extends Phaser.Scene {
     // on top of the front row's own sprites now that they've been raised higher in the arena.
     const anchorY = height * 0.4;
     const INCOMING_TEXT_SIZE = 36;
+    // Same batched-load idea as playOutgoingHits - every landed hit's own FX texture, loaded once
+    // up front rather than once per hit.
+    const neededAssetIds = [...new Set(hits.filter((h) => !h.missed).map((h) => ENEMY_HIT_FX_ASSET[h.hitVfxGroup]))];
+    const texturesLoaded = Promise.all(neededAssetIds.map((assetId) => loadSceneTexture(this, assetId)));
     hits.forEach((hit, i) => {
       const stagger = fastRounds ? 0 : i * INCOMING_HIT_STAGGER_MS;
       this.time.delayedCall(PRE_ENEMY_ATTACK_DELAY_MS + stagger, () => {
@@ -437,8 +486,12 @@ export class BattleScene extends Phaser.Scene {
           return;
         }
         const color = hit.wasDefended ? COLOR_DEFENDED : COLOR_INCOMING_DAMAGE;
+        const effectiveDamage = hit.wasDefended ? hit.damage / 2 : hit.damage;
         playFloatingText(this, anchorX, anchorY, `-${hit.damage}`, color, hit.wasDefended, INCOMING_TEXT_SIZE);
-        playIncomingCameraImpact(this, hit.wasDefended ? hit.damage / 2 : hit.damage, playerMaxHp);
+        playIncomingCameraImpact(this, effectiveDamage, playerMaxHp);
+        const assetId = ENEMY_HIT_FX_ASSET[hit.hitVfxGroup];
+        const { quantity, intensity } = fxIntensityFor(effectiveDamage, playerMaxHp);
+        texturesLoaded.then(() => playFxBurst(this, anchorX, anchorY, assetId, quantity, intensity)).catch(() => {});
       });
     });
   }

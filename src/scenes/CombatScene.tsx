@@ -25,6 +25,7 @@ import type { ActiveAilment, WeaponType } from '@/types';
 import { ENEMY_TIER_LABELS, ENEMY_TIER_COLORS } from '@/utils/enemyTier';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemWouldHaveEffect, sortCombatConsumables } from '@/utils/itemEffect';
+import { enemyHitGroupFor, ENEMY_HIT_SFX } from '@/utils/enemyHitGroup';
 import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { buildRewardLines } from '@/utils/rewardLines';
 import { sceneForLocationKind } from '@/utils/sceneForLocationKind';
@@ -153,8 +154,12 @@ export function CombatScene() {
   // effects; batched by id so a stale timeout can't clear a *newer* round's hits. Split into two
   // arrays (one per data direction) since the engine now reports outgoing (player -> enemy) and
   // incoming (enemy -> player) hits as separate, differently-shaped lists.
-  const [activeOutgoingHits, setActiveOutgoingHits] = useState<(CombatHitResult & { key: number })[]>([]);
-  const [activeIncomingHits, setActiveIncomingHits] = useState<(EnemyHitResult & { key: number })[]>([]);
+  const [activeOutgoingHits, setActiveOutgoingHits] = useState<
+    (CombatHitResult & { key: number; themedAilmentId?: string; targetMaxHp: number })[]
+  >([]);
+  const [activeIncomingHits, setActiveIncomingHits] = useState<
+    (EnemyHitResult & { key: number; hitVfxGroup: 'beast' | 'earthen' | 'spirit' | 'boss' })[]
+  >([]);
   // True for the full duration of a round's staggered hit playback (see the timeout below, sized
   // to actually match that duration) - phase itself returns to 'playerTurn' the instant the
   // server responds, well before a multi-enemy round's staggered incoming-hit animations finish,
@@ -368,7 +373,16 @@ export function CombatScene() {
       // or the generic sfx.combat-hit for everything else (a miss, or a spirit-damageType skill
       // with no dedicated cue).
       let dedicatedSoundId: string | undefined;
-      if (type === 'skill') {
+      // Set alongside dedicatedSoundId whenever the acting skill has its own elemental identity
+      // (a spirit-damageType skill tied to a specific ailment, e.g. Marsh Toxin -> poison) - passed
+      // through to BattleScene.playOutgoingHits so that skill's own themed FX (poison-cloud/ember/
+      // ice-shard/dark-energy) always bursts on a landed hit, not only the round the ailment roll
+      // actually succeeds. See PhaserBattleCanvas's outgoingHits prop and BattleScene's own
+      // AILMENT_FX_ASSET lookup for the other half of this.
+      let themedAilmentId: string | undefined;
+      if (type === 'attack') {
+        dedicatedSoundId = playerHitLanded && weaponDef?.weaponType ? WEAPON_TYPE_SFX[weaponDef.weaponType] : undefined;
+      } else if (type === 'skill') {
         const skill = SKILLS.find((s) => s.id === (options?.skillId ?? 'keepers-strike'));
         if (playerHitLanded && skill?.sfxAssetId) {
           dedicatedSoundId = skill.sfxAssetId;
@@ -377,6 +391,7 @@ export function CombatScene() {
         } else if (playerHitLanded && skill?.damageType === 'spirit') {
           dedicatedSoundId = (skill.inflictsAilmentId && AILMENT_SFX[skill.inflictsAilmentId]) || 'sfx.skill.spirit-generic';
         }
+        if (skill?.damageType === 'spirit' && skill.inflictsAilmentId) themedAilmentId = skill.inflictsAilmentId;
       } else if (type === 'lanternAbility') {
         const ability = LANTERN_ABILITIES.find((a) => a.id === options?.abilityId);
         if (ability?.sfxAssetId && (ability.category !== 'offensive' || playerHitLanded)) {
@@ -385,12 +400,36 @@ export function CombatScene() {
       }
       if (dedicatedSoundId) {
         void playSound(dedicatedSoundId);
-      } else if (playerHitLanded || res.enemyHits.length > 0) {
+      } else if (playerHitLanded) {
         void playSound('sfx.combat-hit');
       }
       if (res.hits.some((h) => h.defeated)) void playSound('sfx.enemy-defeated');
-      setActiveOutgoingHits(res.hits.map((h) => ({ ...h, key: batch * 1000 + h.targetIndex })));
-      setActiveIncomingHits(res.enemyHits.map((h) => ({ ...h, key: batch * 1000 + h.attackerIndex })));
+      setActiveOutgoingHits(
+        res.hits.map((h) => ({
+          ...h,
+          themedAilmentId,
+          targetMaxHp: enemies.find((e) => e.index === h.targetIndex)?.maxHp ?? 0,
+          key: batch * 1000 + h.targetIndex,
+        })),
+      );
+      // Each attacker's own hit SFX plays on the same stagger schedule as its lunge/log-line reveal
+      // above (see INCOMING_HIT_STAGGER_MS) instead of every attacker's cue firing at once the
+      // instant the round resolves - a 3-enemy round previously played one flat sfx.combat-hit
+      // regardless of how many enemies attacked or what they were.
+      res.enemyHits.forEach((hit, i) => {
+        if (hit.missed) return;
+        const stagger = fastRounds ? 0 : i * INCOMING_HIT_STAGGER_MS;
+        const attacker = enemies.find((e) => e.index === hit.attackerIndex);
+        const group = enemyHitGroupFor(attacker?.isBoss, ENEMIES.find((en) => en.id === attacker?.enemyId)?.family);
+        trackedTimeout(() => void playSound(ENEMY_HIT_SFX[group]), PRE_ENEMY_ATTACK_DELAY_MS + stagger);
+      });
+      setActiveIncomingHits(
+        res.enemyHits.map((h) => {
+          const attacker = enemies.find((e) => e.index === h.attackerIndex);
+          const group = enemyHitGroupFor(attacker?.isBoss, ENEMIES.find((en) => en.id === attacker?.enemyId)?.family);
+          return { ...h, hitVfxGroup: group, key: batch * 1000 + h.attackerIndex };
+        }),
+      );
       setAilmentFxEvent({ ailmentIds: res.playerAilments.map((a) => a.ailmentId), key: batch });
       if (newlyInflictedAilmentIds.length > 0) {
         setAilmentTakesHoldEvent({ ailmentIds: newlyInflictedAilmentIds, key: batch });
@@ -470,6 +509,17 @@ export function CombatScene() {
         const res = await callUseItem(itemId);
         setPlayerAilments(res.playerAilments);
         usedCount += 1;
+        // One cue per consumable *type*, not per item id - a fresh potion and a rare elixir both
+        // just play sfx.item-use.hp. Priority order (restore-type effects before cure) matters for
+        // a hybrid item (e.g. a salve that both heals a little and cures an ailment) - restoring a
+        // resource is the more prominent felt effect. cureAilmentId alone falls back to the
+        // existing generic sfx.item-use (already wired into CharacterMenu's own inventory tab) -
+        // one shared cue across every ailment cure, no per-ailment variant requested.
+        const effect = ITEMS.find((i) => i.id === itemId)?.effect;
+        if (effect?.healHpPercent || effect?.reviveOnDefeat) void playSound('sfx.item-use.hp');
+        else if (effect?.healSpiritPercent) void playSound('sfx.item-use.spirit');
+        else if (effect?.restoreOilPercent) void playSound('sfx.item-use.oil');
+        else if (effect?.cureAilmentId) void playSound('sfx.item-use');
       } catch {
         // A later item can still be valid even if an earlier one turned out to be a no-op (e.g.
         // it would have had no effect because an earlier item in the same batch already maxed

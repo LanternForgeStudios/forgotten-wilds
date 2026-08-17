@@ -22,6 +22,8 @@ import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { itemDisplayName, itemIconAssetId, groupRewardItemIds } from '@/utils/itemName';
 import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { itemWouldHaveEffect, sortCombatConsumables } from '@/utils/itemEffect';
+import { enemyHitGroupFor, ENEMY_HIT_SFX } from '@/utils/enemyHitGroup';
+import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
 import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import { SkillSelectMenu } from './SkillSelectMenu';
 import { ItemUseMenu } from './ItemUseMenu';
@@ -124,8 +126,12 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   // enemy's counter-attack actually targeted (party HP itself is the plain list below, not
   // per-player sprites in the canvas). Cleared after a fixed playback window so a later turn with
   // no hits (e.g. a pure Defend) doesn't leave a stale animation queued.
-  const [activeOutgoingHits, setActiveOutgoingHits] = useState<(PartyCombatHitResult & { key: number })[]>([]);
-  const [activeIncomingHits, setActiveIncomingHits] = useState<(PartyEnemyHitResult & { key: number })[]>([]);
+  const [activeOutgoingHits, setActiveOutgoingHits] = useState<
+    (PartyCombatHitResult & { key: number; themedAilmentId?: string; targetMaxHp: number })[]
+  >([]);
+  const [activeIncomingHits, setActiveIncomingHits] = useState<
+    (PartyEnemyHitResult & { key: number; hitVfxGroup: 'beast' | 'earthen' | 'spirit' | 'boss' })[]
+  >([]);
   // True for the full duration of a round's hit playback (matches CombatScene.tsx's own
   // playbackActive) - gates the action buttons below so a fast-cycling battle (e.g. a solo Endless
   // Battle run, where the same player's turn can come right back around the instant the enemy
@@ -143,22 +149,48 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
     // lastTurnResult.skillId/abilityId (see that field's own doc comment) rather than local state -
     // every viewer sees the same result here, not just whoever happened to submit the action.
     let dedicatedSoundId: string | undefined;
+    let themedAilmentId: string | undefined;
     const { skillId, abilityId } = battle.lastTurnResult;
     if (skillId) {
       const skill = SKILLS.find((s) => s.id === skillId);
       if (hitLanded && skill?.sfxAssetId) dedicatedSoundId = skill.sfxAssetId;
+      if (skill?.damageType === 'spirit' && skill.inflictsAilmentId) themedAilmentId = skill.inflictsAilmentId;
     } else if (abilityId) {
       const ability = LANTERN_ABILITIES.find((a) => a.id === abilityId);
       if (ability?.sfxAssetId && (ability.category !== 'offensive' || hitLanded)) dedicatedSoundId = ability.sfxAssetId;
     }
     if (dedicatedSoundId) {
       void playSound(dedicatedSoundId);
-    } else if (hitLanded || enemyHits.length > 0) {
+    } else if (hitLanded) {
       void playSound('sfx.combat-hit');
     }
     if (hits.some((h) => h.defeated)) void playSound('sfx.enemy-defeated');
-    setActiveOutgoingHits(hits.map((h) => ({ ...h, key: resolvedAt })));
-    setActiveIncomingHits(enemyHits.map((h) => ({ ...h, key: resolvedAt })));
+    setActiveOutgoingHits(
+      hits.map((h) => ({
+        ...h,
+        themedAilmentId,
+        targetMaxHp: battle.enemies[h.targetIndex]?.maxHp ?? 0,
+        key: resolvedAt,
+      })),
+    );
+    // Mirrors CombatScene.tsx's own per-attacker staggered enemy-hit SFX (see that file's own
+    // comment) - PhaserBattleCanvas/BattleScene already stagger the *visual* incoming-hit playback
+    // identically in both modes, this just adds the matching sound per attacker instead of one flat
+    // sfx.combat-hit for the whole round regardless of who or how many attacked.
+    enemyHits.forEach((hit, i) => {
+      if (hit.missed) return;
+      const stagger = i * INCOMING_HIT_STAGGER_MS;
+      const enemy = battle.enemies[hit.attackerIndex];
+      const group = enemyHitGroupFor(ENEMIES.find((d) => d.id === enemy?.enemyId)?.isBoss, ENEMIES.find((d) => d.id === enemy?.enemyId)?.family);
+      setTimeout(() => void playSound(ENEMY_HIT_SFX[group]), PRE_ENEMY_ATTACK_DELAY_MS + stagger);
+    });
+    setActiveIncomingHits(
+      enemyHits.map((h) => {
+        const enemy = battle.enemies[h.attackerIndex];
+        const group = enemyHitGroupFor(ENEMIES.find((d) => d.id === enemy?.enemyId)?.isBoss, ENEMIES.find((d) => d.id === enemy?.enemyId)?.family);
+        return { ...h, hitVfxGroup: group, key: resolvedAt };
+      }),
+    );
     setPlaybackActive(true);
     const id = setTimeout(() => {
       setActiveOutgoingHits([]);
@@ -320,6 +352,12 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
       try {
         await callUseItemInPartyBattle(battleId, itemId);
         usedCount += 1;
+        // Mirrors CombatScene.tsx's own item-use SFX priority exactly - see that file's comment.
+        const effect = ITEMS.find((i) => i.id === itemId)?.effect;
+        if (effect?.healHpPercent || effect?.reviveOnDefeat) void playSound('sfx.item-use.hp');
+        else if (effect?.healSpiritPercent) void playSound('sfx.item-use.spirit');
+        else if (effect?.restoreOilPercent) void playSound('sfx.item-use.oil');
+        else if (effect?.cureAilmentId) void playSound('sfx.item-use');
       } catch {
         // A later item can still be valid even if an earlier one in this batch turned out to be a
         // no-op (e.g. it would have had no effect because an earlier item already maxed that

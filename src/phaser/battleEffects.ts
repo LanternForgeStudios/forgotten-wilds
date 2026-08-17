@@ -44,6 +44,61 @@ export function ensureParticleTexture(scene: Phaser.Scene, key: string): void {
   g.destroy();
 }
 
+/** One-time diagonal white streak texture (tapered rectangle, wide in the middle, pointed at both
+ *  ends) for the slash-strike effect a physical hit plays just before its blood-splatter burst -
+ *  same "generated placeholder, no new art asset" approach as ensureParticleTexture above (see
+ *  CREDITS.md's generated-placeholder convention). Drawn wide/long so a single scaled-down sprite
+ *  reads clearly as a blade streak rather than a blob at typical battle-hit sizes. */
+export function ensureSlashTexture(scene: Phaser.Scene, key: string): void {
+  if (scene.textures.exists(key)) return;
+  const width = 96;
+  const height = 20;
+  const g = scene.add.graphics();
+  g.fillStyle(0xffffff, 1);
+  g.beginPath();
+  g.moveTo(0, height / 2);
+  g.lineTo(width * 0.35, 0);
+  g.lineTo(width, height / 2);
+  g.lineTo(width * 0.35, height);
+  g.closePath();
+  g.fillPath();
+  g.generateTexture(key, width, height);
+  g.destroy();
+}
+
+/** A single quick diagonal slash streak across `x, y` - the "weapon making contact" beat a
+ *  physical hit plays a moment before its blood-splatter impact burst (see BattleScene.
+ *  playOutgoingHits). One sprite, not a particle emitter (playFxBurst's scattered-chunks look is
+ *  wrong for a single decisive stroke) - scales in from 0, holds barely long enough to read, then
+ *  fades, with a randomized angle each time so repeated attacks don't look identical. */
+export function playSlashEffect(scene: Phaser.Scene, x: number, y: number, textureKey: string): void {
+  const angle = -35 + Math.random() * 20;
+  const sprite = scene.add
+    .image(x, y, textureKey)
+    .setDepth(FX_EMITTER_DEPTH + 1)
+    .setBlendMode(Phaser.BlendModes.ADD)
+    .setAngle(angle)
+    .setScale(0.4, 1.6)
+    .setAlpha(0);
+  scene.tweens.add({
+    targets: sprite,
+    alpha: { from: 0, to: 1 },
+    scaleX: { from: 0.4, to: 1.8 },
+    duration: 70,
+    ease: 'Cubic.easeOut',
+    onComplete: () => {
+      scene.tweens.add({
+        targets: sprite,
+        alpha: 0,
+        duration: 140,
+        delay: 40,
+        ease: 'Cubic.easeIn',
+        onComplete: () => sprite.destroy(),
+      });
+    },
+  });
+}
+
 /** Tint-flash + recoil-punch tween, for the player's own outgoing hit landing on an enemy -
  *  replaces .enemyBounce. Duration/ease chosen for a punchier, more legible "hit" read than the
  *  old vertical bounce. */
@@ -134,6 +189,17 @@ export function playIncomingLunge(scene: Phaser.Scene, sprite: Phaser.GameObject
   });
 }
 
+/** Derives a hit-FX burst's quantity/intensity from how big `damage` is relative to
+ *  `referenceMaxHp` (the target's own max HP for an outgoing hit, the player's for an incoming
+ *  one) - shared by playOutgoingHits/playIncomingHits so a heavier hit visibly bursts bigger, not
+ *  just more of the same small particles. Both values have a floor well above playFxBurst's own
+ *  defaults, not a floor of "nothing" - a weak hit should still read as a satisfying hit, only a
+ *  strong one should read as bigger still (see this file's own quantity/intensity doc comments). */
+export function fxIntensityFor(damage: number, referenceMaxHp: number): { quantity: number; intensity: number } {
+  const severity = referenceMaxHp > 0 ? Math.max(0, Math.min(1, damage / referenceMaxHp)) : 0;
+  return { quantity: Math.round(14 + severity * 10), intensity: 1 + severity * 0.5 };
+}
+
 /** Camera shake+flash on an incoming hit, scaled to severity - the one effect CSS genuinely
  *  couldn't do cleanly (shaking the whole DOM tree would visibly jitter the HUD/log/action panel
  *  along with the battle stage; camera.shake() only perturbs the Phaser canvas's own contents). */
@@ -210,15 +276,18 @@ export function playDefeatEffect(
  *  public/assets/tilesets/fx_pack/manifest.json) at a fixed point - the shared shape behind every
  *  ailment-effect burst (poison/burn/freeze) and reusable for any future FX-pack wiring. Caller
  *  must have already loaded `textureKey` as a spritesheet (BattleScene.loadTexture handles this
- *  generically for any registry id with a frameSize). */
-export function playFxBurst(scene: Phaser.Scene, x: number, y: number, textureKey: string, quantity = 14): void {
+ *  generically for any registry id with a frameSize). `intensity` (default 1, clamped >= 0.7 by
+ *  every caller that derives it from hit severity - see severityFor) scales particle size/speed on
+ *  top of `quantity` - a weak hit still reads as a real hit, a strong one reads as bigger, not just
+ *  "more of the same small particles." */
+export function playFxBurst(scene: Phaser.Scene, x: number, y: number, textureKey: string, quantity = 14, intensity = 1): void {
   const emitter = scene.add.particles(x, y, textureKey, {
     frame: [0, 1, 2, 3],
     lifespan: { min: 600, max: 1100 },
-    speed: { min: 30, max: 110 },
+    speed: { min: 30 * intensity, max: 110 * intensity },
     angle: { min: 200, max: 340 },
     alpha: { start: 1, end: 0 },
-    scale: { start: 2.1, end: 0.5 },
+    scale: { start: 2.1 * intensity, end: 0.5 * intensity },
     rotate: { min: -180, max: 180 },
     emitting: false,
   });

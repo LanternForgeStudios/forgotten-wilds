@@ -23,6 +23,7 @@ import { AILMENTS, EQUIPMENT, ITEMS, LANTERN_ABILITIES, SKILLS } from '@/data';
 import { AILMENT_TINT_COLORS } from '@/utils/ailmentTint';
 import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { itemWouldHaveEffect, sortCombatConsumables } from '@/utils/itemEffect';
+import { ENEMY_HIT_SFX } from '@/utils/enemyHitGroup';
 import type { PartyBattleSession } from '@/types';
 // Reuses Endless Battle's stylesheet - same Panel/list/bar chrome, no PvP-specific classes needed.
 import styles from './EndlessBattlePanel.module.css';
@@ -109,8 +110,12 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
   // a match-ending one (currentTurnIndex deliberately left pointing at the player who just won/
   // forfeited) - both cases correctly resolve to "whoever was active in the previous snapshot".
   const prevActiveUidRef = useRef<string | null>(null);
-  const [activeOutgoingHits, setActiveOutgoingHits] = useState<(CombatHitResult & { key: number })[]>([]);
-  const [activeIncomingHits, setActiveIncomingHits] = useState<(EnemyHitResult & { key: number })[]>([]);
+  const [activeOutgoingHits, setActiveOutgoingHits] = useState<
+    (CombatHitResult & { key: number; themedAilmentId?: string; targetMaxHp: number })[]
+  >([]);
+  const [activeIncomingHits, setActiveIncomingHits] = useState<
+    (EnemyHitResult & { key: number; hitVfxGroup: 'beast' | 'earthen' | 'spirit' | 'boss' })[]
+  >([]);
   useEffect(() => {
     if (!battle) return;
     const currentActiveUid = battle.turnOrder[battle.currentTurnIndex];
@@ -132,19 +137,30 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
     // instead, sourced from the server's lastTurnResult.skillId/abilityId.
     const hitLanded = !pvpHit.missed;
     let dedicatedSoundId: string | undefined;
+    let themedAilmentId: string | undefined;
     const { skillId, abilityId } = battle.lastTurnResult ?? {};
     if (skillId) {
       const skill = SKILLS.find((s) => s.id === skillId);
       if (hitLanded && skill?.sfxAssetId) dedicatedSoundId = skill.sfxAssetId;
+      if (skill?.damageType === 'spirit' && skill.inflictsAilmentId) themedAilmentId = skill.inflictsAilmentId;
     } else if (abilityId) {
       const ability = LANTERN_ABILITIES.find((a) => a.id === abilityId);
       if (ability?.sfxAssetId && (ability.category !== 'offensive' || hitLanded)) dedicatedSoundId = ability.sfxAssetId;
     }
+    // No Enemy/family exists for a human opponent - 'earthen' (the plainest, most human-combat-
+    // appropriate group) stands in for the hit-SFX/VFX group every incoming PvP hit uses, same
+    // reasoning as CombatScene.tsx's own 'earthen' fallback for an unrecognized family. Only
+    // applies as the *fallback* sound for my own attack landing (an opponent's dedicated skill/
+    // ability cue still wins either way) - an opponent's plain attack lands on me instead, in which
+    // case the enemy-hit cue below replaces sfx.combat-hit entirely, not layers on top of it.
     if (dedicatedSoundId) void playSound(dedicatedSoundId);
-    else if (hitLanded) void playSound('sfx.combat-hit');
+    else if (hitLanded && lastActorUid === uid) void playSound('sfx.combat-hit');
+    else if (hitLanded) void playSound(ENEMY_HIT_SFX.earthen);
     if (pvpHit.defeated && lastActorUid === uid) void playSound('sfx.enemy-defeated');
     if (lastActorUid === uid) {
-      setActiveOutgoingHits([{ targetIndex: 0, ...pvpHit, key: resolvedAt }]);
+      const opponentUid = battle.turnOrder.find((u) => u !== uid);
+      const opponentMaxHp = opponentUid ? battle.participantStats[opponentUid]?.maxHp ?? 0 : 0;
+      setActiveOutgoingHits([{ targetIndex: 0, ...pvpHit, themedAilmentId, targetMaxHp: opponentMaxHp, key: resolvedAt }]);
       setActiveIncomingHits([]);
     } else {
       setActiveIncomingHits([
@@ -156,6 +172,7 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
           logLine: '',
           damageType: pvpHit.damageType,
           ailmentInflicted: pvpHit.ailmentInflicted,
+          hitVfxGroup: 'earthen',
           key: resolvedAt,
         },
       ]);
@@ -310,6 +327,12 @@ export function PvpBattlePanel({ battleId, onClose }: PvpBattlePanelProps) {
       try {
         await callUseItemInPartyBattle(battleId, itemId);
         usedCount += 1;
+        // Mirrors CombatScene.tsx's own item-use SFX priority exactly - see that file's comment.
+        const effect = ITEMS.find((i) => i.id === itemId)?.effect;
+        if (effect?.healHpPercent || effect?.reviveOnDefeat) void playSound('sfx.item-use.hp');
+        else if (effect?.healSpiritPercent) void playSound('sfx.item-use.spirit');
+        else if (effect?.restoreOilPercent) void playSound('sfx.item-use.oil');
+        else if (effect?.cureAilmentId) void playSound('sfx.item-use');
       } catch {
         failed = true;
       }
