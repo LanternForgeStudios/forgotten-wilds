@@ -358,11 +358,22 @@ const ENEMY_MISS_CHANCE = 0.1;
  *  (partyCombatEngine.ts) always use a single fixed table matching 'medium' here, unaffected by
  *  this setting, per its own doc comment. 'medium' is the same values the game shipped with after
  *  the 2026-08 crowd-damage hardening pass; 'easy' reuses the original pre-hardening values
- *  (already well-tested); 'hard' pushes further past 'medium' by the same rough step. */
+ *  (already well-tested).
+ *
+ *  'hard' was originally just one more step past 'medium' (2:0.9, 3:0.8, 4:0.7, 5:0.6, 6:0.5) -
+ *  raised again (2026-08-17, "the crowd damage thresholds are not 'hard' enough") to an
+ *  escalating gap instead of a flat one: nearly un-dampened at low counts, and still noticeably
+ *  closer to full (undampened) damage than 'medium' even at a full 6-enemy pack, so choosing
+ *  'hard' specifically means embracing that crowd fights get disproportionately more dangerous as
+ *  the pack grows, not just "medium plus a little." Expect naive single-targeting against a real
+ *  multi-enemy group to be genuinely dangerous at most levels on 'hard', not just the low ones
+ *  'medium' already makes unwinnable - see combatEngine.test.ts's own 3-mothling-pack simulation
+ *  for how much of a swing that actually is in practice, the same caution its own historical note
+ *  gives about 'medium'. */
 const CROWD_DAMAGE_FACTOR_BY_DIFFICULTY: Record<Difficulty, Record<number, number>> = {
   easy: { 1: 1, 2: 0.3, 3: 0.25, 4: 0.2, 5: 0.15, 6: 0.1 },
   medium: { 1: 1, 2: 0.75, 3: 0.6, 4: 0.5, 5: 0.4, 6: 0.3 },
-  hard: { 1: 1, 2: 0.9, 3: 0.8, 4: 0.7, 5: 0.6, 6: 0.5 },
+  hard: { 1: 1, 2: 1, 3: 0.95, 4: 0.9, 5: 0.85, 6: 0.8 },
 };
 
 export function resolveRound(input: RoundInput): RoundResult {
