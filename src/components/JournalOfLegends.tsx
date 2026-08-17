@@ -496,6 +496,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                       style={{ cursor: 'pointer' }}
                       onClick={() => setSelectedEnemyId(id)}
                     >
+                      {enemy && <SpritePreviewFrame assetId={enemy.battleSpriteAssetId} alt={enemy.name} size={{ width: 48, height: 48 }} />}
                       <span style={{ fontSize: 13, flex: 1 }}>
                         <strong>{enemy?.name ?? id}</strong>
                         {enemy && (
@@ -787,6 +788,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                       style={{ cursor: 'pointer' }}
                       onClick={() => setSelectedEnemyId(id)}
                     >
+                      {enemy && <SpritePreviewFrame assetId={enemy.battleSpriteAssetId} alt={enemy.name} size={{ width: 48, height: 48 }} />}
                       <span style={{ fontSize: 13, flex: 1 }}>
                         <strong>{enemy?.name ?? id}</strong> — defeated
                       </span>

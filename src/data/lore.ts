@@ -38,6 +38,12 @@ export const LORE_ENTRIES: JournalEntry[] = [
     unlockedAt: 0,
   },
   {
+    id: 'lore-keeper-aldric-vane',
+    title: 'Keeper Aldric Vane',
+    body: "A history pieced together from the mine office's own surviving records, by Nell Ashby: Aldric Vane was the last Lantern Keeper to tend Hollow Rail Mine's shrine before whatever kept the miners down there took him too. He left his lantern burning rather than let it go dark with him - the Lantern of Enduring Embers, still lit, still waiting, the same as every legendary lantern in Mytherra would turn out to be.",
+    unlockedAt: 0,
+  },
+  {
     id: 'lore-moon-witch',
     title: 'The Moon Witch (fragment)',
     body: "Silas mentions her only once, and won't be drawn on it again. A story for another day, he says.",

@@ -200,7 +200,7 @@ export const QUESTS: Quest[] = [
     objectives: [
       { id: 'collect-lantern', type: 'collectItem', description: 'Recover the Lantern of Enduring Embers.', targetId: 'miners-lost-lantern', requiredCount: 1 },
     ],
-    reward: { xp: 40, gold: 25, itemIds: ['miners-lost-lantern-equipped'] },
+    reward: { xp: 40, gold: 25, itemIds: ['miners-lost-lantern-equipped'], grantLoreId: 'lore-keeper-aldric-vane' },
   },
   {
     id: 'the-shrine-below',
@@ -708,7 +708,7 @@ export const QUESTS: Quest[] = [
     category: 'main',
     prerequisiteQuestId: 'into-the-ancient-forest',
     objectives: [
-      { id: 'talk-warden-start', type: 'talkToNpc', description: 'Speak with Forest Warden Rowan Hart.', targetId: 'forest-warden-rowan-hart', requiredCount: 1 },
+      { id: 'talk-warden-start', type: 'talkToNpc', description: 'Speak with Forest Warden Corwin Hart.', targetId: 'forest-warden-rowan-hart', requiredCount: 1 },
       { id: 'reach-mistwood-path', type: 'reachLocation', description: 'Travel through Mistwood Path.', targetId: 'mistwood-path', requiredCount: 1 },
       { id: 'reach-elder-forest', type: 'reachLocation', description: 'Explore Elder Forest.', targetId: 'elder-forest', requiredCount: 1 },
       { id: 'calm-echoes', type: 'defeatEnemies', description: 'Calm 2 corrupted forest Echoes.', targetId: 'corrupted-echo', requiredCount: 2 },

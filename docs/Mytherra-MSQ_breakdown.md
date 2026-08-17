@@ -731,7 +731,7 @@ Story Beat 3 — The Forgotten Keeper
 
 Objectives
 
-Discover records of Lantern Keeper Aldric Vale (working name).
+Discover records of Lantern Keeper Aldric Vane (working name).
 Learn he remained behind to protect the miners.
 World Flags
 miners_story_complete
@@ -764,7 +764,7 @@ Story Beat 2 — Final Rest
 
 Objectives
 
-Read Aldric Vale's final journal.
+Read Aldric Vane's final journal.
 Learn why he never left the mine.
 Story Beat 3 — Claim the Lantern
 
@@ -1016,7 +1016,7 @@ Story Milestones
 Joined the Lantern Keepers.
 Restored two Spirit Shrines.
 Learned Echoes are corrupted memories.
-Uncovered the story of Lantern Keeper Aldric Vale.
+Uncovered the story of Lantern Keeper Aldric Vane.
 Restored Hollow Rail Mine.
 Witnessed the first Guardian Memory.
 Learned the Guardians were silenced rather than abandoning Mytherra.
@@ -1848,7 +1848,7 @@ Heartwood Approach
 Primary NPCs
 Elder Rowan Birch (regional elder)
 Archivist Elowen
-Forest Warden Rowan Hart
+Forest Warden Corwin Hart
 Cedar Spirit
 Elias Rowan (letters)
 MSF-WP-001
@@ -1890,7 +1890,7 @@ Investigate disturbances throughout Elder Forest.
 
 Quest Giver
 
-Forest Warden Rowan Hart
+Forest Warden Corwin Hart
 
 Story Beats
 Explore

@@ -38,7 +38,15 @@ export const NPC_DIALOGUE_VARIANTS: Record<string, NpcDialogueVariantGate[]> = {
     { questId: 'embers-that-never-faded' },
     { questId: 'the-lost-expedition' },
   ],
+  'ranger-caleb': [
+    { questId: 'the-mountain-remembers' },
+  ],
+  'mayor-eleanor-ashcroft': [
+    { questId: 'a-new-dawn' },
+    { questId: 'the-mountain-remembers' },
+  ],
   'historian-miriam': [
+    { questId: 'a-new-dawn' },
     { questId: 'embers-beneath-stone' },
     { questId: 'frostbound-pages' },
     { questId: 'the-mountain-remembers' },
@@ -122,9 +130,12 @@ export const NPC_DIALOGUE_VARIANTS: Record<string, NpcDialogueVariantGate[]> = {
     { questId: 'the-second-winter-count', reportForObjectiveId: 'talk-koda-winter-count-ii' },
   ],
   'scout-niska': [
+    { questId: 'the-first-promise-remembered' },
     { questId: 'following-the-herd' },
   ],
   'prairie-spirit': [
+    { questId: 'the-herds-enduring-bond' },
+    { questId: 'the-skys-second-gift' },
     { questId: 'voices-on-the-wind' },
     { questId: 'voices-on-the-wind', reportForObjectiveId: 'talk-prairie-spirit-restore' },
     { questId: 'the-skys-second-gift', reportForObjectiveId: 'talk-prairie-spirit-charm2' },
@@ -138,6 +149,7 @@ export const NPC_DIALOGUE_VARIANTS: Record<string, NpcDialogueVariantGate[]> = {
     { questId: 'into-the-ancient-forest' },
   ],
   'archivist-elowen': [
+    { questId: 'the-keeper-beneath-the-cedar' },
     { questId: 'beneath-the-roots' },
     { questId: 'the-second-recording' },
     { questId: 'the-first-recording' },
@@ -152,9 +164,12 @@ export const NPC_DIALOGUE_VARIANTS: Record<string, NpcDialogueVariantGate[]> = {
     { questId: 'the-keeper-beneath-the-cedar', reportForObjectiveId: 'talk-elowen-lantern' },
   ],
   'forest-warden-rowan-hart': [
+    { questId: 'the-cedar-giant' },
     { questId: 'the-forest-has-fallen-silent' },
   ],
   'cedar-spirit': [
+    { questId: 'roots-that-remember' },
+    { questId: 'the-cedars-second-ring' },
     { questId: 'the-second-recording' },
     { questId: 'the-first-recording' },
     { questId: 'seeds-of-the-ancient-cedar' },
@@ -194,9 +209,13 @@ export const NPC_DIALOGUE_VARIANTS: Record<string, NpcDialogueVariantGate[]> = {
   ],
   // Frozen Frontier (MSQ Volume VI, Chapter 11)
   'elder-henrik': [
+    { questId: 'a-new-dawn' },
+    { questId: 'the-winter-stag' },
     { questId: 'northbound' },
   ],
   'captain-astrid-frost': [
+    { questId: 'a-new-dawn' },
+    { questId: 'the-winter-stag' },
     { questId: 'the-second-scout' },
     { questId: 'the-first-scout' },
     { questId: 'frozen-echoes' },

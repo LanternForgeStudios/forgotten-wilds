@@ -198,7 +198,7 @@ export const QUESTS: Record<string, QuestDef> = {
     id: 'embers-that-never-faded',
     prerequisiteQuestId: 'the-lost-expedition',
     objectives: [{ id: 'collect-lantern', type: 'collectItem', targetId: 'miners-lost-lantern', requiredCount: 1 }],
-    reward: { xp: 40, gold: 25, itemIds: ['miners-lost-lantern-equipped'] },
+    reward: { xp: 40, gold: 25, itemIds: ['miners-lost-lantern-equipped'], grantLoreId: 'lore-keeper-aldric-vane' },
   },
   'the-shrine-below': {
     id: 'the-shrine-below',

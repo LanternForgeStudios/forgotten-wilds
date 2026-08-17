@@ -162,7 +162,7 @@ export const NPCS: Npc[] = [
       {
         questId: 'into-hollow-rail',
         lines: [
-          { speaker: 'Silas Flint', text: "You're in deeper than any Keeper's gone in years. Aldric Vale's supplies, you said? Then it's true. He never left." },
+          { speaker: 'Silas Flint', text: "You're in deeper than any Keeper's gone in years. Old supplies down there, you said - still packed, like whoever left them meant to come back for them." },
           { speaker: 'Silas Flint', text: "Find that shrine. If anything down there can still be put right, it's that." },
         ],
       },
@@ -170,7 +170,7 @@ export const NPCS: Npc[] = [
         questId: 'beneath-hollow-rail',
         lines: [
           { speaker: 'Silas Flint', text: "You went in. Most don't, once they've heard me talk about it." },
-          { speaker: 'Silas Flint', text: "Upper shafts cleared, you said. Don't let that fool you into thinking the worst of it is behind you." },
+          { speaker: 'Silas Flint', text: "Only made it to the entrance so far. Don't let the quiet fool you - the real listening starts once you're past it." },
         ],
       },
     ],
@@ -215,7 +215,7 @@ export const NPCS: Npc[] = [
       {
         questId: 'the-lost-expedition',
         lines: [
-          { speaker: 'Nell Ashby', text: "So the miners' story is real — a Keeper really did stay behind. Aldric Vale. I never once heard that name right." },
+          { speaker: 'Nell Ashby', text: "So the miners' story is real — a Keeper really did stay behind. Aldric Vane. I never once heard that name right." },
           { speaker: 'Nell Ashby', text: "If his lantern's still down there somewhere, I need it in my collection. Or at least in my notes." },
         ],
       },
@@ -273,9 +273,16 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['the-first-flame', 'fragments-of-the-first-promise', 'the-mountain-remembers', 'frostbound-pages', 'embers-beneath-stone'],
+      questIds: ['the-first-flame', 'fragments-of-the-first-promise', 'the-mountain-remembers', 'frostbound-pages', 'embers-beneath-stone', 'a-new-dawn'],
     },
     dialogueVariants: [
+      {
+        questId: 'a-new-dawn',
+        lines: [
+          { speaker: 'Historian Miriam', text: "I told you once I'd spent my life reading fragments and never expected to see one complete. Now there are six, and I was wrong about all of it - wrong in the best way I've ever been." },
+          { speaker: 'Historian Miriam', text: "Every gap in every ledger in this archive finally has an explanation. I'm going to need new shelves. I'm not going to need new questions - just this once, I have all of them." },
+        ],
+      },
       {
         questId: 'embers-beneath-stone',
         lines: [
@@ -411,6 +418,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Ranger Caleb', text: "Whatever's wrong with that mine, it's not staying put anymore. Tell Silas, if you see him." },
     ],
     gameplayHook: { type: 'lore' },
+    dialogueVariants: [
+      {
+        questId: 'the-mountain-remembers',
+        lines: [
+          { speaker: 'Ranger Caleb', text: "Heard the mine's gone quiet - the good kind of quiet, for once. I was the one who told you to look into it, so I suppose I'll take a little credit." },
+          { speaker: 'Ranger Caleb', text: "Rail line's still not moving any carts. Some things a Guardian Memory doesn't fix. I can live with that." },
+        ],
+      },
+    ],
   },
   {
     id: 'mayor-eleanor-ashcroft',
@@ -424,6 +440,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Mayor Eleanor Ashcroft', text: "Folks around here trust a Keeper more than they trust me, and that's exactly how it should be." },
     ],
     gameplayHook: { type: 'lore' },
+    dialogueVariants: [
+      {
+        questId: 'a-new-dawn',
+        lines: [
+          { speaker: 'Mayor Eleanor Ashcroft', text: "Representatives from every region I'd only ever read about, standing in my town hall at the same time. I've been mayor for eleven years and never once had to plan for that." },
+          { speaker: 'Mayor Eleanor Ashcroft', text: "Ash Hallow stood at this crossroads through the whole Silence not knowing why. Now it gets to stand here knowing. I'll take that trade every time." },
+        ],
+      },
+      {
+        questId: 'the-mountain-remembers',
+        lines: [
+          { speaker: 'Mayor Eleanor Ashcroft', text: "Word's already spreading past the boarding house - a Guardian Memory, assembled whole, right here in Ash Hallow. This town hasn't had news like that in longer than I've been alive." },
+          { speaker: 'Mayor Eleanor Ashcroft', text: "Folks trust a Keeper more than they trust me. After this, they may be right to." },
+        ],
+      },
+    ],
   },
 
   // --- Crimson Bayou (MSQ Volume II) ---
@@ -784,7 +816,7 @@ export const NPCS: Npc[] = [
       {
         questId: 'keeper-of-the-open-sky',
         lines: [
-          { speaker: 'Chief Aiyana Whitefeather', text: "A second legendary lantern, and a name to go with it - Talon Greywind. The old lodge songs mention a Greywind. I never once connected it to a Lantern Keeper." },
+          { speaker: 'Chief Aiyana Whitefeather', text: "Another legendary lantern, and a name to go with it - Talon Greywind. The old lodge songs mention a Greywind. I never once connected it to a Lantern Keeper." },
           { speaker: 'Chief Aiyana Whitefeather', text: "Whatever's waiting at Guardian Peak, Keeper, you won't be walking in unlit." },
         ],
       },
@@ -921,8 +953,15 @@ export const NPCS: Npc[] = [
       { speaker: 'Niska', text: "Keep to the trails and the grass won't hide anything from you. Wander off them and you're on your own, same as anyone." },
       { speaker: 'Niska', text: "The herd's still running the old paths, far as I've tracked them. Whatever's out past Golden Prairie, they're not afraid of it yet." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['following-the-herd'] },
+    gameplayHook: { type: 'questGiver', questIds: ['following-the-herd', 'the-first-promise-remembered'] },
     dialogueVariants: [
+      {
+        questId: 'the-first-promise-remembered',
+        lines: [
+          { speaker: 'Niska', text: "The herd's running easier than I've ever tracked them - not spooked, not wary, just running because it's what they do. I don't need Chief Aiyana to tell me that means something." },
+          { speaker: 'Niska', text: "Whatever you and the Thunderbird settled up there, the prairie felt it before I did. Keep to the trails on your way out, Keeper. You've more than earned an easy road." },
+        ],
+      },
       {
         questId: 'following-the-herd',
         lines: [
@@ -943,8 +982,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Prairie Spirit', text: '...another lantern-light, small against all this open sky. The wind brought you here for a reason, same as it brings everything.' },
       { speaker: 'Prairie Spirit', text: 'Three stones hold what the wind remembers - scattered when the remembering stopped mattering to anyone. Find them, and you might hear what I hear.' },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['voices-on-the-wind'] },
+    gameplayHook: { type: 'questGiver', questIds: ['voices-on-the-wind', 'the-skys-second-gift', 'the-herds-enduring-bond'] },
     dialogueVariants: [
+      {
+        questId: 'the-herds-enduring-bond',
+        lines: [
+          { speaker: 'Prairie Spirit', text: 'The second binding took. I can feel it settling into you, the same way the first one did - steadier this time, like you already knew the shape of it.' },
+          { speaker: 'Prairie Spirit', text: 'Two Totems bound, two proofs of resolve behind you. Whatever the wind still has to say, you are carrying more of it now than you were.' },
+        ],
+      },
+      {
+        questId: 'the-skys-second-gift',
+        lines: [
+          { speaker: 'Prairie Spirit', text: 'A second Charm, bound and settled. I felt it take hold the moment you crossed back into the wind\'s reach.' },
+          { speaker: 'Prairie Spirit', text: 'You carry more of the plains with you now than when you arrived. The wind noticed. So did I.' },
+        ],
+      },
       {
         questId: 'voices-on-the-wind',
         lines: [
@@ -1096,9 +1149,17 @@ export const NPCS: Npc[] = [
         'heartwood-sanctuary',
         'the-first-recording',
         'the-second-recording',
+        'the-keeper-beneath-the-cedar',
       ],
     },
     dialogueVariants: [
+      {
+        questId: 'the-keeper-beneath-the-cedar',
+        lines: [
+          { speaker: 'Archivist Elowen', text: "Aldric Thorne. That's the name the inscriptions gave up, once I finally had the light to read them properly. Thirty years I've walked past his lantern's own hiding place without knowing it." },
+          { speaker: 'Archivist Elowen', text: "He left it lit and waiting, the same as it says on the wall. I intend to make sure his name outlasts this library's next thirty years, whatever else this forest still hasn't told us." },
+        ],
+      },
       {
         questId: 'beneath-the-roots',
         lines: [
@@ -1187,22 +1248,29 @@ export const NPCS: Npc[] = [
   },
   {
     id: 'forest-warden-rowan-hart',
-    name: 'Rowan Hart',
+    name: 'Corwin Hart',
     title: 'Forest Warden',
     spriteAssetId: 'sprite.npc.forest-warden-rowan-hart',
     portraitAssetId: 'portrait.forest-warden-rowan-hart',
     locationId: 'cedarwatch',
     dialogue: [
-      { speaker: 'Rowan Hart', text: "Elder Forest's gone quiet the last few months - not peaceful-quiet, wrong-quiet. Birds don't nest there anymore. I don't like it." },
-      { speaker: 'Rowan Hart', text: "Something's stirring the deep parts of the woods. If you're looking for a place to start, Mistwood Path will take you there faster than anywhere else." },
+      { speaker: 'Corwin Hart', text: "Elder Forest's gone quiet the last few months - not peaceful-quiet, wrong-quiet. Birds don't nest there anymore. I don't like it." },
+      { speaker: 'Corwin Hart', text: "Something's stirring the deep parts of the woods. If you're looking for a place to start, Mistwood Path will take you there faster than anywhere else." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-forest-has-fallen-silent'] },
+    gameplayHook: { type: 'questGiver', questIds: ['the-forest-has-fallen-silent', 'the-cedar-giant'] },
     dialogueVariants: [
+      {
+        questId: 'the-cedar-giant',
+        lines: [
+          { speaker: 'Corwin Hart', text: "Birds are back in Elder Forest. Wasn't sure I'd hear that again, and I've walked those woods my whole life." },
+          { speaker: 'Corwin Hart', text: "Whatever wrong-quiet I felt out there is gone now. I don't need Elder Rowan Birch's books to tell me that's your doing." },
+        ],
+      },
       {
         questId: 'the-forest-has-fallen-silent',
         lines: [
-          { speaker: 'Rowan Hart', text: "A shrine, buried that deep in Elder Forest, and none of us ever found it. I've walked those woods my whole life and it still finds ways to surprise me." },
-          { speaker: 'Rowan Hart', text: "Elder Rowan Birch will want to hear about the Cedar Spirit directly from you, Keeper. This isn't secondhand news." },
+          { speaker: 'Corwin Hart', text: "A shrine, buried that deep in Elder Forest, and none of us ever found it. I've walked those woods my whole life and it still finds ways to surprise me." },
+          { speaker: 'Corwin Hart', text: "Elder Rowan Birch will want to hear about the Cedar Spirit directly from you, Keeper. This isn't secondhand news." },
         ],
       },
     ],
@@ -1220,9 +1288,29 @@ export const NPCS: Npc[] = [
     ],
     gameplayHook: {
       type: 'questGiver',
-      questIds: ['seeds-of-the-ancient-cedar', 'the-first-recording', 'the-second-recording'],
+      questIds: [
+        'seeds-of-the-ancient-cedar',
+        'the-first-recording',
+        'the-second-recording',
+        'the-cedars-second-ring',
+        'roots-that-remember',
+      ],
     },
     dialogueVariants: [
+      {
+        questId: 'roots-that-remember',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'The second binding took root - I can feel it through you now, steadier than the first, like the forest already knew the shape of it.' },
+          { speaker: 'Cedar Spirit', text: 'Two Totems bound to you, small light. Whatever this forest still has to remember, you are carrying more of it than you were.' },
+        ],
+      },
+      {
+        questId: 'the-cedars-second-ring',
+        lines: [
+          { speaker: 'Cedar Spirit', text: 'A second Charm, bound and settled through the roots. I felt it take hold the moment you stepped back into the shrine\'s reach.' },
+          { speaker: 'Cedar Spirit', text: 'You carry more of this forest with you now than when you first found me. Root remembers that, even if nothing else does.' },
+        ],
+      },
       {
         questId: 'the-second-recording',
         lines: [
@@ -1608,8 +1696,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Elder Henrik', text: "Frosthaven has held this frontier since before the aurora went dark. Every winter since has been longer than the one before it - this one hasn't ended in longer than anyone here can properly account for." },
       { speaker: 'Elder Henrik', text: "Elias Rowan's letter reached us same as it reached every other region, in the end. He wrote that whoever came looking for the last Lantern should be trusted. I intend to hold him to that." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['northbound'] },
+    gameplayHook: { type: 'questGiver', questIds: ['northbound', 'the-winter-stag', 'a-new-dawn'] },
     dialogueVariants: [
+      {
+        questId: 'a-new-dawn',
+        lines: [
+          { speaker: 'Elder Henrik', text: "Every region gathered in one town hall, and Frosthaven finally has a seat at that table instead of just a letter arriving late from the south." },
+          { speaker: 'Elder Henrik', text: "This winter outlasted every one before it for a reason nobody here could name. Now we can name it, and somehow that matters more than I expected it to." },
+        ],
+      },
+      {
+        questId: 'the-winter-stag',
+        lines: [
+          { speaker: 'Elder Henrik', text: "The longest winter Frosthaven's ever kept a record of, and it broke the same week you brought the Stag back to itself. I don't call that a coincidence." },
+          { speaker: 'Elder Henrik', text: "Elias Rowan's letter asked us to trust whoever came looking for the last Lantern. I'd say you've more than earned that trust, Keeper." },
+        ],
+      },
       {
         questId: 'northbound',
         lines: [
@@ -1630,8 +1732,22 @@ export const NPCS: Npc[] = [
       { speaker: 'Captain Astrid Frost', text: "Every scouting party I've sent past Snowveil in the last season has come back short a member, or hasn't come back at all. I've stopped sending them out alone." },
       { speaker: 'Captain Astrid Frost', text: "Whatever's spreading out there, it isn't ordinary cold. Ordinary cold doesn't leave a trail this deliberate." },
     ],
-    gameplayHook: { type: 'questGiver', questIds: ['the-second-scout', 'the-first-scout', 'frozen-echoes'] },
+    gameplayHook: { type: 'questGiver', questIds: ['the-second-scout', 'the-first-scout', 'frozen-echoes', 'the-winter-stag', 'a-new-dawn'] },
     dialogueVariants: [
+      {
+        questId: 'a-new-dawn',
+        lines: [
+          { speaker: 'Captain Astrid Frost', text: "I still don't have a clean answer for the scouts' families - not one I can write down, anyway. But I know now it wasn't nothing out there, and it wasn't their fault. That's more than I had before." },
+          { speaker: 'Captain Astrid Frost', text: "The company's already saying the watches feel different since the Stag came back. Lighter. I'll take lighter." },
+        ],
+      },
+      {
+        questId: 'the-winter-stag',
+        lines: [
+          { speaker: 'Captain Astrid Frost', text: "Whatever was patient enough to let exhaustion do its work on my scouts - I have a feeling it was never separate from what the Stag's been holding back this whole time. Just the part that got loose at the edges." },
+          { speaker: 'Captain Astrid Frost', text: "It's not the closure I wanted. It's closer to one than I've had in a long time, and I'll take that too." },
+        ],
+      },
       {
         questId: 'the-second-scout',
         lines: [

@@ -770,7 +770,7 @@ not tracked as a gap, those tiles are real, just generic.
 |---|---|---|
 | Elder Rowan Birch | Elder of Cedarwatch | Elderly figure with quiet gravity, cedar-bark cloak, carved wooden staff, deep-lined weathered face, patient watchful expression, forest elder bearing. |
 | Archivist Elowen | Keeper of the Great Tree Library | Middle-aged scholar, ink-stained fingers, robes woven with leaf-pattern trim, surrounded faintly by root-carved shelving, curious focused expression. |
-| Rowan Hart | Forest Warden | Lean alert ranger, practical bark-and-leather gear, hatchet at her belt, watchful forest-green eyes, wind-tousled hair. |
+| Corwin Hart | Forest Warden | Lean alert ranger, practical bark-and-leather gear, hatchet at her belt, watchful forest-green eyes, wind-tousled hair. |
 | Cedar Spirit | Voice of the Ancient Cedar | Ethereal wood-and-leaf spirit, pale green-brown form like living bark given shape, faintly glowing moss-light, ancient patient presence. |
 | Innkeeper Marge | The Cedarwatch Inn | Warm heavyset woman, apron over simple forest-town clothing, welcoming tired smile, holding a ladle or mug. |
 | Storekeeper Byron | Cedarwatch's General Store | Practical middle-aged man, patched forest-trader's vest, standing before shelves of trail goods, easy trader's smile. |
@@ -787,7 +787,7 @@ on the first attempt.
 |---|---|
 | Elder Rowan Birch | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
 | Archivist Elowen | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
-| Rowan Hart | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
+| Corwin Hart | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
 | Cedar Spirit | Full-body version of its portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
 | Innkeeper Marge | Full-body version of her portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |
 | Storekeeper Byron | Full-body version of his portrait prompt above, standing idle pose, transparent background, sized/cropped to read clearly at 72×96. |

@@ -289,7 +289,7 @@ Forest, Silver River, Ancient Cedar Shrine, Heartwood Approach). Resolved the sa
 Primary Maps became the real shipped `Location` entries; this doc's sub-area names (Mist Bridge,
 Fallen Giant, Water Shrine, etc.) were not built as separate landmarks this pass - none of Chapter
 7's own quests needed one individually. Town building list: `Woodworker`/`Ranger Lodge` weren't built
-as their own interiors (Forest Warden Rowan Hart wanders Cedarwatch's town square instead, matching
+as their own interiors (Forest Warden Corwin Hart wanders Cedarwatch's town square instead, matching
 Scout Niska's own precedent in Highwind Crossing) - `Elder's Lodge`/`Great Tree Library` cover the
 recurring cast, matching every other region's leader/historian-gets-a-hall convention.
 
@@ -357,7 +357,7 @@ Maps in earlier regions rather than staying landmarks. Resolved the same way as 
 doc's Primary Maps became the real shipped `Location` entries; this doc's sub-area names weren't
 built as separate landmarks this pass. Town building list: `Observatory` and `Caravan Office`
 weren't built as their own interiors (Desert Ranger Tomas Vega wanders Red Mesa's town square
-instead, matching Scout Niska/Forest Warden Rowan Hart's own precedent; the "Observatory" building
+instead, matching Scout Niska/Forest Warden Corwin Hart's own precedent; the "Observatory" building
 name refers to the Forgotten Observatory dungeon itself, not a separate Red Mesa structure) -
 `The Elder's Hall`/`Relic Museum` cover the recurring cast, matching every other region's leader/
 historian-gets-a-hall convention.
@@ -428,7 +428,7 @@ shipped `Location` entries; this doc's other 9 sub-area names (Wolf Den, Ice Bri
 Avalanche Trail, White Tundra, Mammoth Graveyard, Spirit Stones, Northern Lights Plateau) weren't
 built as separate landmarks this pass, though "Wolf Den" informed the Frost Wolves enemy family's
 own flavor. Town building list: `Hunter Lodge` wasn't built as its own interior - Captain Astrid
-Frost wanders Frosthaven's town square instead, matching Scout Niska/Forest Warden Rowan Hart/Desert
+Frost wanders Frosthaven's town square instead, matching Scout Niska/Forest Warden Corwin Hart/Desert
 Ranger Tomas Vega's own precedent. `Explorer Headquarters`/`Ice Chapel` cover the recurring cast,
 matching every other region's leader/historian-gets-a-hall convention. This doc's own boss name
 ("The Wendigo King") differs from the MSQ doc's ("Winter Stag") - the MSQ doc's name wins per the
