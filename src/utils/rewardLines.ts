@@ -10,6 +10,7 @@ export interface RewardLine {
 export interface RewardLineInput {
   xp?: number;
   gold?: number;
+  spiritEssence?: number;
   premiumCurrency?: number;
   /** Flat, possibly-duplicated item ids (e.g. 3 separate Moth Dust drops) - grouped into one
    *  "Item x3" line per distinct id via groupRewardItemIds, same as every existing reward list. */
@@ -32,6 +33,9 @@ export function buildRewardLines(input: RewardLineInput): RewardLine[] {
   const lines: RewardLine[] = [];
   if (input.xp) lines.push({ key: 'xp', label: `${input.xp} XP` });
   if (input.gold) lines.push({ key: 'gold', icon: 'icon.currency.gold', label: `${input.gold} Gold` });
+  if (input.spiritEssence) {
+    lines.push({ key: 'spirit-essence', icon: 'icon.currency.spirit-essence', label: `${input.spiritEssence} Spirit Essence` });
+  }
   if (input.premiumCurrency) {
     lines.push({ key: 'premium', icon: 'icon.currency.premium-currency', label: `${input.premiumCurrency} Premium Currency` });
   }

@@ -901,6 +901,7 @@ export function CombatScene() {
                   {buildRewardLines({
                     xp: rewards?.xp,
                     gold: rewards?.gold,
+                    spiritEssence: rewards?.spiritEssence,
                     itemIds: rewards?.itemIds,
                     skillIds: rewards?.grantedSkillIds,
                     notices: rewards?.lanternOilUpgradeRegions.map(

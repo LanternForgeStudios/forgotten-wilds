@@ -153,6 +153,7 @@ export function TownScene() {
       lines: buildRewardLines({
         xp: questRewards.xp,
         gold: questRewards.gold,
+        spiritEssence: questRewards.spiritEssence,
         itemIds: questRewards.itemIds,
         skillIds: questRewards.grantedSkillIds,
       }),
@@ -351,6 +352,12 @@ export function TownScene() {
     worldChatOpen,
     map,
     uid,
+    // attemptInteract's 'presence' branch closes over this - without it, the listener kept using
+    // whichever `presences` snapshot was current the last time one of the OTHER deps above
+    // changed, not the latest one. A nearby player logging in/moving into range independently of
+    // every other listed dep meant the friend-request interaction could silently no-op against a
+    // stale (missing) entry.
+    presences,
   ]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand

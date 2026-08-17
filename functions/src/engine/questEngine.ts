@@ -82,13 +82,17 @@ export interface QuestRewardSummary {
   questIds: string[];
   xp: number;
   gold: number;
+  /** Was already being applied to save.player.spiritEssence (and driving spiritRank) before this
+   *  field existed - just never surfaced to the client, so a quest granting Spirit Essence showed
+   *  no acknowledgment for it at all despite silently moving the player's Spirit Rank forward. */
+  spiritEssence: number;
   itemIds: string[];
   grantedSkillIds: string[];
   grantedLoreIds: string[];
 }
 
 function emptyQuestRewardSummary(): QuestRewardSummary {
-  return { questIds: [], xp: 0, gold: 0, itemIds: [], grantedSkillIds: [], grantedLoreIds: [] };
+  return { questIds: [], xp: 0, gold: 0, spiritEssence: 0, itemIds: [], grantedSkillIds: [], grantedLoreIds: [] };
 }
 
 function mergeQuestRewardSummaries(a: QuestRewardSummary, b: QuestRewardSummary): QuestRewardSummary {
@@ -96,6 +100,7 @@ function mergeQuestRewardSummaries(a: QuestRewardSummary, b: QuestRewardSummary)
     questIds: [...a.questIds, ...b.questIds],
     xp: a.xp + b.xp,
     gold: a.gold + b.gold,
+    spiritEssence: a.spiritEssence + b.spiritEssence,
     itemIds: [...a.itemIds, ...b.itemIds],
     grantedSkillIds: [...a.grantedSkillIds, ...b.grantedSkillIds],
     grantedLoreIds: [...a.grantedLoreIds, ...b.grantedLoreIds],
@@ -109,6 +114,7 @@ export function isEmptyQuestRewardSummary(summary: QuestRewardSummary): boolean 
     summary.questIds.length === 0 &&
     summary.xp === 0 &&
     summary.gold === 0 &&
+    summary.spiritEssence === 0 &&
     summary.itemIds.length === 0 &&
     summary.grantedSkillIds.length === 0 &&
     summary.grantedLoreIds.length === 0
@@ -208,6 +214,7 @@ function grantCompletionRewards(save: PlayerSave, completions: QuestCompletion[]
     summary.questIds.push(questId);
     summary.xp += reward.xp;
     summary.gold += reward.gold;
+    summary.spiritEssence += reward.spiritEssence ?? 0;
     save.player.xp += reward.xp;
     save.player.gold += reward.gold;
     save.player.spiritEssence += reward.spiritEssence ?? 0;

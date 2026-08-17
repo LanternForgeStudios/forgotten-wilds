@@ -157,6 +157,7 @@ describe('applyQuestRewards', () => {
       questIds: ['a-new-keeper'],
       xp: 10,
       gold: 20,
+      spiritEssence: 0,
       itemIds: ['healing-poultice'],
       grantedSkillIds: ['frost-lance'],
       grantedLoreIds: ['lore-great-silence'],

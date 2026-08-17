@@ -93,6 +93,7 @@ export interface QuestRewardSummary {
   questIds: string[];
   xp: number;
   gold: number;
+  spiritEssence: number;
   itemIds: string[];
   grantedSkillIds: string[];
   grantedLoreIds: string[];
@@ -202,6 +203,7 @@ export interface ResolveCombatActionResponse {
   rewards: {
     xp: number;
     gold: number;
+    spiritEssence: number;
     itemIds: string[];
     /** Specialty Attack ids learned this fight - from a quest (e.g. "defeat 3 mothlings") that
      *  completed as a side effect of this victory. [] when nothing was learned. */

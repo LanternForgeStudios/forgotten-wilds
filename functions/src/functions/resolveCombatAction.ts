@@ -177,6 +177,10 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
     let rewards: {
       xp: number;
       gold: number;
+      /** Spirit Essence from a quest (e.g. "defeat 3 mothlings") that completed as a side effect
+       *  of this victory - same "pays out in the same victory screen" reasoning as xp/gold below,
+       *  just for the currency that drives Spirit Rank instead. 0 when no such quest completed. */
+      spiritEssence: number;
       itemIds: string[];
       grantedSkillIds: string[];
       /** Lore entry ids unlocked by a quest (e.g. "defeat 3 mothlings") that completed as a side
@@ -257,6 +261,7 @@ export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (req
         // victory screen rather than a second, separately-timed popup - see questRewards above.
         xp: reward.xp + questRewards.xp,
         gold: reward.gold + questRewards.gold,
+        spiritEssence: questRewards.spiritEssence,
         itemIds: [...grantedItemIds, ...questRewards.itemIds],
         grantedSkillIds: questRewards.grantedSkillIds,
         grantedLoreIds: questRewards.grantedLoreIds,

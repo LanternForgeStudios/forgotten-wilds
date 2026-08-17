@@ -199,6 +199,7 @@ export function DungeonScene() {
       lines: buildRewardLines({
         xp: questRewards.xp,
         gold: questRewards.gold,
+        spiritEssence: questRewards.spiritEssence,
         itemIds: questRewards.itemIds,
         skillIds: questRewards.grantedSkillIds,
       }),
@@ -264,6 +265,7 @@ export function DungeonScene() {
               itemIds: [res.itemId],
               xp: res.questRewards?.xp,
               gold: res.questRewards?.gold,
+              spiritEssence: res.questRewards?.spiritEssence,
               skillIds: res.questRewards?.grantedSkillIds,
             }),
           });
