@@ -176,14 +176,26 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
     // Mirrors CombatScene.tsx's own per-attacker staggered enemy-hit SFX (see that file's own
     // comment) - PhaserBattleCanvas/BattleScene already stagger the *visual* incoming-hit playback
     // identically in both modes, this just adds the matching sound per attacker instead of one flat
-    // sfx.combat-hit for the whole round regardless of who or how many attacked.
-    enemyHits.forEach((hit, i) => {
-      if (hit.missed) return;
-      const stagger = i * INCOMING_HIT_STAGGER_MS;
-      const enemy = battle.enemies[hit.attackerIndex];
-      const group = enemyHitGroupFor(ENEMIES.find((d) => d.id === enemy?.enemyId)?.isBoss, ENEMIES.find((d) => d.id === enemy?.enemyId)?.family);
-      setTimeout(() => void playSound(ENEMY_HIT_SFX[group]), PRE_ENEMY_ATTACK_DELAY_MS + stagger);
-    });
+    // sfx.combat-hit for the whole round regardless of who or how many attacked. With Fast Rounds
+    // on, every hit's own visual stagger collapses to 0 (same PhaserBattleCanvas/BattleScene
+    // fastRounds prop), so only the first landed hit's cue plays once instead of firing N
+    // overlapping copies of a short clip in the same instant - same fastRounds handling as
+    // CombatScene.tsx's own identical block.
+    if (fastRounds) {
+      const firstLanded = enemyHits.find((h) => !h.missed);
+      if (firstLanded) {
+        const enemy = battle.enemies[firstLanded.attackerIndex];
+        const group = enemyHitGroupFor(ENEMIES.find((d) => d.id === enemy?.enemyId)?.isBoss, ENEMIES.find((d) => d.id === enemy?.enemyId)?.family);
+        setTimeout(() => void playSound(ENEMY_HIT_SFX[group]), PRE_ENEMY_ATTACK_DELAY_MS);
+      }
+    } else {
+      enemyHits.forEach((hit, i) => {
+        if (hit.missed) return;
+        const enemy = battle.enemies[hit.attackerIndex];
+        const group = enemyHitGroupFor(ENEMIES.find((d) => d.id === enemy?.enemyId)?.isBoss, ENEMIES.find((d) => d.id === enemy?.enemyId)?.family);
+        setTimeout(() => void playSound(ENEMY_HIT_SFX[group]), PRE_ENEMY_ATTACK_DELAY_MS + i * INCOMING_HIT_STAGGER_MS);
+      });
+    }
     setActiveIncomingHits(
       enemyHits.map((h) => {
         const enemy = battle.enemies[h.attackerIndex];

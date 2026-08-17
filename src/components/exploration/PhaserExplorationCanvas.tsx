@@ -124,6 +124,13 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
   const suspended = props.suspended ?? false;
   const equipmentLayers = props.equipmentLayers ?? [];
   const fieldEncounterIcons = props.fieldEncounterIcons ?? [];
+  // Mirrored into a ref (not read directly) so the map-load effect below can preload whatever
+  // entities happen to be current at the moment a real transition starts, without listing
+  // `entities` in that effect's own dependency array - the loading overlay should only reappear on
+  // a genuine location change, not every time the entities array itself updates during normal play
+  // (quest state, chest opens, etc.).
+  const entitiesRef = useRef(entities);
+  entitiesRef.current = entities;
   const onPositionChangeRef = useRef(props.onPositionChange);
   onPositionChangeRef.current = props.onPositionChange;
   const onZoneEnterRef = useRef(props.onZoneEnter);
@@ -224,7 +231,16 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
     const generation = ++mapLoadGenerationRef.current;
     setMapLoading(true);
     setMapLoadError(false);
-    void sceneRef.current?.loadMap(map, tileSize).then(
+    // Both run in parallel and the loading overlay waits on whichever finishes last - ground tiles
+    // and this location's NPC/interactable sprites are both "the map isn't ready yet" from the
+    // player's perspective. A texture load failure here is deliberately non-fatal to the whole
+    // transition (unlike loadMap's own failure, which aborts the tile-layer swap): an entity whose
+    // texture never arrives just never gets a sprite (upsertEntity's own per-entity await handles
+    // that later), it shouldn't block the player from walking around the location at all.
+    void Promise.all([
+      sceneRef.current?.loadMap(map, tileSize),
+      sceneRef.current?.preloadEntityTextures(entitiesRef.current).catch(() => {}),
+    ]).then(
       () => {
         if (mapLoadGenerationRef.current === generation) setMapLoading(false);
       },

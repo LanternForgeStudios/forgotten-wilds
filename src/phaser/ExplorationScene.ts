@@ -1288,6 +1288,23 @@ export class ExplorationScene extends Phaser.Scene {
     this.time.delayedCall(320, () => emitter.destroy());
   }
 
+  /** Loads every one of `entities`' own sprite textures up front (batched, same Promise.all
+   *  pattern loadMap already uses for tileset textures), without creating any sprites - called by
+   *  PhaserExplorationCanvas alongside loadMap on a real location transition, so the "loading..."
+   *  overlay stays up until NPCs/interactables are actually ready to render and collide, not just
+   *  the ground tiles. Without this, setEntities (below) still worked correctly, just too late:
+   *  each entity's texture loads lazily, one Promise per entity, only once upsertEntity itself
+   *  gets called - so for however long that takes (fine on a fast connection/cached texture, a
+   *  real multi-second wait on a slow one - reported live as most visible on mobile, where a
+   *  weaker CPU/GPU and often-slower network both stretch that window and make the resulting
+   *  frame-rate stutter far more noticeable than the same contention is on desktop), the player
+   *  could already move and walk straight through a spot an NPC/interactable was about to occupy,
+   *  since neither its sprite nor its Arcade body exists yet. Safe to call with an empty/duplicate
+   *  list - loadSceneTexture no-ops for anything already cached. */
+  async preloadEntityTextures(entities: GridEntity[]): Promise<void> {
+    await Promise.all(entities.map((e) => loadSceneTexture(this, e.spriteAssetId)));
+  }
+
   /** Reconciles entity sprites/labels/badges against the incoming array - the manual equivalent
    *  of React's `.map()`+`key` reconciliation, which doesn't exist in Phaser. */
   setEntities(entities: GridEntity[]): void {

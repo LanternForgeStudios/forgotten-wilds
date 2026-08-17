@@ -415,14 +415,27 @@ export function CombatScene() {
       // Each attacker's own hit SFX plays on the same stagger schedule as its lunge/log-line reveal
       // above (see INCOMING_HIT_STAGGER_MS) instead of every attacker's cue firing at once the
       // instant the round resolves - a 3-enemy round previously played one flat sfx.combat-hit
-      // regardless of how many enemies attacked or what they were.
-      res.enemyHits.forEach((hit, i) => {
-        if (hit.missed) return;
-        const stagger = fastRounds ? 0 : i * INCOMING_HIT_STAGGER_MS;
-        const attacker = enemies.find((e) => e.index === hit.attackerIndex);
-        const group = enemyHitGroupFor(attacker?.isBoss, ENEMIES.find((en) => en.id === attacker?.enemyId)?.family);
-        trackedTimeout(() => void playSound(ENEMY_HIT_SFX[group]), PRE_ENEMY_ATTACK_DELAY_MS + stagger);
-      });
+      // regardless of how many enemies attacked or what they were. With Fast Rounds on, every hit's
+      // own stagger collapses to 0 (the visual animations all land together too - see
+      // playIncomingHits), so playing one cue per attacker would fire N overlapping copies of a
+      // short clip in the same instant instead of reading as N distinct hits - just the first
+      // landed hit's own cue plays once, matching the pre-per-attacker-SFX behavior this mode
+      // already had (a single sfx.combat-hit for the whole round).
+      if (fastRounds) {
+        const firstLanded = res.enemyHits.find((h) => !h.missed);
+        if (firstLanded) {
+          const attacker = enemies.find((e) => e.index === firstLanded.attackerIndex);
+          const group = enemyHitGroupFor(attacker?.isBoss, ENEMIES.find((en) => en.id === attacker?.enemyId)?.family);
+          trackedTimeout(() => void playSound(ENEMY_HIT_SFX[group]), PRE_ENEMY_ATTACK_DELAY_MS);
+        }
+      } else {
+        res.enemyHits.forEach((hit, i) => {
+          if (hit.missed) return;
+          const attacker = enemies.find((e) => e.index === hit.attackerIndex);
+          const group = enemyHitGroupFor(attacker?.isBoss, ENEMIES.find((en) => en.id === attacker?.enemyId)?.family);
+          trackedTimeout(() => void playSound(ENEMY_HIT_SFX[group]), PRE_ENEMY_ATTACK_DELAY_MS + i * INCOMING_HIT_STAGGER_MS);
+        });
+      }
       setActiveIncomingHits(
         res.enemyHits.map((h) => {
           const attacker = enemies.find((e) => e.index === h.attackerIndex);
