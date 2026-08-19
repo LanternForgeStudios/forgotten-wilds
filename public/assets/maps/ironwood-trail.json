@@ -982,6 +982,44 @@
          "tilecount":216,
          "tileheight":16,
          "tilewidth":16
+        },
+        {
+         "columns":6,
+         "firstgid":12733,
+         "image":"..\/tilesets\/sewer-water.png",
+         "imageheight":192,
+         "imagewidth":96,
+         "margin":0,
+         "name":"sewer-water",
+         "properties":[
+                {
+                 "name":"tilesetAssetId",
+                 "type":"string",
+                 "value":"tileset.sewer-water"
+                }],
+         "spacing":0,
+         "tilecount":72,
+         "tileheight":16,
+         "tilewidth":16
+        },
+        {
+         "columns":11,
+         "firstgid":12805,
+         "image":"..\/tilesets\/sewer-props.png",
+         "imageheight":256,
+         "imagewidth":176,
+         "margin":0,
+         "name":"sewer-props",
+         "properties":[
+                {
+                 "name":"tilesetAssetId",
+                 "type":"string",
+                 "value":"tileset.sewer-props"
+                }],
+         "spacing":0,
+         "tilecount":176,
+         "tileheight":16,
+         "tilewidth":16
         }],
  "tilewidth":16,
  "type":"map",
