@@ -23,6 +23,7 @@ import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
+import { useJournalStore } from '@/state/useJournalStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import {
   callOpenChest,
@@ -285,6 +286,7 @@ export function OverworldScene() {
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const inventory = useInventoryStore((s) => s.items);
+  const locationsVisited = useJournalStore((s) => s.journal.locationsVisited);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;
   const gender = usePlayerStore((s) => s.player?.gender ?? 'male');
   const appearance = usePlayerStore((s) => s.player?.appearance ?? 'white-dark');
@@ -327,6 +329,13 @@ export function OverworldScene() {
   function handleZoneEnter(refId: string) {
     const kind = ZONE_LANDMARK_KIND[refId];
     if (kind === 'fragment') {
+      // Already in inventory (grantedItemIdFor/collectWorldItem.ts's own "collected" convention -
+      // see this file's own resolveDecorEntity-adjacent comment) - skip the round-trip and the
+      // "nothing left to find" popup entirely, rather than showing it every single time the player
+      // walks back through an already-emptied zone. Nothing is lost by skipping the server call
+      // here: a unique world-item grant is idempotent server-side too, this is purely avoiding a
+      // pointless call + an interruption for a state the client already knows for certain.
+      if (inventory.some((i) => i.itemId === grantedItemIdFor(refId))) return;
       run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
         ?.then(async (res) => {
           if (uid) await resyncSave(uid);
@@ -350,6 +359,11 @@ export function OverworldScene() {
       return;
     }
     if (kind === 'visitOnly') {
+      // Same idea as the fragment case above - journal.locationsVisited is exactly what
+      // visitLandmark.ts's own alreadyVisited check reads server-side, so a landmark already in
+      // it is a sure thing client-side too. Skips the "you've already explored X" popup for every
+      // pass back through a landmark zone the player has already investigated once.
+      if (locationsVisited.includes(refId)) return;
       const landmarkName = LOCATIONS.find((l) => l.id === refId)?.name ?? refId;
       run(() => callVisitLandmark(refId), 'Investigating...')
         ?.then(async (res) => {
