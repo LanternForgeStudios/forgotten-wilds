@@ -1077,7 +1077,21 @@ export class ExplorationScene extends Phaser.Scene {
           if (isGround) phaserLayer.putTileAt(VOID_TILE_INDEX, tx, ty);
           return;
         }
-        phaserLayer.putTileAt(gid - 1, tx, ty);
+        // Tiled encodes a tile's horizontal-flip/vertical-flip/anti-diagonal-flip (rotation) state
+        // as 3 flag bits in the gid's own high bits (e.g. rotating or mirroring a tile in Tiled's
+        // "Flip Horizontally/Vertically"/rotate-90° editor commands) - a raw flagged gid is a huge
+        // number nowhere near any real tileset's firstgid..firstgid+tilecount range, so passing it
+        // straight to putTileAt (as `gid - 1`) threw and aborted the whole layer build, which is
+        // what "the map won't load anymore" after rotating a tile in Tiled actually was. ParseGID
+        // is Phaser's own Tiled-flag decoder (used internally by its native Tiled JSON loader,
+        // reused here rather than hand-rolled) - strips the flag bits back to the real gid and
+        // derives the rotation/mirror Phaser's own Tile class understands natively.
+        const gidInfo = Phaser.Tilemaps.Parsers.Tiled.ParseGID(gid);
+        const tile = phaserLayer.putTileAt(gidInfo.gid - 1, tx, ty);
+        if (gidInfo.rotation || gidInfo.flipped) {
+          tile.rotation = gidInfo.rotation;
+          tile.flipX = gidInfo.flipped;
+        }
       });
       phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(this.viewportScale);
       const overhangMatch = /^overhang(?:-(\d+))?$/.exec(layer.name);

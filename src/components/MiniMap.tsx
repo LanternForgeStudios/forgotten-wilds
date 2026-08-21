@@ -14,6 +14,16 @@ import styles from './MiniMap.module.css';
 
 const MINIMAP_TILE_LAYER_NAME = /^(ground|decorations-\d+|overhang(-\d+)?)$/;
 
+// Tiled encodes a placed tile's horizontal/vertical/anti-diagonal flip (its rotate/mirror editor
+// commands) as 3 flag bits in the gid's own high bits - the same constants Phaser's own
+// ParseGID uses (see ExplorationScene.ts's loadMap, which actually renders the flip/rotation; this
+// file only needs the *identity* of the tile underneath those flags, not to redraw the rotation
+// itself at minimap scale, so a plain strip is enough here rather than pulling in Phaser).
+const TILE_FLIP_FLAGS = 0x80000000 | 0x40000000 | 0x20000000;
+function stripTiledFlipFlags(gid: number): number {
+  return gid & ~TILE_FLIP_FLAGS;
+}
+
 /** Finds which of the map's tilesets a gid belongs to - the one with the largest firstgid that's
  *  still <= gid (tilesets are listed in ascending firstgid order, but this doesn't assume that -
  *  it just picks the closest one below). Mirrors the same lookup Phaser does internally when it
@@ -41,7 +51,7 @@ function tilesetForGid(map: TileMap, gid: number): TileMap['tilesets'][number] |
 function isTerrainWalkable(map: TileMap, x: number, y: number): boolean {
   const ground = map.layers.find((l) => l.name === 'ground');
   if (!ground) return false;
-  const gid = ground.data[y * map.width + x];
+  const gid = stripTiledFlipFlags(ground.data[y * map.width + x]);
   return gid > 0 && !map.nonWalkableTileIds.includes(gid);
 }
 
@@ -226,7 +236,7 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
       if (!layer.visible || !MINIMAP_TILE_LAYER_NAME.test(layer.name)) continue;
       for (let y = 0; y < map.height; y++) {
         for (let x = 0; x < map.width; x++) {
-          const gid = layer.data[y * map.width + x];
+          const gid = stripTiledFlipFlags(layer.data[y * map.width + x]);
           if (!gid) continue;
           const tileset = tilesetForGid(map, gid);
           const image = tileset && tilesetImages.get(tileset.assetId);
