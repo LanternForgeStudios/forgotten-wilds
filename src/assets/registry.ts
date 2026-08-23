@@ -74,6 +74,16 @@ const PIXEL_CRAWLER_TILESETS: AssetDefinition[] = [
     notes: 'See docs/Map-Object-Catalog.md for the full 2026-08 Pixel Crawler tileset migration - renamed/reorganized from its original pack folder under art-staging/tilesets/, no image reprocessing (straight copy).',
   },
   {
+    id: 'tileset.raven-ridge-terrain',
+    category: 'tileset',
+    intendedUse:
+      'PixelLab-generated Wang/autotile ground set purpose-built for Raven Ridge\'s hand-crafted overworld map: "rough grey stone mountain path, worn rock" (lower) blending into "sparse windswept rocky ground with patches of hardy grass" (upper) - a complete 16-tile (4x4) edge-transition set covering all 16 corner combinations, painted via the same Wang-corner lookup technique as scripts/paint_bayou_water.py, generalized for this tileset.',
+    filePath: 'tilesets/raven-ridge-terrain.png',
+    dimensions: { width: 64, height: 64 },
+    status: 'final',
+    notes: 'Originals/per-tile corner metadata at public/assets/tilesets/original/raven-ridge-terrain/ - previously generated but unused until the 2026-08 Raven Ridge hand-crafted-map pass.',
+  },
+  {
     id: 'tileset.cemetery-floor',
     category: 'tileset',
     intendedUse: 'Migrated from Pixel Crawler - Cemetery (art-staging/tilesets) - a multi-item contact sheet (Anokolisa, Pixel Crawler series - see each pack\'s own Terms.txt, free for commercial use, credit appreciated not required), hand-sliceable in Tiled at whatever native tile size the art actually uses.',
@@ -10003,6 +10013,96 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
       'Generated via pixellab MCP create_map_object (128x128), cropped/resized to 144x144 via scripts/build_landmark_objects.py. Original archived at public/assets/sprites/structures/original/.',
   },
   {
+    id: 'structure.mine-rail-track',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s "Abandoned Rail Line" beat - a short collapsed/disused wooden rail-track segment. Placed via the DecorEntity/interactable pattern (src/data/decorEntities.ts), same as structure.decor-fireplace.',
+    filePath: 'sprites/structures/mine-rail-track.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/mine-decor/.',
+  },
+  {
+    id: 'structure.mine-cart',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s "Abandoned Rail Line" beat - a derelict mine cart. Placed via the DecorEntity/interactable pattern.',
+    filePath: 'sprites/structures/mine-cart.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/mine-decor/.',
+  },
+  {
+    id: 'structure.mine-support-beam',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s "Abandoned Rail Line" beat - a fallen/leaning wooden support beam from collapsed mine infrastructure. Placed via the DecorEntity/interactable pattern.',
+    filePath: 'sprites/structures/mine-support-beam.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/mine-decor/.',
+  },
+  {
+    id: 'structure.mine-rubble',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s "Abandoned Rail Line" beat - a rubble pile suggesting a mine-tunnel collapse. Placed via the DecorEntity/interactable pattern.',
+    filePath: 'sprites/structures/mine-rubble.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/mine-decor/.',
+  },
+  {
+    id: 'structure.mine-crate',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s "Abandoned Rail Line" beat - an old wooden supply crate. Placed via the DecorEntity/interactable pattern.',
+    filePath: 'sprites/structures/mine-crate.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/mine-decor/.',
+  },
+  {
+    id: 'structure.overworld-boulder',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s Cliff Pass/Eagle Overlook stretches - a standalone boulder. Placed via the DecorEntity/interactable pattern.',
+    filePath: 'sprites/structures/overworld-boulder.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/overworld-decor2/.',
+  },
+  {
+    id: 'structure.overworld-fallen-log',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s Cliff Pass/Eagle Overlook stretches - a fallen log. Placed via the DecorEntity/interactable pattern.',
+    filePath: 'sprites/structures/overworld-fallen-log.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/overworld-decor2/.',
+  },
+  {
+    id: 'structure.overworld-tree-stump',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s Cliff Pass/Eagle Overlook stretches - a weathered tree stump. Placed via the DecorEntity/interactable pattern.',
+    filePath: 'sprites/structures/overworld-tree-stump.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/overworld-decor2/.',
+  },
+  {
+    id: 'structure.overworld-wildflower',
+    category: 'structure',
+    intendedUse:
+      'Purely decorative, non-gated ambient ground prop for Raven Ridge\'s Eagle Overlook/Moon Witch Circle stretches - a small wildflower patch, a color accent against the rocky palette. Placed via the DecorEntity/interactable pattern.',
+    filePath: 'sprites/structures/overworld-wildflower.png',
+    dimensions: { width: 128, height: 128 },
+    status: 'final',
+    notes: 'PixelLab-generated (create_map_object, 128x128, transparent background), previously unused. Original archived at public/assets/tilesets/original/overworld-decor2/.',
+  },
+  {
     id: 'structure.decor-fireplace',
     category: 'structure',
     intendedUse:
@@ -10290,11 +10390,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'music.spirits-forest',
     category: 'audio',
-    intendedUse: 'OverworldScene music for Cypress Marsh and Mother Cypress Shrine (Crimson Bayou)',
+    intendedUse: 'OverworldScene music for Cypress Marsh and Mother Cypress Shrine (Crimson Bayou); OverworldScene subarea music for the Spirit Grove landmark within Ironwood Trail (swapped in for music.lost-shrine - owner reported that pick as a bad mood match)',
     filePath: 'audio/music/spirits-forest.ogg',
     dimensions: null,
     status: 'final',
-    notes: '"28 High Quality 16-bit RPG Music" pack - "07. Spirits Forest (full)" (free pack, see CREDITS.md) - full library preserved at public/assets/audio/library/music/28 High Quality 16-bit RPG Music/. Literal spirit/swamp mood match.',
+    notes: '"28 High Quality 16-bit RPG Music" pack - "07. Spirits Forest (full)" (free pack, see CREDITS.md) - full library preserved at public/assets/audio/library/music/28 High Quality 16-bit RPG Music/. Literal spirit/swamp mood match for Cypress Marsh; reused for Spirit Grove on a near-literal name echo ("Spirits Forest" / "Spirit Grove") plus the same shrine-in-a-forest-clearing content pattern as Mother Cypress Shrine.',
   },
   {
     id: 'music.silent-forest',
@@ -10488,11 +10588,11 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
   {
     id: 'music.lost-shrine',
     category: 'audio',
-    intendedUse: 'OverworldScene subarea music for the Spirit Grove landmark within Ironwood Trail',
+    intendedUse: 'Unused - previously the OverworldScene subarea music for the Spirit Grove landmark within Ironwood Trail, replaced by music.spirits-forest (2026-08) after the owner reported this pick as a bad mood match despite the title reading as a literal fit on paper. Available for a future shrine-flavored slot.',
     filePath: 'audio/music/lost-shrine.ogg',
     dimensions: null,
     status: 'final',
-    notes: 'xDeviruchi - "10 - Lost Shrine" (free pack). Literal match for a hushed clearing with a neglected shrine.',
+    notes: 'xDeviruchi - "10 - Lost Shrine" (free pack).',
   },
   {
     id: 'music.peaceful-village',

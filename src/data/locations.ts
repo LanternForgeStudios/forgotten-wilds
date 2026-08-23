@@ -62,7 +62,7 @@ export const LOCATIONS: Location[] = [
     npcIds: [],
     fastTravel: false,
     parentLocationId: 'ironwood-trail',
-    musicAssetId: 'music.lost-shrine',
+    musicAssetId: 'music.spirits-forest',
   },
   {
     id: 'mossy-creek',

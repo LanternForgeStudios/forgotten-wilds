@@ -50,7 +50,7 @@ in, so ambient subarea music doesn't apply — see `ZONE_LANDMARK_KIND` in `Over
 | Subarea | Parent | Track |
 |---|---|---|
 | Hunter's Camp | Ironwood Trail | `music.peaceful-village` |
-| Spirit Grove | Ironwood Trail | `music.lost-shrine` |
+| Spirit Grove | Ironwood Trail | `music.spirits-forest` (was `music.lost-shrine` - owner reported it as a bad mood match despite the on-paper literal title fit; swapped 2026-08 for a track already proven on the same "shrine in a forest clearing" content pattern elsewhere, see the `II — Crimson Bayou` row above) |
 | Mossy Creek | Ironwood Trail | `music.peaceful-night` |
 
 **How it works**: `ExplorationScene.ts` tracks the live set of `zone` refIds the player's body is
@@ -71,10 +71,13 @@ refresh, victory fanfares) rather than forced into a slot that doesn't fit:
 - **`28 High Quality 16-bit RPG Music`** (12 of 26 unused): the 4 Battle Theme sets (I–IV, each
   full/intro/loop), Lively City, Royal Castle, Long Journey, Goofy Monster, Volcanic Crater,
   Military Base, Malicious Scheme, Dark Factory, Demon King Castle (full/intro/loop), The Evil One.
-- **`xDeviruchi`** (11 of 22 unused): Falling Apart (Prologue), Title Theme, Battle 1, Victory!,
+- **`xDeviruchi`** (12 of 22 unused): Falling Apart (Prologue), Title Theme, Battle 1, Victory!,
   Shop, Battle 2, Decisive Battle 1, Decisive Battle 2, Final Battle, The Final of The Fantasy.
   (Most of what's left is battle/victory/title-purposed — doesn't fit an exploration-bed slot,
-  which is why it's unused rather than an oversight.)
+  which is why it's unused rather than an oversight.) Also **Lost Shrine** (`music.lost-shrine`),
+  freed up 2026-08 when Spirit Grove moved to `music.spirits-forest` - unlike the rest of this
+  list it's exploration-bed-shaped and shrine-flavored, just not what the owner wanted for that
+  specific spot; worth trying first for any future shrine/ruins slot.
 
 Both packs are committed in full under `public/assets/audio/library/music/` (small enough not to
 need the Helton-Yan-style local-only treatment — see below).
