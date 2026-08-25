@@ -92,7 +92,12 @@ export const LOCATIONS: Location[] = [
   {
     id: 'raven-ridge',
     name: 'Raven Ridge',
-    kind: 'overworld',
+    // Reclassified from 'overworld' to 'dungeon' (2026-08) - it's a cave, not open sky (see
+    // description below). Routes through DungeonScene now (src/utils/sceneForLocationKind.ts);
+    // ranger-caleb (NPC) and ember-codex-tunnel (fragment pickup) both got ported into
+    // DungeonScene.tsx's own tables so they keep working under the new scene. No weather/day-night
+    // lighting applies here either way, both systems already gate on kind !== 'dungeon'.
+    kind: 'dungeon',
     description: 'Rocky mountain paths above Ironwood Trail - Cliff Pass, the Abandoned Rail Line, Eagle Overlook, and the old Moon Witch Circle all lie along its length.',
     mapAssetId: 'map.raven-ridge',
     battleBackgroundAssetId: 'battle-bg.raven-ridge',

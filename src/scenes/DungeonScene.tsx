@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { PlayerHUD } from '@/components/PlayerHUD';
+import { DialogueBox } from '@/components/DialogueBox';
 import { TileGrid, type GridEntity, type TileGridHandle } from '@/components/exploration/TileGrid';
 import { MobileHud } from '@/components/exploration/MobileHud';
 import { DirectionPad } from '@/components/exploration/DirectionPad';
@@ -16,7 +17,8 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { useDragMovement } from '@/hooks/useDragMovement';
 import { useExplorationDash } from '@/hooks/useExplorationDash';
-import { ENEMIES, LOCATIONS } from '@/data';
+import { ENEMIES, LOCATIONS, NPCS } from '@/data';
+import { useDebugStore } from '@/state/useDebugStore';
 import { resolveDecorEntity } from '@/data/decorEntities';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -29,7 +31,15 @@ import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
-import { callCollectWorldItem, callOpenChest, callInteractWithShrine, type QuestRewardSummary } from '@/firebase/functionsClient';
+import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
+import type { Npc } from '@/types';
+import {
+  callCollectWorldItem,
+  callOpenChest,
+  callInteractWithShrine,
+  callTalkToNpc,
+  type QuestRewardSummary,
+} from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { grantedItemIdFor } from '@/utils/worldItems';
 import { playMusic, playSound } from '@/audio/audioService';
@@ -149,6 +159,16 @@ const WORLD_ITEM_INTERACTABLES: Record<
     dormantSpriteAssetId: 'structure.lantern-relic-dormant',
     collectedSpriteAssetId: 'structure.lantern-relic-collected',
   },
+  // Ported from OverworldScene.tsx's own fragment table when Raven Ridge was reclassified from
+  // overworld to dungeon (2026-08) - same refId/granted-item-id/sprite pair, just relocated here
+  // now that Raven Ridge renders through DungeonScene.
+  'ember-codex-tunnel': {
+    label: 'Ember Codex',
+    foundMessage: 'A second forgotten manuscript, tucked into an overlooked maintenance tunnel. You recover it.',
+    alreadyMessage: "There's nothing left here — you already recovered the Ember Codex.",
+    dormantSpriteAssetId: 'structure.landmark-tunnel-entrance-glow',
+    collectedSpriteAssetId: 'structure.landmark-tunnel-entrance-collected',
+  },
 };
 
 /** Display name for any interactable on this map, shared between the entity labels and the
@@ -173,6 +193,7 @@ export function DungeonScene() {
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
   const openedChests = useWorldStateStore((s) => s.openedChests);
+  const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   // A world-item ("fragment"-kind) interactable is granted to inventory once and never removed/
   // consumed (see collectWorldItem.ts), so its presence there is a reliable "already collected"
   // signal for swapping its map marker to a collected-state sprite - same idea as openedChests
@@ -186,6 +207,7 @@ export function DungeonScene() {
     void playMusic(location?.musicAssetId ?? 'music.dungeon');
   }, [locationId]);
   const [message, setMessage] = useState<string | null>(null);
+  const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   // Shared reward-acknowledgment popup (see RewardPopup.tsx and OverworldScene.tsx's identical use).
@@ -215,7 +237,8 @@ export function DungeonScene() {
   const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const { scale, viewportSize } = useExplorationViewport();
   const gridWrapperRef = useRef<HTMLDivElement>(null);
-  const otherOverlaysOpen = message !== null || menuOpen || journalOpen || rewardPopup !== null || currentLorePopup !== null;
+  const otherOverlaysOpen =
+    message !== null || activeNpc !== null || menuOpen || journalOpen || rewardPopup !== null || currentLorePopup !== null;
   const { mapOpen, toggleMap, closeMap } = useMapOverlay(otherOverlaysOpen);
   const suspended = otherOverlaysOpen || mapOpen;
   const { map, position, positionRef, tilePosition, spawnPosition, reportPosition, movementInput, handleTransitionEnter } =
@@ -226,6 +249,7 @@ export function DungeonScene() {
     });
   const { icons: fieldEncounterIcons, consumeAt: consumeFieldEncounterAt } = useFieldEncounters(map, locationId, positionRef);
   const gridRef = useRef<TileGridHandle>(null);
+  const debugShowCollisions = useDebugStore((s) => s.showCollisions);
 
   function handleFieldEncounterNear(icon: { id: string; x: number; y: number }) {
     const consumed = consumeFieldEncounterAt(icon.x, icon.y);
@@ -241,10 +265,25 @@ export function DungeonScene() {
   function attemptInteract() {
     if (suspended || !map) return;
     // Pixel-space directional probe (see ExplorationScene.ts's queryInteraction) - replaces the
-    // old exact-facing-tile lookup. Dungeon interactables are always kind 'interactable' (no NPCs
-    // down here) - `refId` is what every lookup table below is keyed by.
+    // old exact-facing-tile lookup.
     const result = gridRef.current?.queryInteraction();
     if (!result) return;
+    // NPCs are rare down here (most dungeons genuinely have none), but a real cave-dwelling
+    // location like Raven Ridge does - same dispatch as OverworldScene.tsx's identical branch.
+    if (result.kind === 'npc') {
+      const npc = NPCS.find((n) => n.id === result.id);
+      if (npc) {
+        setActiveNpc(npc);
+        void playSound('sfx.npc-talk');
+        run(() => callTalkToNpc(npc.id), 'Talking...')
+          ?.then(async (res) => {
+            if (uid) await resyncSave(uid);
+            showQuestRewardPopup(res.questRewards);
+          })
+          .catch((err) => console.error('talkToNpc failed', err));
+      }
+      return;
+    }
     const refId = result.id;
     const worldItem = WORLD_ITEM_INTERACTABLES[refId];
     const bossTrigger = BOSS_TRIGGERS[refId];
@@ -327,6 +366,7 @@ export function DungeonScene() {
       if (e.key === 'Escape') {
         if (rewardPopup) setRewardPopup(null);
         else if (currentLorePopup) dismissCurrentLorePopup();
+        else if (activeNpc) setActiveNpc(null);
         else if (message) setMessage(null);
         else if (menuOpen) setMenuOpen(false);
         else if (journalOpen) setJournalOpen(false);
@@ -346,7 +386,7 @@ export function DungeonScene() {
     window.addEventListener('keydown', handleInteract);
     return () => window.removeEventListener('keydown', handleInteract);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rewardPopup, currentLorePopup, message, menuOpen, journalOpen, map, tilePosition, uid, questProgress, goTo]);
+  }, [rewardPopup, currentLorePopup, activeNpc, message, menuOpen, journalOpen, map, tilePosition, uid, questProgress, goTo]);
 
   // Memoized so a re-render caused by unrelated state (message/menuOpen/etc.) doesn't hand
   // TileGrid a brand-new array reference every time - PhaserExplorationCanvas re-runs
@@ -355,6 +395,26 @@ export function DungeonScene() {
   // early return below) - hooks can never be skipped on some renders and not others.
   const entities = useMemo<GridEntity[]>(() => {
     if (!map) return [];
+    // Most dungeons genuinely have none of these, but a real cave-dwelling location (Raven Ridge)
+    // does - same shape as OverworldScene.tsx's own npcEntities, minus the wander-position system
+    // (a cosmetic-only nicety there; not worth porting for a scene type that rarely needs it -
+    // Ranger Caleb stands still here rather than roaming ±2 tiles).
+    const npcEntities: GridEntity[] = map.objects
+      .filter((o) => o.type === 'npc' && o.refId)
+      .map((o) => {
+        const npc = NPCS.find((n) => n.id === o.refId);
+        return {
+          id: o.refId!,
+          x: o.x,
+          y: o.y,
+          spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
+          label: npc?.name,
+          badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
+          blocksMovement: true,
+          interactionKind: 'npc' as const,
+        };
+      });
+
     const interactableEntities: GridEntity[] = map.objects
       .filter((o) => o.type === 'interactable' && o.refId)
       .map((o) => {
@@ -441,8 +501,8 @@ export function DungeonScene() {
       .filter((o) => o.type === 'transition' && o.refId)
       .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
 
-    return [...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-  }, [map, openedChests, fieldEncounterIcons, questProgress, inventory]);
+    return [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
+  }, [map, openedChests, fieldEncounterIcons, questProgress, inventory, seenNpcDialogueVariant]);
 
   if (!map) {
     return (
@@ -472,6 +532,7 @@ export function DungeonScene() {
           scale={scale}
           viewportSize={viewportSize}
           equipmentLayers={equipmentLayers}
+          showCollisions={debugShowCollisions}
         />
       </div>
       {/* Hidden entirely while a battle panel is open (mobile controls included) - see
@@ -496,6 +557,13 @@ export function DungeonScene() {
           {staminaUnlocked && <>&nbsp;·&nbsp; Dash: hold Shift</>}
           &nbsp;·&nbsp; Inventory: I &nbsp;·&nbsp; Journal: J &nbsp;·&nbsp; Map: M
         </p>
+      )}
+      {activeNpc && (
+        <DialogueBox
+          lines={resolveNpcDialogue(activeNpc, questProgress)}
+          portraitAssetId={activeNpc.portraitAssetId}
+          onClose={() => setActiveNpc(null)}
+        />
       )}
       <MessageOverlay message={message} onClose={() => setMessage(null)} />
       {rewardPopup && (
