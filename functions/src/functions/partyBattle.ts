@@ -6,7 +6,7 @@ import { computeRewards, aggregateItemCounts, hasSufficientQuantity } from '../e
 import { rollChestRewards } from '../engine/dailyChestEngine';
 import { isMilestoneWave, milestoneChestTier } from '../engine/endlessBattleEngine';
 import { grantItem, itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
-import { applyLevelUp } from '../engine/levelingEngine';
+import { applyLevelUp, restoreFullVitals } from '../engine/levelingEngine';
 import { backfillPlayerEquipment, computeAilmentResistances, resolveWeaponAttackAilment } from '../engine/equipmentEngine';
 import { SKILLS } from '../data/skills';
 import { AILMENTS } from '../data/ailments';
@@ -766,14 +766,8 @@ async function restoreAndRewardPvpParticipants(
   ]);
   const now = Date.now();
 
-  function restore(save: PlayerSave): void {
-    save.player.stats.hp = save.player.stats.maxHp;
-    save.player.stats.spirit = save.player.stats.maxSpirit;
-    if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
-  }
-
   if (winnerSave) {
-    restore(winnerSave);
+    restoreFullVitals(winnerSave);
     winnerSave.player.xp += winnerXp;
     winnerSave.player.gold += winnerGold;
     applyLevelUp(winnerSave);
@@ -781,7 +775,7 @@ async function restoreAndRewardPvpParticipants(
     tx.set(db.collection('users').doc(winnerUid), winnerSave);
   }
   if (loserSave) {
-    restore(loserSave);
+    restoreFullVitals(loserSave);
     loserSave.player.xp += loserXp;
     applyLevelUp(loserSave);
     loserSave.updatedAt = now;
@@ -911,9 +905,7 @@ export async function restoreParticipantsAndClearLocks(
   const saves = await Promise.all(uids.map((uid) => getSaveForUid(tx, db, uid, preFetched)));
   saves.forEach((save, i) => {
     if (!save) return;
-    save.player.stats.hp = save.player.stats.maxHp;
-    save.player.stats.spirit = save.player.stats.maxSpirit;
-    if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
+    restoreFullVitals(save);
     save.updatedAt = Date.now();
     tx.set(db.collection('users').doc(uids[i]), save);
   });

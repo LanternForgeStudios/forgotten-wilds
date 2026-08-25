@@ -534,8 +534,18 @@ export function OverworldScene() {
         else if (journalOpen) setJournalOpen(false);
         return;
       }
-      if (e.key === 'i' || e.key === 'I') setMenuOpen((open) => !open);
-      if (e.key === 'j' || e.key === 'J') setJournalOpen((open) => !open);
+      // Blocks *opening* a new overlay while one of these is already up (a stacked pair then
+      // shares one Escape-close and closes together); doesn't block closing the same overlay
+      // back off via its own key.
+      const blockingOverlayOpen = activeNpc !== null || message !== null || rewardPopup !== null || currentLorePopup !== null;
+      if (e.key === 'i' || e.key === 'I') {
+        if (menuOpen || !blockingOverlayOpen) setMenuOpen((open) => !open);
+        return;
+      }
+      if (e.key === 'j' || e.key === 'J') {
+        if (journalOpen || !blockingOverlayOpen) setJournalOpen((open) => !open);
+        return;
+      }
       if (e.key === 'Enter' || e.key === ' ') attemptInteract();
     }
     window.addEventListener('keydown', handleKey);

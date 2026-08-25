@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { fullyRestoredParticipantStats, rollBattleBackgroundAssetId, TURN_TIMEOUT_MS } from './partyBattle';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
+import { restoreFullVitals } from '../engine/levelingEngine';
 import type {
   ClanMembershipDoc,
   FriendshipDoc,
@@ -53,9 +54,7 @@ async function startPvpBattleInTransaction(
     const p = participantUids[i];
     // Full restore before the fight, same "every player starts at 100%" rule as Endless Battle -
     // written to the real save immediately, not just the battle doc snapshot.
-    save.player.stats.hp = save.player.stats.maxHp;
-    save.player.stats.spirit = save.player.stats.maxSpirit;
-    if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
+    restoreFullVitals(save);
     save.updatedAt = now;
     tx.set(userRefs[i], save);
     participantStats[p] = fullyRestoredParticipantStats(save);

@@ -372,12 +372,16 @@ export function DungeonScene() {
         else if (journalOpen) setJournalOpen(false);
         return;
       }
+      // Blocks *opening* a new overlay while one of these is already up (a stacked pair then
+      // shares one Escape-close and closes together); doesn't block closing the same overlay
+      // back off via its own key.
+      const blockingOverlayOpen = message !== null || activeNpc !== null || rewardPopup !== null || currentLorePopup !== null;
       if (e.key === 'i' || e.key === 'I') {
-        setMenuOpen((open) => !open);
+        if (menuOpen || !blockingOverlayOpen) setMenuOpen((open) => !open);
         return;
       }
       if (e.key === 'j' || e.key === 'J') {
-        setJournalOpen((open) => !open);
+        if (journalOpen || !blockingOverlayOpen) setJournalOpen((open) => !open);
         return;
       }
       if (e.key !== 'Enter' && e.key !== ' ') return;

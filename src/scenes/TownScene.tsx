@@ -353,16 +353,29 @@ export function TownScene() {
         else setMessage(null);
         return;
       }
+      // Blocks *opening* a new overlay while one of these is already up (a stacked pair then
+      // shares one Escape-close and closes together); doesn't block closing the same overlay
+      // back off via its own key. Deliberately excludes menuOpen/journalOpen/worldChatOpen
+      // themselves - those are the ones these three keys toggle.
+      const blockingOverlayOpen =
+        activeNpc !== null ||
+        shopOpen ||
+        innOpen ||
+        message !== null ||
+        rewardPopup !== null ||
+        currentLorePopup !== null ||
+        shopActionChoice !== null ||
+        activeApothecaryShopId !== null;
       if (e.key === 'i' || e.key === 'I') {
-        setMenuOpen((open) => !open);
+        if (menuOpen || !blockingOverlayOpen) setMenuOpen((open) => !open);
         return;
       }
       if (e.key === 'j' || e.key === 'J') {
-        setJournalOpen((open) => !open);
+        if (journalOpen || !blockingOverlayOpen) setJournalOpen((open) => !open);
         return;
       }
       if (e.key === 'c' || e.key === 'C') {
-        setWorldChatOpen((open) => !open);
+        if (worldChatOpen || !blockingOverlayOpen) setWorldChatOpen((open) => !open);
         return;
       }
       // 'm'/'M' is handled by useMapOverlay itself (it owns its own keydown listener) - not

@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type DocumentReference, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { rollWaveEnemies } from '../engine/endlessBattleEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
+import { restoreFullVitals } from '../engine/levelingEngine';
 import {
   restoreParticipantsAndClearLocks,
   fullyRestoredParticipantStats,
@@ -158,9 +159,18 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
     const partyAverageLevel = Math.round(saves.reduce((sum, s) => sum + s.player.level, 0) / saves.length);
     const enemies = rollWaveEnemies(1, partyAverageLevel);
 
-    // Clear out anything self-healed above before writing the new battle/locks.
-    for (const { battle } of staleBattles) {
-      await restoreParticipantsAndClearLocks(tx, db, battle.participants);
+    // Clear out anything self-healed above before writing the new battle/locks. A single batched
+    // call across every stale battle's participants, not one call per battle -
+    // restoreParticipantsAndClearLocks does its own tx.get() (via getSaveForUid) followed by
+    // tx.set(), so calling it once per stale battle in a loop interleaved a later iteration's read
+    // after an earlier iteration's write within the same transaction whenever 2+ distinct stale
+    // battles existed at once (e.g. two unrelated abandoned runs both going stale before the same
+    // group re-forms) - Firestore rejects that outright ("transactions require all reads to be
+    // executed before all writes"), turning the self-heal this code exists for into a hard
+    // failure instead.
+    const staleParticipants = Array.from(new Set(staleBattles.flatMap(({ battle }) => battle.participants)));
+    if (staleParticipants.length > 0) {
+      await restoreParticipantsAndClearLocks(tx, db, staleParticipants);
     }
 
     const now = Date.now();
@@ -172,9 +182,7 @@ export const startEndlessBattle = onCall<StartEndlessBattleRequest>(async (reque
       // Health, Spirit, and Lantern Oil" at battle start) - written to their real save right away,
       // not just snapshotted onto the battle doc, so it's still true even if they leave/the run
       // is abandoned before a proper end-of-run restore ever fires.
-      save.player.stats.hp = save.player.stats.maxHp;
-      save.player.stats.spirit = save.player.stats.maxSpirit;
-      if (save.player.equipment.lantern) save.player.stats.lanternOil = save.player.stats.maxLanternOil;
+      restoreFullVitals(save);
       save.updatedAt = now;
       tx.set(userRefs[i], save);
 
