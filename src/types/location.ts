@@ -1,5 +1,10 @@
 export type LocationKind = 'town' | 'overworld' | 'dungeon';
 
+/** Ambient screen-space weather effect (see src/utils/weather.ts's resolveWeather and
+ *  src/phaser/weatherEffects.ts) - 'sun' is a real resolved state (clear/default), not the same
+ *  as "no weather" (null), it just renders no particle effect. */
+export type WeatherKind = 'sun' | 'fog' | 'rain' | 'snow' | 'sandstorm';
+
 export interface EncounterTableEntry {
   enemyId: string;
   weight: number;

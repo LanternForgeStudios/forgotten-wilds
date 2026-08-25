@@ -36,7 +36,9 @@ import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS, LOCATIONS, APOTHECARY_SHOP_IDS } from '@/data';
 import { resolveDecorEntity } from '@/data/decorEntities';
-import type { Npc, OnlinePresence } from '@/types';
+import type { Npc, OnlinePresence, WeatherKind } from '@/types';
+import { resolveWeather, cycleWeather } from '@/utils/weather';
+import { STORY_WEATHER_LOCKS } from '@/data/weatherConfig';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
@@ -124,6 +126,13 @@ export function TownScene() {
     const parentLocation = location?.parentLocationId ? LOCATIONS.find((l) => l.id === location.parentLocationId) : undefined;
     void playMusic(location?.musicAssetId ?? parentLocation?.musicAssetId ?? 'music.town');
   }, [locationId]);
+  // Weather only ever renders for the outdoor town square itself - resolveWeather returns null
+  // for any location with a parentLocationId set (every interior), so this naturally no-ops while
+  // walking through a building without needing to special-case interiors here.
+  const [weather, setWeather] = useState<WeatherKind | null>(null);
+  useEffect(() => {
+    setWeather(resolveWeather(locationId, useQuestStore.getState().progress));
+  }, [locationId]);
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
@@ -168,6 +177,16 @@ export function TownScene() {
   const playerLevel = usePlayerStore((s) => s.player?.level ?? 1);
   const equipmentLayers = useMemo(() => resolveEquipmentLayers(equipment, gender), [equipment, gender]);
   const questProgress = useQuestStore((s) => s.progress);
+  // If this location's own weather-lock quest completes while the player is standing here (not
+  // just on the next visit), clear the lock immediately - keyed on that one quest's status only,
+  // not all of `questProgress`, so it doesn't re-roll on unrelated quest progress (see
+  // OverworldScene.tsx's identical pair of effects).
+  const lockQuestId = STORY_WEATHER_LOCKS[locationId]?.questId;
+  const lockQuestStatus = lockQuestId ? questProgress[lockQuestId]?.status : undefined;
+  useEffect(() => {
+    setWeather(resolveWeather(locationId, useQuestStore.getState().progress));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockQuestStatus]);
   const inventory = useInventoryStore((s) => s.items);
   const bossesDefeated = useJournalStore((s) => s.journal.bossesDefeated);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
@@ -331,6 +350,13 @@ export function TownScene() {
         setWorldChatOpen((open) => !open);
         return;
       }
+      // Debug-only: cycle through every weather kind on demand (see OverworldScene.tsx's
+      // identical binding for why F8, not F9). No-ops visually while inside a building interior
+      // (resolveWeather returns null there), same as the random/locked weather it overrides.
+      if (e.key === 'F8') {
+        setWeather((current) => cycleWeather(current));
+        return;
+      }
       // 'm'/'M' is handled by useMapOverlay itself (it owns its own keydown listener) - not
       // duplicated here.
       if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -471,6 +497,7 @@ export function TownScene() {
           scale={scale}
           viewportSize={viewportSize}
           equipmentLayers={equipmentLayers}
+          weather={weather}
         />
       </div>
       {/* Hidden entirely while a battle panel is open (mobile controls included) - see

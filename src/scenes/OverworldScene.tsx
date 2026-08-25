@@ -47,7 +47,9 @@ import { isTypingTarget } from '@/utils/keyboard';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
 import { playMusic, playSound } from '@/audio/audioService';
-import type { Npc } from '@/types';
+import type { Npc, WeatherKind } from '@/types';
+import { resolveWeather, cycleWeather } from '@/utils/weather';
+import { STORY_WEATHER_LOCKS } from '@/data/weatherConfig';
 import styles from './TownScene.module.css';
 
 /** Which Cloud Function a point `interactable` landmark's Interact-key press routes through - a
@@ -283,6 +285,23 @@ export function OverworldScene() {
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
+  // Rolled fresh each time the player (re)arrives at a top-level location - stable for the
+  // visit, varied across visits (see src/utils/weather.ts's resolveWeather). Reads progress via
+  // getState() rather than the reactive `questProgress` above so an unrelated quest updating
+  // elsewhere doesn't re-roll the weather out from under the player mid-visit.
+  const [weather, setWeather] = useState<WeatherKind | null>(null);
+  useEffect(() => {
+    setWeather(resolveWeather(locationId, useQuestStore.getState().progress));
+  }, [locationId]);
+  // If this location's own weather-lock quest completes while the player is standing here (not
+  // just on the next visit), clear the lock immediately - keyed on that one quest's status only,
+  // not all of `questProgress`, so it doesn't fire on unrelated quest progress.
+  const lockQuestId = STORY_WEATHER_LOCKS[locationId]?.questId;
+  const lockQuestStatus = lockQuestId ? questProgress[lockQuestId]?.status : undefined;
+  useEffect(() => {
+    setWeather(resolveWeather(locationId, useQuestStore.getState().progress));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockQuestStatus]);
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const inventory = useInventoryStore((s) => s.items);
@@ -506,6 +525,13 @@ export function OverworldScene() {
       if (e.key === 'i' || e.key === 'I') setMenuOpen((open) => !open);
       if (e.key === 'j' || e.key === 'J') setJournalOpen((open) => !open);
       if (e.key === 'Enter' || e.key === ' ') attemptInteract();
+      // Debug-only: cycle through every weather kind on demand, so testing doesn't require
+      // traveling to a specific region or waiting on a random roll. F8, not F9 - F9 already
+      // toggles the collision/interaction debug overlay (see PhaserExplorationCanvas.tsx).
+      // Overrides whatever resolveWeather set for the rest of this visit - only the
+      // location-change/lock-cleared effects above can override it again, so it sticks until you
+      // leave.
+      if (e.key === 'F8') setWeather((current) => cycleWeather(current));
     }
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
@@ -620,6 +646,7 @@ export function OverworldScene() {
           scale={scale}
           viewportSize={viewportSize}
           equipmentLayers={equipmentLayers}
+          weather={weather}
         />
       </div>
       {/* Hidden entirely while a battle panel is open (mobile controls included) - see

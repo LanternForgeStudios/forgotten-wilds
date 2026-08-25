@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import type { EquipmentSlot, MapObject, TileMap } from '@/types';
+import type { EquipmentSlot, MapObject, TileMap, WeatherKind } from '@/types';
 import type { Facing, GridPosition } from '@/hooks/useGridMovement';
 import type { MovementInputState } from '@/hooks/useMovementInput';
 import type { MovementState } from '@/animation/characterAnimations';
@@ -69,6 +69,10 @@ interface PhaserExplorationCanvasProps {
   movementInputRef: { current: MovementInputState };
   /** True while an overlay (dialogue, menus, shop, etc.) is open - movement/dash input is ignored. */
   suspended?: boolean;
+  /** Ambient screen-space weather effect, resolved by the caller (OverworldScene/TownScene) via
+   *  src/utils/weather.ts's resolveWeather - see ExplorationScene.setWeather. Omitted/null means
+   *  no effect; DungeonScene never passes this at all, so dungeons/interiors never show weather. */
+  weather?: WeatherKind | null;
   /** Called with the physics-driven player position/movementState, throttled to ~15Hz (see
    *  ExplorationScene.ts's POSITION_FLUSH_INTERVAL_MS) - the caller (useLocationExploration's
    *  reportPosition) mirrors this into React state for HUD/minimap/heartbeat/interaction. */
@@ -122,6 +126,7 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
   const entities = props.entities ?? [];
   const viewportSize = props.viewportSize;
   const suspended = props.suspended ?? false;
+  const weather = props.weather ?? null;
   const equipmentLayers = props.equipmentLayers ?? [];
   const fieldEncounterIcons = props.fieldEncounterIcons ?? [];
   // Mirrored into a ref (not read directly) so the map-load effect below can preload whatever
@@ -262,6 +267,15 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
   useEffect(() => {
     sceneRef.current?.setSuspended(suspended);
   }, [suspended]);
+
+  useEffect(() => {
+    // Gated on sceneReady (unlike setSuspended above) - a real weather kind eventually calls into
+    // scene.add.graphics/particles, which don't exist until Phaser's async boot completes (see
+    // the map-load effect's own comment on this). setSuspended gets away without the guard only
+    // because it just flips a plain boolean field with a class-level default, no Phaser API calls.
+    if (!sceneReady) return;
+    sceneRef.current?.setWeather(weather);
+  }, [sceneReady, weather]);
 
   useEffect(() => {
     if (!sceneReady) return;

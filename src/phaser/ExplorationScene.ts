@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { TileLayer, TileMap, MapObject, CollisionRect, EquipmentSlot } from '@/types';
+import type { TileLayer, TileMap, MapObject, CollisionRect, EquipmentSlot, WeatherKind } from '@/types';
 import type { GridPosition, Facing } from '@/hooks/useGridMovement';
 import { FACING_TO_DELTA } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
@@ -7,6 +7,7 @@ import { PLAYER_ANIMATION_LAYOUT, animationLayoutForSprite, resolveDisplayRow } 
 import { getAssetDefinition } from '@/assets/assetManager';
 import { createCharacterAnimations, animationKey } from './animationDefs';
 import { ensureParticleTexture } from './battleEffects';
+import { WeatherLayer } from './weatherEffects';
 import { loadSceneTexture } from './textureLoader';
 import type { GridEntity } from '@/components/exploration/PhaserExplorationCanvas';
 import type { MovementInputState } from '@/hooks/useMovementInput';
@@ -353,10 +354,19 @@ export class ExplorationScene extends Phaser.Scene {
    *  layers) - guards against a rapid double location-transition racing itself. */
   private mapGeneration = 0;
   private onReady?: () => void;
+  // Constructed here, not in create() - PhaserExplorationCanvas.tsx sets its sceneRef to this
+  // instance synchronously, right after `new ExplorationScene(...)` (before Phaser's async boot
+  // even starts), so any field only assigned inside create() is still undefined if something
+  // calls a method on it before boot completes. WeatherLayer's own constructor is Phaser-API-free
+  // (just stores the scene reference), so building it this early is safe; the real Phaser API
+  // calls (scene.add.graphics/particles) only happen once setWeather is actually invoked with a
+  // real kind, which PhaserExplorationCanvas's effect gates on sceneReady anyway.
+  private weatherLayer: WeatherLayer;
 
   constructor(onReady?: () => void) {
     super({ key: 'ExplorationScene' });
     this.onReady = onReady;
+    this.weatherLayer = new WeatherLayer(this);
   }
 
   create() {
@@ -1508,9 +1518,19 @@ export class ExplorationScene extends Phaser.Scene {
     // roundPixels=true - see the other startFollow call's comment (setPlayer's first-creation
     // branch) for why this matters now that movement is continuous, not tile-snapped.
     if (this.playerSprite) camera.startFollow(this.playerSprite, true);
+    this.weatherLayer.handleResize();
   }
 
   setViewport(viewportSize: { width: number; height: number }): void {
     this.scale.resize(viewportSize.width, viewportSize.height);
+    this.weatherLayer.handleResize();
+  }
+
+  /** Ambient screen-space weather (see src/phaser/weatherEffects.ts) - the caller (Overworld/
+   *  TownScene, via PhaserExplorationCanvas's `weather` prop) resolves *which* kind from
+   *  src/utils/weather.ts; this Scene only owns rendering it. DungeonScene never calls this, so
+   *  dungeons/interiors never show weather. */
+  setWeather(kind: WeatherKind | null): void {
+    this.weatherLayer.setWeather(kind);
   }
 }
