@@ -1,6 +1,6 @@
 import type { QuestProgress, WeatherKind } from '@/types';
-import { LOCATIONS } from '@/data';
 import { REGION_WEATHER_PALETTE, STORY_WEATHER_LOCKS } from '@/data/weatherConfig';
+import { isOutdoorTopLevelLocation } from '@/utils/location';
 
 /** Resolves the ambient weather effect for a location, given the player's quest progress -
  *  see src/data/weatherConfig.ts for the palette/lock data this reads.
@@ -18,8 +18,7 @@ export function resolveWeather(
   questProgress: Record<string, QuestProgress>,
   rng: () => number = Math.random,
 ): WeatherKind | null {
-  const location = LOCATIONS.find((l) => l.id === locationId);
-  if (!location || location.kind === 'dungeon' || location.parentLocationId) return null;
+  if (!isOutdoorTopLevelLocation(locationId)) return null;
 
   const lock = STORY_WEATHER_LOCKS[locationId];
   if (lock) return questProgress[lock.questId]?.status === 'completed' ? 'sun' : lock.weather;
@@ -27,15 +26,4 @@ export function resolveWeather(
   const palette = REGION_WEATHER_PALETTE[locationId];
   if (!palette || palette.length === 0) return 'sun';
   return palette[Math.floor(rng() * palette.length)];
-}
-
-/** Fixed cycle order for the F8 debug hotkey (Overworld/TownScene - F9 is already the collision
- *  debug overlay toggle, see PhaserExplorationCanvas.tsx) - lets weather be tested by hand
- *  without traveling to a specific region or waiting on a random roll. 'sun' stands in for "no
- *  effect" here rather than including a separate null stop, since they render identically. */
-const DEBUG_CYCLE: WeatherKind[] = ['sun', 'fog', 'rain', 'snow', 'sandstorm'];
-
-export function cycleWeather(current: WeatherKind | null): WeatherKind {
-  const index = current ? DEBUG_CYCLE.indexOf(current) : -1;
-  return DEBUG_CYCLE[(index + 1) % DEBUG_CYCLE.length];
 }

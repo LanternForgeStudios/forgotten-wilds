@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { WeatherKind } from '@/types';
+import type { TimePhase, WeatherKind } from '@/types';
 
 /** Depth for the weather layer - must render above every tile layer/entity, matching
  *  ExplorationScene's OVERHANG_DEPTH (1000, "always renders above every tile layer and every
@@ -90,9 +90,25 @@ export class WeatherLayer {
   private readonly scene: Phaser.Scene;
   private kind: WeatherKind | null = null;
   private emitters: Emitter[] = [];
+  private currentPhase: TimePhase = 'day';
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
+  }
+
+  /** Called from ExplorationScene.setTimePhase alongside the lighting update - fog's own particle
+   *  haze stacks with night's dark ambient (reported live as "barely visible"), so fog needs to
+   *  know the current phase to back off at night. Every other weather kind ignores this; only fog
+   *  reads currentPhase. Forces a rebuild if fog is the active kind and the phase actually
+   *  changed, same "null out kind, replay setWeather" trick handleResize uses below. */
+  setPhaseHint(phase: TimePhase): void {
+    if (phase === this.currentPhase) return;
+    this.currentPhase = phase;
+    if (this.kind === 'fog') {
+      const kind = this.kind;
+      this.kind = null;
+      this.setWeather(kind);
+    }
   }
 
   /** `'sun'` and `null` both mean "no visible effect" - sun is still a real resolved weather
@@ -113,9 +129,14 @@ export class WeatherLayer {
       case 'snow':
         this.emitters.push(this.createFallingEmitter({ width, height, tint: 0xffffff, speedY: [40, 90], speedX: [-20, 20], alpha: [0.9, 0.7], frequency: 16, textureKey: SNOWFLAKE_KEY, scale: [0.5, 1.1] }));
         break;
-      case 'fog':
-        this.emitters.push(this.createDriftEmitter({ width, height, tint: 0xd8dce0, alpha: 0.4, frequency: 60, speedX: [8, 22] }));
+      case 'fog': {
+        // Night's own dark ambient (see lightingEffects.ts) already reduces visibility a lot -
+        // stacking fog's normal daytime alpha on top of that made the screen barely visible
+        // (reported live). Half the density at night; unchanged everywhere else.
+        const fogAlpha = this.currentPhase === 'night' ? 0.1 : 0.4;
+        this.emitters.push(this.createDriftEmitter({ width, height, tint: 0xd8dce0, alpha: fogAlpha, frequency: 60, speedX: [8, 22] }));
         break;
+      }
       case 'sandstorm':
         // Its own long horizontal streak texture (not fog's soft-circle haze, not rain's vertical
         // streak rotated) - reads as fast wind-blown grit, "sideways rain, but longer and faster."

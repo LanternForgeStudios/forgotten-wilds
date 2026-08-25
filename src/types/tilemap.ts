@@ -11,7 +11,7 @@ export interface TileLayer {
   opacity: number;
 }
 
-export type MapObjectType = 'npc' | 'transition' | 'interactable' | 'zone' | 'spawnPoint';
+export type MapObjectType = 'npc' | 'transition' | 'interactable' | 'zone' | 'spawnPoint' | 'light';
 
 export interface MapObject {
   type: MapObjectType;
@@ -50,6 +50,13 @@ export interface MapObject {
    *  useLocationExploration.ts's handleStep). Kept on the type so existing map JSON with this
    *  property still parses without error; safe to omit on any new map. */
   requiredFacing?: 'up' | 'down' | 'left' | 'right';
+  /** For `light` objects only - optional per-placement overrides for the day/night point light
+   *  this marks (see src/phaser/lightingEffects.ts). A hex string ("#ffcc66" or the 8-digit
+   *  "#aarrggbb" Tiled's own color-property type exports), parsed leniently. Omitted means use the
+   *  system's default warm light color/intensity - most placements (a window, a torch already
+   *  painted into tile art) don't need a bespoke tint. */
+  lightColor?: string;
+  lightIntensity?: number;
 }
 
 /** A discrete, non-interactive collision-only obstacle (fence, rock, ledge, barrier) authored as a

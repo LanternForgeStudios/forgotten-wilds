@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import type { EquipmentSlot, MapObject, TileMap, WeatherKind } from '@/types';
+import type { EquipmentSlot, MapObject, TileMap, WeatherKind, TimePhase } from '@/types';
 import type { Facing, GridPosition } from '@/hooks/useGridMovement';
 import type { MovementInputState } from '@/hooks/useMovementInput';
 import type { MovementState } from '@/animation/characterAnimations';
@@ -73,6 +73,13 @@ interface PhaserExplorationCanvasProps {
    *  src/utils/weather.ts's resolveWeather - see ExplorationScene.setWeather. Omitted/null means
    *  no effect; DungeonScene never passes this at all, so dungeons/interiors never show weather. */
   weather?: WeatherKind | null;
+  /** Day/night ambient phase, resolved by the caller via useTimeOfDayStore/useDebugStore's
+   *  override - see ExplorationScene.setTimePhase. Omitted defaults to 'day' (no darkening);
+   *  DungeonScene never passes this, so dungeons/interiors never show day/night. */
+  timePhase?: TimePhase;
+  /** Collision/interaction-bounds debug overlay - see ExplorationScene.setDebugEnabled. Driven by
+   *  the UserProfile Debug tab's useDebugStore, reachable from Town/Overworld/Dungeon alike. */
+  showCollisions?: boolean;
   /** Called with the physics-driven player position/movementState, throttled to ~15Hz (see
    *  ExplorationScene.ts's POSITION_FLUSH_INTERVAL_MS) - the caller (useLocationExploration's
    *  reportPosition) mirrors this into React state for HUD/minimap/heartbeat/interaction. */
@@ -127,6 +134,8 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
   const viewportSize = props.viewportSize;
   const suspended = props.suspended ?? false;
   const weather = props.weather ?? null;
+  const timePhase = props.timePhase ?? 'day';
+  const showCollisions = props.showCollisions ?? false;
   const equipmentLayers = props.equipmentLayers ?? [];
   const fieldEncounterIcons = props.fieldEncounterIcons ?? [];
   // Mirrored into a ref (not read directly) so the map-load effect below can preload whatever
@@ -277,6 +286,13 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
     sceneRef.current?.setWeather(weather);
   }, [sceneReady, weather]);
 
+  // Same sceneReady gate as weather above - setTimePhase eventually tweens scene.lights (real
+  // Phaser API calls), not safe before boot completes.
+  useEffect(() => {
+    if (!sceneReady) return;
+    sceneRef.current?.setTimePhase(timePhase);
+  }, [sceneReady, timePhase]);
+
   useEffect(() => {
     if (!sceneReady) return;
     sceneRef.current?.setEntities(entities);
@@ -290,20 +306,14 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
   }, [sceneReady, fieldEncounterIcons]);
 
   // Dev-only collision/interaction-bounds overlay toggle (see ExplorationScene.ts's
-  // setDebugEnabled/drawDebugOverlay) - F9 rather than a UI button since this is a development aid,
-  // not a player-facing feature. Scoped to this one component (not per-scene) so it works
-  // identically in Town/Overworld/Dungeon without three copies of the same keybind.
+  // setDebugEnabled/drawDebugOverlay) - driven by the UserProfile Debug tab's useDebugStore now
+  // (was an F9 hotkey; retired in favor of a tap-friendly UI reachable on mobile too). Scoped to
+  // this one component (not per-scene) so it works identically in Town/Overworld/Dungeon without
+  // three copies of the same toggle.
   useEffect(() => {
     if (!sceneReady) return;
-    let enabled = false;
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key !== 'F9') return;
-      enabled = !enabled;
-      sceneRef.current?.setDebugEnabled(enabled);
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sceneReady]);
+    sceneRef.current?.setDebugEnabled(showCollisions);
+  }, [sceneReady, showCollisions]);
 
   useEffect(() => {
     if (!sceneReady) return;

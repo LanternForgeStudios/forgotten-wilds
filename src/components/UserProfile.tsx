@@ -57,6 +57,8 @@ import { isPresenceOnline } from '@/utils/presence';
 import { useToastStore } from '@/state/useToastStore';
 import { useAudioSettingsStore } from '@/state/useAudioSettingsStore';
 import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
+import { useDebugStore } from '@/state/useDebugStore';
+import type { TimePhase, WeatherKind } from '@/types';
 import { TradeOfferPanel } from './TradeOfferPanel';
 import { ITEMS, EQUIPMENT } from '@/data';
 import { MAX_CLAN_SIZE } from '@/types';
@@ -91,7 +93,7 @@ interface UserProfileProps {
   onClose: () => void;
 }
 
-type ProfileTab = 'profile' | 'friends' | 'clan' | 'skin' | 'settings' | 'reset';
+type ProfileTab = 'profile' | 'friends' | 'clan' | 'skin' | 'settings' | 'debug' | 'reset';
 
 type Gender = 'male' | 'female';
 type Appearance = 'white-dark' | 'black-dark' | 'white-blonde' | 'asian-dark';
@@ -114,6 +116,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const player = usePlayerStore((s) => s.player);
   const audioSettings = useAudioSettingsStore();
   const combatPrefs = useCombatPreferencesStore();
+  const debugStore = useDebugStore();
   useOverlayClose(onClose);
 
   const uid = authUser?.uid;
@@ -726,6 +729,9 @@ export function UserProfile({ onClose }: UserProfileProps) {
           </button>
           <button className={`${styles.tab} ${tab === 'settings' ? styles.tabActive : ''}`} onClick={() => setTab('settings')}>
             Settings
+          </button>
+          <button className={`${styles.tab} ${tab === 'debug' ? styles.tabActive : ''}`} onClick={() => setTab('debug')}>
+            Debug
           </button>
           <button className={`${styles.tab} ${tab === 'reset' ? styles.tabActive : ''}`} onClick={() => setTab('reset')}>
             Reset Progress
@@ -1503,6 +1509,82 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     />
                     Target All
                   </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 'debug' && (
+          <div className={styles.section}>
+            <p style={{ fontSize: 13, opacity: 0.85, marginTop: 0 }}>
+              Testing tools - not saved, not synced, resets every time you reload. Replaces the old F8 (weather)/F9
+              (collisions) hotkeys with something usable on mobile too.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={debugStore.showCollisions}
+                    onChange={(e) => debugStore.setShowCollisions(e.target.checked)}
+                  />
+                  Show collision/interaction bounds
+                </label>
+              </div>
+
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 'bold', margin: '0 0 6px' }}>Weather</p>
+                <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>
+                  Overrides the normal region-random/story-locked weather everywhere until set back to Auto. Only
+                  visible in towns/overworlds, same as normal.
+                </p>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {([null, 'sun', 'fog', 'rain', 'snow', 'sandstorm'] as (WeatherKind | null)[]).map((kind) => {
+                    const isActive = debugStore.weatherOverride === kind;
+                    return (
+                      <button
+                        key={kind ?? 'auto'}
+                        className={styles.smallButton}
+                        style={
+                          isActive
+                            ? { background: 'var(--fw-accent)', borderColor: 'var(--fw-accent)', color: 'var(--fw-bg-deep)', fontWeight: 'bold' }
+                            : undefined
+                        }
+                        onClick={() => debugStore.setWeatherOverride(kind)}
+                      >
+                        {kind ? kind.charAt(0).toUpperCase() + kind.slice(1) : 'Auto'}
+                        {isActive ? ' ✓' : ''}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 'bold', margin: '0 0 6px' }}>Time of day</p>
+                <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>
+                  Overrides the shared real-time day/night clock everywhere until set back to Auto.
+                </p>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {([null, 'day', 'sunrise', 'sunset', 'night'] as (TimePhase | null)[]).map((phase) => {
+                    const isActive = debugStore.timeOverride === phase;
+                    return (
+                      <button
+                        key={phase ?? 'auto'}
+                        className={styles.smallButton}
+                        style={
+                          isActive
+                            ? { background: 'var(--fw-accent)', borderColor: 'var(--fw-accent)', color: 'var(--fw-bg-deep)', fontWeight: 'bold' }
+                            : undefined
+                        }
+                        onClick={() => debugStore.setTimeOverride(phase)}
+                      >
+                        {phase ? phase.charAt(0).toUpperCase() + phase.slice(1) : 'Auto'}
+                        {isActive ? ' ✓' : ''}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

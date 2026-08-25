@@ -48,8 +48,12 @@ import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
 import { shrineSpriteAssetId } from '@/utils/shrineRestoration';
 import { playMusic, playSound } from '@/audio/audioService';
 import type { Npc, WeatherKind } from '@/types';
-import { resolveWeather, cycleWeather } from '@/utils/weather';
+import { resolveWeather } from '@/utils/weather';
 import { STORY_WEATHER_LOCKS } from '@/data/weatherConfig';
+import { isOutdoorTopLevelLocation } from '@/utils/location';
+import { useTimeOfDayStore } from '@/state/useTimeOfDayStore';
+import { useDebugStore } from '@/state/useDebugStore';
+import type { TimePhase } from '@/types';
 import styles from './TownScene.module.css';
 
 /** Which Cloud Function a point `interactable` landmark's Interact-key press routes through - a
@@ -65,7 +69,6 @@ const POINT_LANDMARK_KIND: Record<string, 'shrine' | 'fragment'> = {
   'fallen-watchtower': 'fragment',
   'water-fragment': 'fragment',
   'frostbound-treatise-cache': 'fragment',
-  'ember-codex-tunnel': 'fragment',
   // Crimson Bayou (MSQ Volume II)
   'mother-cypress-shrine': 'shrine',
   'heart-seed-cypress': 'fragment',
@@ -144,7 +147,6 @@ const FRAGMENT_SPRITE_ASSET_ID: Record<string, string> = {
   'fallen-watchtower': 'structure.landmark-watchtower-glow',
   'water-fragment': 'structure.landmark-water-glimmer',
   'frostbound-treatise-cache': 'structure.landmark-frost-cache-glow',
-  'ember-codex-tunnel': 'structure.landmark-tunnel-entrance-glow',
   // Crimson Bayou (MSQ Volume II) - all 3 Heart Seed fragments share one marker sprite
   'heart-seed-cypress': 'structure.landmark-heart-seed-glow',
   'heart-seed-murkwater': 'structure.landmark-heart-seed-glow',
@@ -235,7 +237,6 @@ function labelForInteractable(refId: string, openedChests: string[], inventory: 
   if (refId.startsWith('heart-seed-')) return 'a seed pod nestled among mossy roots, glowing faintly';
   if (refId === 'water-fragment') return 'a faint glimmer in the pool';
   if (refId === 'frostbound-treatise-cache') return 'a hidden cache behind the falls';
-  if (refId === 'ember-codex-tunnel') return 'an overlooked maintenance tunnel';
   if (refId === 'drowned-ledger-cache') return 'a hidden cache in the reeds';
   if (refId === 'bogwater-almanac-cache') return 'a mossy cypress hollow';
   if (refId.startsWith('wind-stone-')) return 'a stone humming faintly with wind';
@@ -302,6 +303,17 @@ export function OverworldScene() {
     setWeather(resolveWeather(locationId, useQuestStore.getState().progress));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lockQuestStatus]);
+  // Debug tab overrides (UserProfile's Debug tab, see useDebugStore) - reactive, so flipping one
+  // while standing in a location takes effect immediately rather than waiting for the next visit.
+  // Both stay gated by the same outdoor-eligibility check as normal resolution, so forcing an
+  // override can't show weather/lighting somewhere it structurally never applies.
+  const outdoorEligible = isOutdoorTopLevelLocation(locationId);
+  const timeOfDayPhase = useTimeOfDayStore((s) => s.phase);
+  const debugWeatherOverride = useDebugStore((s) => s.weatherOverride);
+  const debugTimeOverride = useDebugStore((s) => s.timeOverride);
+  const debugShowCollisions = useDebugStore((s) => s.showCollisions);
+  const effectiveWeather = outdoorEligible ? (debugWeatherOverride ?? weather) : null;
+  const effectiveTimePhase: TimePhase = outdoorEligible ? (debugTimeOverride ?? timeOfDayPhase) : 'day';
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const inventory = useInventoryStore((s) => s.items);
@@ -525,13 +537,6 @@ export function OverworldScene() {
       if (e.key === 'i' || e.key === 'I') setMenuOpen((open) => !open);
       if (e.key === 'j' || e.key === 'J') setJournalOpen((open) => !open);
       if (e.key === 'Enter' || e.key === ' ') attemptInteract();
-      // Debug-only: cycle through every weather kind on demand, so testing doesn't require
-      // traveling to a specific region or waiting on a random roll. F8, not F9 - F9 already
-      // toggles the collision/interaction debug overlay (see PhaserExplorationCanvas.tsx).
-      // Overrides whatever resolveWeather set for the rest of this visit - only the
-      // location-change/lock-cleared effects above can override it again, so it sticks until you
-      // leave.
-      if (e.key === 'F8') setWeather((current) => cycleWeather(current));
     }
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
@@ -646,7 +651,9 @@ export function OverworldScene() {
           scale={scale}
           viewportSize={viewportSize}
           equipmentLayers={equipmentLayers}
-          weather={weather}
+          weather={effectiveWeather}
+          timePhase={effectiveTimePhase}
+          showCollisions={debugShowCollisions}
         />
       </div>
       {/* Hidden entirely while a battle panel is open (mobile controls included) - see

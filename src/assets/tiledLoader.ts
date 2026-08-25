@@ -124,11 +124,12 @@ function objectType(raw: string): MapObjectType {
     raw === 'transition' ||
     raw === 'interactable' ||
     raw === 'zone' ||
-    raw === 'spawnPoint'
+    raw === 'spawnPoint' ||
+    raw === 'light'
   ) {
     return raw;
   }
-  throw new Error(`Unknown Tiled object type "${raw}" — expected npc/transition/interactable/zone/spawnPoint.`);
+  throw new Error(`Unknown Tiled object type "${raw}" — expected npc/transition/interactable/zone/spawnPoint/light.`);
 }
 
 /** Resolves which registry asset id an embedded tileset (by its position in `raw.tilesets`)
@@ -221,10 +222,13 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
       // to the right") - centering keeps the two in the same place no matter how wide the trigger
       // grows. A no-op for every ordinary point-placed object (pixelWidth/pixelHeight both equal
       // the map's own tile size there, so the centering offset is 0).
+      // 'light' objects are drawn the same way 'zone' is - a real hand-drawn rectangle whose x/y
+      // IS the top-left corner, not a point later widened symmetrically - so it's excluded from
+      // isCenteredRect below the same way 'zone' already is.
       const span = o.type === 'zone' && (o.width || o.height) ? pixelRectToTileSpan(o.x, o.y, o.width ?? 0, o.height ?? 0, raw.tilewidth, raw.tileheight) : null;
       const pixelWidth = o.width || raw.tilewidth;
       const pixelHeight = o.height || raw.tileheight;
-      const isCenteredRect = o.type !== 'zone' && (o.width || o.height);
+      const isCenteredRect = o.type !== 'zone' && o.type !== 'light' && (o.width || o.height);
       return {
         type: objectType(o.type),
         x: span?.x ?? Math.floor(o.x / raw.tilewidth),
@@ -240,6 +244,8 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
         wanderRadius: propValue<number>(o.properties, 'wanderRadius'),
         requiredFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'requiredFacing'),
         spawnFacing: propValue<'up' | 'down' | 'left' | 'right'>(o.properties, 'spawnFacing'),
+        lightColor: propValue<string>(o.properties, 'lightColor'),
+        lightIntensity: propValue<number>(o.properties, 'lightIntensity'),
       };
     });
 

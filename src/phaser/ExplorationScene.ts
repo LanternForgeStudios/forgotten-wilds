@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { TileLayer, TileMap, MapObject, CollisionRect, EquipmentSlot, WeatherKind } from '@/types';
+import type { TileLayer, TileMap, MapObject, CollisionRect, EquipmentSlot, WeatherKind, TimePhase } from '@/types';
 import type { GridPosition, Facing } from '@/hooks/useGridMovement';
 import { FACING_TO_DELTA } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
@@ -8,6 +8,8 @@ import { getAssetDefinition } from '@/assets/assetManager';
 import { createCharacterAnimations, animationKey } from './animationDefs';
 import { ensureParticleTexture } from './battleEffects';
 import { WeatherLayer } from './weatherEffects';
+import { LightingLayer } from './lightingEffects';
+import { LIGHT_SOURCES } from '@/data/lightSources';
 import { loadSceneTexture } from './textureLoader';
 import type { GridEntity } from '@/components/exploration/PhaserExplorationCanvas';
 import type { MovementInputState } from '@/hooks/useMovementInput';
@@ -84,6 +86,11 @@ const ENTITY_DEPTH = 500;
  *  this cap with room to spare for future larger maps. */
 const ENTITY_Y_SORT_DIVISOR = 3;
 const ENTITY_Y_SORT_MAX_OFFSET = 480;
+/** Depth-tie-breaker in the player's favor - see its one call site (syncAfterPhysicsStep) for the
+ *  full story. In depthForY's own units (world-pixels / ENTITY_Y_SORT_DIVISOR), so this is worth
+ *  ~24px of "free" y-advantage - enough to cover a small collision-box mismatch, small enough that
+ *  a genuinely-in-front object (a real tile or more further south) still correctly occludes. */
+const PLAYER_DEPTH_TIE_BIAS = 8;
 /** Always above every entity/player body regardless of its Y-sorted depth (see ENTITY_DEPTH's own
  *  comment), but still under OVERHANG_DEPTH - a nameplate shouldn't out-rank a tree canopy above
  *  the character it's labeling. */
@@ -106,6 +113,27 @@ const EQUIPMENT_LAYER_DEPTH_OFFSET: Partial<Record<EquipmentSlot, number>> = {
  *  BattleScene's defeat effect - reused here rather than duplicating the Graphics->texture
  *  boilerplate, tinted differently per call site. */
 const PARTICLE_TEXTURE_KEY = 'fx-dot';
+/** Fallback color/intensity for a `type:"light"` map object with no lightColor/lightIntensity
+ *  custom property of its own (see loadMap) - a generic warm glow, since most placements (a
+ *  window, a torch already painted into tile art) don't need a bespoke tint. */
+const DEFAULT_LIGHT_COLOR = 0xffdd99;
+// 2x brighter (2026-08 owner ask - "same strength as the lantern"), matching lightingEffects.ts's
+// lanternPeakIntensity 2x treatment rather than the 1.5x applied to src/data/lightSources.ts.
+// Only the *default* - an explicit lightIntensity custom property on a placed object is a
+// deliberate per-placement value and isn't multiplied on top.
+const DEFAULT_LIGHT_INTENSITY = 0.7 * 2;
+
+/** Parses a Tiled color-property string - either the 6-digit "#rrggbb" form or the 8-digit
+ *  "#aarrggbb" form Tiled's own "color" property type exports (alpha first, dropped here since
+ *  Phaser Lights have no separate alpha channel) - leniently: any other/missing value falls back
+ *  to `fallback` rather than throwing, since this is hand-typed level-design data. */
+function parseLightColor(raw: string | undefined, fallback: number): number {
+  if (!raw) return fallback;
+  const hex = raw.replace('#', '');
+  const rgbHex = hex.length === 8 ? hex.slice(2) : hex;
+  const parsed = Number.parseInt(rgbHex, 16);
+  return Number.isNaN(parsed) ? fallback : parsed;
+}
 /** Small soft-edged ellipse, generated once (see ensureShadowTexture) and reused via
  *  setDisplaySize per instance - one shared texture rather than a separate generated image per
  *  sprite width, since the shape is identical and only the scale differs. */
@@ -362,11 +390,16 @@ export class ExplorationScene extends Phaser.Scene {
   // calls (scene.add.graphics/particles) only happen once setWeather is actually invoked with a
   // real kind, which PhaserExplorationCanvas's effect gates on sceneReady anyway.
   private weatherLayer: WeatherLayer;
+  // Same early-construction reasoning as weatherLayer above - LightingLayer's constructor is
+  // Phaser-API-free too.
+  private lightingLayer: LightingLayer;
+  private currentTimePhase: TimePhase = 'day';
 
   constructor(onReady?: () => void) {
     super({ key: 'ExplorationScene' });
     this.onReady = onReady;
     this.weatherLayer = new WeatherLayer(this);
+    this.lightingLayer = new LightingLayer(this);
   }
 
   create() {
@@ -381,6 +414,7 @@ export class ExplorationScene extends Phaser.Scene {
     // "Cannot read properties of undefined (reading 'once')").
     ensureParticleTexture(this, PARTICLE_TEXTURE_KEY);
     this.ensureShadowTexture();
+    this.lightingLayer.enable();
     // Fire-and-forget: spawnDashDust checks textures.exists before using this, falling back to the
     // dot texture on the rare chance a dash is triggered before this finishes loading.
     loadSceneTexture(this, DASH_DUST_FX_ASSET_ID).catch(() => {});
@@ -584,7 +618,19 @@ export class ExplorationScene extends Phaser.Scene {
       for (const [, visual] of this.equipmentLayerSprites) {
         visual.sprite.setPosition(sprite.x, sprite.y);
       }
-      const playerDepth = this.depthForY(sprite.y);
+      const lanternVisual = this.equipmentLayerSprites.get('lantern');
+      if (lanternVisual) {
+        this.lightingLayer.updateLanternPosition(lanternVisual.sprite.x, this.lanternLightY(lanternVisual.sprite));
+      }
+      // + PLAYER_DEPTH_TIE_BIAS - reported live: walking up to a blocksMovement decor prop (e.g.
+      // general-bonfire-01) from the south still rendered the prop over the player's head, despite
+      // the player's/entity's collision-box math (both bottom-anchored at ENTITY/PLAYER_BODY_
+      // HEIGHT_RATIO=0.3) working out to player.y > object.y once stopped at the collision edge -
+      // so depthForY *should* already favor the player there. Whatever the exact remaining gap is,
+      // this bias guarantees the player wins any close/near-tie against static scenery without
+      // touching depthForY itself (entities are unaffected, so a genuinely-in-front tall object
+      // still correctly occludes the player from a real distance).
+      const playerDepth = this.depthForY(sprite.y) + PLAYER_DEPTH_TIE_BIAS;
       sprite.setDepth(playerDepth);
       for (const [slot, visual] of this.equipmentLayerSprites) {
         visual.sprite.setDepth(playerDepth + (EQUIPMENT_LAYER_DEPTH_OFFSET[slot] ?? 0.5));
@@ -979,6 +1025,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.collisionStaticGroup = null;
     this.currentCollisionRects = map.collisionObjects;
     this.currentMapObjects = map.objects;
+    this.lightingLayer.clearAllMapLights();
     this.zoneOverlapState.clear();
     this.transitionOverlapState.clear();
     this.activeZoneRefIds.clear();
@@ -1103,7 +1150,7 @@ export class ExplorationScene extends Phaser.Scene {
           tile.flipX = gidInfo.flipped;
         }
       });
-      phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(this.viewportScale);
+      phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(this.viewportScale).setLighting(true);
       const overhangMatch = /^overhang(?:-(\d+))?$/.exec(layer.name);
       // Multiple overhang-N layers stack in numeric order among themselves, all still above every
       // decoration/entity layer (OVERHANG_DEPTH is already higher than any plausible decoration count).
@@ -1132,6 +1179,31 @@ export class ExplorationScene extends Phaser.Scene {
       this.physics.add.existing(zone, true);
       this.collisionStaticGroup.add(zone);
     }
+    // Hand-placed `type:"light"` map objects - pure metadata markers (no sprite of their own),
+    // for tile-painted glow (a window, a torch baked into a wall tileset) that isn't a separate
+    // decor entity - see src/types/tilemap.ts's own doc comment on lightColor/lightIntensity.
+    // Same top-left-rect pixel convention as the collision rects just above (isCenteredRect is
+    // false for 'light' in tiledLoader.ts, matching 'zone').
+    map.objects
+      .filter((o) => o.type === 'light')
+      .forEach((o, index) => {
+        const x = (o.pixelX + o.pixelWidth / 2) * this.viewportScale;
+        const y = (o.pixelY + o.pixelHeight / 2) * this.viewportScale;
+        // Half-diagonal (center to corner), not the average of width/height - averaging badly
+        // under-covers any non-square rectangle (a 52x48 object only got radius 25, nowhere near
+        // its own corners at ~35), which is exactly the shape a wide/short window rect would be.
+        // The 1.3x pad means the corners land at meaningful brightness, not just barely-nonzero at
+        // the light's very edge (radius 0 = the point of zero attenuation - see the quadratic
+        // falloff in DefineLights.glsl).
+        const halfWidth = o.pixelWidth / 2;
+        const halfHeight = o.pixelHeight / 2;
+        const radius = Math.sqrt(halfWidth * halfWidth + halfHeight * halfHeight) * 1.3 * this.viewportScale;
+        this.lightingLayer.setLight(`mapobj:${index}`, x, y, {
+          color: parseLightColor(o.lightColor, DEFAULT_LIGHT_COLOR),
+          radius,
+          intensity: o.lightIntensity ?? DEFAULT_LIGHT_INTENSITY,
+        });
+      });
     this.registerPlayerColliders();
   }
 
@@ -1202,7 +1274,7 @@ export class ExplorationScene extends Phaser.Scene {
       // taller-than-one-tile art (see the 3/4-view scale spec and REFERENCE_VIEWPORT_SCALE above)
       // lines up with the ground instead of floating with its vertical midpoint on the tile - the
       // 48x64 player placeholder is already taller than one 48px tile at desktop's reference scale.
-      const sprite = this.add.sprite(0, 0, spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
+      const sprite = this.add.sprite(0, 0, spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH).setLighting(true);
       this.physics.add.existing(sprite);
       const body = sprite.body as Phaser.Physics.Arcade.Body;
       // Deliberately smaller than the full sprite frame, biased toward the feet - see
@@ -1266,7 +1338,8 @@ export class ExplorationScene extends Phaser.Scene {
         const layerSprite = this.add
           .sprite(sprite.x, sprite.y, layer.spriteAssetId)
           .setOrigin(0.5, 1)
-          .setDepth(ENTITY_DEPTH + (EQUIPMENT_LAYER_DEPTH_OFFSET[layer.slot] ?? 0.5));
+          .setDepth(ENTITY_DEPTH + (EQUIPMENT_LAYER_DEPTH_OFFSET[layer.slot] ?? 0.5))
+          .setLighting(true);
         visual = { sprite: layerSprite, spriteAssetId: layer.spriteAssetId };
         this.equipmentLayerSprites.set(layer.slot, visual);
       } else if (visual.spriteAssetId !== layer.spriteAssetId) {
@@ -1288,6 +1361,30 @@ export class ExplorationScene extends Phaser.Scene {
         this.equipmentLayerSprites.delete(slot);
       }
     }
+    this.syncLanternLight();
+  }
+
+  /** Whether the player's lantern light should be on right now: a lantern is equipped (has a real
+   *  layer sprite - see equipmentLayerSprites) *and* the current phase is sunset or night (not
+   *  sunrise, not day - see lightingEffects.ts's setLanternActive doc comment for why sunrise is
+   *  deliberately excluded). Called whenever either input could have changed - after setPlayer's
+   *  equipment-layer sync above, and from setTimePhase. */
+  private syncLanternLight(): void {
+    const lanternVisual = this.equipmentLayerSprites.get('lantern');
+    const shouldBeActive = !!lanternVisual && (this.currentTimePhase === 'sunset' || this.currentTimePhase === 'night');
+    const x = lanternVisual?.sprite.x ?? 0;
+    const y = lanternVisual ? this.lanternLightY(lanternVisual.sprite) : 0;
+    this.lightingLayer.setLanternActive(shouldBeActive, x, y);
+  }
+
+  /** The lantern equipment layer sprite is anchored at origin (0.5, 1) - bottom-center, same as
+   *  every other sprite - so its own `.y` sits at the player's feet, not where the lantern art
+   *  itself actually is (held around hip/hand height). 0.6 of the way up from feet to the top of
+   *  the sprite reads as "emitting from the lantern," not "emitting from the ground" (reported
+   *  live as looking like it came from the feet at the naive `.y` position) - lower than a full
+   *  half-height offset (that would center on the torso, too high for a hand-held light). */
+  private lanternLightY(sprite: Phaser.GameObjects.Sprite): number {
+    return sprite.y - sprite.displayHeight * 0.6;
   }
 
   /** One small puff of dust, at ground level (behind the player sprite) rather than on top of
@@ -1341,6 +1438,7 @@ export class ExplorationScene extends Phaser.Scene {
     }
     for (const [id, visual] of this.entityVisuals) {
       if (seen.has(id)) continue;
+      this.lightingLayer.setLight(`entity:${id}`, 0, 0, null);
       visual.sprite.destroy();
       visual.label?.destroy();
       visual.badge?.destroy();
@@ -1360,7 +1458,7 @@ export class ExplorationScene extends Phaser.Scene {
       // an entity that's no longer part of the current location's entity list.
       if (generation !== this.entityGeneration) return;
       // Same feet-anchor origin as the player sprite (setPlayer above) - see its comment.
-      const sprite = this.add.sprite(0, 0, entity.spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH);
+      const sprite = this.add.sprite(0, 0, entity.spriteAssetId).setOrigin(0.5, 1).setDepth(ENTITY_DEPTH).setLighting(true);
       if (entity.blocksMovement) {
         // A dynamic (not static) body on purpose - a wandering NPC's sprite moves via the tween
         // below, not via velocity, and Arcade re-derives a dynamic body's position from its
@@ -1419,6 +1517,14 @@ export class ExplorationScene extends Phaser.Scene {
     const x = entity.x * this.tileSize + this.tileSize / 2;
     const y = entity.y * this.tileSize + this.tileSize;
     visual.sprite.setScale(ENTITY_VISUAL_SCALE * (entity.displayScale ?? 1));
+    // Keyed by the *resolved* sprite asset id, not entity.id/refId - see src/data/lightSources.ts.
+    // Covers both a freshly-created entity and one that just retextured (a chest going
+    // structure.chest -> structure.chest-open loses its light right here, same call). Read after
+    // setScale (not before) so displayHeight reflects the real current scale - the sprite's
+    // origin is (0.5, 1), bottom-center, so its feet sit at `y` and its visual center sits
+    // `displayHeight / 2` above that; without this offset the light sat at ground level under the
+    // object instead of glowing from its middle (reported live for a chest/shrine).
+    this.lightingLayer.setLight(`entity:${entity.id}`, x, y - visual.sprite.displayHeight / 2, LIGHT_SOURCES[entity.spriteAssetId] ?? null);
     if (def.frameSize) {
       const row = entity.frameRow ?? 0;
       const column = entity.frameColumn ?? 0;
@@ -1532,5 +1638,17 @@ export class ExplorationScene extends Phaser.Scene {
    *  dungeons/interiors never show weather. */
   setWeather(kind: WeatherKind | null): void {
     this.weatherLayer.setWeather(kind);
+  }
+
+  /** Day/night ambient (see src/phaser/lightingEffects.ts) - the caller (Overworld/TownScene, via
+   *  PhaserExplorationCanvas's `timePhase` prop) resolves *which* phase from useTimeOfDayStore/
+   *  useDebugStore's override; this Scene only owns rendering it, same split as setWeather.
+   *  DungeonScene never calls this, so dungeons/interiors never show day/night. Also re-syncs the
+   *  lantern light, since whether it should be on depends on this phase too. */
+  setTimePhase(phase: TimePhase): void {
+    this.currentTimePhase = phase;
+    this.lightingLayer.setPhase(phase);
+    this.weatherLayer.setPhaseHint(phase);
+    this.syncLanternLight();
   }
 }

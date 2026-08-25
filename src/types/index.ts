@@ -10,6 +10,7 @@ export * from './ailment';
 export * from './combat';
 export * from './tilemap';
 export * from './location';
+export * from './time';
 export * from './presence';
 export * from './social';
 export * from './trade';

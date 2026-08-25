@@ -37,8 +37,12 @@ import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS, LOCATIONS, APOTHECARY_SHOP_IDS } from '@/data';
 import { resolveDecorEntity } from '@/data/decorEntities';
 import type { Npc, OnlinePresence, WeatherKind } from '@/types';
-import { resolveWeather, cycleWeather } from '@/utils/weather';
+import { resolveWeather } from '@/utils/weather';
 import { STORY_WEATHER_LOCKS } from '@/data/weatherConfig';
+import { isOutdoorTopLevelLocation } from '@/utils/location';
+import { useTimeOfDayStore } from '@/state/useTimeOfDayStore';
+import { useDebugStore } from '@/state/useDebugStore';
+import type { TimePhase } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
@@ -187,6 +191,17 @@ export function TownScene() {
     setWeather(resolveWeather(locationId, useQuestStore.getState().progress));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lockQuestStatus]);
+  // Debug tab overrides (see OverworldScene.tsx's identical block) - both gated by the same
+  // outdoor-eligibility check as normal resolution, so a building interior (which shares this
+  // scene component with its outdoor town square) never shows a forced weather/lighting effect
+  // even with an override set.
+  const outdoorEligible = isOutdoorTopLevelLocation(locationId);
+  const timeOfDayPhase = useTimeOfDayStore((s) => s.phase);
+  const debugWeatherOverride = useDebugStore((s) => s.weatherOverride);
+  const debugTimeOverride = useDebugStore((s) => s.timeOverride);
+  const debugShowCollisions = useDebugStore((s) => s.showCollisions);
+  const effectiveWeather = outdoorEligible ? (debugWeatherOverride ?? weather) : null;
+  const effectiveTimePhase: TimePhase = outdoorEligible ? (debugTimeOverride ?? timeOfDayPhase) : 'day';
   const inventory = useInventoryStore((s) => s.items);
   const bossesDefeated = useJournalStore((s) => s.journal.bossesDefeated);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
@@ -350,13 +365,6 @@ export function TownScene() {
         setWorldChatOpen((open) => !open);
         return;
       }
-      // Debug-only: cycle through every weather kind on demand (see OverworldScene.tsx's
-      // identical binding for why F8, not F9). No-ops visually while inside a building interior
-      // (resolveWeather returns null there), same as the random/locked weather it overrides.
-      if (e.key === 'F8') {
-        setWeather((current) => cycleWeather(current));
-        return;
-      }
       // 'm'/'M' is handled by useMapOverlay itself (it owns its own keydown listener) - not
       // duplicated here.
       if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -497,7 +505,9 @@ export function TownScene() {
           scale={scale}
           viewportSize={viewportSize}
           equipmentLayers={equipmentLayers}
-          weather={weather}
+          weather={effectiveWeather}
+          timePhase={effectiveTimePhase}
+          showCollisions={debugShowCollisions}
         />
       </div>
       {/* Hidden entirely while a battle panel is open (mobile controls included) - see
