@@ -80,6 +80,19 @@ export const DECOR_ENTITIES: Record<string, DecorEntity> = {
   // as single-tile tilesets (tileset.general-tree-model*-size*) instead of refId structures, since
   // trees are meant to be scattered many times per map (a tileset stamp) rather than tracked
   // individually. See docs/Map-Object-Catalog.md's Tileset section.
+
+  // Raven Ridge hand-crafted-map pass (2026-08) - previously-unused PixelLab mine-decor/
+  // overworld-decor2 props, each placed once or twice, so DecorEntity fits better than a scatter
+  // tileset (see the tree note above for the opposite case).
+  'mine-rail-track': { label: 'Old Rail Track', spriteAssetId: 'structure.mine-rail-track', flavorText: 'A short stretch of rusted rail, half-swallowed by rubble. Whatever ran on it hasn\'t in a long time.' },
+  'mine-cart': { label: 'Derelict Mine Cart', spriteAssetId: 'structure.mine-cart', flavorText: 'An overturned mine cart, wheels seized with rust.' },
+  'mine-support-beam': { label: 'Collapsed Support Beam', spriteAssetId: 'structure.mine-support-beam', flavorText: 'A wooden support beam, snapped and leaning. Whatever it once held up has long since come down.' },
+  'mine-rubble': { label: 'Rubble', spriteAssetId: 'structure.mine-rubble', flavorText: 'A pile of loose rock, spilled from some old collapse.' },
+  'mine-crate': { label: 'Old Crate', spriteAssetId: 'structure.mine-crate', flavorText: 'A weathered supply crate, empty and forgotten.' },
+  'overworld-boulder': { label: 'Boulder', spriteAssetId: 'structure.overworld-boulder', flavorText: 'A weathered boulder, worn smooth by mountain wind.' },
+  'overworld-fallen-log': { label: 'Fallen Log', spriteAssetId: 'structure.overworld-fallen-log', flavorText: 'A fallen log, moss creeping along its underside.' },
+  'overworld-tree-stump': { label: 'Tree Stump', spriteAssetId: 'structure.overworld-tree-stump', flavorText: 'An old stump - whatever tree it was has been gone a long time up here.' },
+  'overworld-wildflower': { label: 'Wildflower', spriteAssetId: 'structure.overworld-wildflower', flavorText: 'A small patch of wildflowers, stubbornly blooming among the rocks.' },
 };
 
 /** Prefix match - multiple numbered instances of the same decor kind share one refId prefix (e.g.
