@@ -2785,7 +2785,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: regenerated with n_materials=3 (was 2) - the 2-cluster fit was washing this item toward white/pale instead of tracking its icon's actual color, 3 clusters fixed it (verified against the icon by eye and numerically).",
   },
   {
     id: 'sprite.equipment.worn-nomad-robes-female',
@@ -2797,7 +2797,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: regenerated with n_materials=3 (was 2) - the 2-cluster fit was washing this item toward white/pale instead of tracking its icon's actual color, 3 clusters fixed it (verified against the icon by eye and numerically).",
   },
   {
     id: 'sprite.equipment.banded-nomad-robes',
@@ -2809,7 +2809,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: regenerated with n_materials=3 (was 2) - the 2-cluster fit was washing this item toward white/pale instead of tracking its icon's actual color, 3 clusters fixed it (verified against the icon by eye and numerically).",
   },
   {
     id: 'sprite.equipment.banded-nomad-robes-female',
@@ -2821,7 +2821,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: regenerated with n_materials=3 (was 2) - the 2-cluster fit was washing this item toward white/pale instead of tracking its icon's actual color, 3 clusters fixed it (verified against the icon by eye and numerically).",
   },
   {
     id: 'sprite.equipment.starwoven-nomad-robes',
@@ -2833,7 +2833,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: regenerated with n_materials=3 (was 2) - the 2-cluster fit was washing this item toward white/pale instead of tracking its icon's actual color, 3 clusters fixed it (verified against the icon by eye and numerically).",
   },
   {
     id: 'sprite.equipment.starwoven-nomad-robes-female',
@@ -2845,7 +2845,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: regenerated with n_materials=3 (was 2) - the 2-cluster fit was washing this item toward white/pale instead of tracking its icon's actual color, 3 clusters fixed it (verified against the icon by eye and numerically).",
   },
   {
     id: 'sprite.equipment.worn-nomad-leggings',
@@ -3097,7 +3097,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: regenerated with n_materials=3 (was 2) - the 2-cluster fit was washing this item toward white/pale instead of tracking its icon's actual color, 3 clusters fixed it (verified against the icon by eye and numerically).",
   },
   {
     id: 'sprite.equipment.lined-winter-coat-female',
@@ -3109,7 +3109,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: regenerated with n_materials=3 (was 2) - the 2-cluster fit was washing this item toward white/pale instead of tracking its icon's actual color, 3 clusters fixed it (verified against the icon by eye and numerically).",
   },
   {
     id: 'sprite.equipment.auroraweave-coat',
@@ -3817,7 +3817,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: tried n_materials=2/3/4 - n=3 (kept here) finally reproduces the icon's silver diamond-trim pattern, an improvement over 2's flat white-out, but the coat body still renders near-black rather than the icon's mid-brown; n=4 lost the trim again. KNOWN REMAINING MISMATCH, not fully resolved - a different source reference or hand correction is probably needed.",
   },
   {
     id: 'sprite.equipment.chieftains-buffalo-hide-female',
@@ -3829,7 +3829,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     frameSize: { width: 72, height: 96 },
     status: 'final',
     notes:
-      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs.",
+      "scripts/palette_swap_equipment_layer.py recolor from sprite.equipment.worn-keeper-coat-female's hand-positioned sheet - inherits its full walking+running coverage and hand-positioning, only the surface color differs. 2026-08 palette-mismatch audit: tried n_materials=2/3/4 - n=3 (kept here) finally reproduces the icon's silver diamond-trim pattern, an improvement over 2's flat white-out, but the coat body still renders near-black rather than the icon's mid-brown; n=4 lost the trim again. KNOWN REMAINING MISMATCH, not fully resolved - a different source reference or hand correction is probably needed.",
   },
   {
     id: 'sprite.equipment.weathered-cedar-staff',
@@ -4839,7 +4839,8 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: "Auto-generated via scripts/palette_swap_equipment_layer.py, recolored directly from sprite.equipment.traveler-pants - completes the keeper-trousers family (common/uncommon/rare) for full male+female animation coverage.",
+    notes:
+      "Originally auto-generated via scripts/palette_swap_equipment_layer.py from sprite.equipment.traveler-pants (n_materials=2). 2026-08 palette-mismatch audit: the icon is olive/military green with brown boots, but every attempt tried - traveler-pants at n=2/3/4, and worn-keeper-trousers at n=3 - came out brown or black, never green. worn-keeper-trousers at n_materials=4 (kept here) was the closest of everything tried, but still doesn't reproduce the icon's green. KNOWN REMAINING MISMATCH, not fully resolved - a different source reference or hand correction is probably needed.",
   },
   {
     id: 'sprite.equipment.veteran-keeper-trousers-female',
@@ -4849,7 +4850,8 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
-    notes: "Auto-generated via scripts/palette_swap_equipment_layer.py, recolored from sprite.equipment.traveler-pants-female.",
+    notes:
+      "Originally auto-generated via scripts/palette_swap_equipment_layer.py from sprite.equipment.traveler-pants-female (n_materials=2). 2026-08 palette-mismatch audit: see sprite.equipment.veteran-keeper-trousers's own notes - same KNOWN REMAINING MISMATCH, now recolored from worn-keeper-trousers-female at n_materials=4 instead, still not a real match for the icon's olive green.",
   },
   {
     id: 'battle.enemy.mothling',
