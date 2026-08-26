@@ -72,6 +72,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /directMessageModeration/{uid} {
+      // Server-only, same reasoning as worldChatModeration above.
+      allow read: if false;
+      allow write: if false;
+    }
+
     // Trading: friends-only item/gold trades (trade.ts), also server-authoritative.
 
     match /trades/{tradeId} {

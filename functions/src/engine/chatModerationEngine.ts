@@ -1,4 +1,4 @@
-import type { WorldChatModerationDoc } from '../shared-types';
+import type { MessageModerationDoc } from '../shared-types';
 
 /** Cheap machine-gun-spam guard - reject a message sent this soon after the previous one,
  *  checked as a single timestamp (no array needed) the same way dash.ts's DASH_COOLDOWN_MS
@@ -12,8 +12,8 @@ export const FLOOD_MESSAGE_LIMIT = 6;
 export const TEMP_MUTE_MS = 5 * 60_000;
 
 export type MessageCheckResult =
-  | { allowed: true; moderation: WorldChatModerationDoc }
-  | { allowed: false; reason: string; moderation: WorldChatModerationDoc };
+  | { allowed: true; moderation: MessageModerationDoc }
+  | { allowed: false; reason: string; moderation: MessageModerationDoc };
 
 /** The whole flood-control decision, in one pure function: given the sender's current moderation
  *  state and the current time, decide whether this message is allowed, and what the moderation
@@ -21,7 +21,7 @@ export type MessageCheckResult =
  *  including on a rejection - a newly-applied mute must still be saved). Checked in order:
  *  already-muted, too-soon-since-last-message, sustained-flood-over-the-window - the first one
  *  that fires short-circuits the rest. */
-export function checkAndRecordMessage(moderation: WorldChatModerationDoc, now: number): MessageCheckResult {
+export function checkAndRecordMessage(moderation: MessageModerationDoc, now: number): MessageCheckResult {
   if (moderation.mutedUntil > now) {
     const remainingSeconds = Math.ceil((moderation.mutedUntil - now) / 1000);
     return {

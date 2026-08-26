@@ -386,11 +386,12 @@ export interface WorldChatMessage {
   sentAt: number;
 }
 
-/** worldChatModeration/{uid} - one doc per account, server-only, never read by the client (the
- *  Cloud Function's own rejection message carries "muted for Ns" instead of the client reading
- *  this doc directly). See chatModerationEngine.ts's checkAndRecordMessage for how all three
- *  fields get updated together. */
-export interface WorldChatModerationDoc {
+/** Shared shape for worldChatModeration/{uid} AND directMessageModeration/{uid} - one doc per
+ *  account per feature (kept separate so a DM flood doesn't also mute someone's world chat, or
+ *  vice versa), server-only, never read by the client (the Cloud Function's own rejection message
+ *  carries "muted for Ns" instead of the client reading this doc directly). See
+ *  chatModerationEngine.ts's checkAndRecordMessage for how all three fields get updated together. */
+export interface MessageModerationDoc {
   lastMessageAt: number;
   recentMessageTimestamps: number[];
   mutedUntil: number;

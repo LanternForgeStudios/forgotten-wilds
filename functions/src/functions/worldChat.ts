@@ -2,7 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import { findMessageViolation } from '../engine/messageFilter';
 import { checkAndRecordMessage } from '../engine/chatModerationEngine';
-import type { PlayerSave, WorldChatCleanupMeta, WorldChatMessage, WorldChatModerationDoc } from '../shared-types';
+import type { MessageModerationDoc, PlayerSave, WorldChatCleanupMeta, WorldChatMessage } from '../shared-types';
 
 const MAX_MESSAGE_LENGTH = 500;
 const ONE_HOUR_MS = 60 * 60_000;
@@ -29,7 +29,7 @@ const TOWN_LOCATION_IDS = new Set([
   'ash-hallow-town-hall',
 ]);
 
-const EMPTY_MODERATION: WorldChatModerationDoc = { lastMessageAt: 0, recentMessageTimestamps: [], mutedUntil: 0 };
+const EMPTY_MODERATION: MessageModerationDoc = { lastMessageAt: 0, recentMessageTimestamps: [], mutedUntil: 0 };
 
 interface SendWorldChatMessageRequest {
   text: string;
@@ -96,7 +96,7 @@ export const sendWorldChatMessage = onCall<SendWorldChatMessageRequest>(async (r
       throw new HttpsError('failed-precondition', 'World Chat is only available while you are in a town.');
     }
 
-    const moderation = (moderationSnap.data() as WorldChatModerationDoc | undefined) ?? EMPTY_MODERATION;
+    const moderation = (moderationSnap.data() as MessageModerationDoc | undefined) ?? EMPTY_MODERATION;
     const now = Date.now();
     const check = checkAndRecordMessage(moderation, now);
     tx.set(moderationRef, check.moderation);
