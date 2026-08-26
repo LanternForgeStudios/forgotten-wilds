@@ -2348,7 +2348,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - weathered-sunblade (Shattered Desert Sunblade family, common), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/weathered-sunblade-animated.png',
+    filePath: 'sprites/equipment/weathered-sunblade-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2372,7 +2372,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - bound-sunblade (Shattered Desert Sunblade family, uncommon), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/bound-sunblade-animated.png',
+    filePath: 'sprites/equipment/bound-sunblade-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2396,7 +2396,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - solaris-blade (Shattered Desert Sunblade family, rare), palette-swapped from the universal Sword weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/solaris-blade-animated.png',
+    filePath: 'sprites/equipment/solaris-blade-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2420,7 +2420,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - worn-frost-pike (Frozen Frontier Frost Pike family, common), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-frost-pike-animated.png',
+    filePath: 'sprites/equipment/worn-frost-pike-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2444,7 +2444,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - bound-frost-pike (Frozen Frontier Frost Pike family, uncommon), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/bound-frost-pike-animated.png',
+    filePath: 'sprites/equipment/bound-frost-pike-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2468,7 +2468,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - glacier-forged-pike (Frozen Frontier Frost Pike family, rare), palette-swapped from the ashwood-spear Spear weapon-type founder. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/glacier-forged-pike-animated.png',
+    filePath: 'sprites/equipment/glacier-forged-pike-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2492,7 +2492,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - worn-bark-armor (Whispering Pines bark-armor family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-bark-armor-animated.png',
+    filePath: 'sprites/equipment/worn-bark-armor-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2516,7 +2516,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - banded-bark-armor (Whispering Pines bark-armor family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/banded-bark-armor-animated.png',
+    filePath: 'sprites/equipment/banded-bark-armor-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2540,7 +2540,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - elderwood-bark-armor (Whispering Pines bark-armor family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/elderwood-bark-armor-animated.png',
+    filePath: 'sprites/equipment/elderwood-bark-armor-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2564,7 +2564,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - worn-root-woven-leggings (Whispering Pines root-woven-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-root-woven-leggings-animated.png',
+    filePath: 'sprites/equipment/worn-root-woven-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2588,7 +2588,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - banded-root-woven-leggings (Whispering Pines root-woven-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/banded-root-woven-leggings-animated.png',
+    filePath: 'sprites/equipment/banded-root-woven-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2612,7 +2612,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - deep-root-leggings (Whispering Pines root-woven-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/deep-root-leggings-animated.png',
+    filePath: 'sprites/equipment/deep-root-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2636,7 +2636,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - worn-root-boots (Whispering Pines root-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-root-boots-animated.png',
+    filePath: 'sprites/equipment/worn-root-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2660,7 +2660,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - banded-root-boots (Whispering Pines root-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/banded-root-boots-animated.png',
+    filePath: 'sprites/equipment/banded-root-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2684,7 +2684,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - ancient-root-boots (Whispering Pines root-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/ancient-root-boots-animated.png',
+    filePath: 'sprites/equipment/ancient-root-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2708,7 +2708,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - worn-vine-gloves (Whispering Pines vine-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-vine-gloves-animated.png',
+    filePath: 'sprites/equipment/worn-vine-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2732,7 +2732,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - woven-vine-gloves (Whispering Pines vine-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/woven-vine-gloves-animated.png',
+    filePath: 'sprites/equipment/woven-vine-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2756,7 +2756,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - warden-vine-gloves (Whispering Pines vine-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/warden-vine-gloves-animated.png',
+    filePath: 'sprites/equipment/warden-vine-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2780,7 +2780,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - worn-nomad-robes (Shattered Desert nomad-robes family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-nomad-robes-animated.png',
+    filePath: 'sprites/equipment/worn-nomad-robes-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2804,7 +2804,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - banded-nomad-robes (Shattered Desert nomad-robes family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/banded-nomad-robes-animated.png',
+    filePath: 'sprites/equipment/banded-nomad-robes-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2828,7 +2828,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - starwoven-nomad-robes (Shattered Desert nomad-robes family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/starwoven-nomad-robes-animated.png',
+    filePath: 'sprites/equipment/starwoven-nomad-robes-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2852,7 +2852,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - worn-nomad-leggings (Shattered Desert nomad-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-nomad-leggings-animated.png',
+    filePath: 'sprites/equipment/worn-nomad-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2876,7 +2876,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - banded-nomad-leggings (Shattered Desert nomad-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/banded-nomad-leggings-animated.png',
+    filePath: 'sprites/equipment/banded-nomad-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2900,7 +2900,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - starwoven-nomad-leggings (Shattered Desert nomad-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/starwoven-nomad-leggings-animated.png',
+    filePath: 'sprites/equipment/starwoven-nomad-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2924,7 +2924,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - worn-sand-boots (Shattered Desert sand-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-sand-boots-animated.png',
+    filePath: 'sprites/equipment/worn-sand-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2948,7 +2948,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - swift-sand-boots (Shattered Desert sand-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/swift-sand-boots-animated.png',
+    filePath: 'sprites/equipment/swift-sand-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2972,7 +2972,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - sunrunner-boots (Shattered Desert sand-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/sunrunner-boots-animated.png',
+    filePath: 'sprites/equipment/sunrunner-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -2996,7 +2996,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - worn-dune-wraps (Shattered Desert dune-wraps family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-dune-wraps-animated.png',
+    filePath: 'sprites/equipment/worn-dune-wraps-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3020,7 +3020,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - woven-dune-wraps (Shattered Desert dune-wraps family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/woven-dune-wraps-animated.png',
+    filePath: 'sprites/equipment/woven-dune-wraps-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3044,7 +3044,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - rangers-dune-wraps (Shattered Desert dune-wraps family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/rangers-dune-wraps-animated.png',
+    filePath: 'sprites/equipment/rangers-dune-wraps-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3068,7 +3068,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - worn-winter-coat (Frozen Frontier winter-coat family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-winter-coat-animated.png',
+    filePath: 'sprites/equipment/worn-winter-coat-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3092,7 +3092,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - lined-winter-coat (Frozen Frontier winter-coat family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/lined-winter-coat-animated.png',
+    filePath: 'sprites/equipment/lined-winter-coat-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3116,7 +3116,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - auroraweave-coat (Frozen Frontier winter-coat family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/auroraweave-coat-animated.png',
+    filePath: 'sprites/equipment/auroraweave-coat-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3140,7 +3140,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - worn-winter-leggings (Frozen Frontier winter-leggings family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-winter-leggings-animated.png',
+    filePath: 'sprites/equipment/worn-winter-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3164,7 +3164,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - lined-winter-leggings (Frozen Frontier winter-leggings family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/lined-winter-leggings-animated.png',
+    filePath: 'sprites/equipment/lined-winter-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3188,7 +3188,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - auroraweave-leggings (Frozen Frontier winter-leggings family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/auroraweave-leggings-animated.png',
+    filePath: 'sprites/equipment/auroraweave-leggings-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3212,7 +3212,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - worn-glacier-boots (Frozen Frontier glacier-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-glacier-boots-animated.png',
+    filePath: 'sprites/equipment/worn-glacier-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3236,7 +3236,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - crampon-glacier-boots (Frozen Frontier glacier-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/crampon-glacier-boots-animated.png',
+    filePath: 'sprites/equipment/crampon-glacier-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3260,7 +3260,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - frostwardens-boots (Frozen Frontier glacier-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/frostwardens-boots-animated.png',
+    filePath: 'sprites/equipment/frostwardens-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3284,7 +3284,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - worn-fur-gloves (Frozen Frontier fur-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/worn-fur-gloves-animated.png',
+    filePath: 'sprites/equipment/worn-fur-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3308,7 +3308,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - lined-fur-gloves (Frozen Frontier fur-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/lined-fur-gloves-animated.png',
+    filePath: 'sprites/equipment/lined-fur-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3332,7 +3332,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - frostwardens-gloves (Frozen Frontier fur-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/frostwardens-gloves-animated.png',
+    filePath: 'sprites/equipment/frostwardens-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3356,7 +3356,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - weathered-prairie-spear (Endless Prairie prairie-spear family, common), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/weathered-prairie-spear-animated.png',
+    filePath: 'sprites/equipment/weathered-prairie-spear-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3380,7 +3380,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - bound-prairie-spear (Endless Prairie prairie-spear family, uncommon), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/bound-prairie-spear-animated.png',
+    filePath: 'sprites/equipment/bound-prairie-spear-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3404,7 +3404,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - windriders-spear (Endless Prairie prairie-spear family, rare), palette-swapped from the generic ashwood-spear weapon template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/windriders-spear-animated.png',
+    filePath: 'sprites/equipment/windriders-spear-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3428,7 +3428,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - worn-buffalo-hide (Endless Prairie buffalo-hide family, common), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/worn-buffalo-hide-animated.png',
+    filePath: 'sprites/equipment/worn-buffalo-hide-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3452,7 +3452,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - banded-buffalo-hide (Endless Prairie buffalo-hide family, uncommon), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/banded-buffalo-hide-animated.png',
+    filePath: 'sprites/equipment/banded-buffalo-hide-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3476,7 +3476,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - worn-riders-chaps (Endless Prairie riders-chaps family, common), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/worn-riders-chaps-animated.png',
+    filePath: 'sprites/equipment/worn-riders-chaps-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3500,7 +3500,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - banded-riders-chaps (Endless Prairie riders-chaps family, uncommon), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/banded-riders-chaps-animated.png',
+    filePath: 'sprites/equipment/banded-riders-chaps-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3524,7 +3524,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the legs slot - windborn-riders-chaps (Endless Prairie riders-chaps family, rare), palette-swapped from the generic traveler-pants legs template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/windborn-riders-chaps-animated.png',
+    filePath: 'sprites/equipment/windborn-riders-chaps-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3548,7 +3548,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - worn-wind-boots (Endless Prairie wind-boots family, common), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/worn-wind-boots-animated.png',
+    filePath: 'sprites/equipment/worn-wind-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3572,7 +3572,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - swift-wind-boots (Endless Prairie wind-boots family, uncommon), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/swift-wind-boots-animated.png',
+    filePath: 'sprites/equipment/swift-wind-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3596,7 +3596,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the boots slot - windrunner-boots (Endless Prairie wind-boots family, rare), palette-swapped from the generic traveler-boots boots template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/windrunner-boots-animated.png',
+    filePath: 'sprites/equipment/windrunner-boots-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3620,7 +3620,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - worn-rider-gloves (Endless Prairie rider-gloves family, common), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/worn-rider-gloves-animated.png',
+    filePath: 'sprites/equipment/worn-rider-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3644,7 +3644,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - reinforced-rider-gloves (Endless Prairie rider-gloves family, uncommon), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/reinforced-rider-gloves-animated.png',
+    filePath: 'sprites/equipment/reinforced-rider-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3668,7 +3668,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the gloves slot - warden-rider-gloves (Endless Prairie rider-gloves family, rare), palette-swapped from the generic leather-gauntlets gloves template per the project's own documented equipment-layer workflow (recolor the existing base garment to match the new item's icon, not a silhouette-match requirement - that rule is specific to weapons). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId already pointed at this id in src/data/equipment.ts, but no registry entry or art existed - equipping any of these 15 Endless Prairie items would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition) until this pass.",
-    filePath: 'sprites/equipment/warden-rider-gloves-animated.png',
+    filePath: 'sprites/equipment/warden-rider-gloves-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3692,7 +3692,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the lantern slot - lantern-of-still-waters-equipped (Crimson Bayou's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
-    filePath: 'sprites/equipment/lantern-of-still-waters-equipped-animated.png',
+    filePath: 'sprites/equipment/lantern-of-still-waters-equipped-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3716,7 +3716,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the lantern slot - lantern-of-open-skies-equipped (Endless Prairie's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
-    filePath: 'sprites/equipment/lantern-of-open-skies-equipped-animated.png',
+    filePath: 'sprites/equipment/lantern-of-open-skies-equipped-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3740,7 +3740,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the lantern slot - lantern-of-ancient-roots-equipped (Whispering Pines's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
-    filePath: 'sprites/equipment/lantern-of-ancient-roots-equipped-animated.png',
+    filePath: 'sprites/equipment/lantern-of-ancient-roots-equipped-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3764,7 +3764,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the lantern slot - lantern-of-forgotten-stars-equipped (Shattered Desert's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
-    filePath: 'sprites/equipment/lantern-of-forgotten-stars-equipped-animated.png',
+    filePath: 'sprites/equipment/lantern-of-forgotten-stars-equipped-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3788,7 +3788,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the lantern slot - lantern-of-winters-resolve-equipped (Frozen Frontier's own Legendary Lantern), palette-swapped from the keepers-lantern founder (same held-left-hand shape, only the glow color differs per region). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer. layerSpriteAssetId was entirely missing from src/data/equipment.ts for all 5 regional Legendary Lanterns until this pass - equipping any of them would throw UnknownAssetError at runtime (ExplorationScene.ensureAnimationsFor -> getAssetDefinition).",
-    filePath: 'sprites/equipment/lantern-of-winters-resolve-equipped-animated.png',
+    filePath: 'sprites/equipment/lantern-of-winters-resolve-equipped-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3812,7 +3812,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the chest slot - chieftains-buffalo-hide (Endless Prairie buffalo-hide family, rare), palette-swapped from the generic worn-keeper-coat chest template per the project's own documented equipment-layer workflow. Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/chieftains-buffalo-hide-animated.png',
+    filePath: 'sprites/equipment/chieftains-buffalo-hide-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3836,7 +3836,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - weathered-cedar-staff (Whispering Pines Cedar Staff family, common), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/weathered-cedar-staff-animated.png',
+    filePath: 'sprites/equipment/weathered-cedar-staff-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3860,7 +3860,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - bound-cedar-staff (Whispering Pines Cedar Staff family, uncommon), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/bound-cedar-staff-animated.png',
+    filePath: 'sprites/equipment/bound-cedar-staff-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
@@ -3884,7 +3884,7 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     category: 'character',
     intendedUse:
       "Equipment layer for the weapon slot - ancient-cedar-staff (Whispering Pines Cedar Staff family, rare), palette-swapped from the ashwood-spear Spear weapon-type founder. Its icon reads as a straight shaft with a leafy/frond crown, close enough to ashwood-spear's straight-shaft-with-point silhouette to reuse cleanly (confirmed by direct visual test - the walking-staff/cane family's curved-handle shape was the wrong match, ashwood-spear's straight shaft was the right one). Drawn on top of sprite.player.base.male.* every frame, same 8-row x 4-col x 72x96 layout as every other equipment layer.",
-    filePath: 'sprites/equipment/ancient-cedar-staff-animated.png',
+    filePath: 'sprites/equipment/ancient-cedar-staff-male-animated.png',
     dimensions: { width: 288, height: 768 },
     frameSize: { width: 72, height: 96 },
     status: 'final',
