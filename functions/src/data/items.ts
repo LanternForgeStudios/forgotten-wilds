@@ -624,8 +624,22 @@ export const SHOP_CATALOGS: Record<string, string[]> = {
     'eye-drops',
     'echo-herb',
   ],
-  // Common+Uncommon Cypress Cane/Bayou Charm stock (see SHOP_UNLOCK_TIERS for the Rare unlock).
-  'toussaint-forge': ['weathered-cypress-cane', 'bound-cypress-cane', 'marsh-reed-charm', 'swamp-talisman'],
+  // Common+Uncommon Cypress Cane/Bog Cutlass/Bog Axe/Reed Spear/Bog Maul/Bayou Charm stock (see
+  // SHOP_UNLOCK_TIERS for the Rare unlock).
+  'toussaint-forge': [
+    'weathered-cypress-cane',
+    'bound-cypress-cane',
+    'weathered-bog-cutlass',
+    'weathered-bog-axe',
+    'weathered-reed-spear',
+    'weathered-bog-maul',
+    'bound-bog-cutlass',
+    'bound-bog-axe',
+    'bound-reed-spear',
+    'bound-bog-maul',
+    'marsh-reed-charm',
+    'swamp-talisman',
+  ],
   // Common+Uncommon Bayou Vestments/Leg-Wraps/Marsh Boots/Mire Gloves stock - Rare tier of every
   // one of these families is chest/boss-found instead (see cypress-marsh/murkwater-trails/
   // hidden-river-landing's own chest loot and the Ancient Serpent Guardian's own loot table).
