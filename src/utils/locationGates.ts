@@ -27,13 +27,33 @@ export const LOCATION_GATES: Record<string, string> = {
   // (see functions/src/functions/enterLocation.ts's matching comment for detail).
   'highwind-crossing': 'the-waters-remember',
   'thunderbird-mesa-approach': 'the-stone-circles',
+  // Each multi-room dungeon's interior rooms are gated on the same quest as their chain's entry
+  // room below - see functions/src/functions/enterLocation.ts's matching comment for why (closes a
+  // real gap: a raw enterLocation call naming an interior room id had no gate at all otherwise). A
+  // legitimate player reaching an interior room already holds this same quest, so nothing changes
+  // for them here.
   'summit-temple': 'climbing-thunderbird-mesa',
+  'sky-bridge': 'climbing-thunderbird-mesa',
+  'storm-galleries': 'climbing-thunderbird-mesa',
+  'lantern-sanctuary': 'climbing-thunderbird-mesa',
+  'guardian-peak': 'climbing-thunderbird-mesa',
   'cedarwatch': 'the-first-promise-remembered',
   'root-caverns': 'heartwood-sanctuary',
+  'inner-archive': 'heartwood-sanctuary',
+  'heartwood-lantern-sanctuary': 'heartwood-sanctuary',
+  'guardian-grove': 'heartwood-sanctuary',
   'red-mesa': 'the-missing-pages',
   'inner-observatory': 'the-path-of-the-astronomers',
+  'star-chamber': 'the-path-of-the-astronomers',
+  'star-lantern-sanctuary': 'the-path-of-the-astronomers',
+  'canyon-depths': 'the-path-of-the-astronomers',
+  'guardian-summit': 'the-path-of-the-astronomers',
   'frosthaven': 'the-stars-never-lied',
   'hall-of-eternal-winter': 'hall-of-eternal-winter',
+  'winter-lantern-sanctuary': 'hall-of-eternal-winter',
+  'guardian-chamber': 'hall-of-eternal-winter',
+  'summit-of-winter': 'hall-of-eternal-winter',
+  'hall-of-memories': 'hall-of-eternal-winter',
 };
 
 /** Returns a player-facing message if `locationId` is gated and not yet unlocked, or null if it's

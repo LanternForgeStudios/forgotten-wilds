@@ -10,7 +10,18 @@ interface EnterLocationRequest {
 
 /** Which completed quest unlocks travel into a given region - authoritative enforcement (a
  *  modified client can't skip this even if it also bypasses the client-side check in
- *  useLocationExploration.ts). Kept in sync by hand with src/utils/locationGates.ts. */
+ *  useLocationExploration.ts). Kept in sync by hand with src/utils/locationGates.ts.
+ *
+ *  A multi-room dungeon's interior rooms are each gated on the SAME quest as their chain's entry
+ *  room, not left ungated on the assumption a player can only reach them by physically walking the
+ *  chained transitions from the entry room. This function has no adjacency/topology check at all -
+ *  a bare `enterLocation` call naming an interior room id directly (no client UI needed, just a
+ *  authenticated callable-function call) would otherwise skip the entry gate entirely, and since
+ *  every one of these interior rooms is also a quest's own `reachLocation` objective, that call
+ *  would silently complete that region's finale quest - which is exactly what unlocks the NEXT
+ *  region's own gate. Mirroring the entry gate onto every interior room closes that without a real
+ *  topology model: a legitimate player who reached the entry room already holds this same quest, so
+ *  nothing changes for them (see useLocationExploration.ts's identical per-transition check). */
 const LOCATION_GATES: Record<string, string> = {
   'ironwood-trail': 'the-first-flame',
   'raven-ridge': 'the-forgotten-shrine',
@@ -40,31 +51,50 @@ const LOCATION_GATES: Record<string, string> = {
   'thunderbird-mesa-approach': 'the-stone-circles',
   // Thunderbird Mesa dungeon entrance - gated on Chapter 5's true finale. The other 4 rooms
   // (sky-bridge/storm-galleries/lantern-sanctuary/guardian-peak) are reached by physically walking
-  // the chained transitions from here, matching temple-of-the-deep-current's own single-gate
-  // dungeon precedent - no separate gate needed per room.
+  // the chained transitions from here - but each also gets its own entry below, mirroring this
+  // same quest, since a raw enterLocation call (bypassing the map entirely) had no gate at all on
+  // those room ids otherwise. A legitimate player who reached summit-temple already holds this
+  // quest, so this closes nothing for them - see this file's own top comment.
   'summit-temple': 'climbing-thunderbird-mesa',
+  'sky-bridge': 'climbing-thunderbird-mesa',
+  'storm-galleries': 'climbing-thunderbird-mesa',
+  'lantern-sanctuary': 'climbing-thunderbird-mesa',
+  'guardian-peak': 'climbing-thunderbird-mesa',
   // Whispering Pines (MSQ Volume IV) - same single-gate-per-region-entry-point model, gated on
   // Volume III's own true finale.
   'cedarwatch': 'the-first-promise-remembered',
   // Heartwood Sanctuary dungeon entrance (Chapter 8) - gated on Chapter 7's true finale. The other
   // 3 rooms (inner-archive/heartwood-lantern-sanctuary/guardian-grove) are reached by physically
-  // walking the chained transitions from here, same single-gate dungeon precedent as Summit Temple.
+  // walking the chained transitions from here - each also gated below on this same quest, same
+  // reasoning as summit-temple's own chain above.
   'root-caverns': 'heartwood-sanctuary',
+  'inner-archive': 'heartwood-sanctuary',
+  'heartwood-lantern-sanctuary': 'heartwood-sanctuary',
+  'guardian-grove': 'heartwood-sanctuary',
   // Shattered Desert (MSQ Volume V) - same single-gate-per-region-entry-point model, gated on
   // Volume IV's own true finale.
   'red-mesa': 'the-missing-pages',
   // Forgotten Observatory dungeon entrance (Chapter 10) - gated on Chapter 9's true finale. The
   // other 4 rooms (star-chamber/star-lantern-sanctuary/canyon-depths/guardian-summit) are reached
-  // by physically walking the chained transitions from here, same single-gate dungeon precedent.
+  // by physically walking the chained transitions from here - each also gated below on this same
+  // quest, same reasoning as summit-temple's own chain above.
   'inner-observatory': 'the-path-of-the-astronomers',
+  'star-chamber': 'the-path-of-the-astronomers',
+  'star-lantern-sanctuary': 'the-path-of-the-astronomers',
+  'canyon-depths': 'the-path-of-the-astronomers',
+  'guardian-summit': 'the-path-of-the-astronomers',
   // Frozen Frontier (MSQ Volume VI) - same single-gate-per-region-entry-point model, gated on
   // Volume V's own true finale.
   'frosthaven': 'the-stars-never-lied',
   // Hall of Eternal Winter dungeon entrance (Chapter 12) - gated on Chapter 11's true finale. The
   // other 4 rooms (winter-lantern-sanctuary/guardian-chamber/summit-of-winter/hall-of-memories) are
-  // reached by physically walking the chained transitions from here, same single-gate dungeon
-  // precedent.
+  // reached by physically walking the chained transitions from here - each also gated below on
+  // this same quest, same reasoning as summit-temple's own chain above.
   'hall-of-eternal-winter': 'hall-of-eternal-winter',
+  'winter-lantern-sanctuary': 'hall-of-eternal-winter',
+  'guardian-chamber': 'hall-of-eternal-winter',
+  'summit-of-winter': 'hall-of-eternal-winter',
+  'hall-of-memories': 'hall-of-eternal-winter',
 };
 
 const KNOWN_LOCATION_IDS = new Set([
