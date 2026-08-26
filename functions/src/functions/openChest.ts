@@ -199,7 +199,7 @@ const CHESTS: Record<string, Record<string, ChestReward>> = {
   'summit-of-winter': { 'chest-summit-of-winter-1': { itemId: 'pristine-healing-poultice', gold: 55, xp: 105 } },
 };
 
-export const openChest = onCall<OpenChestRequest>(async (request) => {
+export const openChest = onCall<OpenChestRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

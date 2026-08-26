@@ -5,7 +5,7 @@ import { grantItem } from '../engine/inventoryEngine';
 import { CHEST_CLAIM_INTERVAL_MS } from '../data/dailyChest';
 import type { PlayerSave } from '../shared-types';
 
-export const claimDailyChest = onCall(async (request) => {
+export const claimDailyChest = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

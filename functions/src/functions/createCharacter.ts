@@ -29,7 +29,7 @@ function validateName(raw: unknown): string {
   return name;
 }
 
-export const createCharacter = onCall<CreateCharacterRequest>(async (request) => {
+export const createCharacter = onCall<CreateCharacterRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in to create a character.');

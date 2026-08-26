@@ -86,7 +86,7 @@ const NPC_LOCATIONS: Record<string, string> = {
 };
 const KNOWN_NPC_IDS = new Set(Object.keys(NPC_LOCATIONS));
 
-export const talkToNpc = onCall<TalkToNpcRequest>(async (request) => {
+export const talkToNpc = onCall<TalkToNpcRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

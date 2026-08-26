@@ -206,7 +206,7 @@ const KNOWN_LOCATION_IDS = new Set([
   'hall-of-memories',
 ]);
 
-export const enterLocation = onCall<EnterLocationRequest>(async (request) => {
+export const enterLocation = onCall<EnterLocationRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

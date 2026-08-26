@@ -136,7 +136,7 @@ interface UseItemInPartyBattleRequest {
  *  battle from the real save. Deliberately not turn-gated (any participant, any time, matching
  *  solo's "costs no turn" behavior) - only requires the battle still be active and the caller
  *  still be alive in it. */
-export const useItemInPartyBattle = onCall<UseItemInPartyBattleRequest>(async (request) => {
+export const useItemInPartyBattle = onCall<UseItemInPartyBattleRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const battleId = request.data?.battleId;
@@ -298,7 +298,7 @@ interface SubmitPartyBattleActionRequest {
  * turn" or "the deadline passed" condition is the one that triggers the actual resolution, guarded
  * by this being a single Firestore transaction so it can only ever fire once.
  */
-export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>(async (request) => {
+export const submitPartyBattleAction = onCall<SubmitPartyBattleActionRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const battleId = request.data?.battleId;

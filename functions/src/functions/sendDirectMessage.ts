@@ -19,7 +19,7 @@ const EMPTY_MODERATION: MessageModerationDoc = { lastMessageAt: 0, recentMessage
  *  friendship alone doesn't stop a "friend" from flooding someone's DMs, so this needs the same
  *  cooldown/flood-mute guard, just tracked in its own directMessageModeration/{uid} doc so a DM
  *  flood doesn't also mute the sender's world chat, or vice versa. */
-export const sendDirectMessage = onCall<SendDirectMessageRequest>(async (request) => {
+export const sendDirectMessage = onCall<SendDirectMessageRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const toUid = request.data?.toUid;

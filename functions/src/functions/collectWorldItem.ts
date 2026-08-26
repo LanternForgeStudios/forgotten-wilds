@@ -26,7 +26,7 @@ const WORLD_ITEM_QUEST_GATES: Record<string, string> = {
   'desert-totem-relic': 'sands-that-endure',
 };
 
-export const collectWorldItem = onCall<CollectWorldItemRequest>(async (request) => {
+export const collectWorldItem = onCall<CollectWorldItemRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

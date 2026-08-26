@@ -13,7 +13,7 @@ interface CraftItemRequest {
  *  craftable item. Mirrors sellItem.ts's shape (validate ownership/quantity, mutate
  *  save.inventory, single tx.set), reusing grantItem (inventoryEngine.ts) for the output the same
  *  way every other item-granting path already does. */
-export const craftItem = onCall<CraftItemRequest>(async (request) => {
+export const craftItem = onCall<CraftItemRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

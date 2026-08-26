@@ -27,7 +27,7 @@ interface UpgradeLanternOilRequest {
  *  tracked per lanternId (player.lanternOilUpgrades), independent of whether that lantern happens
  *  to be equipped right now - if it IS currently equipped, this also immediately recomputes
  *  stats.maxLanternOil so the new capacity takes effect without needing to re-equip. */
-export const upgradeLanternOil = onCall<UpgradeLanternOilRequest>(async (request) => {
+export const upgradeLanternOil = onCall<UpgradeLanternOilRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

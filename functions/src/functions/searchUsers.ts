@@ -10,7 +10,7 @@ const MAX_RESULTS = 10;
 
 /** Prefix search by display name only - deliberately not by email, so this can't be used to
  *  confirm/harvest account emails. Returns at most 10 matches, excluding the caller themself. */
-export const searchUsers = onCall<SearchUsersRequest>(async (request) => {
+export const searchUsers = onCall<SearchUsersRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

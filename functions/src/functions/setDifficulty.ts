@@ -12,7 +12,7 @@ interface SetDifficultyRequest {
  *  Settings tab) - purely a balance preference, no economy/progress implications, so no
  *  validation beyond "is this a real difficulty value" is needed. Only affects solo combat (see
  *  the Difficulty type's own doc comment) - resolveCombatAction.ts is the only reader. */
-export const setDifficulty = onCall<SetDifficultyRequest>(async (request) => {
+export const setDifficulty = onCall<SetDifficultyRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

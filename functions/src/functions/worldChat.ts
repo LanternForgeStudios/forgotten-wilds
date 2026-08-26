@@ -65,7 +65,7 @@ async function purgeOldMessagesIfDue(db: FirebaseFirestore.Firestore): Promise<v
   }
 }
 
-export const sendWorldChatMessage = onCall<SendWorldChatMessageRequest>(async (request) => {
+export const sendWorldChatMessage = onCall<SendWorldChatMessageRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

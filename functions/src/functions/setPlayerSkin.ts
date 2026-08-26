@@ -13,7 +13,7 @@ interface SetPlayerSkinRequest {
 /** Lets the player change their chosen body silhouette/appearance any time (see UserProfile.tsx's
  *  Skin tab) - purely cosmetic, no economy/progress implications, so no validation beyond "is
  *  this a real gender/appearance value" is needed. */
-export const setPlayerSkin = onCall<SetPlayerSkinRequest>(async (request) => {
+export const setPlayerSkin = onCall<SetPlayerSkinRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

@@ -23,7 +23,7 @@ const INN_LOCATION_IDS = new Set([
   'red-mesa-inn',
 ]);
 
-export const restAtInn = onCall(async (request) => {
+export const restAtInn = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

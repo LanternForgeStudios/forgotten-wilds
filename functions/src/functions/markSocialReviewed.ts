@@ -6,7 +6,7 @@ import type { PlayerSave } from '../shared-types';
  *  activity" indicator in PlayerHUD, which compares incoming friend requests'/direct messages'
  *  timestamps against this value. Not folded into friends.ts since it isn't a friend-relationship
  *  mutation, just a viewed-timestamp write. */
-export const markSocialReviewed = onCall(async (request) => {
+export const markSocialReviewed = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

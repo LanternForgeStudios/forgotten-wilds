@@ -27,7 +27,7 @@ interface ResolveCombatActionRequest {
   action: CombatAction;
 }
 
-export const resolveCombatAction = onCall<ResolveCombatActionRequest>(async (request) => {
+export const resolveCombatAction = onCall<ResolveCombatActionRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in to fight.');

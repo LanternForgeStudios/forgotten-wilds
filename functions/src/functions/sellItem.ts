@@ -10,7 +10,7 @@ interface SellItemRequest {
   quantity?: number;
 }
 
-export const sellItem = onCall<SellItemRequest>(async (request) => {
+export const sellItem = onCall<SellItemRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

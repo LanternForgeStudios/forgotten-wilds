@@ -44,7 +44,7 @@ interface SendFriendRequestRequest {
 /** If the other person already sent *us* a pending request, sending our own is really just
  *  accepting theirs - mutual interest becomes friends immediately rather than leaving two
  *  redundant pending requests sitting in each other's inbox. */
-export const sendFriendRequest = onCall<SendFriendRequestRequest>(async (request) => {
+export const sendFriendRequest = onCall<SendFriendRequestRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const toUid = request.data?.toUid;
@@ -122,7 +122,7 @@ interface RespondToFriendRequestRequest {
   accept: boolean;
 }
 
-export const respondToFriendRequest = onCall<RespondToFriendRequestRequest>(async (request) => {
+export const respondToFriendRequest = onCall<RespondToFriendRequestRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const { requestId, accept } = request.data ?? {};
@@ -155,7 +155,7 @@ interface RemoveFriendRequest {
   friendUid: string;
 }
 
-export const removeFriend = onCall<RemoveFriendRequest>(async (request) => {
+export const removeFriend = onCall<RemoveFriendRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const friendUid = request.data?.friendUid;

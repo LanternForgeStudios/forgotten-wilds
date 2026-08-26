@@ -27,7 +27,7 @@ const BOSS_REQUIRED_LOCATION: Record<string, string> = {
   'winter-stag': 'summit-of-winter',
 };
 
-export const startEncounter = onCall<StartEncounterRequest>(async (request) => {
+export const startEncounter = onCall<StartEncounterRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in to fight.');

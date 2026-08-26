@@ -11,7 +11,7 @@ interface InteractWithShrineRequest {
   refId: string;
 }
 
-export const interactWithShrine = onCall<InteractWithShrineRequest>(async (request) => {
+export const interactWithShrine = onCall<InteractWithShrineRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

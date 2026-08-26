@@ -13,7 +13,7 @@ interface ResetPlayerProgressRequest {
  *  friends/blocks/directMessages (separate Firestore collections this function never reads or
  *  writes), or the account itself (displayName/createdAt/email/uid). Requires the caller to type
  *  their own account email back, exactly, as a confirmation gate - there is no undo. */
-export const resetPlayerProgress = onCall<ResetPlayerProgressRequest>(async (request) => {
+export const resetPlayerProgress = onCall<ResetPlayerProgressRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

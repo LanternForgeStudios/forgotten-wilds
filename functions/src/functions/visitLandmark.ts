@@ -15,7 +15,7 @@ interface VisitLandmarkRequest {
  *  actually left the parent map. */
 const KNOWN_LANDMARK_IDS = new Set(Object.keys(LANDMARK_PARENT_LOCATION));
 
-export const visitLandmark = onCall<VisitLandmarkRequest>(async (request) => {
+export const visitLandmark = onCall<VisitLandmarkRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

@@ -101,7 +101,7 @@ interface ChallengeToPvpRequest {
  * `${fromUid}_${toUid}` doc id, same reuse-the-doc-on-a-repeat-challenge pattern as
  * sendFriendRequest.
  */
-export const challengeToPvp = onCall<ChallengeToPvpRequest>(async (request) => {
+export const challengeToPvp = onCall<ChallengeToPvpRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const toUid = request.data?.toUid;
@@ -158,7 +158,7 @@ interface RespondToPvpChallengeRequest {
   accept: boolean;
 }
 
-export const respondToPvpChallenge = onCall<RespondToPvpChallengeRequest>(async (request) => {
+export const respondToPvpChallenge = onCall<RespondToPvpChallengeRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const { challengeId, accept } = request.data ?? {};
@@ -196,7 +196,7 @@ export const respondToPvpChallenge = onCall<RespondToPvpChallengeRequest>(async 
  * this transaction to retry (Firestore's normal optimistic-concurrency behavior), which is what
  * stops two simultaneous joiners from both grabbing the same opponent.
  */
-export const joinPvpQueue = onCall(async (request) => {
+export const joinPvpQueue = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
@@ -231,7 +231,7 @@ export const joinPvpQueue = onCall(async (request) => {
   });
 });
 
-export const leavePvpQueue = onCall(async (request) => {
+export const leavePvpQueue = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   await getFirestore().collection('pvpQueue').doc(uid).delete();

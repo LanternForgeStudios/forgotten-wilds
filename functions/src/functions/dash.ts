@@ -13,7 +13,7 @@ import type { PlayerSave } from '../shared-types';
 const DASH_COST_PER_TILE = 3;
 const FULL_REGEN_SECONDS = 20;
 
-export const dash = onCall(async (request) => {
+export const dash = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

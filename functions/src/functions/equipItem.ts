@@ -48,7 +48,7 @@ function resolveTargetSlot(defSlot: EquipmentSlot, requestedSlot: EquipmentSlot 
   return requestedSlot && family.includes(requestedSlot) ? requestedSlot : defSlot;
 }
 
-export const equipItem = onCall<EquipItemRequest>(async (request) => {
+export const equipItem = onCall<EquipItemRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
@@ -108,7 +108,7 @@ interface UnequipItemRequest {
   slot: EquipmentSlot;
 }
 
-export const unequipItem = onCall<UnequipItemRequest>(async (request) => {
+export const unequipItem = onCall<UnequipItemRequest>({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
