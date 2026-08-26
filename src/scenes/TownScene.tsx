@@ -27,11 +27,11 @@ import { useQuestStore } from '@/state/useQuestStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useJournalStore } from '@/state/useJournalStore';
 import { useSceneStore } from '@/state/useSceneStore';
-import { callTalkToNpc, callInteractWithShrine, callSendFriendRequest, type QuestRewardSummary } from '@/firebase/functionsClient';
+import { callTalkToNpc, callInteractWithShrine, callSendFriendRequest } from '@/firebase/functionsClient';
 import { RewardPopup } from '@/components/RewardPopup';
 import { LorePopup } from '@/components/LorePopup';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
-import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
+import { useQuestRewardPopup } from '@/hooks/useQuestRewardPopup';
 import { resyncSave } from '@/state/hydrate';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { NPCS, LOCATIONS, APOTHECARY_SHOP_IDS } from '@/data';
@@ -155,23 +155,9 @@ export function TownScene() {
   const [journalOpen, setJournalOpen] = useState(false);
   const [worldChatOpen, setWorldChatOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  // Shared reward-acknowledgment popup (see RewardPopup.tsx and OverworldScene.tsx's identical use).
-  const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
   const { currentLorePopup, queueLorePopups, dismissCurrentLorePopup } = useLorePopupQueue();
-  function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
-    if (!questRewards) return;
-    queueLorePopups(questRewards.grantedLoreIds);
-    setRewardPopup({
-      title: 'Quest Complete!',
-      lines: buildRewardLines({
-        xp: questRewards.xp,
-        gold: questRewards.gold,
-        spiritEssence: questRewards.spiritEssence,
-        itemIds: questRewards.itemIds,
-        skillIds: questRewards.grantedSkillIds,
-      }),
-    });
-  }
+  // Shared reward-acknowledgment popup (see RewardPopup.tsx).
+  const { rewardPopup, setRewardPopup, showQuestRewardPopup } = useQuestRewardPopup(queueLorePopups);
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const staminaUnlocked = (usePlayerStore((s) => s.player?.stats.maxStamina) ?? 0) > 0;

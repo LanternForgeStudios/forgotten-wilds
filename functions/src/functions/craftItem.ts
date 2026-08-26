@@ -54,7 +54,13 @@ export const craftItem = onCall<CraftItemRequest>(async (request) => {
     }
     save.inventory = save.inventory.filter((i) => i.quantity > 0);
 
-    grantItem(save, recipe.outputItemId);
+    // No recipe outputs a unique item today, so this can't actually fail yet - but if grantItem
+    // ever does refuse (a duplicate unique), abort rather than silently consuming materials for
+    // nothing: throwing here is safe even after the material deduction above since nothing has
+    // been tx.set() yet, so the whole transaction (including those deductions) never commits.
+    if (!grantItem(save, recipe.outputItemId)) {
+      throw new HttpsError('failed-precondition', 'You already own the only one of those.');
+    }
 
     save.updatedAt = Date.now();
     tx.set(userRef, save);

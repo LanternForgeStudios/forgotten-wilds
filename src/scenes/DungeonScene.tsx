@@ -38,7 +38,6 @@ import {
   callOpenChest,
   callInteractWithShrine,
   callTalkToNpc,
-  type QuestRewardSummary,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { grantedItemIdFor } from '@/utils/worldItems';
@@ -46,7 +45,8 @@ import { playMusic, playSound } from '@/audio/audioService';
 import { RewardPopup } from '@/components/RewardPopup';
 import { LorePopup } from '@/components/LorePopup';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
-import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
+import { useQuestRewardPopup } from '@/hooks/useQuestRewardPopup';
+import { buildRewardLines } from '@/utils/rewardLines';
 import styles from './TownScene.module.css';
 
 /** Which boss a boss-trigger interactable refId starts, keyed by refId (always the same as the
@@ -210,23 +210,9 @@ export function DungeonScene() {
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
-  // Shared reward-acknowledgment popup (see RewardPopup.tsx and OverworldScene.tsx's identical use).
-  const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
   const { currentLorePopup, queueLorePopups, dismissCurrentLorePopup } = useLorePopupQueue();
-  function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
-    if (!questRewards) return;
-    queueLorePopups(questRewards.grantedLoreIds);
-    setRewardPopup({
-      title: 'Quest Complete!',
-      lines: buildRewardLines({
-        xp: questRewards.xp,
-        gold: questRewards.gold,
-        spiritEssence: questRewards.spiritEssence,
-        itemIds: questRewards.itemIds,
-        skillIds: questRewards.grantedSkillIds,
-      }),
-    });
-  }
+  // Shared reward-acknowledgment popup (see RewardPopup.tsx).
+  const { rewardPopup, setRewardPopup, showQuestRewardPopup } = useQuestRewardPopup(queueLorePopups);
   const isMobile = useIsMobile();
   const battleOverlayOpen = useBattleOverlayStore((s) => s.isOpen);
   const hudBarHeight = useHudBarHeight();

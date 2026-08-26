@@ -106,6 +106,51 @@ export interface PartyPlayerTurnResult {
   turnConsumed: boolean;
 }
 
+/** Applies up to 3 queued consumable items (cure/heal/spirit/oil), shared by
+ *  resolvePartyPlayerTurn and resolvePvpTurn - both used to hand-roll this identically. `log` and
+ *  `itemConsumedIds` are pushed onto directly (arrays, mutated in place); `ailments`/`hp`/
+ *  `spirit`/`lanternOil` come back in the return value since the caller's copies are `let`
+ *  locals, not references this function can mutate. */
+function consumeCombatItems(
+  itemIds: string[] | undefined,
+  player: { stats: { maxHp: number; maxSpirit: number; maxLanternOil: number } },
+  ailments: ActiveAilment[],
+  hp: number,
+  spirit: number,
+  lanternOil: number,
+  log: string[],
+  itemConsumedIds: string[],
+): { ailments: ActiveAilment[]; hp: number; spirit: number; lanternOil: number } {
+  const counts = new Map<string, number>();
+  for (const id of (itemIds ?? []).slice(0, 3)) counts.set(id, (counts.get(id) ?? 0) + 1);
+
+  for (const [itemId, count] of counts) {
+    const def = ITEMS[itemId];
+    if (!def?.effect) continue;
+    for (let n = 0; n < count; n++) itemConsumedIds.push(itemId);
+
+    if (def.effect.cureAilmentId) {
+      const idx = ailments.findIndex((a) => a.ailmentId === def.effect!.cureAilmentId);
+      if (idx >= 0) {
+        const curedName = AILMENTS[def.effect.cureAilmentId]?.name ?? def.effect.cureAilmentId;
+        ailments = ailments.filter((_, i) => i !== idx);
+        log.push(`You use ${itemId.replace(/-/g, ' ')} and cure ${curedName}.`);
+      }
+    }
+    for (let n = 0; n < count; n++) {
+      if (def.effect.healHpPercent) hp = Math.min(player.stats.maxHp, hp + Math.round(player.stats.maxHp * def.effect.healHpPercent));
+      if (def.effect.healSpiritPercent) {
+        spirit = Math.min(player.stats.maxSpirit, spirit + Math.round(player.stats.maxSpirit * def.effect.healSpiritPercent));
+      }
+      if (def.effect.restoreOilPercent) {
+        lanternOil = Math.min(player.stats.maxLanternOil, lanternOil + Math.round(player.stats.maxLanternOil * def.effect.restoreOilPercent));
+      }
+    }
+  }
+
+  return { ailments, hp, spirit, lanternOil };
+}
+
 /** Resolves exactly one player's turn (item use, then their primary action) against the given
  *  live enemy board - callers advance through every alive party member this way, one at a time,
  *  each call's `enemyHp` feeding the next player's `enemies` input (see this file's own top
@@ -199,40 +244,19 @@ export function resolvePartyPlayerTurn(player: PartyPlayerInput, enemies: RoundE
     }
   }
 
-  function consumeItems() {
-    const itemIds = player.action.itemIds ?? [];
-    const counts = new Map<string, number>();
-    for (const id of itemIds.slice(0, 3)) counts.set(id, (counts.get(id) ?? 0) + 1);
-
-    for (const [itemId, count] of counts) {
-      const def = ITEMS[itemId];
-      if (!def?.effect) continue;
-      for (let n = 0; n < count; n++) itemConsumedIds.push(itemId);
-
-      if (def.effect.cureAilmentId) {
-        const idx = ailments.findIndex((a) => a.ailmentId === def.effect!.cureAilmentId);
-        if (idx >= 0) {
-          const curedName = AILMENTS[def.effect.cureAilmentId]?.name ?? def.effect.cureAilmentId;
-          ailments = ailments.filter((_, i) => i !== idx);
-          log.push(`You use ${itemId.replace(/-/g, ' ')} and cure ${curedName}.`);
-        }
-      }
-      for (let n = 0; n < count; n++) {
-        if (def.effect.healHpPercent) hp = Math.min(player.stats.maxHp, hp + Math.round(player.stats.maxHp * def.effect.healHpPercent));
-        if (def.effect.healSpiritPercent) {
-          spirit = Math.min(player.stats.maxSpirit, spirit + Math.round(player.stats.maxSpirit * def.effect.healSpiritPercent));
-        }
-        if (def.effect.restoreOilPercent) {
-          lanternOil = Math.min(player.stats.maxLanternOil, lanternOil + Math.round(player.stats.maxLanternOil * def.effect.restoreOilPercent));
-        }
-      }
-    }
-  }
-
   if (isStunned(ailments)) {
     log.push(`${player.name} is stunned and cannot act!`);
   } else {
-    consumeItems();
+    ({ ailments, hp, spirit, lanternOil } = consumeCombatItems(
+      player.action.itemIds,
+      player,
+      ailments,
+      hp,
+      spirit,
+      lanternOil,
+      log,
+      itemConsumedIds,
+    ));
     switch (player.action.type) {
       case 'attack':
         resolveOffensiveHits(
@@ -456,40 +480,19 @@ export function resolvePvpTurn(player: PartyPlayerInput, defender: PvpDefenderIn
     }
   }
 
-  function consumeItems() {
-    const itemIds = player.action.itemIds ?? [];
-    const counts = new Map<string, number>();
-    for (const id of itemIds.slice(0, 3)) counts.set(id, (counts.get(id) ?? 0) + 1);
-
-    for (const [itemId, count] of counts) {
-      const def = ITEMS[itemId];
-      if (!def?.effect) continue;
-      for (let n = 0; n < count; n++) itemConsumedIds.push(itemId);
-
-      if (def.effect.cureAilmentId) {
-        const idx = ailments.findIndex((a) => a.ailmentId === def.effect!.cureAilmentId);
-        if (idx >= 0) {
-          const curedName = AILMENTS[def.effect.cureAilmentId]?.name ?? def.effect.cureAilmentId;
-          ailments = ailments.filter((_, i) => i !== idx);
-          log.push(`You use ${itemId.replace(/-/g, ' ')} and cure ${curedName}.`);
-        }
-      }
-      for (let n = 0; n < count; n++) {
-        if (def.effect.healHpPercent) hp = Math.min(player.stats.maxHp, hp + Math.round(player.stats.maxHp * def.effect.healHpPercent));
-        if (def.effect.healSpiritPercent) {
-          spirit = Math.min(player.stats.maxSpirit, spirit + Math.round(player.stats.maxSpirit * def.effect.healSpiritPercent));
-        }
-        if (def.effect.restoreOilPercent) {
-          lanternOil = Math.min(player.stats.maxLanternOil, lanternOil + Math.round(player.stats.maxLanternOil * def.effect.restoreOilPercent));
-        }
-      }
-    }
-  }
-
   if (isStunned(ailments)) {
     log.push('You are stunned and cannot act!');
   } else {
-    consumeItems();
+    ({ ailments, hp, spirit, lanternOil } = consumeCombatItems(
+      player.action.itemIds,
+      player,
+      ailments,
+      hp,
+      spirit,
+      lanternOil,
+      log,
+      itemConsumedIds,
+    ));
     switch (player.action.type) {
       case 'attack':
         resolveOffensiveHit(SKILLS.attack.power, 'You strike', 'physical', player.attackAilment);

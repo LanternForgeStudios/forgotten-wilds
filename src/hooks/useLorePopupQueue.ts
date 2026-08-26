@@ -11,9 +11,9 @@ export interface LorePopupEntry {
  *  should call `queueLorePopups` with it - queued rather than shown immediately so it never
  *  visually stacks with the shared RewardPopup (callers gate rendering on the reward popup being
  *  closed) and so multiple lore grants from one action reveal one at a time instead of all at
- *  once. Deliberately a separate, additive hook rather than folding into each scene's own
- *  (already-varied) reward-popup state - see TownScene/OverworldScene/DungeonScene for the several
- *  slightly different shapes that state takes today. */
+ *  once. Deliberately a separate, additive hook rather than folded into useQuestRewardPopup -
+ *  lore can be granted by moments (combat, world items) that have nothing to do with quest
+ *  rewards, so the queue needs to outlive any one reward popup's own state. */
 export function useLorePopupQueue() {
   const [queue, setQueue] = useState<LorePopupEntry[]>([]);
 

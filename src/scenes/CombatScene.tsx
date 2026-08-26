@@ -598,7 +598,7 @@ export function CombatScene() {
     else void returnToExploration();
   }
 
-  const combatItems = sortCombatConsumables(inventory);
+  const combatItems = useMemo(() => sortCombatConsumables(inventory), [inventory]);
   const canAct = phase === 'playerTurn' && !playbackActive;
   const canPickTarget = aliveEnemies.length > 1 && canAct;
   // Every full-screen modal that renders on top of the battle canvas - see

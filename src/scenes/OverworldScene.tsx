@@ -31,7 +31,6 @@ import {
   callCollectWorldItem,
   callInteractWithShrine,
   callTalkToNpc,
-  type QuestRewardSummary,
 } from '@/firebase/functionsClient';
 import { resyncSave } from '@/state/hydrate';
 import { grantedItemIdFor } from '@/utils/worldItems';
@@ -40,7 +39,8 @@ import { resolveDecorEntity } from '@/data/decorEntities';
 import { RewardPopup } from '@/components/RewardPopup';
 import { LorePopup } from '@/components/LorePopup';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
-import { buildRewardLines, type RewardLine } from '@/utils/rewardLines';
+import { useQuestRewardPopup } from '@/hooks/useQuestRewardPopup';
+import { buildRewardLines } from '@/utils/rewardLines';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { enemyMapIconScale } from '@/utils/enemyMapIcon';
 import { isTypingTarget } from '@/utils/keyboard';
@@ -217,40 +217,69 @@ function fragmentCollectedSpriteAssetId(refId: string): string | undefined {
   return `${baseId}-collected`;
 }
 
+/** Display name for a shrine-kind point interactable (POINT_LANDMARK_KIND[refId] === 'shrine')
+ *  whose refId doesn't double as its own LOCATIONS entry the way mother-cypress-shrine/stone-
+ *  circle-carvings do (they sit inside a larger field map that already has its own Location id) -
+ *  without an explicit entry here these fell all the way through to labelForInteractable's
+ *  'something' fallback. */
+const SHRINE_LABEL: Record<string, string> = {
+  'cedar-shrine-heart': 'Ancient Cedar Shrine',
+  'heartwood-sanctuary-gate': 'Heartwood Sanctuary Gate',
+  'star-crystal-shrine': 'Star Crystal Shrine',
+  'winter-shrine': 'Winter Shrine',
+};
+
+/** Flavor-text label for each 'fragment'-kind point interactable, pre-collection - one entry per
+ *  refId in FRAGMENT_SPRITE_ASSET_ID above (a fragment's label and its marker sprite are looked up
+ *  from the same set of ids, just never needed to be the same table). */
+const FRAGMENT_LABEL: Record<string, string> = {
+  'fallen-watchtower': 'a crumbling watchtower, wind-worn and abandoned',
+  'water-fragment': 'a faint glimmer in the pool',
+  'frostbound-treatise-cache': 'a hidden cache behind the falls',
+  'heart-seed-cypress': 'a seed pod nestled among mossy roots, glowing faintly',
+  'heart-seed-murkwater': 'a seed pod nestled among mossy roots, glowing faintly',
+  'heart-seed-river': 'a seed pod nestled among mossy roots, glowing faintly',
+  'drowned-ledger-cache': 'a hidden cache in the reeds',
+  'bogwater-almanac-cache': 'a mossy cypress hollow',
+  'wind-stone-golden-prairie': 'a stone humming faintly with wind',
+  'wind-stone-spirit-herd-plains': 'a stone humming faintly with wind',
+  'wind-stone-stone-circle-valley': 'a stone humming faintly with wind',
+  'winter-count-hide-i-cache': 'a painted hide half-buried in the grass',
+  'winter-count-hide-ii-cache': 'a painted hide half-buried in the grass',
+  'prairie-charm-relic': 'a wind-worn relic, humming with old spirit-craft',
+  'prairie-totem-relic': 'a wind-worn relic, humming with old spirit-craft',
+  'spirit-seed-elder-forest': 'a seed pod humming faintly with spirit-light',
+  'spirit-seed-silver-river': 'a seed pod humming faintly with spirit-light',
+  'spirit-seed-heartwood-approach': 'a seed pod humming faintly with spirit-light',
+  'lost-library-records': 'a bundle of forgotten records',
+  'heartwood-recording-i-cache': 'a hidden recording, tucked out of sight',
+  'heartwood-recording-ii-cache': 'a hidden recording, tucked out of sight',
+  'cedar-charm-relic': 'a cedar-carved relic, humming with old spirit-craft',
+  'cedar-totem-relic': 'a cedar-carved relic, humming with old spirit-craft',
+  'star-fragment-sunfire-dunes': 'a shard of crystal that catches starlight',
+  'star-fragment-crimson-canyons': 'a shard of crystal that catches starlight',
+  'star-fragment-painted-mesas': 'a shard of crystal that catches starlight',
+  'desert-relic-i-cache': 'a carved relic half-buried in the sand',
+  'desert-relic-ii-cache': 'a carved relic half-buried in the sand',
+  'desert-charm-relic': 'a sun-worn relic, humming with old spirit-craft',
+  'desert-totem-relic': 'a sun-worn relic, humming with old spirit-craft',
+  'aurora-crystal-fragment-snowveil-forest': 'a shard of ice holding a faint trace of aurora-light',
+  'aurora-crystal-fragment-glacier-pass': 'a shard of ice holding a faint trace of aurora-light',
+  'aurora-crystal-fragment-aurora-basin': 'a shard of ice holding a faint trace of aurora-light',
+  'lost-scout-effects-i-cache': "a lost scout's frozen pack",
+  'lost-scout-effects-ii-cache': "a lost scout's frozen pack",
+};
+
 /** Display name for any interactable on this map, shared between the entity labels and the
  *  "nothing to do here yet" fallback message so they never drift out of sync. */
 function labelForInteractable(refId: string, openedChests: string[], inventory: { itemId: string }[]): string {
   if (refId.startsWith('chest-')) return openedChests.includes(refId) ? 'Empty Chest' : 'Chest';
-  // Shrine-kind point interactables (POINT_LANDMARK_KIND[refId] === 'shrine') whose refId doesn't
-  // double as its own LOCATIONS entry the way mother-cypress-shrine/stone-circle-carvings do (they
-  // sit inside a larger field map that already has its own Location id) - without an explicit case
-  // here these fell all the way through to the 'something' fallback below.
-  if (refId === 'cedar-shrine-heart') return 'Ancient Cedar Shrine';
-  if (refId === 'heartwood-sanctuary-gate') return 'Heartwood Sanctuary Gate';
-  if (refId === 'star-crystal-shrine') return 'Star Crystal Shrine';
-  if (refId === 'winter-shrine') return 'Winter Shrine';
+  if (SHRINE_LABEL[refId]) return SHRINE_LABEL[refId];
   // A fragment-kind refId IS its own granted itemId (collectWorldItem.ts) - once it's in the
   // player's inventory the flavor text below (describing something still hidden/waiting) is no
   // longer accurate, same staleness the sprite swap above already fixes for the visual.
   if (inventory.some((i) => i.itemId === grantedItemIdFor(refId))) return 'Already Collected';
-  if (refId === 'fallen-watchtower') return 'a crumbling watchtower, wind-worn and abandoned';
-  if (refId.startsWith('heart-seed-')) return 'a seed pod nestled among mossy roots, glowing faintly';
-  if (refId === 'water-fragment') return 'a faint glimmer in the pool';
-  if (refId === 'frostbound-treatise-cache') return 'a hidden cache behind the falls';
-  if (refId === 'drowned-ledger-cache') return 'a hidden cache in the reeds';
-  if (refId === 'bogwater-almanac-cache') return 'a mossy cypress hollow';
-  if (refId.startsWith('wind-stone-')) return 'a stone humming faintly with wind';
-  if (refId === 'winter-count-hide-i-cache' || refId === 'winter-count-hide-ii-cache') return 'a painted hide half-buried in the grass';
-  if (refId === 'prairie-charm-relic' || refId === 'prairie-totem-relic') return 'a wind-worn relic, humming with old spirit-craft';
-  if (refId.startsWith('spirit-seed-')) return 'a seed pod humming faintly with spirit-light';
-  if (refId === 'lost-library-records') return 'a bundle of forgotten records';
-  if (refId === 'heartwood-recording-i-cache' || refId === 'heartwood-recording-ii-cache') return 'a hidden recording, tucked out of sight';
-  if (refId === 'cedar-charm-relic' || refId === 'cedar-totem-relic') return 'a cedar-carved relic, humming with old spirit-craft';
-  if (refId.startsWith('star-fragment-')) return 'a shard of crystal that catches starlight';
-  if (refId === 'desert-relic-i-cache' || refId === 'desert-relic-ii-cache') return 'a carved relic half-buried in the sand';
-  if (refId === 'desert-charm-relic' || refId === 'desert-totem-relic') return 'a sun-worn relic, humming with old spirit-craft';
-  if (refId.startsWith('aurora-crystal-fragment-')) return 'a shard of ice holding a faint trace of aurora-light';
-  if (refId === 'lost-scout-effects-i-cache' || refId === 'lost-scout-effects-ii-cache') return "a lost scout's frozen pack";
+  if (FRAGMENT_LABEL[refId]) return FRAGMENT_LABEL[refId];
   const decorEntity = resolveDecorEntity(refId);
   if (decorEntity) return decorEntity.label;
   const landmark = LOCATIONS.find((l) => l.id === refId);
@@ -327,25 +356,11 @@ export function OverworldScene() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  // Shared reward-acknowledgment popup (see RewardPopup.tsx) - shown for chest opens/world-item
-  // pickups (always) and for a quest completed by a talk/enter/visit/shrine event (only when it
-  // actually granted something, since most of those events complete no quest at all).
-  const [rewardPopup, setRewardPopup] = useState<{ title: string; subtitle?: string; lines: RewardLine[] } | null>(null);
   const { currentLorePopup, queueLorePopups, dismissCurrentLorePopup } = useLorePopupQueue();
-  function showQuestRewardPopup(questRewards: QuestRewardSummary | null) {
-    if (!questRewards) return;
-    queueLorePopups(questRewards.grantedLoreIds);
-    setRewardPopup({
-      title: 'Quest Complete!',
-      lines: buildRewardLines({
-        xp: questRewards.xp,
-        gold: questRewards.gold,
-        spiritEssence: questRewards.spiritEssence,
-        itemIds: questRewards.itemIds,
-        skillIds: questRewards.grantedSkillIds,
-      }),
-    });
-  }
+  // Shared reward-acknowledgment popup (see RewardPopup.tsx) - shown for chest opens/world-item
+  // pickups (always, via setRewardPopup directly) and for a quest completed by a talk/enter/
+  // visit/shrine event (only when it actually granted something, via showQuestRewardPopup).
+  const { rewardPopup, setRewardPopup, showQuestRewardPopup } = useQuestRewardPopup(queueLorePopups);
   const isMobile = useIsMobile();
   const battleOverlayOpen = useBattleOverlayStore((s) => s.isOpen);
   const hudBarHeight = useHudBarHeight();
@@ -357,6 +372,33 @@ export function OverworldScene() {
   const suspended = otherOverlaysOpen || mapOpen;
   const { pending, run } = usePendingAction();
 
+  // Shared by handleZoneEnter's 'fragment' zone case and attemptInteract's POINT_LANDMARK_KIND
+  // 'fragment' case - identical server call + reward-popup wiring, only whether an already-
+  // collected fragment is worth a round-trip differs (see handleZoneEnter's own early-return
+  // below), so that check stays with each caller rather than folded in here.
+  function collectFragment(refId: string) {
+    run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
+      ?.then(async (res) => {
+        if (uid) await resyncSave(uid);
+        if (res.alreadyCollected) {
+          setMessage("There's nothing left to find here.");
+          return;
+        }
+        queueLorePopups(res.questRewards?.grantedLoreIds);
+        setRewardPopup({
+          title: 'You found...',
+          lines: buildRewardLines({
+            itemIds: [res.itemId],
+            xp: res.questRewards?.xp,
+            gold: res.questRewards?.gold,
+            spiritEssence: res.questRewards?.spiritEssence,
+            skillIds: res.questRewards?.grantedSkillIds,
+          }),
+        });
+      })
+      .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
+  }
+
   function handleZoneEnter(refId: string) {
     const kind = ZONE_LANDMARK_KIND[refId];
     if (kind === 'fragment') {
@@ -367,26 +409,7 @@ export function OverworldScene() {
       // here: a unique world-item grant is idempotent server-side too, this is purely avoiding a
       // pointless call + an interruption for a state the client already knows for certain.
       if (inventory.some((i) => i.itemId === grantedItemIdFor(refId))) return;
-      run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
-        ?.then(async (res) => {
-          if (uid) await resyncSave(uid);
-          if (res.alreadyCollected) {
-            setMessage("There's nothing left to find here.");
-            return;
-          }
-          queueLorePopups(res.questRewards?.grantedLoreIds);
-          setRewardPopup({
-            title: 'You found...',
-            lines: buildRewardLines({
-              itemIds: [res.itemId],
-              xp: res.questRewards?.xp,
-              gold: res.questRewards?.gold,
-              spiritEssence: res.questRewards?.spiritEssence,
-              skillIds: res.questRewards?.grantedSkillIds,
-            }),
-          });
-        })
-        .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
+      collectFragment(refId);
       return;
     }
     if (kind === 'visitOnly') {
@@ -496,26 +519,7 @@ export function OverworldScene() {
       return;
     }
     if (POINT_LANDMARK_KIND[refId] === 'fragment') {
-      run(() => callCollectWorldItem(locationId, refId), 'Collecting...')
-        ?.then(async (res) => {
-          if (uid) await resyncSave(uid);
-          if (res.alreadyCollected) {
-            setMessage("There's nothing left to find here.");
-            return;
-          }
-          queueLorePopups(res.questRewards?.grantedLoreIds);
-          setRewardPopup({
-            title: 'You found...',
-            lines: buildRewardLines({
-              itemIds: [res.itemId],
-              xp: res.questRewards?.xp,
-              gold: res.questRewards?.gold,
-              spiritEssence: res.questRewards?.spiritEssence,
-              skillIds: res.questRewards?.grantedSkillIds,
-            }),
-          });
-        })
-        .catch((err) => setMessage(err instanceof Error ? err.message : 'Nothing happens.'));
+      collectFragment(refId);
       return;
     }
     const label = labelForInteractable(refId, openedChests, inventory);

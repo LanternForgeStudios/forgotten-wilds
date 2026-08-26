@@ -5,12 +5,18 @@ import { LANTERN_ABILITIES } from '../data/lanternAbilities';
 import { AILMENTS } from '../data/ailments';
 import { levelForXp, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
 import {
+  ailmentAttackMultiplier,
   applyAilmentEntry,
   applyAilmentResistance,
+  applyAilmentTickDamage as tickPlayerAilmentDamage,
   applyAilmentTickDamageToTarget,
   blindMissChance,
   computeDamage,
+  expireAilments,
+  inflictAilment as inflictPlayerAilment,
+  isStunned,
   pickEnemyMove,
+  rollInitiative,
   scaleLanternAbility,
   weightedPick,
 } from './combatMath';
@@ -452,46 +458,26 @@ export function resolveRound(input: RoundInput): RoundResult {
   // round so the end-of-round expiry step (below) doesn't immediately decrement a fresh Stun to 0
   // before it
   // ever gets the chance to actually skip a turn.
-  const ailments: ActiveAilment[] = input.playerAilments.map((a) => ({ ...a }));
+  let ailments: ActiveAilment[] = input.playerAilments.map((a) => ({ ...a }));
   const inflictedThisRound = new Set<string>();
-  const playerStunned = ailments.some((a) => a.ailmentId === 'stun');
+  const playerStunned = isStunned(ailments);
 
   function inflictAilment(ailmentId: string) {
-    const def = AILMENTS[ailmentId];
-    if (!def) return;
-    const existingIndex = ailments.findIndex((a) => a.ailmentId === ailmentId);
-    // Omit turnsRemaining entirely rather than setting it to `undefined` - Firestore's Admin SDK
-    // throws on an explicit `undefined` field value (`tx.update`/`tx.set` reject it outright), so
-    // an ailment with no autoExpireAfterTurns (every one except Stun) crashed the whole
-    // transaction the moment it was inflicted, surfacing to the client as a bare "internal" error.
-    const entry: ActiveAilment =
-      def.autoExpireAfterTurns === undefined ? { ailmentId } : { ailmentId, turnsRemaining: def.autoExpireAfterTurns };
-    if (existingIndex >= 0) ailments[existingIndex] = entry;
-    else ailments.push(entry);
+    if (!AILMENTS[ailmentId]) return;
+    ailments = inflictPlayerAilment(ailments, ailmentId, log);
     inflictedThisRound.add(ailmentId);
-    log.push(`You are afflicted with ${def.name}!`);
   }
 
   /** Applied once, right as the player's own turn resolves (whichever branch that turns out to
    *  be - a normal action, a stunned no-op, or a flee attempt) - matches AilmentEffect's "dealt at
    *  the end of the afflicted character's own turn" contract for Poison/Burn/Freeze. */
   function applyAilmentTickDamage() {
-    for (const active of ailments) {
-      if (playerHp <= 0) break;
-      const def = AILMENTS[active.ailmentId];
-      if (!def?.effect.damagePercentPerTurn) continue;
-      const dmg = Math.max(1, Math.round(input.playerStats.maxHp * def.effect.damagePercentPerTurn));
-      playerHp = Math.max(0, playerHp - dmg);
-      log.push(`${def.name} deals ${dmg} damage to you.`);
-    }
+    playerHp = tickPlayerAilmentDamage(playerHp, input.playerStats.maxHp, ailments, log);
   }
 
   // Burn's attackMultiplier is the only ailment effect that touches outgoing damage - multiple
   // stacked ailments with an attackMultiplier (none currently) would compound multiplicatively.
-  const playerAttackMultiplier = ailments.reduce(
-    (mult, a) => mult * (AILMENTS[a.ailmentId]?.effect.attackMultiplier ?? 1),
-    1,
-  );
+  const playerAttackMultiplier = ailmentAttackMultiplier(ailments);
   const playerBlindMissChance = blindMissChance(ailments);
 
   function damageEnemy(i: number, dmg: number, verb: string): boolean {
@@ -537,10 +523,7 @@ export function resolveRound(input: RoundInput): RoundResult {
     const moveSource = isSilenced ? { ...def, moves: def.moves.filter((m) => m.skillId === 'attack') } : def;
     const move = pickEnemyMove(moveSource.moves.length > 0 ? moveSource : def, hpFraction);
     const skill = SKILLS[move.skillId] ?? SKILLS.attack;
-    const attackMultiplier = enemyAilments[i].reduce(
-      (mult, a) => mult * (AILMENTS[a.ailmentId]?.effect.attackMultiplier ?? 1),
-      1,
-    );
+    const attackMultiplier = ailmentAttackMultiplier(enemyAilments[i]);
     let dmg = computeDamage(skill.power, stats.attack * attackMultiplier, input.playerStats.defense);
     if (def.tier !== 'boss') {
       const crowdFactor = crowdDamageFactor[Math.min(6, aliveNonBossCount())] ?? 1;
@@ -834,13 +817,11 @@ export function resolveRound(input: RoundInput): RoundResult {
         applyEnemyAilmentTickDamage(i);
       }
     } else {
-      // Initiative = speed + a d6 roll, re-rolled every round - keeps speed the dominant factor
-      // (a big enough lead still reliably goes first) while giving turn order genuine round-to-
-      // round variance instead of the old fully-deterministic sort. Stable sort keeps the player
-      // (listed first) ahead of any enemy that rolls the exact same total.
-      function rollInitiative(speed: number): number {
-        return speed + (1 + Math.floor(Math.random() * 6));
-      }
+      // Initiative = speed + a d6 roll, re-rolled every round (see combatMath.ts's rollInitiative)
+      // - keeps speed the dominant factor (a big enough lead still reliably goes first) while
+      // giving turn order genuine round-to-round variance instead of a fully-deterministic sort.
+      // Stable sort keeps the player (listed first) ahead of any enemy that rolls the exact same
+      // total.
       type Turn = { kind: 'player'; roll: number } | { kind: 'enemy'; index: number; roll: number };
       const alive = aliveIndices();
       const turns: Turn[] = [
@@ -864,23 +845,11 @@ export function resolveRound(input: RoundInput): RoundResult {
 
   // End-of-round ailment expiry - anything inflicted THIS round is left untouched (see
   // inflictedThisRound's doc comment above) so a fresh Stun actually blocks the player's next
-  // turn instead of expiring before it ever takes effect.
-  const remainingAilments = ailments
-    .map((a) =>
-      a.turnsRemaining === undefined || inflictedThisRound.has(a.ailmentId) ? a : { ...a, turnsRemaining: a.turnsRemaining - 1 },
-    )
-    .filter((a) => a.turnsRemaining === undefined || a.turnsRemaining > 0);
+  // turn instead of expiring before it ever takes effect (see combatMath.ts's expireAilments).
+  const remainingAilments = expireAilments(ailments, inflictedThisRound);
 
   // Same expiry rule, per enemy.
-  const remainingEnemyAilments = enemyAilments.map((list, i) =>
-    list
-      .map((a) =>
-        a.turnsRemaining === undefined || inflictedThisRoundByEnemy[i].has(a.ailmentId)
-          ? a
-          : { ...a, turnsRemaining: a.turnsRemaining - 1 },
-      )
-      .filter((a) => a.turnsRemaining === undefined || a.turnsRemaining > 0),
-  );
+  const remainingEnemyAilments = enemyAilments.map((list, i) => expireAilments(list, inflictedThisRoundByEnemy[i]));
 
   const allDefeated = enemyHp.every((hp) => hp <= 0);
   let phase: RoundOutcomePhase = 'continue';
