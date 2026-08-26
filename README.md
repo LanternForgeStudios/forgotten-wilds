@@ -38,6 +38,15 @@ rules deny direct client writes to `users/{uid}` and `combatSessions/{uid}` enti
    - Create a **Firestore** database (production mode is fine — `firestore.rules` locks it down).
    - Add your local dev domain and your eventual GitHub Pages domain under Authentication →
      Settings → Authorized domains.
+5. (Optional but recommended) Register **App Check** so Cloud Functions can reject calls that
+   didn't come from this actual client, not just calls with a valid Auth token — Build → App
+   Check → register your web app → reCAPTCHA v3 (let Firebase auto-create the key, or paste one
+   from https://www.google.com/recaptcha/admin). Copy the site key into `VITE_RECAPTCHA_SITE_KEY`
+   in `.env.local`. App Check stays fully disabled until this var is set, so this step can be
+   skipped and added later with no code changes. Local dev uses App Check's debug provider instead
+   of real reCAPTCHA (localhost can't be verified) — the first local run logs a debug token to the
+   browser console; register it on the same App Check page (Apps → your app → Manage debug
+   tokens) once, the same one-time step as an authorized domain.
 
 ## Local development
 
@@ -63,7 +72,10 @@ first save) - export the current state at any time, emulators still running, wit
   Pages — see `vite.config.ts`).
 - Deploy Cloud Functions + Firestore rules to production: `npx firebase-tools deploy --only
   functions,firestore:rules` (requires `firebase login` and billing enabled on the project).
-- The client deploys to GitHub Pages via `.github/workflows/deploy.yml` on push to `main`.
+- The client deploys to GitHub Pages via `.github/workflows/deploy.yml` on push to `main`, which
+  reads all `VITE_*` build-time values (including `VITE_RECAPTCHA_SITE_KEY`, if set) from the
+  repo's own GitHub Actions secrets, not from `.env.local` — add/update them under Settings →
+  Secrets and variables → Actions.
 
 ## Project structure
 
