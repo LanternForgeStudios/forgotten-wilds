@@ -3,7 +3,7 @@ import { Panel } from '@/components/common/Panel';
 import { SpritePreviewFrame } from '@/components/common/SpritePreviewFrame';
 import { getAssetUrl } from '@/assets/assetManager';
 import { callCreateCharacter } from '@/firebase/functionsClient';
-import { hydrateAllStores } from '@/state/hydrate';
+import { hydrateAllStores, seedAudioSettingsFromSave } from '@/state/hydrate';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useCutsceneStore } from '@/state/useCutsceneStore';
 import { INTRO_CUTSCENE } from '@/data/cutscenes';
@@ -46,6 +46,7 @@ export function CharacterCreationScene() {
     try {
       const save = await callCreateCharacter(name.trim(), gender, appearance);
       hydrateAllStores(save);
+      seedAudioSettingsFromSave(save);
       // A brand new character's own existence is the "first time" signal - no persisted flag
       // needed, this only ever runs once per account by construction. Town only loads once the
       // player dismisses the cutscene, per "before you actually appear in Ash Hallow."

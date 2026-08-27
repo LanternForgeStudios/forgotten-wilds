@@ -59,6 +59,19 @@ export async function callSetCombatPreferences(
   return result.data;
 }
 
+interface AudioSettingsPayload {
+  musicEnabled: boolean;
+  sfxEnabled: boolean;
+  musicVolume: number;
+  sfxVolume: number;
+}
+
+export async function callSetAudioSettings(settings: AudioSettingsPayload): Promise<AudioSettingsPayload> {
+  const fn = httpsCallable<AudioSettingsPayload, AudioSettingsPayload>(functions, 'setAudioSettings');
+  const result = await fn(settings);
+  return result.data;
+}
+
 export async function callSetDisplayName(name: string): Promise<{ displayName: string }> {
   const fn = httpsCallable<{ name: string }, { displayName: string }>(functions, 'setDisplayName');
   const result = await fn({ name });

@@ -33,6 +33,7 @@ import {
   callSetPlayerSkin,
   callSetDifficulty,
   callSetCombatPreferences,
+  callSetAudioSettings,
   callCreateClan,
   callInviteToClan,
   callRespondToClanInvite,
@@ -443,6 +444,25 @@ export function UserProfile({ onClose }: UserProfileProps) {
     } finally {
       setBusy(false);
     }
+  }
+
+  // Audio settings apply to actual playback the instant a checkbox/slider changes (via
+  // useAudioSettingsStore directly, see each control's onChange below) - this only persists that
+  // same change to the account afterward, debounced so dragging a volume slider doesn't fire a
+  // Cloud Function call per tick. Deliberately not gated on `busy`/resynced afterward like the
+  // other settings above: the local store is already the live truth (see its own doc comment), so
+  // there's nothing to wait on or re-hydrate. Best-effort - a dropped sync just means the next
+  // change retries with the (still correct, more current) local values.
+  const audioSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (audioSyncTimerRef.current) clearTimeout(audioSyncTimerRef.current);
+  }, []);
+  function syncAudioSettings() {
+    if (audioSyncTimerRef.current) clearTimeout(audioSyncTimerRef.current);
+    audioSyncTimerRef.current = setTimeout(() => {
+      const { musicEnabled, sfxEnabled, musicVolume, sfxVolume } = useAudioSettingsStore.getState();
+      void callSetAudioSettings({ musicEnabled, sfxEnabled, musicVolume, sfxVolume }).catch(() => {});
+    }, 500);
   }
 
   // Every trade action escrows/releases/grants items+gold on at least one account, including the
@@ -1418,7 +1438,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
         {tab === 'settings' && (
           <div className={styles.section}>
             <p style={{ fontSize: 13, opacity: 0.85, marginTop: 0 }}>
-              Music and sound effect preferences, saved on this device only.
+              Music and sound effect preferences - saved to your account, so they follow you to any device.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div>
@@ -1426,7 +1446,10 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   <input
                     type="checkbox"
                     checked={audioSettings.musicEnabled}
-                    onChange={(e) => audioSettings.setMusicEnabled(e.target.checked)}
+                    onChange={(e) => {
+                      audioSettings.setMusicEnabled(e.target.checked);
+                      syncAudioSettings();
+                    }}
                   />
                   Music
                 </label>
@@ -1437,7 +1460,10 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   step={0.05}
                   value={audioSettings.musicVolume}
                   disabled={!audioSettings.musicEnabled}
-                  onChange={(e) => audioSettings.setMusicVolume(Number(e.target.value))}
+                  onChange={(e) => {
+                    audioSettings.setMusicVolume(Number(e.target.value));
+                    syncAudioSettings();
+                  }}
                   style={{ width: '100%', marginTop: 6 }}
                   aria-label="Music volume"
                 />
@@ -1447,7 +1473,10 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   <input
                     type="checkbox"
                     checked={audioSettings.sfxEnabled}
-                    onChange={(e) => audioSettings.setSfxEnabled(e.target.checked)}
+                    onChange={(e) => {
+                      audioSettings.setSfxEnabled(e.target.checked);
+                      syncAudioSettings();
+                    }}
                   />
                   Sound Effects
                 </label>
@@ -1458,7 +1487,10 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   step={0.05}
                   value={audioSettings.sfxVolume}
                   disabled={!audioSettings.sfxEnabled}
-                  onChange={(e) => audioSettings.setSfxVolume(Number(e.target.value))}
+                  onChange={(e) => {
+                    audioSettings.setSfxVolume(Number(e.target.value));
+                    syncAudioSettings();
+                  }}
                   style={{ width: '100%', marginTop: 6 }}
                   aria-label="Sound effects volume"
                 />

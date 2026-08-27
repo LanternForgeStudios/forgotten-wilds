@@ -39,6 +39,7 @@ export function buildFreshPlayer(
     lanternOilUpgrades: {},
     difficulty: 'medium',
     combatPreferences: { fastRounds: false, targetAll: false },
+    audioSettings: { musicEnabled: true, sfxEnabled: true, musicVolume: 0.5, sfxVolume: 0.7 },
   };
 }
 

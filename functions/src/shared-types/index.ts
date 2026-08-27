@@ -85,6 +85,20 @@ export interface CombatPreferences {
   targetAll: boolean;
 }
 
+/** Music/SFX mute+volume (Settings tab) - account-wide (synced via setAudioSettings.ts) so the
+ *  player's chosen levels follow them to a new device/browser instead of resetting, same reasoning
+ *  as CombatPreferences. The client still keeps its own localStorage-backed copy as the live
+ *  source of truth for actual playback (src/audio/audioService.ts reads/reacts to it directly,
+ *  including before sign-in, e.g. Title screen music) - this field is only ever pulled from on a
+ *  fresh sign-in to seed that local copy, then pushed to on every change; it's never read by any
+ *  other server-side logic. musicVolume/sfxVolume are 0-1. */
+export interface AudioSettings {
+  musicEnabled: boolean;
+  sfxEnabled: boolean;
+  musicVolume: number;
+  sfxVolume: number;
+}
+
 export type PlayerEquipment = Partial<Record<EquipmentSlot, string | null>>;
 
 export interface Player {
@@ -144,6 +158,10 @@ export interface Player {
    *  for a fresh character (newCharacter.ts) and as a read-time fallback for any save that
    *  predates this field. */
   combatPreferences: CombatPreferences;
+  /** See AudioSettings' own doc comment. Defaults to { musicEnabled: true, sfxEnabled: true,
+   *  musicVolume: 0.5, sfxVolume: 0.7 } for a fresh character (newCharacter.ts) and as a read-time
+   *  fallback for any save that predates this field. */
+  audioSettings: AudioSettings;
 }
 
 export interface InventoryItem {

@@ -13,10 +13,17 @@ interface AudioSettingsState {
   setSfxVolume: (volume: number) => void;
 }
 
-/** Device preference, not game state - deliberately persisted to localStorage directly (via
- *  zustand's own `persist` middleware) rather than through a Cloud Function/users/{uid}, since
- *  volume/mute has no gameplay-integrity stake and shouldn't need a signed-in round-trip to take
- *  effect. Read directly by src/audio/audioService.ts on every playSound/playMusic call. */
+/** Persisted to localStorage directly (via zustand's own `persist` middleware) as the live source
+ *  of truth for actual playback - read directly by src/audio/audioService.ts on every
+ *  playSound/playMusic call, and needs to work instantly (a slider drag can't wait on a network
+ *  round-trip) and pre-sign-in (Title screen music has no account to read from yet). Also synced
+ *  to the account (see AudioSettings' own doc comment in functions/src/shared-types/index.ts) so
+ *  the chosen levels follow the player to a new device: UserProfile.tsx pushes every change here
+ *  to setAudioSettings.ts (fire-and-forget, debounced for the volume sliders), and App.tsx/
+ *  CharacterCreationScene.tsx seed this store from the account's saved values once on sign-in
+ *  (see seedAudioSettingsFromSave in state/hydrate.ts) - deliberately NOT on every resyncSave,
+ *  since that runs mid-session after almost every action and would otherwise clobber a change the
+ *  player just made locally before it's finished being pushed to the server. */
 export const useAudioSettingsStore = create<AudioSettingsState>()(
   persist(
     (set) => ({

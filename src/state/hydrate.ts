@@ -7,6 +7,7 @@ import { useJournalStore } from './useJournalStore';
 import { useWorldStateStore } from './useWorldStateStore';
 import { useToastStore } from './useToastStore';
 import { useCutsceneStore } from './useCutsceneStore';
+import { useAudioSettingsStore } from './useAudioSettingsStore';
 import { QUESTS } from '@/data';
 import { QUEST_COMPLETION_CUTSCENES } from '@/data/cutscenes';
 import { effectiveQuestStatus } from '@/engine/quests/questStatus';
@@ -24,6 +25,19 @@ export function hydrateAllStores(save: PlayerSave): void {
   useWorldStateStore
     .getState()
     .hydrate(save.openedChests ?? [], save.seenNpcDialogueVariant ?? {}, save.lastReviewedSocialAt ?? 0, save.apothecaryQuests ?? {});
+}
+
+/** Applies the account's saved music/SFX mute+volume to the local, live-playback store - see
+ *  useAudioSettingsStore's own doc comment for why this is a separate one-time call (App.tsx/
+ *  CharacterCreationScene.tsx, once per sign-in) rather than part of hydrateAllStores, which
+ *  resyncSave re-runs after nearly every action. A save that predates this field has
+ *  `audioSettings` absent entirely - leave the local store as-is (whatever localStorage/defaults
+ *  already had) rather than calling zustand's setState with `undefined`, which replaces the whole
+ *  store state instead of merging (a no-op object is only skipped for object partials) and would
+ *  otherwise leave every field undefined until the player next touches a control. */
+export function seedAudioSettingsFromSave(save: PlayerSave): void {
+  if (!save.player.audioSettings) return;
+  useAudioSettingsStore.setState(save.player.audioSettings);
 }
 
 /** Compares quest progress before/after a resync and pushes a toast for anything that changed -

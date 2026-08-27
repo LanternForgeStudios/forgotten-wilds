@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { hydrateAllStores } from '@/state/hydrate';
+import { hydrateAllStores, seedAudioSettingsFromSave } from '@/state/hydrate';
 import { fetchPlayerSave } from '@/firebase/saveService';
 import { TitleScene } from '@/scenes/TitleScene';
 import { CharacterCreationScene } from '@/scenes/CharacterCreationScene';
@@ -50,6 +50,7 @@ function App() {
         .then((save) => {
           if (save) {
             hydrateAllStores(save);
+            seedAudioSettingsFromSave(save);
             const locationId = freshLoadStartLocationId(save.player.currentLocationId);
             // A returning character's fresh sign-in (this effect only ever runs once per auth
             // transition - see checkedForUid above) gets a "welcome back" beat before landing in

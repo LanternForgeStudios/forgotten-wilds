@@ -50,11 +50,24 @@ export interface Player {
    *  present once hydrated from the server (defaults to false/false), even for a save that
    *  predates this field. */
   combatPreferences: CombatPreferences;
+  /** Account-wide music/SFX mute+volume - see functions/src/shared-types/index.ts's matching field
+   *  for the full design reasoning (the client's own localStorage copy, useAudioSettingsStore, is
+   *  the live source of truth for actual playback; this field only seeds/persists it). Always
+   *  present once hydrated from the server (defaults to musicEnabled/sfxEnabled: true, musicVolume:
+   *  0.5, sfxVolume: 0.7), even for a save that predates this field. */
+  audioSettings: AudioSettings;
 }
 
 export interface CombatPreferences {
   fastRounds: boolean;
   targetAll: boolean;
+}
+
+export interface AudioSettings {
+  musicEnabled: boolean;
+  sfxEnabled: boolean;
+  musicVolume: number;
+  sfxVolume: number;
 }
 
 /** One dynamically-generated Apothecary/Herbalist "restock" request - see PlayerSave's own

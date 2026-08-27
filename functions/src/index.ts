@@ -24,6 +24,7 @@ export { craftItem } from './functions/craftItem';
 export { setPlayerSkin } from './functions/setPlayerSkin';
 export { setDifficulty } from './functions/setDifficulty';
 export { setCombatPreferences } from './functions/setCombatPreferences';
+export { setAudioSettings } from './functions/setAudioSettings';
 export { searchUsers } from './functions/searchUsers';
 export { sendFriendRequest, respondToFriendRequest, removeFriend } from './functions/friends';
 export { blockUser, unblockUser } from './functions/blocking';
