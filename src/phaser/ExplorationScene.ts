@@ -248,6 +248,12 @@ interface EntityVisual {
   label?: Phaser.GameObjects.Text;
   badge?: Phaser.GameObjects.Text;
   questMarker?: Phaser.GameObjects.Image;
+  /** Per-slot equipment layer sprites stacked on this entity's own base sprite - same shape/
+   *  reconciliation approach as the local player's Scene-wide equipmentLayerSprites map (setPlayer),
+   *  just nested per-entity here since many remote players' presence entities can be on screen at
+   *  once. Undefined for any entity with no GridEntity.equipmentLayers (everything except another
+   *  player's presence entity, today). */
+  layerSprites?: Map<EquipmentSlot, { sprite: Phaser.GameObjects.Sprite; spriteAssetId: string }>;
   /** Mirrors GridEntity.interactionKind - set once at creation (see upsertEntity), read by
    *  queryInteraction to find nearby NPCs/other players. Undefined for every other entity kind
    *  (building/exit markers, field-encounter icons, decor/shrine - the latter are looked up via
@@ -673,6 +679,16 @@ export class ExplorationScene extends Phaser.Scene {
       const entityDepth = this.depthForY(visual.sprite.y);
       visual.sprite.setDepth(entityDepth);
       visual.shadow?.setPosition(visual.sprite.x, this.shadowY(visual.sprite)).setDepth(entityDepth - 0.5);
+      // Another player's equipped-gear layers (see upsertEntity) glued to their own base sprite
+      // every frame, same "position always mirrors the base" contract as the local player's own
+      // equipmentLayerSprites sync just above in this same method.
+      if (visual.layerSprites) {
+        for (const [slot, layerVisual] of visual.layerSprites) {
+          layerVisual.sprite
+            .setPosition(visual.sprite.x, visual.sprite.y)
+            .setDepth(entityDepth + (EQUIPMENT_LAYER_DEPTH_OFFSET[slot] ?? 0.5));
+        }
+      }
     }
     this.drawDebugOverlay();
   }
@@ -1440,7 +1456,10 @@ export class ExplorationScene extends Phaser.Scene {
    *  since neither its sprite nor its Arcade body exists yet. Safe to call with an empty/duplicate
    *  list - loadSceneTexture no-ops for anything already cached. */
   async preloadEntityTextures(entities: GridEntity[]): Promise<void> {
-    await Promise.all(entities.map((e) => loadSceneTexture(this, e.spriteAssetId)));
+    await Promise.all([
+      ...entities.map((e) => loadSceneTexture(this, e.spriteAssetId)),
+      ...entities.flatMap((e) => (e.equipmentLayers ?? []).map((layer) => loadSceneTexture(this, layer.spriteAssetId))),
+    ]);
   }
 
   /** Reconciles entity sprites/labels/badges against the incoming array - the manual equivalent
@@ -1462,6 +1481,7 @@ export class ExplorationScene extends Phaser.Scene {
       if (visual.questMarker) this.tweens.killTweensOf(visual.questMarker);
       visual.questMarker?.destroy();
       visual.shadow?.destroy();
+      if (visual.layerSprites) for (const layerVisual of visual.layerSprites.values()) layerVisual.sprite.destroy();
       this.entityVisuals.delete(id);
     }
   }
@@ -1561,16 +1581,79 @@ export class ExplorationScene extends Phaser.Scene {
         // Not every NPC/enemy has an idle animation of its own (most don't) - only play one if
         // createCharacterAnimations actually registered it for this sheet; otherwise fall back to
         // the plain static frame exactly as before.
-        const idleKey = animationKey(entity.spriteAssetId, 'idle', 'down');
+        // entity.facing was previously ignored here entirely (hardcoded 'down') - any character
+        // entity that tracks a real facing (wandering NPCs, another player's presence entity)
+        // stood still always facing down between walk steps regardless of which way they'd
+        // actually turned, most noticeable on presence entities since they're idle far more than
+        // they're mid-glide. Only applied when facing is actually set - decor/chest/shrine
+        // entities never set it, and keep using their own manually-pinned frameRow/frameColumn.
+        const idleFacing = entity.facing ?? 'down';
+        const idleKey = animationKey(entity.spriteAssetId, 'idle', idleFacing);
         if (this.anims.exists(idleKey)) {
           if (!visual.sprite.anims.isPlaying || visual.sprite.anims.currentAnim?.key !== idleKey) {
             visual.sprite.play(idleKey);
           }
         } else {
           visual.sprite.anims.stop();
-          visual.sprite.setFrame(row * layout.frameCount + column);
+          const idleRow = entity.facing !== undefined ? resolveDisplayRow(layout, 'idle', entity.facing) : row;
+          visual.sprite.setFrame(idleRow * layout.frameCount + column);
         }
       }
+    }
+
+    // Another player's equipped gear (GridEntity.equipmentLayers, resolved by TownScene.tsx's
+    // otherPlayerEntities the same way resolveEquipmentLayers feeds the local player's own
+    // setPlayer) - one child sprite per equipped slot, stacked on this entity's base sprite. Same
+    // per-slot create/retexture/teardown approach as setPlayer's own equipmentLayerSprites, just
+    // keyed under this entity's own visual instead of one Scene-wide singleton, since there can be
+    // several other players' presence entities on screen at once.
+    if (entity.equipmentLayers && entity.equipmentLayers.length > 0) {
+      await Promise.all(entity.equipmentLayers.map((layer) => this.ensureAnimationsFor(layer.spriteAssetId)));
+      if (generation !== this.entityGeneration) return;
+    }
+    if (!visual.layerSprites) visual.layerSprites = new Map();
+    const seenLayerSlots = new Set<EquipmentSlot>();
+    for (const layer of entity.equipmentLayers ?? []) {
+      seenLayerSlots.add(layer.slot);
+      let layerVisual = visual.layerSprites.get(layer.slot);
+      if (!layerVisual) {
+        // Positioned at the already-computed target x/y, not visual.sprite's own current
+        // position - on a freshly-created entity, the base sprite is still sitting at its (0,0)
+        // creation point this far into the method (it isn't moved to x/y until the
+        // justCreated/tween branch further below), so reading it here would snap this layer to
+        // the wrong spot for one entity's very first frame.
+        const layerSprite = this.add
+          .sprite(x, y, layer.spriteAssetId)
+          .setOrigin(0.5, 1)
+          .setDepth(ENTITY_DEPTH + (EQUIPMENT_LAYER_DEPTH_OFFSET[layer.slot] ?? 0.5))
+          .setLighting(true);
+        layerVisual = { sprite: layerSprite, spriteAssetId: layer.spriteAssetId };
+        visual.layerSprites.set(layer.slot, layerVisual);
+      } else if (layerVisual.spriteAssetId !== layer.spriteAssetId) {
+        // Same retexture-must-stop-the-old-animation-first fix as this entity's own base-sprite
+        // retexture branch above.
+        layerVisual.sprite.anims.stop();
+        layerVisual.sprite.setTexture(layer.spriteAssetId);
+        layerVisual.spriteAssetId = layer.spriteAssetId;
+      }
+      layerVisual.sprite.setScale(visual.sprite.scaleX, visual.sprite.scaleY);
+      if (justCreated || this.mapJustChanged) layerVisual.sprite.setPosition(x, y);
+    }
+    // A slot that had a layer sprite before but isn't in this call's list anymore (the other
+    // player unequipped it, or switched to an item with no layer art) gets its sprite torn down.
+    for (const [slot, layerVisual] of visual.layerSprites) {
+      if (!seenLayerSlots.has(slot)) {
+        layerVisual.sprite.destroy();
+        visual.layerSprites.delete(slot);
+      }
+    }
+    // Every equipment layer mirrors the base sprite's own CURRENT frame, same reasoning as
+    // applyPlayerAnimation's identical loop for the local player (never given an independent
+    // Animation instance of its own - see that method's own comment for why that drifts).
+    for (const layerVisual of visual.layerSprites.values()) {
+      if (!getAssetDefinition(layerVisual.spriteAssetId).frameSize) continue;
+      if (layerVisual.sprite.anims.isPlaying) layerVisual.sprite.anims.stop();
+      layerVisual.sprite.setFrame(visual.sprite.frame.name);
     }
 
     const v = visual;
@@ -1594,7 +1677,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.tweens.killTweensOf(visual.sprite);
       visual.sprite.setPosition(x, y);
     } else {
-      this.tweens.add({ targets: visual.sprite, x, y, duration: GLIDE_MS, ease: 'Linear', onUpdate: repositionAttachments });
+      this.tweens.add({ targets: visual.sprite, x, y, duration: entity.glideMs ?? GLIDE_MS, ease: 'Linear', onUpdate: repositionAttachments });
     }
 
     const labelY = y - visual.sprite.displayHeight - 8;

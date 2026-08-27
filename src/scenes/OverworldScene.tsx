@@ -451,7 +451,7 @@ export function OverworldScene() {
     if (consumed) goTo('combat', { locationId, spawnX: icon.x, spawnY: icon.y });
   }
 
-  useHeartbeat(uid, displayName, locationId, position, gender);
+  useHeartbeat(uid, displayName, locationId, position, gender, appearance, equipment);
   useDragMovement(gridWrapperRef, movementInput.setDirectionHeld, isMobile && !suspended);
   const { startDash, stopDash } = useExplorationDash(movementInput.setDashHeld, staminaUnlocked && !suspended);
 

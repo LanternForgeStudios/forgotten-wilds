@@ -17,6 +17,9 @@ export async function updatePresence(presence: OnlinePresence): Promise<void> {
     x: presence.x,
     y: presence.y,
     gender: presence.gender ?? 'male',
+    appearance: presence.appearance ?? 'white-dark',
+    equipment: presence.equipment ?? {},
+    facing: presence.facing ?? 'down',
   });
 }
 

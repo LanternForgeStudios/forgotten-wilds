@@ -32,6 +32,18 @@ export interface GridEntity {
    *  indicator so a player can also spot their next objective while actually walking the overworld,
    *  not just glancing at the map overlay. */
   questTarget?: boolean;
+  /** Per-slot equipment layer sprites stacked on top of this entity's own base sprite - same shape
+   *  and rendering approach (ExplorationScene.ts's upsertEntity) as the local player's own
+   *  top-level equipmentLayers prop (see resolveEquipmentLayers). Used for other online players'
+   *  presence entities so they render with their real equipped gear instead of a bare base body -
+   *  omitted (undefined/empty) for everything else (NPCs, interactables, decor). */
+  equipmentLayers?: { slot: EquipmentSlot; spriteAssetId: string }[];
+  /** Overrides ExplorationScene's default GLIDE_MS glide duration when this entity's x/y changes -
+   *  a remote player's presence entity sets this to POSITION_THROTTLE_MS (useHeartbeat.ts) so it
+   *  glides continuously for the full gap between position broadcasts instead of a short default
+   *  glide followed by a freeze until the next update (see TownScene.tsx's otherPlayerEntities).
+   *  Omitted for everything else, keeping the default. */
+  glideMs?: number;
   /** Multiplier on top of ExplorationScene's normal viewport-relative scale (see
    *  REFERENCE_VIEWPORT_SCALE) - for a caller that wants to render this specific entity's existing
    *  art smaller/larger than its native pixel size would otherwise imply, without needing new art

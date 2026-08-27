@@ -102,7 +102,13 @@ const NPC_WALK_ANIMATION_LAYOUT: CharacterAnimationLayout = {
  *  `anims.exists(...)` before playing (see upsertEntity/createEnemySlot) and fall back to a static
  *  frame instead of assuming one was defined. */
 export function animationLayoutForSprite(spriteAssetId: string): CharacterAnimationLayout {
-  if (PLAYER_SKIN_ASSET_IDS.has(spriteAssetId)) return PLAYER_ANIMATION_LAYOUT;
+  // 'sprite.player.base.{gender}.{appearance}' (resolvePlayerBaseSpriteAssetId) - the same base
+  // body art the local player uses, now also used for other online players' presence entities
+  // (see TownScene.tsx's otherPlayerEntities) - shares the exact same sheet layout as the legacy
+  // PLAYER_SKIN_ASSET_IDS below, just parameterized by appearance instead of one fixed skin.
+  if (PLAYER_SKIN_ASSET_IDS.has(spriteAssetId) || spriteAssetId.startsWith('sprite.player.base.')) {
+    return PLAYER_ANIMATION_LAYOUT;
+  }
   if (NPC_WALK_ASSET_IDS.has(spriteAssetId)) return NPC_WALK_ANIMATION_LAYOUT;
   const def = getAssetDefinition(spriteAssetId);
   const frameSize = def.frameSize ?? DEFAULT_IDLE_FRAME_SIZE;

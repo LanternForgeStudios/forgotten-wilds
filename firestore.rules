@@ -27,7 +27,7 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if request.auth != null
         && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['displayName', 'avatarSymbol', 'locationId', 'lastHeartbeat', 'joinedAt', 'x', 'y', 'gender'])
+        && request.resource.data.keys().hasOnly(['displayName', 'avatarSymbol', 'locationId', 'lastHeartbeat', 'joinedAt', 'x', 'y', 'gender', 'appearance', 'equipment', 'facing'])
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() <= 40
         && request.resource.data.avatarSymbol is string
@@ -36,7 +36,13 @@ service cloud.firestore {
         && request.resource.data.joinedAt is number
         && request.resource.data.x is number
         && request.resource.data.y is number
-        && request.resource.data.gender in ['male', 'female'];
+        && request.resource.data.gender in ['male', 'female']
+        && request.resource.data.appearance in ['white-dark', 'black-dark', 'white-blonde', 'asian-dark']
+        // Not deep-validated slot-by-slot - same "worst case is a fake nameplate" risk tolerance
+        // as the rest of this collection (see this file's own top comment), not an economy-facing
+        // write path.
+        && request.resource.data.equipment is map
+        && request.resource.data.facing in ['up', 'down', 'left', 'right'];
     }
 
     // Social: friend search/requests/blocking/DMs. All server-authoritative, same anti-cheat

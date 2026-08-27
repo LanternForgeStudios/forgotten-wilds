@@ -15,7 +15,7 @@ import { WorldChat } from '@/components/WorldChat';
 import { MiniMap } from '@/components/MiniMap';
 import { useLocationExploration } from '@/hooks/useLocationExploration';
 import { useMapOverlay } from '@/hooks/useMapOverlay';
-import { useHeartbeat } from '@/hooks/useHeartbeat';
+import { useHeartbeat, POSITION_THROTTLE_MS } from '@/hooks/useHeartbeat';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useExplorationViewport, useHudBarHeight } from '@/hooks/useExplorationViewport';
@@ -223,7 +223,7 @@ export function TownScene() {
   const { pending, run } = usePendingAction();
   const gridRef = useRef<TileGridHandle>(null);
 
-  useHeartbeat(uid, displayName, locationId, position, gender);
+  useHeartbeat(uid, displayName, locationId, position, gender, appearance, equipment);
   useDragMovement(gridWrapperRef, movementInput.setDirectionHeld, isMobile && !suspended);
   const { startDash, stopDash } = useExplorationDash(movementInput.setDashHeld, staminaUnlocked && !suspended);
 
@@ -489,14 +489,29 @@ export function TownScene() {
         (p) =>
           p.uid !== uid && p.locationId === locationId && now - p.lastHeartbeat < PRESENCE_STALE_AFTER_MS,
       )
-      .map((p) => ({
-        id: `player-${p.uid}`,
-        x: p.x,
-        y: p.y,
-        spriteAssetId: p.gender === 'female' ? 'sprite.player.female' : 'sprite.player.male',
-        label: p.displayName,
-        interactionKind: 'presence' as const,
-      }));
+      .map((p) => {
+        const presenceGender = p.gender ?? 'male';
+        return {
+          id: `player-${p.uid}`,
+          x: p.x,
+          y: p.y,
+          // Same base-body + equipment-layer resolution as the local player's own rendering
+          // (equipmentLayers/playerSpriteAssetId below) - so another online player looks the same
+          // to everyone else as they do to themselves, instead of the old generic sprite.player.
+          // male/female placeholder. Falls back the same way updatePresence.ts's own write-side
+          // defaults do, for a presence doc written before appearance/equipment existed.
+          spriteAssetId: resolvePlayerBaseSpriteAssetId(presenceGender, p.appearance ?? 'white-dark'),
+          equipmentLayers: resolveEquipmentLayers(p.equipment, presenceGender),
+          label: p.displayName,
+          facing: p.facing ?? 'down',
+          // Glides continuously across the full gap between this player's own throttled position
+          // broadcasts (see useHeartbeat.ts) instead of ExplorationScene's default short glide,
+          // which would otherwise dash to each new spot and then freeze until the next update -
+          // reported live as remote players appearing to "jump" between positions.
+          glideMs: POSITION_THROTTLE_MS,
+          interactionKind: 'presence' as const,
+        };
+      });
 
     return [...npcEntities, ...buildingEntities, ...shrineEntities, ...decorEntities, ...exitEntities, ...otherPlayerEntities];
   }, [map, wanderPositions, questProgress, hiddenQuestIds, seenNpcDialogueVariant, presences, uid, locationId]);
