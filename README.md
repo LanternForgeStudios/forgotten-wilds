@@ -46,7 +46,10 @@ rules deny direct client writes to `users/{uid}` and `combatSessions/{uid}` enti
    skipped and added later with no code changes. Local dev uses App Check's debug provider instead
    of real reCAPTCHA (localhost can't be verified) — the first local run logs a debug token to the
    browser console; register it on the same App Check page (Apps → your app → Manage debug
-   tokens) once, the same one-time step as an authorized domain.
+   tokens) once, the same one-time step as an authorized domain. This debug-token step only
+   matters if your local client calls real deployed Cloud Functions — the Functions emulator
+   itself skips App Check enforcement entirely (`functions/src/appCheckConfig.ts`), so the
+   `emulators:start` flow below needs no App Check setup at all.
 
 ## Local development
 

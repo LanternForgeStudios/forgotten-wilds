@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import { MAX_CLAN_SIZE } from '../shared-types';
 import type { ClanDoc, ClanInvite, ClanMembershipDoc, PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 24;
@@ -49,7 +50,7 @@ interface CreateClanRequest {
   tag: string;
 }
 
-export const createClan = onCall<CreateClanRequest>({ enforceAppCheck: true }, async (request) => {
+export const createClan = onCall<CreateClanRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const name = validateClanName(request.data?.name);
@@ -95,7 +96,7 @@ interface InviteToClanRequest {
  *  (`${clanId}_${toUid}`, mirroring friendRequests' own deterministic-id reasoning) - a clan can
  *  only ever have one live invite out to a given person at once, so there's no need for an
  *  auto-id plus a dedup query. */
-export const inviteToClan = onCall<InviteToClanRequest>({ enforceAppCheck: true }, async (request) => {
+export const inviteToClan = onCall<InviteToClanRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const clanId = request.data?.clanId;
@@ -151,7 +152,7 @@ interface RespondToClanInviteRequest {
   accept: boolean;
 }
 
-export const respondToClanInvite = onCall<RespondToClanInviteRequest>({ enforceAppCheck: true }, async (request) => {
+export const respondToClanInvite = onCall<RespondToClanInviteRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const inviteId = request.data?.inviteId;
@@ -192,7 +193,7 @@ export const respondToClanInvite = onCall<RespondToClanInviteRequest>({ enforceA
   });
 });
 
-export const leaveClan = onCall({ enforceAppCheck: true }, async (request) => {
+export const leaveClan = onCall({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
@@ -227,7 +228,7 @@ interface RemoveFromClanRequest {
   uid: string;
 }
 
-export const removeFromClan = onCall<RemoveFromClanRequest>({ enforceAppCheck: true }, async (request) => {
+export const removeFromClan = onCall<RemoveFromClanRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const targetUid = request.data?.uid;
@@ -261,7 +262,7 @@ interface TransferClanLeadershipRequest {
   toUid: string;
 }
 
-export const transferClanLeadership = onCall<TransferClanLeadershipRequest>({ enforceAppCheck: true }, async (request) => {
+export const transferClanLeadership = onCall<TransferClanLeadershipRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const toUid = request.data?.toUid;
@@ -287,7 +288,7 @@ export const transferClanLeadership = onCall<TransferClanLeadershipRequest>({ en
   });
 });
 
-export const disbandClan = onCall({ enforceAppCheck: true }, async (request) => {
+export const disbandClan = onCall({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
@@ -338,7 +339,7 @@ export interface ClanLeaderboardEntry {
  *  userDirectory's own per-doc rules, via an Admin-SDK query any signed-in caller can invoke.
  *  Deliberately strips each doc down to display fields only (no memberUids/leaderUid/xp) rather
  *  than returning full ClanDocs for clans the caller isn't a member of. */
-export const getClanLeaderboard = onCall({ enforceAppCheck: true }, async (request) => {
+export const getClanLeaderboard = onCall({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

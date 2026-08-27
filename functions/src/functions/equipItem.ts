@@ -12,6 +12,7 @@ import {
   TOTEM_SLOTS,
 } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 // Derived from freshPlayerEquipment() (the canonical slot list) rather than its own hardcoded
 // literal, so a future slot add/rename can't drift this validation set out of sync the way it
@@ -48,7 +49,7 @@ function resolveTargetSlot(defSlot: EquipmentSlot, requestedSlot: EquipmentSlot 
   return requestedSlot && family.includes(requestedSlot) ? requestedSlot : defSlot;
 }
 
-export const equipItem = onCall<EquipItemRequest>({ enforceAppCheck: true }, async (request) => {
+export const equipItem = onCall<EquipItemRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
@@ -108,7 +109,7 @@ interface UnequipItemRequest {
   slot: EquipmentSlot;
 }
 
-export const unequipItem = onCall<UnequipItemRequest>({ enforceAppCheck: true }, async (request) => {
+export const unequipItem = onCall<UnequipItemRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards, currentNpcDialogueVariantKey, isEmptyQuestRewardSummary } from '../engine/questEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface TalkToNpcRequest {
   npcId: string;
@@ -86,7 +87,7 @@ const NPC_LOCATIONS: Record<string, string> = {
 };
 const KNOWN_NPC_IDS = new Set(Object.keys(NPC_LOCATIONS));
 
-export const talkToNpc = onCall<TalkToNpcRequest>({ enforceAppCheck: true }, async (request) => {
+export const talkToNpc = onCall<TalkToNpcRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

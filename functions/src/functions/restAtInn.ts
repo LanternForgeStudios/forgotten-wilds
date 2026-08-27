@@ -4,6 +4,7 @@ import { INN_REST_COST } from '../data/items';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { restoreFullVitals } from '../engine/levelingEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 // No client-supplied locationId needed (unlike openChest.ts/interactWithShrine.ts) - the player's
 // own (server-authoritative) currentLocationId is checked directly against every known inn. Every
@@ -23,7 +24,7 @@ const INN_LOCATION_IDS = new Set([
   'red-mesa-inn',
 ]);
 
-export const restAtInn = onCall({ enforceAppCheck: true }, async (request) => {
+export const restAtInn = onCall({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

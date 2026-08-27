@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { SHOP_PRICES, effectiveShopCatalog, ITEMS } from '../data/items';
 import { grantItem } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface PurchaseItemRequest {
   itemId: string;
@@ -44,7 +45,7 @@ const SHOP_LOCATIONS: Record<string, string> = {
   'magnus-armory': 'frosthaven-armory',
 };
 
-export const purchaseItem = onCall<PurchaseItemRequest>({ enforceAppCheck: true }, async (request) => {
+export const purchaseItem = onCall<PurchaseItemRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

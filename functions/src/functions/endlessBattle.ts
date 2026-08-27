@@ -21,6 +21,7 @@ import type {
   PlayerSave,
   UserDirectoryDoc,
 } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 /** Endless Battle can only be started from a Town - the only place clan members can actually see
  *  each other via presence (Overworld/Dungeon scenes don't track it - see PlayerHUD.tsx's own doc
@@ -92,7 +93,7 @@ async function resolveStaleLocks(
  * clan administration). `solo: true` is a distinct entry point (see StartEndlessBattleRequest's
  * own doc comment) - always exactly one participant (the caller), no clan involved at all.
  */
-export const startEndlessBattle = onCall<StartEndlessBattleRequest>({ enforceAppCheck: true }, async (request) => {
+export const startEndlessBattle = onCall<StartEndlessBattleRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const solo = request.data?.solo === true;
@@ -231,7 +232,7 @@ interface VoteContinueEndlessBattleRequest {
  * is what's required to actually advance to the next wave. Restores every participant to full
  * vitals and clears their battle lock either way a run ends.
  */
-export const voteContinueEndlessBattle = onCall<VoteContinueEndlessBattleRequest>({ enforceAppCheck: true }, async (request) => {
+export const voteContinueEndlessBattle = onCall<VoteContinueEndlessBattleRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const battleId = request.data?.battleId;
@@ -301,7 +302,7 @@ export interface SoloEndlessLeaderboardEntry {
  *  own callable anyway (rather than a client-side query) so a future field addition here doesn't
  *  require a firestore.indexes.json change on the client's behalf, and to match this project's
  *  existing "every cross-account read goes through a Cloud Function" convention. */
-export const getSoloEndlessLeaderboard = onCall({ enforceAppCheck: true }, async (request) => {
+export const getSoloEndlessLeaderboard = onCall({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

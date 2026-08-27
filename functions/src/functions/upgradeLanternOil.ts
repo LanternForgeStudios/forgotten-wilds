@@ -4,6 +4,7 @@ import { EQUIPMENT } from '../data/equipment';
 import { LANTERN_OIL_UPGRADE_GATES, LANTERN_OIL_UPGRADE_MAX_TIER, LANTERN_OIL_UPGRADE_PRICES } from '../data/lanternOilUpgrades';
 import { backfillPlayerEquipment, effectiveOilCapacity, setLanternOilCapacity } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 // Same table purchaseItem.ts uses for every General Store, keyed by the same shopId - a player
 // standing anywhere else can't spend gold on an upgrade whose price/discovery the client only
@@ -27,7 +28,7 @@ interface UpgradeLanternOilRequest {
  *  tracked per lanternId (player.lanternOilUpgrades), independent of whether that lantern happens
  *  to be equipped right now - if it IS currently equipped, this also immediately recomputes
  *  stats.maxLanternOil so the new capacity takes effect without needing to re-equip. */
-export const upgradeLanternOil = onCall<UpgradeLanternOilRequest>({ enforceAppCheck: true }, async (request) => {
+export const upgradeLanternOil = onCall<UpgradeLanternOilRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

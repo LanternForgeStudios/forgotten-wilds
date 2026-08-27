@@ -4,6 +4,7 @@ import { rollEncounterGroup, rollBossEncounter, rollEnemyLevel, scaledEnemyStats
 import { ENEMIES } from '../data/enemies';
 import { effectiveStatus } from '../engine/questEngine';
 import type { CombatSession, PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface StartEncounterRequest {
   locationId: string;
@@ -27,7 +28,7 @@ const BOSS_REQUIRED_LOCATION: Record<string, string> = {
   'winter-stag': 'summit-of-winter',
 };
 
-export const startEncounter = onCall<StartEncounterRequest>({ enforceAppCheck: true }, async (request) => {
+export const startEncounter = onCall<StartEncounterRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in to fight.');

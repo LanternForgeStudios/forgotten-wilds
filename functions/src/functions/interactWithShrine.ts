@@ -5,13 +5,14 @@ import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { BASE_STAMINA_ON_UNLOCK, STAT_GROWTH_PER_LEVEL } from '../data/leveling';
 import { KNOWN_SHRINES } from '../data/locations';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface InteractWithShrineRequest {
   locationId: string;
   refId: string;
 }
 
-export const interactWithShrine = onCall<InteractWithShrineRequest>({ enforceAppCheck: true }, async (request) => {
+export const interactWithShrine = onCall<InteractWithShrineRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

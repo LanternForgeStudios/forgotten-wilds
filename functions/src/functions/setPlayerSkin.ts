@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 const VALID_APPEARANCES = ['white-dark', 'black-dark', 'white-blonde', 'asian-dark'] as const;
 type Appearance = (typeof VALID_APPEARANCES)[number];
@@ -13,7 +14,7 @@ interface SetPlayerSkinRequest {
 /** Lets the player change their chosen body silhouette/appearance any time (see UserProfile.tsx's
  *  Skin tab) - purely cosmetic, no economy/progress implications, so no validation beyond "is
  *  this a real gender/appearance value" is needed. */
-export const setPlayerSkin = onCall<SetPlayerSkinRequest>({ enforceAppCheck: true }, async (request) => {
+export const setPlayerSkin = onCall<SetPlayerSkinRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 /** How much Stamina one dashed tile costs, and how long a full empty-to-max refill takes - both
  *  fixed server constants rather than data-file content since there's only one kind of dash right
@@ -13,7 +14,7 @@ import type { PlayerSave } from '../shared-types';
 const DASH_COST_PER_TILE = 3;
 const FULL_REGEN_SECONDS = 20;
 
-export const dash = onCall({ enforceAppCheck: true }, async (request) => {
+export const dash = onCall({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

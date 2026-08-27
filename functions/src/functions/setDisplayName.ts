@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 24;
@@ -32,7 +33,7 @@ interface SetDisplayNameRequest {
  *  deterministic doc id instead, because a display name has no natural id to derive one from.
  *  Firestore still evaluates a query read inside a transaction atomically alongside the other
  *  reads, so this is just as race-free as those. */
-export const setDisplayName = onCall<SetDisplayNameRequest>({ enforceAppCheck: true }, async (request) => {
+export const setDisplayName = onCall<SetDisplayNameRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const name = validateDisplayName(request.data?.name);

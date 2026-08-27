@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { grantItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface OpenChestRequest {
   locationId: string;
@@ -199,7 +200,7 @@ const CHESTS: Record<string, Record<string, ChestReward>> = {
   'summit-of-winter': { 'chest-summit-of-winter-1': { itemId: 'pristine-healing-poultice', gold: 55, xp: 105 } },
 };
 
-export const openChest = onCall<OpenChestRequest>({ enforceAppCheck: true }, async (request) => {
+export const openChest = onCall<OpenChestRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

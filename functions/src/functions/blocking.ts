@@ -3,6 +3,7 @@ import { getFirestore, type DocumentSnapshot } from 'firebase-admin/firestore';
 import { releaseOffer } from '../engine/tradeEngine';
 import { sortedPairKey } from './trade';
 import type { ActiveTradeLockDoc, BlockListDoc, FriendshipDoc, PlayerSave, TradeDoc } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface BlockUserRequest {
   targetUid: string;
@@ -13,7 +14,7 @@ interface BlockUserRequest {
  *  (restoring both sides' escrow), consistent with blocking already meaning "close out anything
  *  pending with this person." The blocked user is never notified either happened; only the
  *  blocker's own blocks/{uid} doc is ever readable by them. */
-export const blockUser = onCall<BlockUserRequest>({ enforceAppCheck: true }, async (request) => {
+export const blockUser = onCall<BlockUserRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const targetUid = request.data?.targetUid;
@@ -104,7 +105,7 @@ interface UnblockUserRequest {
   targetUid: string;
 }
 
-export const unblockUser = onCall<UnblockUserRequest>({ enforceAppCheck: true }, async (request) => {
+export const unblockUser = onCall<UnblockUserRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const targetUid = request.data?.targetUid;

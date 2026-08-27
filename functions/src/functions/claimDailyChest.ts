@@ -4,8 +4,9 @@ import { chestTierForLevel, rollChestRewards } from '../engine/dailyChestEngine'
 import { grantItem } from '../engine/inventoryEngine';
 import { CHEST_CLAIM_INTERVAL_MS } from '../data/dailyChest';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
-export const claimDailyChest = onCall({ enforceAppCheck: true }, async (request) => {
+export const claimDailyChest = onCall({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

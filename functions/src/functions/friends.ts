@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, type Firestore, type Transaction } from 'firebase-admin/firestore';
 import type { FriendRequest, FriendshipDoc, PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 /** Reads through the given transaction (not a plain `.get()`) so this participates in the same
  *  optimistic-concurrency check as the rest of sendFriendRequest's transaction - a concurrent
@@ -44,7 +45,7 @@ interface SendFriendRequestRequest {
 /** If the other person already sent *us* a pending request, sending our own is really just
  *  accepting theirs - mutual interest becomes friends immediately rather than leaving two
  *  redundant pending requests sitting in each other's inbox. */
-export const sendFriendRequest = onCall<SendFriendRequestRequest>({ enforceAppCheck: true }, async (request) => {
+export const sendFriendRequest = onCall<SendFriendRequestRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const toUid = request.data?.toUid;
@@ -122,7 +123,7 @@ interface RespondToFriendRequestRequest {
   accept: boolean;
 }
 
-export const respondToFriendRequest = onCall<RespondToFriendRequestRequest>({ enforceAppCheck: true }, async (request) => {
+export const respondToFriendRequest = onCall<RespondToFriendRequestRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const { requestId, accept } = request.data ?? {};
@@ -155,7 +156,7 @@ interface RemoveFriendRequest {
   friendUid: string;
 }
 
-export const removeFriend = onCall<RemoveFriendRequest>({ enforceAppCheck: true }, async (request) => {
+export const removeFriend = onCall<RemoveFriendRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const friendUid = request.data?.friendUid;

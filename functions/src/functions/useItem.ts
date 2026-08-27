@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { ITEMS } from '../data/items';
 import { itemWouldHaveEffect, removeItem } from '../engine/inventoryEngine';
 import type { CombatSession, PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface UseItemRequest {
   itemId: string;
@@ -15,7 +16,7 @@ interface UseItemRequest {
  *  resolveCombatAction. An ailment cure needs combatSessions/{uid} (playerAilments lives there,
  *  never on users/{uid}), so this reads it too when present - harmless no-op outside combat, where
  *  no combat session document exists at all and a cureAilmentId item simply can't apply here. */
-export const useItem = onCall<UseItemRequest>({ enforceAppCheck: true }, async (request) => {
+export const useItem = onCall<UseItemRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

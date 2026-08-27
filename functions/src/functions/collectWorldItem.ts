@@ -5,6 +5,7 @@ import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { grantItem } from '../engine/inventoryEngine';
 import { WORLD_ITEMS } from '../data/locations';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface CollectWorldItemRequest {
   locationId: string;
@@ -26,7 +27,7 @@ const WORLD_ITEM_QUEST_GATES: Record<string, string> = {
   'desert-totem-relic': 'sands-that-endure',
 };
 
-export const collectWorldItem = onCall<CollectWorldItemRequest>({ enforceAppCheck: true }, async (request) => {
+export const collectWorldItem = onCall<CollectWorldItemRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

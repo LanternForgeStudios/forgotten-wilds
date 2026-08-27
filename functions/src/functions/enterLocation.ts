@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { advanceQuests, applyQuestRewards, isEmptyQuestRewardSummary } from '../engine/questEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface EnterLocationRequest {
   locationId: string;
@@ -206,7 +207,7 @@ const KNOWN_LOCATION_IDS = new Set([
   'hall-of-memories',
 ]);
 
-export const enterLocation = onCall<EnterLocationRequest>({ enforceAppCheck: true }, async (request) => {
+export const enterLocation = onCall<EnterLocationRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

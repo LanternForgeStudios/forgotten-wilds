@@ -5,6 +5,7 @@ import { generateApothecaryQuest, rollApothecaryReward } from '../engine/apothec
 import { grantItem, removeItem } from '../engine/inventoryEngine';
 import { applyLevelUp } from '../engine/levelingEngine';
 import type { ApothecaryQuest, PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface ApothecaryShopRequest {
   shopId: string;
@@ -15,7 +16,7 @@ interface ApothecaryShopRequest {
  *  player opens the Restock Supplies panel and doesn't need to track locally whether it already
  *  asked. See PlayerSave.apothecaryQuests' own doc comment for why this isn't modeled as a real
  *  QuestDef. */
-export const requestApothecaryQuest = onCall<ApothecaryShopRequest>({ enforceAppCheck: true }, async (request) => {
+export const requestApothecaryQuest = onCall<ApothecaryShopRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
@@ -59,7 +60,7 @@ export const requestApothecaryQuest = onCall<ApothecaryShopRequest>({ enforceApp
 /** Turns in the shop's active restock request - requires owning at least `requiredCount` of the
  *  target material (removed from inventory, not just checked), grants a randomized gold+maybe-item
  *  reward, and clears the request so a new one can be requested next visit. */
-export const turnInApothecaryQuest = onCall<ApothecaryShopRequest>({ enforceAppCheck: true }, async (request) => {
+export const turnInApothecaryQuest = onCall<ApothecaryShopRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { RECIPES } from '../data/recipes';
 import { grantItem } from '../engine/inventoryEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface CraftItemRequest {
   recipeId: string;
@@ -13,7 +14,7 @@ interface CraftItemRequest {
  *  craftable item. Mirrors sellItem.ts's shape (validate ownership/quantity, mutate
  *  save.inventory, single tx.set), reusing grantItem (inventoryEngine.ts) for the output the same
  *  way every other item-granting path already does. */
-export const craftItem = onCall<CraftItemRequest>({ enforceAppCheck: true }, async (request) => {
+export const craftItem = onCall<CraftItemRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

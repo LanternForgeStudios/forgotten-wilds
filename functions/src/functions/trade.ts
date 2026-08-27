@@ -10,6 +10,7 @@ import {
 } from '../engine/tradeEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { ActiveTradeLockDoc, FriendshipDoc, PlayerSave, TradeDoc, TradeOfferSide } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 /** Deterministic key for the one-active-trade-per-pair lock, independent of who's the initiator
  *  this time - mirrors friendRequests' own use of a sorted/deterministic id for exactly the same
@@ -51,7 +52,7 @@ interface ProposeTradeRequest {
  *  doc (read via tx.get, a doc ref - every transaction read in this codebase is a doc ref, never
  *  a query) makes "no other active trade already exists between this pair" race-free; a
  *  query-then-transact check here would have a TOCTOU gap between two concurrent proposals. */
-export const proposeTrade = onCall<ProposeTradeRequest>({ enforceAppCheck: true }, async (request) => {
+export const proposeTrade = onCall<ProposeTradeRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const toUid = request.data?.toUid;
@@ -122,7 +123,7 @@ interface RespondToTradeOfferRequest {
  *  handing the final yes/no back to the initiator via finalizeTrade). One transaction branching
  *  on `action`, mirroring respondToFriendRequest's single-transaction accept/decline shape rather
  *  than two separate transactions. */
-export const respondToTradeOffer = onCall<RespondToTradeOfferRequest>({ enforceAppCheck: true }, async (request) => {
+export const respondToTradeOffer = onCall<RespondToTradeOfferRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const tradeId = request.data?.tradeId;
@@ -200,7 +201,7 @@ interface FinalizeTradeRequest {
  *  doc's own read/write, exactly as Firestore transactions require. Splitting this into two
  *  transactions would reintroduce the exact atomicity gap escrow exists to prevent - a crash
  *  between them could durably strand one side's assets. */
-export const finalizeTrade = onCall<FinalizeTradeRequest>({ enforceAppCheck: true }, async (request) => {
+export const finalizeTrade = onCall<FinalizeTradeRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const tradeId = request.data?.tradeId;
@@ -260,7 +261,7 @@ interface CancelTradeRequest {
 
 /** Lets the initiator back out before the recipient has responded at all - once countered, the
  *  initiator's only remaining path is finalizeTrade's accept/reject, not this. */
-export const cancelTrade = onCall<CancelTradeRequest>({ enforceAppCheck: true }, async (request) => {
+export const cancelTrade = onCall<CancelTradeRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
   const tradeId = request.data?.tradeId;

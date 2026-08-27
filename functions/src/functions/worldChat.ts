@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { findMessageViolation } from '../engine/messageFilter';
 import { checkAndRecordMessage } from '../engine/chatModerationEngine';
 import type { MessageModerationDoc, PlayerSave, WorldChatCleanupMeta, WorldChatMessage } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 const MAX_MESSAGE_LENGTH = 500;
 const ONE_HOUR_MS = 60 * 60_000;
@@ -65,7 +66,7 @@ async function purgeOldMessagesIfDue(db: FirebaseFirestore.Firestore): Promise<v
   }
 }
 
-export const sendWorldChatMessage = onCall<SendWorldChatMessageRequest>({ enforceAppCheck: true }, async (request) => {
+export const sendWorldChatMessage = onCall<SendWorldChatMessageRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 

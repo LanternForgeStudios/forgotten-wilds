@@ -4,6 +4,7 @@ import { advanceQuests, applyQuestRewards, isEmptyQuestRewardSummary } from '../
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import { LANDMARK_PARENT_LOCATION } from '../data/locations';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface VisitLandmarkRequest {
   landmarkId: string;
@@ -15,7 +16,7 @@ interface VisitLandmarkRequest {
  *  actually left the parent map. */
 const KNOWN_LANDMARK_IDS = new Set(Object.keys(LANDMARK_PARENT_LOCATION));
 
-export const visitLandmark = onCall<VisitLandmarkRequest>({ enforceAppCheck: true }, async (request) => {
+export const visitLandmark = onCall<VisitLandmarkRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in.');

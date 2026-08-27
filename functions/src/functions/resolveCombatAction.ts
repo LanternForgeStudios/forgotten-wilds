@@ -21,13 +21,14 @@ import { LANTERN_OIL_UPGRADE_GATES } from '../data/lanternOilUpgrades';
 import { AILMENTS } from '../data/ailments';
 import { homeTownFor } from '../data/locationHomeTown';
 import type { CombatAction, CombatSession, PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface ResolveCombatActionRequest {
   sessionId: string;
   action: CombatAction;
 }
 
-export const resolveCombatAction = onCall<ResolveCombatActionRequest>({ enforceAppCheck: true }, async (request) => {
+export const resolveCombatAction = onCall<ResolveCombatActionRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError('unauthenticated', 'You must be signed in to fight.');

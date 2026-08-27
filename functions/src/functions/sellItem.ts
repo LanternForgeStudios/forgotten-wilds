@@ -4,13 +4,14 @@ import { sellPriceFor } from '../engine/pricingEngine';
 import { isItemEquipped, removeItem } from '../engine/inventoryEngine';
 import { backfillPlayerEquipment } from '../engine/equipmentEngine';
 import type { PlayerSave } from '../shared-types';
+import { ENFORCE_APP_CHECK } from '../appCheckConfig';
 
 interface SellItemRequest {
   itemId: string;
   quantity?: number;
 }
 
-export const sellItem = onCall<SellItemRequest>({ enforceAppCheck: true }, async (request) => {
+export const sellItem = onCall<SellItemRequest>({ enforceAppCheck: ENFORCE_APP_CHECK }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'You must be signed in.');
 
