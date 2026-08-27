@@ -147,6 +147,18 @@ const SHADOW_TEXTURE_SIZE = { width: 40, height: 20 };
  *  camera angle. */
 const SHADOW_WIDTH_RATIO = 0.9;
 const SHADOW_HEIGHT_TO_WIDTH_RATIO = 0.35;
+/** Gold map-pin marker floated above a GridEntity with questTarget set (registry id
+ *  'ui.quest-target-marker', a user-supplied image - see registry.ts's own notes for the source/
+ *  scaling history). Loaded once via loadSceneTexture (same fire-and-forget-then-textures.exists-
+ *  guard convention as DASH_DUST_FX_ASSET_ID below), not generated. Displayed at a fixed pixel
+ *  size regardless of viewport scale, matching how the label/badge text attachments are also
+ *  unaffected by entity scale. */
+const QUEST_MARKER_ASSET_ID = 'ui.quest-target-marker';
+const QUEST_MARKER_DISPLAY_SIZE = { width: 30, height: 36 };
+/** Idle pulse the marker plays continuously (see upsertEntity) to draw the eye - peak scale is a
+ *  multiplier on top of QUEST_MARKER_DISPLAY_SIZE's own scale, not an absolute value. */
+const QUEST_MARKER_PULSE_SCALE = 1.15;
+const QUEST_MARKER_PULSE_MS = 650;
 /** How far above the sprite's own anchor point (sprite.y - see setPlayer/upsertEntity's "origin
  *  (0.5, 1)" comment) a shadow is centered, as a fraction of the sprite's frame height. Not 0 -
  *  every character sheet here is cropped/exported with a margin of fully transparent pixels below
@@ -235,6 +247,7 @@ interface EntityVisual {
   spriteAssetId: string;
   label?: Phaser.GameObjects.Text;
   badge?: Phaser.GameObjects.Text;
+  questMarker?: Phaser.GameObjects.Image;
   /** Mirrors GridEntity.interactionKind - set once at creation (see upsertEntity), read by
    *  queryInteraction to find nearby NPCs/other players. Undefined for every other entity kind
    *  (building/exit markers, field-encounter icons, decor/shrine - the latter are looked up via
@@ -418,6 +431,10 @@ export class ExplorationScene extends Phaser.Scene {
     // Fire-and-forget: spawnDashDust checks textures.exists before using this, falling back to the
     // dot texture on the rare chance a dash is triggered before this finishes loading.
     loadSceneTexture(this, DASH_DUST_FX_ASSET_ID).catch(() => {});
+    // Same fire-and-forget convention - upsertEntity checks textures.exists before showing a
+    // quest-target marker, so a marker just doesn't appear for the brief window (if any) before
+    // this resolves, rather than failing anything.
+    loadSceneTexture(this, QUEST_MARKER_ASSET_ID).catch(() => {});
     this.physics.world.gravity.set(0, 0);
     // Created once (not per-map) - see its own field doc comment for why membership doesn't need
     // manual per-location bookkeeping.
@@ -1442,6 +1459,8 @@ export class ExplorationScene extends Phaser.Scene {
       visual.sprite.destroy();
       visual.label?.destroy();
       visual.badge?.destroy();
+      if (visual.questMarker) this.tweens.killTweensOf(visual.questMarker);
+      visual.questMarker?.destroy();
       visual.shadow?.destroy();
       this.entityVisuals.delete(id);
     }
@@ -1558,9 +1577,18 @@ export class ExplorationScene extends Phaser.Scene {
     // Computed from the sprite's own displayHeight (rather than a fixed tileSize/2) so the label
     // floats above the actual sprite top - matters once taller-than-one-tile art lands, since the
     // sprite's origin is now feet-anchored (bottom), not center.
+    // NPCs get the marker floating close above their head - same offset as the "!" unheard-
+    // dialogue badge (spriteY - displayHeight - 2), not the nameplate's more distant one - an
+    // overlay on a character's own face would look wrong. Every other quest-target-able entity
+    // (interactables, building/exit markers) gets it centered over its own top third instead,
+    // since those don't have a "head" to float above and read better as a badge on the icon
+    // itself.
+    const questMarkerYFor = (spriteY: number, displayHeight: number) =>
+      entity.interactionKind === 'npc' ? spriteY - displayHeight - 2 : spriteY - displayHeight * (2 / 3);
     const repositionAttachments = () => {
       v.label?.setPosition(v.sprite.x, v.sprite.y - v.sprite.displayHeight - 8);
       v.badge?.setPosition(v.sprite.x + this.tileSize / 2 - 4, v.sprite.y - v.sprite.displayHeight - 2);
+      v.questMarker?.setPosition(v.sprite.x, questMarkerYFor(v.sprite.y, v.sprite.displayHeight));
     };
     if (justCreated || this.mapJustChanged) {
       this.tweens.killTweensOf(visual.sprite);
@@ -1609,6 +1637,44 @@ export class ExplorationScene extends Phaser.Scene {
     } else if (visual.badge) {
       visual.badge.destroy();
       visual.badge = undefined;
+    }
+
+    // NPCs float the marker above their head (see questMarkerYFor above); every other quest-
+    // target-able entity gets it centered over its own top third as a badge on the icon itself.
+    const questMarkerX = x;
+    const questMarkerY = questMarkerYFor(y, visual.sprite.displayHeight);
+    // Guards on textures.exists the same way spawnDashDust does for DASH_DUST_FX_ASSET_ID above -
+    // the load kicked off fire-and-forget in create() usually wins the race easily, but a marker
+    // just silently not appearing yet (rather than throwing on a missing texture key) is the
+    // correct fallback for the rare case it hasn't.
+    if (entity.questTarget && this.textures.exists(QUEST_MARKER_ASSET_ID)) {
+      if (!visual.questMarker) {
+        const marker = this.add
+          .image(questMarkerX, questMarkerY, QUEST_MARKER_ASSET_ID)
+          .setOrigin(0.5, entity.interactionKind === 'npc' ? 1 : 0.5)
+          .setDisplaySize(QUEST_MARKER_DISPLAY_SIZE.width, QUEST_MARKER_DISPLAY_SIZE.height)
+          .setDepth(ENTITY_LABEL_DEPTH);
+        visual.questMarker = marker;
+        // Gentle breathing pulse (size + brightness) to draw the eye without being obnoxious -
+        // tweened relative to the scale setDisplaySize just computed, not a hardcoded 1, so the
+        // marker's actual intended size is the low point of the pulse, not a reset value.
+        this.tweens.add({
+          targets: marker,
+          scaleX: marker.scaleX * QUEST_MARKER_PULSE_SCALE,
+          scaleY: marker.scaleY * QUEST_MARKER_PULSE_SCALE,
+          alpha: { from: 1, to: 0.7 },
+          duration: QUEST_MARKER_PULSE_MS,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+      } else {
+        visual.questMarker.setPosition(questMarkerX, questMarkerY);
+      }
+    } else if (visual.questMarker) {
+      this.tweens.killTweensOf(visual.questMarker);
+      visual.questMarker.destroy();
+      visual.questMarker = undefined;
     }
   }
 

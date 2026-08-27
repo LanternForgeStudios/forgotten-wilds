@@ -21,6 +21,8 @@ import { useSceneStore } from '@/state/useSceneStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useQuestStore } from '@/state/useQuestStore';
+import { useMapPreferencesStore } from '@/state/useMapPreferencesStore';
+import { resolveActiveQuestTargetRefIds } from '@/utils/questTargetLookup';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { useJournalStore } from '@/state/useJournalStore';
@@ -315,6 +317,7 @@ export function OverworldScene() {
   const uid = useAuthStore((s) => s.user?.uid);
   const displayName = usePlayerStore((s) => s.displayName ?? undefined);
   const questProgress = useQuestStore((s) => s.progress);
+  const hiddenQuestIds = useMapPreferencesStore((s) => s.hiddenQuestIds);
   // Rolled fresh each time the player (re)arrives at a top-level location - stable for the
   // visit, varied across visits (see src/utils/weather.ts's resolveWeather). Reads progress via
   // getState() rather than the reactive `questProgress` above so an unrelated quest updating
@@ -564,6 +567,11 @@ export function OverworldScene() {
   // early return below) - hooks can never be skipped on some renders and not others.
   const entities = useMemo<GridEntity[]>(() => {
     if (!map) return [];
+    // Same target-resolution rules as MiniMap.tsx's own "quest gold ring" (see
+    // questTargetLookup.ts) - lets a quest-target NPC/interactable/exit show the floating marker
+    // ExplorationScene.ts renders above its head, not just on the map overlay.
+    const activeQuestTargetRefIds = resolveActiveQuestTargetRefIds(map, questProgress, hiddenQuestIds);
+
     const npcEntities: GridEntity[] = map.objects
       .filter((o) => o.type === 'npc' && o.refId)
       .map((o) => {
@@ -576,6 +584,7 @@ export function OverworldScene() {
           spriteAssetId: npc?.spriteAssetId ?? 'sprite.player',
           label: npc?.name,
           badge: npc && hasNewDialogue(npc, questProgress, seenNpcDialogueVariant) ? '!' : undefined,
+          questTarget: activeQuestTargetRefIds.has(o.refId!),
           // Only meaningful for a wandering NPC whose sheet actually has walk rows
           // (NPC_WALK_ASSET_IDS) - see TownScene.tsx's identical wiring for the full explanation.
           movementState: pos.isMoving ? 'walking' : undefined,
@@ -613,6 +622,7 @@ export function OverworldScene() {
           y: o.y,
           spriteAssetId,
           label: isChest || decorEntity ? undefined : labelForInteractable(o.refId!, openedChests, inventory),
+          questTarget: activeQuestTargetRefIds.has(o.refId!),
           blocksMovement: true,
         };
       });
@@ -630,10 +640,17 @@ export function OverworldScene() {
     // looking like plain ground - same generic marker as TownScene's interior exits.
     const exitEntities: GridEntity[] = map.objects
       .filter((o) => o.type === 'transition' && o.refId)
-      .map((o) => ({ id: `exit-${o.refId}`, x: o.x, y: o.y, spriteAssetId: 'structure.exit-marker', label: 'Exit' }));
+      .map((o) => ({
+        id: `exit-${o.refId}`,
+        x: o.x,
+        y: o.y,
+        spriteAssetId: 'structure.exit-marker',
+        label: 'Exit',
+        questTarget: activeQuestTargetRefIds.has(o.refId!),
+      }));
 
     return [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
-  }, [map, wanderPositions, questProgress, seenNpcDialogueVariant, openedChests, fieldEncounterIcons, inventory]);
+  }, [map, wanderPositions, questProgress, hiddenQuestIds, seenNpcDialogueVariant, openedChests, fieldEncounterIcons, inventory]);
 
   if (!map) {
     return (

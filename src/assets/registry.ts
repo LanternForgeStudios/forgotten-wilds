@@ -1637,6 +1637,17 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'Kenney "Fantasy UI Borders" pack, CC0 1.0, kenney.nl/assets/fantasy-ui-borders. Use as CSS border-image with ~16px slice insets.',
   },
   {
+    id: 'ui.quest-target-marker',
+    category: 'ui',
+    intendedUse:
+      "Floating map-pin marker shown above an NPC/interactable/exit that's the current, unmet target of an active quest objective (see ExplorationScene.ts's questMarker attachment and questTargetLookup.ts) - mirrors MiniMap.tsx's own gold-ring quest indicator so the player can spot the same objective while actually walking the overworld.",
+    filePath: 'ui/quest-target-marker.png',
+    dimensions: { width: 33, height: 40 },
+    status: 'final',
+    notes:
+      'User-supplied source image (art-staging/icons/quest-location-marker-yellow.png, 64x64) - cropped to its opaque bounding box plus a 2px transparent margin, then downscaled to 40px tall with LANCZOS and PNG-optimized (2026-08), replacing an earlier procedurally-generated Graphics teardrop texture with the same silhouette/role.',
+  },
+  {
     id: 'portrait.elias-rowan',
     category: 'portrait',
     intendedUse: 'Dialogue portrait for elias-rowan',

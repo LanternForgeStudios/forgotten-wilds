@@ -26,6 +26,12 @@ export interface GridEntity {
   facing?: Facing;
   /** Small overlay shown above the entity's label (e.g. "!" for an NPC with unheard dialogue). */
   badge?: string;
+  /** Shows a floating gold teardrop marker above this entity - set when it's the current, unmet
+   *  target of an active quest objective (see questTargetLookup.ts's resolveActiveQuestTargetRefIds,
+   *  the same resolution rules MiniMap.tsx's own "quest gold ring" uses). Mirrors that minimap
+   *  indicator so a player can also spot their next objective while actually walking the overworld,
+   *  not just glancing at the map overlay. */
+  questTarget?: boolean;
   /** Multiplier on top of ExplorationScene's normal viewport-relative scale (see
    *  REFERENCE_VIEWPORT_SCALE) - for a caller that wants to render this specific entity's existing
    *  art smaller/larger than its native pixel size would otherwise imply, without needing new art
