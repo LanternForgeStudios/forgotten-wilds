@@ -32,6 +32,7 @@ import {
   callCancelTrade,
   callSetPlayerSkin,
   callSetDifficulty,
+  callSetCombatPreferences,
   callCreateClan,
   callInviteToClan,
   callRespondToClanInvite,
@@ -56,7 +57,6 @@ import { useNow } from '@/hooks/useNow';
 import { isPresenceOnline } from '@/utils/presence';
 import { useToastStore } from '@/state/useToastStore';
 import { useAudioSettingsStore } from '@/state/useAudioSettingsStore';
-import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import { useDebugStore } from '@/state/useDebugStore';
 import type { TimePhase, WeatherKind } from '@/types';
 import { TradeOfferPanel } from './TradeOfferPanel';
@@ -115,7 +115,6 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const authUser = useAuthStore((s) => s.user);
   const player = usePlayerStore((s) => s.player);
   const audioSettings = useAudioSettingsStore();
-  const combatPrefs = useCombatPreferencesStore();
   const debugStore = useDebugStore();
   useOverlayClose(onClose);
 
@@ -429,6 +428,17 @@ export function UserProfile({ onClose }: UserProfileProps) {
     setBusy(true);
     try {
       await callSetDifficulty(difficulty);
+      if (uid) await resyncSave(uid);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function changeCombatPreferences(fastRounds: boolean, targetAll: boolean) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await callSetCombatPreferences(fastRounds, targetAll);
       if (uid) await resyncSave(uid);
     } finally {
       setBusy(false);
@@ -1496,16 +1506,22 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
                     <input
                       type="checkbox"
-                      checked={combatPrefs.defaultFastRounds}
-                      onChange={(e) => combatPrefs.setDefaultFastRounds(e.target.checked)}
+                      disabled={busy}
+                      checked={player?.combatPreferences?.fastRounds ?? false}
+                      onChange={(e) =>
+                        changeCombatPreferences(e.target.checked, player?.combatPreferences?.targetAll ?? false)
+                      }
                     />
                     Fast Rounds
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
                     <input
                       type="checkbox"
-                      checked={combatPrefs.defaultTargetAll}
-                      onChange={(e) => combatPrefs.setDefaultTargetAll(e.target.checked)}
+                      disabled={busy}
+                      checked={player?.combatPreferences?.targetAll ?? false}
+                      onChange={(e) =>
+                        changeCombatPreferences(player?.combatPreferences?.fastRounds ?? false, e.target.checked)
+                      }
                     />
                     Target All
                   </label>

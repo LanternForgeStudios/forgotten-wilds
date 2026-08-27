@@ -76,6 +76,15 @@ export type RegionalReputationRank = 'Stranger' | 'Acquaintance' | 'Trusted Ally
  *  appearance via setPlayerSkin.ts. */
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
+/** Starting state for the in-combat "Fast Rounds"/"Target All" toggles (Settings > Encounter
+ *  Defaults) - each fight still owns its own local toggle state, this only seeds it. Account-wide
+ *  (synced via setCombatPreferences.ts) rather than per-device localStorage, so the player's
+ *  chosen defaults follow them to a new device/browser instead of resetting. */
+export interface CombatPreferences {
+  fastRounds: boolean;
+  targetAll: boolean;
+}
+
 export type PlayerEquipment = Partial<Record<EquipmentSlot, string | null>>;
 
 export interface Player {
@@ -131,6 +140,10 @@ export interface Player {
    *  fresh character (newCharacter.ts) and as a read-time fallback for any save that predates
    *  this field (see resolveCombatAction.ts). */
   difficulty: Difficulty;
+  /** See CombatPreferences' own doc comment. Defaults to { fastRounds: false, targetAll: false }
+   *  for a fresh character (newCharacter.ts) and as a read-time fallback for any save that
+   *  predates this field. */
+  combatPreferences: CombatPreferences;
 }
 
 export interface InventoryItem {

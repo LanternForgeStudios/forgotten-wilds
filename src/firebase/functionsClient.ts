@@ -47,6 +47,18 @@ export async function callSetDifficulty(difficulty: Difficulty): Promise<{ diffi
   return result.data;
 }
 
+export async function callSetCombatPreferences(
+  fastRounds: boolean,
+  targetAll: boolean,
+): Promise<{ fastRounds: boolean; targetAll: boolean }> {
+  const fn = httpsCallable<{ fastRounds: boolean; targetAll: boolean }, { fastRounds: boolean; targetAll: boolean }>(
+    functions,
+    'setCombatPreferences',
+  );
+  const result = await fn({ fastRounds, targetAll });
+  return result.data;
+}
+
 export async function callSetDisplayName(name: string): Promise<{ displayName: string }> {
   const fn = httpsCallable<{ name: string }, { displayName: string }>(functions, 'setDisplayName');
   const result = await fn({ name });

@@ -45,6 +45,16 @@ export interface Player {
   lanternOilUpgrades: Record<string, number>;
   /** Solo-combat-only, see the Difficulty type's own doc comment. Defaults to 'medium'. */
   difficulty: Difficulty;
+  /** Account-wide starting state for the in-combat "Fast Rounds"/"Target All" toggles - see
+   *  functions/src/shared-types/index.ts's matching field for the full design reasoning. Always
+   *  present once hydrated from the server (defaults to false/false), even for a save that
+   *  predates this field. */
+  combatPreferences: CombatPreferences;
+}
+
+export interface CombatPreferences {
+  fastRounds: boolean;
+  targetAll: boolean;
 }
 
 /** One dynamically-generated Apothecary/Herbalist "restock" request - see PlayerSave's own

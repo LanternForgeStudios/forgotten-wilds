@@ -14,9 +14,9 @@ interface DebugState {
 
 /** Backs the UserProfile Debug tab (replaces the old F8 weather-cycle/F9 collision-toggle
  *  hotkeys - see PhaserExplorationCanvas.tsx and OverworldScene.tsx/TownScene.tsx). Deliberately
- *  NOT persisted (no zustand `persist` middleware, unlike useAudioSettingsStore/
- *  useCombatPreferencesStore) - a debug session shouldn't silently carry into a later real play
- *  session; it resets to normal (Auto/off) on every reload. */
+ *  NOT persisted (no zustand `persist` middleware, unlike useAudioSettingsStore) - a debug
+ *  session shouldn't silently carry into a later real play session; it resets to normal
+ *  (Auto/off) on every reload. */
 export const useDebugStore = create<DebugState>((set) => ({
   showCollisions: false,
   weatherOverride: null,

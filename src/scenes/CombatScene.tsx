@@ -40,7 +40,6 @@ import { SkillSelectMenu } from '@/components/SkillSelectMenu';
 import { ItemUseMenu } from '@/components/ItemUseMenu';
 import { useLorePopupQueue } from '@/hooks/useLorePopupQueue';
 import { useItemTray } from '@/hooks/useItemTray';
-import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import styles from './CombatScene.module.css';
 
 const RESTORE_STAT_LABEL: Record<'hp' | 'spirit' | 'lanternOil', string> = {
@@ -91,7 +90,7 @@ export function CombatScene() {
   const [enemies, setEnemies] = useState<EncounterEnemy[]>([]);
   const [targetIndex, setTargetIndex] = useState<number | null>(null);
   const [targetMode, setTargetMode] = useState<'single' | 'all'>(() =>
-    useCombatPreferencesStore.getState().defaultTargetAll ? 'all' : 'single',
+    usePlayerStore.getState().player?.combatPreferences?.targetAll ? 'all' : 'single',
   );
   const [log, setLog] = useState<string[]>([]);
   const [playerAilments, setPlayerAilments] = useState<ActiveAilment[]>([]);
@@ -171,7 +170,7 @@ export function CombatScene() {
   // enemy round every time can speed through it. Seeded from the player's saved default (Settings
   // > Encounter Defaults) on a fresh encounter (new CombatScene mount); still resets to that
   // default rather than persisting mid-session toggles across fights.
-  const [fastRounds, setFastRounds] = useState(() => useCombatPreferencesStore.getState().defaultFastRounds);
+  const [fastRounds, setFastRounds] = useState(() => usePlayerStore.getState().player?.combatPreferences?.fastRounds ?? false);
   const hitBatchRef = useRef(0);
   const encounterGuardRef = useRef<{ locationId: string; cancelled: boolean } | null>(null);
   // True once a defeat round's response has arrived but its (already-respawned-at-Ash-Hallow)

@@ -4,6 +4,7 @@ import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { PhaserBattleCanvas } from './combat/PhaserBattleCanvas';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useInventoryStore } from '@/state/useInventoryStore';
+import { usePlayerStore } from '@/state/usePlayerStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useNow } from '@/hooks/useNow';
 import { useCombatMusic } from '@/hooks/useCombatMusic';
@@ -24,7 +25,6 @@ import { describeSkill, describeLanternAbility } from '@/utils/moveDescription';
 import { itemWouldHaveEffect, sortCombatConsumables } from '@/utils/itemEffect';
 import { enemyHitGroupFor, ENEMY_HIT_SFX } from '@/utils/enemyHitGroup';
 import { INCOMING_HIT_STAGGER_MS, PRE_ENEMY_ATTACK_DELAY_MS } from '@/phaser/battleEffects';
-import { useCombatPreferencesStore } from '@/state/useCombatPreferencesStore';
 import { SkillSelectMenu } from './SkillSelectMenu';
 import { ItemUseMenu } from './ItemUseMenu';
 import { useItemTray } from '@/hooks/useItemTray';
@@ -51,7 +51,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   const [battle, setBattle] = useState<PartyBattleSession | null>(null);
   const [selectedTarget, setSelectedTarget] = useState(0);
   const [targetMode, setTargetMode] = useState<'single' | 'all'>(() =>
-    useCombatPreferencesStore.getState().defaultTargetAll ? 'all' : 'single',
+    usePlayerStore.getState().player?.combatPreferences?.targetAll ? 'all' : 'single',
   );
   const [showSkillMenu, setShowSkillMenu] = useState(false);
   const [showItemMenu, setShowItemMenu] = useState(false);
@@ -71,7 +71,7 @@ export function EndlessBattlePanel({ battleId, onClose }: EndlessBattlePanelProp
   // combat's own fastRounds (CombatScene.tsx) exactly: purely a local animation-pacing choice, so
   // one player toggling it has zero effect on what anyone else in the same battle sees. Seeded
   // from the player's saved default (Settings > Encounter Defaults), same as solo combat.
-  const [fastRounds, setFastRounds] = useState(() => useCombatPreferencesStore.getState().defaultFastRounds);
+  const [fastRounds, setFastRounds] = useState(() => usePlayerStore.getState().player?.combatPreferences?.fastRounds ?? false);
   const [names, setNames] = useState<Record<string, string>>({});
   const now = useNow(1000);
   // While a fight is actively in progress, Escape/click-outside must NOT silently dismiss this

@@ -38,6 +38,7 @@ export function buildFreshPlayer(
     lastChestClaimedAt: 0,
     lanternOilUpgrades: {},
     difficulty: 'medium',
+    combatPreferences: { fastRounds: false, targetAll: false },
   };
 }
 

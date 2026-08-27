@@ -23,6 +23,7 @@ export { sellItem } from './functions/sellItem';
 export { craftItem } from './functions/craftItem';
 export { setPlayerSkin } from './functions/setPlayerSkin';
 export { setDifficulty } from './functions/setDifficulty';
+export { setCombatPreferences } from './functions/setCombatPreferences';
 export { searchUsers } from './functions/searchUsers';
 export { sendFriendRequest, respondToFriendRequest, removeFriend } from './functions/friends';
 export { blockUser, unblockUser } from './functions/blocking';
