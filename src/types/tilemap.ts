@@ -103,4 +103,11 @@ export interface TileMap {
    *  less error-prone than the reverse (forgetting to flag an obstacle non-walkable is much rarer
    *  and more visually obvious - you can see the wall/water sitting there). */
   nonWalkableTileIds: number[];
+  /** Tiled's native per-tile animation feature (Tileset Editor -> a tile -> Tile Animation Editor),
+   *  keyed by the *source* tile's own global gid (tileset.firstgid + local tile id - same convention
+   *  as nonWalkableTileIds above). Each frame's `gid` is likewise already resolved to global space,
+   *  paired with that frame's own on-screen `durationMs`. Empty for the (common) case of a map that
+   *  doesn't use the feature - ExplorationScene only pays the per-frame cycling cost for gids present
+   *  here. */
+  animatedTiles: Record<number, { gid: number; durationMs: number }[]>;
 }

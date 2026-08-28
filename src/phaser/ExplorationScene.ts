@@ -284,6 +284,20 @@ export class ExplorationScene extends Phaser.Scene {
    *  character/entity sprites relative to REFERENCE_VIEWPORT_SCALE. Set once per loadMap call. */
   private viewportScale = REFERENCE_VIEWPORT_SCALE;
   private mapLayers: Phaser.Tilemaps.TilemapLayer[] = [];
+  /** One entry per distinct *source* tile (identified by its own global gid) that the current map's
+   *  Tiled data marks as animated AND that's actually placed somewhere on the map - built once in
+   *  loadMap by grouping every placement sharing that source gid, then cycled every frame by
+   *  advanceAnimatedTiles (called from update()). `cycleMs` walks forward through `totalDurationMs`
+   *  (wrapping via modulo, not accumulated frame-by-frame) so a very large delta - e.g. the tab was
+   *  backgrounded for a while - resolves straight to the correct frame instead of looping through
+   *  every intermediate one. Rebuilt alongside mapLayers on every real location swap. */
+  private animatedTileGroups: {
+    frames: { gid: number; durationMs: number }[];
+    totalDurationMs: number;
+    cycleMs: number;
+    frameIndex: number;
+    placements: { layer: Phaser.Tilemaps.TilemapLayer; tx: number; ty: number; rotation: number; flipX: boolean }[];
+  }[] = [];
   private currentMapKey: string | null = null;
   /** Set whenever loadMap actually swaps to a different location - consumed by the next
    *  setPlayer call so a location transition snaps the player to the new spawn point instantly
@@ -575,7 +589,9 @@ export class ExplorationScene extends Phaser.Scene {
    *  does NOT touch `playerSprite.x/y` or anything derived from it (depth-sort, equipment-layer
    *  mirroring, the throttled React position report) - see syncAfterPhysicsStep's own comment for
    *  why that has to happen in a separate, later hook instead of here. */
-  update(_time: number, _delta: number): void {
+  update(_time: number, delta: number): void {
+    this.advanceAnimatedTiles(delta);
+
     const sprite = this.playerSprite;
     if (!sprite || !sprite.body) return;
     const body = sprite.body as Phaser.Physics.Arcade.Body;
@@ -615,6 +631,35 @@ export class ExplorationScene extends Phaser.Scene {
     this.currentMovementState = dx === 0 && dy === 0 ? 'idle' : dashHeld ? 'running' : 'walking';
 
     this.applyPlayerAnimation(this.currentMovementState);
+  }
+
+  /** Cycles every Tiled-animated tile group (water, sewer, etc. - see animatedTileGroups' own doc
+   *  comment) forward by this frame's delta. `cycleMs` resolves fresh from 0 every call rather than
+   *  tracking "time since last frame change" so a huge delta (a backgrounded tab) lands directly on
+   *  the correct frame instead of stepping through every intermediate one. Cheap no-op for the
+   *  overwhelming majority of maps, which declare no animated tiles at all. */
+  private advanceAnimatedTiles(deltaMs: number): void {
+    for (const group of this.animatedTileGroups) {
+      if (group.frames.length <= 1) continue;
+      group.cycleMs = (group.cycleMs + deltaMs) % group.totalDurationMs;
+      let acc = 0;
+      let frameIndex = group.frames.length - 1;
+      for (let i = 0; i < group.frames.length; i++) {
+        acc += group.frames[i].durationMs;
+        if (group.cycleMs < acc) {
+          frameIndex = i;
+          break;
+        }
+      }
+      if (frameIndex === group.frameIndex) continue;
+      group.frameIndex = frameIndex;
+      const frame = group.frames[frameIndex];
+      for (const placement of group.placements) {
+        const tile = placement.layer.putTileAt(frame.gid - 1, placement.tx, placement.ty);
+        if (placement.rotation) tile.rotation = placement.rotation;
+        if (placement.flipX) tile.flipX = placement.flipX;
+      }
+    }
   }
 
   /** Runs after Arcade Physics has fully resolved this frame's movement/collisions AND already
@@ -1053,6 +1098,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.currentFootstepSurface = footstepSurfaceFor(map.locationId);
     for (const layer of this.mapLayers) layer.destroy();
     this.mapLayers = [];
+    this.animatedTileGroups = [];
     this.groundLayer = null;
     this.collisionStaticGroup?.clear(true, true);
     this.collisionStaticGroup = null;
@@ -1153,6 +1199,12 @@ export class ExplorationScene extends Phaser.Scene {
     const voidTileset = tilemap.addTilesetImage('void-tile', voidKey, map.tileWidth, map.tileHeight, 0, 0, VOID_TILE_INDEX)!;
     const tilesetsWithVoid = [...tilesets, voidTileset];
 
+    // Groups placements that share the same *source* animated tile (by its global gid) so every
+    // occurrence of, say, a water tile cycles through Tiled's declared frame sequence in lockstep -
+    // built up across all layers here, then handed to this.animatedTileGroups once as arrays (see
+    // that field's own doc comment for why cycleMs is wall-clock rather than frame-accumulated).
+    const animatedGroupsByGid = new Map<number, (typeof this.animatedTileGroups)[number]>();
+
     let groundPhaserLayer: Phaser.Tilemaps.TilemapLayer | null = null;
     orderedLayers.forEach((layer, index) => {
       const isGround = layer.name === 'ground';
@@ -1182,6 +1234,21 @@ export class ExplorationScene extends Phaser.Scene {
           tile.rotation = gidInfo.rotation;
           tile.flipX = gidInfo.flipped;
         }
+        const frames = map.animatedTiles[gidInfo.gid];
+        if (frames) {
+          let group = animatedGroupsByGid.get(gidInfo.gid);
+          if (!group) {
+            group = {
+              frames,
+              totalDurationMs: frames.reduce((sum, f) => sum + f.durationMs, 0),
+              cycleMs: 0,
+              frameIndex: 0,
+              placements: [],
+            };
+            animatedGroupsByGid.set(gidInfo.gid, group);
+          }
+          group.placements.push({ layer: phaserLayer, tx, ty, rotation: gidInfo.rotation, flipX: gidInfo.flipped });
+        }
       });
       phaserLayer.setAlpha(layer.opacity).setVisible(layer.visible).setScale(this.viewportScale).setLighting(true);
       const overhangMatch = /^overhang(?:-(\d+))?$/.exec(layer.name);
@@ -1192,6 +1259,7 @@ export class ExplorationScene extends Phaser.Scene {
       if (isGround) groundPhaserLayer = phaserLayer;
     });
     this.groundLayer = groundPhaserLayer;
+    this.animatedTileGroups = [...animatedGroupsByGid.values()];
 
     if (groundPhaserLayer) {
       const nonWalkableIndices = map.nonWalkableTileIds.map((gid) => gid - 1);

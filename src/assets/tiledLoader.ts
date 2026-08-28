@@ -53,6 +53,9 @@ interface TiledObjectGroup {
 interface TiledTilesetTile {
   id: number;
   properties?: TiledProperty[];
+  /** Tiled's native Tile Animation Editor output - `tileid` is local to this tile's own tileset
+   *  (0-based), same space as `id` above; `duration` is milliseconds this frame stays on screen. */
+  animation?: { tileid: number; duration: number }[];
 }
 
 interface TiledEmbeddedTileset {
@@ -263,10 +266,17 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
   // marks it `walkable: false` (walls, water, chasms, ...). Checks strictly against `=== false` -
   // a tile with no `walkable` property at all (propValue returns undefined) defaults to walkable.
   const nonWalkableTileIds: number[] = [];
+  const animatedTiles: TileMap['animatedTiles'] = {};
   for (const tileset of raw.tilesets) {
     for (const tile of tileset.tiles ?? []) {
       if (propValue<boolean>(tile.properties, 'walkable') === false) {
         nonWalkableTileIds.push(tileset.firstgid + tile.id);
+      }
+      if (tile.animation && tile.animation.length > 0) {
+        animatedTiles[tileset.firstgid + tile.id] = tile.animation.map((f) => ({
+          gid: tileset.firstgid + f.tileid,
+          durationMs: f.duration,
+        }));
       }
     }
   }
@@ -282,5 +292,6 @@ export async function loadTiledMap(locationId: string, mapAssetId: string): Prom
     objects,
     collisionObjects,
     nonWalkableTileIds,
+    animatedTiles,
   };
 }

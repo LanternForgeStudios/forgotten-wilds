@@ -96,6 +96,21 @@ is walkable, so a newly-painted floor variant works immediately without also hav
 flag it walkable somewhere else — you only ever need to think about this for the (usually much
 smaller) set of tiles that should block movement.
 
+## Tile animation
+
+Tiled's native per-tile animation (Tileset Editor → select a tile → Tile Animation Editor) is
+supported — a water, sewer, or forge tile animated this way plays back in-game automatically, no
+game code changes needed. Every placement of that same source tile across the whole map cycles in
+lockstep, using each frame's own duration exactly as set in the editor.
+
+This only takes effect on a tile actually placed on a layer — animating a tile in the Tileset
+Editor doesn't do anything on its own, same as `walkable` above.
+
+If more than one map shares the same tileset (see "Multiple tilesets per map") and you animate a
+tile in one map's copy of it, that animation only applies to that one map — each map embeds its own
+copy of the tileset's data, so the same tile in another map stays static until you either repeat the
+animation there too or ask for it to be copied over.
+
 ## Custom properties
 
 - **Map Properties → Custom Properties**: `tilesetAssetId` (string) — the game asset-registry id for
@@ -103,6 +118,8 @@ smaller) set of tiles that should block movement.
   tilesets per map" above for maps with more than one.
 - **Tileset editor, per tile**: `walkable` (bool) — see "Walkability" above. Omit entirely for any
   tile that should just be walkable.
+- **Tileset editor, per tile**: Tile Animation Editor — see "Tile animation" above. Omit entirely
+  for any tile that should just be static.
 
 ## Export settings — hard constraints
 
