@@ -3,7 +3,9 @@ import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { ITEMS, EQUIPMENT } from '@/data';
 import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
-import { itemDisplayName } from '@/utils/itemName';
+import { itemDisplayName, itemIconAssetId } from '@/utils/itemName';
+import { getAssetUrl } from '@/assets/assetManager';
+import { ItemDetailPopup } from './common/ItemDetailPopup';
 import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './UserProfile.module.css';
 import subtabStyles from './CharacterMenu.module.css';
@@ -48,6 +50,7 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
   // choice should persist across sessions.
   const [typeFilter, setTypeFilter] = useState<TradeTypeFilter>('all');
   const [slotFilter, setSlotFilter] = useState<EquipmentSlot | 'all'>('all');
+  const [detailItemId, setDetailItemId] = useState<string | null>(null);
 
   const equippedItemIds = new Set(Object.values(player?.equipment ?? {}).filter((id): id is string => !!id));
   const pickable = inventory
@@ -129,7 +132,18 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
         {pickable.length === 0 && <p className={styles.empty}>No tradeable items in your inventory.</p>}
         {pickable.map((entry) => (
           <div key={entry.itemId} className={styles.row}>
-            <span className={styles.rowName}>
+            <span
+              className={styles.rowName}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+              onClick={() => setDetailItemId(entry.itemId)}
+            >
+              {itemIconAssetId(entry.itemId) && (
+                <img
+                  src={getAssetUrl(itemIconAssetId(entry.itemId)!)}
+                  alt=""
+                  style={{ width: 20, height: 20, imageRendering: 'pixelated', flexShrink: 0 }}
+                />
+              )}
               {itemDisplayName(entry.itemId)} (own {entry.quantity})
             </span>
             <input
@@ -162,6 +176,13 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
           Cancel
         </button>
       </div>
+      {detailItemId && (
+        <ItemDetailPopup
+          itemId={detailItemId}
+          quantity={inventory.find((e) => e.itemId === detailItemId)?.quantity ?? 0}
+          onClose={() => setDetailItemId(null)}
+        />
+      )}
     </div>
   );
 }

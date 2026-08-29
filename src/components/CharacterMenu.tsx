@@ -3,6 +3,7 @@ import { Panel } from './common/Panel';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { TierBadge } from './common/TierBadge';
 import { BestBadge } from './common/BestBadge';
+import { ItemDetailPopup } from './common/ItemDetailPopup';
 import { getAssetUrl } from '@/assets/assetManager';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -14,7 +15,6 @@ import { ITEMS, EQUIPMENT, RECIPES, QUESTS } from '@/data';
 import { EQUIPMENT_SLOTS, type EquipmentSlot } from '@/types';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { StatBonusesText, AilmentResistanceText } from '@/components/common/StatBonusText';
-import { LanternAbilitiesText } from '@/components/common/LanternAbilitiesText';
 import { bestEquipmentIds } from '@/utils/equipmentScore';
 import { isUsableEffect, itemWouldHaveEffect, itemEffectGroupOf, ITEM_EFFECT_GROUP_ORDER, ITEM_EFFECT_GROUP_LABELS } from '@/utils/itemEffect';
 import { SLOT_LABELS, SLOT_FILTER_ORDER, slotFamily, isSlotUnlocked, SLOT_UNLOCK_QUEST_ID } from '@/utils/equipmentSlotLabels';
@@ -351,69 +351,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
               </div>
 
               {selected && (
-                <div
-                  className={styles.detailOverlay}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedItemId(null);
-                  }}
-                >
-                  <Panel className={styles.detailPopupPanel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                    <OverlayCloseButton onClick={() => setSelectedItemId(null)} />
-                    <div className={styles.detailPanel}>
-                      <div className={styles.detailHeader}>
-                        {selected.iconAssetId && (
-                          <img src={getAssetUrl(selected.iconAssetId)} alt="" className={styles.detailIcon} />
-                        )}
-                        <div>
-                          <p className={styles.detailName}>
-                            {selected.name} {(selected.equipDef ?? selected.itemDef) && (
-                              <TierBadge tier={(selected.equipDef ?? selected.itemDef)!.tier} style={{ marginLeft: 6 }} />
-                            )}
-                          </p>
-                          <p className={styles.detailMeta}>
-                            {selected.equipDef
-                              ? `${SLOT_LABELS[selected.equipDef.slot]} · x${selected.quantity}`
-                              : `${SUBTAB_LABELS[subTabOf(selected)]} · x${selected.quantity}`}
-                            {(selected.equipDef?.unique ?? selected.itemDef?.unique) &&
-                              ' · Unique (cannot be lost, sold, or traded)'}
-                          </p>
-                        </div>
-                      </div>
-                      <p className={styles.detailDescription}>{selected.description}</p>
-                      {selected.equipDef && formatStatBonuses(selected.equipDef.statBonuses) && (
-                        <p className={styles.detailStats}>
-                          <StatBonusesText bonuses={selected.equipDef.statBonuses} />
-                        </p>
-                      )}
-                      {selected.equipDef && formatAilmentResistance(selected.equipDef.ailmentResistance) && (
-                        <p className={styles.detailStats}>
-                          <AilmentResistanceText resistances={selected.equipDef.ailmentResistance} />
-                        </p>
-                      )}
-                      {selected.equipDef?.lanternAbilityIds && (
-                        <LanternAbilitiesText
-                          equipDef={selected.equipDef}
-                          oilTier={player?.lanternOilUpgrades?.[selected.equipDef.id] ?? 0}
-                        />
-                      )}
-                      {selected.itemDef?.effect && (
-                        <p className={styles.detailStats}>
-                          {selected.itemDef.effect.healHpPercent
-                            ? `Restores ${Math.round(selected.itemDef.effect.healHpPercent * 100)}% HP  `
-                            : ''}
-                          {selected.itemDef.effect.healSpiritPercent
-                            ? `Restores ${Math.round(selected.itemDef.effect.healSpiritPercent * 100)}% Spirit  `
-                            : ''}
-                          {selected.itemDef.effect.restoreOilPercent
-                            ? `Restores ${Math.round(selected.itemDef.effect.restoreOilPercent * 100)}% Lantern Oil  `
-                            : ''}
-                          {selected.itemDef.effect.reviveOnDefeat ? 'Revives on defeat' : ''}
-                        </p>
-                      )}
-                    </div>
-                  </Panel>
-                </div>
+                <ItemDetailPopup itemId={selected.itemId} quantity={selected.quantity} onClose={() => setSelectedItemId(null)} />
               )}
             </div>
           );
