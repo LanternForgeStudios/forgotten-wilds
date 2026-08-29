@@ -6,26 +6,16 @@ import { SLOT_LABELS, SLOT_FILTER_ORDER } from '@/utils/equipmentSlotLabels';
 import { itemDisplayName, itemIconAssetId } from '@/utils/itemName';
 import { getAssetUrl } from '@/assets/assetManager';
 import { ItemDetailPopup } from './common/ItemDetailPopup';
+import panelStyles from './common/Panel.module.css';
+import { ITEM_CATEGORY_LABELS, resolveItemCategory } from '@/utils/itemCategoryLabels';
 import type { EquipmentSlot, ItemCategory } from '@/types';
 import styles from './UserProfile.module.css';
 import subtabStyles from './CharacterMenu.module.css';
 
-/** Same filter dimension as Shop.tsx's Sell tab - every real ItemCategory, plus a synthesized
- *  'equipment' bucket for anything found in EQUIPMENT (which has no `category` field of its own). */
-type TradeTypeFilter = ItemCategory | 'equipment' | 'all';
-
-const TRADE_TYPE_LABELS: Record<Exclude<TradeTypeFilter, 'all'>, string> = {
-  consumable: 'Consumables',
-  equipment: 'Equipment',
-  keyItem: 'Key Items',
-  lanternUpgrade: 'Lantern Upgrades',
-  materials: 'Materials',
-};
-
-function tradeTypeOf(itemDef: (typeof ITEMS)[number] | undefined, equipDef: (typeof EQUIPMENT)[number] | undefined): TradeTypeFilter {
-  if (equipDef) return 'equipment';
-  return itemDef?.category ?? 'materials';
-}
+/** Same filter dimension as Shop.tsx's Sell tab - every real ItemCategory ('equipment' included,
+ *  synthesized for anything found in EQUIPMENT, which has no `category` field of its own), plus
+ *  the cross-cutting 'all'. */
+type TradeTypeFilter = ItemCategory | 'all';
 
 interface TradeOfferPanelProps {
   title: string;
@@ -62,7 +52,7 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
       if (typeFilter === 'all') return true;
       const itemDef = ITEMS.find((i) => i.id === entry.itemId);
       const equipDef = EQUIPMENT.find((e) => e.id === entry.itemId);
-      return tradeTypeOf(itemDef, equipDef) === typeFilter;
+      return resolveItemCategory(itemDef, equipDef) === typeFilter;
     })
     .filter((entry) => {
       if (typeFilter !== 'equipment' || slotFilter === 'all') return true;
@@ -96,7 +86,7 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
         >
           All
         </button>
-        {(Object.keys(TRADE_TYPE_LABELS) as Exclude<TradeTypeFilter, 'all'>[]).map((key) => (
+        {(Object.keys(ITEM_CATEGORY_LABELS) as ItemCategory[]).map((key) => (
           <button
             key={key}
             className={`${subtabStyles.subtab} ${typeFilter === key ? subtabStyles.subtabActive : ''}`}
@@ -105,7 +95,7 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
               setSlotFilter('all');
             }}
           >
-            {TRADE_TYPE_LABELS[key]}
+            {ITEM_CATEGORY_LABELS[key]}
           </button>
         ))}
       </div>
@@ -129,33 +119,47 @@ export function TradeOfferPanel({ title, submitLabel, busy, onSubmit, onCancel }
         </div>
       )}
       <div className={styles.list}>
-        {pickable.length === 0 && <p className={styles.empty}>No tradeable items in your inventory.</p>}
-        {pickable.map((entry) => (
-          <div key={entry.itemId} className={styles.row}>
-            <span
-              className={styles.rowName}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
-              onClick={() => setDetailItemId(entry.itemId)}
-            >
-              {itemIconAssetId(entry.itemId) && (
-                <img
-                  src={getAssetUrl(itemIconAssetId(entry.itemId)!)}
-                  alt=""
-                  style={{ width: 20, height: 20, imageRendering: 'pixelated', flexShrink: 0 }}
-                />
-              )}
-              {itemDisplayName(entry.itemId)} (own {entry.quantity})
-            </span>
-            <input
-              className={styles.tradeQuantityInput}
-              type="number"
-              min={0}
-              max={entry.quantity}
-              value={selected[entry.itemId] ?? 0}
-              onChange={(e) => setQuantity(entry.itemId, Number(e.target.value), entry.quantity)}
-            />
-          </div>
-        ))}
+        {pickable.length === 0 && <p className={panelStyles.empty}>No tradeable items in your inventory.</p>}
+        {pickable.map((entry) => {
+          const quantity = selected[entry.itemId] ?? 0;
+          return (
+            <div key={entry.itemId} className={styles.row}>
+              <span
+                className={styles.rowName}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+                onClick={() => setDetailItemId(entry.itemId)}
+              >
+                {itemIconAssetId(entry.itemId) && (
+                  <img
+                    src={getAssetUrl(itemIconAssetId(entry.itemId)!)}
+                    alt=""
+                    style={{ width: 20, height: 20, imageRendering: 'pixelated', flexShrink: 0 }}
+                  />
+                )}
+                {itemDisplayName(entry.itemId)} (own {entry.quantity})
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <button
+                  type="button"
+                  className={styles.smallButton}
+                  disabled={quantity <= 0}
+                  onClick={() => setQuantity(entry.itemId, quantity - 1, entry.quantity)}
+                >
+                  −
+                </button>
+                <span style={{ fontSize: 12, minWidth: 18, textAlign: 'center' }}>{quantity}</span>
+                <button
+                  type="button"
+                  className={styles.smallButton}
+                  disabled={quantity >= entry.quantity}
+                  onClick={() => setQuantity(entry.itemId, quantity + 1, entry.quantity)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
       <div className={styles.row}>
         <span className={styles.rowName}>Gold (you have {player?.gold ?? 0})</span>
