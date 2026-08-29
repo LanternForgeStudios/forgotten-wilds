@@ -59,6 +59,7 @@ import { isPresenceOnline } from '@/utils/presence';
 import { useToastStore } from '@/state/useToastStore';
 import { useAudioSettingsStore } from '@/state/useAudioSettingsStore';
 import { useDebugStore } from '@/state/useDebugStore';
+import { CYCLE_DURATION_MS, resolveTimePhase } from '@/utils/timeOfDay';
 import type { TimePhase, WeatherKind } from '@/types';
 import { TradeOfferPanel } from './TradeOfferPanel';
 import { ITEMS, EQUIPMENT } from '@/data';
@@ -1633,6 +1634,32 @@ export function UserProfile({ onClose }: UserProfileProps) {
                       </button>
                     );
                   })}
+                </div>
+                <p style={{ fontSize: 12, opacity: 0.7, margin: '10px 0 4px' }}>
+                  Scrub the cycle - watch a full sunrise-to-night sweep (and the shadows it casts on
+                  buildings/interactables) in seconds instead of real minutes. Takes priority over
+                  the buttons above while dragged; "Live" hands control back to the real clock.
+                </p>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input
+                    type="range"
+                    min={0}
+                    max={CYCLE_DURATION_MS}
+                    step={1000}
+                    value={debugStore.cycleScrubMs ?? Date.now() % CYCLE_DURATION_MS}
+                    onChange={(e) => debugStore.setCycleScrubMs(Number(e.target.value))}
+                    style={{ flex: 1 }}
+                  />
+                  <span style={{ fontSize: 12, width: 90, textAlign: 'right' }}>
+                    {debugStore.cycleScrubMs === null
+                      ? 'Live'
+                      : `${resolveTimePhase(debugStore.cycleScrubMs).charAt(0).toUpperCase() + resolveTimePhase(debugStore.cycleScrubMs).slice(1)} ${Math.round((debugStore.cycleScrubMs / CYCLE_DURATION_MS) * 100)}%`}
+                  </span>
+                  {debugStore.cycleScrubMs !== null && (
+                    <button className={styles.smallButton} onClick={() => debugStore.setCycleScrubMs(null)}>
+                      Live
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

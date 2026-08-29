@@ -55,7 +55,8 @@ import { STORY_WEATHER_LOCKS } from '@/data/weatherConfig';
 import { isOutdoorTopLevelLocation } from '@/utils/location';
 import { useTimeOfDayStore } from '@/state/useTimeOfDayStore';
 import { useDebugStore } from '@/state/useDebugStore';
-import type { TimePhase } from '@/types';
+import { representativeCycleTime, resolveSunPosition, resolveTimePhase } from '@/utils/timeOfDay';
+import type { SunPosition, TimePhase } from '@/types';
 import styles from './TownScene.module.css';
 
 /** Which Cloud Function a point `interactable` landmark's Interact-key press routes through - a
@@ -341,11 +342,28 @@ export function OverworldScene() {
   // override can't show weather/lighting somewhere it structurally never applies.
   const outdoorEligible = isOutdoorTopLevelLocation(locationId);
   const timeOfDayPhase = useTimeOfDayStore((s) => s.phase);
+  const timeOfDaySunPosition = useTimeOfDayStore((s) => s.sunPosition);
   const debugWeatherOverride = useDebugStore((s) => s.weatherOverride);
   const debugTimeOverride = useDebugStore((s) => s.timeOverride);
+  const debugCycleScrubMs = useDebugStore((s) => s.cycleScrubMs);
   const debugShowCollisions = useDebugStore((s) => s.showCollisions);
   const effectiveWeather = outdoorEligible ? (debugWeatherOverride ?? weather) : null;
-  const effectiveTimePhase: TimePhase = outdoorEligible ? (debugTimeOverride ?? timeOfDayPhase) : 'day';
+  // A cycle scrub (Debug tab's slider) wins over a forced discrete phase, which wins over the live
+  // clock - both the ambient tint AND the cast-shadow sun position resolve from the SAME scrubbed
+  // instant, so dragging the slider shows a coherent sunrise->noon->sunset->night sweep rather than
+  // the sky and shadows disagreeing with each other.
+  const effectiveTimePhase: TimePhase = !outdoorEligible
+    ? 'day'
+    : debugCycleScrubMs !== null
+      ? resolveTimePhase(debugCycleScrubMs)
+      : (debugTimeOverride ?? timeOfDayPhase);
+  const effectiveSunPosition: SunPosition | null = !outdoorEligible
+    ? null
+    : debugCycleScrubMs !== null
+      ? resolveSunPosition(debugCycleScrubMs)
+      : debugTimeOverride !== null
+        ? resolveSunPosition(representativeCycleTime(debugTimeOverride))
+        : timeOfDaySunPosition;
   const openedChests = useWorldStateStore((s) => s.openedChests);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
   const inventory = useInventoryStore((s) => s.items);
@@ -624,6 +642,7 @@ export function OverworldScene() {
           label: isChest || decorEntity ? undefined : labelForInteractable(o.refId!, openedChests, inventory),
           questTarget: activeQuestTargetRefIds.has(o.refId!),
           blocksMovement: true,
+          castsSunShadow: true,
         };
       });
 
@@ -647,6 +666,7 @@ export function OverworldScene() {
         spriteAssetId: 'structure.exit-marker',
         label: 'Exit',
         questTarget: activeQuestTargetRefIds.has(o.refId!),
+        castsSunShadow: true,
       }));
 
     return [...npcEntities, ...interactableEntities, ...exitEntities, ...fieldEncounterEntities];
@@ -684,6 +704,7 @@ export function OverworldScene() {
           equipmentLayers={equipmentLayers}
           weather={effectiveWeather}
           timePhase={effectiveTimePhase}
+          sunPosition={effectiveSunPosition}
           showCollisions={debugShowCollisions}
         />
       </div>

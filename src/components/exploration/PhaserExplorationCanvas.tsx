@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import type { EquipmentSlot, MapObject, TileMap, WeatherKind, TimePhase } from '@/types';
+import type { EquipmentSlot, MapObject, TileMap, WeatherKind, TimePhase, SunPosition } from '@/types';
 import type { Facing, GridPosition } from '@/hooks/useGridMovement';
 import type { MovementInputState } from '@/hooks/useMovementInput';
 import type { MovementState } from '@/animation/characterAnimations';
@@ -73,6 +73,14 @@ export interface GridEntity {
    *  Omitted/false for everything else (buildings/exit markers/decor/shrines/chests, which already
    *  sit flush on the map art). */
   hasShadow?: boolean;
+  /** Casts a rotating, sun-tracking shadow (see ExplorationScene.ts's upsertEntity/setSunPosition)
+   *  instead of - or in addition to - the static ellipse `hasShadow` draws. Set for buildings, exit
+   *  markers, and interactables/decor (shrines, chests, ambient props) by TownScene.tsx/
+   *  OverworldScene.tsx; omitted/false for NPCs, other players, and field-encounter icons, which
+   *  already read as ground-standing characters via the static ellipse and aren't what "cast a
+   *  shadow that tracks the sun" was asked for. No-ops entirely when the caller's `sunPosition`
+   *  prop is null (night, or a location where day/night doesn't apply). */
+  castsSunShadow?: boolean;
 }
 
 interface PhaserExplorationCanvasProps {
@@ -95,6 +103,11 @@ interface PhaserExplorationCanvasProps {
    *  override - see ExplorationScene.setTimePhase. Omitted defaults to 'day' (no darkening);
    *  DungeonScene never passes this, so dungeons/interiors never show day/night. */
   timePhase?: TimePhase;
+  /** Continuous sun position for cast-shadow rotation/length on structures/interactables, resolved
+   *  by the caller via useTimeOfDayStore/useDebugStore's override - see
+   *  ExplorationScene.setSunPosition. `null` (including omitted) means no directional shadow
+   *  (night, or DungeonScene, which never passes this at all). */
+  sunPosition?: SunPosition | null;
   /** Collision/interaction-bounds debug overlay - see ExplorationScene.setDebugEnabled. Driven by
    *  the UserProfile Debug tab's useDebugStore, reachable from Town/Overworld/Dungeon alike. */
   showCollisions?: boolean;
@@ -153,6 +166,7 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
   const suspended = props.suspended ?? false;
   const weather = props.weather ?? null;
   const timePhase = props.timePhase ?? 'day';
+  const sunPosition = props.sunPosition ?? null;
   const showCollisions = props.showCollisions ?? false;
   const equipmentLayers = props.equipmentLayers ?? [];
   const fieldEncounterIcons = props.fieldEncounterIcons ?? [];
@@ -310,6 +324,15 @@ export const PhaserExplorationCanvas = forwardRef<PhaserExplorationCanvasHandle,
     if (!sceneReady) return;
     sceneRef.current?.setTimePhase(timePhase);
   }, [sceneReady, timePhase]);
+
+  // Cast-shadow sun position - same sceneReady gate (rotates/scales real shadow Sprites). Depends
+  // on the primitive elevation/azimuth values rather than the sunPosition object reference, which
+  // is a fresh object every render even when unchanged (same reasoning as position/facing effects
+  // elsewhere in this codebase, e.g. useHeartbeat.ts).
+  useEffect(() => {
+    if (!sceneReady) return;
+    sceneRef.current?.setSunPosition(sunPosition);
+  }, [sceneReady, sunPosition?.elevation, sunPosition?.azimuth]);
 
   useEffect(() => {
     if (!sceneReady) return;

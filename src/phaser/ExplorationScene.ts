@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { TileLayer, TileMap, MapObject, CollisionRect, EquipmentSlot, WeatherKind, TimePhase } from '@/types';
+import type { TileLayer, TileMap, MapObject, CollisionRect, EquipmentSlot, WeatherKind, TimePhase, SunPosition } from '@/types';
 import type { GridPosition, Facing } from '@/hooks/useGridMovement';
 import { FACING_TO_DELTA } from '@/hooks/useGridMovement';
 import type { MovementState } from '@/animation/characterAnimations';
@@ -169,6 +169,35 @@ const QUEST_MARKER_PULSE_MS = 650;
  *  approximation, not derived per-sprite - it won't be pixel-perfect for every asset, but reads
  *  right across the character sheets in use today. */
 const SHADOW_Y_OFFSET_RATIO = 0.1;
+/** Rotating, sun-tracking cast shadow for buildings/interactables (GridEntity.castsSunShadow) -
+ *  a tinted, flattened, elongated COPY of the entity's own sprite/frame (so the shadow shape
+ *  matches the real silhouette for free), pivoting at the same feet-anchor origin the owner uses,
+ *  rotated/scaled per the current SunPosition (see setSunPosition). A cheap, well-worn 2D fake-
+ *  shadow technique - not a true 3D-geometry projection, an accepted simplification for this
+ *  genre/scale. Tint/alpha/flatten/length values below are art-direction taste calls, easy to
+ *  retune later without touching the angle/length math itself. */
+const SUN_SHADOW_TINT = 0x000000;
+const SUN_SHADOW_ALPHA = 0.35;
+/** Squash on the axis perpendicular to the shadow's length, so a rotated silhouette still reads as
+ *  lying flat on the ground rather than a mirrored duplicate standing upright. */
+const SUN_SHADOW_FLATTEN_RATIO = 0.6;
+/** Length multiplier at solar noon (elevation 1) vs. at the horizon (elevation 0) - real shadows
+ *  shrink to almost nothing underfoot at peak sun and stretch long at sunrise/sunset. */
+const SUN_SHADOW_MIN_LENGTH_SCALE = 0.3;
+const SUN_SHADOW_MAX_LENGTH_SCALE = 2.2;
+/** How far the shadow swings from straight-down (its resting position under a directly-overhead
+ *  sun) at either end of the visible arc (azimuth = ±1, i.e. just risen/about to set). */
+const SUN_SHADOW_MAX_SWING_RADIANS = Math.PI * 0.5;
+/** Resolved sprite asset ids that never cast a sun-tracking shadow regardless of
+ *  GridEntity.castsSunShadow - flat, ground-level glow/glimmer art (a shimmer on a pool's surface)
+ *  where a rotating shadow silhouette doesn't make physical sense (2026-08 owner ask: "it's a
+ *  pond - the shadow doesn't make sense here"). Checked against the entity's CURRENT resolved
+ *  sprite id, not its static refId, so this also covers every other refId that happens to reuse
+ *  the same shared marker art (star-fragment-* and aurora-crystal-fragment-* all reuse
+ *  structure.landmark-water-glimmer too - see OverworldScene.tsx's FRAGMENT_SPRITE_ASSET_ID)
+ *  without needing a matching exclusion at every call site, and covers the found/unfound
+ *  retrofit's "-collected" variant the same way. */
+const NO_SUN_SHADOW_SPRITE_IDS = new Set(['structure.landmark-water-glimmer', 'structure.landmark-water-glimmer-collected']);
 /** The viewport zoom level that every character/structure/decoration asset's own pixel dimensions
  *  are authored against - a 48x64 sprite is meant to render at exactly 48x64 screen pixels
  *  (ENTITY_VISUAL_SCALE below), not be force-fit to exactly one tile's width. Player/NPC/
@@ -263,6 +292,10 @@ interface EntityVisual {
    *  characters visual depth against the flat ground the same way the player's own shadow does.
    *  Absent for buildings/exit markers/decor/shrines, which already sit flush on the ground art. */
   shadow?: Phaser.GameObjects.Image;
+  /** Rotating sun-tracking shadow, only present for entities with GridEntity.castsSunShadow (see
+   *  upsertEntity and setSunPosition) - buildings/exit markers/decor/shrines/chests, the mutually
+   *  exclusive counterpart to the static `shadow` ellipse above (never both on the same entity). */
+  sunShadow?: Phaser.GameObjects.Sprite;
 }
 
 /** The one generic exploration-rendering Phaser Scene - loaded once per Game instance, reused
@@ -427,6 +460,10 @@ export class ExplorationScene extends Phaser.Scene {
   // Phaser-API-free too.
   private lightingLayer: LightingLayer;
   private currentTimePhase: TimePhase = 'day';
+  /** Last value passed to setSunPosition - applied to a sun-shadow sprite the instant it's created
+   *  (upsertEntity), not just at the next setSunPosition call (which could be seconds away on the
+   *  store's own poll cadence), so a newly-placed building's shadow never briefly sits unrotated. */
+  private currentSunPosition: SunPosition | null = null;
 
   constructor(onReady?: () => void) {
     super({ key: 'ExplorationScene' });
@@ -584,6 +621,25 @@ export class ExplorationScene extends Phaser.Scene {
     return ownerSprite.y - ownerSprite.height * SHADOW_Y_OFFSET_RATIO;
   }
 
+  /** Rotates/scales one sun-shadow sprite for the given position, or hides it entirely at night
+   *  (pos === null). `baseScaleX/Y` is the OWNER sprite's own current scale (ENTITY_VISUAL_SCALE *
+   *  entity.displayScale) - the shadow's final scale layers length/flatten multipliers on top of
+   *  that, so a bigger-than-normal entity (see displayScale) still gets a proportionally-sized
+   *  shadow. An unrotated sprite at origin (0.5,1) extends upward from its anchor (matching the
+   *  owner drawn right on top of it) - rotating by π first flips it to extend downward/onto the
+   *  ground, which is the shadow's resting look under a directly-overhead sun; the azimuth sweep
+   *  then tilts it left/right from that resting point as the sun moves toward either horizon. */
+  private applySunPositionTo(shadow: Phaser.GameObjects.Sprite, baseScaleX: number, baseScaleY: number, pos: SunPosition | null): void {
+    if (!pos) {
+      shadow.setVisible(false);
+      return;
+    }
+    shadow.setVisible(true);
+    const lengthScale = SUN_SHADOW_MIN_LENGTH_SCALE + (SUN_SHADOW_MAX_LENGTH_SCALE - SUN_SHADOW_MIN_LENGTH_SCALE) * (1 - pos.elevation);
+    shadow.setScale(baseScaleX * SUN_SHADOW_FLATTEN_RATIO, baseScaleY * lengthScale);
+    shadow.setRotation(Math.PI + pos.azimuth * SUN_SHADOW_MAX_SWING_RADIANS);
+  }
+
   /** Reads the shared input ref and drives the player's Arcade body velocity every frame - the
    *  actual "continuous, Arcade-Physics-driven movement" this migration exists for. Deliberately
    *  does NOT touch `playerSprite.x/y` or anything derived from it (depth-sort, equipment-layer
@@ -724,6 +780,9 @@ export class ExplorationScene extends Phaser.Scene {
       const entityDepth = this.depthForY(visual.sprite.y);
       visual.sprite.setDepth(entityDepth);
       visual.shadow?.setPosition(visual.sprite.x, this.shadowY(visual.sprite)).setDepth(entityDepth - 0.5);
+      // Pivots at the SAME point as the owner's own origin (not shadowY's feet-gap offset above) -
+      // rotation needs to sweep around the entity's true base, not a point already nudged upward.
+      visual.sunShadow?.setPosition(visual.sprite.x, visual.sprite.y).setDepth(entityDepth - 0.5);
       // Another player's equipped-gear layers (see upsertEntity) glued to their own base sprite
       // every frame, same "position always mirrors the base" contract as the local player's own
       // equipmentLayerSprites sync just above in this same method.
@@ -1549,6 +1608,7 @@ export class ExplorationScene extends Phaser.Scene {
       if (visual.questMarker) this.tweens.killTweensOf(visual.questMarker);
       visual.questMarker?.destroy();
       visual.shadow?.destroy();
+      visual.sunShadow?.destroy();
       if (visual.layerSprites) for (const layerVisual of visual.layerSprites.values()) layerVisual.sprite.destroy();
       this.entityVisuals.delete(id);
     }
@@ -1589,7 +1649,18 @@ export class ExplorationScene extends Phaser.Scene {
         entity.interactionKind === 'npc' || entity.interactionKind === 'presence' || entity.hasShadow
           ? this.createShadowFor(sprite)
           : undefined;
-      visual = { sprite, spriteAssetId: entity.spriteAssetId, interactionKind: entity.interactionKind, shadow };
+      // Rotating sun-tracking shadow (buildings/exit markers/decor/shrines/chests) - mutually
+      // exclusive with the static ellipse above. Created at (0,0) same as the owner sprite itself;
+      // both get moved to their real x/y further down once that's been computed.
+      const sunShadow = entity.castsSunShadow && !NO_SUN_SHADOW_SPRITE_IDS.has(entity.spriteAssetId)
+        ? this.add
+            .sprite(0, 0, entity.spriteAssetId)
+            .setOrigin(0.5, 1)
+            .setDepth(ENTITY_DEPTH - 1)
+            .setTint(SUN_SHADOW_TINT)
+            .setAlpha(SUN_SHADOW_ALPHA)
+        : undefined;
+      visual = { sprite, spriteAssetId: entity.spriteAssetId, interactionKind: entity.interactionKind, shadow, sunShadow };
       this.entityVisuals.set(entity.id, visual);
       // Mirrors ensurePlayerAnimations - a static single-frame sprite (no frameSize) has no rows to
       // register at all. Safe to call unconditionally for every frameSize'd entity sharing this
@@ -1618,12 +1689,21 @@ export class ExplorationScene extends Phaser.Scene {
       if (getAssetDefinition(entity.spriteAssetId).frameSize) {
         createCharacterAnimations(this.anims, entity.spriteAssetId, animationLayoutForSprite(entity.spriteAssetId));
       }
+      // Same retexture as the base sprite, so a chest's shadow silhouette flips from closed to
+      // open right alongside it instead of staying stuck on the old shape.
+      if (visual.sunShadow) {
+        visual.sunShadow.anims.stop();
+        visual.sunShadow.setTexture(entity.spriteAssetId);
+      }
     }
 
     const def = getAssetDefinition(entity.spriteAssetId);
     const x = entity.x * this.tileSize + this.tileSize / 2;
     const y = entity.y * this.tileSize + this.tileSize;
     visual.sprite.setScale(ENTITY_VISUAL_SCALE * (entity.displayScale ?? 1));
+    if (visual.sunShadow) {
+      this.applySunPositionTo(visual.sunShadow, visual.sprite.scaleX, visual.sprite.scaleY, this.currentSunPosition);
+    }
     // Keyed by the *resolved* sprite asset id, not entity.id/refId - see src/data/lightSources.ts.
     // Covers both a freshly-created entity and one that just retextured (a chest going
     // structure.chest -> structure.chest-open loses its light right here, same call). Read after
@@ -1722,6 +1802,12 @@ export class ExplorationScene extends Phaser.Scene {
       if (!getAssetDefinition(layerVisual.spriteAssetId).frameSize) continue;
       if (layerVisual.sprite.anims.isPlaying) layerVisual.sprite.anims.stop();
       layerVisual.sprite.setFrame(visual.sprite.frame.name);
+    }
+    // A sun shadow mirrors whichever frame the base sprite is currently on too (e.g. the chest/
+    // activated-shrine glow loop), same reasoning as the equipment-layer mirroring just above.
+    if (visual.sunShadow && def.frameSize) {
+      if (visual.sunShadow.anims.isPlaying) visual.sunShadow.anims.stop();
+      visual.sunShadow.setFrame(visual.sprite.frame.name);
     }
 
     const v = visual;
@@ -1867,5 +1953,19 @@ export class ExplorationScene extends Phaser.Scene {
     this.lightingLayer.setPhase(phase);
     this.weatherLayer.setPhaseHint(phase);
     this.syncLanternLight();
+  }
+
+  /** Cast-shadow sun position for buildings/exit markers/decor/shrines/chests (GridEntity.
+   *  castsSunShadow) - the caller (Overworld/TownScene, via PhaserExplorationCanvas's
+   *  `sunPosition` prop) resolves the value from useTimeOfDayStore/useDebugStore's override; this
+   *  Scene only owns rendering it, same split as setTimePhase/setWeather. Called on the store's own
+   *  ~5s poll cadence, not per frame - see useTimeOfDayStore's own comment on why that's plenty
+   *  smooth for a sweep this slow. Stored so a sun-shadow sprite created between ticks (a newly
+   *  loaded map) picks up the current position immediately - see upsertEntity/applySunPositionTo. */
+  setSunPosition(pos: SunPosition | null): void {
+    this.currentSunPosition = pos;
+    for (const visual of this.entityVisuals.values()) {
+      if (visual.sunShadow) this.applySunPositionTo(visual.sunShadow, visual.sprite.scaleX, visual.sprite.scaleY, pos);
+    }
   }
 }

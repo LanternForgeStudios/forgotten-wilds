@@ -44,7 +44,8 @@ import { STORY_WEATHER_LOCKS } from '@/data/weatherConfig';
 import { isOutdoorTopLevelLocation } from '@/utils/location';
 import { useTimeOfDayStore } from '@/state/useTimeOfDayStore';
 import { useDebugStore } from '@/state/useDebugStore';
-import type { TimePhase } from '@/types';
+import { representativeCycleTime, resolveSunPosition, resolveTimePhase } from '@/utils/timeOfDay';
+import type { SunPosition, TimePhase } from '@/types';
 import { isTypingTarget } from '@/utils/keyboard';
 import { resolveEquipmentLayers, resolvePlayerBaseSpriteAssetId } from '@/utils/equipmentLayers';
 import { resolveNpcDialogue, hasNewDialogue } from '@/utils/npcDialogue';
@@ -186,11 +187,26 @@ export function TownScene() {
   // even with an override set.
   const outdoorEligible = isOutdoorTopLevelLocation(locationId);
   const timeOfDayPhase = useTimeOfDayStore((s) => s.phase);
+  const timeOfDaySunPosition = useTimeOfDayStore((s) => s.sunPosition);
   const debugWeatherOverride = useDebugStore((s) => s.weatherOverride);
   const debugTimeOverride = useDebugStore((s) => s.timeOverride);
+  const debugCycleScrubMs = useDebugStore((s) => s.cycleScrubMs);
   const debugShowCollisions = useDebugStore((s) => s.showCollisions);
   const effectiveWeather = outdoorEligible ? (debugWeatherOverride ?? weather) : null;
-  const effectiveTimePhase: TimePhase = outdoorEligible ? (debugTimeOverride ?? timeOfDayPhase) : 'day';
+  // See OverworldScene.tsx's identical block for why scrub > forced phase > live clock, and why
+  // both phase and sun position resolve from the same scrubbed instant.
+  const effectiveTimePhase: TimePhase = !outdoorEligible
+    ? 'day'
+    : debugCycleScrubMs !== null
+      ? resolveTimePhase(debugCycleScrubMs)
+      : (debugTimeOverride ?? timeOfDayPhase);
+  const effectiveSunPosition: SunPosition | null = !outdoorEligible
+    ? null
+    : debugCycleScrubMs !== null
+      ? resolveSunPosition(debugCycleScrubMs)
+      : debugTimeOverride !== null
+        ? resolveSunPosition(representativeCycleTime(debugTimeOverride))
+        : timeOfDaySunPosition;
   const inventory = useInventoryStore((s) => s.items);
   const bossesDefeated = useJournalStore((s) => s.journal.bossesDefeated);
   const seenNpcDialogueVariant = useWorldStateStore((s) => s.seenNpcDialogueVariant);
@@ -442,6 +458,7 @@ export function TownScene() {
           spriteAssetId: marker.spriteAssetId,
           label: marker.label,
           questTarget: activeQuestTargetRefIds.has(o.refId!),
+          castsSunShadow: true,
         };
       });
 
@@ -455,6 +472,7 @@ export function TownScene() {
         label: 'Shrine',
         questTarget: activeQuestTargetRefIds.has(o.refId!),
         blocksMovement: true,
+        castsSunShadow: true,
       }));
 
     // Every transition that doesn't already get a building facade (buildingEntities above) -
@@ -469,6 +487,7 @@ export function TownScene() {
         spriteAssetId: 'structure.exit-marker',
         label: 'Exit',
         questTarget: activeQuestTargetRefIds.has(o.refId!),
+        castsSunShadow: true,
       }));
 
     const decorEntities: GridEntity[] = map.objects
@@ -480,7 +499,7 @@ export function TownScene() {
         // these were cluttering the map with tooltips for props that don't do anything on
         // interact besides flavor text). The flavor-text-only interact path itself still uses
         // decor.label for its message - only this floating tag is suppressed.
-        return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: decor.spriteAssetId, label: undefined, blocksMovement: true };
+        return { id: o.refId!, x: o.x, y: o.y, spriteAssetId: decor.spriteAssetId, label: undefined, blocksMovement: true, castsSunShadow: true };
       });
 
     const now = Date.now();
@@ -545,6 +564,7 @@ export function TownScene() {
           equipmentLayers={equipmentLayers}
           weather={effectiveWeather}
           timePhase={effectiveTimePhase}
+          sunPosition={effectiveSunPosition}
           showCollisions={debugShowCollisions}
         />
       </div>
