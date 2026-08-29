@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { useAuthStore } from '@/state/useAuthStore';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
@@ -53,12 +54,12 @@ export function WorldChat({ onClose }: WorldChatProps) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={panelStyles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <OverlayCloseButton onClick={onClose} />
         <h2 className={styles.title}>World Chat</h2>
         <div className={styles.messages} ref={messagesRef}>
-          {visibleMessages.length === 0 && <p className={styles.empty}>No messages yet - say hello!</p>}
+          {visibleMessages.length === 0 && <p className={panelStyles.empty}>No messages yet - say hello!</p>}
           {visibleMessages.map((m) => (
             <p key={m.id} className={styles.messageRow}>
               <span className={styles.messageName}>{m.uid === uid ? 'You' : m.displayName}:</span>
@@ -73,7 +74,7 @@ export function WorldChat({ onClose }: WorldChatProps) {
         {error && <p className={styles.error}>{error}</p>}
         <div className={styles.inputRow}>
           <input
-            className={styles.textInput}
+            className={panelStyles.textInput}
             placeholder="Say something to everyone in town..."
             value={draft}
             maxLength={500}
@@ -84,7 +85,7 @@ export function WorldChat({ onClose }: WorldChatProps) {
             Send
           </button>
         </div>
-        <p className={styles.closeHint}>Click outside or press Esc to close</p>
+        <p className={panelStyles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );

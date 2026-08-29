@@ -4,6 +4,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { useWorldStateStore } from '@/state/useWorldStateStore';
 import { useBattleOverlayStore } from '@/state/useBattleOverlayStore';
 import { useNow } from '@/hooks/useNow';
+import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { useHudBarHeight } from '@/hooks/useExplorationViewport';
 import { subscribeToPresence } from '@/firebase/presenceService';
 import { subscribeToIncomingFriendRequests, subscribeToAllDirectMessages, subscribeToFriendship } from '@/firebase/socialService';
@@ -24,6 +25,24 @@ import type { DirectMessage, FriendRequest, OnlinePresence, TradeDoc } from '@/t
 import styles from './PlayerHUD.module.css';
 
 const MAX_LEVEL = XP_THRESHOLDS.length - 1;
+
+/** Closes a small anchored popover (the chest/presence dropdowns below) on any pointer press
+ *  outside its own wrapping element - these previously only closed on `onMouseLeave`, which never
+ *  fires on touch, so tapping one open on a mobile device left it stuck open with no way to
+ *  dismiss it except tapping the toggle button again. `pointerdown` (not `click`) covers mouse and
+ *  touch uniformly with no extra delay. Local to this file since PlayerHUD is the only place with
+ *  this small-anchored-popover shape - every other overlay in the app is a full-screen modal that
+ *  already closes via its own backdrop `onClick`. */
+function useCloseOnOutsideClick(ref: React.RefObject<HTMLElement | null>, onOutside: () => void, active: boolean) {
+  useEffect(() => {
+    if (!active) return;
+    function handlePointerDown(e: PointerEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onOutside();
+    }
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [active, onOutside, ref]);
+}
 
 /** How far into the current level `xp` is, out of what the next level requires - display-only
  *  math using the client's XP_THRESHOLDS copy, same as the "not authoritative" rule for anything
@@ -91,7 +110,15 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
   // so each row tracks its own outcome independently (sending/sent/accepted/already-pending/error),
   // same shape as UserProfile.tsx's own friend-search flow.
   const [friendRequestStatus, setFriendRequestStatus] = useState<Record<string, string>>({});
+  const chestWrapRef = useRef<HTMLDivElement>(null);
+  const presenceWrapRef = useRef<HTMLDivElement>(null);
   const [chestOpen, setChestOpen] = useState(false);
+  useCloseOnOutsideClick(chestWrapRef, () => setChestOpen(false), chestOpen);
+  useCloseOnOutsideClick(presenceWrapRef, () => setPresenceOpen(false), presenceOpen);
+  useOverlayClose(() => {
+    setChestOpen(false);
+    setPresenceOpen(false);
+  });
   const [chestClaiming, setChestClaiming] = useState(false);
   const [chestError, setChestError] = useState<string | null>(null);
   const [chestResult, setChestResult] = useState<{ tier: 'standard' | 'elite'; rewards: DailyChestRewards } | null>(
@@ -240,7 +267,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
 
         <span className={styles.gold}>{player.gold}g</span>
 
-        <div className={styles.chestWrap}>
+        <div className={styles.chestWrap} ref={chestWrapRef}>
           <button
             className={`${styles.chestButton} ${chestReady ? styles.chestReady : ''}`}
             onClick={() => setChestOpen((open) => !open)}
@@ -264,7 +291,7 @@ export function PlayerHUD({ locationId }: PlayerHUDProps) {
         </div>
 
         {locationId && (
-          <div className={styles.presenceWrap}>
+          <div className={styles.presenceWrap} ref={presenceWrapRef}>
             <button className={styles.presenceButton} onClick={() => setPresenceOpen((open) => !open)}>
               {visiblePresences.length} here
             </button>

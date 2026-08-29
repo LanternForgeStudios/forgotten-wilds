@@ -14,6 +14,27 @@
 
   --fw-font: 'Segoe UI', system-ui, sans-serif;
 
+  /* Type scale - four buckets covering the ~11 raw font-size values that had accumulated across
+     components before this existed (12/13px were already the de facto "normal text" size; this
+     just names what was already common practice instead of leaving every component to pick its
+     own literal). Prefer these over a new hardcoded px value in any new/edited UI code. */
+  --fw-font-xs: 10px;
+  --fw-font-sm: 12px;
+  --fw-font-md: 13px;
+  --fw-font-lg: 16px;
+
+  /* Spacing scale - same reasoning as the type scale above, for gap/padding/margin. */
+  --fw-space-xs: 4px;
+  --fw-space-sm: 8px;
+  --fw-space-md: 12px;
+  --fw-space-lg: 16px;
+
+  /* Named panel widths - Trade/Chat/Character-menu-sized overlays genuinely need different widths,
+     so this names the 3 existing values rather than forcing one width on everything. */
+  --fw-panel-width-sm: 480px;
+  --fw-panel-width-md: 560px;
+  --fw-panel-width-lg: 640px;
+
   color-scheme: dark;
   color: var(--fw-text);
   background: var(--fw-bg-deep);

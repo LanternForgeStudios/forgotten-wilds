@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { useOverlayClose } from '@/hooks/useOverlayClose';
 import { type GridPosition } from '@/hooks/useGridMovement';
@@ -464,12 +465,14 @@ export function MiniMap({ map, position, locationId, openedChests, questProgress
   }, [map, position, locationId, openedChests, questProgress, hiddenQuestIds, canvasBudget, tilesetLoadTick]);
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={panelStyles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <OverlayCloseButton onClick={onClose} />
         <h2 className={styles.title}>Map</h2>
         <canvas ref={canvasRef} className={styles.canvas} />
-        <p className={styles.closeHint}>Click outside, press Esc, or press M to close</p>
+        <p className={panelStyles.closeHint} style={{ alignSelf: 'flex-end' }}>
+          Click outside, press Esc, or press M to close
+        </p>
       </Panel>
     </div>
   );

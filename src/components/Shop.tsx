@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { TierBadge } from './common/TierBadge';
 import { BestBadge } from './common/BestBadge';
@@ -31,6 +32,7 @@ import {
   LANTERN_OIL_UPGRADE_PER_TIER,
 } from '@/data';
 import { eligibleLanternUpgrades } from '@/utils/lanternOilUpgradeEligibility';
+import { ITEM_CATEGORY_LABELS, resolveItemCategory } from '@/utils/itemCategoryLabels';
 import { playSound } from '@/audio/audioService';
 import type { EquipmentItem, EquipmentSlot, ItemCategory, PlayerEquipment, QuestProgress } from '@/types';
 import styles from './CharacterMenu.module.css';
@@ -73,23 +75,10 @@ function isEquipmentUpgrade(
   return equipmentScore(def) > Math.min(...equippedScores);
 }
 
-/** Filter dimension for the Sell tab: every real ItemCategory, plus a synthesized 'equipment'
- *  bucket for anything found in EQUIPMENT (which has no `category` field of its own - see
- *  defFor's merge of the two separate item/equipment arrays). */
-type SellTypeFilter = ItemCategory | 'equipment' | 'all';
-
-const SELL_TYPE_LABELS: Record<Exclude<SellTypeFilter, 'all'>, string> = {
-  consumable: 'Consumables',
-  equipment: 'Equipment',
-  keyItem: 'Key Items',
-  lanternUpgrade: 'Lantern Upgrades',
-  materials: 'Materials',
-};
-
-function sellTypeOf(itemDef: (typeof ITEMS)[number] | undefined, equipDef: (typeof EQUIPMENT)[number] | undefined): SellTypeFilter {
-  if (equipDef) return 'equipment';
-  return itemDef?.category ?? 'materials';
-}
+/** Filter dimension for the Sell tab: every real ItemCategory ('equipment' included, synthesized
+ *  for anything found in EQUIPMENT, which has no `category` field of its own - see defFor's merge
+ *  of the two separate item/equipment arrays), plus the cross-cutting 'all'. */
+type SellTypeFilter = ItemCategory | 'all';
 
 interface PendingSale {
   itemId: string;
@@ -194,7 +183,7 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={panelStyles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <OverlayCloseButton onClick={onClose} />
         <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>{SHOP_TITLES[shopId] ?? 'Shop'}</h2>
@@ -270,7 +259,7 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
               if (sellTypeFilter === 'all') return true;
               const itemDef = ITEMS.find((i) => i.id === entry.itemId);
               const equipDef = EQUIPMENT.find((e) => e.id === entry.itemId);
-              return sellTypeOf(itemDef, equipDef) === sellTypeFilter;
+              return resolveItemCategory(itemDef, equipDef) === sellTypeFilter;
             })
             .filter(({ entry }) => {
               if (sellTypeFilter !== 'equipment' || sellSlotFilter === 'all') return true;
@@ -289,7 +278,7 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
                 >
                   All
                 </button>
-                {(Object.keys(SELL_TYPE_LABELS) as Exclude<SellTypeFilter, 'all'>[]).map((key) => (
+                {(Object.keys(ITEM_CATEGORY_LABELS) as ItemCategory[]).map((key) => (
                   <button
                     key={key}
                     className={`${styles.subtab} ${sellTypeFilter === key ? styles.subtabActive : ''}`}
@@ -298,7 +287,7 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
                       setSellSlotFilter('all');
                     }}
                   >
-                    {SELL_TYPE_LABELS[key]}
+                    {ITEM_CATEGORY_LABELS[key]}
                   </button>
                 ))}
               </div>
@@ -425,7 +414,7 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
         {error && (
           <p style={{ color: 'var(--fw-danger)', fontSize: 13 }}>{error}</p>
         )}
-        <p className={styles.closeHint}>Click outside or press Esc to close</p>
+        <p className={panelStyles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
 
       {selectedDef && (
@@ -488,7 +477,7 @@ export function Shop({ shopId, onClose, initialTab = 'buy' }: ShopProps) {
 
       {pendingSale && (
         <div
-          className={styles.overlay}
+          className={panelStyles.overlay}
           style={{ zIndex: 30 }}
           onClick={(e) => {
             e.stopPropagation();

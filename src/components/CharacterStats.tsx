@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { getAssetUrl } from '@/assets/assetManager';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -56,7 +57,7 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
       : 0;
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={panelStyles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <OverlayCloseButton onClick={onClose} />
         <div className={styles.header}>
@@ -216,7 +217,7 @@ export function CharacterStats({ onClose }: CharacterStatsProps) {
           ))}
         </div>
 
-        <p className={styles.closeHint}>Click outside or press Esc to close</p>
+        <p className={panelStyles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );

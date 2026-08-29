@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { SpritePreviewFrame } from './common/SpritePreviewFrame';
 import { useJournalStore } from '@/state/useJournalStore';
@@ -21,9 +22,11 @@ import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { AILMENTS, ENEMIES, ITEMS, EQUIPMENT, SKILLS, LOCATIONS, LORE_ENTRIES, QUESTS, NPCS } from '@/data';
 import { regionNameFor, regionSortIndex } from '@/utils/locationRegion';
+import { ITEM_CATEGORY_LABELS } from '@/utils/itemCategoryLabels';
 import type { Enemy, EnemyTier, Item, EquipmentItem, ItemCategory, LocationKind, Quest, QuestCategory, QuestProgress } from '@/types';
 import styles from './CharacterMenu.module.css';
 import questStyles from './QuestLog.module.css';
+import journalStyles from './JournalOfLegends.module.css';
 
 /** Fast Travel is earned via the Prologue's shrine-restoration quest (MSF-P-003, "The First
  *  Flame") - matches the MSQ's `fast_travel_unlocked` world flag. Ordinary step-by-step map
@@ -52,14 +55,6 @@ const WEAKNESS_LABELS: Record<'physical' | 'spirit' | 'lantern', string> = {
   physical: 'Vulnerable to physical attacks.',
   spirit: "Vulnerable to spirit-infused attacks (Keeper's Strike and other Specialty Attacks).",
   lantern: 'Vulnerable to lantern abilities.',
-};
-
-const ITEM_CATEGORY_LABELS: Record<ItemCategory, string> = {
-  consumable: 'Consumables',
-  equipment: 'Equipment',
-  keyItem: 'Key Items',
-  lanternUpgrade: 'Lantern Upgrades',
-  materials: 'Materials',
 };
 
 function matchesItemQuery(item: { name: string; description: string } | undefined, query: string): boolean {
@@ -293,7 +288,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={panelStyles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <OverlayCloseButton onClick={onClose} />
         <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>Journal of Legends</h2>
@@ -362,7 +357,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                       </button>
                     ))}
                   </div>
-                  <label style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                  <label className={journalStyles.filterCheckboxLabel}>
                     <input
                       type="checkbox"
                       checked={activeQuestsOnly}
@@ -372,7 +367,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   </label>
                 </div>
 
-                {regions.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No quests here yet.</p>}
+                {regions.length === 0 && <p className={panelStyles.empty}>No quests here yet.</p>}
 
                 {regions.map(({ regionId, regionQuests, visibleQuests, completedCount }) => {
                   const expanded = !collapsedQuestRegions.has(regionId);
@@ -409,7 +404,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                                 </p>
                               ))}
                               {status === 'active' && (
-                                <label style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginTop: 4 }}>
+                                <label className={journalStyles.filterCheckboxLabel} style={{ marginTop: 4 }}>
                                   <input
                                     type="checkbox"
                                     checked={!hiddenQuestIds.has(quest.id)}
@@ -483,9 +478,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                     </button>
                   ))}
                 </div>
-                {journal.creaturesDiscovered.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No echoes discovered yet.</p>}
+                {journal.creaturesDiscovered.length === 0 && <p className={panelStyles.empty}>No echoes discovered yet.</p>}
                 {journal.creaturesDiscovered.length > 0 && visible.length === 0 && (
-                  <p style={{ fontSize: 13, opacity: 0.7 }}>No echoes match those filters.</p>
+                  <p className={panelStyles.empty}>No echoes match those filters.</p>
                 )}
                 {visible.map((id) => {
                   const enemy = ENEMIES.find((e) => e.id === id);
@@ -497,10 +492,10 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                       onClick={() => setSelectedEnemyId(id)}
                     >
                       {enemy && <SpritePreviewFrame assetId={enemy.battleSpriteAssetId} alt={enemy.name} size={{ width: 48, height: 48 }} />}
-                      <span style={{ fontSize: 13, flex: 1 }}>
+                      <span className={journalStyles.entryName}>
                         <strong>{enemy?.name ?? id}</strong>
                         {enemy && (
-                          <span style={{ fontSize: 10, color: ENEMY_TIER_COLORS[enemy.tier], marginLeft: 8 }}>
+                          <span className={journalStyles.inlineTierBadge} style={{ color: ENEMY_TIER_COLORS[enemy.tier] }}>
                             {ENEMY_TIER_LABELS[enemy.tier]}
                           </span>
                         )}
@@ -561,7 +556,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                     </button>
                   ))}
                 </div>
-                <label style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginBottom: 10 }}>
+                <label className={journalStyles.filterCheckboxLabel} style={{ marginBottom: 10 }}>
                   <input
                     type="checkbox"
                     checked={activeQuestLocationsOnly}
@@ -570,7 +565,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   Active quest locations only
                 </label>
 
-                {candidates.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No locations match those filters.</p>}
+                {candidates.length === 0 && <p className={panelStyles.empty}>No locations match those filters.</p>}
 
                 {regionNames.map((regionName) => {
                   const regionLocations = candidates.filter(({ id }) => regionNameFor(id) === regionName);
@@ -604,13 +599,13 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                                 style={{ cursor: children.length > 0 ? 'pointer' : 'default' }}
                                 onClick={() => children.length > 0 && toggleExpanded(id)}
                               >
-                                <span style={{ fontSize: 13, flex: 1 }}>
+                                <span className={journalStyles.entryName}>
                                   <strong>
                                     {children.length > 0 && (expandedLoc ? '▾ ' : '▸ ')}
                                     {loc?.name ?? id}
                                   </strong>
                                   {isQuestRelevant && (
-                                    <span style={{ fontSize: 10, color: 'var(--fw-accent)', marginLeft: 8 }}>● Active Quest</span>
+                                    <span className={journalStyles.inlineTierBadge} style={{ color: 'var(--fw-accent)' }}>● Active Quest</span>
                                   )}
                                   <br />
                                   <span style={{ opacity: 0.7 }}>{loc?.description}</span>
@@ -627,15 +622,12 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                                   </button>
                                 )}
                                 {loc?.fastTravel && id === currentLocationId && (
-                                  <span style={{ fontSize: 11, opacity: 0.6 }}>You are here</span>
+                                  <span className={journalStyles.metaCaption}>You are here</span>
                                 )}
                                 {loc?.fastTravel && id !== currentLocationId && !fastTravelUnlocked && (
-                                  <span
-                                    style={{ fontSize: 11, opacity: 0.6 }}
-                                    title="Restore the Ash Hallow shrine to unlock Fast Travel."
-                                  >
-                                    Locked
-                                  </span>
+                                  // Reason shown as always-visible caption text, not just a hover
+                                  // title - a hover-only explanation is invisible on touch devices.
+                                  <span className={journalStyles.metaCaption}>Locked — restore the Ash Hallow shrine to unlock.</span>
                                 )}
                               </div>
                               {expandedLoc &&
@@ -701,9 +693,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                     </button>
                   ))}
                 </div>
-                {journal.itemsDiscovered.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No items discovered yet.</p>}
+                {journal.itemsDiscovered.length === 0 && <p className={panelStyles.empty}>No items discovered yet.</p>}
                 {journal.itemsDiscovered.length > 0 && visible.length === 0 && (
-                  <p style={{ fontSize: 13, opacity: 0.7 }}>No items match those filters.</p>
+                  <p className={panelStyles.empty}>No items match those filters.</p>
                 )}
                 {visible.map((id) => {
                   const entry = resolveDiscoveredEntry(id);
@@ -716,19 +708,19 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                       onClick={() => setSelectedItemId(id)}
                     >
                       {entry?.iconAssetId && <img src={getAssetUrl(entry.iconAssetId)} alt="" className={styles.icon} />}
-                      <span style={{ fontSize: 13, flex: 1 }}>
+                      <span className={journalStyles.entryName}>
                         <strong>{entry?.name ?? id}</strong>
                         {entry && (
-                          <span style={{ fontSize: 10, color: TIER_COLORS[entry.tier], marginLeft: 8 }}>
+                          <span className={journalStyles.inlineTierBadge} style={{ color: TIER_COLORS[entry.tier] }}>
                             {TIER_LABELS[entry.tier]}
                           </span>
                         )}
                         <br />
                         <span style={{ opacity: 0.7 }}>{entry?.description}</span>
                       </span>
-                      {owned > 0 && <span style={{ fontSize: 11, opacity: 0.6 }}>You own x{owned}</span>}
+                      {owned > 0 && <span className={journalStyles.metaCaption}>You own x{owned}</span>}
                       {owned === 0 && entry?.equipment && (
-                        <span style={{ fontSize: 11, opacity: 0.5 }}>No longer owned</span>
+                        <span className={journalStyles.metaCaption}>No longer owned</span>
                       )}
                     </div>
                   );
@@ -739,7 +731,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
 
         {tab === 'lore' && (
           <div>
-            {journal.loreUnlocked.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No lore unlocked yet.</p>}
+            {journal.loreUnlocked.length === 0 && <p className={panelStyles.empty}>No lore unlocked yet.</p>}
             {[...journal.loreUnlocked]
               .sort((a, b) =>
                 (LORE_ENTRIES.find((l) => l.id === a)?.title ?? a).localeCompare(LORE_ENTRIES.find((l) => l.id === b)?.title ?? b),
@@ -749,7 +741,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
               if (!entry) return null;
               return (
                 <div key={id} className={styles.slotRow}>
-                  <span style={{ fontSize: 13, flex: 1 }}>
+                  <span className={journalStyles.entryName}>
                     <strong>{entry.title}</strong>
                     <br />
                     <span style={{ opacity: 0.7 }}>{entry.body}</span>
@@ -775,9 +767,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                   value={bossesSearch}
                   onChange={(e) => setBossesSearch(e.target.value)}
                 />
-                {journal.bossesDefeated.length === 0 && <p style={{ fontSize: 13, opacity: 0.7 }}>No bosses defeated yet.</p>}
+                {journal.bossesDefeated.length === 0 && <p className={panelStyles.empty}>No bosses defeated yet.</p>}
                 {journal.bossesDefeated.length > 0 && visible.length === 0 && (
-                  <p style={{ fontSize: 13, opacity: 0.7 }}>No bosses match that search.</p>
+                  <p className={panelStyles.empty}>No bosses match that search.</p>
                 )}
                 {visible.map((id) => {
                   const enemy = ENEMIES.find((e) => e.id === id);
@@ -789,7 +781,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                       onClick={() => setSelectedEnemyId(id)}
                     >
                       {enemy && <SpritePreviewFrame assetId={enemy.battleSpriteAssetId} alt={enemy.name} size={{ width: 48, height: 48 }} />}
-                      <span style={{ fontSize: 13, flex: 1 }}>
+                      <span className={journalStyles.entryName}>
                         <strong>{enemy?.name ?? id}</strong> — defeated
                       </span>
                     </div>
@@ -799,7 +791,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             );
           })()}
 
-        <p className={styles.closeHint}>Click outside or press Esc to close</p>
+        <p className={panelStyles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
 
       {selectedEnemyId &&
@@ -814,7 +806,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
             .filter((d) => !!d.item);
           return (
             <div
-              className={styles.overlay}
+              className={panelStyles.overlay}
               style={{ zIndex: 30 }}
               onClick={(e) => {
                 e.stopPropagation();
@@ -825,9 +817,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <div className={styles.detailHeader}>
                   <SpritePreviewFrame assetId={enemy.battleSpriteAssetId} alt={enemy.name} size={{ width: 56, height: 56 }} />
                   <div>
-                    <p className={styles.detailName} style={{ fontSize: 16 }}>
+                    <p className={`${styles.detailName} ${journalStyles.detailNameLarge}`}>
                       {enemy.name}
-                      <span style={{ fontSize: 11, color: ENEMY_TIER_COLORS[enemy.tier], marginLeft: 8 }}>
+                      <span className={journalStyles.inlineTierBadge} style={{ color: ENEMY_TIER_COLORS[enemy.tier] }}>
                         {ENEMY_TIER_LABELS[enemy.tier]}
                       </span>
                     </p>
@@ -839,7 +831,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <p className={styles.detailStats} style={{ marginBottom: 4 }}>
                   <strong>Base Stats</strong>
                 </p>
-                <p className={questStyles.objective}>
+                <p className={journalStyles.detailLine}>
                   HP {enemy.stats.maxHp} &nbsp;·&nbsp; ATK {enemy.stats.attack} &nbsp;·&nbsp; DEF {enemy.stats.defense} &nbsp;·&nbsp;
                   SPD {enemy.stats.speed}
                 </p>
@@ -847,9 +839,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Special Attacks</strong>
                 </p>
-                {moves.length === 0 && <p className={questStyles.objective}>None known.</p>}
+                {moves.length === 0 && <p className={journalStyles.detailLine}>None known.</p>}
                 {moves.map((move) => (
-                  <p key={move.id} className={questStyles.objective}>
+                  <p key={move.id} className={journalStyles.detailLine}>
                     • {move.name} — {move.description}
                   </p>
                 ))}
@@ -857,12 +849,12 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Weakness</strong>
                 </p>
-                <p className={questStyles.objective}>{WEAKNESS_LABELS[enemy.weaknessDamageType]}</p>
+                <p className={journalStyles.detailLine}>{WEAKNESS_LABELS[enemy.weaknessDamageType]}</p>
 
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Ailments Inflicted</strong>
                 </p>
-                <p className={questStyles.objective}>
+                <p className={journalStyles.detailLine}>
                   {enemy.ailmentsInflicted && enemy.ailmentsInflicted.length > 0
                     ? enemy.ailmentsInflicted.map((id) => AILMENTS[id]?.name ?? id).join(', ')
                     : 'None known'}
@@ -871,7 +863,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Vulnerable To</strong>
                 </p>
-                <p className={questStyles.objective}>
+                <p className={journalStyles.detailLine}>
                   {enemy.vulnerableAilments && enemy.vulnerableAilments.length > 0
                     ? enemy.vulnerableAilments.map((id) => AILMENTS[id]?.name ?? id).join(', ')
                     : 'None known'}
@@ -880,9 +872,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Drops</strong>
                 </p>
-                {drops.length === 0 && <p className={questStyles.objective}>None known.</p>}
+                {drops.length === 0 && <p className={journalStyles.detailLine}>None known.</p>}
                 {drops.map((d) => (
-                  <p key={d.itemId} className={questStyles.objective}>
+                  <p key={d.itemId} className={journalStyles.detailLine}>
                     • {d.item!.name} ({Math.round(d.chance * 100)}% chance, x{d.minQuantity}
                     {d.maxQuantity !== d.minQuantity ? `-${d.maxQuantity}` : ''})
                   </p>
@@ -891,7 +883,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Rewards</strong>
                 </p>
-                <p className={questStyles.objective}>
+                <p className={journalStyles.detailLine}>
                   {enemy.xpReward} XP &nbsp;·&nbsp; {enemy.goldReward} gold
                 </p>
 
@@ -924,7 +916,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
           const hasAilmentResistance = entry.equipment ? !!formatAilmentResistance(entry.equipment.ailmentResistance) : false;
           return (
             <div
-              className={styles.overlay}
+              className={panelStyles.overlay}
               style={{ zIndex: 30 }}
               onClick={(e) => {
                 e.stopPropagation();
@@ -935,9 +927,9 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <div className={styles.detailHeader}>
                   {entry.iconAssetId && <img src={getAssetUrl(entry.iconAssetId)} alt="" className={styles.detailIcon} />}
                   <div>
-                    <p className={styles.detailName} style={{ fontSize: 16 }}>
+                    <p className={`${styles.detailName} ${journalStyles.detailNameLarge}`}>
                       {entry.name}
-                      <span style={{ fontSize: 11, color: TIER_COLORS[entry.tier], marginLeft: 8 }}>{TIER_LABELS[entry.tier]}</span>
+                      <span className={journalStyles.inlineTierBadge} style={{ color: TIER_COLORS[entry.tier] }}>{TIER_LABELS[entry.tier]}</span>
                     </p>
                     <p className={styles.detailMeta}>
                       {ITEM_CATEGORY_LABELS[entry.category]}
@@ -951,7 +943,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <p className={styles.detailStats} style={{ marginBottom: 4 }}>
                   <strong>{entry.equipment ? 'Bonuses' : 'Used For'}</strong>
                 </p>
-                <p className={questStyles.objective}>
+                <p className={journalStyles.detailLine}>
                   {entry.equipment ? (
                     hasStatBonuses || hasAilmentResistance ? (
                       <>
@@ -975,7 +967,7 @@ export function JournalOfLegends({ onClose }: JournalOfLegendsProps) {
                 <p className={styles.detailStats} style={{ marginTop: 10, marginBottom: 4 }}>
                   <strong>Sale Price</strong>
                 </p>
-                <p className={questStyles.objective}>{price !== undefined ? `${price} gold` : 'Cannot be sold'}</p>
+                <p className={journalStyles.detailLine}>{price !== undefined ? `${price} gold` : 'Cannot be sold'}</p>
 
                 <button
                   className={styles.smallButton}

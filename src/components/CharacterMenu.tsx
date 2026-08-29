@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { TierBadge } from './common/TierBadge';
 import { BestBadge } from './common/BestBadge';
 import { ItemDetailPopup } from './common/ItemDetailPopup';
+import { ITEM_CATEGORY_LABELS } from '@/utils/itemCategoryLabels';
 import { getAssetUrl } from '@/assets/assetManager';
 import { useInventoryStore } from '@/state/useInventoryStore';
 import { usePlayerStore } from '@/state/usePlayerStore';
@@ -31,11 +33,11 @@ type InventorySubTab = 'all' | 'consumable' | 'equipment' | 'materials' | 'keyIt
 
 const SUBTAB_LABELS: Record<InventorySubTab, string> = {
   all: 'All',
-  consumable: 'Consumables',
-  equipment: 'Equipment',
-  materials: 'Materials',
-  keyItem: 'Key Items',
   unique: 'Unique',
+  consumable: ITEM_CATEGORY_LABELS.consumable,
+  equipment: ITEM_CATEGORY_LABELS.equipment,
+  materials: ITEM_CATEGORY_LABELS.materials,
+  keyItem: ITEM_CATEGORY_LABELS.keyItem,
 };
 
 // Crafting tab: recipes (RECIPES) are keyed by their output item's own id, one recipe per
@@ -178,7 +180,7 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={panelStyles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <OverlayCloseButton onClick={onClose} />
         <div className={styles.tabs}>
@@ -383,11 +385,10 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
                 <div key={slot} className={styles.slotRow}>
                   <span className={styles.slotName}>{SLOT_LABELS[slot]}</span>
                   {!unlocked ? (
-                    <span
-                      style={{ fontSize: 12, opacity: 0.6, flex: 1 }}
-                      title={`Complete "${QUESTS.find((q) => q.id === SLOT_UNLOCK_QUEST_ID[slot])?.name ?? 'the matching side quest'}" to unlock this slot.`}
-                    >
-                      Locked
+                    <span style={{ fontSize: 12, opacity: 0.6, flex: 1 }}>
+                      {/* Reason shown as always-visible caption text, not just a hover title - a
+                          hover-only explanation is invisible on touch devices. */}
+                      Locked — complete &quot;{QUESTS.find((q) => q.id === SLOT_UNLOCK_QUEST_ID[slot])?.name ?? 'the matching side quest'}&quot; to unlock.
                     </span>
                   ) : equipDef ? (
                     <>
@@ -537,12 +538,12 @@ export function CharacterMenu({ onClose }: CharacterMenuProps) {
           );
         })()}
 
-        <p className={styles.closeHint}>Click outside or press Esc to close</p>
+        <p className={panelStyles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
 
       {equipPickerSlot && (
         <div
-          className={styles.overlay}
+          className={panelStyles.overlay}
           style={{ zIndex: 30 }}
           onClick={(e) => {
             e.stopPropagation();

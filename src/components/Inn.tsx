@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -43,7 +44,7 @@ export function Inn({ onClose }: InnProps) {
   const hasLantern = !!player?.equipment.lantern;
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={panelStyles.overlay} onClick={onClose}>
       <Panel className={styles.panel} style={{ width: 'min(400px, 92vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <OverlayCloseButton onClick={onClose} />
         <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 8px' }}>Juniper Reed's Inn</h2>
@@ -59,7 +60,7 @@ export function Inn({ onClose }: InnProps) {
           </button>
         )}
         {error && <p style={{ color: 'var(--fw-danger)', fontSize: 13 }}>{error}</p>}
-        <p className={styles.closeHint}>Click outside or press Esc to close</p>
+        <p className={panelStyles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );

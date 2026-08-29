@@ -1,15 +1,5 @@
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-}
-
 .panel {
-  width: min(560px, 94vw);
+  width: min(var(--fw-panel-width-md), 94vw);
   max-height: 85vh;
   overflow-y: auto;
 }
@@ -157,11 +147,4 @@
 .slotEmpty {
   font-size: 13px;
   opacity: 0.5;
-}
-
-.closeHint {
-  margin-top: 14px;
-  font-size: 12px;
-  opacity: 0.7;
-  text-align: right;
 }

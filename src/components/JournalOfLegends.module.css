@@ -1,0 +1,53 @@
+/** JournalOfLegends previously had no CSS module of its own - it borrowed CharacterMenu.module.css
+ *  and QuestLog.module.css for shared widget classes (still imported for those) and fell back to
+ *  ~29 separate inline style objects for everything else, at 5 different font-size values for what
+ *  were really only a handful of recurring roles. This module names those roles instead. */
+
+/** A list row's main name/title text (Echoes/Locations/Items/Lore/Bosses tabs all repeat this). */
+.entryName {
+  font-size: var(--fw-font-md);
+  flex: 1;
+}
+
+/** Small dim secondary text next to a name (e.g. "You are here", "You own x3", "No longer owned",
+ *  a locked reason). Color is intentionally fixed here - anything needing a semantic color (danger/
+ *  success/tier) should layer that on top rather than fork this class. */
+.metaCaption {
+  font-size: var(--fw-font-xs);
+  opacity: 0.6;
+}
+
+/** Small inline tier/rarity badge next to a name - size/spacing only; the color is per-tier/
+ *  per-enemy and stays as an inline style at each call site. */
+.inlineTierBadge {
+  font-size: var(--fw-font-xs);
+  margin-left: var(--fw-space-sm);
+}
+
+/** A filter checkbox's own label row (Quests/Echoes/Locations tabs' toggle filters). Vertical
+ *  spacing around it is still a per-call-site inline style, since it varies with neighboring
+ *  content, not a property of the label itself. */
+.filterCheckboxLabel {
+  font-size: var(--fw-font-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--fw-space-sm);
+  cursor: pointer;
+}
+
+/** Enlarges the shared .detailName (from CharacterMenu.module.css) for Journal's own Echoes/Items
+ *  detail popups specifically - combine both classNames rather than using this alone. */
+.detailNameLarge {
+  font-size: var(--fw-font-lg);
+}
+
+/** A line of detail-card text (enemy moves/weakness/drops, item effect/sale price) in the Echoes/
+ *  Items/Bosses detail popups. Identical to QuestLog.module.css's .objective, which this file used
+ *  to reuse for both real quest objectives AND these unrelated detail lines - same class, two
+ *  different meanings. Split out as its own name so a future change to one doesn't silently affect
+ *  the other; still visually identical today. */
+.detailLine {
+  font-size: var(--fw-font-md);
+  margin: 2px 0;
+  color: var(--fw-text-dim);
+}

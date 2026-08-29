@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { RewardPopup } from './RewardPopup';
 import { getAssetUrl } from '@/assets/assetManager';
@@ -95,7 +96,7 @@ export function ApothecaryRestockPanel({ shopId, onClose }: ApothecaryRestockPan
 
   return (
     <>
-      <div className={styles.overlay} onClick={onClose}>
+      <div className={panelStyles.overlay} onClick={onClose}>
         <Panel style={{ width: 'min(380px, 90vw)' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
           <OverlayCloseButton onClick={onClose} />
           <h2 style={{ color: 'var(--fw-accent)', margin: '0 0 12px' }}>{SHOP_TITLES[shopId] ?? 'Restock Supplies'}</h2>
@@ -136,7 +137,7 @@ export function ApothecaryRestockPanel({ shopId, onClose }: ApothecaryRestockPan
               </button>
             </div>
           )}
-          <p className={styles.closeHint}>Click outside or press Esc to close</p>
+          <p className={panelStyles.closeHint}>Click outside or press Esc to close</p>
         </Panel>
       </div>
       {reward && (

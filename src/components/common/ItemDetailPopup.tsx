@@ -6,18 +6,10 @@ import { LanternAbilitiesText } from './LanternAbilitiesText';
 import { getAssetUrl } from '@/assets/assetManager';
 import { usePlayerStore } from '@/state/usePlayerStore';
 import { ITEMS, EQUIPMENT } from '@/data';
-import type { ItemCategory } from '@/types';
 import { formatAilmentResistance, formatStatBonuses } from '@/utils/statBonuses';
 import { SLOT_LABELS } from '@/utils/equipmentSlotLabels';
+import { ITEM_CATEGORY_LABELS } from '@/utils/itemCategoryLabels';
 import styles from '../CharacterMenu.module.css';
-
-const ITEM_CATEGORY_LABELS: Record<ItemCategory, string> = {
-  consumable: 'Consumables',
-  equipment: 'Equipment',
-  keyItem: 'Key Items',
-  lanternUpgrade: 'Lantern Upgrades',
-  materials: 'Materials',
-};
 
 interface ItemDetailPopupProps {
   itemId: string;

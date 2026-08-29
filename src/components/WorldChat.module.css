@@ -1,15 +1,5 @@
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-}
-
 .panel {
-  width: min(480px, 94vw);
+  width: min(var(--fw-panel-width-sm), 94vw);
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -43,11 +33,6 @@
   margin-right: 4px;
 }
 
-.empty {
-  font-size: 13px;
-  opacity: 0.6;
-}
-
 .warning {
   font-size: 11px;
   opacity: 0.7;
@@ -65,15 +50,6 @@
   gap: 8px;
 }
 
-.textInput {
-  flex: 1;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--fw-panel-border);
-  color: var(--fw-text);
-  font-size: 13px;
-  padding: 6px 8px;
-  border-radius: 4px;
-}
 
 .sendButton {
   background: var(--fw-accent-dim);
@@ -92,11 +68,4 @@
 
 .sendButton:disabled {
   opacity: 0.4;
-}
-
-.closeHint {
-  margin-top: 10px;
-  font-size: 12px;
-  opacity: 0.7;
-  text-align: right;
 }

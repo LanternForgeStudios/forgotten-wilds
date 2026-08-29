@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Panel } from './common/Panel';
+import panelStyles from './common/Panel.module.css';
+import { SegmentedOptionRow } from './common/SegmentedOptionRow';
 import { OverlayCloseButton } from './common/OverlayCloseButton';
 import { SpritePreviewFrame } from './common/SpritePreviewFrame';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -740,7 +742,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
   const canReset = email !== null && confirmEmail.trim().toLowerCase() === email.toLowerCase();
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={panelStyles.overlay} onClick={onClose}>
       <Panel className={styles.panel} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <OverlayCloseButton onClick={onClose} />
         <h2 className={styles.title}>User Profile</h2>
@@ -780,7 +782,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
               {editingName ? (
                 <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                   <input
-                    className={styles.textInput}
+                    className={panelStyles.textInput}
                     style={{ width: 140 }}
                     value={nameDraft}
                     maxLength={24}
@@ -847,34 +849,36 @@ export function UserProfile({ onClose }: UserProfileProps) {
 
         {tab === 'friends' && (
           <div className={styles.section}>
-            <div className={styles.searchBar}>
-              <input
-                className={styles.textInput}
-                placeholder="Search by character name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && search()}
-              />
-              <button className={styles.smallButton} onClick={search} disabled={busy}>
-                Search
-              </button>
-            </div>
-            {searchError && <p className={styles.error}>{searchError}</p>}
-            {searchResults.length > 0 && (
-              <div className={styles.list}>
-                {searchResults.map((r) => (
-                  <div key={r.uid} className={styles.row}>
-                    <span className={styles.rowName}>{r.displayName}</span>
-                    <button className={styles.smallButton} disabled={busy} onClick={() => sendRequest(r.uid)}>
-                      Add Friend
-                    </button>
-                  </div>
-                ))}
+            <div className={styles.friendsGroup}>
+              <div className={styles.searchBar}>
+                <input
+                  className={panelStyles.textInput}
+                  placeholder="Search by character name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && search()}
+                />
+                <button className={styles.smallButton} onClick={search} disabled={busy}>
+                  Search
+                </button>
               </div>
-            )}
+              {searchError && <p className={styles.error}>{searchError}</p>}
+              {searchResults.length > 0 && (
+                <div className={styles.list}>
+                  {searchResults.map((r) => (
+                    <div key={r.uid} className={styles.row}>
+                      <span className={styles.rowName}>{r.displayName}</span>
+                      <button className={styles.smallButton} disabled={busy} onClick={() => sendRequest(r.uid)}>
+                        Add Friend
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {incoming.length > 0 && (
-              <>
+              <div className={styles.friendsGroup}>
                 <h3 className={styles.sectionTitle}>Incoming Requests</h3>
                 <div className={styles.list}>
                   {incoming.map((r) => (
@@ -889,11 +893,11 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             )}
 
             {outgoing.length > 0 && (
-              <>
+              <div className={styles.friendsGroup}>
                 <h3 className={styles.sectionTitle}>Outgoing Requests</h3>
                 <div className={styles.list}>
                   {outgoing.map((r) => (
@@ -903,11 +907,11 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             )}
 
             {incomingPvpChallenges.length > 0 && (
-              <>
+              <div className={styles.friendsGroup}>
                 <h3 className={styles.sectionTitle}>Duel Challenges</h3>
                 <div className={styles.list}>
                   {incomingPvpChallenges.map((c) => (
@@ -922,29 +926,32 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             )}
 
-            <h3 className={styles.sectionTitle}>Casual PvP</h3>
-            <div className={styles.searchBar}>
-              {pvpQueueStatus === 'queued' ? (
-                <>
-                  <span className={styles.pendingTag}>Searching for an opponent...</span>
-                  <button className={styles.dangerButton} onClick={() => void leavePvpQueue()}>
-                    Cancel
+            <div className={styles.friendsGroup}>
+              <h3 className={styles.sectionTitle}>Casual PvP</h3>
+              <div className={styles.searchBar}>
+                {pvpQueueStatus === 'queued' ? (
+                  <>
+                    <span className={styles.pendingTag}>Searching for an opponent...</span>
+                    <button className={styles.dangerButton} onClick={() => void leavePvpQueue()}>
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button className={styles.smallButton} disabled={pvpQueueStatus === 'joining'} onClick={() => void joinPvpQueue()}>
+                    Find a Match
                   </button>
-                </>
-              ) : (
-                <button className={styles.smallButton} disabled={pvpQueueStatus === 'joining'} onClick={() => void joinPvpQueue()}>
-                  Find a Match
-                </button>
-              )}
+                )}
+              </div>
+              {pvpError && <p className={styles.error}>{pvpError}</p>}
             </div>
-            {pvpError && <p className={styles.error}>{pvpError}</p>}
 
+            <div className={styles.friendsGroup}>
             <h3 className={styles.sectionTitle}>Friends</h3>
             <div className={styles.list}>
-              {friendUids.length === 0 && <p className={styles.empty}>No friends yet - search above to add one.</p>}
+              {friendUids.length === 0 && <p className={panelStyles.empty}>No friends yet - search above to add one.</p>}
               {friendUids.map((fUid) => {
                 const online = isPresenceOnline(
                   presences.find((p) => p.uid === fUid),
@@ -1000,11 +1007,12 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 onCancel={() => setTradeProposalToUid(null)}
               />
             )}
-            {tradeError && <p className={styles.error}>{tradeError}</p>}
+              {tradeError && <p className={styles.error}>{tradeError}</p>}
+            </div>
 
             {myTrades.filter((t) => t.status === 'awaiting_recipient' || t.status === 'awaiting_initiator').length >
               0 && (
-              <>
+              <div className={styles.friendsGroup}>
                 <h3 className={styles.sectionTitle}>Active Trades</h3>
                 <div className={styles.list}>
                   {myTrades
@@ -1094,14 +1102,14 @@ export function UserProfile({ onClose }: UserProfileProps) {
                       );
                     })}
                 </div>
-              </>
+              </div>
             )}
 
             {activeDmUid && (
               <div className={styles.dmPanel}>
                 <h3 className={styles.sectionTitle}>Message {names[activeDmUid] ?? '...'}</h3>
                 <div className={styles.dmMessages}>
-                  {dmMessages.length === 0 && <p className={styles.empty}>No messages yet.</p>}
+                  {dmMessages.length === 0 && <p className={panelStyles.empty}>No messages yet.</p>}
                   {dmMessages.map((m) => (
                     <p key={m.id} className={m.fromUid === uid ? styles.dmMine : styles.dmTheirs}>
                       {m.text}
@@ -1115,7 +1123,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 {dmError && <p className={styles.error}>{dmError}</p>}
                 <div className={styles.searchBar}>
                   <input
-                    className={styles.textInput}
+                    className={panelStyles.textInput}
                     placeholder="Type a message..."
                     value={dmDraft}
                     onChange={(e) => setDmDraft(e.target.value)}
@@ -1129,7 +1137,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
             )}
 
             {blockedUids.length > 0 && (
-              <>
+              <div className={styles.friendsGroup}>
                 <h3 className={styles.sectionTitle}>Blocked</h3>
                 <div className={styles.list}>
                   {blockedUids.map((bUid) => (
@@ -1141,7 +1149,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             )}
           </div>
         )}
@@ -1160,7 +1168,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
             </div>
             {!showClanLeaderboard && soloBattleError && <p className={styles.error}>{soloBattleError}</p>}
             {!showClanLeaderboard && (
-              <p className={styles.empty} style={{ marginTop: 6 }}>
+              <p className={panelStyles.empty} style={{ marginTop: 6 }}>
                 Fights alone, from a Town (like Ash Hallow) - counts toward the Solo leaderboard, not your clan's.
               </p>
             )}
@@ -1187,8 +1195,8 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 {clanLeaderboardError && <p className={styles.error}>{clanLeaderboardError}</p>}
                 {leaderboardCategory === 'clan' && (
                   <>
-                    {!clanLeaderboardError && !clanLeaderboard && <p className={styles.empty}>Loading...</p>}
-                    {clanLeaderboard?.length === 0 && <p className={styles.empty}>No clans have entered an Endless Battle yet.</p>}
+                    {!clanLeaderboardError && !clanLeaderboard && <p className={panelStyles.empty}>Loading...</p>}
+                    {clanLeaderboard?.length === 0 && <p className={panelStyles.empty}>No clans have entered an Endless Battle yet.</p>}
                     {clanLeaderboard && clanLeaderboard.length > 0 && (
                       <div className={styles.list}>
                         {clanLeaderboard.map((entry, i) => (
@@ -1205,8 +1213,8 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 )}
                 {leaderboardCategory === 'solo' && (
                   <>
-                    {!clanLeaderboardError && !soloLeaderboard && <p className={styles.empty}>Loading...</p>}
-                    {soloLeaderboard?.length === 0 && <p className={styles.empty}>No one has entered a solo Endless Battle yet.</p>}
+                    {!clanLeaderboardError && !soloLeaderboard && <p className={panelStyles.empty}>Loading...</p>}
+                    {soloLeaderboard?.length === 0 && <p className={panelStyles.empty}>No one has entered a solo Endless Battle yet.</p>}
                     {soloLeaderboard && soloLeaderboard.length > 0 && (
                       <div className={styles.list}>
                         {soloLeaderboard.map((entry, i) => (
@@ -1252,13 +1260,13 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 <h3 className={styles.sectionTitle}>Create a Clan</h3>
                 <div className={styles.searchBar}>
                   <input
-                    className={styles.textInput}
+                    className={panelStyles.textInput}
                     placeholder="Clan name"
                     value={newClanName}
                     onChange={(e) => setNewClanName(e.target.value)}
                   />
                   <input
-                    className={styles.textInput}
+                    className={panelStyles.textInput}
                     placeholder="Tag (2-5 letters)"
                     value={newClanTag}
                     onChange={(e) => setNewClanTag(e.target.value)}
@@ -1307,7 +1315,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
                     <h3 className={styles.sectionTitle}>Invite a Player</h3>
                     <div className={styles.searchBar}>
                       <input
-                        className={styles.textInput}
+                        className={panelStyles.textInput}
                         placeholder="Search by character name..."
                         value={clanInviteQuery}
                         onChange={(e) => setClanInviteQuery(e.target.value)}
@@ -1336,7 +1344,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   <button className={styles.smallButton} disabled={clanBusy} onClick={startEndlessBattle}>
                     Start Endless Battle
                   </button>
-                  <p className={styles.empty} style={{ marginTop: 6 }}>
+                  <p className={panelStyles.empty} style={{ marginTop: 6 }}>
                     Starts from a Town (like Ash Hallow) - solo is fine, or bring along any clan
                     members standing there with you.
                   </p>
@@ -1357,7 +1365,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
             )}
 
                 {!clanId && incomingClanInvites.length === 0 && (
-                  <p className={styles.empty} style={{ marginTop: 12 }}>
+                  <p className={panelStyles.empty} style={{ marginTop: 12 }}>
                     Not in a clan yet - create one above, or wait for an invite.
                   </p>
                 )}
@@ -1502,31 +1510,17 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>
                   Solo combat only - party/Endless Battle and PvP always use Medium.
                 </p>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {(['easy', 'medium', 'hard'] as Difficulty[]).map((level) => {
-                    const isActive = player?.difficulty === level;
-                    return (
-                      <button
-                        key={level}
-                        className={styles.smallButton}
-                        // Only busy disables - the active one stays clickable (a harmless no-op
-                        // re-select) rather than disabled, since a native disabled button's own
-                        // dimmed browser styling was fighting the accent-color override below and
-                        // making the "current" button look the SAME as the others, not different.
-                        disabled={busy}
-                        style={
-                          isActive
-                            ? { background: 'var(--fw-accent)', borderColor: 'var(--fw-accent)', color: 'var(--fw-bg-deep)', fontWeight: 'bold' }
-                            : undefined
-                        }
-                        onClick={() => changeDifficulty(level)}
-                      >
-                        {level === 'easy' ? 'Easy' : level === 'medium' ? 'Medium' : 'Hard'}
-                        {isActive ? ' ✓' : ''}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SegmentedOptionRow
+                  options={['easy', 'medium', 'hard'] as Difficulty[]}
+                  value={player?.difficulty ?? 'medium'}
+                  onChange={changeDifficulty}
+                  buttonClassName={styles.smallButton}
+                  // Only busy disables - the active one stays clickable (a harmless no-op
+                  // re-select) rather than disabled, since a native disabled button's own dimmed
+                  // browser styling was fighting the accent-color override and making the
+                  // "current" button look the SAME as the others, not different.
+                  disabled={busy}
+                />
               </div>
 
               <div>
@@ -1588,26 +1582,12 @@ export function UserProfile({ onClose }: UserProfileProps) {
                   Overrides the normal region-random/story-locked weather everywhere until set back to Auto. Only
                   visible in towns/overworlds, same as normal.
                 </p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {([null, 'sun', 'fog', 'rain', 'snow', 'sandstorm'] as (WeatherKind | null)[]).map((kind) => {
-                    const isActive = debugStore.weatherOverride === kind;
-                    return (
-                      <button
-                        key={kind ?? 'auto'}
-                        className={styles.smallButton}
-                        style={
-                          isActive
-                            ? { background: 'var(--fw-accent)', borderColor: 'var(--fw-accent)', color: 'var(--fw-bg-deep)', fontWeight: 'bold' }
-                            : undefined
-                        }
-                        onClick={() => debugStore.setWeatherOverride(kind)}
-                      >
-                        {kind ? kind.charAt(0).toUpperCase() + kind.slice(1) : 'Auto'}
-                        {isActive ? ' ✓' : ''}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SegmentedOptionRow
+                  options={[null, 'sun', 'fog', 'rain', 'snow', 'sandstorm'] as (WeatherKind | null)[]}
+                  value={debugStore.weatherOverride}
+                  onChange={debugStore.setWeatherOverride}
+                  buttonClassName={styles.smallButton}
+                />
               </div>
 
               <div>
@@ -1615,26 +1595,12 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>
                   Overrides the shared real-time day/night clock everywhere until set back to Auto.
                 </p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {([null, 'day', 'sunrise', 'sunset', 'night'] as (TimePhase | null)[]).map((phase) => {
-                    const isActive = debugStore.timeOverride === phase;
-                    return (
-                      <button
-                        key={phase ?? 'auto'}
-                        className={styles.smallButton}
-                        style={
-                          isActive
-                            ? { background: 'var(--fw-accent)', borderColor: 'var(--fw-accent)', color: 'var(--fw-bg-deep)', fontWeight: 'bold' }
-                            : undefined
-                        }
-                        onClick={() => debugStore.setTimeOverride(phase)}
-                      >
-                        {phase ? phase.charAt(0).toUpperCase() + phase.slice(1) : 'Auto'}
-                        {isActive ? ' ✓' : ''}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SegmentedOptionRow
+                  options={[null, 'day', 'sunrise', 'sunset', 'night'] as (TimePhase | null)[]}
+                  value={debugStore.timeOverride}
+                  onChange={debugStore.setTimeOverride}
+                  buttonClassName={styles.smallButton}
+                />
                 <p style={{ fontSize: 12, opacity: 0.7, margin: '10px 0 4px' }}>
                   Scrub the cycle - watch a full sunrise-to-night sweep (and the shadows it casts on
                   buildings/interactables) in seconds instead of real minutes. Takes priority over
@@ -1674,7 +1640,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
               are not affected. This cannot be undone.
             </p>
             {resetDone ? (
-              <p className={styles.empty}>Your progress has been reset.</p>
+              <p className={panelStyles.empty}>Your progress has been reset.</p>
             ) : (
               <>
                 <label className={styles.infoLabel} htmlFor="confirmEmail">
@@ -1682,7 +1648,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
                 </label>
                 <input
                   id="confirmEmail"
-                  className={styles.textInput}
+                  className={panelStyles.textInput}
                   value={confirmEmail}
                   onChange={(e) => setConfirmEmail(e.target.value)}
                   placeholder="you@example.com"
@@ -1696,7 +1662,7 @@ export function UserProfile({ onClose }: UserProfileProps) {
           </div>
         )}
 
-        <p className={styles.closeHint}>Click outside or press Esc to close</p>
+        <p className={panelStyles.closeHint}>Click outside or press Esc to close</p>
       </Panel>
     </div>
   );

@@ -11,3 +11,51 @@
   background-color: var(--fw-panel);
   color: var(--fw-text);
 }
+
+/** Shared "Click outside or press Esc to close" hint text - was independently redefined (with
+ *  drifting margin-top) in CharacterMenu/CharacterStats/MiniMap/UserProfile/WorldChat's own CSS
+ *  modules. The exact wording/keys still varies per screen (MiniMap's also mentions its own "M"
+ *  shortcut) - only the styling is shared here. */
+.closeHint {
+  margin-top: var(--fw-space-md);
+  font-size: var(--fw-font-sm);
+  opacity: 0.7;
+  text-align: right;
+}
+
+/** Shared centered fullscreen backdrop, for the "menu-tier" overlays (z-index 25, 50% black) -
+ *  was independently redefined identically in CharacterMenu/CharacterStats/MiniMap/QuestLog/
+ *  UserProfile/WorldChat's own CSS modules. Other overlay tiers (dialogue below menus at 20;
+ *  battle/skill-select above at 30; toast-like popups on top of everything at 40) genuinely
+ *  differ in z-index/darkness by design and are left as their own per-file rules, not folded in
+ *  here - only this one exact variant was pure copy-paste. A caller needing a different stacking
+ *  tier on top of this same shape (e.g. CharacterMenu's equip-picker sub-overlay) can still
+ *  override z-index inline, same as before. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/** Shared text input styling - was independently redefined identically in UserProfile's and
+ *  WorldChat's own CSS modules (search boxes, chat composer, DM composer). */
+.textInput {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--fw-panel-border);
+  color: var(--fw-text);
+  font-size: var(--fw-font-md);
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+/** Shared "nothing here yet" empty-state text - was independently redefined identically in
+ *  UserProfile's and WorldChat's own CSS modules. */
+.empty {
+  font-size: var(--fw-font-md);
+  opacity: 0.6;
+}
