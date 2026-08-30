@@ -566,6 +566,31 @@ registry - hand off the finished file for a location and it gets registered + wi
 
 ---
 
+## Quest cutscene backgrounds (1 outstanding placeholder)
+
+Dedicated, non-combat full-screen backgrounds for `src/data/cutscenes.ts`'s
+`QUEST_COMPLETION_CUTSCENES` - a handful of the heaviest story beats get their own bespoke art
+instead of reusing a `battle-bg.*` location backdrop, the same way `background.quest-
+rekindling-spirit-grove` and `background.quest-the-mountain-remembers` already do for the
+Prologue's two cutscenes.
+
+**Spec**: 1536×1024 PNG, painterly full-screen illustration - matches
+`quest-rekindling-spirit-grove.png`/`quest-the-mountain-remembers.png`/`defeat-cutscene.png`
+exactly (same dimensions, same "AI-generated illustration commissioned for this project" pipeline
+as the battle backgrounds above - see "Things Claude can't generate itself" below). Unlike a battle
+background, a **quiet, human-scaled presence in frame is fine** here (distant townsfolk, warm lit
+windows) since nothing renders on top of it during a cutscene the way combat sprites do over a
+battle backdrop - just no single figure large/foregrounded enough to look like a portrait or a
+specific named character.
+
+**Registry id convention**: `background.quest-<quest-id>` (matches the Prologue precedent exactly).
+
+| Cutscene | Registry id | Generation prompt |
+|---|---|---|
+| A New Dawn (game finale - `a-new-dawn`) | `background.quest-a-new-dawn` | Ash Hallow's rooftops at dusk, seen from above the mining-town rise, seven lantern-flames visible at once for the first time - scattered warm points of light across the whole town and the mountains beyond, windows glowing amber, a few distant townsfolk small and unhurried in the streets below, the Iron Mountains softening into blue evening haze behind the rooftops, quiet triumphant homecoming atmosphere, painterly fantasy illustration, no single figure large enough to read as a specific character. |
+
+---
+
 ## Endless Prairie (Volume III, Chapter 5) - all real art done
 
 **Status (2026-08-09): PixelLab quota renewed (subscription refreshed, ~1568 generations
