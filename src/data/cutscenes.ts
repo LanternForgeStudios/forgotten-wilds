@@ -178,7 +178,7 @@ export const QUEST_COMPLETION_CUTSCENES: Record<string, QuestCutscene> = {
 
   // Game finale
   'a-new-dawn': {
-    backgroundAssetId: 'battle-bg.forest',
+    backgroundAssetId: 'background.quest-a-new-dawn',
     dramatic: true,
     lines: [
       'Seven Lanterns, lit together, for the first time since before the Silence.',

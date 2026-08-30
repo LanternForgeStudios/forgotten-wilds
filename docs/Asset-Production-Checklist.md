@@ -566,7 +566,7 @@ registry - hand off the finished file for a location and it gets registered + wi
 
 ---
 
-## Quest cutscene backgrounds (1 outstanding placeholder)
+## Quest cutscene backgrounds (all done)
 
 Dedicated, non-combat full-screen backgrounds for `src/data/cutscenes.ts`'s
 `QUEST_COMPLETION_CUTSCENES` - a handful of the heaviest story beats get their own bespoke art
@@ -588,6 +588,10 @@ specific named character.
 | Cutscene | Registry id | Generation prompt |
 |---|---|---|
 | A New Dawn (game finale - `a-new-dawn`) | `background.quest-a-new-dawn` | Ash Hallow's rooftops at dusk, seen from above the mining-town rise, seven lantern-flames visible at once for the first time - scattered warm points of light across the whole town and the mountains beyond, windows glowing amber, a few distant townsfolk small and unhurried in the streets below, the Iron Mountains softening into blue evening haze behind the rooftops, quiet triumphant homecoming atmosphere, painterly fantasy illustration, no single figure large enough to read as a specific character. |
+
+Delivered at 1672x941 (the battle-bg aspect ratio) rather than the 1536x1024 spec above - harmless,
+since `CutsceneScene.loadBackground` cover-scales any background-category asset generically. Not
+regenerated to match the spec exactly; noted here rather than silently treated as identical.
 
 ---
 

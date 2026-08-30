@@ -7809,6 +7809,15 @@ export const ASSET_REGISTRY: AssetDefinition[] = [
     notes: 'AI-generated illustration commissioned for this project.',
   },
   {
+    id: 'background.quest-a-new-dawn',
+    category: 'background',
+    intendedUse: "Full-screen cutscene background for the 'a-new-dawn' game finale quest completion beat",
+    filePath: 'backgrounds/quest-a-new-dawn.png',
+    dimensions: { width: 1672, height: 941 },
+    status: 'final',
+    notes: 'AI-generated illustration commissioned for this project.',
+  },
+  {
     id: 'map.ash-hallow',
     category: 'map',
     intendedUse: 'Tiled JSON map for Ash Hallow town',

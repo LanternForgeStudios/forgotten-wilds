@@ -42,8 +42,8 @@ concerns:
   `docs/Asset-Production-Checklist.md` for the full per-location list. Generic `forest.png`/
   `shrine.png`/`hollow-rail-mine.png` remain as the fallback for Ash Hallow, interiors, and
   sub-landmarks that were never in scope for their own bespoke art.
-- **Cutscene backgrounds (3)** - `quest-rekindling-spirit-grove.png`, `quest-the-mountain-remembers.png`,
-  `defeat-cutscene.png`.
+- **Cutscene backgrounds (4)** - `quest-rekindling-spirit-grove.png`, `quest-the-mountain-remembers.png`,
+  `defeat-cutscene.png`, `quest-a-new-dawn.png`.
 - **Ash Hallow building facades (9) + shrine marker** - the original painterly building-entrance
   art for Ash Hallow's 9 buildings and the shrine landmark, in `public/assets/sprites/structures/`.
   **Note**: later regions' own building facades (e.g. Mirehaven's 7 buildings) were generated via
