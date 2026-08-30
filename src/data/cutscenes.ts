@@ -74,6 +74,119 @@ export const QUEST_COMPLETION_CUTSCENES: Record<string, QuestCutscene> = {
       "The mountain remembers more than anyone has been willing to say aloud. It's time you understood why.",
     ],
   },
+
+  // Crimson Bayou (MSQ Volume II)
+  'seeds-of-memory': {
+    backgroundAssetId: 'battle-bg.cypress-marsh',
+    lines: [
+      'The last Heart Seed settles into the cypress\'s roots, and for a long moment the whole marsh holds its breath.',
+      'Then Mother Cypress wakes - slow as a season turning, but wakes all the same.',
+      '"She remembers you now," the Marsh Spirit says. "Even the roots remember your name, small lantern-light."',
+      "Somewhere in Mirehaven, someone's grandmother laughs, and doesn't know why it suddenly feels familiar.",
+    ],
+  },
+  'the-waters-remember': {
+    backgroundAssetId: 'battle-bg.temple-of-the-deep-current',
+    lines: [
+      'The memory rises out of the shrine like silt stirred from a riverbed - old, and slow to settle.',
+      'Not abandonment, the vision shows you. A silence kept on purpose, by something that never stopped watching.',
+      '"The archive\'s filling back in, memory by memory," Lucien says, setting the fragment carefully on his shelf.',
+      "The Bayou's story finally has an ending worth writing down. It just isn't the one anyone expected.",
+    ],
+  },
+
+  // Endless Prairie (MSQ Volume III)
+  'voices-on-the-wind': {
+    backgroundAssetId: 'battle-bg.sacred-hills',
+    lines: [
+      'The third Wind Stone settles into the shrine, and the wind changes - just slightly, just enough to notice.',
+      '"Three stones held what the wind remembers," the Prairie Spirit says. "Scattered when the remembering stopped mattering to anyone."',
+      'For a moment, the grass over Sacred Hills seems to lean the same direction, all at once, listening.',
+      "Whatever the wind carried here, it isn't finished carrying it yet.",
+    ],
+  },
+  'the-first-promise-remembered': {
+    backgroundAssetId: 'battle-bg.stone-circle-valley',
+    lines: [
+      'The carvings at the Stone Circles catch the light differently this time, and the memory opens like a held breath finally released.',
+      'Equals, it shows you - not master and servant, sealed together willingly, long before anyone thought to call it a debt.',
+      '"Someone went to a great deal of trouble to make sure nobody remembered it that way," Chief Aiyana says quietly.',
+      "You've just proven it can be un-rewritten. That matters more than she can easily say.",
+    ],
+  },
+
+  // Whispering Pines (MSQ Volume IV)
+  'seeds-of-the-ancient-cedar': {
+    backgroundAssetId: 'battle-bg.ancient-cedar-shrine',
+    lines: [
+      'The third Spirit Seed takes root, and the shrine shudders - not with pain, but with growth, sudden and enormous.',
+      '"Root, and root, and root again," the Cedar Spirit murmurs. "The forest reaching back through me, further than I could reach alone."',
+      'I had forgotten what it felt like to be whole.',
+      'This shrine will remember what you did here, long after I am withered again.',
+    ],
+  },
+  'the-missing-pages': {
+    backgroundAssetId: 'battle-bg.ancient-cedar-shrine',
+    lines: [
+      "The fourth memory unfolds slower than the others, reluctant, as if the shrine itself is unsure you're ready for it.",
+      '"Deliberately emptied, not lost," Elder Rowan Birch says, turning the fragment over in his hands.',
+      'A star map falls into place among the roots, pointing north and west, toward a desert none of you have seen with your own eyes.',
+      "Cedarwatch will still be here when you're ready to follow it.",
+    ],
+  },
+
+  // Shattered Desert (MSQ Volume V)
+  'fragments-of-the-sky': {
+    backgroundAssetId: 'battle-bg.celestial-oasis',
+    lines: [
+      'The third Star Fragment slides into place, and the crystal above the oasis flares, then steadies into a clean, quiet light.',
+      '"Whole again," the Sand Spirit says, tilting her face toward the sky. "And the stars sharper for it already."',
+      'I had forgotten how much of the sky I was supposed to be able to see.',
+      'The old roads are opening now. Whatever waits at the Observatory has been waiting a very long time.',
+    ],
+  },
+  'the-stars-never-lied': {
+    backgroundAssetId: 'battle-bg.inner-observatory',
+    lines: [
+      "Five memories now, and for the first time, Elder Santiago Ortega doesn't reach for a page to explain what he's seeing.",
+      '"The Great Silence wasn\'t done to the Guardians," he says slowly. "It was chosen - by Keepers and Guardians together, to save this world from something none of them wrote down."',
+      "The Observatory's own star charts point north, past every road Red Mesa has ever mapped.",
+      "The Frozen Frontier. That's where the last of it is waiting.",
+    ],
+  },
+
+  // Frozen Frontier (MSQ Volume VI)
+  'light-within-the-ice': {
+    backgroundAssetId: 'battle-bg.aurora-basin',
+    lines: [
+      'The third Aurora Crystal Fragment locks into the shrine, and the sky over the basin catches - green, then violet, spreading slow as a held breath.',
+      '"Whole again," the Winter Spirit says, and for the first time her voice doesn\'t shiver. "The first warmth this basin has felt since the sky went dark."',
+      'I had forgotten what it was to not be cold.',
+      'The road north is open now. Whatever waits in the Hall of Eternal Winter has been waiting for you specifically.',
+    ],
+  },
+  'the-complete-memory': {
+    backgroundAssetId: 'battle-bg.hall-of-memories',
+    dramatic: true,
+    lines: [
+      'Six fragments, six regions, and for one long moment the Hall of Memories holds all of it at once - too much light, too much silence, too much to hold steady.',
+      '"The Hollow," Aurora Keeper Lyra breathes. "I read the word in your face before you said it. None of us were ready to hear it named, even after everything."',
+      'Worse than anyone guessed, because it was real. Better than anyone guessed, because they chose it - all of them, together, on purpose.',
+      'Only the answer waiting here in this hall is left now. And it is finally, finally listening back.',
+    ],
+  },
+
+  // Game finale
+  'a-new-dawn': {
+    backgroundAssetId: 'battle-bg.forest',
+    dramatic: true,
+    lines: [
+      'Seven Lanterns, lit together, for the first time since before the Silence.',
+      'Elias Rowan says it like a man setting down a weight he has carried since before you were born.',
+      "Ash Hallow's rooftops catch the lantern-light differently tonight - warmer, somehow, like a held breath finally let go.",
+      'The mountain remembers you, Keeper. Now, at last, so does everything else.',
+    ],
+  },
 };
 
 /** Built dynamically from the actual encounter roster (not static data, since it depends on which
