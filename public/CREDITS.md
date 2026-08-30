@@ -36,14 +36,12 @@ concerns:
 
 - **Title screen hero art** - `public/assets/backgrounds/title-screen.png`
   (`background.title-screen`) - has the game's own logo and tagline painted in.
-- **Battle backgrounds (7)** - `ironwood-trail.png`, `raven-ridge.png`, `whisper-falls.png`,
-  `black-briar-forest.png`, `hollow-rail-mine.png` (one per Iron Mountains region/dungeon with real
-  encounters), plus generic `forest.png`/`shrine.png` used as the fallback for every location that
-  doesn't have its own dedicated background yet. **Outstanding gap**: every region past Iron
-  Mountains (43 major locations across Crimson Bayou/Endless Prairie/Whispering Pines/Shattered
-  Desert/Frozen Frontier) still falls back to the generic `forest`/`hollow-rail-mine` backgrounds -
-  see the Battle Backgrounds section of `docs/Asset-Production-Checklist.md` for the full list and
-  ready-to-use generation prompts.
+- **Battle backgrounds (48)** - one dedicated full-screen illustration per major field/dungeon
+  location across every region (Iron Mountains, Crimson Bayou, Endless Prairie, Whispering Pines,
+  Shattered Desert, Frozen Frontier) - see the Battle Backgrounds section of
+  `docs/Asset-Production-Checklist.md` for the full per-location list. Generic `forest.png`/
+  `shrine.png`/`hollow-rail-mine.png` remain as the fallback for Ash Hallow, interiors, and
+  sub-landmarks that were never in scope for their own bespoke art.
 - **Cutscene backgrounds (3)** - `quest-rekindling-spirit-grove.png`, `quest-the-mountain-remembers.png`,
   `defeat-cutscene.png`.
 - **Ash Hallow building facades (9) + shrine marker** - the original painterly building-entrance

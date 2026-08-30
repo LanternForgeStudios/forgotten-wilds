@@ -301,7 +301,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A hushed water-logged marsh of ancient cypress trees, their roots knotted deep into the bayou.',
     mapAssetId: 'map.cypress-marsh',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.cypress-marsh',
     encounterTable: [
       { enemyId: 'bog-hag', weight: 3 },
       { enemyId: 'cypress-witch', weight: 1 },
@@ -329,7 +329,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Winding waterlogged paths through the deep bayou - the Old Cemetery lies somewhere among the reeds.',
     mapAssetId: 'map.murkwater-trails',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.murkwater-trails',
     encounterTable: [
       { enemyId: 'marsh-crocodile', weight: 3 },
       { enemyId: 'bog-ravager', weight: 1 },
@@ -344,7 +344,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A weathered dock hidden among the reeds, where Warden Sabine Thorne keeps watch over the rising waters.',
     mapAssetId: 'map.hidden-river-landing',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.hidden-river-landing',
     encounterTable: [
       { enemyId: 'rougarou-stalker', weight: 3 },
       { enemyId: 'alpha-rougarou', weight: 1 },
@@ -359,7 +359,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A flooded ancient temple beneath Hidden River Landing, once tended by Lantern Keepers alongside the Ancient Serpent Guardian.',
     mapAssetId: 'map.temple-of-the-deep-current',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.temple-of-the-deep-current',
     encounterTable: [
       { enemyId: 'bog-ravager', weight: 2 },
       { enemyId: 'cypress-witch', weight: 2 },
@@ -490,7 +490,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Rolling grassland stretching to the horizon, gold-tipped grass bending in a wind that never quite stops.',
     mapAssetId: 'map.golden-prairie',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.golden-prairie',
     encounterTable: [
       { enemyId: 'prairie-wolf', weight: 3 },
       { enemyId: 'dire-prairie-wolf', weight: 1 },
@@ -505,7 +505,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Open plains where a great buffalo herd still runs, wardens against wolves that shadow its edges.',
     mapAssetId: 'map.spirit-herd-plains',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.spirit-herd-plains',
     encounterTable: [
       { enemyId: 'prairie-wolf', weight: 2 },
       { enemyId: 'wind-wisp', weight: 2 },
@@ -520,7 +520,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: "A ring of low hills where the wind carries voices, if you know how to listen. Not marked on any trader's map.",
     mapAssetId: 'map.sacred-hills',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.sacred-hills',
     encounterTable: [
       { enemyId: 'wind-wisp', weight: 3 },
       { enemyId: 'storm-wisp', weight: 1 },
@@ -535,7 +535,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Weathered stone rings stand in careful arrangement here, carved with figures too worn to read at a glance.',
     mapAssetId: 'map.stone-circle-valley',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.stone-circle-valley',
     encounterTable: [
       { enemyId: 'wind-wisp', weight: 2 },
       { enemyId: 'storm-wisp', weight: 2 },
@@ -550,7 +550,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'The grassland gives way to bare rock here, rising toward a mesa lost in cloud - the wind grows sharper with every step.',
     mapAssetId: 'map.thunderbird-mesa-approach',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.thunderbird-mesa-approach',
     encounterTable: [
       { enemyId: 'storm-wisp', weight: 2 },
       { enemyId: 'dire-prairie-wolf', weight: 2 },
@@ -668,7 +668,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A wind-scoured stone temple at the foot of Thunderbird Mesa, its halls still humming with old, half-forgotten mechanisms.',
     mapAssetId: 'map.summit-temple',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.summit-temple',
     encounterTable: [
       { enemyId: 'wind-wisp', weight: 3 },
       { enemyId: 'storm-wisp', weight: 1 },
@@ -683,7 +683,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A narrow stone span arcing over open cloud, the wind strong enough here to lean into.',
     mapAssetId: 'map.sky-bridge',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.sky-bridge',
     encounterTable: [
       { enemyId: 'storm-wisp', weight: 2 },
       { enemyId: 'storm-fledgling', weight: 2 },
@@ -698,7 +698,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'Open-air chambers where lightning gathers instead of dispersing, crackling between carved stone pillars.',
     mapAssetId: 'map.storm-galleries',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.storm-galleries',
     encounterTable: [
       { enemyId: 'storm-fledgling', weight: 3 },
       { enemyId: 'thunder-roc', weight: 1 },
@@ -713,7 +713,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A quiet round chamber where a single lantern has burned, untended, since long before Highwind Crossing had a name.',
     mapAssetId: 'map.lantern-sanctuary',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.lantern-sanctuary',
     encounterTable: [{ enemyId: 'storm-wisp', weight: 1 }],
     npcIds: [],
     fastTravel: true,
@@ -725,7 +725,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: "The mesa's true summit, open to the sky on every side - where the Great Thunderbird still keeps its long watch.",
     mapAssetId: 'map.guardian-peak',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.guardian-peak',
     encounterTable: [
       { enemyId: 'thunder-roc', weight: 2 },
       { enemyId: 'dire-prairie-wolf', weight: 1 },
@@ -760,7 +760,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A narrow trail winding between fog-wrapped trunks, the mist here thick enough to swallow sound.',
     mapAssetId: 'map.mistwood-path',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.mistwood-path',
     encounterTable: [
       { enemyId: 'forest-echo', weight: 3 },
       { enemyId: 'corrupted-echo', weight: 1 },
@@ -775,7 +775,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'The oldest stand of trees in Mytherra, canopy so dense the ground below has forgotten what direct sun feels like.',
     mapAssetId: 'map.elder-forest',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.elder-forest',
     encounterTable: [
       { enemyId: 'forest-echo', weight: 2 },
       { enemyId: 'corrupted-echo', weight: 2 },
@@ -790,7 +790,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A cold, clear river cutting through the forest, its far bank lined with old fishing camps long since abandoned.',
     mapAssetId: 'map.silver-river',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.silver-river',
     encounterTable: [
       { enemyId: 'forest-echo', weight: 3 },
       { enemyId: 'corrupted-echo', weight: 1 },
@@ -805,7 +805,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A shrine grown into the trunk of the Ancient Cedar itself, its Spirit Seed long since withered.',
     mapAssetId: 'map.ancient-cedar-shrine',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.ancient-cedar-shrine',
     encounterTable: [{ enemyId: 'corrupted-echo', weight: 1 }],
     npcIds: ['cedar-spirit'],
     fastTravel: true,
@@ -817,7 +817,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'The forest thins here, ancient roots breaking the surface like the ribs of something buried - Heartwood Sanctuary waits below.',
     mapAssetId: 'map.heartwood-approach',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.heartwood-approach',
     encounterTable: [
       { enemyId: 'corrupted-echo', weight: 2 },
       { enemyId: 'forest-echo', weight: 2 },
@@ -917,7 +917,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A cavern of interlocking roots thick as tree trunks, descending below the forest floor into the dark.',
     mapAssetId: 'map.root-caverns',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.root-caverns',
     encounterTable: [
       { enemyId: 'root-wraith', weight: 3 },
       { enemyId: 'elder-root-wraith', weight: 1 },
@@ -932,7 +932,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'Shelves grown from living root, most of them bare - what survives here is only a fragment of what once filled this chamber.',
     mapAssetId: 'map.inner-archive',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.inner-archive',
     encounterTable: [
       { enemyId: 'root-wraith', weight: 2 },
       { enemyId: 'elder-root-wraith', weight: 2 },
@@ -947,7 +947,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A round root-walled chamber at the heart of the sanctuary, where a single lantern has waited, unlit, since long before Cedarwatch had a name.',
     mapAssetId: 'map.heartwood-lantern-sanctuary',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.heartwood-lantern-sanctuary',
     encounterTable: [{ enemyId: 'elder-root-wraith', weight: 1 }],
     npcIds: [],
     fastTravel: true,
@@ -959,7 +959,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A vast open cavern lit by pale root-light, where a shape too large and too still to be a tree keeps watch.',
     mapAssetId: 'map.guardian-grove',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.guardian-grove',
     encounterTable: [
       { enemyId: 'elder-root-wraith', weight: 2 },
       { enemyId: 'corrupted-echo', weight: 1 },
@@ -988,7 +988,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Endless rolling dunes, heat shimmering off the sand in waves visible from a mile off.',
     mapAssetId: 'map.sunfire-dunes',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.sunfire-dunes',
     encounterTable: [
       { enemyId: 'dust-devil', weight: 3 },
       { enemyId: 'sandstorm-devil', weight: 1 },
@@ -1003,7 +1003,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Deep red-rock canyons, narrow enough in places to touch both walls at once.',
     mapAssetId: 'map.crimson-canyons',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.crimson-canyons',
     encounterTable: [
       { enemyId: 'dust-devil', weight: 2 },
       { enemyId: 'sandstorm-devil', weight: 2 },
@@ -1018,7 +1018,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Banded cliffs in a dozen colors, layered like the desert itself kept a written record no one can read anymore.',
     mapAssetId: 'map.painted-mesas',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.painted-mesas',
     encounterTable: [
       { enemyId: 'dust-devil', weight: 2 },
       { enemyId: 'sandstorm-devil', weight: 2 },
@@ -1033,7 +1033,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A pocket of green and open water, ringed with stones angled toward the night sky.',
     mapAssetId: 'map.celestial-oasis',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.celestial-oasis',
     encounterTable: [{ enemyId: 'sandstorm-devil', weight: 1 }],
     npcIds: ['sand-spirit'],
     fastTravel: true,
@@ -1045,7 +1045,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'The dunes thin here, and the ground rises toward a shape too regular to be a natural formation.',
     mapAssetId: 'map.forgotten-observatory-approach',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.forgotten-observatory-approach',
     encounterTable: [
       { enemyId: 'dust-devil', weight: 2 },
       { enemyId: 'sandstorm-devil', weight: 2 },
@@ -1146,7 +1146,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A vast circular chamber ringed with dead brass instruments, dust-caked dials still pointed at a sky no one has read in centuries.',
     mapAssetId: 'map.inner-observatory',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.inner-observatory',
     encounterTable: [
       { enemyId: 'celestial-wisp', weight: 3 },
       { enemyId: 'star-phantom', weight: 1 },
@@ -1161,7 +1161,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A domed room whose ceiling still holds a faint painted map of a sky that no longer quite matches the one outside.',
     mapAssetId: 'map.star-chamber',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.star-chamber',
     encounterTable: [
       { enemyId: 'celestial-wisp', weight: 2 },
       { enemyId: 'star-phantom', weight: 2 },
@@ -1176,7 +1176,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A round chamber at the heart of the Observatory, where a single lantern has waited, unlit, since before Red Mesa had a name.',
     mapAssetId: 'map.star-lantern-sanctuary',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.star-lantern-sanctuary',
     encounterTable: [{ enemyId: 'star-phantom', weight: 1 }],
     npcIds: [],
     fastTravel: true,
@@ -1188,7 +1188,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A crevice deep enough that the sky above narrows to a thin bright line, the air cool and still.',
     mapAssetId: 'map.canyon-depths',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.canyon-depths',
     encounterTable: [
       { enemyId: 'star-phantom', weight: 2 },
       { enemyId: 'sandstorm-devil', weight: 1 },
@@ -1203,7 +1203,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A wide stone platform open to the sky, where a shape carved from the canyon itself keeps a watch no one relieved.',
     mapAssetId: 'map.guardian-summit',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.guardian-summit',
     encounterTable: [
       { enemyId: 'star-phantom', weight: 2 },
       { enemyId: 'sandstorm-devil', weight: 1 },
@@ -1232,7 +1232,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'Pines bent white under snow so thick the trail beneath them is more memory than path.',
     mapAssetId: 'map.snowveil-forest',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.snowveil-forest',
     encounterTable: [
       { enemyId: 'frost-wolf', weight: 3 },
       { enemyId: 'alpha-frost-wolf', weight: 1 },
@@ -1247,7 +1247,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A river caught mid-current and held there, its surface a frozen record of a current that never finished passing.',
     mapAssetId: 'map.frozen-river',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.frozen-river',
     encounterTable: [
       { enemyId: 'frost-wolf', weight: 2 },
       { enemyId: 'alpha-frost-wolf', weight: 2 },
@@ -1262,7 +1262,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A narrow cut between walls of blue-white ice, cold enough that breath hangs in the air like fog that refuses to clear.',
     mapAssetId: 'map.glacier-pass',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.glacier-pass',
     encounterTable: [
       { enemyId: 'frost-wolf', weight: 2 },
       { enemyId: 'alpha-frost-wolf', weight: 2 },
@@ -1277,7 +1277,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'A wide snowfield open to the sky, ringed with standing stones angled toward where the aurora used to burn brightest.',
     mapAssetId: 'map.aurora-basin',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.aurora-basin',
     encounterTable: [{ enemyId: 'alpha-frost-wolf', weight: 1 }],
     npcIds: ['winter-spirit'],
     fastTravel: true,
@@ -1289,7 +1289,7 @@ export const LOCATIONS: Location[] = [
     kind: 'overworld',
     description: 'The snow thins here, scoured off a stone stair leading up toward a doorway too old for this to be its first winter.',
     mapAssetId: 'map.hall-of-eternal-winter-approach',
-    battleBackgroundAssetId: 'battle-bg.forest',
+    battleBackgroundAssetId: 'battle-bg.hall-of-eternal-winter-approach',
     encounterTable: [
       { enemyId: 'frost-wolf', weight: 2 },
       { enemyId: 'alpha-frost-wolf', weight: 2 },
@@ -1390,7 +1390,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A vast frozen hall, its columns rimed thick with frost that has never once thawed.',
     mapAssetId: 'map.hall-of-eternal-winter',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.hall-of-eternal-winter',
     encounterTable: [
       { enemyId: 'frozen-wraith', weight: 3 },
       { enemyId: 'ancient-frozen-wraith', weight: 1 },
@@ -1405,7 +1405,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A round chamber deep in the Hall, where a single lantern has waited, unlit, since before Frosthaven had a name.',
     mapAssetId: 'map.winter-lantern-sanctuary',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.winter-lantern-sanctuary',
     encounterTable: [{ enemyId: 'ancient-frozen-wraith', weight: 1 }],
     npcIds: [],
     fastTravel: true,
@@ -1417,7 +1417,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A wide chamber lined with carved likenesses of every Guardian that came before this one, all facing the same direction.',
     mapAssetId: 'map.guardian-chamber',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.guardian-chamber',
     encounterTable: [
       { enemyId: 'frozen-wraith', weight: 2 },
       { enemyId: 'ancient-frozen-wraith', weight: 2 },
@@ -1432,7 +1432,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'An open platform at the Hall\'s highest point, where a shape carved from ice itself has kept a watch that never once relieved.',
     mapAssetId: 'map.summit-of-winter',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.summit-of-winter',
     encounterTable: [
       { enemyId: 'ancient-frozen-wraith', weight: 2 },
       { enemyId: 'frozen-wraith', weight: 1 },
@@ -1447,7 +1447,7 @@ export const LOCATIONS: Location[] = [
     kind: 'dungeon',
     description: 'A quiet chamber past the Summit, its walls lined with six empty alcoves, each shaped to hold something that was never returned - until now.',
     mapAssetId: 'map.hall-of-memories',
-    battleBackgroundAssetId: 'battle-bg.hollow-rail-mine',
+    battleBackgroundAssetId: 'battle-bg.hall-of-memories',
     encounterTable: [],
     npcIds: [],
     fastTravel: true,

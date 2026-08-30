@@ -470,15 +470,14 @@ whenever you want, under `sprite.tx-player`, `enemy.velmora-slime-animation`, an
 
 ---
 
-## Battle backgrounds (43 - full-screen combat backdrops) - outstanding placeholders
+## Battle backgrounds (43 - full-screen combat backdrops) - all 43 done
 
-Every field/dungeon location from Crimson Bayou onward currently falls back to the generic
-`battle-bg.forest` (field) or `battle-bg.hollow-rail-mine` (dungeon) - the mine background in
-particular is a real mismatch for a sky temple, a desert observatory, or an ice hall. Only Iron
-Mountains has dedicated per-location art (`battle-bg.ironwood-trail`, `.raven-ridge`,
-`.whisper-falls`, `.black-briar-forest` for its 4 major field locations, `.hollow-rail-mine` for its
-one dungeon). This section brings every other region up to that same one-background-per-major-
-location granularity.
+Every major field/dungeon location across every region now has dedicated per-location art (Iron
+Mountains `battle-bg.ironwood-trail`/`.raven-ridge`/`.whisper-falls`/`.black-briar-forest`/
+`.hollow-rail-mine`, plus the full Crimson Bayou/Endless Prairie/Whispering Pines/Shattered
+Desert/Frozen Frontier sets below) - the old generic `battle-bg.forest`/`battle-bg.hollow-rail-mine`
+fallbacks are no longer used by any major location (they remain wired for Ash Hallow, interiors,
+and sub-landmarks that were never in scope for bespoke art).
 
 **Spec**: 1672×941 PNG, painterly full-screen illustration - matches the existing Iron Mountains set
 exactly (same dimensions, same "AI-generated illustration commissioned for this project" pipeline,
@@ -497,7 +496,7 @@ e.g. `ironwood-trail` -> `battle-bg.ironwood-trail`). The ids below are proposed
 registry - hand off the finished file for a location and it gets registered + wired into
 `locations.ts`'s `battleBackgroundAssetId` in one pass, same as the tilesets.
 
-### Crimson Bayou (4: 3 field + 1 dungeon)
+### Crimson Bayou (4: 3 field + 1 dungeon) - all 4 done
 
 | Location | Registry id | Generation prompt |
 |---|---|---|
@@ -506,7 +505,7 @@ registry - hand off the finished file for a location and it gets registered + wi
 | Hidden River Landing | `battle-bg.hidden-river-landing` | A weathered wooden dock hidden among tall reeds, dark river water rising higher than it should, warm lantern-light from a nearby post, quiet and tense atmosphere, painterly fantasy illustration, no characters in frame. |
 | Temple of the Deep Current | `battle-bg.temple-of-the-deep-current` | A flooded ancient stone temple interior, water pooling across cracked tile floors, faint bioluminescent glow reflecting off wet stone columns, submerged carvings of serpent guardians, dim and reverent atmosphere, painterly fantasy illustration, no characters in frame. |
 
-### Endless Prairie (10: 5 field + 5 dungeon)
+### Endless Prairie (10: 5 field + 5 dungeon) - all 10 done
 
 | Location | Registry id | Generation prompt |
 |---|---|---|
@@ -521,7 +520,7 @@ registry - hand off the finished file for a location and it gets registered + wi
 | Lantern Sanctuary (Endless Prairie) | `battle-bg.lantern-sanctuary` | A quiet round stone chamber, a single old lantern burning untended at its center, warm golden light against ancient windswept stonework, reverent hushed atmosphere, painterly fantasy illustration, no characters in frame. |
 | Guardian Peak | `battle-bg.guardian-peak` | A mesa's true summit, open to the sky on every side, thin high-altitude clouds level with the viewer, sense of a vast ancient watcher's domain, dramatic golden-hour light, painterly fantasy illustration, no characters in frame. |
 
-### Whispering Pines (9: 5 field + 4 dungeon)
+### Whispering Pines (9: 5 field + 4 dungeon) - all 9 done
 
 | Location | Registry id | Generation prompt |
 |---|---|---|
@@ -535,7 +534,7 @@ registry - hand off the finished file for a location and it gets registered + wi
 | Lantern Sanctuary (Whispering Pines) | `battle-bg.heartwood-lantern-sanctuary` | A round root-walled chamber deep underground, a single unlit lantern waiting at its center, faint pale-green ambient root-light, reverent hushed atmosphere, painterly fantasy illustration, no characters in frame. |
 | Guardian Grove | `battle-bg.guardian-grove` | A vast open underground cavern lit by pale root-light, an enormous still shape watching from the shadows, scale and stillness emphasized, painterly fantasy illustration, no characters in frame. |
 
-### Shattered Desert (10: 5 field + 5 dungeon)
+### Shattered Desert (10: 5 field + 5 dungeon) - all 10 done
 
 | Location | Registry id | Generation prompt |
 |---|---|---|
@@ -550,7 +549,7 @@ registry - hand off the finished file for a location and it gets registered + wi
 | Canyon Depths | `battle-bg.canyon-depths` | A deep narrow crevice where the sky above narrows to a thin bright line, cool still air, tall red-rock walls close on both sides, painterly fantasy illustration, no characters in frame. |
 | Guardian Summit | `battle-bg.guardian-summit` | A wide stone platform carved from canyon rock, open to the sky, an enormous still shape watching from the edge, dramatic warm desert-sunset light, painterly fantasy illustration, no characters in frame. |
 
-### Frozen Frontier (10: 5 field + 5 dungeon)
+### Frozen Frontier (10: 5 field + 5 dungeon) - all 10 done
 
 | Location | Registry id | Generation prompt |
 |---|---|---|
