@@ -42,6 +42,22 @@ const CHESTS: Record<string, Record<string, ChestReward>> = {
     'chest-ironwood-2': { itemId: 'ranger-boots', gold: 20, xp: 30 },
     'chest-ironwood-3': { itemId: 'ghost-miners-coin', gold: 20, xp: 30 },
   },
+  // Iron Mountains field maps that had no chests at all until the 2026-08 "every overworld map
+  // gets 3 chests" pass - Rare-tier equipment the ironwood-trail/hollow-rail-mine chests above
+  // hadn't already handed out (spiritwood-walking-staff/veteran-keeper-coat/keepers-gauntlets/
+  // mountain-knot stay shop-exclusive per the no-backfill policy above), plus a consumable that
+  // cures each map's own signature ailment (wisp-chill's Freeze at Whisper Falls, briar-thorn-
+  // lash's Poison at Black Briar Forest - see data/enemies.ts's own loot-table comments).
+  'whisper-falls': {
+    'chest-whisper-falls-1': { itemId: 'veteran-keeper-trousers', gold: 20, xp: 30 },
+    'chest-whisper-falls-2': { itemId: 'wardens-broadsword', gold: 20, xp: 30 },
+    'chest-whisper-falls-3': { itemId: 'thaw-crystal', itemQuantity: 2, gold: 20, xp: 30 },
+  },
+  'black-briar-forest': {
+    'chest-black-briar-forest-1': { itemId: 'ghostbreaker-warhammer', gold: 20, xp: 30 },
+    'chest-black-briar-forest-2': { itemId: 'ghost-miners-axe', gold: 20, xp: 30 },
+    'chest-black-briar-forest-3': { itemId: 'antidote', itemQuantity: 2, gold: 20, xp: 30 },
+  },
   'hollow-rail-mine': {
     'chest-mine-1': { itemId: 'spirit-draught', itemQuantity: 2, gold: 20, xp: 30 },
     'chest-mine-2': { itemId: 'thin-lantern-oil', itemQuantity: 2, gold: 20, xp: 30 },

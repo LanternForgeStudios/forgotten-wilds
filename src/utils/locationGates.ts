@@ -56,12 +56,34 @@ export const LOCATION_GATES: Record<string, string> = {
   'hall-of-memories': 'hall-of-eternal-winter',
 };
 
-/** Returns a player-facing message if `locationId` is gated and not yet unlocked, or null if it's
- *  free to enter. Deliberately vague about which quest is required, matching the existing
- *  lore-toned "Perhaps it will mean something, in time" style elsewhere in these scenes. */
-export function getBlockedMessage(locationId: string, progress: Record<string, QuestProgress>): string | null {
+/** Per-transition gates, on top of the per-location gates above - for a specific `from -> to` door
+ *  that needs to stay locked even though `to` itself is otherwise open. Kept in sync by hand with
+ *  the server-side copy in functions/src/functions/enterLocation.ts (same pattern as LOCATION_GATES). */
+export const TRANSITION_GATES: Array<{ from: string; to: string; requiredQuestId: string }> = [
+  // The Mine Office's door opens straight onto Hollow Rail Mine right next to the Coalbound
+  // Warden's chamber - without this, it's a shortcut past the entire dungeon (shrine, Echoes, and
+  // the boss room itself) for anyone who reaches the office before finishing the mine the long way.
+  { from: 'ash-hallow-mine-office', to: 'hollow-rail-mine', requiredQuestId: 'the-coalbound-warden' },
+];
+
+/** Returns a player-facing message if entering `locationId` (optionally via a transition standing
+ *  in `fromLocationId`) is gated and not yet unlocked, or null if it's free to enter. Deliberately
+ *  vague about which quest is required, matching the existing lore-toned "Perhaps it will mean
+ *  something, in time" style elsewhere in these scenes. */
+export function getBlockedMessage(
+  locationId: string,
+  progress: Record<string, QuestProgress>,
+  fromLocationId?: string,
+): string | null {
   const requiredQuestId = LOCATION_GATES[locationId];
-  if (!requiredQuestId) return null;
-  if (progress[requiredQuestId]?.status === 'completed') return null;
-  return "The way isn't open to you yet. Perhaps there's more to do first.";
+  if (requiredQuestId && progress[requiredQuestId]?.status !== 'completed') {
+    return "The way isn't open to you yet. Perhaps there's more to do first.";
+  }
+  const transitionGate = fromLocationId
+    ? TRANSITION_GATES.find((g) => g.from === fromLocationId && g.to === locationId)
+    : undefined;
+  if (transitionGate && progress[transitionGate.requiredQuestId]?.status !== 'completed') {
+    return "The way isn't open to you yet. Perhaps there's more to do first.";
+  }
+  return null;
 }

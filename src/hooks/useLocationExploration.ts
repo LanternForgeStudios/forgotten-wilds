@@ -85,7 +85,7 @@ export function useLocationExploration({ locationId, suspended, onBlockedTransit
   const handleTransitionEnter = useCallback(
     (transition: MapObject) => {
       if (!transition.refId) return;
-      const blockedMessage = getBlockedMessage(transition.refId, useQuestStore.getState().progress);
+      const blockedMessage = getBlockedMessage(transition.refId, useQuestStore.getState().progress, locationId);
       if (blockedMessage) {
         onBlockedTransition?.(blockedMessage);
         return;
@@ -97,7 +97,7 @@ export function useLocationExploration({ locationId, suspended, onBlockedTransit
         goTo(scene, { locationId: transition.refId, spawnId: transition.targetSpawnId });
       }
     },
-    [goTo, onBlockedTransition],
+    [goTo, onBlockedTransition, locationId],
   );
 
   return {

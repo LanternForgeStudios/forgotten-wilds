@@ -98,6 +98,18 @@ const LOCATION_GATES: Record<string, string> = {
   'hall-of-memories': 'hall-of-eternal-winter',
 };
 
+/** Per-transition gates, on top of LOCATION_GATES above - for a specific `from -> to` door that
+ *  needs to stay locked even though `to` itself is otherwise open. `from` is checked against
+ *  `save.player.currentLocationId`, which is already authoritative server state (set by this same
+ *  function on every prior location entry) - no extra client-supplied param needed. Kept in sync by
+ *  hand with the client-side copy in src/utils/locationGates.ts. */
+const TRANSITION_GATES: Array<{ from: string; to: string; requiredQuestId: string }> = [
+  // The Mine Office's door opens straight onto Hollow Rail Mine right next to the Coalbound
+  // Warden's chamber - without this, it's a shortcut past the entire dungeon (shrine, Echoes, and
+  // the boss room itself) for anyone who reaches the office before finishing the mine the long way.
+  { from: 'ash-hallow-mine-office', to: 'hollow-rail-mine', requiredQuestId: 'the-coalbound-warden' },
+];
+
 const KNOWN_LOCATION_IDS = new Set([
   'ash-hallow',
   'ironwood-trail',
@@ -228,6 +240,11 @@ export const enterLocation = onCall<EnterLocationRequest>({ enforceAppCheck: ENF
 
     const requiredQuestId = LOCATION_GATES[locationId];
     if (requiredQuestId && save.quests[requiredQuestId]?.status !== 'completed') {
+      throw new HttpsError('failed-precondition', "The way isn't open to you yet.");
+    }
+
+    const transitionGate = TRANSITION_GATES.find((g) => g.from === save.player.currentLocationId && g.to === locationId);
+    if (transitionGate && save.quests[transitionGate.requiredQuestId]?.status !== 'completed') {
       throw new HttpsError('failed-precondition', "The way isn't open to you yet.");
     }
 

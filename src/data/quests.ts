@@ -211,7 +211,7 @@ export const QUESTS: Quest[] = [
     prerequisiteQuestId: 'embers-that-never-faded',
     objectives: [
       { id: 'clear-wraiths', type: 'defeatEnemies', description: 'Defeat 2 Echoes guarding the shrine.', targetId: 'coal-wraith', requiredCount: 2 },
-      { id: 'restore-mine-shrine', type: 'interactWithShrine', description: 'Restore the shrine deep in the mine.', targetId: 'mine-shrine', requiredCount: 1 },
+      { id: 'restore-mine-shrine', type: 'interactWithShrine', description: 'Restore the shrine deep in the mine.', targetId: 'mine-shrine', requiredCount: 1, requiresObjectiveIds: ['clear-wraiths'] },
     ],
     reward: { xp: 30, gold: 20 },
   },
@@ -780,7 +780,7 @@ export const QUESTS: Quest[] = [
     objectives: [
       { id: 'talk-elowen-final', type: 'talkToNpc', description: 'Report to Archivist Elowen.', targetId: 'archivist-elowen', requiredCount: 1 },
       { id: 'clear-sanctuary-entrance', type: 'defeatEnemies', description: 'Clear the corrupted Echoes guarding the Sanctuary gate.', targetId: 'corrupted-echo', requiredCount: 2 },
-      { id: 'restore-sanctuary-gate', type: 'interactWithShrine', description: "Restore the Sanctuary's ancient gate mechanism.", targetId: 'heartwood-sanctuary-gate', requiredCount: 1 },
+      { id: 'restore-sanctuary-gate', type: 'interactWithShrine', description: "Restore the Sanctuary's ancient gate mechanism.", targetId: 'heartwood-sanctuary-gate', requiredCount: 1, requiresObjectiveIds: ['clear-sanctuary-entrance'] },
     ],
     reward: { xp: 70, gold: 35, regionalReputation: 40, grantLoreId: 'lore-heartwood-sanctuary-gate' },
   },
